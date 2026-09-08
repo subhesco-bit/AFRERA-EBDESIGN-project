@@ -15,8 +15,8 @@ router.post('/profiles/:id/skills', controller.addSkill);
 router.post('/profiles/:id/enrich', controller.enrichProfile);
 router.get('/profiles/:id/completeness', controller.analyzeProfileCompleteness);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

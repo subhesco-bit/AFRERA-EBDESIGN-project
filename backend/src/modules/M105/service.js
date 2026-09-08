@@ -26,7 +26,7 @@ async function registerFleetVehicle(vehicleData) {
       location,
       state,
       district,
-      status
+      status,
     } = vehicleData;
 
     const vehicle = {
@@ -45,7 +45,7 @@ async function registerFleetVehicle(vehicleData) {
       state,
       district,
       status: status || 'available',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered fleet optimization
@@ -56,8 +56,8 @@ async function registerFleetVehicle(vehicleData) {
         fleet_requirements: await getFleetRequirements(vehicle_type),
         operational_patterns: await getOperationalPatterns(state, district),
         cost_analysis: await analyzeOperationalCost(vehicle_type, fuel_type),
-        utilization_potential: await assessUtilizationPotential(vehicle_type, state)
-      }
+        utilization_potential: await assessUtilizationPotential(vehicle_type, state),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -87,8 +87,8 @@ async function registerFleetVehicle(vehicleData) {
         vehicle.district,
         vehicle.status,
         JSON.stringify(vehicle.ai_recommendations),
-        vehicle.created_at
-      ]
+        vehicle.created_at,
+      ],
     );
 
     logger.info(`Fleet vehicle registered: ${vehicle.fleet_vehicle_id}`);
@@ -112,7 +112,7 @@ async function createDispatchSchedule(dispatchData) {
       end_time,
       cargo_details,
       destination,
-      priority
+      priority,
     } = dispatchData;
 
     const dispatch = {
@@ -126,7 +126,7 @@ async function createDispatchSchedule(dispatchData) {
       destination,
       priority: priority || 'normal',
       status: 'scheduled',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered dispatch optimization
@@ -137,8 +137,8 @@ async function createDispatchSchedule(dispatchData) {
         route_optimization: await optimizeRoute(route_id, destination),
         traffic_conditions: await getTrafficConditions(route_id),
         fuel_efficiency: await calculateFuelEfficiency(vehicle_id, route_id),
-        time_estimates: await getTimeEstimates(route_id, start_time)
-      }
+        time_estimates: await getTimeEstimates(route_id, start_time),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -162,8 +162,8 @@ async function createDispatchSchedule(dispatchData) {
         dispatch.priority,
         dispatch.status,
         JSON.stringify(dispatch.ai_optimization),
-        dispatch.created_at
-      ]
+        dispatch.created_at,
+      ],
     );
 
     logger.info(`Dispatch scheduled: ${dispatch.dispatch_id}`);
@@ -188,7 +188,7 @@ async function trackFleetPerformance(vehicleId, period) {
       on_time_delivery: await getOnTimeDelivery(vehicleId, period),
       fuel_efficiency: await getFuelEfficiency(vehicleId, period),
       operational_cost: await getOperationalCost(vehicleId, period),
-      recommendations: await generatePerformanceRecommendations(vehicleId, period)
+      recommendations: await generatePerformanceRecommendations(vehicleId, period),
     };
 
     return performance;
@@ -213,7 +213,7 @@ async function generateFleetReport(farmerId, reportType) {
       utilization_rate: await getUtilizationRate(farmerId),
       cost_analysis: await getCostAnalysis(farmerId),
       efficiency_metrics: await getEfficiencyMetrics(farmerId),
-      recommendations: await generateFleetRecommendations(farmerId)
+      recommendations: await generateFleetRecommendations(farmerId),
     };
 
     return report;
@@ -231,7 +231,7 @@ async function getFleetRequirements(vehicleType) {
   return {
     minimum_capacity: 2000,
     fuel_efficiency_target: 8,
-    maintenance_interval: 5000
+    maintenance_interval: 5000,
   };
 }
 
@@ -239,7 +239,7 @@ async function getOperationalPatterns(state, district) {
   return {
     peak_hours: ['06:00-10:00', '14:00-18:00'],
     seasonal_demand: 'high',
-    typical_routes: ['local', 'regional']
+    typical_routes: ['local', 'regional'],
   };
 }
 
@@ -247,7 +247,7 @@ async function analyzeOperationalCost(vehicleType, fuelType) {
   return {
     fuel_cost_per_km: fuelType === 'diesel' ? 8 : 10,
     maintenance_cost_per_km: 2,
-    driver_cost_per_hour: 200
+    driver_cost_per_hour: 200,
   };
 }
 
@@ -255,7 +255,7 @@ async function assessUtilizationPotential(vehicleType, state) {
   return {
     potential: 'high',
     utilization_target: 80,
-    rental_opportunities: 10
+    rental_opportunities: 10,
   };
 }
 
@@ -263,7 +263,7 @@ async function optimizeRoute(routeId, destination) {
   return {
     optimized_route: 'highway',
     estimated_distance: 50,
-    estimated_time: 60
+    estimated_time: 60,
   };
 }
 
@@ -271,14 +271,14 @@ async function getTrafficConditions(routeId) {
   return {
     current_traffic: 'moderate',
     peak_traffic: 'high',
-    best_departure_time: '06:00'
+    best_departure_time: '06:00',
   };
 }
 
 async function calculateFuelEfficiency(vehicleId, routeId) {
   return {
     estimated_consumption: 8,
-    efficiency_rating: 'good'
+    efficiency_rating: 'good',
   };
 }
 
@@ -286,7 +286,7 @@ async function getTimeEstimates(routeId, startTime) {
   return {
     estimated_duration: 60,
     buffer_time: 15,
-    confidence: 85
+    confidence: 85,
   };
 }
 
@@ -295,7 +295,7 @@ async function getDispatchCount(vehicleId, period) {
     total_dispatches: 50,
     completed: 45,
     in_progress: 3,
-    pending: 2
+    pending: 2,
   };
 }
 
@@ -303,7 +303,7 @@ async function getOnTimeDelivery(vehicleId, period) {
   return {
     on_time_rate: 92,
     delayed: 4,
-    early: 4
+    early: 4,
   };
 }
 
@@ -311,7 +311,7 @@ async function getFuelEfficiency(vehicleId, period) {
   return {
     average_consumption: 7.5,
     efficiency_rating: 'excellent',
-    cost_savings: 10
+    cost_savings: 10,
   };
 }
 
@@ -320,7 +320,7 @@ async function getOperationalCost(vehicleId, period) {
     total_cost: 50000,
     fuel_cost: 30000,
     maintenance_cost: 10000,
-    driver_cost: 10000
+    driver_cost: 10000,
   };
 }
 
@@ -328,7 +328,7 @@ async function generatePerformanceRecommendations(vehicleId, period) {
   return [
     'Optimize departure times to avoid peak traffic',
     'Implement route optimization algorithms',
-    'Monitor fuel consumption patterns'
+    'Monitor fuel consumption patterns',
   ];
 }
 
@@ -336,7 +336,7 @@ async function getTotalVehicles(farmerId) {
   try {
     const result = await pool.query(
       'SELECT COUNT(*) as count FROM fleet_vehicles WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -350,7 +350,7 @@ async function getTotalDispatches(farmerId) {
       `SELECT COUNT(*) as count FROM fleet_dispatches fd
        JOIN fleet_vehicles fv ON fd.vehicle_id = fv.fleet_vehicle_id
        WHERE fv.farmer_id = $1`,
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -362,7 +362,7 @@ async function getUtilizationRate(farmerId) {
   return {
     average_utilization: 75,
     peak_utilization: 90,
-    off_peak_utilization: 50
+    off_peak_utilization: 50,
   };
 }
 
@@ -370,7 +370,7 @@ async function getCostAnalysis(farmerId) {
   return {
     total_cost: 200000,
     cost_per_dispatch: 400,
-    cost_per_km: 15
+    cost_per_km: 15,
   };
 }
 
@@ -378,7 +378,7 @@ async function getEfficiencyMetrics(farmerId) {
   return {
     on_time_delivery_rate: 90,
     fuel_efficiency_score: 85,
-    customer_satisfaction: 92
+    customer_satisfaction: 92,
   };
 }
 
@@ -386,7 +386,7 @@ async function generateFleetRecommendations(farmerId) {
   return [
     'Implement predictive maintenance',
     'Use AI for route optimization',
-    'Consider vehicle sharing during off-peak'
+    'Consider vehicle sharing during off-peak',
   ];
 }
 
@@ -394,6 +394,6 @@ module.exports = {
   registerFleetVehicle,
   createDispatchSchedule,
   trackFleetPerformance,
-  generateFleetReport
+  generateFleetReport,
 };
 

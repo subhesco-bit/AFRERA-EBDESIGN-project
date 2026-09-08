@@ -1,6 +1,6 @@
 # API UI/UX Enhancement Summary
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Date:** 30 August 2026  
 **Scope:** Comprehensive API UI/UX enhancement to highest production level
 

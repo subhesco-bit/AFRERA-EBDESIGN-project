@@ -45,7 +45,7 @@ async function getTokens(theme = 'base', { resolve = true } = {}) {
        FROM design_tokens
       WHERE theme = $1 OR theme = 'base'
       ORDER BY category, token_key`,
-    [theme]
+    [theme],
   );
   if (!resolve) return { theme, tokens: rows, count: rows.length };
 
@@ -77,11 +77,11 @@ async function getTokens(theme = 'base', { resolve = true } = {}) {
     tokens: resolved,
     count: resolved.length,
     broken,
-    note: broken.length
-      ? `${broken.length} token(s) reference something that does not exist or form a cycle. `
-      + 'These resolve to null rather than a fallback colour — a silent fallback is how a '
-      + 'broken token ships looking fine.'
-      : null,
+    note: broken.length ?
+      `${broken.length} token(s) reference something that does not exist or form a cycle. ` +
+      'These resolve to null rather than a fallback colour — a silent fallback is how a ' +
+      'broken token ships looking fine.' :
+      null,
   };
 }
 
@@ -98,7 +98,7 @@ async function upsertToken(t) {
        description = EXCLUDED.description
      RETURNING *`,
     [t.tokenKey, t.category, t.value, t.referencesToken ?? null,
-      t.theme ?? 'base', t.description ?? null]
+      t.theme ?? 'base', t.description ?? null],
   );
   return rows[0];
 }
@@ -109,16 +109,16 @@ async function upsertToken(t) {
 
 async function listThemes() {
   const { rows } = await pool.query(
-    'SELECT * FROM ui_themes WHERE enabled ORDER BY is_default DESC, theme_key'
+    'SELECT * FROM ui_themes WHERE enabled ORDER BY is_default DESC, theme_key',
   );
   return {
     themes: rows,
     unverified: rows.filter((t) => !t.contrast_verified_on).map((t) => t.theme_key),
-    note: rows.some((t) => !t.contrast_verified_on)
-      ? 'Some themes have never had their contrast verified. A dark theme built by '
-      + 'inverting a light one routinely lands at 2:1 against its background, which '
-      + 'fails WCAG AA and is unreadable for a lot of people.'
-      : null,
+    note: rows.some((t) => !t.contrast_verified_on) ?
+      'Some themes have never had their contrast verified. A dark theme built by ' +
+      'inverting a light one routinely lands at 2:1 against its background, which ' +
+      'fails WCAG AA and is unreadable for a lot of people.' :
+      null,
   };
 }
 
@@ -156,11 +156,11 @@ function checkContrast(foreground, background, { largeText = false } = {}) {
     passesAAA: ratio >= aaa,
     requiredAA: aa,
     verdict: ratio >= aaa ? 'AAA' : ratio >= aa ? 'AA' : 'fails AA',
-    note: ratio < aa
-      ? `${ratio}:1 is below the ${aa}:1 needed for ${largeText ? 'large' : 'body'} text. `
-      + 'This is not a preference — it is unreadable for people with low vision, which '
-      + 'is a large share of an older farming population.'
-      : null,
+    note: ratio < aa ?
+      `${ratio}:1 is below the ${aa}:1 needed for ${largeText ? 'large' : 'body'} text. ` +
+      'This is not a preference — it is unreadable for people with low vision, which ' +
+      'is a large share of an older farming population.' :
+      null,
   };
 }
 
@@ -173,7 +173,7 @@ async function breakpointFor(widthPx) {
     `SELECT * FROM ui_breakpoints
       WHERE min_width_px <= $1 AND (max_width_px IS NULL OR max_width_px >= $1)
       ORDER BY min_width_px DESC LIMIT 1`,
-    [Number(widthPx) || 0]
+    [Number(widthPx) || 0],
   );
   return rows[0] ?? null;
 }
@@ -203,10 +203,10 @@ async function getMotion({ reducedMotion = false } = {}) {
       // tells the user nothing is happening.
       retainedUnderReducedMotion: p.reduced_motion_duration_ms > 0,
     })),
-    note: reducedMotion
-      ? 'Durations already reduced server-side. Presets with a non-zero reduced duration '
-      + 'are retained deliberately: they carry information rather than decoration.'
-      : null,
+    note: reducedMotion ?
+      'Durations already reduced server-side. Presets with a non-zero reduced duration ' +
+      'are retained deliberately: they carry information rather than decoration.' :
+      null,
   };
 }
 
@@ -220,15 +220,15 @@ async function listComponents({ status, category } = {}) {
       WHERE ($1::text IS NULL OR status = $1)
         AND ($2::text IS NULL OR category = $2)
       ORDER BY category, component_key`,
-    [status ?? null, category ?? null]
+    [status ?? null, category ?? null],
   );
   return {
     components: rows,
     stable: rows.filter((c) => c.status === 'stable').length,
-    note: rows.length === 0
-      ? 'No components registered. The library exists in files but has not been catalogued, '
-      + 'so nothing can report on its accessibility contract.'
-      : null,
+    note: rows.length === 0 ?
+      'No components registered. The library exists in files but has not been catalogued, ' +
+      'so nothing can report on its accessibility contract.' :
+      null,
   };
 }
 
@@ -236,12 +236,12 @@ async function registerComponent(c) {
   if (!c.componentKey || !c.displayName || !c.category) {
     throw new Error('componentKey, displayName and category are required');
   }
-  if (c.status === 'stable'
-      && !(c.keyboardOperable && c.screenReaderLabelled && c.focusVisible)) {
+  if (c.status === 'stable' &&
+      !(c.keyboardOperable && c.screenReaderLabelled && c.focusVisible)) {
     throw new Error(
-      'A component cannot be marked stable until it is keyboard-operable, labelled for '
-      + 'screen readers and shows a visible focus ring. Promoting it first makes it a '
-      + 'dependency of every screen that uses it.'
+      'A component cannot be marked stable until it is keyboard-operable, labelled for ' +
+      'screen readers and shows a visible focus ring. Promoting it first makes it a ' +
+      'dependency of every screen that uses it.',
     );
   }
   const { rows } = await pool.query(
@@ -259,7 +259,7 @@ async function registerComponent(c) {
     [c.componentKey, c.displayName, c.category, c.filePath ?? null,
       Boolean(c.keyboardOperable), Boolean(c.screenReaderLabelled),
       Boolean(c.focusVisible), c.wcagLevel ?? null, c.states ?? [],
-      c.variants ?? [], c.usesTokens ?? [], c.status ?? 'draft']
+      c.variants ?? [], c.usesTokens ?? [], c.status ?? 'draft'],
   );
   return rows[0];
 }
@@ -273,8 +273,8 @@ async function recordConformance(r) {
     throw new Error('surface, wcagCriterion, level and status are required');
   }
   if (r.status === 'fail' && !r.finding) {
-    throw new Error('A failure must record what failed — a bare "fail" tells the next '
-                  + 'person nothing about what to fix');
+    throw new Error('A failure must record what failed — a bare "fail" tells the next ' +
+                  'person nothing about what to fix');
   }
   const { rows } = await pool.query(
     `INSERT INTO a11y_conformance
@@ -285,7 +285,7 @@ async function recordConformance(r) {
        status = EXCLUDED.status, finding = EXCLUDED.finding
      RETURNING *`,
     [r.surface, r.surfaceType ?? 'page', r.wcagCriterion, r.level, r.status,
-      r.verifiedBy ?? 'automated', r.tool ?? null, r.finding ?? null, r.remediation ?? null]
+      r.verifiedBy ?? 'automated', r.tool ?? null, r.finding ?? null, r.remediation ?? null],
   );
   return rows[0];
 }
@@ -297,11 +297,11 @@ async function conformanceSummary() {
     surfaces: rows,
     failing: rows.filter((r) => r.standing === 'failing').length,
     automatedOnly: automatedOnly.length,
-    note: automatedOnly.length
-      ? `${automatedOnly.length} surface(s) have only automated checks. Automated tooling `
-      + 'catches roughly a third of WCAG issues, so "all checks pass" is not a conformance '
-      + 'claim — it is the absence of the third that a machine can see.'
-      : null,
+    note: automatedOnly.length ?
+      `${automatedOnly.length} surface(s) have only automated checks. Automated tooling ` +
+      'catches roughly a third of WCAG issues, so "all checks pass" is not a conformance ' +
+      'claim — it is the absence of the third that a machine can see.' :
+      null,
   };
 }
 
@@ -311,7 +311,7 @@ async function conformanceSummary() {
 
 async function getPreferences(userId) {
   const { rows } = await pool.query(
-    'SELECT * FROM user_experience_preferences WHERE user_id = $1', [userId]
+    'SELECT * FROM user_experience_preferences WHERE user_id = $1', [userId],
   );
   return rows[0] ?? null;
 }
@@ -337,7 +337,7 @@ async function savePreferences(userId, p) {
     [userId, p.themeKey ?? null, p.reducedMotion ?? null, p.highContrast ?? null,
       p.fontScale ?? 1.0, p.screenReaderInUse ?? null, p.language ?? 'en',
       p.density ?? 'comfortable', Boolean(p.dataSaver),
-      p.dashboardLayout ? JSON.stringify(p.dashboardLayout) : null]
+      p.dashboardLayout ? JSON.stringify(p.dashboardLayout) : null],
   );
   return rows[0];
 }
@@ -366,8 +366,8 @@ async function resolveExperience({ userId, viewportWidthPx, prefersReducedMotion
     overrides.push('reduced motion applied from the OS setting (no stored preference)');
   }
 
-  let themeKey = prefs?.theme_key
-    ?? (prefersDark ? 'dark' : 'light');
+  let themeKey = prefs?.theme_key ??
+    (prefersDark ? 'dark' : 'light');
 
   if (prefs?.high_contrast) {
     themeKey = 'high_contrast';
@@ -387,7 +387,7 @@ async function resolveExperience({ userId, viewportWidthPx, prefersReducedMotion
   const dataSaver = Boolean(prefs?.data_saver);
   const { rows: media } = await pool.query(
     'SELECT * FROM media_delivery_profiles WHERE for_data_saver = $1 OR $1 = FALSE',
-    [dataSaver]
+    [dataSaver],
   );
 
   return {
@@ -403,10 +403,10 @@ async function resolveExperience({ userId, viewportWidthPx, prefersReducedMotion
     dataSaver,
     mediaProfiles: dataSaver ? media.filter((m) => m.for_data_saver) : media,
     overrides,
-    note: overrides.length
-      ? 'Accessibility preferences were applied over the theme. These are not cosmetic '
-      + 'settings and the client must not re-apply what they replaced.'
-      : null,
+    note: overrides.length ?
+      'Accessibility preferences were applied over the theme. These are not cosmetic ' +
+      'settings and the client must not re-apply what they replaced.' :
+      null,
   };
 }
 
@@ -416,7 +416,7 @@ async function resolveExperience({ userId, viewportWidthPx, prefersReducedMotion
 
 async function feedbackFor(eventKey) {
   const { rows } = await pool.query(
-    'SELECT * FROM ui_feedback_rules WHERE event_key = $1 AND enabled', [eventKey]
+    'SELECT * FROM ui_feedback_rules WHERE event_key = $1 AND enabled', [eventKey],
   );
   if (!rows.length) return null;
   const r = rows[0];
@@ -439,3 +439,4 @@ module.exports = {
   resolveExperience,
   feedbackFor,
 };
+

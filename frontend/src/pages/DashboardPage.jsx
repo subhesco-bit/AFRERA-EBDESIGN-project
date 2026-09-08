@@ -1,10 +1,10 @@
-import { useAuthStore } from '../store/authStore'
-import { useQuery } from '@tanstack/react-query'
-import { analyticsAPI, ordersAPI, farmersAPI, financialAPI } from '../services/api'
-import { ShoppingCart, Package, TrendingUp, DollarSign, Leaf, Award, Sparkles } from 'lucide-react'
+import { useAuthStore } from '../store/authStore';
+import { useQuery } from '@tanstack/react-query';
+import { analyticsAPI, ordersAPI, farmersAPI, financialAPI } from '../services/api';
+import { ShoppingCart, Package, TrendingUp, DollarSign, Leaf, Award, Sparkles } from 'lucide-react';
 
 function DashboardPage() {
-  const { user } = useAuthStore()
+  const { user } = useAuthStore();
 
   // Every query here used a v3/v4 signature (bare string key, or a 3-arg
   // (key, fn, options) call) that @tanstack/react-query v5 (installed)
@@ -15,28 +15,28 @@ function DashboardPage() {
   const { data: orders } = useQuery({
     queryKey: ['user-orders'],
     queryFn: () => ordersAPI.getOrders({}, { page: 1, limit: 5 }).then((r) => r.data),
-  })
+  });
 
   const { data: creditScore } = useQuery({
     queryKey: ['credit-score', user?.id],
     queryFn: () => financialAPI.getCreditScore(user?.id).then((r) => r.data),
-    enabled: !!user?.id && user?.role === 'farmer',
-  })
+    enabled: Boolean(user?.id) && user?.role === 'farmer',
+  });
 
   const { data: farmerData } = useQuery({
     queryKey: ['farmer', user?.id],
     queryFn: () => farmersAPI.getFarmer(user?.id).then((r) => r.data),
-    enabled: !!user?.id && user?.role === 'farmer',
-  })
+    enabled: Boolean(user?.id) && user?.role === 'farmer',
+  });
 
   const { data: analyticsData } = useQuery({
     queryKey: ['dashboard-analytics'],
     queryFn: () => analyticsAPI.getOverview().then((r) => r.data),
-  })
+  });
   const analytics = analyticsData?.analytics || {
     totals: { forms: 0, submissions: 0, activeForms: 0, draftForms: 0, approvalReady: 0 },
-    recommendations: []
-  }
+    recommendations: [],
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -214,7 +214,7 @@ function DashboardPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default DashboardPage
+export default DashboardPage;

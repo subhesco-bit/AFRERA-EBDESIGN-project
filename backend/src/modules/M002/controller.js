@@ -55,5 +55,5 @@ module.exports = {
   getConfiguration,
   updateConfiguration,
   bulkUpdateConfigurations,
-  getConfigurationHistory
+  getConfigurationHistory,
 };

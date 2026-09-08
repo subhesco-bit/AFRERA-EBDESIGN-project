@@ -1,6 +1,6 @@
 /**
  * Shared Infrastructure Access Service
- * 
+ *
  * Enterprise-grade shared infrastructure management service with AI integration.
  * Wires the existing `shared_infrastructure_access` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for shared resource management with:
@@ -29,14 +29,14 @@ const aiInsightsCache = new Map();
 async function getSharedInfrastructureAccess(accessId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM shared_infrastructure_access WHERE access_id = $1`,
-      [accessId]
+      'SELECT * FROM shared_infrastructure_access WHERE access_id = $1',
+      [accessId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Shared infrastructure access not found: ${accessId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get shared infrastructure access: ${error.message}`);
@@ -52,10 +52,10 @@ async function getSharedInfrastructureAccess(accessId) {
 async function getSharedInfrastructureAccessByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM shared_infrastructure_access WHERE village_id = $1 ORDER BY infrastructure_type`,
-      [villageId]
+      'SELECT * FROM shared_infrastructure_access WHERE village_id = $1 ORDER BY infrastructure_type',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get shared infrastructure access by village: ${error.message}`);
@@ -71,10 +71,10 @@ async function getSharedInfrastructureAccessByVillage(villageId) {
 async function getSharedInfrastructureAccessByType(infrastructureType) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM shared_infrastructure_access WHERE infrastructure_type = $1 ORDER BY village_id`,
-      [infrastructureType]
+      'SELECT * FROM shared_infrastructure_access WHERE infrastructure_type = $1 ORDER BY village_id',
+      [infrastructureType],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get shared infrastructure access by type: ${error.message}`);
@@ -100,7 +100,7 @@ async function upsertSharedInfrastructureAccess(access) {
       annual_usage_hours,
       cost_sharing_model,
       maintenance_contribution,
-      last_updated
+      last_updated,
     } = access;
 
     const { rows } = await pool.query(
@@ -123,8 +123,8 @@ async function upsertSharedInfrastructureAccess(access) {
          last_updated = NOW()
        RETURNING *`,
       [access_id, village_id, district, infrastructure_type, infrastructure_id,
-       access_level, usage_frequency, annual_usage_hours, cost_sharing_model,
-       maintenance_contribution]
+        access_level, usage_frequency, annual_usage_hours, cost_sharing_model,
+        maintenance_contribution],
     );
 
     logger.info(`Shared infrastructure access upserted: ${access_id}`);
@@ -153,7 +153,7 @@ async function getVillageInfrastructureSummary(villageId) {
        FROM shared_infrastructure_access
        WHERE village_id = $1
        GROUP BY infrastructure_type`,
-      [villageId]
+      [villageId],
     );
 
     return {
@@ -164,8 +164,8 @@ async function getVillageInfrastructureSummary(villageId) {
         totalUsageHours: row.total_usage_hours ? parseInt(row.total_usage_hours) : 0,
         avgUsageHours: row.avg_usage_hours ? r2(row.avg_usage_hours) : 0,
         fullAccessCount: parseInt(row.full_access_count),
-        partialAccessCount: parseInt(row.partial_access_count)
-      }))
+        partialAccessCount: parseInt(row.partial_access_count),
+      })),
     };
   } catch (error) {
     logger.error(`Failed to get village infrastructure summary: ${error.message}`);
@@ -181,26 +181,26 @@ async function getVillageInfrastructureSummary(villageId) {
 async function generateAIUsageOptimization(villageId) {
   try {
     const summary = await getVillageInfrastructureSummary(villageId);
-    
+
     // AI-powered analysis (simulated for demonstration)
     const recommendations = {
       villageId,
       generatedAt: new Date().toISOString(),
       insights: [],
-      recommendations: []
+      recommendations: [],
     };
 
     // Analyze usage patterns
     summary.infrastructureTypes.forEach(inf => {
       const utilizationRate = inf.totalUsageHours / (inf.accessCount * 8760); // Hours per year
-      
+
       if (utilizationRate < 0.3) {
         recommendations.recommendations.push({
           infrastructureType: inf.infrastructureType,
           issue: 'Underutilization',
           severity: 'medium',
           recommendation: 'Consider sharing with neighboring villages to improve utilization',
-          potentialSavings: `${r2((1 - utilizationRate) * 100)}% cost reduction`
+          potentialSavings: `${r2((1 - utilizationRate) * 100)}% cost reduction`,
         });
       } else if (utilizationRate > 0.8) {
         recommendations.recommendations.push({
@@ -208,22 +208,22 @@ async function generateAIUsageOptimization(villageId) {
           issue: 'Overutilization',
           severity: 'high',
           recommendation: 'Consider capacity expansion or additional infrastructure',
-          urgency: 'Immediate action required'
+          urgency: 'Immediate action required',
         });
       }
 
       recommendations.insights.push({
         infrastructureType: inf.infrastructureType,
-        utilizationRate: r2(utilizationRate * 100) + '%',
+        utilizationRate: `${r2(utilizationRate * 100) }%`,
         accessCount: inf.accessCount,
         avgUsageHours: inf.avgUsageHours,
-        status: utilizationRate > 0.8 ? 'critical' : utilizationRate < 0.3 ? 'underutilized' : 'optimal'
+        status: utilizationRate > 0.8 ? 'critical' : utilizationRate < 0.3 ? 'underutilized' : 'optimal',
       });
     });
 
     // Cache the insights
     aiInsightsCache.set(`${villageId}-${Date.now()}`, recommendations);
-    
+
     return recommendations;
   } catch (error) {
     logger.error(`Failed to generate AI usage optimization: ${error.message}`);
@@ -239,36 +239,36 @@ async function generateAIUsageOptimization(villageId) {
 async function generatePredictiveMaintenance(infrastructureType) {
   try {
     const accessRecords = await getSharedInfrastructureAccessByType(infrastructureType);
-    
+
     const schedule = {
       infrastructureType,
       generatedAt: new Date().toISOString(),
-      maintenanceSchedule: []
+      maintenanceSchedule: [],
     };
 
     // AI-powered predictive maintenance (simulated)
     const avgUsageHours = accessRecords.reduce((sum, r) => sum + (r.annual_usage_hours || 0), 0) / accessRecords.length;
-    
+
     if (avgUsageHours > 3000) {
       schedule.maintenanceSchedule.push({
         priority: 'high',
         recommendedDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         action: 'Comprehensive inspection',
-        reason: 'High usage hours detected'
+        reason: 'High usage hours detected',
       });
     } else if (avgUsageHours > 2000) {
       schedule.maintenanceSchedule.push({
         priority: 'medium',
         recommendedDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         action: 'Routine maintenance',
-        reason: 'Moderate usage hours'
+        reason: 'Moderate usage hours',
       });
     } else {
       schedule.maintenanceSchedule.push({
         priority: 'low',
         recommendedDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
         action: 'Scheduled inspection',
-        reason: 'Normal usage pattern'
+        reason: 'Normal usage pattern',
       });
     }
 
@@ -296,7 +296,7 @@ async function getCostSharingAnalytics(district) {
        FROM shared_infrastructure_access
        WHERE district = $1
        GROUP BY infrastructure_type, cost_sharing_model`,
-      [district]
+      [district],
     );
 
     return {
@@ -307,8 +307,8 @@ async function getCostSharingAnalytics(district) {
         costSharingModel: row.cost_sharing_model,
         villageCount: parseInt(row.village_count),
         avgUsageHours: r2(row.avg_usage),
-        totalContribution: row.total_contribution ? parseFloat(row.total_contribution) : 0
-      }))
+        totalContribution: row.total_contribution ? parseFloat(row.total_contribution) : 0,
+      })),
     };
   } catch (error) {
     logger.error(`Failed to get cost sharing analytics: ${error.message}`);
@@ -324,11 +324,11 @@ async function getCostSharingAnalytics(district) {
 async function getResourceAllocationRecommendations(villageId) {
   try {
     const accessRecords = await getSharedInfrastructureAccessByVillage(villageId);
-    
+
     const recommendations = {
       villageId,
       generatedAt: new Date().toISOString(),
-      recommendations: []
+      recommendations: [],
     };
 
     // AI-powered allocation analysis
@@ -340,7 +340,7 @@ async function getResourceAllocationRecommendations(villageId) {
           currentAccess: 'partial',
           recommendedAccess: 'full',
           reason: 'High usage hours suggest need for full access',
-          potentialBenefit: 'Improved operational efficiency'
+          potentialBenefit: 'Improved operational efficiency',
         });
       }
 
@@ -351,7 +351,7 @@ async function getResourceAllocationRecommendations(villageId) {
           currentModel: 'usage-based',
           recommendedModel: 'fixed',
           reason: 'Daily usage suggests fixed cost model may be more economical',
-          potentialSavings: 'Estimated 15-20% cost reduction'
+          potentialSavings: 'Estimated 15-20% cost reduction',
         });
       }
     });
@@ -500,5 +500,6 @@ module.exports = {
   getSharedInfrastructureAccessByType,
   upsertSharedInfrastructureAccess,
   getVillageInfrastructureSummary,
-  setupRoutes
+  setupRoutes,
 };
+

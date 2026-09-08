@@ -13,7 +13,7 @@ const TWILIO_CONFIG = {
   accountSid: process.env.TWILIO_ACCOUNT_SID,
   authToken: process.env.TWILIO_AUTH_TOKEN,
   fromNumber: process.env.TWILIO_PHONE_NUMBER,
-  voiceEnabled: process.env.TWILIO_VOICE_ENABLED === 'true'
+  voiceEnabled: process.env.TWILIO_VOICE_ENABLED === 'true',
 };
 
 // Initialize Twilio client.
@@ -49,13 +49,13 @@ const OTP_CONFIG = {
   maxAttempts: 3,
   resendCooldownSeconds: 60,
   voiceLanguageMap: {
-    'en': 'en-US',
-    'hi': 'hi-IN',
-    'as': 'as-IN',
-    'bn': 'bn-IN',
-    'mni': 'mni-IN',
-    'or': 'or-IN'
-  }
+    en: 'en-US',
+    hi: 'hi-IN',
+    as: 'as-IN',
+    bn: 'bn-IN',
+    mni: 'mni-IN',
+    or: 'or-IN',
+  },
 };
 
 /**
@@ -78,12 +78,12 @@ function hashOTP(otp) {
 async function sendSMSOTP(phoneNumber, otp, language = 'en') {
   try {
     const messageTemplates = {
-      'en': `Your AFRERA verification code is ${otp}. Valid for 10 minutes. Do not share this code.`,
-      'hi': `आपका AFRERA सत्यापन कोड ${otp} है। यह 10 मिनट के लिए वैध है। इस कोड को साझा न करें।`,
-      'as': `আপোনাৰ AFRERA সত্যাপন কোড ${otp}। ইয়াক ১০ মিনিটৰ বাবে বৈধ। এই কোডটো অন্যৰ সৈতে অংশীদাৰ কৰিব নাই।`,
-      'bn': `আপনার AFRERA যাচাইকরণ কোড ${otp}। এটি ১০ মিনিটের জন্য বৈধ। এই কোডটি অন্যের সাথে শেয়ার করবেন না।`,
-      'mni': `অতোয়ার আফ্ৰেৰা যাচাইকরণ কোড ${otp}। অদো ১০ মিনিটীগী কালত ওইবা। অসি কোড অদুগী অন্যতৈ শেয়ার করিবা ঙাইদোক।`,
-      'or': `ଆପଣଙ୍କର AFRERA ଯାଞ୍ଚ କୋଡ୍ ${otp}। ଏହା ୧୦ ମିନିଟ୍ ପାଇଁ ବୈଧ। ଏହି କୋଡ୍ ଅନ୍ୟ ସହିତ ସେୟାର କରନ୍ତୁ ନାହିଁ।`
+      en: `Your AFRERA verification code is ${otp}. Valid for 10 minutes. Do not share this code.`,
+      hi: `आपका AFRERA सत्यापन कोड ${otp} है। यह 10 मिनट के लिए वैध है। इस कोड को साझा न करें।`,
+      as: `আপোনাৰ AFRERA সত্যাপন কোড ${otp}। ইয়াক ১০ মিনিটৰ বাবে বৈধ। এই কোডটো অন্যৰ সৈতে অংশীদাৰ কৰিব নাই।`,
+      bn: `আপনার AFRERA যাচাইকরণ কোড ${otp}। এটি ১০ মিনিটের জন্য বৈধ। এই কোডটি অন্যের সাথে শেয়ার করবেন না।`,
+      mni: `অতোয়ার আফ্ৰেৰা যাচাইকরণ কোড ${otp}। অদো ১০ মিনিটীগী কালত ওইবা। অসি কোড অদুগী অন্যতৈ শেয়ার করিবা ঙাইদোক।`,
+      or: `ଆପଣଙ୍କର AFRERA ଯାଞ୍ଚ କୋଡ୍ ${otp}। ଏହା ୧୦ ମିନିଟ୍ ପାଇଁ ବୈଧ। ଏହି କୋଡ୍ ଅନ୍ୟ ସହିତ ସେୟାର କରନ୍ତୁ ନାହିଁ।`,
     };
 
     const message = messageTemplates[language] || messageTemplates['en'];
@@ -92,7 +92,7 @@ async function sendSMSOTP(phoneNumber, otp, language = 'en') {
       await twilioClient.messages.create({
         body: message,
         from: TWILIO_CONFIG.fromNumber,
-        to: phoneNumber
+        to: phoneNumber,
       });
       logger.info(`SMS OTP sent to ${phoneNumber}`);
     } else {
@@ -116,12 +116,12 @@ async function sendVoiceOTP(phoneNumber, otp, language = 'en') {
     }
 
     const voiceTemplate = {
-      'en': `Your AFRERA verification code is ${otp}. Repeat. ${otp}. This code expires in 10 minutes.`,
-      'hi': `आपका AFRERA सत्यापन कोड ${otp} है। दोहराना। ${otp}। यह कोड 10 मिनट में समाप्त हो जाएगा।`,
-      'as': `আপোনাৰ AFRERA সত্যাপন কোড ${otp}। পুনৰাবৃত্তি। ${otp}। এই কোডটো ১০ মিনিটত সমাপ্ত হ'ব।`,
-      'bn': `আপনার AFRERA যাচাইকরণ কোড ${otp}। পুনরাবৃত্তি। ${otp}। এই কোডটি ১০ মিনিটে মেয়াদ শেষ হবে।`,
-      'mni': `অতোয়ার আফ্ৰেৰা যাচাইকরণ কোড ${otp}। পুনরাবৃত্তি। ${otp}। অদো ১০ মিনিটীগী কালত মেয়াদ ওইবা।`,
-      'or': `ଆପଣଙ୍କର AFRERA ଯାଞ୍ଚ କୋଡ୍ ${otp}। ପୁନରାବୃତ୍ତି। ${otp}। ଏହି କୋଡ୍ ୧୦ ମିନିଟ୍ରେ ମିୟଦ ସରିବ।`
+      en: `Your AFRERA verification code is ${otp}. Repeat. ${otp}. This code expires in 10 minutes.`,
+      hi: `आपका AFRERA सत्यापन कोड ${otp} है। दोहराना। ${otp}। यह कोड 10 मिनट में समाप्त हो जाएगा।`,
+      as: `আপোনাৰ AFRERA সত্যাপন কোড ${otp}। পুনৰাবৃত্তি। ${otp}। এই কোডটো ১০ মিনিটত সমাপ্ত হ'ব।`,
+      bn: `আপনার AFRERA যাচাইকরণ কোড ${otp}। পুনরাবৃত্তি। ${otp}। এই কোডটি ১০ মিনিটে মেয়াদ শেষ হবে।`,
+      mni: `অতোয়ার আফ্ৰেৰা যাচাইকরণ কোড ${otp}। পুনরাবৃত্তি। ${otp}। অদো ১০ মিনিটীগী কালত মেয়াদ ওইবা।`,
+      or: `ଆପଣଙ୍କର AFRERA ଯାଞ୍ଚ କୋଡ୍ ${otp}। ପୁନରାବୃତ୍ତି। ${otp}। ଏହି କୋଡ୍ ୧୦ ମିନିଟ୍ରେ ମିୟଦ ସରିବ।`,
     };
 
     const message = voiceTemplate[language] || voiceTemplate['en'];
@@ -131,7 +131,7 @@ async function sendVoiceOTP(phoneNumber, otp, language = 'en') {
       await twilioClient.calls.create({
         twiml: `<Response><Say language="${twimlLanguage}">${message}</Say></Response>`,
         from: TWILIO_CONFIG.fromNumber,
-        to: phoneNumber
+        to: phoneNumber,
       });
       logger.info(`Voice OTP sent to ${phoneNumber}`);
     } else {
@@ -223,7 +223,7 @@ async function initiateSMSLogin(phoneNumber, language = 'en', useVoice = false) 
       phone_number: phoneNumber,
       expires_in_minutes: OTP_CONFIG.expiryMinutes,
       user_exists: true,
-      user_name: `${user.first_name} ${user.last_name}`.trim()
+      user_name: `${user.first_name} ${user.last_name}`.trim(),
     };
   } catch (error) {
     logger.error('SMS login initiation failed', { error: error.message, stack: error.stack });
@@ -263,7 +263,7 @@ async function verifySMSOTP(phoneNumber, otp) {
       // Increment attempt count
       await pg.query(
         'UPDATE sms_otps SET attempt_count = attempt_count + 1 WHERE id = $1',
-        [otpRecord.id]
+        [otpRecord.id],
       );
 
       if (otpRecord.attempt_count >= OTP_CONFIG.maxAttempts - 1) {
@@ -276,7 +276,7 @@ async function verifySMSOTP(phoneNumber, otp) {
     // Mark OTP as verified
     await pg.query(
       'UPDATE sms_otps SET verified = true, verified_at = NOW() WHERE id = $1',
-      [otpRecord.id]
+      [otpRecord.id],
     );
 
     // Get user
@@ -293,11 +293,11 @@ async function verifySMSOTP(phoneNumber, otp) {
     // Reset failed login attempts
     await pg.query(
       'UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = $1',
-      [user.id]
+      [user.id],
     );
 
     // Generate tokens
-    const authService = require('../dual-use/authService');
+    const authService = require('../../dual-use/authService');
     const accessToken = authService.generateAccessToken(user);
     const refreshToken = authService.generateRefreshToken(user);
 
@@ -315,12 +315,12 @@ async function verifySMSOTP(phoneNumber, otp) {
         profile: {
           first_name: user.first_name,
           last_name: user.last_name,
-          preferred_language: user.preferred_language
-        }
+          preferred_language: user.preferred_language,
+        },
       },
       accessToken,
       refreshToken,
-      expiresIn: '15m'
+      expiresIn: '15m',
     };
   } catch (error) {
     logger.error('SMS OTP verification failed', { error: error.message, stack: error.stack });
@@ -338,7 +338,7 @@ async function registerWithPhone(phoneNumber, userData, language = 'en') {
     // Check if phone already exists
     const existingPhone = await pg.query(
       'SELECT id FROM users WHERE phone = $1',
-      [phoneNumber]
+      [phoneNumber],
     );
 
     if (existingPhone.rows.length > 0) {
@@ -362,7 +362,7 @@ async function registerWithPhone(phoneNumber, userData, language = 'en') {
       JSON.stringify(userData),
       otpHash,
       expiresAt,
-      language
+      language,
     ]);
 
     // Send OTP
@@ -374,7 +374,7 @@ async function registerWithPhone(phoneNumber, userData, language = 'en') {
       success: true,
       message: 'OTP sent for verification',
       phone_number: phoneNumber,
-      expires_in_minutes: OTP_CONFIG.expiryMinutes
+      expires_in_minutes: OTP_CONFIG.expiryMinutes,
     };
   } catch (error) {
     logger.error('Phone registration failed', { error: error.message, stack: error.stack });
@@ -416,17 +416,17 @@ async function completePhoneRegistration(phoneNumber, otp) {
     // Mark registration as verified
     await pg.query(
       'UPDATE pending_registrations SET verified = true, verified_at = NOW() WHERE id = $1',
-      [registration.id]
+      [registration.id],
     );
 
     // Create user
     const userData = JSON.parse(registration.user_data);
-    const authService = require('../dual-use/authService');
+    const authService = require('../../dual-use/authService');
 
     const user = await authService.registerUser({
       ...userData,
       phone: phoneNumber,
-      status: 'active'
+      status: 'active',
     });
 
     logger.info(`Phone registration completed for ${phoneNumber}`);
@@ -478,15 +478,15 @@ const express = require('express');
 // require authMiddleware — you cannot be logged in before you log in. The
 // correct control is rate limiting: an unthrottled OTP /initiate is an SMS
 // bombing vector against a citizen's phone AND a direct cost attack on the
-// SMS gateway. authRateLimit is the strictest bucket available.
-const { authRateLimit } = require('../../middleware/rateLimiter');
+// SMS gateway. authLimiter is the strictest bucket available.
+const { authLimiter } = require('../../middleware/rateLimiter');
 const router = express.Router();
 
 /**
  * POST /api/v1/sms-auth/initiate
  * Initiate SMS-based login
  */
-router.post('/initiate', authRateLimit, async (req, res) => {
+router.post('/initiate', authLimiter, async (req, res) => {
   try {
     const { phone_number, language, use_voice } = req.body;
 
@@ -510,7 +510,7 @@ router.post('/initiate', authRateLimit, async (req, res) => {
  * POST /api/v1/sms-auth/verify
  * Verify SMS OTP
  */
-router.post('/verify', authRateLimit, async (req, res) => {
+router.post('/verify', authLimiter, async (req, res) => {
   try {
     const { phone_number, otp } = req.body;
 
@@ -530,7 +530,7 @@ router.post('/verify', authRateLimit, async (req, res) => {
  * POST /api/v1/sms-auth/register
  * Register user with phone number
  */
-router.post('/register', authRateLimit, async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
     const { phone_number, user_data, language } = req.body;
 
@@ -550,7 +550,7 @@ router.post('/register', authRateLimit, async (req, res) => {
  * POST /api/v1/sms-auth/complete-registration
  * Complete phone registration
  */
-router.post('/complete-registration', authRateLimit, async (req, res) => {
+router.post('/complete-registration', authLimiter, async (req, res) => {
   try {
     const { phone_number, otp } = req.body;
 
@@ -578,9 +578,9 @@ router.get('/languages', (req, res) => {
       { code: 'as', name: 'Assamese', native_name: 'অসমীয়া' },
       { code: 'bn', name: 'Bengali', native_name: 'বাংলা' },
       { code: 'mni', name: 'Manipuri', native_name: 'মৈতৈলোন্' },
-      { code: 'or', name: 'Odia', native_name: 'ଓଡ଼ିଆ' }
+      { code: 'or', name: 'Odia', native_name: 'ଓଡ଼ିଆ' },
     ],
-    voice_enabled: TWILIO_CONFIG.voiceEnabled
+    voice_enabled: TWILIO_CONFIG.voiceEnabled,
   });
 });
 
@@ -592,5 +592,6 @@ module.exports = {
   completePhoneRegistration,
   sendSMSOTP,
   sendVoiceOTP,
-  isHealthy
+  isHealthy,
 };
+

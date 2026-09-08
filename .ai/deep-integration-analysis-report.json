@@ -1,0 +1,3752 @@
+{
+  "services": {
+    "exported": 0,
+    "imported": 0,
+    "orphaned": [
+      {
+        "file": "backend\\src\\services\\yieldManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\websocketService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\weatherAdvisoryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\warehouseManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\walletService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\vrService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\videoAnalyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\unifiedConfigService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\transactionService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\supplyChainTrackingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\supplyChainAnalyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\subscriptionService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\soilHealthService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\sellerVerificationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\riskAssessmentService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\redisCacheService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\qualityAssuranceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\productionExampleService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\productCertificationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\priceForecastingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\predictiveIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\predictiveAnalyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\phase9.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\phase8.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\phase12.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\phase11.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\phase10.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\paymentService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\paymentGatewayService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\notificationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\nlpService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\moduleEventService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\mlOptimizationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\marketAnalyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\loggingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\loanManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\livestockService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\libraryKnowledgeService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\jobService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\jobQueueService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\iotSensorsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\iotIntegrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\horticultureService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\greenhouseService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\freightPoolingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\financialAnalyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\farmCostingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\farmAnalyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\etlService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\enterpriseIntegrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\digitalTwinService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\dietTherapyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\dataVisualizationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\dataValidationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\cropRecommendationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\complianceTrackingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\coldChainMonitoringService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\climateAdvisoryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\certificationManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\cacheService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\buyerTrustService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\bulkOrderService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\blockchainVerificationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\blockchainTraceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\biometricService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\batchProcessingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\automationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\auditTrailService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\auditService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\arService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\aiFeedbackService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\aiCollaborationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\aiApprovalService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\aiAgentService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\advancedVoiceAI.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\advancedSearchService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\advancedAnalyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\strategic\\preSeasonPurchaseService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\strategic\\householdProcurementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\strategic\\governmentSubsidyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\strategic\\contractFarmingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\wikipediaService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\whatsappService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\weatherService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\wearableIntegrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\waterManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\voiceAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\visionService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\villageProfileService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\vermicompostService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\valueCommerceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\v42IntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\tenantManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\systemAdministrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\subsidyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\soilTestingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\soilManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\smsAuthService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\shelfLifeService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\sheepService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\sharedInfrastructureService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\sharedInfraService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\sericultureService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\sellerRankingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\seedVaultService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\sapModuleArchitectureService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ruralFinanceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ruralEnterpriseService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\roleManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\riskPricingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\rfqService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\revenueService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\returnLoadBoardService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\resourceCrudFactory.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\researchAndDevelopmentService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\renewableEnergyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\regionalVarietyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\recoveredFinanceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\recipeIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\realtimeMonitoringService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\projectSystemsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\productService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\productReviewService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\productMediaAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\procurementSubscriptionService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\preventiveMaintenanceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\preSeasonOrderService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\predictiveAnalyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\poultryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\platformTelemetryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\platformConfigurationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\pigService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\organizationManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\organicTraceabilityService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\orderService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\operationsManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\omnichannelAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\offlineSyncService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\offlinePaymentService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ocrService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\nutritionIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\nutrientValueSalesService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\neProductIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\mushroomService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\multilingualService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\moduleCatalogService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\mobilityRidesService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\millCircuitService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\merchandisingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\marketIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\marketDataService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\marketAccessService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\machineryAccessService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\logisticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\logisticsEnhancementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\livestockManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\libraryKnowledgeService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\landRecordsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\landManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\laboratoryERPService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\knowledgeService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\knowledgeGraphService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\irrigationManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\iotSensorService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\iotIntegrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\insuranceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\insurancePremiumService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\insurancePolicyIssuanceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\insuranceFraudDetectionService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\insuranceClaimsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\institutionalProcurementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\inputSupplyManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\informationSharingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\indigenousKnowledgeService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\identityManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\hrService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\householdEconomyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\horticultureManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\gstService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\greenhouseService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\governmentSchemeService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\governanceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\goatService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\glutWarningService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\giIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\geofencingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\freightPoolingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\formService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\forestryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\foodSafetyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\foodIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\foluBenchmarkService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\fisheriesService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\fisheriesManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\financialService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\fertilizerInventoryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\farmerValueService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\farmerTrainingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\farmerService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\farmerFamilyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\experienceLayerService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\escrowService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\erpService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\equipmentExchangeService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\enterpriseMemoryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\enterpriseControlService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\engineeringProjectService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ecommerceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ecommerceMarketingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ecommerceIntegrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ecommerceERPService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ecommerceBusinessSalesService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\ecommerceAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\dynamicPricingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\dprGenerationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\digitalTwinService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\digitalProductPassportService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\demandService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\defenseFitnessPrepService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\decisionSupportService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\dairyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\custodyEventService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\custodyEventRoutes.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\cropValueResearchService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\cropPlanningService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\cropManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\costService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\costControlService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\cooperativeShareService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\conversationalAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\consumerHealthService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\comprehensiveERPService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\complianceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\completeERPIntegrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\completeAIIntegrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\companyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\communityManagementService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\commerceRulesService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\coldStorageService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\climateMonitoringService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\civilDisruptionService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\catalogIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\buyingClubService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\bulkOrderService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\blockchainTraceabilityService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\biodiversityService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\backupService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\auditService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\assetAccountingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\arVrService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\apicultureService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\animalHealthService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\analyticsService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\analyticsMonitoringService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiSelfHealingService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiOrchestrationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiOperationIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiGatewayService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiCopilotService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiBrainService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiBackboneService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiAgenticCompanionService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\aiAdvisoryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\agriculturalIntelligenceService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\advancedFeaturesService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\legacy\\advancedAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\food\\FoodIntelligenceEngine.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\energy\\EnergyCostCalculator.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\dual-use\\platformCoreService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\dual-use\\mfaService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\dual-use\\gdprService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\dual-use\\authService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\unifiedConfigService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\productAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\orderAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\logisticsAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\insuranceAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\financialAIService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\enhancedLibraryKnowledgeService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiStrategyService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiRecoveryService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiProviderService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiOptimizationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiDecisionService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiCopilotService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiCoordinationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiCollaborationService.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\services\\claude\\aiAgentService.js",
+        "reason": "No export statement found"
+      }
+    ],
+    "wired": []
+  },
+  "routes": {
+    "defined": 218,
+    "mounted": 193,
+    "orphaned": [
+      {
+        "file": "backend\\src\\routes\\ORPHANED_SERVICES_MOUNT.js",
+        "reason": "No export statement found"
+      },
+      {
+        "file": "backend\\src\\routes\\strategic\\preSeasonPurchaseRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\strategic\\householdProcurementRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\strategic\\governmentSubsidyRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\strategic\\contractFarmingRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\legacy\\vermicompostRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\legacy\\sericultureRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\legacy\\mushroomRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\legacy\\forestryRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\legacy\\fisheriesRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\legacy\\apicultureRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\generated\\all_routes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\dual-use\\mfaRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\dual-use\\gdprRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\productAIRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\orderAIRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\moduleRegistryRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\logisticsAIRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\insuranceAIRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\financialAIRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\backendModuleBridge.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\aiStrategyRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\aiProviderRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\aiDecisionRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\aiCopilotRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      },
+      {
+        "file": "backend\\src\\routes\\claude\\aiCoordinationRoutes.js",
+        "reason": "Not mounted in backend/src/index.js"
+      }
+    ],
+    "wired": [
+      "backend\\src\\routes\\yieldManagement.js",
+      "backend\\src\\routes\\wikipediaRoutes.js",
+      "backend\\src\\routes\\weatherRoutes.js",
+      "backend\\src\\routes\\weatherAdvisory.js",
+      "backend\\src\\routes\\wearableIntegrationRoutes.js",
+      "backend\\src\\routes\\waterManagementRoutes.js",
+      "backend\\src\\routes\\warehouseManagement.js",
+      "backend\\src\\routes\\walletRoutes.js",
+      "backend\\src\\routes\\vr.js",
+      "backend\\src\\routes\\visionRoutes.js",
+      "backend\\src\\routes\\videoAnalytics.js",
+      "backend\\src\\routes\\vendorRoutes.js",
+      "backend\\src\\routes\\userRoutes.js",
+      "backend\\src\\routes\\unifiedAIRoutes.js",
+      "backend\\src\\routes\\unifiedAIGateway.js",
+      "backend\\src\\routes\\transactionRoutes.js",
+      "backend\\src\\routes\\trackDartRoutes.js",
+      "backend\\src\\routes\\tenantManagementRoutes.js",
+      "backend\\src\\routes\\systemAdministrationRoutes.js",
+      "backend\\src\\routes\\supplyChainTracking.js",
+      "backend\\src\\routes\\supplyChainAnalytics.js",
+      "backend\\src\\routes\\subscriptions.js",
+      "backend\\src\\routes\\soilManagementRoutes.js",
+      "backend\\src\\routes\\soilHealth.js",
+      "backend\\src\\routes\\sheepRoutes.js",
+      "backend\\src\\routes\\sellerVerifications.js",
+      "backend\\src\\routes\\sellerRankingRoutes.js",
+      "backend\\src\\routes\\seedVaultRoutes.js",
+      "backend\\src\\routes\\sapModuleArchitectureRoutes.js",
+      "backend\\src\\routes\\roleManagementRoutes.js",
+      "backend\\src\\routes\\riskPricingRoutes.js",
+      "backend\\src\\routes\\riskAssessment.js",
+      "backend\\src\\routes\\rfqRoutes.js",
+      "backend\\src\\routes\\revenueRoutes.js",
+      "backend\\src\\routes\\returnLoadBoardRoutes.js",
+      "backend\\src\\routes\\researchAndDevelopmentRoutes.js",
+      "backend\\src\\routes\\regionalVarietyRoutes.js",
+      "backend\\src\\routes\\recoveredFinanceRoutes.js",
+      "backend\\src\\routes\\realtimeMonitoringRoutes.js",
+      "backend\\src\\routes\\qualityAssurance.js",
+      "backend\\src\\routes\\projectSystemsRoutes.js",
+      "backend\\src\\routes\\productRoutes.js",
+      "backend\\src\\routes\\productReviewRoutes.js",
+      "backend\\src\\routes\\productMediaAIRoutes.js",
+      "backend\\src\\routes\\productCertifications.js",
+      "backend\\src\\routes\\priceForecasting.js",
+      "backend\\src\\routes\\preventiveMaintenanceRoutes.js",
+      "backend\\src\\routes\\predictiveIntelligenceRoutes.js",
+      "backend\\src\\routes\\predictiveAnalytics.js",
+      "backend\\src\\routes\\poultryRoutes.js",
+      "backend\\src\\routes\\platformTelemetryRoutes.js",
+      "backend\\src\\routes\\platformCoreRoutes.js",
+      "backend\\src\\routes\\platformConfigurationRoutes.js",
+      "backend\\src\\routes\\pigRoutes.js",
+      "backend\\src\\routes\\phase9.js",
+      "backend\\src\\routes\\phase8.js",
+      "backend\\src\\routes\\phase12.js",
+      "backend\\src\\routes\\phase11.js",
+      "backend\\src\\routes\\phase10.js",
+      "backend\\src\\routes\\paymentRoutes.js",
+      "backend\\src\\routes\\paymentGatewayRoutes.js",
+      "backend\\src\\routes\\organizationManagementRoutes.js",
+      "backend\\src\\routes\\orderRoutes.js",
+      "backend\\src\\routes\\operationsRouteSupport.js",
+      "backend\\src\\routes\\operationsManagementRoutes.js",
+      "backend\\src\\routes\\nutritionIntelligenceRoutes.js",
+      "backend\\src\\routes\\nutrientValueSalesRoutes.js",
+      "backend\\src\\routes\\nlp.js",
+      "backend\\src\\routes\\nervousSystemRoutes.js",
+      "backend\\src\\routes\\mlOptimization.js",
+      "backend\\src\\routes\\marketplaceEnhancements.js",
+      "backend\\src\\routes\\marketDataRoutes.js",
+      "backend\\src\\routes\\marketAnalytics.js",
+      "backend\\src\\routes\\m400AiBackboneRoutes.js",
+      "backend\\src\\routes\\logisticsEnhancements.js",
+      "backend\\src\\routes\\logisticsEnhancementRoutes.js",
+      "backend\\src\\routes\\loanManagement.js",
+      "backend\\src\\routes\\livestockRouteSupport.js",
+      "backend\\src\\routes\\livestockManagementRoutes.js",
+      "backend\\src\\routes\\livestock.js",
+      "backend\\src\\routes\\libraryRoutes.js",
+      "backend\\src\\routes\\landRecordsRoutes.js",
+      "backend\\src\\routes\\landManagementRoutes.js",
+      "backend\\src\\routes\\knowledgeRoutes.js",
+      "backend\\src\\routes\\irrigationManagementRoutes.js",
+      "backend\\src\\routes\\iotSensors.js",
+      "backend\\src\\routes\\iotIntegrationRoutes.js",
+      "backend\\src\\routes\\insuranceEnhancements.js",
+      "backend\\src\\routes\\inputSupplyManagementRoutes.js",
+      "backend\\src\\routes\\informationSharingRoutes.js",
+      "backend\\src\\routes\\identityManagementRoutes.js",
+      "backend\\src\\routes\\hrRoutes.js",
+      "backend\\src\\routes\\horticultureManagementRoutes.js",
+      "backend\\src\\routes\\horticulture.js",
+      "backend\\src\\routes\\healthRoutes.js",
+      "backend\\src\\routes\\gstRoutes.js",
+      "backend\\src\\routes\\greenhouse.js",
+      "backend\\src\\routes\\governanceModule.js",
+      "backend\\src\\routes\\goatRoutes.js",
+      "backend\\src\\routes\\glutWarningRoutes.js",
+      "backend\\src\\routes\\geofencingRoutes.js",
+      "backend\\src\\routes\\freightPoolingRoutes.js",
+      "backend\\src\\routes\\freightPooling.js",
+      "backend\\src\\routes\\foodRoutes.js",
+      "backend\\src\\routes\\foluRoutes.js",
+      "backend\\src\\routes\\foluBenchmarkRoutes.js",
+      "backend\\src\\routes\\fisheriesManagementRoutes.js",
+      "backend\\src\\routes\\financialAnalytics.js",
+      "backend\\src\\routes\\fertilizerRoutes.js",
+      "backend\\src\\routes\\farmerValueRoutes.js",
+      "backend\\src\\routes\\farmerTrainingRoutes.js",
+      "backend\\src\\routes\\farmerRoutes.js",
+      "backend\\src\\routes\\farmerPortalEnhancements.js",
+      "backend\\src\\routes\\farmerHealthRoutes.js",
+      "backend\\src\\routes\\farmerFamilyRoutes.js",
+      "backend\\src\\routes\\farmCosting.js",
+      "backend\\src\\routes\\farmAnalytics.js",
+      "backend\\src\\routes\\experienceRoutes.js",
+      "backend\\src\\routes\\escrowRoutes.js",
+      "backend\\src\\routes\\equipmentExchangeRoutes.js",
+      "backend\\src\\routes\\enterpriseRouteSupport.js",
+      "backend\\src\\routes\\enterpriseIntegrationRoutes.js",
+      "backend\\src\\routes\\enterpriseAIRoutes.js",
+      "backend\\src\\routes\\engineeringProjectRoutes.js",
+      "backend\\src\\routes\\energyRoutes.js",
+      "backend\\src\\routes\\ecommerceRoutes.js",
+      "backend\\src\\routes\\ecommerceMarketingRoutes.js",
+      "backend\\src\\routes\\ecommerceIntegrationRoutes.js",
+      "backend\\src\\routes\\ecommerceERPRoutes.js",
+      "backend\\src\\routes\\ecommerceBusinessSalesRoutes.js",
+      "backend\\src\\routes\\ecommerceAIRoutes.js",
+      "backend\\src\\routes\\dprGenerationRoutes.js",
+      "backend\\src\\routes\\digitalTwinRoutes.js",
+      "backend\\src\\routes\\dietTherapyRoutes.js",
+      "backend\\src\\routes\\demandRoutes.js",
+      "backend\\src\\routes\\defenseFitnessPrepRoutes.js",
+      "backend\\src\\routes\\decisionSupportRoutes.js",
+      "backend\\src\\routes\\dataVisualization.js",
+      "backend\\src\\routes\\dashboardRoutes.js",
+      "backend\\src\\routes\\dairyRoutes.js",
+      "backend\\src\\routes\\cropValueResearchRoutes.js",
+      "backend\\src\\routes\\cropRecommendations.js",
+      "backend\\src\\routes\\cropPlanningRoutes.js",
+      "backend\\src\\routes\\cropManagementRoutes.js",
+      "backend\\src\\routes\\costRoutes.js",
+      "backend\\src\\routes\\costControlRoutes.js",
+      "backend\\src\\routes\\cooperativeShareRoutes.js",
+      "backend\\src\\routes\\comprehensiveERPRoutes.js",
+      "backend\\src\\routes\\complianceTracking.js",
+      "backend\\src\\routes\\complianceRoutes.js",
+      "backend\\src\\routes\\completeERPIntegrationRoutes.js",
+      "backend\\src\\routes\\completeAIIntegrationRoutes.js",
+      "backend\\src\\routes\\companyRoutes.js",
+      "backend\\src\\routes\\communityManagementRoutes.js",
+      "backend\\src\\routes\\coldStorageRoutes.js",
+      "backend\\src\\routes\\coldChainMonitoring.js",
+      "backend\\src\\routes\\climateRouteSupport.js",
+      "backend\\src\\routes\\climateMonitoringRoutes.js",
+      "backend\\src\\routes\\climateAdvisoryRoutes.js",
+      "backend\\src\\routes\\climateAdvisory.js",
+      "backend\\src\\routes\\civilDisruptionRoutes.js",
+      "backend\\src\\routes\\certificationManagement.js",
+      "backend\\src\\routes\\buyerTrust.js",
+      "backend\\src\\routes\\bulkOrders.js",
+      "backend\\src\\routes\\bulkOrderRoutes.js",
+      "backend\\src\\routes\\blockchainVerificationRoutes.js",
+      "backend\\src\\routes\\blockchainTrace.js",
+      "backend\\src\\routes\\biometric.js",
+      "backend\\src\\routes\\automation.js",
+      "backend\\src\\routes\\authRoutes.js",
+      "backend\\src\\routes\\auditTrail.js",
+      "backend\\src\\routes\\auditRoutes.js",
+      "backend\\src\\routes\\assetAccountingRoutes.js",
+      "backend\\src\\routes\\ar.js",
+      "backend\\src\\routes\\apiCompatibilityRoutes.js",
+      "backend\\src\\routes\\animalHealthRoutes.js",
+      "backend\\src\\routes\\analyticsReportRoutes.js",
+      "backend\\src\\routes\\aiSelfHealingRoutes.js",
+      "backend\\src\\routes\\aiOperationIntelligenceRoutes.js",
+      "backend\\src\\routes\\aiGatewayRoutes.js",
+      "backend\\src\\routes\\aiCollaborationRoutes.js",
+      "backend\\src\\routes\\aiBrainRoutes.js",
+      "backend\\src\\routes\\aiBackboneRoutes.js",
+      "backend\\src\\routes\\aiApprovalRoutes.js",
+      "backend\\src\\routes\\aiAgentRoutes.js",
+      "backend\\src\\routes\\agriculturalIntelligenceRoutes.js",
+      "backend\\src\\routes\\advancedSearchRoutes.js",
+      "backend\\src\\routes\\advancedFeatures.js",
+      "backend\\src\\routes\\advancedAnalyticsRoutes.js",
+      "backend\\src\\routes\\claude\\unifiedAIRoutes.js",
+      "backend\\src\\routes\\claude\\libraryRoutes.js",
+      "backend\\src\\routes\\claude\\aiCollaborationRoutes.js",
+      "backend\\src\\routes\\claude\\aiAgentRoutes.js"
+    ]
+  },
+  "pages": {
+    "defined": 155,
+    "routed": 0,
+    "orphaned": [
+      {
+        "file": "frontend\\src\\pages\\YieldManagementPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\WhatGrowPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\WeatherAnalyticsPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\WearablesPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\WaterRecordsPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\WaterManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\WalletPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\VillageRegistryPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\VarietyDirectoryPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\UnifiedLedgerPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\TransactionHistoryPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\TrainingAcademyPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\TractorManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\TraceabilityPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\SystemAdministrationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SustainabilityDashboardPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\SupportCenterPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\SupplyChainAnalyticsPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\SubsidyManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SparePartsManagementPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\SowingManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SoilManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ShgManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SheepFarmingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SharedInfraPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SellTimingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SellerProductFormPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\SeedVaultPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SeedPlanningPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SAPModuleArchitecturePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\SalesReportPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\RolePermissionPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\RiskManagementPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\RfqPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ResearchDashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ResearchAndDevelopmentPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ReportsDashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\REOSDashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\RegisterPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\RealtimeMonitoringPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\QualityControlPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ProjectSystemsPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ProductDetailPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PriceCheckPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PriceBuildPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PreSeasonPurchasePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PreOrderPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PremiumMarketplacePage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\PredictiveIntelligencePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PoultryManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PondManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PlatformManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PlatformFoundationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PigFarmingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PaymentProcessingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\PaymentGatewayPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\OrderDetailPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\OrchardManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\OperationsReportPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\OperationsManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\OperationalDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\NutritionCalculatorPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\NutrientValueMarketplace.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\NurseryManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\NervousSystemPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\NaturalTherapistPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ModuleHubPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\MFASetupPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\MarketSignalsPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\MarketplacePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\MarketIntelligencePage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\MarketingCenter.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\MachineryManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LogisticsProviderPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LogisticsPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LogisticsMatchingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LogisticsEnhancementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LoginPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LoanManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LivestockManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LibraryBrowserPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\LedgerPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\LandUseCarbonPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\LandRegistryPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LandManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\LabourManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\KnowledgeReferencePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\KnowledgeBasePage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\IrrigationManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\IoTMonitoringDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\InventoryReportPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\InsurancePage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\InsuranceManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\InputSupplyManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\InformationSharingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ImplementManagementPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\IdentityManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\HouseholdProcurementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\HorticultureManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\HomePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\HarvestScorePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\HarvestPlanPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\GroupBuyingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\GovernmentSubsidyPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\GovernmentDashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\GoatFarmingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\GDPRConsentPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\FuelManagementPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\FPORegistrationPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\FPODashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ForwardPricingPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\FormManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FitbitCallbackPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\FisheriesManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FinancialServicesDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FinancialReportPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FertilizerInventoryPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerVerificationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerSkillPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerSharedDoorPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerSellPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerSellDoorPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerRevenueLedgerPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerReportPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerProfilePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerPortalPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerKycPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerHouseholdDoorPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerHomePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerHealthWelfarePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerFieldPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerFieldDoorPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerFamilyPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmerEntranceHubPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmCostingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\FarmAdvisorPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ExportDocumentationPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ExperienceLayerPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\EscrowPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ERPDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\EquipmentRentalPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\EquipmentInventoryPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\EnvironmentManagementPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\EnterpriseIntegrationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\EnterpriseControlPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\EnterpriseAIPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\EngineeringProjectPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\EMICalculatorPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\EcommerceMarketplacePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\EcommerceIntegrationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\DynamicPricingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\DisruptionPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\DiscoverPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\DigitalTwinPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\DietRecipesPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\DefenseFitnessPrepPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\DecisionSupportPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\DashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\DairyManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CropVarietyPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CropValueReviewPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\CropRegistrationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CropMonitoringPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CropCalendarPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CreditScorePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CostControlPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\CorridorEconomicsPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\CorporateBuyerPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CopilotHubPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CooperativeSharePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ContractListingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ContractFarmingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ComprehensiveERPPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CompliancePage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ComplianceDashboardPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\CompleteERPIntegrationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CompleteAIIntegrationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CompetitivePositionPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ComparePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CommunityManagementPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CommunityForumPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ColdStoragePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ClimateWeatherPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\ClimateMonitoringPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\ClimateAdvisoryPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CheckoutPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CattleRegistryPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\CartPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\CADashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\BulkPurchasePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\BulkOrderPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\BreakdownMaintenancePage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\BlockchainVerificationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\BankPassportPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\BankerDashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\B2BMarketplace.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AuthorizationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AuditReportPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AssetLifecycleManagementPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\AssetAccountingPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\AnimalHealthPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AnalyticsPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AISelfHealingPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AIProductStudioPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\AIOperationIntelligencePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AIDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AICollaborationPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\AIChatPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\AIBrainPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AIBackbonePage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\AIAgentPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AgriculturalIntelligencePage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AdvancedSearchPage.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\AdvancedAnalyticsDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AdminDashboardPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\AboutPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileWallet.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileSettings.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileProfile.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobilePayments.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileOffers.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileNotifications.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileMarketplace.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileHomepage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileHelp.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\mobile\\MobileChat.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\SubsidyApplicationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\SchemeVerificationPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\SchemeUpdate Notifier.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\SchemeReportGenerator.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\SchemeEligibilityChecker.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\SchemeBeneficiaryList.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\PaymentGateway.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\MobileVerification.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\GovernmentSchemeDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\GovernmentNotificationCenter.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\DocumentUploadPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\DisputeResolutionPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\DeadlineTracker.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\ComplianceValidator.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\CancellationManagement.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\BiometricAuthentication.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\BeneficiaryManagement.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\AuditLogPage.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\ApprovalWorkflow.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\ApplicationStatusTracker.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\government\\AnnouncementBoard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page9.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page88.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page87.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page86.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page85.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page84.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page83.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page82.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page81.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page80.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page8.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page79.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page78.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page77.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page76.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page75.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page74.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page73.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page72.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page71.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page70.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page7.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page69.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page68.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page67.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page66.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page65.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page64.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page63.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page62.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page61.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page60.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page6.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page59.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page58.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page57.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page56.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page55.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page54.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page53.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page52.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page51.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page50.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page5.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page49.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page48.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page47.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page46.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page45.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page44.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page43.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page42.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page41.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page40.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page4.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page39.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page38.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page37.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page36.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page35.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page34.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page33.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page32.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page31.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page30.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page3.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page29.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page28.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page27.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page26.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page25.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page24.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page23.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page22.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page21.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page20.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page2.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page19.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page18.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page17.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page16.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page15.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page14.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page13.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page12.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page11.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page10.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page1.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\Generated\\Page0.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\economic\\EconomicDashboard.jsx",
+        "reason": "Not found in frontend/src/config/routes.js"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\WeatherImpactAssessment.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\UserEngagementStats.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\SystemHealthMonitor.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\SubsidyDistributionMap.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\RiskAssessment.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\ResponseTimeMetrics.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\RegionalComparison.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\PriceVolatilityChart.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\PerformanceMetrics.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\OpportunitiesIdentifier.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\MarketTrendAnalysis.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\IntelligenceReports.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\HistoricalDataView.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\ForecastingDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\FarmerBehaviorAnalytics.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\ErrorRateAnalysis.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\DataQualityReport.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\CustomReportBuilder.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\CropYieldPrediction.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\AnomalyDetection.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\analytics\\AdvancedAnalyticsDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\UserManagement.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\SystemConfiguration.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\SecuritySettings.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\RolePermissions.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\ResourceMonitoring.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\PerformanceTuning.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\NotificationPreferences.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\LogViewer.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\IntegrationSettings.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\ErrorHandling.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\DatabaseManagement.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\ComplianceDashboard.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\CacheManagement.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\BackupRecovery.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\AuditLogs.jsx",
+        "reason": "No React component export found"
+      },
+      {
+        "file": "frontend\\src\\pages\\admin\\APIManagement.jsx",
+        "reason": "No React component export found"
+      }
+    ],
+    "wired": []
+  },
+  "components": {
+    "defined": 0,
+    "exported": 0,
+    "used": [],
+    "orphaned": []
+  },
+  "imports": {
+    "unresolved": [
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/index.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/yieldManagement.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/wikipediaRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/weatherRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/weatherAdvisory.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/wearableIntegrationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/waterManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/warehouseManagement.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/walletRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/vr.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/visionRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/videoAnalytics.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/vendorRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/userRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/unifiedAIRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/unifiedAIGateway.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/transactionRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/trackDartRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/tenantManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/systemAdministrationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/supplyChainTracking.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/supplyChainAnalytics.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/subscriptions.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/soilManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/soilHealth.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/sheepRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/sellerVerifications.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/sellerRankingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/seedVaultRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/sapModuleArchitectureRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/roleManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/riskPricingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/riskAssessment.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/rfqRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/revenueRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/returnLoadBoardRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/researchAndDevelopmentRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/regionalVarietyRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/recoveredFinanceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/realtimeMonitoringRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/qualityAssurance.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/projectSystemsRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/productRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/productReviewRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/productMediaAIRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/productCertifications.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/priceForecasting.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/preventiveMaintenanceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/predictiveIntelligenceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/predictiveAnalytics.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/poultryRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/platformTelemetryRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/platformCoreRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/platformConfigurationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/pigRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/phase9.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/phase8.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/phase12.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/phase11.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/phase10.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/paymentRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/paymentGatewayRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/ORPHANED_SERVICES_MOUNT.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/organizationManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/orderRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/operationsRouteSupport.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/operationsManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/nutritionIntelligenceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/nutrientValueSalesRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/nlp.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/nervousSystemRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/mlOptimization.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/marketplaceEnhancements.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/marketDataRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/marketAnalytics.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/m400AiBackboneRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/logisticsEnhancements.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/logisticsEnhancementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/loanManagement.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/livestockRouteSupport.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/livestockManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/livestock.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/libraryRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/landRecordsRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/landManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/knowledgeRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/irrigationManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/iotSensors.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/iotIntegrationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/insuranceEnhancements.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/inputSupplyManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/informationSharingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/identityManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/hrRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/horticultureManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/horticulture.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/gstRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/greenhouse.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/governanceModule.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/goatRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/glutWarningRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/geofencingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/freightPoolingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/freightPooling.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/foodRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/foluRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/foluBenchmarkRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/fisheriesManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/financialAnalytics.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/fertilizerRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/farmerValueRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/farmerTrainingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/farmerRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/farmerPortalEnhancements.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/farmerHealthRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/farmerFamilyRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/farmCosting.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/farmAnalytics.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/experienceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/escrowRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/equipmentExchangeRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/enterpriseRouteSupport.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/enterpriseIntegrationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/enterpriseAIRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/engineeringProjectRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/energyRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/ecommerceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/ecommerceMarketingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/ecommerceIntegrationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/ecommerceERPRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/ecommerceBusinessSalesRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/ecommerceAIRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/dprGenerationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/digitalTwinRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/dietTherapyRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/demandRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/defenseFitnessPrepRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/decisionSupportRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/dataVisualization.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/dashboardRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/dairyRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/cropValueResearchRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/cropRecommendations.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/cropPlanningRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/cropManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/costRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/costControlRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/cooperativeShareRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/comprehensiveERPRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/complianceTracking.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/complianceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/completeERPIntegrationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/completeAIIntegrationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/companyRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/communityManagementRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/coldStorageRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/coldChainMonitoring.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/climateRouteSupport.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/climateMonitoringRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/climateAdvisoryRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/climateAdvisory.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/civilDisruptionRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/certificationManagement.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/buyerTrust.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/bulkOrders.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/bulkOrderRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/blockchainVerificationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/blockchainTrace.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/biometric.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/automation.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/authRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/auditTrail.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/auditRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/assetAccountingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/ar.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/apiCompatibilityRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/animalHealthRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/analyticsReportRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/aiSelfHealingRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/aiOperationIntelligenceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/aiGatewayRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/aiCollaborationRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/aiBrainRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/aiBackboneRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/aiApprovalRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/aiAgentRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/agriculturalIntelligenceRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/advancedSearchRoutes.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/advancedFeatures.js"
+      },
+      {
+        "file": "backend\\src\\index.js",
+        "requires": "./routes/advancedAnalyticsRoutes.js"
+      }
+    ],
+    "circular": [],
+    "valid": 106
+  },
+  "exports": {
+    "valid": 324,
+    "invalid": 0,
+    "missing": []
+  },
+  "issues": [],
+  "warnings": []
+}

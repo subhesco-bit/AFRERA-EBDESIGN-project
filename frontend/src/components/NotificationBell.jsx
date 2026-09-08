@@ -1,73 +1,73 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
-import { Bell, Check, CheckCheck } from 'lucide-react'
-import { useAuthStore } from '../store/authStore'
-import { notificationAPI } from '../services/api'
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Bell, Check, CheckCheck } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
+import { notificationAPI } from '../services/componentApi';
 
 // Real UI consumer for the M010 notification system (notificationAPI in
-// services/api.js) — previously fully built on the backend (13 methods,
-// live-mounted at /api/v1/modules/m010/*) with zero frontend caller.
+// previously fully built on the backend (13 methods, live-mounted at
+// /api/v1/modules/m010/*) with zero frontend caller.
 // Polls for the current user's notifications and lets them mark items read.
 function NotificationBell() {
-  const { user, isAuthenticated } = useAuthStore()
-  const [open, setOpen] = useState(false)
-  const [notifications, setNotifications] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const ref = useRef(null)
+  const { user, isAuthenticated } = useAuthStore();
+  const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const ref = useRef(null);
 
-  const unreadCount = notifications.filter((n) => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const loadNotifications = useCallback(async () => {
-    if (!user?.id) return
-    setLoading(true)
-    setError(null)
+    if (!user?.id) return;
+    setLoading(true);
+    setError(null);
     try {
-      const res = await notificationAPI.getNotifications({ userId: user.id, limit: 20 })
-      setNotifications(res.data?.data?.items || [])
+      const res = await notificationAPI.getNotifications({ userId: user.id, limit: 20 });
+      setNotifications(res.data?.data?.items || []);
     } catch (err) {
-      setError(err.message || 'Failed to load notifications')
+      setError(err.message || 'Failed to load notifications');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [user?.id])
+  }, [user?.id]);
 
   // Fetch on mount and poll every 60s for logged-in users only.
   useEffect(() => {
-    if (!isAuthenticated || !user?.id) return
-    loadNotifications()
-    const interval = setInterval(loadNotifications, 60000)
-    return () => clearInterval(interval)
-  }, [isAuthenticated, user?.id, loadNotifications])
+    if (!isAuthenticated || !user?.id) return;
+    loadNotifications();
+    const interval = setInterval(loadNotifications, 60000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, user?.id, loadNotifications]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (open && ref.current && !ref.current.contains(event.target)) {
-        setOpen(false)
+        setOpen(false);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [open])
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
 
   const handleMarkRead = async (id) => {
     try {
-      await notificationAPI.markAsRead(id)
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)))
+      await notificationAPI.markAsRead(id);
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
     } catch (err) {
-      setError(err.message || 'Failed to mark notification read')
+      setError(err.message || 'Failed to mark notification read');
     }
-  }
+  };
 
   const handleMarkAllRead = async () => {
     try {
-      await notificationAPI.markAllAsRead()
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+      await notificationAPI.markAllAsRead();
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     } catch (err) {
-      setError(err.message || 'Failed to mark all notifications read')
+      setError(err.message || 'Failed to mark all notifications read');
     }
-  }
+  };
 
-  if (!isAuthenticated) return null
+  if (!isAuthenticated) return null;
 
   return (
     <div className="relative" ref={ref}>
@@ -77,8 +77,8 @@ function NotificationBell() {
         aria-expanded={open}
         aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
         onClick={() => {
-          setOpen((v) => !v)
-          if (!open) loadNotifications()
+          setOpen((v) => !v);
+          if (!open) loadNotifications();
         }}
       >
         <Bell className="w-6 h-6" />
@@ -149,7 +149,7 @@ function NotificationBell() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default NotificationBell
+export default NotificationBell;

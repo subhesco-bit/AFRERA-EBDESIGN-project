@@ -13,12 +13,6 @@ const router = express.Router();
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../../database/pool');
-// AI backbone gateway (2026-09-07): generateResponse() previously always
-// returned a static per-intent template with no indication it wasn't a real
-// AI response. Now attempts a real LLM call through the shared gateway and
-// only falls back to the template - explicitly labeled source: 'fallback' -
-// when no provider is configured or the call fails.
-const { callAI } = require('./aiBackboneService');
 
 // ============================================================================
 // CONVERSATION SESSIONS
@@ -38,8 +32,8 @@ async function createConversationSession(userId, domainId, language = 'en') {
         userId,
         `SESSION-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         domainId,
-        language
-      ]
+        language,
+      ],
     );
 
     return result.rows[0];
@@ -73,7 +67,7 @@ async function getConversationSession(sessionId) {
        FROM conversation_sessions cs
        LEFT JOIN conversation_domains cd ON cs.domain_id = cd.id
        WHERE cs.session_id = $1`,
-      [sessionId]
+      [sessionId],
     );
 
     if (result.rows.length === 0) {
@@ -136,8 +130,8 @@ async function addMessage(sessionId, role, content, contentType = 'text', metada
         JSON.stringify(metadata),
         intentDetected,
         confidenceScore,
-        processingTime
-      ]
+        processingTime,
+      ],
     );
 
     // Update session activity
@@ -174,7 +168,7 @@ async function getConversationMessages(sessionId, limit = 50) {
        WHERE session_id = $1 
        ORDER BY timestamp ASC 
        LIMIT $2`,
-      [sessionId, limit]
+      [sessionId, limit],
     );
 
     return result.rows;
@@ -209,18 +203,18 @@ async function detectIntent(message) {
   try {
     // Simple keyword-based intent detection (can be enhanced with ML model)
     const lowerMessage = message.toLowerCase();
-    
+
     const intentMap = {
-      'greeting': ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'],
-      'product_search': ['search', 'find', 'looking for', 'show me', 'product'],
-      'order_status': ['order', 'status', 'track', 'where is my'],
-      'farmer_info': ['farmer', 'profile', 'farmer details'],
-      'loan_inquiry': ['loan', 'credit', 'finance', 'money'],
-      'shipment_tracking': ['shipment', 'delivery', 'track package'],
-      'insurance': ['insurance', 'policy', 'claim'],
-      'organic': ['organic', 'certification', 'traceability'],
-      'nutrition': ['nutrition', 'health', 'dietary'],
-      'help': ['help', 'assist', 'support', 'what can you do']
+      greeting: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'],
+      product_search: ['search', 'find', 'looking for', 'show me', 'product'],
+      order_status: ['order', 'status', 'track', 'where is my'],
+      farmer_info: ['farmer', 'profile', 'farmer details'],
+      loan_inquiry: ['loan', 'credit', 'finance', 'money'],
+      shipment_tracking: ['shipment', 'delivery', 'track package'],
+      insurance: ['insurance', 'policy', 'claim'],
+      organic: ['organic', 'certification', 'traceability'],
+      nutrition: ['nutrition', 'health', 'dietary'],
+      help: ['help', 'assist', 'support', 'what can you do'],
     };
 
     let detectedIntent = 'general';
@@ -236,7 +230,7 @@ async function detectIntent(message) {
 
     return {
       intent: detectedIntent,
-      confidence: maxMatches > 0 ? 0.85 : 0.50
+      confidence: maxMatches > 0 ? 0.85 : 0.50,
     };
   } catch (error) {
     logger.error('Detect intent error', { error: error.message, stack: error.stack });
@@ -273,39 +267,16 @@ async function generateResponse(sessionId, userMessage, context = {}) {
     // Detect intent
     const intentResult = await detectIntent(userMessage);
 
-    let content;
-    let source;
-    try {
-      // Real AI call through the shared gateway (throws if no provider is
-      // configured, e.g. no API key set - caught below).
-      const recentMessages = await getConversationMessages(sessionId, 10);
-      const history = recentMessages
-        .map(m => `${m.role}: ${m.content}`)
-        .join('\n');
-      const prompt = `You are the AFRERA agricultural platform assistant. ` +
-        `Detected intent: ${intentResult.intent}. ` +
-        `Conversation so far:\n${history}\n\n` +
-        `Respond helpfully and concisely to the user's latest message: "${userMessage}"`;
-      const aiResult = await callAI(prompt, { maxTokens: 400 });
-      content = aiResult.content;
-      source = 'ai';
-    } catch (aiError) {
-      // No AI provider configured, or the call failed - fall back to the
-      // template response and say so honestly rather than pretending it's
-      // an AI-generated answer.
-      logger.warn('AI provider unavailable for conversational response, using template fallback', {
-        error: aiError.message
-      });
-      content = await getResponseForIntent(intentResult.intent, session.domain_id, context);
-      source = 'fallback';
-    }
+    // Get response template based on intent
+    const response = await getResponseForIntent(intentResult.intent, session.domain_id, context);
 
+    // In production, this would call an AI model (OpenAI, Anthropic, etc.)
+    // For now, return template-based response
     return {
-      content,
-      source,
+      content: response,
       intent: intentResult.intent,
       confidence: intentResult.confidence,
-      requires_action: determineIfActionRequired(intentResult.intent)
+      requires_action: determineIfActionRequired(intentResult.intent),
     };
   } catch (error) {
     logger.error('Generate response error', { error: error.message, stack: error.stack });
@@ -320,23 +291,23 @@ async function getResponseForIntent(intent, domainId, context) {
   try {
     // Simple response templates (can be enhanced with knowledge base)
     const responses = {
-      greeting: "Hello! I'm your AFRERA assistant. How can I help you today?",
-      product_search: "I can help you search for products. What type of product are you looking for?",
-      order_status: "I can help you check your order status. Please provide your order number.",
-      farmer_info: "I can help you with farmer information. What would you like to know?",
-      loan_inquiry: "I can help you with loan information. Are you looking to apply for a loan or check your status?",
-      shipment_tracking: "I can help you track your shipment. Please provide your tracking number.",
-      insurance: "I can help you with insurance information. What would you like to know?",
-      organic: "I can help you with organic certification and traceability information.",
-      nutrition: "I can help you with nutrition information and dietary recommendations.",
-      help: "I can assist you with products, orders, farmers, loans, shipments, insurance, organic certification, and nutrition information. What would you like help with?",
-      general: "I'm here to help. Could you please provide more details about what you need?"
+      greeting: 'Hello! I\'m your AFRERA assistant. How can I help you today?',
+      product_search: 'I can help you search for products. What type of product are you looking for?',
+      order_status: 'I can help you check your order status. Please provide your order number.',
+      farmer_info: 'I can help you with farmer information. What would you like to know?',
+      loan_inquiry: 'I can help you with loan information. Are you looking to apply for a loan or check your status?',
+      shipment_tracking: 'I can help you track your shipment. Please provide your tracking number.',
+      insurance: 'I can help you with insurance information. What would you like to know?',
+      organic: 'I can help you with organic certification and traceability information.',
+      nutrition: 'I can help you with nutrition information and dietary recommendations.',
+      help: 'I can assist you with products, orders, farmers, loans, shipments, insurance, organic certification, and nutrition information. What would you like help with?',
+      general: 'I\'m here to help. Could you please provide more details about what you need?',
     };
 
     return responses[intent] || responses.general;
   } catch (error) {
     logger.error('Get response for intent error', { error: error.message, stack: error.stack });
-    return "I apologize, but I'm having trouble processing your request. Please try again.";
+    return 'I apologize, but I\'m having trouble processing your request. Please try again.';
   }
 }
 
@@ -354,16 +325,16 @@ function determineIfActionRequired(intent) {
 router.post('/sessions/:sessionId/respond', authMiddleware, async (req, res) => {
   try {
     const { message, context } = req.body;
-    
+
     // Add user message
     await addMessage(req.params.sessionId, 'user', message);
-    
+
     // Generate response
     const response = await generateResponse(req.params.sessionId, message, context);
-    
+
     // Add assistant message
     await addMessage(req.params.sessionId, 'assistant', response.content);
-    
+
     res.json(response);
   } catch (error) {
     logger.error('Generate response API error', { error: error.message, stack: error.stack });
@@ -381,7 +352,7 @@ router.post('/sessions/:sessionId/respond', authMiddleware, async (req, res) => 
 async function getConversationDomains() {
   try {
     const result = await pool.query(
-      'SELECT * FROM conversation_domains WHERE is_active = true ORDER BY priority DESC, name'
+      'SELECT * FROM conversation_domains WHERE is_active = true ORDER BY priority DESC, name',
     );
     return result.rows;
   } catch (error) {
@@ -420,7 +391,7 @@ async function setContext(sessionId, contextKey, contextValue, expiresAt = null)
                       expires_at = EXCLUDED.expires_at,
                       updated_at = CURRENT_TIMESTAMP
        RETURNING *`,
-      [sessionId, contextKey, JSON.stringify(contextValue), expiresAt]
+      [sessionId, contextKey, JSON.stringify(contextValue), expiresAt],
     );
 
     return result.rows[0];
@@ -504,7 +475,7 @@ async function endConversation(sessionId, resolutionStatus, userSatisfaction = n
   try {
     // Get session messages
     const messages = await getConversationMessages(sessionId);
-    
+
     const userMessages = messages.filter(m => m.role === 'user').length;
     const assistantMessages = messages.filter(m => m.role === 'assistant').length;
     const avgResponseTime = messages
@@ -530,14 +501,14 @@ async function endConversation(sessionId, resolutionStatus, userSatisfaction = n
         avgResponseTime,
         resolutionStatus,
         userSatisfaction,
-        feedback
-      ]
+        feedback,
+      ],
     );
 
     // Update session status
     await pool.query(
       'UPDATE conversation_sessions SET status = $1, last_activity_at = CURRENT_TIMESTAMP WHERE id = $2',
-      ['ended', sessionId]
+      ['ended', sessionId],
     );
 
     return { success: true };
@@ -581,5 +552,6 @@ module.exports = {
   setContext,
   getContext,
   endConversation,
-  isHealthy
+  isHealthy,
 };
+

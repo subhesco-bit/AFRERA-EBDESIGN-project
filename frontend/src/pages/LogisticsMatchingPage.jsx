@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Truck, PackageSearch, Wrench } from 'lucide-react'
-import ActionCard from '../components/common/ActionCard'
-import { freightPoolingAPI, returnLoadBoardAPI, equipmentExchangeAPI } from '../services/api'
+import { useState } from 'react';
+import { Truck, PackageSearch, Wrench } from 'lucide-react';
+import ActionCard from '../components/common/ActionCard';
+import { freightPoolingAPI, returnLoadBoardAPI, equipmentExchangeAPI } from '../services/api';
 
 /**
  * Logistics matching hub: three real, mounted backend route files that had
@@ -17,10 +17,10 @@ const TABS = [
   { id: 'freight', label: 'Freight Pooling', icon: Truck },
   { id: 'returns', label: 'Return-Load Board', icon: PackageSearch },
   { id: 'equipment', label: 'Equipment Exchange', icon: Wrench },
-]
+];
 
 function LogisticsMatchingPage() {
-  const [tab, setTab] = useState('freight')
+  const [tab, setTab] = useState('freight');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -168,7 +168,7 @@ function LogisticsMatchingPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default LogisticsMatchingPage
+export default LogisticsMatchingPage;

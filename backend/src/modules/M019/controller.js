@@ -198,32 +198,32 @@ module.exports = {
   getProfile,
   updateProfile,
   deleteProfile,
-  
+
   // Profile enrichment
   enrichProfile,
-  
+
   // AI-powered completion
   suggestProfileCompletion,
-  
+
   // Social media integration
   linkSocialAccount,
   unlinkSocialAccount,
-  
+
   // Visibility controls
   setProfileVisibility,
   getProfileVisibility,
-  
+
   // Activity tracking
   logProfileActivity,
   getProfileActivity,
-  
+
   // Search and discovery
   searchProfiles,
   getProfileRecommendations,
-  
+
   // Analytics
   getProfileAnalytics,
-  
+
   // Bulk operations
   bulkUpdateProfiles,
 };

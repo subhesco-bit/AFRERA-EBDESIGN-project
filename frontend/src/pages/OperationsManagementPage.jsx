@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ClipboardList, CalendarClock, HardHat, Cog, CalendarRange, Fuel, TrendingUp, Gauge } from 'lucide-react'
+import { useState } from 'react';
+import { ClipboardList, CalendarClock, HardHat, Cog, CalendarRange, Fuel, TrendingUp, Gauge } from 'lucide-react';
 import {
   farmActivityAPI,
   farmTaskAPI,
@@ -9,8 +9,8 @@ import {
   inputConsumptionAPI,
   farmProductivityAPI,
   farmOperationsDashboardAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Operations domain sub-modules, batch 4: M091 (Farm Activity
@@ -35,19 +35,19 @@ const TABS = [
   { id: 'inputs', label: 'Input Consumption', icon: Fuel },
   { id: 'productivity', label: 'Productivity', icon: TrendingUp },
   { id: 'dashboard', label: 'Ops Dashboard', icon: Gauge },
-]
+];
 
-const ACTIVITY_TYPES = ['Ploughing', 'Sowing', 'Weeding', 'Spraying', 'Irrigation', 'Harvesting', 'Other']
-const ACTIVITY_STATUS = ['Pending', 'In Progress', 'Completed']
-const PRIORITY = ['Low', 'Medium', 'High', 'Urgent']
-const TASK_STATUS = ['To Do', 'In Progress', 'Done']
-const CONTRACTOR_STATUS = ['Active', 'Inactive']
-const SCHEDULE_STATUS = ['Scheduled', 'In Use', 'Completed', 'Cancelled']
-const INPUT_TYPES = ['Seed', 'Fertilizer', 'Pesticide', 'Water', 'Fuel', 'Other']
-const TRENDS = ['Up', 'Down', 'Stable']
+const ACTIVITY_TYPES = ['Ploughing', 'Sowing', 'Weeding', 'Spraying', 'Irrigation', 'Harvesting', 'Other'];
+const ACTIVITY_STATUS = ['Pending', 'In Progress', 'Completed'];
+const PRIORITY = ['Low', 'Medium', 'High', 'Urgent'];
+const TASK_STATUS = ['To Do', 'In Progress', 'Done'];
+const CONTRACTOR_STATUS = ['Active', 'Inactive'];
+const SCHEDULE_STATUS = ['Scheduled', 'In Use', 'Completed', 'Cancelled'];
+const INPUT_TYPES = ['Seed', 'Fertilizer', 'Pesticide', 'Water', 'Fuel', 'Other'];
+const TRENDS = ['Up', 'Down', 'Stable'];
 
 function OperationsManagementPage() {
-  const [activeTab, setActiveTab] = useState('activities')
+  const [activeTab, setActiveTab] = useState('activities');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -384,7 +384,7 @@ function OperationsManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default OperationsManagementPage
+export default OperationsManagementPage;

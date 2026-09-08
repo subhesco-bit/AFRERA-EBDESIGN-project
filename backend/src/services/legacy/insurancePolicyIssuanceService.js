@@ -26,7 +26,7 @@ class InsurancePolicyIssuanceService {
       paymentReference,
       startDate,
       endDate,
-      policyData: riskData
+      policyData: riskData,
     } = policyData;
 
     try {
@@ -44,7 +44,7 @@ class InsurancePolicyIssuanceService {
         premiumAmount,
         insuranceType,
         startDate,
-        endDate
+        endDate,
       );
 
       const query = `
@@ -67,7 +67,7 @@ class InsurancePolicyIssuanceService {
         startDate,
         endDate,
         JSON.stringify(paymentSchedule),
-        JSON.stringify(riskData)
+        JSON.stringify(riskData),
       ]);
 
       // Update quote status
@@ -86,12 +86,12 @@ class InsurancePolicyIssuanceService {
    */
   async generatePolicyNumber(insuranceType) {
     const typeCodes = {
-      'crop': 'CRP',
-      'transit': 'TRN',
-      'warehouse': 'WRH',
-      'livestock': 'LST',
-      'weather': 'WTH',
-      'seed': 'SED'
+      crop: 'CRP',
+      transit: 'TRN',
+      warehouse: 'WRH',
+      livestock: 'LST',
+      weather: 'WTH',
+      seed: 'SED',
     };
 
     const code = typeCodes[insuranceType] || 'GEN';
@@ -106,12 +106,12 @@ class InsurancePolicyIssuanceService {
    */
   calculatePaymentSchedule(premiumAmount, insuranceType, startDate, endDate) {
     const schedules = {
-      'crop': this.calculateAnnualSchedule(premiumAmount, startDate),
-      'transit': this.calculateSinglePayment(premiumAmount, startDate),
-      'warehouse': this.calculateAnnualSchedule(premiumAmount, startDate),
-      'livestock': this.calculateAnnualSchedule(premiumAmount, startDate),
-      'weather': this.calculateSeasonalSchedule(premiumAmount, startDate),
-      'seed': this.calculateSinglePayment(premiumAmount, startDate)
+      crop: this.calculateAnnualSchedule(premiumAmount, startDate),
+      transit: this.calculateSinglePayment(premiumAmount, startDate),
+      warehouse: this.calculateAnnualSchedule(premiumAmount, startDate),
+      livestock: this.calculateAnnualSchedule(premiumAmount, startDate),
+      weather: this.calculateSeasonalSchedule(premiumAmount, startDate),
+      seed: this.calculateSinglePayment(premiumAmount, startDate),
     };
 
     return schedules[insuranceType] || this.calculateAnnualSchedule(premiumAmount, startDate);
@@ -132,7 +132,7 @@ class InsurancePolicyIssuanceService {
         installment: i + 1,
         dueDate: dueDate.toISOString().split('T')[0],
         amount: installmentAmount.toFixed(2),
-        status: 'pending'
+        status: 'pending',
       });
     }
 
@@ -147,7 +147,7 @@ class InsurancePolicyIssuanceService {
       installment: 1,
       dueDate: startDate,
       amount: premiumAmount.toFixed(2),
-      status: 'pending'
+      status: 'pending',
     }];
   }
 
@@ -163,7 +163,7 @@ class InsurancePolicyIssuanceService {
       installment: 1,
       dueDate: startDate,
       amount: installmentAmount.toFixed(2),
-      status: 'pending'
+      status: 'pending',
     });
 
     // Second installment (6 months later)
@@ -173,7 +173,7 @@ class InsurancePolicyIssuanceService {
       installment: 2,
       dueDate: secondDate.toISOString().split('T')[0],
       amount: installmentAmount.toFixed(2),
-      status: 'pending'
+      status: 'pending',
     });
 
     return schedule;
@@ -306,7 +306,7 @@ class InsurancePolicyIssuanceService {
 
       return {
         policies: result.rows,
-        pagination: { page, limit }
+        pagination: { page, limit },
       };
     } catch (error) {
       logger.error('Error getting user policies', { error: error.message, stack: error.stack });
@@ -347,7 +347,7 @@ class InsurancePolicyIssuanceService {
         endDate,
         premiumAmount,
         paymentReference,
-        policyId
+        policyId,
       ]);
 
       logger.info(`Policy ${policy.policy_number} renewed`);
@@ -388,7 +388,7 @@ class InsurancePolicyIssuanceService {
       logger.info(`Policy ${policy.policy_number} cancelled`);
       return {
         ...result.rows[0],
-        refundAmount
+        refundAmount,
       };
     } catch (error) {
       logger.error('Error cancelling policy', { error: error.message, stack: error.stack });
@@ -430,7 +430,7 @@ class InsurancePolicyIssuanceService {
       }
 
       const installment = paymentSchedule.find(
-        i => i.installment === installmentNumber && i.status === 'pending'
+        i => i.installment === installmentNumber && i.status === 'pending',
       );
 
       if (!installment) {
@@ -461,7 +461,7 @@ class InsurancePolicyIssuanceService {
         JSON.stringify(paymentSchedule),
         amount,
         allPaid,
-        policyId
+        policyId,
       ]);
 
       logger.info(`Payment processed for policy ${policy.policy_number}, installment ${installmentNumber}`);
@@ -511,7 +511,7 @@ class InsurancePolicyIssuanceService {
         documentType,
         fileName,
         fileUrl,
-        fileSize
+        fileSize,
       ]);
 
       logger.info(`Document uploaded for policy ${policyId}`);
@@ -524,3 +524,4 @@ class InsurancePolicyIssuanceService {
 }
 
 module.exports = new InsurancePolicyIssuanceService();
+

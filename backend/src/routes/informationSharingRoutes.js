@@ -1,6 +1,6 @@
 /**
  * Information Sharing Routes
- * 
+ *
  * Express routes for the Information Sharing service,
  * providing endpoints for document management, folder organization,
  * permissions, sharing, collaboration, and AI recommendations.
@@ -9,6 +9,9 @@
 const express = require('express');
 const router = express.Router();
 const informationSharingService = require('../services/legacy/informationSharingService');
+const { authMiddleware } = require('../middleware/auth');
+
+router.use(authMiddleware);
 
 /**
  * Document Management Routes
@@ -23,19 +26,19 @@ router.get('/documents', (req, res) => {
       type: req.query.type,
       ownerId: req.query.ownerId,
       folderId: req.query.folderId,
-      tag: req.query.tag
+      tag: req.query.tag,
     };
-    
+
     const documents = informationSharingService.getDocuments(filters);
     res.json({
       success: true,
       count: documents.length,
-      data: documents
+      data: documents,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -50,19 +53,19 @@ router.get('/documents/search', (req, res) => {
     const filters = {
       status: req.query.status,
       category: req.query.category,
-      type: req.query.type
+      type: req.query.type,
     };
 
     const documents = informationSharingService.searchDocuments(query, filters);
     res.json({
       success: true,
       count: documents.length,
-      data: documents
+      data: documents,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -74,17 +77,17 @@ router.get('/documents/:documentId', (req, res) => {
     if (!document) {
       return res.status(404).json({
         success: false,
-        error: 'Document not found'
+        error: 'Document not found',
       });
     }
     res.json({
       success: true,
-      data: document
+      data: document,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -96,12 +99,12 @@ router.post('/documents', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Document created successfully',
-      data: document
+      data: document,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -113,12 +116,12 @@ router.put('/documents/:documentId', (req, res) => {
     res.json({
       success: true,
       message: 'Document updated successfully',
-      data: document
+      data: document,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -129,12 +132,12 @@ router.delete('/documents/:documentId', (req, res) => {
     const result = informationSharingService.deleteDocument(req.params.documentId);
     res.json({
       success: true,
-      message: result.message
+      message: result.message,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -149,19 +152,19 @@ router.get('/folders', (req, res) => {
     const filters = {
       type: req.query.type,
       ownerId: req.query.ownerId,
-      parentId: req.query.parentId
+      parentId: req.query.parentId,
     };
-    
+
     const folders = informationSharingService.getFolders(filters);
     res.json({
       success: true,
       count: folders.length,
-      data: folders
+      data: folders,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -173,12 +176,12 @@ router.get('/folders/tree', (req, res) => {
     const tree = informationSharingService.getFolderTree(rootId);
     res.json({
       success: true,
-      data: tree
+      data: tree,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -190,12 +193,12 @@ router.post('/folders', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Folder created successfully',
-      data: folder
+      data: folder,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -212,12 +215,12 @@ router.get('/permissions/:resourceId', (req, res) => {
     res.json({
       success: true,
       count: permissions.length,
-      data: permissions
+      data: permissions,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -229,12 +232,12 @@ router.post('/permissions', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Permission granted successfully',
-      data: permission
+      data: permission,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -246,16 +249,16 @@ router.get('/permissions/:resourceId/check/:userId', (req, res) => {
     const hasPermission = informationSharingService.checkPermission(
       req.params.resourceId,
       req.params.userId,
-      requiredPermission
+      requiredPermission,
     );
     res.json({
       success: true,
-      hasPermission: hasPermission
+      hasPermission,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -271,12 +274,12 @@ router.post('/sharing-links', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Sharing link created successfully',
-      data: link
+      data: link,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -288,17 +291,17 @@ router.get('/sharing-links/access/:token', (req, res) => {
     if (!link) {
       return res.status(404).json({
         success: false,
-        error: 'Invalid or expired sharing link'
+        error: 'Invalid or expired sharing link',
       });
     }
     res.json({
       success: true,
-      data: link
+      data: link,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -312,19 +315,19 @@ router.get('/collaboration-sessions', (req, res) => {
   try {
     const filters = {
       status: req.query.status,
-      resourceId: req.query.resourceId
+      resourceId: req.query.resourceId,
     };
-    
+
     const sessions = informationSharingService.getCollaborationSessions(filters);
     res.json({
       success: true,
       count: sessions.length,
-      data: sessions
+      data: sessions,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -336,12 +339,12 @@ router.post('/collaboration-sessions', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Collaboration session created successfully',
-      data: session
+      data: session,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -353,12 +356,12 @@ router.post('/collaboration-sessions/:sessionId/join', (req, res) => {
     res.json({
       success: true,
       message: 'Joined session successfully',
-      data: session
+      data: session,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -370,12 +373,12 @@ router.post('/collaboration-sessions/:sessionId/end', (req, res) => {
     res.json({
       success: true,
       message: 'Session ended successfully',
-      data: session
+      data: session,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -391,19 +394,19 @@ router.post('/ai-recommendations', async (req, res) => {
     if (!userId || !context) {
       return res.status(400).json({
         success: false,
-        error: 'userId and context are required in request body'
+        error: 'userId and context are required in request body',
       });
     }
-    
+
     const recommendations = await informationSharingService.generateAIRecommendations(userId, context);
     res.json({
       success: true,
-      data: recommendations
+      data: recommendations,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -419,12 +422,12 @@ router.get('/activity-logs/:resourceId', (req, res) => {
     res.json({
       success: true,
       count: logs.length,
-      data: logs
+      data: logs,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -439,12 +442,12 @@ router.get('/analytics', (req, res) => {
     const analytics = informationSharingService.getAnalytics();
     res.json({
       success: true,
-      data: analytics
+      data: analytics,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -459,12 +462,12 @@ router.get('/health', (req, res) => {
     const health = informationSharingService.getHealthStatus();
     res.json({
       success: true,
-      data: health
+      data: health,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });

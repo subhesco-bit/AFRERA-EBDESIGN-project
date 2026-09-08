@@ -16,7 +16,7 @@ const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 function handleFor(rfqId, bidderId) {
   const h = crypto.createHash('sha256').update(`${rfqId}:${bidderId}`).digest('hex');
   return `Bidder-${h.slice(0, 6).toUpperCase()}`;
-  }
+}
 
 async function createRfq(r) {
   const rfqNo = `RFQ-${Date.now().toString(36).toUpperCase()}`;
@@ -29,7 +29,7 @@ async function createRfq(r) {
     [rfqNo, r.buyerId ?? null, r.buyerOrg ?? null, r.product, r.grade ?? null,
       r.quantityKg, r.deliveryBy ?? null, r.deliveryLocation ?? null,
       r.targetPriceInrPerKg ?? null, r.bidsSealedUntil ?? r.closesAt, r.closesAt,
-      r.successFeePct ?? 2.0]
+      r.successFeePct ?? 2.0],
   );
   return rows[0];
 }
@@ -52,11 +52,11 @@ async function submitBid(b) {
      RETURNING *`,
     [b.rfqId, b.bidderId, b.bidderType ?? 'farmer', handleFor(b.rfqId, b.bidderId),
       b.priceInrPerKg, b.quantityOfferedKg, b.earliestDelivery ?? null,
-      b.qualityEvidence ?? null, b.notes ?? null]
+      b.qualityEvidence ?? null, b.notes ?? null],
   );
-  return { ...rows[0], note: 'Bid recorded under an anonymous handle. Other bidders cannot '
-    + 'see your price, and you cannot see theirs — visible bids let a later bidder undercut '
-    + 'a number they should never have seen.' };
+  return { ...rows[0], note: 'Bid recorded under an anonymous handle. Other bidders cannot ' +
+    'see your price, and you cannot see theirs — visible bids let a later bidder undercut ' +
+    'a number they should never have seen.' };
 }
 
 /**
@@ -73,18 +73,18 @@ async function bidsFor(rfqId, { asBuyer = false } = {}) {
     `SELECT id, anonymous_handle, bidder_type, price_inr_per_kg, quantity_offered_kg,
             earliest_delivery, quality_evidence, status, submitted_at
        FROM rfq_bids WHERE rfq_id = $1 ORDER BY price_inr_per_kg`,
-    [rfqId]
+    [rfqId],
   );
 
   if (sealed && !asBuyer) {
     return { sealed: true, bidCount: rows.length, bids: [],
-      note: 'Bids are sealed until ' + rfq[0].bids_sealed_until };
+      note: `Bids are sealed until ${ rfq[0].bids_sealed_until}` };
   }
   if (sealed) {
     return {
       sealed: true, bidCount: rows.length,
       bids: rows.map((r) => ({ handle: r.anonymous_handle, submittedAt: r.submitted_at })),
-      note: 'Bid count is visible; prices open at ' + rfq[0].bids_sealed_until,
+      note: `Bid count is visible; prices open at ${ rfq[0].bids_sealed_until}`,
     };
   }
   return { sealed: false, bidCount: rows.length, bids: rows };
@@ -94,8 +94,8 @@ async function bidsFor(rfqId, { asBuyer = false } = {}) {
 
 async function recordQuoteOutcome(q) {
   if (q.outcome === 'lost' && !q.lossReason) {
-    throw new Error('A lost quote must record why. Conversion rate without a reason tells '
-                  + 'you that you are losing and nothing about what to change.');
+    throw new Error('A lost quote must record why. Conversion rate without a reason tells ' +
+                  'you that you are losing and nothing about what to change.');
   }
   const { rows } = await pool.query(
     `INSERT INTO quote_outcomes
@@ -110,7 +110,7 @@ async function recordQuoteOutcome(q) {
      RETURNING *`,
     [q.quoteRef, q.buyerId ?? null, q.product ?? null, q.quantityKg ?? null,
       q.quotedPriceInrPerKg ?? null, q.quotedDeliveryDays ?? null, q.outcome,
-      q.lossReason ?? null, q.competitorPriceInrPerKg ?? null, q.lossDetail ?? null]
+      q.lossReason ?? null, q.competitorPriceInrPerKg ?? null, q.lossDetail ?? null],
   );
   return rows[0];
 }
@@ -125,13 +125,13 @@ async function lossAnalysis({ days = 90 } = {}) {
        FROM quote_outcomes
       WHERE outcome = 'lost' AND quoted_at >= CURRENT_DATE - ($1 || ' days')::interval
       GROUP BY loss_reason ORDER BY losses DESC`,
-    [Number(days)]
+    [Number(days)],
   );
   const total = rows.reduce((s, r) => s + Number(r.losses), 0);
   const { rows: won } = await pool.query(
     `SELECT COUNT(*) AS n FROM quote_outcomes
       WHERE outcome = 'won' AND quoted_at >= CURRENT_DATE - ($1 || ' days')::interval`,
-    [Number(days)]
+    [Number(days)],
   );
   const wonN = Number(won[0].n);
   return {
@@ -139,9 +139,9 @@ async function lossAnalysis({ days = 90 } = {}) {
     lost: total, won: wonN,
     winRatePct: (total + wonN) ? Math.round((wonN / (total + wonN)) * 10000) / 100 : null,
     byReason: rows,
-    note: total === 0 && wonN === 0
-      ? 'No quotes recorded in this window — win rate is unknown, not 100%.'
-      : null,
+    note: total === 0 && wonN === 0 ?
+      'No quotes recorded in this window — win rate is unknown, not 100%.' :
+      null,
   };
 }
 
@@ -153,7 +153,7 @@ async function raiseQcHold(h) {
        (lot_code, hold_reason, lab_report_ref, failed_parameter, observed_value, permitted_limit)
      VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
     [h.lotCode, h.holdReason, h.labReportRef ?? null, h.failedParameter ?? null,
-      h.observedValue ?? null, h.permittedLimit ?? null]
+      h.observedValue ?? null, h.permittedLimit ?? null],
   );
 
   // AFFERENT WIRING: core/effectors.js already has a 'quality.failure_response'
@@ -172,28 +172,28 @@ async function raiseQcHold(h) {
       failedParameter: rows[0].failed_parameter ?? null,
       observedValue: rows[0].observed_value ?? null,
       permittedLimit: rows[0].permitted_limit ?? null,
-      labReportRef: rows[0].lab_report_ref ?? null
+      labReportRef: rows[0].lab_report_ref ?? null,
     },
-    { severity: SEVERITY.CRITICAL, source: 'rfqService.raiseQcHold', entityId: rows[0].lot_code ?? null }
+    { severity: SEVERITY.CRITICAL, source: 'rfqService.raiseQcHold', entityId: rows[0].lot_code ?? null },
   );
 
-  return { ...rows[0], note: 'Lot is blocked from dispatch. Release requires a named QC '
-    + 'manager and a signature.' };
+  return { ...rows[0], note: 'Lot is blocked from dispatch. Release requires a named QC ' +
+    'manager and a signature.' };
 }
 
 /** Release a hold. Requires a named person, a signature and a justification. */
 async function releaseQcHold({ holdId, releasedBy, signature, justification }) {
   if (!releasedBy || !signature || !justification || !justification.trim()) {
-    throw new Error('Releasing a QC hold requires the releasing person, their signature and '
-                  + 'a justification. The hold exists precisely because somebody must take '
-                  + 'responsibility for overriding it.');
+    throw new Error('Releasing a QC hold requires the releasing person, their signature and ' +
+                  'a justification. The hold exists precisely because somebody must take ' +
+                  'responsibility for overriding it.');
   }
   const { rows } = await pool.query(
     `UPDATE qc_holds
         SET status='released', released_by=$2, release_signature=$3,
             release_justification=$4, released_at=CURRENT_TIMESTAMP
       WHERE id=$1 AND status='held' RETURNING *`,
-    [holdId, releasedBy, signature, justification]
+    [holdId, releasedBy, signature, justification],
   );
   if (!rows.length) throw new Error(`Hold ${holdId} not found or not currently held`);
   return rows[0];
@@ -201,7 +201,7 @@ async function releaseQcHold({ holdId, releasedBy, signature, justification }) {
 
 async function activeHolds() {
   const { rows } = await pool.query(
-    "SELECT * FROM qc_holds WHERE status='held' ORDER BY held_at"
+    'SELECT * FROM qc_holds WHERE status=\'held\' ORDER BY held_at',
   );
   return { holds: rows, count: rows.length };
 }
@@ -214,7 +214,7 @@ async function centrePnl(fpoId) {
        JOIN fpo_cost_centres c ON c.id = p.centre_id
       WHERE ($1::uuid IS NULL OR c.fpo_id = $1)
       ORDER BY p.net_inr DESC NULLS LAST`,
-    [fpoId ?? null]
+    [fpoId ?? null],
   );
   const wastages = rows.map((r) => r.wastage_pct_of_procurement).filter((w) => w !== null).map(Number);
   const meanWastage = wastages.length ? wastages.reduce((a, b) => a + b, 0) / wastages.length : null;
@@ -224,8 +224,8 @@ async function centrePnl(fpoId) {
     meanWastagePct: meanWastage === null ? null : Math.round(meanWastage * 100) / 100,
     // The comparison is the control. An FPO-level total hides a centre being robbed.
     outliers: meanWastage === null ? [] : rows
-      .filter((r) => r.wastage_pct_of_procurement !== null
-                  && Number(r.wastage_pct_of_procurement) > meanWastage * 1.5)
+      .filter((r) => r.wastage_pct_of_procurement !== null &&
+                  Number(r.wastage_pct_of_procurement) > meanWastage * 1.5)
       .map((r) => ({ centre: r.centre_name, wastagePct: Number(r.wastage_pct_of_procurement),
         finding: 'Wastage more than 50% above the peer mean — badly run, or being robbed.' })),
   };
@@ -237,3 +237,4 @@ module.exports = {
   raiseQcHold, releaseQcHold, activeHolds,
   centrePnl,
 };
+

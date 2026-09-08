@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react';
 
 /**
  * Accessible drop-in replacement for the hand-rolled
@@ -14,45 +14,45 @@ import { useEffect, useRef } from 'react'
  * returns to the trigger element on close.
  */
 function Modal({ onClose, children, className = '' }) {
-  const overlayRef = useRef(null)
-  const previouslyFocused = useRef(null)
+  const overlayRef = useRef(null);
+  const previouslyFocused = useRef(null);
 
   useEffect(() => {
-    previouslyFocused.current = document.activeElement
+    previouslyFocused.current = document.activeElement;
 
     const focusable = overlayRef.current?.querySelectorAll(
-      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
     )
-    ;(focusable?.[0] || overlayRef.current)?.focus()
+    ;(focusable?.[0] || overlayRef.current)?.focus();
 
     function handleKeyDown(e) {
       if (e.key === 'Escape') {
-        e.preventDefault()
-        onClose?.()
-        return
+        e.preventDefault();
+        onClose?.();
+        return;
       }
-      if (e.key !== 'Tab') return
+      if (e.key !== 'Tab') return;
       const nodes = overlayRef.current?.querySelectorAll(
-        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-      )
-      if (!nodes || nodes.length === 0) return
-      const first = nodes[0]
-      const last = nodes[nodes.length - 1]
+        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!nodes || nodes.length === 0) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
       if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault()
-        last.focus()
+        e.preventDefault();
+        last.focus();
       } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault()
-        first.focus()
+        e.preventDefault();
+        first.focus();
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      previouslyFocused.current?.focus?.()
-    }
-  }, [onClose])
+      document.removeEventListener('keydown', handleKeyDown);
+      previouslyFocused.current?.focus?.();
+    };
+  }, [onClose]);
 
   return (
     <div
@@ -64,7 +64,7 @@ function Modal({ onClose, children, className = '' }) {
     >
       {children}
     </div>
-  )
+  );
 }
 
-export default Modal
+export default Modal;

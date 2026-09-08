@@ -22,7 +22,7 @@ async function createLandParcel(parcelData) {
       soil_type,
       irrigation_source,
       current_crop,
-      land_use_classification
+      land_use_classification,
     } = parcelData;
 
     const parcel = {
@@ -41,7 +41,7 @@ async function createLandParcel(parcelData) {
       current_crop,
       land_use_classification,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered land valuation
@@ -52,8 +52,8 @@ async function createLandParcel(parcelData) {
         location_data: await getLocationData(location),
         soil_analysis: await getSoilAnalysis(soil_type),
         market_trends: await getMarketTrends(land_type),
-        comparable_sales: await getComparableSales(village_id, area)
-      }
+        comparable_sales: await getComparableSales(village_id, area),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -72,8 +72,8 @@ async function createLandParcel(parcelData) {
         parcel.area, parcel.area_unit, JSON.stringify(parcel.location), parcel.land_type,
         parcel.ownership_type, JSON.stringify(parcel.boundary_details), parcel.soil_type,
         parcel.irrigation_source, parcel.current_crop, parcel.land_use_classification,
-        parcel.market_value, JSON.stringify(parcel.ai_valuation_data), parcel.status, parcel.created_at
-      ]
+        parcel.market_value, JSON.stringify(parcel.ai_valuation_data), parcel.status, parcel.created_at,
+      ],
     );
 
     logger.info(`Land parcel created: ${parcel.parcel_id}`);
@@ -99,7 +99,7 @@ async function transferLandOwnership(parcelId, fromFarmerId, toFarmerId, transfe
       transfer_details: transfer_details || {},
       documents: documents || [],
       approval_status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const result = await pool.query(
@@ -112,8 +112,8 @@ async function transferLandOwnership(parcelId, fromFarmerId, toFarmerId, transfe
         transfer.transfer_id, transfer.parcel_id, transfer.from_farmer_id,
         transfer.to_farmer_id, transfer.transfer_date, transfer.transfer_type,
         transfer.transfer_amount, JSON.stringify(transfer.transfer_details),
-        JSON.stringify(transfer.documents), transfer.approval_status, transfer.created_at
-      ]
+        JSON.stringify(transfer.documents), transfer.approval_status, transfer.created_at,
+      ],
     );
 
     logger.info(`Land transfer initiated: ${transfer.transfer_id}`);
@@ -128,7 +128,7 @@ async function getLandByFarmer(farmerId) {
   try {
     const result = await pool.query(
       'SELECT * FROM land_parcels WHERE farmer_id = $1 ORDER BY created_at DESC',
-      [farmerId]
+      [farmerId],
     );
 
     return {
@@ -136,7 +136,7 @@ async function getLandByFarmer(farmerId) {
       total_parcels: result.rows.length,
       total_area: result.rows.reduce((sum, parcel) => sum + parseFloat(parcel.area || 0), 0),
       total_value: result.rows.reduce((sum, parcel) => sum + parseFloat(parcel.market_value || 0), 0),
-      parcels: result.rows
+      parcels: result.rows,
     };
   } catch (error) {
     logger.error('Error getting land by farmer', { error: error.message });
@@ -153,7 +153,7 @@ async function getLandAnalytics({ district, land_type, startDate, endDate } = {}
       average_value_per_hectare: await getAverageValue(district, land_type),
       land_type_distribution: await getLandTypeDistribution(district),
       ownership_distribution: await getOwnershipDistribution(district),
-      ai_insights: await generateLandInsights(district, land_type)
+      ai_insights: await generateLandInsights(district, land_type),
     };
 
     return analytics;
@@ -171,7 +171,7 @@ async function getLocationData(location) {
   return {
     soil_quality: 'high',
     water_access: 'good',
-    climate_suitability: 'excellent'
+    climate_suitability: 'excellent',
   };
 }
 
@@ -179,7 +179,7 @@ async function getSoilAnalysis(soilType) {
   return {
     fertility: 'high',
     drainage: 'good',
-    organic_matter: 3.5
+    organic_matter: 3.5,
   };
 }
 
@@ -187,7 +187,7 @@ async function getMarketTrends(landType) {
   return {
     price_trend: 'increasing',
     demand: 'high',
-    appreciation_rate: 0.08
+    appreciation_rate: 0.08,
   };
 }
 
@@ -195,7 +195,7 @@ async function getComparableSales(villageId, area) {
   return {
     recent_sales: 5,
     average_price: 500000,
-    price_range: { min: 400000, max: 600000 }
+    price_range: { min: 400000, max: 600000 },
   };
 }
 
@@ -312,8 +312,8 @@ async function generateLandInsights(district, landType) {
       district,
       land_type: landType,
       market_data: await getMarketTrends(landType),
-      ownership_data: await getOwnershipDistribution(district)
-    }
+      ownership_data: await getOwnershipDistribution(district),
+    },
   };
 
   const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -324,6 +324,6 @@ module.exports = {
   createLandParcel,
   transferLandOwnership,
   getLandByFarmer,
-  getLandAnalytics
+  getLandAnalytics,
 };
 

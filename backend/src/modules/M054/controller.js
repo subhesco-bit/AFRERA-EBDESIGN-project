@@ -74,5 +74,5 @@ module.exports = {
   get,
   update,
   remove,
-  getCustomerInsights
+  getCustomerInsights,
 };

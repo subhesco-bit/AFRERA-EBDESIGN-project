@@ -43,7 +43,7 @@ async function recordWaterQualityMeasurement(measurementData) {
       chemical_contaminants,
       location_name,
       state,
-      district
+      district,
     } = measurementData;
 
     const measurement = {
@@ -59,13 +59,13 @@ async function recordWaterQualityMeasurement(measurementData) {
         temperature,
         total_dissolved_solids,
         bacterial_count,
-        chemical_contaminants
+        chemical_contaminants,
       },
       location_name,
       state,
       district,
       compliance_status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered water quality assessment
@@ -76,8 +76,8 @@ async function recordWaterQualityMeasurement(measurementData) {
         water_standards: await getWaterStandards(source_type),
         historical_data: await getHistoricalQualityData(location_id),
         seasonal_patterns: await getSeasonalPatterns(state, district),
-        usage_context: await getUsageContext(location_id)
-      }
+        usage_context: await getUsageContext(location_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -113,8 +113,8 @@ async function recordWaterQualityMeasurement(measurementData) {
         measurement.compliance_status,
         measurement.health_risk_level,
         JSON.stringify(measurement.ai_assessment),
-        measurement.created_at
-      ]
+        measurement.created_at,
+      ],
     );
 
     logger.info(`Water quality measurement recorded: ${measurement.measurement_id}`);
@@ -133,13 +133,13 @@ async function getComplianceReport(locationId, period) {
     const report = {
       report_id: generateId(),
       location_id: locationId,
-      period: period,
+      period,
       generated_at: new Date().toISOString(),
       measurements: await getMeasurements(locationId, period),
       compliance_score: await calculateComplianceScore(locationId, period),
       violations: await identifyViolations(locationId, period),
       trends: await analyzeQualityTrends(locationId, period),
-      recommendations: await generateComplianceRecommendations(locationId, period)
+      recommendations: await generateComplianceRecommendations(locationId, period),
     };
 
     return report;
@@ -162,7 +162,7 @@ async function monitorWaterQuality(locationId) {
       quality_index: await calculateQualityIndex(locationId),
       health_status: await determineHealthStatus(locationId),
       alerts: await generateQualityAlerts(locationId),
-      predictions: await predictQualityChanges(locationId)
+      predictions: await predictQualityChanges(locationId),
     };
 
     return monitoring;
@@ -186,8 +186,8 @@ async function generateTreatmentRecommendations(locationId, qualityIssues) {
         source_type: await getSourceType(locationId),
         treatment_capacity: await getTreatmentCapacity(locationId),
         budget_constraints: await getBudgetConstraints(locationId),
-        regulatory_requirements: await getRegulatoryRequirements(locationId)
-      }
+        regulatory_requirements: await getRegulatoryRequirements(locationId),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -202,7 +202,7 @@ async function generateTreatmentRecommendations(locationId, qualityIssues) {
       cost_estimate: aiResponse.cost_estimate,
       expected_improvement: aiResponse.expected_improvement,
       priority: aiResponse.priority,
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
 
     return recommendations;
@@ -223,20 +223,20 @@ async function getWaterStandards(sourceType) {
       ph: { min: 6.5, max: 8.5 },
       turbidity: { max: 5 },
       dissolved_oxygen: { min: 6 },
-      bacterial_count: { max: 0 }
+      bacterial_count: { max: 0 },
     },
     irrigation: {
       ph: { min: 6.0, max: 8.5 },
       turbidity: { max: 50 },
       dissolved_oxygen: { min: 3 },
-      bacterial_count: { max: 100 }
+      bacterial_count: { max: 100 },
     },
     industrial: {
       ph: { min: 5.5, max: 9.0 },
       turbidity: { max: 100 },
       dissolved_oxygen: { min: 2 },
-      bacterial_count: { max: 500 }
-    }
+      bacterial_count: { max: 500 },
+    },
   };
   return standards[sourceType] || standards.drinking_water;
 }
@@ -245,7 +245,7 @@ async function getHistoricalQualityData(locationId) {
   try {
     const result = await pool.query(
       'SELECT * FROM water_quality_measurements WHERE location_id = $1 ORDER BY sample_date DESC LIMIT 30',
-      [locationId]
+      [locationId],
     );
     return result.rows;
   } catch (error) {
@@ -257,7 +257,7 @@ async function getSeasonalPatterns(state, district) {
   return {
     monsoon: { ph: 'lower', turbidity: 'higher', bacterial: 'higher' },
     summer: { ph: 'higher', turbidity: 'lower', bacterial: 'lower' },
-    winter: { ph: 'stable', turbidity: 'stable', bacterial: 'lower' }
+    winter: { ph: 'stable', turbidity: 'stable', bacterial: 'lower' },
   };
 }
 
@@ -265,7 +265,7 @@ async function getUsageContext(locationId) {
   try {
     const result = await pool.query(
       'SELECT primary_use, secondary_use FROM water_usage_context WHERE location_id = $1',
-      [locationId]
+      [locationId],
     );
     return result.rows[0] || { primary_use: 'domestic', secondary_use: 'irrigation' };
   } catch (error) {
@@ -279,7 +279,7 @@ async function getMeasurements(locationId, period) {
       `SELECT * FROM water_quality_measurements 
        WHERE location_id = $1 AND sample_date >= $2 
        ORDER BY sample_date DESC`,
-      [locationId, period]
+      [locationId, period],
     );
     return result.rows;
   } catch (error) {
@@ -290,7 +290,7 @@ async function getMeasurements(locationId, period) {
 async function calculateComplianceScore(locationId, period) {
   const measurements = await getMeasurements(locationId, period);
   if (measurements.length === 0) return 0;
-  
+
   const compliantCount = measurements.filter(m => m.compliance_status === 'compliant').length;
   return Math.round((compliantCount / measurements.length) * 100);
 }
@@ -298,12 +298,12 @@ async function calculateComplianceScore(locationId, period) {
 async function identifyViolations(locationId, period) {
   const measurements = await getMeasurements(locationId, period);
   const violations = measurements.filter(m => m.compliance_status !== 'compliant');
-  
+
   return violations.map(v => ({
     measurement_id: v.measurement_id,
     sample_date: v.sample_date,
     violation_type: v.compliance_status,
-    parameters_out_of_range: v.ai_assessment?.parameters_out_of_range || []
+    parameters_out_of_range: v.ai_assessment?.parameters_out_of_range || [],
   }));
 }
 
@@ -312,22 +312,22 @@ async function analyzeQualityTrends(locationId, period) {
     ph_trend: 'stable',
     turbidity_trend: 'increasing',
     dissolved_oxygen_trend: 'decreasing',
-    overall_quality_trend: 'declining'
+    overall_quality_trend: 'declining',
   };
 }
 
 async function generateComplianceRecommendations(locationId, period) {
   const violations = await identifyViolations(locationId, period);
-  
+
   if (violations.length > 0) {
     return [
       'Implement regular water treatment',
       'Monitor contamination sources',
       'Increase sampling frequency',
-      'Install water filtration systems'
+      'Install water filtration systems',
     ];
   }
-  
+
   return ['Maintain current monitoring practices'];
 }
 
@@ -335,7 +335,7 @@ async function getCurrentReadings(locationId) {
   try {
     const result = await pool.query(
       'SELECT * FROM water_quality_measurements WHERE location_id = $1 ORDER BY sample_date DESC LIMIT 1',
-      [locationId]
+      [locationId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -350,7 +350,7 @@ async function calculateQualityIndex(locationId) {
     ph_index: 80,
     turbidity_index: 70,
     biological_index: 75,
-    chemical_index: 70
+    chemical_index: 70,
   };
 }
 
@@ -365,15 +365,15 @@ async function determineHealthStatus(locationId) {
 async function generateQualityAlerts(locationId) {
   const readings = await getCurrentReadings(locationId);
   const alerts = [];
-  
+
   if (readings.ph_level < 6.0 || readings.ph_level > 8.5) {
     alerts.push({ type: 'ph_anomaly', severity: 'high', message: 'pH level outside safe range' });
   }
-  
+
   if (readings.bacterial_count > 100) {
     alerts.push({ type: 'bacterial_contamination', severity: 'high', message: 'High bacterial count detected' });
   }
-  
+
   return alerts;
 }
 
@@ -384,7 +384,7 @@ async function predictQualityChanges(locationId) {
     configured: false,
     reason: 'No water-quality prediction model is wired for this location. Needs historical trend data and a real forecasting method.',
     factors: ['seasonal_changes', 'increased_usage', 'potential_contamination'],
-    recommended_actions: ['increase_monitoring', 'check_sources']
+    recommended_actions: ['increase_monitoring', 'check_sources'],
   };
 }
 
@@ -392,7 +392,7 @@ async function getSourceType(locationId) {
   try {
     const result = await pool.query(
       'SELECT source_type FROM water_sources WHERE location_id = $1',
-      [locationId]
+      [locationId],
     );
     return result.rows[0]?.source_type || 'drinking_water';
   } catch (error) {
@@ -405,7 +405,7 @@ async function getTreatmentCapacity(locationId) {
     current_capacity: 1000,
     utilized_capacity: 750,
     available_capacity: 250,
-    treatment_types: ['filtration', 'disinfection', 'reverse_osmosis']
+    treatment_types: ['filtration', 'disinfection', 'reverse_osmosis'],
   };
 }
 
@@ -413,7 +413,7 @@ async function getBudgetConstraints(locationId) {
   return {
     monthly_budget: 50000,
     current_spending: 35000,
-    available_budget: 15000
+    available_budget: 15000,
   };
 }
 
@@ -422,7 +422,7 @@ async function getRegulatoryRequirements(locationId) {
     standards: 'WHO_drinking_water',
     monitoring_frequency: 'daily',
     reporting_frequency: 'monthly',
-    compliance_threshold: 95
+    compliance_threshold: 95,
   };
 }
 
@@ -430,6 +430,6 @@ module.exports = {
   recordWaterQualityMeasurement,
   getComplianceReport,
   monitorWaterQuality,
-  generateTreatmentRecommendations
+  generateTreatmentRecommendations,
 };
 

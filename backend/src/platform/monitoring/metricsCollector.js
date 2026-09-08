@@ -2,7 +2,7 @@
  * Metrics Collector (Section 23: Observability)
  * Collects and aggregates system metrics
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class MetricsCollector {
   constructor() {

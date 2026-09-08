@@ -69,7 +69,7 @@ function priceFreeze({ lockedPrice, livePrice, lockedAtIso, nowIso } = {}) {
       frozen: true,
       msRemaining: PRICE_FREEZE_MS - elapsed,
       priceChanged: false,
-      requiresBuyerAcknowledgement: false
+      requiresBuyerAcknowledgement: false,
     };
   }
 
@@ -83,9 +83,9 @@ function priceFreeze({ lockedPrice, livePrice, lockedAtIso, nowIso } = {}) {
     delta: changed ? Math.round((live - locked) * 100) / 100 : 0,
     // The interface MUST surface this before charging.
     requiresBuyerAcknowledgement: changed,
-    message: changed
-      ? `The held price expired and this item is now ₹${live} (was ₹${locked}). Please confirm before checkout.`
-      : 'The held price expired but the price has not changed.'
+    message: changed ?
+      `The held price expired and this item is now ₹${live} (was ₹${locked}). Please confirm before checkout.` :
+      'The held price expired but the price has not changed.',
   };
 }
 
@@ -93,7 +93,7 @@ function priceFreeze({ lockedPrice, livePrice, lockedAtIso, nowIso } = {}) {
 // 2. Loyalty redemption
 // ---------------------------------------------------------------------------
 
-const LOYALTY_MIN_REDEEM = 100;   // minimum points redeemable
+const LOYALTY_MIN_REDEEM = 100; // minimum points redeemable
 const LOYALTY_POINTS_PER_RUPEE = 10; // 100 points -> ₹10
 
 /**
@@ -112,7 +112,7 @@ function loyaltyRedemption({ availablePoints } = {}) {
       creditRupees: 0,
       pointsRemaining: Math.floor(points),
       minimumRequired: LOYALTY_MIN_REDEEM,
-      message: `A minimum of ${LOYALTY_MIN_REDEEM} points is needed to redeem (you have ${Math.floor(points)}).`
+      message: `A minimum of ${LOYALTY_MIN_REDEEM} points is needed to redeem (you have ${Math.floor(points)}).`,
     };
   }
 
@@ -125,7 +125,7 @@ function loyaltyRedemption({ availablePoints } = {}) {
     creditRupees: credit,
     pointsRemaining: Math.floor(points - redeemable),
     conversionRate: `${LOYALTY_POINTS_PER_RUPEE} points = ₹1`,
-    message: `Redeemed ${redeemable} points for ₹${credit} wallet credit.`
+    message: `Redeemed ${redeemable} points for ₹${credit} wallet credit.`,
   };
 }
 
@@ -143,20 +143,20 @@ const SIP_BASE_PLANS = Object.freeze({
     { item: 'Seasonal vegetables', costPerWeek: 420 },
     { item: 'Seasonal fruit', costPerWeek: 330 },
     { item: 'NE speciality (rotating)', costPerWeek: 260 },
-    { item: 'Staples / pulses', costPerWeek: 290 }
+    { item: 'Staples / pulses', costPerWeek: 290 },
   ],
   protein: [
     { item: 'Pulses & legumes', costPerWeek: 480 },
     { item: 'Seasonal vegetables', costPerWeek: 360 },
     { item: 'Seasonal fruit', costPerWeek: 260 },
-    { item: 'NE speciality (rotating)', costPerWeek: 200 }
+    { item: 'NE speciality (rotating)', costPerWeek: 200 },
   ],
   immunity: [
     { item: 'Lakadong turmeric & spices', costPerWeek: 300 },
     { item: 'Citrus & vitamin-C fruit', costPerWeek: 380 },
     { item: 'Seasonal vegetables', costPerWeek: 380 },
-    { item: 'Fermented / probiotic NE items', costPerWeek: 240 }
-  ]
+    { item: 'Fermented / probiotic NE items', costPerWeek: 240 },
+  ],
 });
 
 const SIP_FREQUENCY = Object.freeze({ weekly: 4.33, fortnightly: 2.17, monthly: 1 });
@@ -181,7 +181,7 @@ function subscriptionPlan({ householdSize = 4, emphasis = 'balanced', monthlyBud
   const scale = size / 4;
   const items = base.map((i) => ({
     item: i.item,
-    costPerDelivery: Math.round(i.costPerWeek * scale)
+    costPerDelivery: Math.round(i.costPerWeek * scale),
   }));
 
   const perDelivery = items.reduce((s, i) => s + i.costPerDelivery, 0);
@@ -200,9 +200,9 @@ function subscriptionPlan({ householdSize = 4, emphasis = 'balanced', monthlyBud
     budget: hasBudget ? budget : null,
     withinBudget: hasBudget ? monthlyCost <= budget : null,
     shortfall: hasBudget && monthlyCost > budget ? monthlyCost - budget : 0,
-    note: hasBudget && monthlyCost > budget
-      ? `This basket costs ₹${monthlyCost}/month, which is ₹${monthlyCost - budget} above the stated budget. Reduce household size, change frequency, or raise the budget — items have not been silently removed to fit.`
-      : null
+    note: hasBudget && monthlyCost > budget ?
+      `This basket costs ₹${monthlyCost}/month, which is ₹${monthlyCost - budget} above the stated budget. Reduce household size, change frequency, or raise the budget — items have not been silently removed to fit.` :
+      null,
   };
 }
 
@@ -212,10 +212,10 @@ function subscriptionPlan({ householdSize = 4, emphasis = 'balanced', monthlyBud
 
 /** NCR delivery zones. Source: ne_harvest_v8_os DELIVERY_ZONES. */
 const DELIVERY_ZONES = Object.freeze({
-  '122001': { area: 'DLF Phase 1-5, Gurugram', hub: 'Sohna Rd RWA hub', eta: 'Saturday 7-11AM', cod: true },
-  '122002': { area: 'Sector 14-56, Gurugram', hub: 'Sohna Rd RWA hub', eta: 'Saturday 7-11AM', cod: true },
-  '122003': { area: 'Sushant Lok, Gurugram', hub: 'Sohna Rd RWA hub', eta: 'Saturday 7-11AM', cod: true },
-  '110030': { area: 'Vasant Vihar, Delhi', hub: 'South Delhi hub', eta: 'Sunday 8-12PM', cod: true }
+  122001: { area: 'DLF Phase 1-5, Gurugram', hub: 'Sohna Rd RWA hub', eta: 'Saturday 7-11AM', cod: true },
+  122002: { area: 'Sector 14-56, Gurugram', hub: 'Sohna Rd RWA hub', eta: 'Saturday 7-11AM', cod: true },
+  122003: { area: 'Sushant Lok, Gurugram', hub: 'Sohna Rd RWA hub', eta: 'Saturday 7-11AM', cod: true },
+  110030: { area: 'Vasant Vihar, Delhi', hub: 'South Delhi hub', eta: 'Sunday 8-12PM', cod: true },
 });
 
 function deliveryZone({ pincode } = {}) {
@@ -229,7 +229,7 @@ function deliveryZone({ pincode } = {}) {
       serviceable: false,
       valid: true,
       pincode: code,
-      message: 'Not currently serviceable. We deliver via RWA hubs and are adding areas as demand clusters.'
+      message: 'Not currently serviceable. We deliver via RWA hubs and are adding areas as demand clusters.',
     };
   }
   return { serviceable: true, valid: true, pincode: code, ...zone };
@@ -262,7 +262,7 @@ const HS_TIERS = [
   ['\u{1F33F}', 'Sprout', 100],
   ['\u{1F333}', 'Sapling', 300],
   ['\u{1F3D4}️', 'Grove', 600],
-  ['\u{1F451}', 'Forest Patron', 1000]
+  ['\u{1F451}', 'Forest Patron', 1000],
 ];
 
 function harvestTier(points) {
@@ -278,14 +278,14 @@ async function harvestPoints(userId) {
 
   const { rows: orderRows } = await pool.query(
     'SELECT COUNT(*)::int AS n FROM orders WHERE user_id = $1',
-    [userId]
+    [userId],
   );
   const { rows: subRows } = await pool.query(
     `SELECT COUNT(*)::int AS n
        FROM procurement_subscriptions ps
        JOIN rural_economic_units reu ON reu.id = ps.reu_id
       WHERE reu.user_id = $1 AND ps.status = 'active'`,
-    [userId]
+    [userId],
   );
 
   const orders = orderRows[0].n;
@@ -301,11 +301,11 @@ async function harvestPoints(userId) {
     userId,
     totalPoints,
     currentTier: { emoji: tier[0], name: tier[1], threshold: tier[2] },
-    nextTier: next
-      ? { emoji: next[0], name: next[1], threshold: next[2], pointsNeeded: next[2] - totalPoints }
-      : null,
+    nextTier: next ?
+      { emoji: next[0], name: next[1], threshold: next[2], pointsNeeded: next[2] - totalPoints } :
+      null,
     breakdown: { orders: orders * 50, subscriptions: subs * 120, gifts: gifts * 40 },
-    counts: { orders, subscriptions: subs, giftOrders: gifts }
+    counts: { orders, subscriptions: subs, giftOrders: gifts },
   };
 }
 
@@ -354,5 +354,6 @@ module.exports = {
   harvestTier,
   HS_TIERS,
   PRICE_FREEZE_MS,
-  LOYALTY_MIN_REDEEM
+  LOYALTY_MIN_REDEEM,
 };
+

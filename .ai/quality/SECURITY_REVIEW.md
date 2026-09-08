@@ -1,6 +1,6 @@
 # SECURITY REVIEW
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Last Updated:** 24 August 2026  
 **Type:** HIGH-LEVEL SECURITY REVIEW
 
@@ -323,3 +323,4 @@
 ---
 
 *This is a review/documentation task, not authorization to perform destructive security changes.*
+

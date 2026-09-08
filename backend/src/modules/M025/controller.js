@@ -34,5 +34,5 @@ const getRecommendedSubsidies = async (req, res) => {
 module.exports = {
   createSubsidyScheme,
   applyForSubsidy,
-  getRecommendedSubsidies
+  getRecommendedSubsidies,
 };

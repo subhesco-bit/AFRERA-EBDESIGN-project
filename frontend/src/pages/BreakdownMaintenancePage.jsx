@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Breakdown Maintenance (backend/src/modules/M107). Generic operation panel -
@@ -12,5 +12,5 @@ export default function BreakdownMaintenancePage() {
       title="Breakdown Maintenance"
       description="Equipment breakdown and emergency repair tracking."
     />
-  )
+  );
 }

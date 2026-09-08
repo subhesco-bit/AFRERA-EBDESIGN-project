@@ -1,6 +1,6 @@
 # KNOWN ISSUES AND TECHNICAL DEBT
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Last Updated:** 24 August 2026
 
 ## Known Bugs
@@ -306,3 +306,4 @@
 ---
 
 *This document provides a comprehensive view of known issues and technical debt.*
+

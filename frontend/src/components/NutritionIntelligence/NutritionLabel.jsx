@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { nutritionAPI } from '../../services/api';
+import { nutritionAPI } from '../../services/componentApi';
 
 /**
  * Nutrition Label Component
@@ -37,7 +37,7 @@ const NutritionLabel = ({ productId, showComparison = false, nutritionData: nutr
       const [nutritionResponse, scoreResponse, valueResponse] = await Promise.all([
         nutritionAPI.getProductNutrition(productId),
         nutritionAPI.getNutritionScore(productId).catch(() => null),
-        nutritionAPI.getValuePerNutrient(productId).catch(() => null)
+        nutritionAPI.getValuePerNutrient(productId).catch(() => null),
       ]);
 
       setNutritionData(nutritionResponse.data);
@@ -243,7 +243,7 @@ const NutritionLabel = ({ productId, showComparison = false, nutritionData: nutr
         <p className="mt-1">Your daily values may be higher or lower depending on your calorie needs.</p>
         {nutritionData.verification_method && (
           <p className="mt-2">
-            <strong>Verification:</strong> {nutritionData.verification_method} 
+            <strong>Verification:</strong> {nutritionData.verification_method}
             {nutritionData.confidence_score && ` (${(nutritionData.confidence_score * 100).toFixed(0)}% confidence)`}
           </p>
         )}
@@ -252,7 +252,7 @@ const NutritionLabel = ({ productId, showComparison = false, nutritionData: nutr
       {showComparison && scoreData && (
         <div className="bg-blue-50 p-4 border-t">
           <p className="text-sm text-blue-800">
-            <strong>Value-Based Pricing:</strong> This product qualifies for a nutrition-based price premium 
+            <strong>Value-Based Pricing:</strong> This product qualifies for a nutrition-based price premium
             due to its {scoreData.grade} grade.
           </p>
         </div>

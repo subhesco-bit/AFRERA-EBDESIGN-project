@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Shield, CheckCircle2, XCircle, HelpCircle } from 'lucide-react'
-import { defenseFitnessPrepAPI } from '../services/api'
-import { AsyncState, Section } from '../components/common/DataPrimitives'
-import { Card, CardContent } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Badge } from '../components/ui/badge'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Shield, CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
+import { defenseFitnessPrepAPI } from '../services/api';
+import { AsyncState, Section } from '../components/common/DataPrimitives';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
 
 /**
  * Defense/Police/BSF Fitness Prep — self-training comparison against real,
@@ -16,40 +16,40 @@ import { Badge } from '../components/ui/badge'
  * standards are cycle-dependent and change.
  */
 function componentLabel(component) {
-  return component.replace(/_/g, ' ').replace('km', ' km').replace('m', ' m')
+  return component.replace(/_/g, ' ').replace('km', ' km').replace('m', ' m');
 }
 
 function formatThreshold(row) {
-  if (row.threshold_value === null) return 'varies by cycle — see source'
+  if (row.threshold_value === null) return 'varies by cycle — see source';
   if (row.threshold_type === 'max_time_seconds') {
-    const m = Math.floor(row.threshold_value / 60)
-    const s = row.threshold_value % 60
-    return `within ${m}:${String(s).padStart(2, '0')}`
+    const m = Math.floor(row.threshold_value / 60);
+    const s = row.threshold_value % 60;
+    return `within ${m}:${String(s).padStart(2, '0')}`;
   }
-  return `≥ ${row.threshold_value} ${row.unit}`
+  return `≥ ${row.threshold_value} ${row.unit}`;
 }
 
 export default function DefenseFitnessPrepPage() {
-  const queryClient = useQueryClient()
-  const [category, setCategory] = useState('')
-  const [gender, setGender] = useState('male')
-  const [attemptValues, setAttemptValues] = useState({})
+  const queryClient = useQueryClient();
+  const [category, setCategory] = useState('');
+  const [gender, setGender] = useState('male');
+  const [attemptValues, setAttemptValues] = useState({});
 
   const { data: categories, isLoading: catLoading } = useQuery({
     queryKey: ['defense-fitness-categories'],
     queryFn: () => defenseFitnessPrepAPI.getCategories().then((r) => r.data?.data || []),
-  })
+  });
 
   const { data: readiness, isLoading: readinessLoading, error: readinessError } = useQuery({
     queryKey: ['defense-fitness-readiness', category, gender],
     queryFn: () => defenseFitnessPrepAPI.getReadiness(category, gender).then((r) => r.data?.data || []),
     enabled: Boolean(category),
-  })
+  });
 
   const recordMutation = useMutation({
     mutationFn: ({ testComponent, value }) => defenseFitnessPrepAPI.recordAttempt(category, testComponent, value, 'manual'),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['defense-fitness-readiness', category, gender] }),
-  })
+  });
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
@@ -141,5 +141,5 @@ export default function DefenseFitnessPrepPage() {
         </Section>
       )}
     </main>
-  )
+  );
 }

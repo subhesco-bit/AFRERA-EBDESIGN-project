@@ -5,33 +5,33 @@
  * on a real invoice looks completely normal until a buyer tries to claim input
  * credit against it and cannot.
  */
-import React, { useState, useEffect } from 'react'
-import { complianceAPI } from '../services/api'
-import { ModulePage, Section, Field, Rupees, Value, AsyncState, DataTable } from '../components/common/DataPrimitives'
+import React, { useState, useEffect } from 'react';
+import { complianceAPI } from '../services/api';
+import { ModulePage, Section, Field, Rupees, Value, AsyncState, DataTable } from '../components/common/DataPrimitives';
 
 export default function CompliancePage() {
-  const [summary, setSummary] = useState(null)
-  const [rates, setRates] = useState(null)
-  const [rcm, setRcm] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [period, setPeriod] = useState('')
+  const [summary, setSummary] = useState(null);
+  const [rates, setRates] = useState(null);
+  const [rcm, setRcm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [period, setPeriod] = useState('');
 
   useEffect(() => {
     (async () => {
       try {
-        const [s, r] = await Promise.all([complianceAPI.tdsSummary({}), complianceAPI.tdsRates()])
-        setSummary(s.data?.data); setRates(r.data?.data)
-      } catch (e) { setError(e.response?.data?.error || e.message) } finally { setLoading(false) }
-    })()
-  }, [])
+        const [s, r] = await Promise.all([complianceAPI.tdsSummary({}), complianceAPI.tdsRates()]);
+        setSummary(s.data?.data); setRates(r.data?.data);
+      } catch (e) { setError(e.response?.data?.error || e.message); } finally { setLoading(false); }
+    })();
+  }, []);
 
   const loadRcm = async (e) => {
-    e.preventDefault()
-    if (!period) return
-    try { const r = await complianceAPI.rcmOutstanding(period); setRcm(r.data?.data) }
-    catch (err) { setRcm({ error: err.message }) }
-  }
+    e.preventDefault();
+    if (!period) return;
+    try { const r = await complianceAPI.rcmOutstanding(period); setRcm(r.data?.data); }
+    catch (err) { setRcm({ error: err.message }); }
+  };
 
   return (
     <ModulePage title="Tax compliance" subtitle="TDS, e-invoicing, GSTR and reverse charge — one surface, not four features."
@@ -40,8 +40,8 @@ export default function CompliancePage() {
         <>
           <Section title={`TDS — ${summary?.financialYear || ''} ${summary?.quarter || ''}`}>
             {summary?.warning && (
-              <p role="alert" style={{ border: '1px solid #cf222e', borderLeft: '4px solid #cf222e',
-                background: '#ffebe9', borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>
+              <p role="alert" style={{ border: '1px solid hsl(var(--destructive))', borderLeft: '4px solid hsl(var(--destructive))',
+                background: 'color-mix(in srgb, hsl(var(--destructive)) 12%, transparent)', borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>
                 <strong>{summary.warning}</strong>
               </p>
             )}
@@ -98,5 +98,5 @@ export default function CompliancePage() {
         </>
       </AsyncState>
     </ModulePage>
-  )
+  );
 }

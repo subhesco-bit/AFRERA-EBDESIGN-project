@@ -9,25 +9,25 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
+import { financialAPI } from '../services/api';
 
 const FinancialServicesDashboard = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const [activeTab, setActiveTab] = useState('overview');
 
   // Financial overview data
-  const { data: financialData, isLoading: financialLoading } = useQuery({
+  const { data: financialData, isLoading: financialLoading, error: financialError } = useQuery({
     queryKey: ['financialOverview', timeRange],
-    queryFn: () => fetch(`/api/financial/overview?timeRange=${timeRange}`)
-      .then(res => res.json())
-      .then(res => res.data),
-    refetchInterval: 300000 // 5 minutes
+    queryFn: () => financialAPI.getOverview(timeRange)
+      .then(res => res.data.data),
+    refetchInterval: 300000, // 5 minutes
   });
 
   const timeRanges = [
     { value: '7d', label: '7 Days' },
     { value: '30d', label: '30 Days' },
     { value: '90d', label: '90 Days' },
-    { value: '1y', label: '1 Year' }
+    { value: '1y', label: '1 Year' },
   ];
 
   return (
@@ -62,6 +62,10 @@ const FinancialServicesDashboard = () => {
 
       {financialLoading ? (
         <LoadingSkeleton variant="rectangular" lines={4} />
+      ) : financialError ? (
+        <p className="rounded border border-red-200 bg-red-50 p-4 text-red-700">
+          Unable to load financial services data: {financialError.message}
+        </p>
       ) : (
         <>
           {/* Key Financial Metrics */}

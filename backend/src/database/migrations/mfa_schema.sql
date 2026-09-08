@@ -4,7 +4,7 @@
 -- MFA secrets table
 CREATE TABLE IF NOT EXISTS mfa_secrets (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     secret VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20),
     enabled BOOLEAN DEFAULT false,

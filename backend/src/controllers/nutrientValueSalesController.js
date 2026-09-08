@@ -1,6 +1,6 @@
 /**
  * AFRERA Nutrient Value Sales Controller
- * 
+ *
  * Handles all nutrient-value-based sales endpoints:
  * - Nutrient-Value Pricing
  * - Nutrient Content Verification
@@ -27,15 +27,15 @@ async function calculateNutrientValuePrice(req, res) {
   try {
     const { productId } = req.params;
     const { nutrientContent } = req.body;
-    
+
     const result = await nutrientValueSalesService.calculateNutrientValuePrice(productId, nutrientContent);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in calculateNutrientValuePrice controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to calculate nutrient value price'
+      error: error.message || 'Failed to calculate nutrient value price',
     });
   }
 }
@@ -51,15 +51,15 @@ async function calculateNutrientValuePrice(req, res) {
 async function submitNutrientContent(req, res) {
   try {
     const { productId, contentData, verificationData } = req.body;
-    
+
     const result = await nutrientValueSalesService.submitNutrientContent(productId, contentData, verificationData);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in submitNutrientContent controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to submit nutrient content verification'
+      error: error.message || 'Failed to submit nutrient content verification',
     });
   }
 }
@@ -72,15 +72,15 @@ async function approveNutrientVerification(req, res) {
   try {
     const { verificationId } = req.params;
     const { approvedBy, notes } = req.body;
-    
+
     const result = await nutrientValueSalesService.approveNutrientVerification(verificationId, approvedBy, notes);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in approveNutrientVerification controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to approve nutrient verification'
+      error: error.message || 'Failed to approve nutrient verification',
     });
   }
 }
@@ -97,13 +97,13 @@ async function createNutrientValueListing(req, res) {
   try {
     const sellerId = req.user.id;
     const result = await nutrientValueSalesService.createNutrientValueListing(sellerId, req.body);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in createNutrientValueListing controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to create nutrient-value listing'
+      error: error.message || 'Failed to create nutrient-value listing',
     });
   }
 }
@@ -120,15 +120,15 @@ async function assignNutrientTier(req, res) {
   try {
     const { productId } = req.params;
     const { manualOverride } = req.body;
-    
+
     const result = await nutrientValueSalesService.assignNutrientTier(productId, manualOverride);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in assignNutrientTier controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to assign nutrient tier'
+      error: error.message || 'Failed to assign nutrient tier',
     });
   }
 }
@@ -144,15 +144,15 @@ async function assignNutrientTier(req, res) {
 async function compareProductsByNutrient(req, res) {
   try {
     const { productIds } = req.body;
-    
+
     const result = await nutrientValueSalesService.compareProductsByNutrient(productIds);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in compareProductsByNutrient controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to compare products by nutrient'
+      error: error.message || 'Failed to compare products by nutrient',
     });
   }
 }
@@ -168,15 +168,15 @@ async function compareProductsByNutrient(req, res) {
 async function issueNutrientCertificate(req, res) {
   try {
     const { productId, certificationData } = req.body;
-    
+
     const result = await nutrientValueSalesService.issueNutrientCertificate(productId, certificationData);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in issueNutrientCertificate controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to issue nutrient certificate'
+      error: error.message || 'Failed to issue nutrient certificate',
     });
   }
 }
@@ -192,15 +192,15 @@ async function issueNutrientCertificate(req, res) {
 async function calculateNutrientBasedCommission(req, res) {
   try {
     const { orderId } = req.params;
-    
+
     const result = await nutrientValueSalesService.calculateNutrientBasedCommission(orderId);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in calculateNutrientBasedCommission controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to calculate nutrient-based commission'
+      error: error.message || 'Failed to calculate nutrient-based commission',
     });
   }
 }
@@ -216,15 +216,15 @@ async function calculateNutrientBasedCommission(req, res) {
 async function searchByNutrientCriteria(req, res) {
   try {
     const criteria = req.query;
-    
+
     const result = await nutrientValueSalesService.searchByNutrientCriteria(criteria);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in searchByNutrientCriteria controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to search by nutrient criteria'
+      error: error.message || 'Failed to search by nutrient criteria',
     });
   }
 }
@@ -236,26 +236,26 @@ async function searchByNutrientCriteria(req, res) {
 module.exports = {
   // Nutrient-Value Pricing
   calculateNutrientValuePrice,
-  
+
   // Nutrient Content Verification
   submitNutrientContent,
   approveNutrientVerification,
-  
+
   // Nutrient-Value Listings
   createNutrientValueListing,
-  
+
   // Nutrient Quality Tiers
   assignNutrientTier,
-  
+
   // Nutrient-Based Comparison
   compareProductsByNutrient,
-  
+
   // Nutrient Certification
   issueNutrientCertificate,
-  
+
   // Nutrient-Based Commission
   calculateNutrientBasedCommission,
-  
+
   // Nutrient-Value Search
-  searchByNutrientCriteria
+  searchByNutrientCriteria,
 };

@@ -1,12 +1,12 @@
-import { useMemo, useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
-import { Bot, Sparkles, MessageSquare, Cloud, Brain, RefreshCw, Send, CheckCircle2, XCircle } from 'lucide-react'
-import { aiBackboneAPI } from '../services/api'
-import { AsyncState, Section } from '../components/common/DataPrimitives'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
+import { useMemo, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { Bot, Sparkles, MessageSquare, Cloud, Brain, RefreshCw, Send, CheckCircle2, XCircle } from 'lucide-react';
+import { aiBackboneAPI } from '../services/api';
+import { AsyncState, Section } from '../components/common/DataPrimitives';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 
 /**
  * AI Backbone — layer 2 of AFRERA's AI system, backend/src/services/aiBackboneService.js,
@@ -27,8 +27,8 @@ const PROVIDER_META = {
   gemini: { label: 'Gemini', vendor: 'Google', icon: Bot },
   azure: { label: 'Azure OpenAI', vendor: 'Microsoft', icon: Cloud },
   huggingface: { label: 'Hugging Face', vendor: 'Open models', icon: Brain },
-}
-const PROVIDER_ORDER = ['claude', 'openai', 'gemini', 'azure', 'huggingface']
+};
+const PROVIDER_ORDER = ['claude', 'openai', 'gemini', 'azure', 'huggingface'];
 
 function ProviderStatusBadge({ configured, enabled }) {
   if (configured && enabled) {
@@ -36,24 +36,24 @@ function ProviderStatusBadge({ configured, enabled }) {
       <Badge className="gap-1 border-transparent bg-sev-info/15 text-sev-info hover:bg-sev-info/15">
         <CheckCircle2 className="h-3 w-3" /> Ready
       </Badge>
-    )
+    );
   }
   return (
     <Badge variant="outline" className="gap-1 text-muted-foreground">
       <XCircle className="h-3 w-3" /> Not configured
     </Badge>
-  )
+  );
 }
 
 function ProviderCard({ name, config, stats }) {
-  const meta = PROVIDER_META[name]
-  const Icon = meta.icon
-  const configured = Boolean(config?.configured)
-  const enabled = Boolean(config?.enabled)
-  const total = stats?.total ?? 0
-  const success = stats?.success ?? 0
-  const failed = stats?.failed ?? 0
-  const successRate = total > 0 ? Math.round((success / total) * 100) : null
+  const meta = PROVIDER_META[name];
+  const Icon = meta.icon;
+  const configured = Boolean(config?.configured);
+  const enabled = Boolean(config?.enabled);
+  const total = stats?.total ?? 0;
+  const success = stats?.success ?? 0;
+  const failed = stats?.failed ?? 0;
+  const successRate = total > 0 ? Math.round((success / total) * 100) : null;
 
   return (
     <Card className={!configured ? 'opacity-70' : undefined}>
@@ -86,7 +86,7 @@ function ProviderCard({ name, config, stats }) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function SetupNotice() {
@@ -106,53 +106,53 @@ function SetupNotice() {
         backend.
       </p>
     </div>
-  )
+  );
 }
 
 export default function AIBackbonePage() {
-  const queryClient = useQueryClient()
-  const [prompt, setPrompt] = useState('')
-  const [provider, setProvider] = useState('')
-  const [lastResult, setLastResult] = useState(null)
-  const [lastError, setLastError] = useState(null)
+  const queryClient = useQueryClient();
+  const [prompt, setPrompt] = useState('');
+  const [provider, setProvider] = useState('');
+  const [lastResult, setLastResult] = useState(null);
+  const [lastError, setLastError] = useState(null);
 
   const { data: status, isLoading, error } = useQuery({
     queryKey: ['ai-backbone-status'],
     queryFn: () => aiBackboneAPI.getAIProviderStatus().then((r) => r.data?.data),
     refetchInterval: 20000,
-  })
+  });
 
-  const availableProviders = status?.availableProviders || []
+  const availableProviders = status?.availableProviders || [];
 
   const callMutation = useMutation({
     mutationFn: () => aiBackboneAPI.callAI({ prompt, ...(provider ? { provider } : {}) }),
     onMutate: () => {
-      setLastResult(null)
-      setLastError(null)
+      setLastResult(null);
+      setLastError(null);
     },
     onSuccess: (res) => {
-      setLastResult(res.data?.data)
-      queryClient.invalidateQueries({ queryKey: ['ai-backbone-status'] })
+      setLastResult(res.data?.data);
+      queryClient.invalidateQueries({ queryKey: ['ai-backbone-status'] });
     },
     onError: (err) => {
-      setLastError(err.response?.data?.error || err.message)
-      queryClient.invalidateQueries({ queryKey: ['ai-backbone-status'] })
+      setLastError(err.response?.data?.error || err.message);
+      queryClient.invalidateQueries({ queryKey: ['ai-backbone-status'] });
     },
-  })
+  });
 
   const resetMutation = useMutation({
     mutationFn: () => aiBackboneAPI.resetAIStatistics(),
     onSuccess: () => {
-      toast.success('AI backbone statistics reset')
-      queryClient.invalidateQueries({ queryKey: ['ai-backbone-status'] })
+      toast.success('AI backbone statistics reset');
+      queryClient.invalidateQueries({ queryKey: ['ai-backbone-status'] });
     },
     onError: (err) => toast.error(err.response?.data?.error || err.message),
-  })
+  });
 
   const providerOptions = useMemo(
     () => PROVIDER_ORDER.filter((p) => availableProviders.includes(p)),
-    [availableProviders]
-  )
+    [availableProviders],
+  );
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
@@ -272,5 +272,5 @@ export default function AIBackbonePage() {
         </Card>
       </Section>
     </main>
-  )
+  );
 }

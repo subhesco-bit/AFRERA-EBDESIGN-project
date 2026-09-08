@@ -9,6 +9,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const pool = require('../database/pool');
 const { authMiddleware } = require('../middleware/auth');
@@ -21,7 +23,7 @@ async function trackOneKey(key) {
   const byNumber = await pool.query(
     `SELECT s.*, (SELECT json_agg(t.* ORDER BY t.timestamp ASC) FROM shipment_tracking t WHERE t.shipment_id = s.id) AS tracking_history
        FROM shipments s WHERE s.shipment_number = $1`,
-    [trimmed]
+    [trimmed],
   );
   if (byNumber.rows.length > 0) return { queriedKey: trimmed, matchType: 'shipment_number', shipment: byNumber.rows[0] };
 
@@ -29,7 +31,7 @@ async function trackOneKey(key) {
   // vehicle FK in this schema, so this surfaces the vehicle record itself
   // plus its most recent tracking-relevant status, honestly, rather than
   // inventing a shipment linkage that doesn't exist.
-  const byVehicle = await pool.query(`SELECT * FROM vehicles WHERE registration_number = $1`, [trimmed]);
+  const byVehicle = await pool.query('SELECT * FROM vehicles WHERE registration_number = $1', [trimmed]);
   if (byVehicle.rows.length > 0) {
     return { queriedKey: trimmed, matchType: 'vehicle_registration', vehicle: byVehicle.rows[0], note: 'This schema does not link shipments to a vehicle directly, so no shipment history is attached here.' };
   }

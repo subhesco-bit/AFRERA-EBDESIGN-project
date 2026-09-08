@@ -39,7 +39,7 @@ function createCrudService(tableName, { idColumn = 'id', orderBy = 'created_at D
     const listParams = [...params, limitNum, offset];
     const res = await pool.query(
       `SELECT * FROM ${tableName} ${where} ORDER BY ${orderBy} LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-      listParams
+      listParams,
     );
     return { items: res.rows, pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.max(1, Math.ceil(total / limitNum)) } };
   }
@@ -62,7 +62,7 @@ function createCrudService(tableName, { idColumn = 'id', orderBy = 'created_at D
     const placeholders = cols.map((_, i) => `$${i + 1}`);
     const res = await pool.query(
       `INSERT INTO ${tableName} (${cols.join(', ')}) VALUES (${placeholders.join(', ')}) RETURNING *`,
-      values
+      values,
     );
     return res.rows[0];
   }
@@ -75,14 +75,14 @@ function createCrudService(tableName, { idColumn = 'id', orderBy = 'created_at D
     values.push(id);
     const res = await pool.query(
       `UPDATE ${tableName} SET ${setClauses.join(', ')}, updated_at = NOW() WHERE ${idColumn} = $${values.length} RETURNING *`,
-      values
+      values,
     );
     return res.rows[0] || null;
   }
 
   async function remove(id) {
     const res = await pool.query(`DELETE FROM ${tableName} WHERE ${idColumn} = $1 RETURNING ${idColumn}`, [id]);
-    return !!res.rows[0];
+    return Boolean(res.rows[0]);
   }
 
   return { list, get, create, update, remove };
@@ -92,14 +92,15 @@ module.exports = { createCrudService };
 
 // Merged from backend/src/modules/M076
 {
-  const m076 = require("../../modules/M076/service");
+  const m076 = require('../../modules/M076/service');
   const { ...rest } = m076;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M105
 {
-  const m105 = require("../../modules/M105/service");
+  const m105 = require('../../modules/M105/service');
   const { ...rest } = m105;
   Object.assign(module.exports, rest);
 }
+

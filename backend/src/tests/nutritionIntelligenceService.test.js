@@ -13,7 +13,7 @@ describe('Nutrition Intelligence Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     // Create test user and get auth token
@@ -22,7 +22,7 @@ describe('Nutrition Intelligence Service', () => {
       .send({
         email: 'nutrition-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
 
     authToken = registerResponse.body.token;
@@ -70,14 +70,14 @@ describe('Nutrition Intelligence Service', () => {
             VIT_A: 0,
             VIT_C: 0,
             CAL: 28,
-            IRON: 0.8
+            IRON: 0.8,
           },
           serving_size_g: 100,
           calories_per_100g: 346,
           glycemic_index: 68,
           glycemic_load: 52,
           anti_inflammatory_score: 3,
-          antioxidant_capacity: 150
+          antioxidant_capacity: 150,
         })
         .expect(201);
 
@@ -89,7 +89,7 @@ describe('Nutrition Intelligence Service', () => {
       const response = await request(app)
         .post('/api/v1/nutrition-intelligence/food-profiles')
         .send({
-          food_name: 'Test Food'
+          food_name: 'Test Food',
         })
         .expect(401);
     });
@@ -114,7 +114,7 @@ describe('Nutrition Intelligence Service', () => {
   describe('POST /api/v1/nutrition-intelligence/product-nutrition', () => {
     it('should add nutrition data to product', async () => {
       testProductId = 'test-product-id-123';
-      
+
       const response = await request(app)
         .post('/api/v1/nutrition-intelligence/product-nutrition')
         .set('Authorization', `Bearer ${authToken}`)
@@ -136,13 +136,13 @@ describe('Nutrition Intelligence Service', () => {
             VIT_A: 5,
             VIT_C: 2,
             CAL: 30,
-            IRON: 1.2
+            IRON: 1.2,
           },
           calories_per_serving: 320,
           serving_size_g: 100,
           servings_per_container: 5,
           verification_method: 'lab_test',
-          confidence_score: 0.95
+          confidence_score: 0.95,
         })
         .expect(201);
 
@@ -174,7 +174,7 @@ describe('Nutrition Intelligence Service', () => {
         .post(`/api/v1/nutrition-intelligence/product-nutrition/${testProductId}/score`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          scoring_model_id: 1
+          scoring_model_id: 1,
         })
         .expect(200);
 
@@ -203,7 +203,7 @@ describe('Nutrition Intelligence Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           base_price: 100,
-          pricing_rule_id: 1
+          pricing_rule_id: 1,
         })
         .expect(200);
 
@@ -220,7 +220,7 @@ describe('Nutrition Intelligence Service', () => {
         .post('/api/v1/nutrition-intelligence/compare')
         .send({
           product_a_id: testProductId,
-          product_b_id: 'test-product-id-456'
+          product_b_id: 'test-product-id-456',
         })
         .expect(200);
 

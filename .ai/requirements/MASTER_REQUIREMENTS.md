@@ -1,6 +1,6 @@
 # MASTER REQUIREMENTS
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Last Updated:** 24 August 2026
 
 ## Confidence Levels
@@ -414,3 +414,4 @@
 ---
 
 *This document reconstructs requirements from existing code, documentation, and implementation.*
+

@@ -1,37 +1,37 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { DollarSign, Search, TrendingUp, TrendingDown, MapPin, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import { DollarSign, Search, TrendingUp, TrendingDown, MapPin, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 function PriceCheckPage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedState, setSelectedState] = useState('all')
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedState, setSelectedState] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: marketPrices } = useQuery({
     queryKey: ['market-prices', selectedState, selectedCategory],
     queryFn: () => farmersAPI.getMarketPrices(selectedState, selectedCategory).then(r => r.data),
-  })
+  });
 
   const { data: priceTrends } = useQuery({
     queryKey: ['price-trends'],
     queryFn: () => farmersAPI.getPriceTrends().then(r => r.data),
-  })
+  });
 
   const { data: states } = useQuery({
     queryKey: ['states'],
     queryFn: () => farmersAPI.getStates().then(r => r.data),
-  })
+  });
 
   const { data: categories } = useQuery({
     queryKey: ['price-categories'],
     queryFn: () => farmersAPI.getPriceCategories().then(r => r.data),
-  })
+  });
 
   const filteredPrices = marketPrices?.filter(price =>
-    price.commodity.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+    price.commodity.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -120,9 +120,9 @@ function PriceCheckPage() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-        {/* A caption is the first thing a screen-reader user hears. Without
+            {/* A caption is the first thing a screen-reader user hears. Without
             it the table is announced only as "table with N columns". */}
-        <caption className="sr-only">Price comparison across sources</caption>
+            <caption className="sr-only">Price comparison across sources</caption>
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -209,7 +209,7 @@ function PriceCheckPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default PriceCheckPage
+export default PriceCheckPage;

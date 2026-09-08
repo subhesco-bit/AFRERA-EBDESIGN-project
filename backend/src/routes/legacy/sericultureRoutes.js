@@ -5,10 +5,10 @@
 
 const express = require('express');
 const router = express.Router();
-const sericultureService = require('../../services/legacy/sericultureService');
+const sericultureService = require('../../services/legacy/sericultureService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - fixed to the real middleware module. See apicultureRoutes.js.
-const { authMiddleware: authenticate } = require('../../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth.js');
 
 // GET /api/v1/sericulture - Get all sericulture
 router.get('/', authenticate, async (req, res) => {
@@ -16,7 +16,7 @@ router.get('/', authenticate, async (req, res) => {
     const filters = {
       farmer_id: req.query.farmer_id,
       variety: req.query.variety,
-      status: req.query.status
+      status: req.query.status,
     };
     const sericulture = await sericultureService.getAllSericulture(filters);
     res.json({ success: true, data: sericulture });

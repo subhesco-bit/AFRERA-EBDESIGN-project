@@ -30,7 +30,7 @@ async function createVoiceSession(userId, language = 'en') {
        (user_id, session_id, language, status)
        VALUES ($1, $2, $3, 'active')
        RETURNING *`,
-      [userId, sessionId, language]
+      [userId, sessionId, language],
     );
 
     return result.rows[0];
@@ -66,7 +66,7 @@ async function endVoiceSession(sessionId) {
            duration_seconds = calculate_session_duration(id)
        WHERE id = $1
        RETURNING *`,
-      [sessionId]
+      [sessionId],
     );
 
     return result.rows[0];
@@ -107,7 +107,7 @@ async function processVoiceCommand(sessionId, transcript, commandType, parameter
        (session_id, command_type, transcript, intent, confidence_score, parameters, execution_status)
        VALUES ($1, $2, $3, $4, $5, $6, 'executed')
        RETURNING *`,
-      [sessionId, commandType, transcript, intent, confidence, JSON.stringify(parameters)]
+      [sessionId, commandType, transcript, intent, confidence, JSON.stringify(parameters)],
     );
 
     return result.rows[0];
@@ -122,13 +122,13 @@ async function processVoiceCommand(sessionId, transcript, commandType, parameter
  */
 function detectIntentFromTranscript(transcript) {
   const lowerTranscript = transcript.toLowerCase();
-  
+
   const intentMap = {
-    'product_search': ['search', 'find', 'show me', 'looking for'],
-    'order': ['order', 'buy', 'purchase', 'add to cart'],
-    'navigation': ['go to', 'navigate', 'open', 'show'],
-    'information': ['tell me', 'what is', 'how to', 'information'],
-    'control': ['stop', 'pause', 'play', 'cancel']
+    product_search: ['search', 'find', 'show me', 'looking for'],
+    order: ['order', 'buy', 'purchase', 'add to cart'],
+    navigation: ['go to', 'navigate', 'open', 'show'],
+    information: ['tell me', 'what is', 'how to', 'information'],
+    control: ['stop', 'pause', 'play', 'cancel'],
   };
 
   for (const [intent, keywords] of Object.entries(intentMap)) {
@@ -161,7 +161,7 @@ async function getVoiceCommands(sessionId) {
   try {
     const result = await pool.query(
       'SELECT * FROM voice_commands WHERE session_id = $1 ORDER BY created_at ASC',
-      [sessionId]
+      [sessionId],
     );
 
     return result.rows;
@@ -199,7 +199,7 @@ async function logSpeechRecognition(sessionId, audioDuration, transcript, confid
         recognition_provider, processing_time_ms)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [sessionId, audioDuration, transcript, confidence, language, provider, processingTime]
+      [sessionId, audioDuration, transcript, confidence, language, provider, processingTime],
     );
 
     return result.rows[0];
@@ -221,7 +221,7 @@ router.post('/speech-recognition', authMiddleware, async (req, res) => {
       confidence_score,
       language_detected,
       recognition_provider,
-      processing_time_ms
+      processing_time_ms,
     } = req.body;
     const result = await logSpeechRecognition(
       session_id,
@@ -230,7 +230,7 @@ router.post('/speech-recognition', authMiddleware, async (req, res) => {
       confidence_score,
       language_detected,
       recognition_provider,
-      processing_time_ms
+      processing_time_ms,
     );
     res.status(201).json(result);
   } catch (error) {
@@ -253,7 +253,7 @@ async function createVoiceResponse(sessionId, commandId, responseType, content, 
        (session_id, command_id, response_type, content, audio_url, language)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [sessionId, commandId, responseType, content, audioUrl, language]
+      [sessionId, commandId, responseType, content, audioUrl, language],
     );
 
     return result.rows[0];
@@ -308,8 +308,8 @@ async function setVoicePreferences(userId, preferences) {
         preferences.speech_rate || 1.0,
         preferences.voice_volume || 1.0,
         preferences.auto_response_enabled !== false,
-        preferences.confirmation_required !== false
-      ]
+        preferences.confirmation_required !== false,
+      ],
     );
 
     return result.rows[0];
@@ -339,7 +339,7 @@ async function getVoicePreferences(userId) {
   try {
     const result = await pool.query(
       'SELECT * FROM voice_preferences WHERE user_id = $1',
-      [userId]
+      [userId],
     );
 
     if (result.rows.length === 0) {
@@ -350,7 +350,7 @@ async function getVoicePreferences(userId) {
         speech_rate: 1.0,
         voice_volume: 1.0,
         auto_response_enabled: true,
-        confirmation_required: true
+        confirmation_required: true,
       };
     }
 
@@ -403,8 +403,8 @@ async function recordVoiceAnalytics(userId, metrics) {
         metrics.failed || 0,
         metrics.avg_confidence || 0,
         metrics.avg_duration || 0,
-        JSON.stringify(metrics.most_used || {})
-      ]
+        JSON.stringify(metrics.most_used || {}),
+      ],
     );
 
     return result.rows[0];
@@ -442,7 +442,7 @@ async function getVoiceAnalytics(userId, startDate = null, endDate = null) {
     }
 
     if (endDate) {
-      query += ' AND date <= $' + (params.length + 1);
+      query += ` AND date <= $${ params.length + 1}`;
       params.push(endDate);
     }
 
@@ -490,5 +490,6 @@ module.exports = {
   getVoicePreferences,
   recordVoiceAnalytics,
   getVoiceAnalytics,
-  isHealthy
+  isHealthy,
 };
+

@@ -51,7 +51,7 @@ async function getPlatformAnalytics() {
 
   const [usersResult, activeUsersResult, ordersResult] = await Promise.all([
     pg.query('SELECT COUNT(*)::int AS count FROM users'),
-    pg.query(`SELECT COUNT(*)::int AS count FROM users WHERE last_login_at > NOW() - INTERVAL '30 days'`),
+    pg.query('SELECT COUNT(*)::int AS count FROM users WHERE last_login_at > NOW() - INTERVAL \'30 days\''),
     pg.query('SELECT COUNT(*)::int AS count FROM orders').catch(() => ({ rows: [{ count: null }] })),
   ]);
 
@@ -88,3 +88,4 @@ async function getServiceHealth() {
 }
 
 module.exports = { getSystemMetrics, getPlatformAnalytics, getServiceHealth };
+

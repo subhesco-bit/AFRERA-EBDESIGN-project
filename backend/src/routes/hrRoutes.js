@@ -1,6 +1,6 @@
 /**
  * HR Routes with AI Integration
- * 
+ *
  * Routes for HR module with AI-powered capabilities:
  * - Employee management with AI recommendations
  * - Attrition prediction
@@ -128,8 +128,8 @@ router.get('/analytics/workforce', async (req, res) => {
         'skill_gap_analysis',
         'performance_distribution',
         'sentiment_trends',
-        'training_effectiveness'
-      ]
+        'training_effectiveness',
+      ],
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -149,8 +149,8 @@ router.get('/analytics/predictions', async (req, res) => {
         'headcount_forecasting',
         'budget_predictions',
         'succession_planning',
-        'hiring_demand_forecast'
-      ]
+        'hiring_demand_forecast',
+      ],
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

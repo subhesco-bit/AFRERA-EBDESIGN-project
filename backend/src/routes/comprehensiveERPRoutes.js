@@ -1,6 +1,6 @@
 /**
  * Comprehensive ERP Routes - Oracle/SAP Standards
- * 
+ *
  * REST API routes for all ERP modules
  * Following Oracle E-Business Suite and SAP S/4HANA routing conventions
  */
@@ -18,15 +18,20 @@ const {
   projectSystemController,
   treasuryController,
   assetManagementController,
-  businessIntelligenceController
+  businessIntelligenceController,
 } = require('../controllers/comprehensiveERPController');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { requireRole } = require('../middleware/auth');
+const { protectRouter, requireHumanAuthorization } = require('./enterpriseRouteSupport');
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+protectRouter(router, { signal: 'enterprise.erp.changed' });
+router.use((req, res, next) => {
+  if (req.method === 'GET') return next();
+  requireRole('admin', 'superadmin')(req, res, () => requireHumanAuthorization(req, res, next));
+});
 
 // ============================================================================
 // FINANCIAL ACCOUNTING (FI) / GENERAL LEDGER (GL) ROUTES

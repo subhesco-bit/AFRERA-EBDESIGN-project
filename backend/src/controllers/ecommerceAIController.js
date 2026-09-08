@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce AI Controller
- * 
+ *
  * Handles all AI-powered endpoints for E-commerce marketplace:
  * - Customer Segmentation (RFM, behavioral)
  * - Demand Forecasting
@@ -11,7 +11,7 @@
  * - Market Basket Analysis
  */
 
-const ecommerceaiBackboneService = require('../services/legacy/ecommerceAIService');
+const ecommerceAIService = require('../services/legacy/ecommerceAIService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
@@ -24,14 +24,14 @@ const { logger } = require('../utils/logger');
  */
 async function segmentCustomersRFM(req, res) {
   try {
-    const result = await ecommerceaiBackboneService.segmentCustomersRFM();
-    
+    const result = await ecommerceAIService.segmentCustomersRFM();
+
     res.json(result);
   } catch (error) {
     logger.error('Error in segmentCustomersRFM controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to segment customers by RFM'
+      error: error.message || 'Failed to segment customers by RFM',
     });
   }
 }
@@ -42,14 +42,14 @@ async function segmentCustomersRFM(req, res) {
  */
 async function segmentCustomersBehavioral(req, res) {
   try {
-    const result = await ecommerceaiBackboneService.segmentCustomersBehavioral();
-    
+    const result = await ecommerceAIService.segmentCustomersBehavioral();
+
     res.json(result);
   } catch (error) {
     logger.error('Error in segmentCustomersBehavioral controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to segment customers by behavior'
+      error: error.message || 'Failed to segment customers by behavior',
     });
   }
 }
@@ -66,15 +66,15 @@ async function forecastProductDemand(req, res) {
   try {
     const { productId } = req.params;
     const { horizonDays } = req.body;
-    
-    const result = await ecommerceaiBackboneService.forecastProductDemand(productId, horizonDays || 30);
-    
+
+    const result = await ecommerceAIService.forecastProductDemand(productId, horizonDays || 30);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in forecastProductDemand controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to forecast product demand'
+      error: error.message || 'Failed to forecast product demand',
     });
   }
 }
@@ -90,15 +90,15 @@ async function forecastProductDemand(req, res) {
 async function optimizeInventory(req, res) {
   try {
     const { productId } = req.params;
-    
-    const result = await ecommerceaiBackboneService.optimizeInventory(productId);
-    
+
+    const result = await ecommerceAIService.optimizeInventory(productId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in optimizeInventory controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to optimize inventory'
+      error: error.message || 'Failed to optimize inventory',
     });
   }
 }
@@ -115,15 +115,15 @@ async function getPersonalizedRecommendations(req, res) {
   try {
     const { userId } = req.params;
     const { limit } = req.query;
-    
-    const result = await ecommerceaiBackboneService.getPersonalizedRecommendations(userId, parseInt(limit) || 10);
-    
+
+    const result = await ecommerceAIService.getPersonalizedRecommendations(userId, parseInt(limit) || 10);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getPersonalizedRecommendations controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get personalized recommendations'
+      error: error.message || 'Failed to get personalized recommendations',
     });
   }
 }
@@ -139,15 +139,15 @@ async function getPersonalizedRecommendations(req, res) {
 async function predictSales(req, res) {
   try {
     const { categoryId, periodDays } = req.body;
-    
-    const result = await ecommerceaiBackboneService.predictSales(categoryId, periodDays || 30);
-    
+
+    const result = await ecommerceAIService.predictSales(categoryId, periodDays || 30);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in predictSales controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to predict sales'
+      error: error.message || 'Failed to predict sales',
     });
   }
 }
@@ -163,15 +163,15 @@ async function predictSales(req, res) {
 async function calculateCustomerLifetimeValue(req, res) {
   try {
     const { userId } = req.params;
-    
-    const result = await ecommerceaiBackboneService.calculateCustomerLifetimeValue(userId);
-    
+
+    const result = await ecommerceAIService.calculateCustomerLifetimeValue(userId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in calculateCustomerLifetimeValue controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to calculate customer lifetime value'
+      error: error.message || 'Failed to calculate customer lifetime value',
     });
   }
 }
@@ -187,15 +187,15 @@ async function calculateCustomerLifetimeValue(req, res) {
 async function analyzeMarketBasket(req, res) {
   try {
     const { categoryId } = req.query;
-    
-    const result = await ecommerceaiBackboneService.analyzeMarketBasket(categoryId);
-    
+
+    const result = await ecommerceAIService.analyzeMarketBasket(categoryId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in analyzeMarketBasket controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to analyze market basket'
+      error: error.message || 'Failed to analyze market basket',
     });
   }
 }
@@ -208,23 +208,22 @@ module.exports = {
   // Customer Segmentation
   segmentCustomersRFM,
   segmentCustomersBehavioral,
-  
+
   // Demand Forecasting
   forecastProductDemand,
-  
+
   // Inventory Optimization
   optimizeInventory,
-  
+
   // Product Recommendations
   getPersonalizedRecommendations,
-  
+
   // Sales Prediction
   predictSales,
-  
+
   // Customer Lifetime Value
   calculateCustomerLifetimeValue,
-  
-  // Market Basket Analysis
-  analyzeMarketBasket
-};
 
+  // Market Basket Analysis
+  analyzeMarketBasket,
+};

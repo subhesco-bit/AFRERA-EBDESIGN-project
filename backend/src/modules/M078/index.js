@@ -8,8 +8,8 @@ router.get('/systems/:id/collection', controller.monitorCollection);
 router.get('/systems/:id/budget', controller.calculateWaterBudget);
 router.post('/systems/:id/storage', controller.manageStorageCapacity);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

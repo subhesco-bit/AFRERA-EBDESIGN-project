@@ -4,32 +4,10 @@ const { getPostgreSQL } = require('../../database/connection');
 
 const tableName = 'farmer_health_records';
 
-const MEDICAL_CODE_SYSTEMS = new Set(['ICD-10-CM', 'SNOMED-CT', 'LOINC']);
-
-function normalizeMedicalCoding(payload = {}) {
-  const coding = payload.medicalCoding || payload.medical_coding || {};
-  const codeSystem = coding.codeSystem || coding.code_system || payload.codeSystem || payload.code_system;
-  const code = coding.code || payload.code;
-  const display = coding.display || payload.codeDisplay || payload.code_display;
-
-  if (!codeSystem && !code && !display) return null;
-  if (!codeSystem || !code) {
-    throw new Error('Medical coding requires both codeSystem and code');
-  }
-  if (!MEDICAL_CODE_SYSTEMS.has(codeSystem)) {
-    throw new Error('Unsupported medical codeSystem; use ICD-10-CM, SNOMED-CT, or LOINC');
-  }
-  if (!/^[A-Za-z0-9][A-Za-z0-9.:-]{1,31}$/.test(String(code))) {
-    throw new Error('Medical code must be 2-32 characters using letters, numbers, dot, colon, or hyphen');
-  }
-
-  return { system: codeSystem, code: String(code), display: display ? String(display).trim() : null };
-}
-
 async function listHealthRecords({ page = 1, limit = 20, farmerId = null } = {}) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
   const offset = (page - 1) * limit;
-  
+
   let query = `SELECT COUNT(*) FROM ${tableName}`;
   let countParams = [];
   if (farmerId) {
@@ -38,7 +16,7 @@ async function listHealthRecords({ page = 1, limit = 20, farmerId = null } = {})
   }
   const totalRes = await pg.query(query, countParams);
   const total = parseInt(totalRes.rows[0].count || '0');
-  
+
   let dataQuery = `SELECT * FROM ${tableName}`;
   let dataParams = [];
   if (farmerId) {
@@ -48,53 +26,51 @@ async function listHealthRecords({ page = 1, limit = 20, farmerId = null } = {})
     dataQuery += ' ORDER BY created_at DESC LIMIT $1 OFFSET $2';
     dataParams = [limit, offset];
   }
-  
+
   const res = await pg.query(dataQuery, dataParams);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function getHealthRecord(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
   const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
   return res.rows[0] || null;
 }
 
 async function createHealthRecord(payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
   const { farmerId, healthType, description, severity, date, metadata } = payload;
-  const medicalCoding = normalizeMedicalCoding(payload);
-  
+
   const res = await pg.query(
     `INSERT INTO ${tableName} (farmer_id, health_type, description, severity, date, metadata, created_at) 
      VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *`,
-    [farmerId, healthType, description, severity, date, JSON.stringify({ ...(metadata || {}), medicalCoding })]
+    [farmerId, healthType, description, severity, date, JSON.stringify(metadata || {})],
   );
   return res.rows[0];
 }
 
 async function updateHealthRecord(id, payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
   const { healthType, description, severity, date, metadata } = payload;
-  const medicalCoding = normalizeMedicalCoding(payload);
-  
+
   const res = await pg.query(
     `UPDATE ${tableName} 
      SET health_type = $1, description = $2, severity = $3, date = $4, metadata = $5, updated_at = NOW() 
      WHERE id = $6 RETURNING *`,
-    [healthType, description, severity, date, JSON.stringify({ ...(metadata || {}), medicalCoding }), id]
+    [healthType, description, severity, date, JSON.stringify(metadata || {}), id],
   );
   return res.rows[0] || null;
 }
 
 async function deleteHealthRecord(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
   const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 async function getFarmerHealthSummary(farmerId) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  
+  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
+
   const res = await pg.query(
     `SELECT 
       health_type,
@@ -103,21 +79,21 @@ async function getFarmerHealthSummary(farmerId) {
      FROM ${tableName} 
      WHERE farmer_id = $1 
      GROUP BY health_type`,
-    [farmerId]
+    [farmerId],
   );
-  
+
   return {
     farmerId,
     summary: res.rows,
-    totalRecords: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0)
+    totalRecords: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
   };
 }
 
 async function getWelfarePrograms({ page = 1, limit = 20, eligibility = null } = {}) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
   const offset = (page - 1) * limit;
-  
-  let query = `SELECT COUNT(*) FROM welfare_programs`;
+
+  let query = 'SELECT COUNT(*) FROM welfare_programs';
   let countParams = [];
   if (eligibility) {
     query += ' WHERE eligibility = $1';
@@ -125,8 +101,8 @@ async function getWelfarePrograms({ page = 1, limit = 20, eligibility = null } =
   }
   const totalRes = await pg.query(query, countParams);
   const total = parseInt(totalRes.rows[0].count || '0');
-  
-  let dataQuery = `SELECT * FROM welfare_programs`;
+
+  let dataQuery = 'SELECT * FROM welfare_programs';
   let dataParams = [];
   if (eligibility) {
     dataQuery += ' WHERE eligibility = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3';
@@ -135,18 +111,18 @@ async function getWelfarePrograms({ page = 1, limit = 20, eligibility = null } =
     dataQuery += ' ORDER BY created_at DESC LIMIT $1 OFFSET $2';
     dataParams = [limit, offset];
   }
-  
+
   const res = await pg.query(dataQuery, dataParams);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function enrollWelfareProgram(farmerId, programId) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  
+  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
+
   const res = await pg.query(
     `INSERT INTO welfare_enrollments (farmer_id, program_id, enrollment_date, status) 
      VALUES ($1, $2, NOW(), 'PENDING') RETURNING *`,
-    [farmerId, programId]
+    [farmerId, programId],
   );
   return res.rows[0];
 }
@@ -179,7 +155,7 @@ async function healthCheck() {
     status: 'healthy',
     moduleId: 'M029',
     moduleName: 'Farmer Health & Welfare',
-    tableName
+    tableName,
   };
 }
 
@@ -222,5 +198,5 @@ module.exports = {
   getWelfarePrograms,
   enrollWelfareProgram,
   healthCheck,
-  execute
+  execute,
 };

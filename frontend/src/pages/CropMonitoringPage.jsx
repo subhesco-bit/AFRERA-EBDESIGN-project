@@ -1,9 +1,9 @@
-import { Eye } from 'lucide-react'
-import { cropMonitoringAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { Eye } from 'lucide-react';
+import { cropMonitoringAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const OBSERVATION_TYPES = ['Growth Stage', 'Pest Incidence', 'Disease Incidence', 'Nutrient Deficiency', 'Weather Stress', 'General']
-const SEVERITY = ['None', 'Low', 'Medium', 'High', 'Critical']
+const OBSERVATION_TYPES = ['Growth Stage', 'Pest Incidence', 'Disease Incidence', 'Nutrient Deficiency', 'Weather Stress', 'General'];
+const SEVERITY = ['None', 'Low', 'Medium', 'High', 'Critical'];
 
 const initialForm = {
   crop_name: '',
@@ -13,7 +13,7 @@ const initialForm = {
   observed_date: '',
   observer_name: '',
   findings: '',
-}
+};
 
 function CropMonitoringPage() {
   return (
@@ -39,8 +39,8 @@ function CropMonitoringPage() {
         { key: 'field_reference', label: 'Field' },
         { key: 'observation_type', label: 'Type' },
         { key: 'severity', label: 'Severity', render: (r) => {
-          const color = { None: 'bg-gray-100 text-gray-700', Low: 'bg-green-100 text-green-800', Medium: 'bg-yellow-100 text-yellow-800', High: 'bg-orange-100 text-orange-800', Critical: 'bg-red-100 text-red-800' }[r.severity] || 'bg-gray-100 text-gray-700'
-          return <span className={`text-xs px-2 py-1 rounded-full ${color}`}>{r.severity || 'None'}</span>
+          const color = { None: 'bg-gray-100 text-gray-700', Low: 'bg-green-100 text-green-800', Medium: 'bg-yellow-100 text-yellow-800', High: 'bg-orange-100 text-orange-800', Critical: 'bg-red-100 text-red-800' }[r.severity] || 'bg-gray-100 text-gray-700';
+          return <span className={`text-xs px-2 py-1 rounded-full ${color}`}>{r.severity || 'None'}</span>;
         } },
         { key: 'observed_date', label: 'Observed On' },
         { key: 'observer_name', label: 'Observer' },
@@ -60,7 +60,7 @@ function CropMonitoringPage() {
         { label: 'Fields monitored', value: new Set(items.map((i) => i.field_reference).filter(Boolean)).size },
       ]}
     />
-  )
+  );
 }
 
-export default CropMonitoringPage
+export default CropMonitoringPage;

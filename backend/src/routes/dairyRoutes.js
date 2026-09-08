@@ -12,14 +12,10 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 const { logger } = require('../utils/logger');
-// Sanitizes bodies, bounds pagination/IDs, redacts internal errors, and
-// emits a correlated LIVESTOCK_RECORD_CHANGED signal on mutations - this
-// helper already existed (built for this exact purpose) but was never wired
-// into the mounted dairy/fisheries routes; only animalHealthRoutes.js had
-// partial hand-rolled equivalents.
 const { protectLivestockRouter } = require('./livestockRouteSupport');
 
-protectLivestockRouter(router, { signal: SIGNAL.LIVESTOCK_RECORD_CHANGED });
+protectLivestockRouter(router);
+router.use(authMiddleware);
 
 router.get('/animals', async (req, res) => {
   try {
@@ -71,20 +67,20 @@ router.get('/milk-records', async (req, res) => {
 router.post('/milk-records', authMiddleware, async (req, res) => {
   try {
     const record = await dairyService.recordMilk(req.body);
-    
+
     // Emit signal for milk production recording
     signalBus.emitSignal(SIGNAL.MILK_PRODUCTION_RECORDED, {
       recordId: record.id,
       animalId: record.animal_id,
       quantity: record.quantity,
       quality: record.quality,
-      recordingDate: record.recording_date
+      recordingDate: record.recording_date,
     }, {
       severity: SEVERITY.INFO,
       source: 'dairy_routes',
-      entityId: record.animal_id
+      entityId: record.animal_id,
     });
-    
+
     res.status(201).json({ success: true, data: record });
   } catch (error) {
     logger.error('dairyRoutes:recordMilk', { error: error.message });

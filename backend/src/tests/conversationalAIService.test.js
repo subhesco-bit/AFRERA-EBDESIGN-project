@@ -13,7 +13,7 @@ describe('Conversational AI Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     // Create test user and get auth token
@@ -22,7 +22,7 @@ describe('Conversational AI Service', () => {
       .send({
         email: 'chat-test@example.com',
         password: 'Test123!@#',
-        role: 'consumer'
+        role: 'consumer',
       });
 
     authToken = registerResponse.body.token;
@@ -52,7 +52,7 @@ describe('Conversational AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           domain_id: 1,
-          language: 'en'
+          language: 'en',
         })
         .expect(201);
 
@@ -66,7 +66,7 @@ describe('Conversational AI Service', () => {
       const response = await request(app)
         .post('/api/v1/conversational-ai/sessions')
         .send({
-          domain_id: 1
+          domain_id: 1,
         })
         .expect(401);
     });
@@ -99,7 +99,7 @@ describe('Conversational AI Service', () => {
         .send({
           role: 'user',
           content: 'Hello, I need help with products',
-          content_type: 'text'
+          content_type: 'text',
         })
         .expect(201);
 
@@ -127,7 +127,7 @@ describe('Conversational AI Service', () => {
         .post('/api/v1/conversational-ai/detect-intent')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          message: 'I want to search for products'
+          message: 'I want to search for products',
         })
         .expect(200);
 
@@ -141,7 +141,7 @@ describe('Conversational AI Service', () => {
         .post('/api/v1/conversational-ai/detect-intent')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          message: 'Hello there!'
+          message: 'Hello there!',
         })
         .expect(200);
 
@@ -155,7 +155,7 @@ describe('Conversational AI Service', () => {
         .post(`/api/v1/conversational-ai/sessions/${testSessionId}/respond`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          message: 'What can you help me with?'
+          message: 'What can you help me with?',
         })
         .expect(200);
 
@@ -172,7 +172,7 @@ describe('Conversational AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           context_key: 'user_preference',
-          context_value: { category: 'organic' }
+          context_value: { category: 'organic' },
         })
         .expect(200);
 
@@ -208,7 +208,7 @@ describe('Conversational AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           resolution_status: 'resolved',
-          user_satisfaction: 5
+          user_satisfaction: 5,
         })
         .expect(200);
 

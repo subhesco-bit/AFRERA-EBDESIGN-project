@@ -1,5 +1,5 @@
 function FormBuilderPanel({ draft, onChange, onAddField, onRemoveField, onSave, onSubmit, selectedFormId, loading, saving }) {
-  const fieldTypes = ['text', 'number', 'date', 'select', 'file', 'signature']
+  const fieldTypes = ['text', 'number', 'date', 'select', 'file', 'signature'];
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -176,7 +176,7 @@ function FormBuilderPanel({ draft, onChange, onAddField, onRemoveField, onSave, 
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FormBuilderPanel
+export default FormBuilderPanel;

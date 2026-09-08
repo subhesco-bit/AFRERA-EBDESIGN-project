@@ -38,7 +38,7 @@ async function registerPoultryFlock(flockData) {
       district,
       registration_date,
       purpose,
-      feed_type
+      feed_type,
     } = flockData;
 
     const flock = {
@@ -57,7 +57,7 @@ async function registerPoultryFlock(flockData) {
       purpose,
       feed_type,
       status: 'registered',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered poultry health assessment
@@ -68,8 +68,8 @@ async function registerPoultryFlock(flockData) {
         breed_characteristics: await getBreedCharacteristics(breed),
         regional_health_patterns: await getRegionalHealthPatterns(state, district),
         vaccination_schedule: await getVaccinationSchedule(breed, age_weeks),
-        nutritional_requirements: await getNutritionalRequirements(breed, purpose)
-      }
+        nutritional_requirements: await getNutritionalRequirements(breed, purpose),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -99,8 +99,8 @@ async function registerPoultryFlock(flockData) {
         flock.feed_type,
         flock.status,
         JSON.stringify(flock.ai_health_assessment),
-        flock.created_at
-      ]
+        flock.created_at,
+      ],
     );
 
     logger.info(`Poultry flock registered: ${flock.flock_registry_id}`);
@@ -124,7 +124,7 @@ async function updateFlockHealth(registryId, healthData) {
       vaccination_records,
       treatment_history,
       egg_production,
-      weight_gains
+      weight_gains,
     } = healthData;
 
     const healthRecord = {
@@ -138,7 +138,7 @@ async function updateFlockHealth(registryId, healthData) {
       treatment_history,
       egg_production,
       weight_gains,
-      recorded_at: new Date().toISOString()
+      recorded_at: new Date().toISOString(),
     };
 
     const aiRequest = {
@@ -148,8 +148,8 @@ async function updateFlockHealth(registryId, healthData) {
         health_data: healthData,
         historical_health: await getFlockHealthHistory(registryId),
         breed_standards: await getBreedHealthStandards(await getFlockBreed(registryId)),
-        environmental_factors: await getEnvironmentalFactors(await getFlockLocation(registryId))
-      }
+        environmental_factors: await getEnvironmentalFactors(await getFlockLocation(registryId)),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -159,7 +159,7 @@ async function updateFlockHealth(registryId, healthData) {
       `UPDATE poultry_registry 
        SET health_status = $1, updated_at = CURRENT_TIMESTAMP
        WHERE flock_registry_id = $2`,
-      [health_status, registryId]
+      [health_status, registryId],
     );
 
     await pool.query(
@@ -180,8 +180,8 @@ async function updateFlockHealth(registryId, healthData) {
         JSON.stringify(egg_production),
         JSON.stringify(weight_gains),
         JSON.stringify(healthRecord.ai_analysis),
-        healthRecord.recorded_at
-      ]
+        healthRecord.recorded_at,
+      ],
     );
 
     logger.info(`Poultry flock health updated: ${registryId}`);
@@ -207,7 +207,7 @@ async function trackFlockPerformance(registryId, period) {
       health_metrics: await getHealthMetrics(registryId, period),
       mortality_analysis: await getMortalityAnalysis(registryId, period),
       weight_gains: await getWeightGains(registryId, period),
-      recommendations: await generatePerformanceRecommendations(registryId, period)
+      recommendations: await generatePerformanceRecommendations(registryId, period),
     };
 
     return performance;
@@ -232,7 +232,7 @@ async function generatePoultryReport(farmerId, reportType) {
       health_summary: await getHealthSummary(farmerId),
       production_metrics: await getProductionMetrics(farmerId),
       vaccination_status: await getVaccinationStatus(farmerId),
-      recommendations: await generateFarmerRecommendations(farmerId)
+      recommendations: await generateFarmerRecommendations(farmerId),
     };
 
     return report;
@@ -251,14 +251,14 @@ async function getBreedCharacteristics(breed) {
     ideal_temperature: 20,
     humidity_range: '60-70%',
     space_per_bird: '0.5 sq ft',
-    lifespan_weeks: 72
+    lifespan_weeks: 72,
   };
 }
 
 async function getRegionalHealthPatterns(state, district) {
   return {
     common_diseases: ['newcastle', 'avian_influenza', 'coccidiosis'],
-    vaccination_requirements: ['ndv', 'ib', 'ibd']
+    vaccination_requirements: ['ndv', 'ib', 'ibd'],
   };
 }
 
@@ -266,7 +266,7 @@ async function getVaccinationSchedule(breed, ageWeeks) {
   return [
     { vaccine: 'NDV', due_week: 1, status: 'pending' },
     { vaccine: 'IB', due_week: 2, status: 'pending' },
-    { vaccine: 'IBD', due_week: 3, status: 'pending' }
+    { vaccine: 'IBD', due_week: 3, status: 'pending' },
   ];
 }
 
@@ -275,7 +275,7 @@ async function getNutritionalRequirements(breed, purpose) {
     protein_percentage: 18,
     energy_kcal: 2800,
     calcium_percentage: 1.0,
-    phosphorus_percentage: 0.5
+    phosphorus_percentage: 0.5,
   };
 }
 
@@ -283,7 +283,7 @@ async function getFlockHealthHistory(registryId) {
   try {
     const result = await pool.query(
       'SELECT * FROM poultry_health_records WHERE registry_id = $1 ORDER BY recorded_at DESC LIMIT 10',
-      [registryId]
+      [registryId],
     );
     return result.rows;
   } catch (error) {
@@ -295,7 +295,7 @@ async function getBreedHealthStandards(breed) {
   return {
     ideal_mortality_rate: 5,
     target_feed_conversion: 1.8,
-    target_egg_production: 85
+    target_egg_production: 85,
   };
 }
 
@@ -303,7 +303,7 @@ async function getEnvironmentalFactors(location) {
   return {
     climate: 'tropical',
     altitude: 100,
-    biosecurity_level: 'standard'
+    biosecurity_level: 'standard',
   };
 }
 
@@ -311,7 +311,7 @@ async function getFlockBreed(registryId) {
   try {
     const result = await pool.query(
       'SELECT breed FROM poultry_registry WHERE flock_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     return result.rows[0]?.breed || 'unknown';
   } catch (error) {
@@ -323,7 +323,7 @@ async function getFlockLocation(registryId) {
   try {
     const result = await pool.query(
       'SELECT location, state, district FROM poultry_registry WHERE flock_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -336,7 +336,7 @@ async function getEggProductionMetrics(registryId, period) {
     total_eggs: 1000,
     egg_rate: 85,
     egg_weight: 60,
-    quality_grade: 'A'
+    quality_grade: 'A',
   };
 }
 
@@ -344,7 +344,7 @@ async function calculateFeedEfficiency(registryId, period) {
   return {
     feed_conversion_ratio: 1.8,
     feed_cost_per_kg: 2.5,
-    efficiency_rating: 'good'
+    efficiency_rating: 'good',
   };
 }
 
@@ -352,7 +352,7 @@ async function getHealthMetrics(registryId, period) {
   return {
     overall_health_score: 80,
     disease_incidence: 3,
-    mortality_rate: 4
+    mortality_rate: 4,
   };
 }
 
@@ -360,7 +360,7 @@ async function getMortalityAnalysis(registryId, period) {
   return {
     total_deaths: 20,
     mortality_rate: 4,
-    causes: ['disease', 'predation', 'unknown']
+    causes: ['disease', 'predation', 'unknown'],
   };
 }
 
@@ -368,7 +368,7 @@ async function getWeightGains(registryId, period) {
   return {
     average_weight: 2.5,
     weight_gain: 0.5,
-    growth_rate: 'normal'
+    growth_rate: 'normal',
   };
 }
 
@@ -376,7 +376,7 @@ async function generatePerformanceRecommendations(registryId, period) {
   return [
     'Optimize feed composition for better conversion',
     'Improve biosecurity measures',
-    'Monitor environmental conditions'
+    'Monitor environmental conditions',
   ];
 }
 
@@ -384,7 +384,7 @@ async function getFlockCount(farmerId) {
   try {
     const result = await pool.query(
       'SELECT COUNT(*) as count FROM poultry_registry WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -396,7 +396,7 @@ async function getBreedDistribution(farmerId) {
   try {
     const result = await pool.query(
       'SELECT breed, COUNT(*) as count FROM poultry_registry WHERE farmer_id = $1 GROUP BY breed',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -408,7 +408,7 @@ async function getHealthSummary(farmerId) {
   return {
     healthy: 80,
     needs_attention: 15,
-    critical: 5
+    critical: 5,
   };
 }
 
@@ -416,7 +416,7 @@ async function getProductionMetrics(farmerId) {
   return {
     total_eggs: 50000,
     average_egg_rate: 82,
-    total_meat_production: 1000
+    total_meat_production: 1000,
   };
 }
 
@@ -424,7 +424,7 @@ async function getVaccinationStatus(farmerId) {
   return {
     fully_vaccinated: 70,
     partially_vaccinated: 20,
-    not_vaccinated: 10
+    not_vaccinated: 10,
   };
 }
 
@@ -432,7 +432,7 @@ async function generateFarmerRecommendations(farmerId) {
   return [
     'Complete vaccination schedule for all flocks',
     'Implement regular health check-ups',
-    'Optimize feed management'
+    'Optimize feed management',
   ];
 }
 
@@ -440,6 +440,6 @@ module.exports = {
   registerPoultryFlock,
   updateFlockHealth,
   trackFlockPerformance,
-  generatePoultryReport
+  generatePoultryReport,
 };
 

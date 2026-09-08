@@ -28,13 +28,15 @@ const {
   predictMortalityRisk,
 } = require('../services/legacy/poultryService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
+protectLivestockRouter(router);
 
 /**
  * GET /api/v1/poultry/flocks

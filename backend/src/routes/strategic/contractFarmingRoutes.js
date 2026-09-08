@@ -5,10 +5,10 @@
 
 const express = require('express');
 const router = express.Router();
-const contractFarmingService = require('../../services/strategic/contractFarmingService');
-const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth');
+const contractFarmingService = require('../../services/strategic/contractFarmingService.js');
+const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth.js');
 const authorize = (roles) => requireRole(...roles);
-const apiResponseHandler = require('../../middleware/apiResponseHandler');
+const apiResponseHandler = require('../../middleware/apiResponseHandler.js');
 
 const service = new contractFarmingService();
 
@@ -17,9 +17,19 @@ const service = new contractFarmingService();
  * @desc    Create a new contract farming agreement
  * @access  Private (Farmer, Buyer)
  */
-router.post('/contracts', authenticate, async (req, res) => {
+router.post('/contracts', authenticate, authorize(['farmer', 'buyer']), async (req, res) => {
   try {
-    const result = await service.createContract(req.body);
+    const contractData = { ...req.body };
+
+    // Never trust a client-supplied party ID for either side of the agreement.
+    // Farmers apply for themselves; buyers create offers for their own account.
+    if (req.user.role === 'farmer') {
+      contractData.farmer_id = req.user.id;
+    } else {
+      contractData.buyer_id = req.user.id;
+    }
+
+    const result = await service.createContract(contractData);
     apiResponseHandler.sendSuccess(res, result, 'Contract farming agreement created successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to create contract farming agreement');

@@ -1,22 +1,21 @@
 /**
- * Product Media AI Routes
- * Routes for AI-powered product image and video generation
+ * Product Media AI Routes — AI product-image generation and nutrient-
+ * comparison video generation. See services/productMediaAIService.js header.
  */
 
 const express = require('express');
-const router = express.Router();
 const productMediaAIController = require('../controllers/productMediaAIController');
 const { authMiddleware } = require('../middleware/auth');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
-// Provider status
+const router = express.Router();
+
+router.use(authMiddleware);
+router.use(apiLimiter);
+
 router.get('/status', productMediaAIController.getProviderStatus);
-
-// Image generation
-router.post('/products/:productId/image', authMiddleware, productMediaAIController.generateProductImage);
-router.post('/products/:productId/cartoon', authMiddleware, productMediaAIController.generateProductCartoon);
-
-// Video generation
-router.post('/products/:productId/video/script', authMiddleware, productMediaAIController.buildNutrientVideoScript);
-router.post('/products/:productId/video', authMiddleware, productMediaAIController.generateProductVideo);
+router.post('/products/:productId/image', productMediaAIController.generateProductImage);
+router.post('/products/:productId/video-script', productMediaAIController.buildNutrientVideoScript);
+router.post('/products/:productId/video', productMediaAIController.generateProductVideo);
 
 module.exports = router;

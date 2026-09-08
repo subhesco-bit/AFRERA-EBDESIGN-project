@@ -32,7 +32,7 @@ router.post('/session', authMiddleware, async (req, res) => {
       channel_identifier,
       device_info,
       session_context,
-      capabilities
+      capabilities,
     } = req.body;
 
     const result = await pool.query(
@@ -47,8 +47,8 @@ router.post('/session', authMiddleware, async (req, res) => {
         channel_identifier,
         JSON.stringify(device_info),
         JSON.stringify(session_context),
-        JSON.stringify(capabilities)
-      ]
+        JSON.stringify(capabilities),
+      ],
     );
 
     logger.info(`Omnichannel session created: ${result.rows[0].id} for ${channel_type}`);
@@ -70,7 +70,7 @@ router.post('/message', authMiddleware, async (req, res) => {
       message,
       message_type,
       metadata,
-      priority
+      priority,
     } = req.body;
 
     // Store incoming message
@@ -86,8 +86,8 @@ router.post('/message', authMiddleware, async (req, res) => {
         message,
         message_type || 'text',
         JSON.stringify(metadata),
-        priority || 'normal'
-      ]
+        priority || 'normal',
+      ],
     );
 
     // Process message based on channel type
@@ -105,8 +105,8 @@ router.post('/message', authMiddleware, async (req, res) => {
         aiResponse.content,
         aiResponse.message_type,
         JSON.stringify(aiResponse.metadata),
-        priority || 'normal'
-      ]
+        priority || 'normal',
+      ],
     );
 
     // Update session
@@ -114,12 +114,12 @@ router.post('/message', authMiddleware, async (req, res) => {
       `UPDATE omnichannel_sessions 
        SET updated_at = NOW(), last_activity = NOW()
        WHERE id = $1`,
-      [session_id]
+      [session_id],
     );
 
     res.json({
       message_id: messageResult.rows[0].id,
-      response: aiResponse
+      response: aiResponse,
     });
   } catch (error) {
     logger.error('Process omnichannel message error', { error: error.message, stack: error.stack });
@@ -173,16 +173,16 @@ async function processWebAIMessage(message, messageRecord) {
       supports_rich_media: true,
       supports_interactive_elements: true,
       session_continuity: true,
-      response_format: 'html'
+      response_format: 'html',
     },
     actions: [
       {
         type: 'button',
         label: 'Learn More',
         action: 'navigate',
-        target: '/learn-more'
-      }
-    ]
+        target: '/learn-more',
+      },
+    ],
   };
 }
 
@@ -193,7 +193,7 @@ router.get('/web/config', authMiddleware, async (req, res) => {
   try {
     const config = await pool.query(
       'SELECT * FROM omnichannel_config WHERE channel_type = $1',
-      ['web']
+      ['web'],
     );
 
     res.json(config.rows[0] || {
@@ -201,7 +201,7 @@ router.get('/web/config', authMiddleware, async (req, res) => {
       capabilities: ['text', 'image', 'video', 'interactive_elements'],
       max_message_length: 10000,
       supported_formats: ['text', 'html', 'markdown'],
-      ai_features: ['context_awareness', 'personalization', 'multimodal']
+      ai_features: ['context_awareness', 'personalization', 'multimodal'],
     });
   } catch (error) {
     logger.error('Get web AI config error', { error: error.message, stack: error.stack });
@@ -223,15 +223,15 @@ async function processAndroidAIMessage(message, messageRecord) {
       native_integration: true,
       push_notification_support: true,
       offline_capability: true,
-      response_format: 'json'
+      response_format: 'json',
     },
     actions: [
       {
         type: 'intent',
         action: 'open_activity',
-        target: 'com.afrera.details'
-      }
-    ]
+        target: 'com.afrera.details',
+      },
+    ],
   };
 }
 
@@ -247,7 +247,7 @@ router.post('/android/push', authMiddleware, async (req, res) => {
       `INSERT INTO android_push_notifications 
        (user_id, title, body, data, status, created_at)
        VALUES ($1, $2, $3, $4, 'queued', NOW())`,
-      [user_id, title, body, JSON.stringify(data)]
+      [user_id, title, body, JSON.stringify(data)],
     );
 
     // In production, this would use Firebase Cloud Messaging
@@ -274,15 +274,15 @@ async function processIOSAIMessage(message, messageRecord) {
       siri_integration: true,
       apns_support: true,
       carplay_compatible: true,
-      response_format: 'json'
+      response_format: 'json',
     },
     actions: [
       {
         type: 'deeplink',
         action: 'open_url',
-        target: 'afrera://details'
-      }
-    ]
+        target: 'afrera://details',
+      },
+    ],
   };
 }
 
@@ -298,7 +298,7 @@ router.post('/ios/push', authMiddleware, async (req, res) => {
       `INSERT INTO ios_push_notifications 
        (user_id, title, body, data, badge, status, created_at)
        VALUES ($1, $2, $3, $4, $5, 'queued', NOW())`,
-      [user_id, title, body, JSON.stringify(data), badge || 0]
+      [user_id, title, body, JSON.stringify(data), badge || 0],
     );
 
     // In production, this would use Apple Push Notification Service
@@ -325,17 +325,17 @@ async function processWhatsAppAIMessage(message, messageRecord) {
       supports_templates: true,
       supports_media: true,
       supports_quick_replies: true,
-      response_format: 'text'
+      response_format: 'text',
     },
     template: {
       name: 'response_template',
       components: [
         {
           type: 'body',
-          text: message
-        }
-      ]
-    }
+          text: message,
+        },
+      ],
+    },
   };
 }
 
@@ -351,7 +351,7 @@ router.post('/whatsapp/template', authMiddleware, async (req, res) => {
       `INSERT INTO whatsapp_templates 
        (template_name, language, components, status, created_at, updated_at)
        VALUES ($1, $2, $3, 'active', NOW(), NOW())`,
-      [template_name, language, JSON.stringify(components)]
+      [template_name, language, JSON.stringify(components)],
     );
 
     logger.info(`WhatsApp template created: ${template_name}`);
@@ -369,9 +369,9 @@ router.post('/whatsapp/template', authMiddleware, async (req, res) => {
 async function processSMSAIMessage(message, messageRecord) {
   // SMS-specific AI processing with character limits
   const maxLength = 160;
-  const truncatedMessage = message.length > maxLength 
-    ? message.substring(0, maxLength - 3) + '...' 
-    : message;
+  const truncatedMessage = message.length > maxLength ?
+    `${message.substring(0, maxLength - 3) }...` :
+    message;
 
   return {
     content: truncatedMessage,
@@ -381,8 +381,8 @@ async function processSMSAIMessage(message, messageRecord) {
       max_length: maxLength,
       supports_unicode: true,
       concat_enabled: true,
-      response_format: 'plain_text'
-    }
+      response_format: 'plain_text',
+    },
   };
 }
 
@@ -398,7 +398,7 @@ router.post('/sms/send', authMiddleware, async (req, res) => {
       `INSERT INTO sms_messages 
        (phone_number, message, unicode, status, created_at)
        VALUES ($1, $2, $3, 'queued', NOW())`,
-      [phone_number, message, unicode || false]
+      [phone_number, message, unicode || false],
     );
 
     // In production, this would use SMS gateway API
@@ -425,16 +425,16 @@ async function processTelegramAIMessage(message, messageRecord) {
       inline_keyboard_support: true,
       supports_media: true,
       supports_commands: true,
-      response_format: 'markdown'
+      response_format: 'markdown',
     },
     reply_markup: {
       inline_keyboard: [
         [
           { text: 'Option 1', callback_data: 'opt1' },
-          { text: 'Option 2', callback_data: 'opt2' }
-        ]
-      ]
-    }
+          { text: 'Option 2', callback_data: 'opt2' },
+        ],
+      ],
+    },
   };
 }
 
@@ -451,7 +451,7 @@ router.post('/telegram/webhook', async (req, res) => {
         `INSERT INTO telegram_messages 
          (update_type, message_data, status, created_at)
          VALUES ('message', $1, 'received', NOW())`,
-        [JSON.stringify(message)]
+        [JSON.stringify(message)],
       );
     }
 
@@ -461,7 +461,7 @@ router.post('/telegram/webhook', async (req, res) => {
         `INSERT INTO telegram_messages 
          (update_type, message_data, status, created_at)
          VALUES ('callback_query', $1, 'received', NOW())`,
-        [JSON.stringify(callback_query)]
+        [JSON.stringify(callback_query)],
       );
     }
 
@@ -486,11 +486,11 @@ async function processEmailAIMessage(message, messageRecord) {
       supports_attachments: true,
       supports_html: true,
       threading_support: true,
-      response_format: 'html'
+      response_format: 'html',
     },
     subject: 'Re: Your Inquiry',
     body: `<p>${message}</p>`,
-    attachments: []
+    attachments: [],
   };
 }
 
@@ -511,8 +511,8 @@ router.post('/email/send', authMiddleware, async (req, res) => {
         subject,
         body,
         JSON.stringify(attachments || []),
-        html || false
-      ]
+        html || false,
+      ],
     );
 
     // In production, this would use email service API
@@ -539,10 +539,10 @@ async function processVoiceAIMessage(message, messageRecord) {
       speech_to_text: true,
       text_to_speech: true,
       supports_interruption: true,
-      response_format: 'audio'
+      response_format: 'audio',
     },
     audio_url: null, // Would be generated in production
-    transcript: message
+    transcript: message,
   };
 }
 
@@ -559,7 +559,7 @@ router.post('/voice/transcribe', authMiddleware, async (req, res) => {
     res.json({
       transcript: transcription,
       confidence: 0.95,
-      language: language || 'en-US'
+      language: language || 'en-US',
     });
   } catch (error) {
     logger.error('Transcribe audio error', { error: error.message, stack: error.stack });
@@ -587,13 +587,13 @@ async function processIVRAIMessage(message, messageRecord) {
       dtmf_support: true,
       voice_recognition: true,
       call_flow_management: true,
-      response_format: 'audio'
+      response_format: 'audio',
     },
     menu_options: [
       { key: '1', action: 'support', description: 'Customer Support' },
       { key: '2', action: 'orders', description: 'Order Status' },
-      { key: '3', action: 'sales', description: 'Sales Inquiry' }
-    ]
+      { key: '3', action: 'sales', description: 'Sales Inquiry' },
+    ],
   };
 }
 
@@ -609,7 +609,7 @@ router.post('/ivr/call-flow', authMiddleware, async (req, res) => {
       `INSERT INTO ivr_call_flows 
        (flow_name, nodes, entry_point, status, created_at, updated_at)
        VALUES ($1, $2, $3, 'active', NOW(), NOW())`,
-      [flow_name, JSON.stringify(nodes), entry_point]
+      [flow_name, JSON.stringify(nodes), entry_point],
     );
 
     logger.info(`IVR call flow created: ${flow_name}`);
@@ -634,20 +634,20 @@ async function processKioskAIMessage(message, messageRecord) {
       touch_interface: true,
       large_display: true,
       multilingual_support: true,
-      response_format: 'json'
+      response_format: 'json',
     },
     ui_elements: [
       {
         type: 'button',
         label: 'Continue',
-        action: 'next_screen'
+        action: 'next_screen',
       },
       {
         type: 'button',
         label: 'Back',
-        action: 'previous_screen'
-      }
-    ]
+        action: 'previous_screen',
+      },
+    ],
   };
 }
 
@@ -663,7 +663,7 @@ router.post('/kiosk/screen', authMiddleware, async (req, res) => {
       `INSERT INTO kiosk_screens 
        (kiosk_id, screen_name, content, navigation, status, created_at, updated_at)
        VALUES ($1, $2, $3, $4, 'active', NOW(), NOW())`,
-      [kiosk_id, screen_name, JSON.stringify(content), JSON.stringify(navigation)]
+      [kiosk_id, screen_name, JSON.stringify(content), JSON.stringify(navigation)],
     );
 
     logger.info(`Kiosk screen created: ${screen_name} for kiosk ${kiosk_id}`);
@@ -684,8 +684,8 @@ async function processGenericMessage(message, messageRecord) {
     message_type: 'text',
     metadata: {
       channel: 'generic',
-      response_format: 'text'
-    }
+      response_format: 'text',
+    },
   };
 }
 
@@ -729,7 +729,7 @@ router.get('/config/:channel_type', authMiddleware, async (req, res) => {
   try {
     const config = await pool.query(
       'SELECT * FROM omnichannel_config WHERE channel_type = $1',
-      [req.params.channel_type]
+      [req.params.channel_type],
     );
 
     if (config.rows.length === 0) {
@@ -762,8 +762,8 @@ router.put('/config/:channel_type', authMiddleware, requireRole(...PLATFORM_STAF
         capabilities ? JSON.stringify(capabilities) : null,
         settings ? JSON.stringify(settings) : null,
         enabled,
-        req.params.channel_type
-      ]
+        req.params.channel_type,
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -785,5 +785,6 @@ function isHealthy() {
 
 module.exports = {
   router,
-  isHealthy
+  isHealthy,
 };
+

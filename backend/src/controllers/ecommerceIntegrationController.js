@@ -1,15 +1,15 @@
 /**
  * AFRERA E-Commerce Integration Controller
- * 
+ *
  * Handles all cross-module integration endpoints between E-commerce and:
  * - Nutrition Intelligence
- * - Recipe Intelligence  
+ * - Recipe Intelligence
  * - Consumer Health
  * - Nutrient Calculator
  * - Dietitian Services
  */
 
-const ecommerceService = require('../services/legacy/ecommerceService');
+const ecommerceIntegrationService = require('../services/legacy/ecommerceIntegrationService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
@@ -23,15 +23,15 @@ const { logger } = require('../utils/logger');
 async function calculateNutritionScore(req, res) {
   try {
     const { productId } = req.params;
-    
-    const result = await ecommerceService.calculateProductNutritionScore(productId);
-    
+
+    const result = await ecommerceIntegrationService.calculateProductNutritionScore(productId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in calculateNutritionScore controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to calculate nutrition score'
+      error: error.message || 'Failed to calculate nutrition score',
     });
   }
 }
@@ -44,21 +44,21 @@ async function getNutritionPricePremium(req, res) {
   try {
     const { productId } = req.params;
     const { basePrice } = req.query;
-    
-    const result = await ecommerceService.calculateNutritionPricePremium(
-      productId, 
-      parseFloat(basePrice)
+
+    const result = await ecommerceIntegrationService.calculateNutritionPricePremium(
+      productId,
+      parseFloat(basePrice),
     );
-    
+
     res.json({
       success: true,
-      ...result
+      ...result,
     });
   } catch (error) {
     logger.error('Error in getNutritionPricePremium controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to calculate nutrition price premium'
+      error: error.message || 'Failed to calculate nutrition price premium',
     });
   }
 }
@@ -75,18 +75,18 @@ async function getRecipeSuggestions(req, res) {
   try {
     const { productId } = req.params;
     const { limit } = req.query;
-    
-    const result = await ecommerceService.getRecipeSuggestionsForProduct(
-      productId, 
-      parseInt(limit) || 5
+
+    const result = await ecommerceIntegrationService.getRecipeSuggestionsForProduct(
+      productId,
+      parseInt(limit) || 5,
     );
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getRecipeSuggestions controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get recipe suggestions'
+      error: error.message || 'Failed to get recipe suggestions',
     });
   }
 }
@@ -98,15 +98,15 @@ async function getRecipeSuggestions(req, res) {
 async function getRecipeProducts(req, res) {
   try {
     const { recipeId } = req.params;
-    
-    const result = await ecommerceService.getProductsForRecipe(recipeId);
-    
+
+    const result = await ecommerceIntegrationService.getProductsForRecipe(recipeId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getRecipeProducts controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get recipe products'
+      error: error.message || 'Failed to get recipe products',
     });
   }
 }
@@ -123,18 +123,18 @@ async function getHealthRecommendations(req, res) {
   try {
     const userId = req.user.id;
     const { limit } = req.query;
-    
-    const result = await ecommerceService.getHealthBasedRecommendations(
-      userId, 
-      parseInt(limit) || 10
+
+    const result = await ecommerceIntegrationService.getHealthBasedRecommendations(
+      userId,
+      parseInt(limit) || 10,
     );
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getHealthRecommendations controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get health recommendations'
+      error: error.message || 'Failed to get health recommendations',
     });
   }
 }
@@ -147,18 +147,18 @@ async function checkCompatibility(req, res) {
   try {
     const { productId } = req.params;
     const userId = req.user.id;
-    
-    const result = await ecommerceService.checkProductCompatibility(productId, userId);
-    
+
+    const result = await ecommerceIntegrationService.checkProductCompatibility(productId, userId);
+
     res.json({
       success: true,
-      ...result
+      ...result,
     });
   } catch (error) {
     logger.error('Error in checkCompatibility controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to check product compatibility'
+      error: error.message || 'Failed to check product compatibility',
     });
   }
 }
@@ -174,15 +174,15 @@ async function checkCompatibility(req, res) {
 async function calculateCartNutrition(req, res) {
   try {
     const { cartItems } = req.body;
-    
-    const result = await ecommerceService.calculateCartNutrition(cartItems);
-    
+
+    const result = await ecommerceIntegrationService.calculateCartNutrition(cartItems);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in calculateCartNutrition controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to calculate cart nutrition'
+      error: error.message || 'Failed to calculate cart nutrition',
     });
   }
 }
@@ -195,15 +195,15 @@ async function calculateCartRDA(req, res) {
   try {
     const { cartNutrition } = req.body;
     const userId = req.user.id;
-    
-    const result = await ecommerceService.calculateCartRDAPercentage(cartNutrition, userId);
-    
+
+    const result = await ecommerceIntegrationService.calculateCartRDAPercentage(cartNutrition, userId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in calculateCartRDA controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to calculate cart RDA'
+      error: error.message || 'Failed to calculate cart RDA',
     });
   }
 }
@@ -219,15 +219,15 @@ async function calculateCartRDA(req, res) {
 async function getDietitianCollections(req, res) {
   try {
     const { dietitianId } = req.query;
-    
-    const result = await ecommerceService.getDietitianCollections(dietitianId);
-    
+
+    const result = await ecommerceIntegrationService.getDietitianCollections(dietitianId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getDietitianCollections controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get dietitian collections'
+      error: error.message || 'Failed to get dietitian collections',
     });
   }
 }
@@ -239,15 +239,15 @@ async function getDietitianCollections(req, res) {
 async function getDietitianRecommendation(req, res) {
   try {
     const userId = req.user.id;
-    
-    const result = await ecommerceService.getDietitianRecommendation(userId);
-    
+
+    const result = await ecommerceIntegrationService.getDietitianRecommendation(userId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getDietitianRecommendation controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get dietitian recommendation'
+      error: error.message || 'Failed to get dietitian recommendation',
     });
   }
 }
@@ -260,21 +260,20 @@ module.exports = {
   // Nutrition Scoring
   calculateNutritionScore,
   getNutritionPricePremium,
-  
+
   // Recipe Integration
   getRecipeSuggestions,
   getRecipeProducts,
-  
+
   // Health-Based Recommendations
   getHealthRecommendations,
   checkCompatibility,
-  
+
   // Shopping Cart Nutrition
   calculateCartNutrition,
   calculateCartRDA,
-  
+
   // Dietitian Integration
   getDietitianCollections,
-  getDietitianRecommendation
+  getDietitianRecommendation,
 };
-

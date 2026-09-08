@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { ArrowRight, Sprout, ShoppingBag, Landmark, Building2, Truck, Wheat } from 'lucide-react'
+import { Link } from 'react-router-dom';
+import { ArrowRight, Sprout, ShoppingBag, Landmark, Building2, Truck, Wheat } from 'lucide-react';
 
 const stakeholders = [
   {
@@ -44,7 +44,7 @@ const stakeholders = [
     to: '/logistics-provider',
     cta: 'Open the logistics portal',
   },
-]
+];
 
 function AboutPage() {
   return (
@@ -90,7 +90,7 @@ function AboutPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-export default AboutPage
+export default AboutPage;

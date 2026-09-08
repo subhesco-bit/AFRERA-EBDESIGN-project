@@ -1,128 +1,128 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { sheepAPI, sheepAIAPI } from '../services/api'
-import { Rabbit, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Baby, Scissors } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { sheepAPI, sheepAIAPI } from '../services/api';
+import { Rabbit, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Baby, Scissors } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
+import ActionCard from '../components/common/ActionCard';
 
-const BREEDS = ['Merino', 'Rambouillet', 'Dorper', 'Suffolk', 'Hampshire', 'Corriedale', 'Local / Desi', 'Crossbred']
-const STATUSES = ['Active', 'Pregnant', 'Lambing', 'Weaning', 'Shearing', 'Sold', 'Deceased']
+const BREEDS = ['Merino', 'Rambouillet', 'Dorper', 'Suffolk', 'Hampshire', 'Corriedale', 'Local / Desi', 'Crossbred'];
+const STATUSES = ['Active', 'Pregnant', 'Lambing', 'Weaning', 'Shearing', 'Sold', 'Deceased'];
 
 const emptyAnimal = {
   tag_id: '', breed: 'Local / Desi', dob: '', sex: 'female', status: 'Active', notes: '',
   last_vaccination_date: '', last_breeding_date: '', last_shearing_date: '',
-}
+};
 
 function SheepFarmingPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyAnimal)
-  const [woolForm, setWoolForm] = useState({ animal_id: '', date: '', weight_kg: '', grade: '', notes: '' })
-  const [feedForm, setFeedForm] = useState({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
-  const [breedingForm, setBreedingForm] = useState({ female_id: '', male_id: '', breeding_date: '', expected_lambing_date: '' })
-  const [tab, setTab] = useState('flock')
-  const [aiAnimalId, setAiAnimalId] = useState('')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyAnimal);
+  const [woolForm, setWoolForm] = useState({ animal_id: '', date: '', weight_kg: '', grade: '', notes: '' });
+  const [feedForm, setFeedForm] = useState({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' });
+  const [breedingForm, setBreedingForm] = useState({ female_id: '', male_id: '', breeding_date: '', expected_lambing_date: '' });
+  const [tab, setTab] = useState('flock');
+  const [aiAnimalId, setAiAnimalId] = useState('');
 
   const { data: flockData, isLoading, error } = useQuery({
     queryKey: ['sheep-flock'],
     queryFn: async () => (await sheepAPI.listFlock()).data?.data ?? [],
-  })
+  });
 
   const { data: woolData, isLoading: woolLoading, error: woolError } = useQuery({
     queryKey: ['sheep-wool-production'],
     queryFn: async () => (await sheepAPI.listWoolProduction()).data?.data ?? [],
-  })
+  });
 
   const { data: performanceData, isLoading: performanceLoading, error: performanceError } = useQuery({
     queryKey: ['sheep-flock-performance'],
     queryFn: async () => (await sheepAPI.getFlockPerformance()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: breedingAlertsData, isLoading: breedingAlertsLoading, error: breedingAlertsError } = useQuery({
     queryKey: ['sheep-breeding-alerts'],
     queryFn: async () => (await sheepAPI.getBreedingAlerts()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: vaccinationAlertsData, isLoading: vaccinationAlertsLoading, error: vaccinationAlertsError } = useQuery({
     queryKey: ['sheep-vaccination-alerts'],
     queryFn: async () => (await sheepAPI.getVaccinationAlerts()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: shearingAlertsData, isLoading: shearingAlertsLoading, error: shearingAlertsError } = useQuery({
     queryKey: ['sheep-shearing-alerts'],
     queryFn: async () => (await sheepAPI.getShearingAlerts()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? sheepAPI.updateAnimal(editingId, payload) : sheepAPI.createAnimal(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Animal updated' : 'Animal registered')
-      queryClient.invalidateQueries({ queryKey: ['sheep-flock'] })
-      closeForm()
+      toast.success(editingId ? 'Animal updated' : 'Animal registered');
+      queryClient.invalidateQueries({ queryKey: ['sheep-flock'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save animal'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => sheepAPI.deleteAnimal(id),
-    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['sheep-flock'] }) },
+    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['sheep-flock'] }); },
     onError: () => toast.error('Failed to remove animal'),
-  })
+  });
 
   const recordWoolMutation = useMutation({
     mutationFn: (payload) => sheepAPI.recordWoolProduction(payload),
     onSuccess: () => {
-      toast.success('Wool production recorded')
-      queryClient.invalidateQueries({ queryKey: ['sheep-wool-production'] })
-      setWoolForm({ animal_id: '', date: '', weight_kg: '', grade: '', notes: '' })
+      toast.success('Wool production recorded');
+      queryClient.invalidateQueries({ queryKey: ['sheep-wool-production'] });
+      setWoolForm({ animal_id: '', date: '', weight_kg: '', grade: '', notes: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record wool production'),
-  })
+  });
 
   const recordFeedMutation = useMutation({
     mutationFn: (payload) => sheepAPI.recordFeedConsumption(payload),
     onSuccess: () => {
-      toast.success('Feed consumption recorded')
-      queryClient.invalidateQueries({ queryKey: ['sheep-feed-consumption'] })
-      setFeedForm({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
+      toast.success('Feed consumption recorded');
+      queryClient.invalidateQueries({ queryKey: ['sheep-feed-consumption'] });
+      setFeedForm({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record feed consumption'),
-  })
+  });
 
   const recordBreedingMutation = useMutation({
     mutationFn: (payload) => sheepAPI.recordBreeding(payload),
     onSuccess: () => {
-      toast.success('Breeding recorded')
-      queryClient.invalidateQueries({ queryKey: ['sheep-breeding-records'] })
-      setBreedingForm({ female_id: '', male_id: '', breeding_date: '', expected_lambing_date: '' })
+      toast.success('Breeding recorded');
+      queryClient.invalidateQueries({ queryKey: ['sheep-breeding-records'] });
+      setBreedingForm({ female_id: '', male_id: '', breeding_date: '', expected_lambing_date: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record breeding'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyAnimal) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyAnimal); };
 
   const openEdit = (a) => {
     setForm({
-      tag_id: a.tag_id || '', breed: a.breed || 'Local / Desi', dob: a.dob ? a.dob.slice(0, 10) : '', 
+      tag_id: a.tag_id || '', breed: a.breed || 'Local / Desi', dob: a.dob ? a.dob.slice(0, 10) : '',
       sex: a.sex || 'female', status: a.status || 'Active', notes: a.notes || '',
       last_vaccination_date: a.last_vaccination_date ? a.last_vaccination_date.slice(0, 10) : '',
       last_breeding_date: a.last_breeding_date ? a.last_breeding_date.slice(0, 10) : '',
       last_shearing_date: a.last_shearing_date ? a.last_shearing_date.slice(0, 10) : '',
-    })
-    setEditingId(a.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(a.id);
+    setShowForm(true);
+  };
 
-  const flock = flockData || []
-  const woolRecords = woolData || []
-  const pregnant = flock.filter((a) => a.status === 'Pregnant').length
-  const totalWoolThisMonth = woolRecords.reduce((s, w) => s + (Number(w.weight_kg) || 0), 0)
+  const flock = flockData || [];
+  const woolRecords = woolData || [];
+  const pregnant = flock.filter((a) => a.status === 'Pregnant').length;
+  const totalWoolThisMonth = woolRecords.reduce((s, w) => s + (Number(w.weight_kg) || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -137,7 +137,7 @@ function SheepFarmingPage() {
           <p className="text-gray-600">Track flock health, wool production, and breeding records</p>
         </div>
         {tab === 'flock' && (
-          <button onClick={() => { setForm(emptyAnimal); setEditingId(null); setShowForm(true) }}
+          <button onClick={() => { setForm(emptyAnimal); setEditingId(null); setShowForm(true); }}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition flex items-center">
             <Plus className="w-4 h-4 mr-2" /> Add Animal
           </button>
@@ -324,7 +324,7 @@ function SheepFarmingPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default SheepFarmingPage
+export default SheepFarmingPage;

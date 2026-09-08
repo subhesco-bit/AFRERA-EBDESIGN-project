@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { Droplets } from 'lucide-react'
+import { useState } from 'react';
+import { Droplets } from 'lucide-react';
 import {
   waterBudgetRecordsAPI, waterQualityRecordsAPI, rainwaterStructuresAPI,
   watershedRecordsAPI, waterAnalyticsRecordsAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Real backend: backend/src/routes/waterManagementRoutes.js +
@@ -23,10 +23,10 @@ const TABS = [
   ['structures', 'Rainwater Structures'],
   ['watersheds', 'Watersheds'],
   ['analytics', 'Analytics Records'],
-]
+];
 
 function WaterRecordsPage() {
-  const [tab, setTab] = useState('budgets')
+  const [tab, setTab] = useState('budgets');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -162,7 +162,7 @@ function WaterRecordsPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default WaterRecordsPage
+export default WaterRecordsPage;

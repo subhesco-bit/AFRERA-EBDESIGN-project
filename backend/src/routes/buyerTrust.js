@@ -8,7 +8,7 @@ const router = express.Router();
 const buyerTrustService = require('../services/buyerTrustService');
 const { authMiddleware: authenticateToken } = require('../middleware/auth');
 const { validateBody: validateRequest } = require('../middleware/validation');
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 /**
  * GET /buyers/:id/trust

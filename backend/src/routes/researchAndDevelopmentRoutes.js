@@ -1,12 +1,14 @@
 /**
  * Research and Development (R&D) Routes
- * 
+ *
  * Express routes for the Research and Development service,
  * providing endpoints for project management, collaborations, innovations,
  * patents, funding, publications, and AI research assistance.
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const researchAndDevelopmentService = require('../services/legacy/researchAndDevelopmentService');
 
@@ -21,19 +23,19 @@ router.get('/projects', (req, res) => {
       status: req.query.status,
       category: req.query.category,
       priority: req.query.priority,
-      aiEnabled: req.query.aiEnabled
+      aiEnabled: req.query.aiEnabled,
     };
-    
+
     const projects = researchAndDevelopmentService.getRDProjects(filters);
     res.json({
       success: true,
       count: projects.length,
-      data: projects
+      data: projects,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -45,17 +47,17 @@ router.get('/projects/:projectId', (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        error: 'R&D project not found'
+        error: 'R&D project not found',
       });
     }
     res.json({
       success: true,
-      data: project
+      data: project,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -67,12 +69,12 @@ router.post('/projects', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'R&D project created successfully',
-      data: project
+      data: project,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -84,12 +86,12 @@ router.put('/projects/:projectId', (req, res) => {
     res.json({
       success: true,
       message: 'R&D project updated successfully',
-      data: project
+      data: project,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -100,12 +102,12 @@ router.delete('/projects/:projectId', (req, res) => {
     const result = researchAndDevelopmentService.deleteRDProject(req.params.projectId);
     res.json({
       success: true,
-      message: result.message
+      message: result.message,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -121,12 +123,12 @@ router.post('/projects/:projectId/milestones', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Milestone added successfully',
-      data: milestone
+      data: milestone,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -138,12 +140,12 @@ router.put('/projects/:projectId/milestones/:milestoneId', (req, res) => {
     res.json({
       success: true,
       message: 'Milestone updated successfully',
-      data: milestone
+      data: milestone,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -158,19 +160,19 @@ router.get('/collaborations', (req, res) => {
     const filters = {
       status: req.query.status,
       type: req.query.type,
-      projectId: req.query.projectId
+      projectId: req.query.projectId,
     };
-    
+
     const collaborations = researchAndDevelopmentService.getCollaborations(filters);
     res.json({
       success: true,
       count: collaborations.length,
-      data: collaborations
+      data: collaborations,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -182,12 +184,12 @@ router.post('/collaborations', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Collaboration created successfully',
-      data: collaboration
+      data: collaboration,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -203,19 +205,19 @@ router.get('/innovations', (req, res) => {
       status: req.query.status,
       category: req.query.category,
       projectId: req.query.projectId,
-      patentStatus: req.query.patentStatus
+      patentStatus: req.query.patentStatus,
     };
-    
+
     const innovations = researchAndDevelopmentService.getInnovations(filters);
     res.json({
       success: true,
       count: innovations.length,
-      data: innovations
+      data: innovations,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -227,12 +229,12 @@ router.post('/innovations', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Innovation created successfully',
-      data: innovation
+      data: innovation,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -247,19 +249,19 @@ router.get('/patents', (req, res) => {
     const filters = {
       status: req.query.status,
       jurisdiction: req.query.jurisdiction,
-      innovationId: req.query.innovationId
+      innovationId: req.query.innovationId,
     };
-    
+
     const patents = researchAndDevelopmentService.getPatents(filters);
     res.json({
       success: true,
       count: patents.length,
-      data: patents
+      data: patents,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -271,12 +273,12 @@ router.post('/patents', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Patent created successfully',
-      data: patent
+      data: patent,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -291,19 +293,19 @@ router.get('/funding', (req, res) => {
     const filters = {
       status: req.query.status,
       category: req.query.category,
-      provider: req.query.provider
+      provider: req.query.provider,
     };
-    
+
     const opportunities = researchAndDevelopmentService.getFundingOpportunities(filters);
     res.json({
       success: true,
       count: opportunities.length,
-      data: opportunities
+      data: opportunities,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -315,12 +317,12 @@ router.post('/funding', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Funding opportunity created successfully',
-      data: funding
+      data: funding,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -332,12 +334,12 @@ router.post('/funding/:fundingId/apply', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Funding application submitted successfully',
-      data: application
+      data: application,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -352,19 +354,19 @@ router.get('/publications', (req, res) => {
     const filters = {
       status: req.query.status,
       type: req.query.type,
-      projectId: req.query.projectId
+      projectId: req.query.projectId,
     };
-    
+
     const publications = researchAndDevelopmentService.getPublications(filters);
     res.json({
       success: true,
       count: publications.length,
-      data: publications
+      data: publications,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -376,12 +378,12 @@ router.post('/publications', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Publication created successfully',
-      data: publication
+      data: publication,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -397,19 +399,19 @@ router.post('/ai-assistance', async (req, res) => {
     if (!query) {
       return res.status(400).json({
         success: false,
-        error: 'Query is required in request body'
+        error: 'Query is required in request body',
       });
     }
-    
+
     const assistance = await researchAndDevelopmentService.getAIResearchAssistance(query, context);
     res.json({
       success: true,
-      data: assistance
+      data: assistance,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -424,19 +426,19 @@ router.get('/knowledge', (req, res) => {
     const query = req.query.q;
     const filters = {
       category: req.query.category,
-      verified: req.query.verified
+      verified: req.query.verified,
     };
-    
+
     const knowledge = researchAndDevelopmentService.searchKnowledgeBase(query, filters);
     res.json({
       success: true,
       count: knowledge.length,
-      data: knowledge
+      data: knowledge,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -448,12 +450,12 @@ router.post('/knowledge', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Knowledge added successfully',
-      data: knowledge
+      data: knowledge,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -468,12 +470,12 @@ router.get('/analytics', (req, res) => {
     const analytics = researchAndDevelopmentService.getRDAnalytics();
     res.json({
       success: true,
-      data: analytics
+      data: analytics,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -488,12 +490,12 @@ router.get('/health', (req, res) => {
     const health = researchAndDevelopmentService.getHealthStatus();
     res.json({
       success: true,
-      data: health
+      data: health,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });

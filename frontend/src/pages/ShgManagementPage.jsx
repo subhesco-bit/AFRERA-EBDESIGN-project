@@ -1,75 +1,75 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { shgAPI } from '../services/api'
-import { HeartHandshake, Plus, X, Users2, IndianRupee, UserPlus } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { shgAPI } from '../services/api';
+import { HeartHandshake, Plus, X, Users2, IndianRupee, UserPlus } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const emptyGroup = { name: '', village: '', formation_date: '', focus_area: '' }
-const emptyMember = { name: '', phone: '', role: 'Member' }
-const emptySaving = { amount: '', date: '', type: 'deposit' }
+const emptyGroup = { name: '', village: '', formation_date: '', focus_area: '' };
+const emptyMember = { name: '', phone: '', role: 'Member' };
+const emptySaving = { amount: '', date: '', type: 'deposit' };
 
 function ShgManagementPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(emptyGroup)
-  const [selectedGroup, setSelectedGroup] = useState(null)
-  const [memberForm, setMemberForm] = useState(emptyMember)
-  const [savingForm, setSavingForm] = useState(emptySaving)
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyGroup);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [memberForm, setMemberForm] = useState(emptyMember);
+  const [savingForm, setSavingForm] = useState(emptySaving);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: groupsData, isLoading, error } = useQuery({
     queryKey: ['shg-groups'],
     queryFn: async () => (await shgAPI.getGroups()).data?.data ?? [],
-  })
+  });
 
   const { data: membersData, isLoading: membersLoading, error: membersError } = useQuery({
     queryKey: ['shg-members', selectedGroup?.id],
     queryFn: async () => (await shgAPI.getMembers(selectedGroup.id)).data?.data ?? [],
-    enabled: !!selectedGroup,
-  })
+    enabled: Boolean(selectedGroup),
+  });
 
   const { data: savingsData, isLoading: savingsLoading, error: savingsError } = useQuery({
     queryKey: ['shg-savings', selectedGroup?.id],
     queryFn: async () => (await shgAPI.getSavings(selectedGroup.id)).data?.data ?? [],
-    enabled: !!selectedGroup,
-  })
+    enabled: Boolean(selectedGroup),
+  });
 
   const createGroupMutation = useMutation({
     mutationFn: (payload) => shgAPI.createGroup(payload),
     onSuccess: () => {
-      toast.success('SHG registered')
-      queryClient.invalidateQueries({ queryKey: ['shg-groups'] })
-      setShowForm(false)
-      setForm(emptyGroup)
+      toast.success('SHG registered');
+      queryClient.invalidateQueries({ queryKey: ['shg-groups'] });
+      setShowForm(false);
+      setForm(emptyGroup);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to register group'),
-  })
+  });
 
   const addMemberMutation = useMutation({
     mutationFn: (payload) => shgAPI.addMember(selectedGroup.id, payload),
     onSuccess: () => {
-      toast.success('Member added')
-      queryClient.invalidateQueries({ queryKey: ['shg-members', selectedGroup.id] })
-      setMemberForm(emptyMember)
+      toast.success('Member added');
+      queryClient.invalidateQueries({ queryKey: ['shg-members', selectedGroup.id] });
+      setMemberForm(emptyMember);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to add member'),
-  })
+  });
 
   const recordSavingMutation = useMutation({
     mutationFn: (payload) => shgAPI.recordSaving(selectedGroup.id, payload),
     onSuccess: () => {
-      toast.success('Savings entry recorded')
-      queryClient.invalidateQueries({ queryKey: ['shg-savings', selectedGroup.id] })
-      setSavingForm(emptySaving)
+      toast.success('Savings entry recorded');
+      queryClient.invalidateQueries({ queryKey: ['shg-savings', selectedGroup.id] });
+      setSavingForm(emptySaving);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record entry'),
-  })
+  });
 
-  const groups = groupsData || []
-  const members = membersData || []
-  const savings = savingsData || []
-  const totalSavings = savings.reduce((s, x) => s + (x.type === 'withdrawal' ? -Number(x.amount || 0) : Number(x.amount || 0)), 0)
+  const groups = groupsData || [];
+  const members = membersData || [];
+  const savings = savingsData || [];
+  const totalSavings = savings.reduce((s, x) => s + (x.type === 'withdrawal' ? -Number(x.amount || 0) : Number(x.amount || 0)), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -137,9 +137,9 @@ function ShgManagementPage() {
                 )}
                 <form
                   onSubmit={(e) => {
-                    e.preventDefault()
-                    if (!memberForm.name) { toast.error('Member name required'); return }
-                    addMemberMutation.mutate(memberForm)
+                    e.preventDefault();
+                    if (!memberForm.name) { toast.error('Member name required'); return; }
+                    addMemberMutation.mutate(memberForm);
                   }}
                   className="flex flex-wrap gap-2"
                 >
@@ -164,9 +164,9 @@ function ShgManagementPage() {
                 )}
                 <form
                   onSubmit={(e) => {
-                    e.preventDefault()
-                    if (!savingForm.amount || !savingForm.date) { toast.error('Amount and date are required'); return }
-                    recordSavingMutation.mutate({ ...savingForm, amount: Number(savingForm.amount) })
+                    e.preventDefault();
+                    if (!savingForm.amount || !savingForm.date) { toast.error('Amount and date are required'); return; }
+                    recordSavingMutation.mutate({ ...savingForm, amount: Number(savingForm.amount) });
                   }}
                   className="grid grid-cols-3 gap-2"
                 >
@@ -199,9 +199,9 @@ function ShgManagementPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.name || !form.village) { toast.error('Group name and village are required'); return }
-                  createGroupMutation.mutate(form)
+                  e.preventDefault();
+                  if (!form.name || !form.village) { toast.error('Group name and village are required'); return; }
+                  createGroupMutation.mutate(form);
                 }}
                 className="space-y-4"
               >
@@ -239,7 +239,7 @@ function ShgManagementPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default ShgManagementPage
+export default ShgManagementPage;

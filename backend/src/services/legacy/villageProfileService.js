@@ -1,6 +1,6 @@
 /**
  * Village Profile Service
- * 
+ *
  * Implements REOS Missing Layer 5: District/Village/Block Economic Database
  * Wires the existing `village_profiles` table (migration 052) to application logic
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getVillageProfile(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM village_profiles WHERE village_id = $1`,
-      [villageId]
+      'SELECT * FROM village_profiles WHERE village_id = $1',
+      [villageId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Village profile not found: ${villageId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get village profile: ${error.message}`);
@@ -43,10 +43,10 @@ async function getVillageProfile(villageId) {
 async function getVillagesByDistrict(district) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM village_profiles WHERE district = $1 ORDER BY village_name`,
-      [district]
+      'SELECT * FROM village_profiles WHERE district = $1 ORDER BY village_name',
+      [district],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get villages by district: ${error.message}`);
@@ -62,10 +62,10 @@ async function getVillagesByDistrict(district) {
 async function getVillagesByBlock(block) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM village_profiles WHERE block = $1 ORDER BY village_name`,
-      [block]
+      'SELECT * FROM village_profiles WHERE block = $1 ORDER BY village_name',
+      [block],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get villages by block: ${error.message}`);
@@ -99,7 +99,7 @@ async function upsertVillageProfile(profile) {
       financial_institutions_count,
       schools_count,
       health_centers_count,
-      cooperative_societies_count
+      cooperative_societies_count,
     } = profile;
 
     const { rows } = await pool.query(
@@ -133,10 +133,10 @@ async function upsertVillageProfile(profile) {
          last_updated = NOW()
        RETURNING *`,
       [village_id, village_name, district, block, state, population, households,
-       main_crops, soil_type, irrigation_coverage, avg_income_per_household,
-       literacy_rate, electrified_households, road_access, market_distance_km,
-       financial_institutions_count, schools_count, health_centers_count,
-       cooperative_societies_count]
+        main_crops, soil_type, irrigation_coverage, avg_income_per_household,
+        literacy_rate, electrified_households, road_access, market_distance_km,
+        financial_institutions_count, schools_count, health_centers_count,
+        cooperative_societies_count],
     );
 
     logger.info(`Village profile upserted: ${village_id}`);
@@ -171,7 +171,7 @@ async function getDistrictEconomicSummary(district) {
        FROM village_profiles
        WHERE district = $1
        GROUP BY district`,
-      [district]
+      [district],
     );
 
     if (!rows.length) {
@@ -191,7 +191,7 @@ async function getDistrictEconomicSummary(district) {
       totalFinancialInstitutions: parseInt(summary.total_financial_institutions),
       totalSchools: parseInt(summary.total_schools),
       totalHealthCenters: parseInt(summary.total_health_centers),
-      totalCooperatives: parseInt(summary.total_cooperatives)
+      totalCooperatives: parseInt(summary.total_cooperatives),
     };
   } catch (error) {
     logger.error(`Failed to get district economic summary: ${error.message}`);
@@ -213,10 +213,10 @@ async function searchVillages(filters) {
       maxPopulation,
       minIrrigationCoverage,
       hasRoadAccess,
-      mainCrop
+      mainCrop,
     } = filters;
 
-    let query = `SELECT * FROM village_profiles WHERE 1=1`;
+    let query = 'SELECT * FROM village_profiles WHERE 1=1';
     const params = [];
     let paramIndex = 1;
 
@@ -262,7 +262,7 @@ async function searchVillages(filters) {
       paramIndex++;
     }
 
-    query += ` ORDER BY village_name LIMIT 100`;
+    query += ' ORDER BY village_name LIMIT 100';
 
     const { rows } = await pool.query(query, params);
     return rows;
@@ -344,26 +344,27 @@ module.exports = {
   upsertVillageProfile,
   getDistrictEconomicSummary,
   searchVillages,
-  setupRoutes
+  setupRoutes,
 };
 
 // Merged from backend/src/modules/M019
 {
-  const m019 = require("../../modules/M019/service");
+  const m019 = require('../../modules/M019/service');
   const { ...rest } = m019;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M041
 {
-  const m041 = require("../../modules/M041/service");
+  const m041 = require('../../modules/M041/service');
   const { ...rest } = m041;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M054
 {
-  const m054 = require("../../modules/M054/service");
+  const m054 = require('../../modules/M054/service');
   const { ...rest } = m054;
   Object.assign(module.exports, rest);
 }
+

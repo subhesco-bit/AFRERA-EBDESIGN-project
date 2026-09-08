@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 /**
  * One real backend operation: scalar fields (for simple id/string/number
@@ -12,36 +12,36 @@ import { useState } from 'react'
  * and the parsed JSON payload (or {} if hasJsonPayload is false/empty).
  */
 export default function ActionCard({ title, description, fields = [], hasJsonPayload, jsonLabel, jsonPlaceholder, onRun }) {
-  const [values, setValues] = useState({})
-  const [jsonText, setJsonText] = useState('')
-  const [jsonError, setJsonError] = useState('')
-  const [result, setResult] = useState(null)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [values, setValues] = useState({});
+  const [jsonText, setJsonText] = useState('');
+  const [jsonError, setJsonError] = useState('');
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleRun = async () => {
-    setError('')
-    setResult(null)
-    let payload
+    setError('');
+    setResult(null);
+    let payload;
     if (hasJsonPayload) {
       try {
-        payload = jsonText.trim() ? JSON.parse(jsonText) : {}
-        setJsonError('')
+        payload = jsonText.trim() ? JSON.parse(jsonText) : {};
+        setJsonError('');
       } catch {
-        setJsonError('Not valid JSON')
-        return
+        setJsonError('Not valid JSON');
+        return;
       }
     }
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await onRun(values, payload)
-      setResult(res?.data ?? res)
+      const res = await onRun(values, payload);
+      setResult(res?.data ?? res);
     } catch (e) {
-      setError(e?.response?.data?.error || e.message || 'Request failed')
+      setError(e?.response?.data?.error || e.message || 'Request failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
@@ -96,5 +96,5 @@ export default function ActionCard({ title, description, fields = [], hasJsonPay
         </pre>
       )}
     </div>
-  )
+  );
 }

@@ -66,5 +66,5 @@ module.exports = {
   registerSparePart,
   recordPartConsumption,
   trackInventoryStatus,
-  generateInventoryReport
+  generateInventoryReport,
 };

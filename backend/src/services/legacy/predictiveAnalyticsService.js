@@ -48,7 +48,7 @@ async function createPredictiveModel(data) {
     accuracy_score,
     precision_score,
     recall_score,
-    f1_score
+    f1_score,
   } = data;
 
   try {
@@ -68,8 +68,8 @@ async function createPredictiveModel(data) {
         accuracy_score,
         precision_score,
         recall_score,
-        f1_score
-      ]
+        f1_score,
+      ],
     );
 
     return result.rows[0];
@@ -148,7 +148,7 @@ async function createPrediction(data) {
     confidence_interval_lower,
     confidence_interval_upper,
     confidence_score,
-    prediction_metadata
+    prediction_metadata,
   } = data;
 
   try {
@@ -170,8 +170,8 @@ async function createPrediction(data) {
         confidence_interval_lower,
         confidence_interval_upper,
         confidence_score,
-        JSON.stringify(prediction_metadata)
-      ]
+        JSON.stringify(prediction_metadata),
+      ],
     );
 
     return result.rows[0];
@@ -252,7 +252,7 @@ async function createForecast(data) {
     forecast_horizon_days,
     forecast_values,
     forecast_metadata,
-    generated_by_model_id
+    generated_by_model_id,
   } = data;
 
   try {
@@ -270,8 +270,8 @@ async function createForecast(data) {
         forecast_horizon_days,
         JSON.stringify(forecast_values),
         JSON.stringify(forecast_metadata),
-        generated_by_model_id
-      ]
+        generated_by_model_id,
+      ],
     );
 
     return result.rows[0];
@@ -308,7 +308,7 @@ async function getForecasts(entityId = null, entityType = null, forecastType = n
     }
 
     if (forecastType) {
-      query += ' AND forecast_type = $' + (params.length + 1);
+      query += ` AND forecast_type = $${ params.length + 1}`;
       params.push(forecastType);
     }
 
@@ -349,7 +349,7 @@ async function createPredictionAlert(data) {
     alert_type,
     alert_severity,
     alert_message,
-    alert_data
+    alert_data,
   } = data;
 
   try {
@@ -363,8 +363,8 @@ async function createPredictionAlert(data) {
         alert_type,
         alert_severity,
         alert_message,
-        JSON.stringify(alert_data)
-      ]
+        JSON.stringify(alert_data),
+      ],
     );
 
     return result.rows[0];
@@ -397,7 +397,7 @@ async function getUnacknowledgedAlerts() {
        FROM prediction_alerts pa
        LEFT JOIN predictions p ON pa.prediction_id = p.id
        WHERE pa.is_acknowledged = false
-       ORDER BY pa.created_at DESC`
+       ORDER BY pa.created_at DESC`,
     );
 
     return result.rows;
@@ -447,8 +447,8 @@ async function recordPredictiveAnalytics(metrics) {
         metrics.avg_confidence || 0,
         metrics.total_forecasts || 0,
         metrics.training_runs || 0,
-        metrics.active_models || 0
-      ]
+        metrics.active_models || 0,
+      ],
     );
 
     return result.rows[0];
@@ -491,9 +491,10 @@ module.exports = {
   createPredictionAlert,
   getUnacknowledgedAlerts,
   recordPredictiveAnalytics,
-  isHealthy
+  isHealthy,
 };
 
 // Merged unique operations from backend/src/modules/M080 (see git history there for
 // full context) - complementary functionality this service did not have.
-Object.assign(module.exports, require("../../modules/M080/service"));
+Object.assign(module.exports, require('../../modules/M080/service'));
+

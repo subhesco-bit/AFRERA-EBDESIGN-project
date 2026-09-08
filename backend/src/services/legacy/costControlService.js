@@ -53,7 +53,7 @@ class CostControlService {
            (company_id, code, name, parent_cost_center_id, business_unit_id, department_id, responsible_user_id)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING *`,
-        [companyId, code, name, parentCostCenterId || null, businessUnitId || null, departmentId || null, responsibleUserId || null]
+        [companyId, code, name, parentCostCenterId || null, businessUnitId || null, departmentId || null, responsibleUserId || null],
       );
 
       logger.info(`Cost centre created: ${result.rows[0].id} (${code})`);
@@ -152,7 +152,7 @@ class CostControlService {
            (company_id, code, name, parent_profit_center_id, business_unit_id, responsible_user_id)
          VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING *`,
-        [companyId, code, name, parentProfitCenterId || null, businessUnitId || null, responsibleUserId || null]
+        [companyId, code, name, parentProfitCenterId || null, businessUnitId || null, responsibleUserId || null],
       );
 
       logger.info(`Profit centre created: ${result.rows[0].id} (${code})`);
@@ -199,7 +199,7 @@ class CostControlService {
         `INSERT INTO budgets (company_id, fiscal_year_id, code, name, budget_type)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
-        [companyId, fiscalYearId, code, name, budgetType]
+        [companyId, fiscalYearId, code, name, budgetType],
       );
 
       logger.info(`Budget created: ${result.rows[0].id} (${code})`);
@@ -252,8 +252,8 @@ class CostControlService {
   async submitBudget(budgetId) {
     try {
       const result = await this.pool.query(
-        `UPDATE budgets SET status = 'submitted' WHERE id = $1 AND status = 'draft' RETURNING *`,
-        [budgetId]
+        'UPDATE budgets SET status = \'submitted\' WHERE id = $1 AND status = \'draft\' RETURNING *',
+        [budgetId],
       );
       if (result.rows.length === 0) {
         throw new Error('Budget not found or not in draft status');
@@ -272,7 +272,7 @@ class CostControlService {
          SET status = $1, approved_by = $2, approved_at = NOW()
          WHERE id = $3 AND status = 'submitted'
          RETURNING *`,
-        [approved ? 'approved' : 'rejected', approverId, budgetId]
+        [approved ? 'approved' : 'rejected', approverId, budgetId],
       );
       if (result.rows.length === 0) {
         throw new Error('Budget not found or not in submitted status');
@@ -299,7 +299,7 @@ class CostControlService {
            (budget_id, account_id, cost_center_id, profit_center_id, fiscal_period_id, budgeted_amount, notes)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING *`,
-        [budgetId, accountId, costCenterId || null, profitCenterId || null, fiscalPeriodId || null, budgetedAmount, notes || null]
+        [budgetId, accountId, costCenterId || null, profitCenterId || null, fiscalPeriodId || null, budgetedAmount, notes || null],
       );
 
       return result.rows[0];
@@ -317,7 +317,7 @@ class CostControlService {
          JOIN chart_of_accounts coa ON coa.id = bl.account_id
          WHERE bl.budget_id = $1
          ORDER BY coa.account_code`,
-        [budgetId]
+        [budgetId],
       );
       return result.rows;
     } catch (error) {
@@ -379,7 +379,7 @@ class CostControlService {
         lines: result.rows,
         totalBudgeted,
         totalActual,
-        totalVariance: totalActual - totalBudgeted
+        totalVariance: totalActual - totalBudgeted,
       };
     } catch (error) {
       logger.error('Error getting budget vs actual', { error: error.message, stack: error.stack });
@@ -422,9 +422,9 @@ class CostControlService {
         totalActual,
         totalVariance,
         recommendations,
-        note: recommendations.length === 0
-          ? 'No budget lines currently exceed the over-budget threshold — nothing to recommend.'
-          : undefined,
+        note: recommendations.length === 0 ?
+          'No budget lines currently exceed the over-budget threshold — nothing to recommend.' :
+          undefined,
       };
     } catch (error) {
       logger.error('Error getting cost reduction recommendations', { error: error.message, stack: error.stack });
@@ -434,3 +434,4 @@ class CostControlService {
 }
 
 module.exports = new CostControlService();
+

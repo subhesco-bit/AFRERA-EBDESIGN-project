@@ -1,10 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ClipboardCheck, Check, X, ExternalLink } from 'lucide-react'
-import { cropValueResearchAPI } from '../services/api'
-import { AsyncState, Section } from '../components/common/DataPrimitives'
-import { Card, CardContent } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Badge } from '../components/ui/badge'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ClipboardCheck, Check, X, ExternalLink } from 'lucide-react';
+import { cropValueResearchAPI } from '../services/api';
+import { AsyncState, Section } from '../components/common/DataPrimitives';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
 
 /**
  * Admin review queue for AI-suggested crop value-compound reference data
@@ -15,17 +15,17 @@ import { Badge } from '../components/ui/badge'
  * than leaving a known-bad AI guess sitting in the table.
  */
 export default function CropValueReviewPage() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const { data: pending, isLoading, error } = useQuery({
     queryKey: ['crop-value-pending'],
     queryFn: () => cropValueResearchAPI.getPending().then((r) => r.data?.data || []),
-  })
+  });
 
   const reviewMutation = useMutation({
     mutationFn: ({ id, approve }) => cropValueResearchAPI.review(id, approve),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['crop-value-pending'] }),
-  })
+  });
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
@@ -74,5 +74,5 @@ export default function CropValueReviewPage() {
         </AsyncState>
       </Section>
     </main>
-  )
+  );
 }

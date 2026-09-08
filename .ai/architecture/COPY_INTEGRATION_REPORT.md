@@ -1,6 +1,6 @@
 # COPY + INTEGRATION REPORT
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Mode:** Copy + Integration Mode  
 **Date:** 31 August 2026  
 **Classification:** Audit-Ready, Litigation-Ready  

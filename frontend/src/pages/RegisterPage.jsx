@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
-import { authAPI } from '../services/api'
-import { useAuthStore } from '../store/authStore'
-import toast from 'react-hot-toast'
-import { UserPlus, Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { authAPI } from '../services/api';
+import { useAuthStore } from '../store/authStore';
+import toast from 'react-hot-toast';
+import { UserPlus, Eye, EyeOff } from 'lucide-react';
 
 function RegisterPage() {
-  const navigate = useNavigate()
-  const { setAuth } = useAuthStore()
-  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate();
+  const { setAuth } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -17,7 +17,7 @@ function RegisterPage() {
     phone: '',
     password: '',
     role: 'consumer',
-  })
+  });
 
   // See LoginPage.jsx: v5 react-query object-syntax fix, same pattern.
   const registerMutation = useMutation({
@@ -25,24 +25,24 @@ function RegisterPage() {
     onSuccess: (response) => {
       // See LoginPage.jsx: authAPI.register resolves to the raw axios
       // response, so the payload is under response.data.
-      const { user, accessToken, refreshToken } = response.data
-      setAuth(user, accessToken, refreshToken)
-      toast.success('Registration successful')
-      navigate('/dashboard')
+      const { user, accessToken, refreshToken } = response.data;
+      setAuth(user, accessToken, refreshToken);
+      toast.success('Registration successful');
+      navigate('/dashboard');
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Registration failed')
+      toast.error(error.response?.data?.error || 'Registration failed');
     },
-  })
+  });
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    registerMutation.mutate(formData)
-  }
+    e.preventDefault();
+    registerMutation.mutate(formData);
+  };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-v42-paddy2 py-12 px-4">
@@ -209,7 +209,7 @@ function RegisterPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default RegisterPage
+export default RegisterPage;

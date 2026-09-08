@@ -30,7 +30,7 @@ async function getOverview({ from, to, buyerId } = {}) {
        FROM revenue_contracts
       ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
       GROUP BY status`,
-    params
+    params,
   );
 
   if (!rows.length) {
@@ -39,9 +39,9 @@ async function getOverview({ from, to, buyerId } = {}) {
       totalRevenue: null,
       channels: [],
       contracts: 0,
-      note: 'No revenue contracts recorded for this filter. Reported as null rather than '
-          + '0 — an empty table means unrecorded, not zero revenue, and a dashboard '
-          + 'showing 0 would state something the data does not support.',
+      note: 'No revenue contracts recorded for this filter. Reported as null rather than ' +
+          '0 — an empty table means unrecorded, not zero revenue, and a dashboard ' +
+          'showing 0 would state something the data does not support.',
     };
   }
 
@@ -57,8 +57,8 @@ async function getOverview({ from, to, buyerId } = {}) {
       contractValue: r.contract_value === null ? null : Number(r.contract_value),
     })),
     contracts: rows.reduce((s, r) => s + Number(r.contracts), 0),
-    note: 'totalRevenue counts active and completed contracts only. Draft and offered '
-        + 'contracts are pipeline, not revenue, and are reported separately.',
+    note: 'totalRevenue counts active and completed contracts only. Draft and offered ' +
+        'contracts are pipeline, not revenue, and are reported separately.',
   };
 }
 
@@ -80,7 +80,7 @@ async function allocateChannels({ contractId, channels } = {}) {
   }
 
   const { rows } = await pool.query(
-    'SELECT * FROM revenue_contracts WHERE contract_id = $1', [Number(contractId)]
+    'SELECT * FROM revenue_contracts WHERE contract_id = $1', [Number(contractId)],
   );
   if (!rows.length) throw new Error(`Contract ${contractId} not found`);
   const c = rows[0];
@@ -95,13 +95,13 @@ async function allocateChannels({ contractId, channels } = {}) {
       channel: ch.channel,
       sharePct: Number(ch.sharePct),
       qty: Math.round(qty * Number(ch.sharePct) / 100 * 100) / 100,
-      value: c.price_per_unit
-        ? Math.round(qty * Number(ch.sharePct) / 100 * Number(c.price_per_unit) * 100) / 100
-        : null,
+      value: c.price_per_unit ?
+        Math.round(qty * Number(ch.sharePct) / 100 * Number(c.price_per_unit) * 100) / 100 :
+        null,
     })),
-    note: 'Proposed only. Reallocating committed volume changes what a farmer was promised '
-        + 'and what a buyer expects, so it needs a named human to approve it before it '
-        + 'takes effect.',
+    note: 'Proposed only. Reallocating committed volume changes what a farmer was promised ' +
+        'and what a buyer expects, so it needs a named human to approve it before it ' +
+        'takes effect.',
   };
 }
 
@@ -109,7 +109,8 @@ module.exports = { getOverview, allocateChannels };
 
 // Merged from backend/src/modules/M104
 {
-  const m104 = require("../../modules/M104/service");
+  const m104 = require('../../modules/M104/service');
   const { ...rest } = m104;
   Object.assign(module.exports, rest);
 }
+

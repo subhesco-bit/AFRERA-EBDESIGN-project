@@ -1,6 +1,6 @@
 /**
  * AI Agent Service - Agentic AI Capabilities
- * 
+ *
  * This service provides agentic AI capabilities including:
  * - Autonomous task execution
  * - Multi-agent coordination
@@ -11,69 +11,8 @@
  */
 
 const axios = require('axios');
-const { URL } = require('url');
-
-function evaluateArithmetic(expression) {
-  if (typeof expression !== 'string' || expression.length > 200 || !/^[\d\s()+\-*/%.]+$/.test(expression)) {
-    throw new Error('Only bounded arithmetic expressions are supported');
-  }
-
-  const rawTokens = expression.match(/\d+(?:\.\d+)?|[()+\-*/%]/g) || [];
-  if (rawTokens.join('') !== expression.replace(/\s+/g, '')) {
-    throw new Error('Invalid arithmetic expression');
-  }
-
-  // Rewrite unary +/- (at the start, or right after '(' or another operator)
-  // into a binary form by inserting an implicit leading 0, e.g. "-5+3" ->
-  // "0 - 5 + 3". The shunting-yard loop below only understands binary
-  // operators, so without this "-5+3" fails to parse as an operand ever
-  // being pushed before the first apply().
-  const tokens = [];
-  let expectOperand = true;
-  for (const token of rawTokens) {
-    if ((token === '-' || token === '+') && expectOperand) {
-      tokens.push('0', token);
-    } else {
-      tokens.push(token);
-      expectOperand = token === '(' || (isNaN(Number(token)) && token !== ')');
-    }
-  }
-
-  const values = [];
-  const operators = [];
-  const precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '%': 2 };
-  const apply = () => {
-    const operator = operators.pop();
-    const right = values.pop();
-    const left = values.pop();
-    if (left === undefined || right === undefined || (operator === '/' && right === 0)) {
-      throw new Error('Invalid arithmetic expression');
-    }
-    values.push(operator === '+' ? left + right : operator === '-' ? left - right
-      : operator === '*' ? left * right : operator === '/' ? left / right : left % right);
-  };
-
-  for (const token of tokens) {
-    if (!Number.isNaN(Number(token))) {
-      values.push(Number(token));
-    } else if (token === '(') {
-      operators.push(token);
-    } else if (token === ')') {
-      while (operators.length && operators[operators.length - 1] !== '(') apply();
-      if (operators.pop() !== '(') throw new Error('Invalid arithmetic expression');
-    } else {
-      while (operators.length && operators[operators.length - 1] !== '('
-        && precedence[operators[operators.length - 1]] >= precedence[token]) apply();
-      operators.push(token);
-    }
-  }
-  while (operators.length) {
-    if (operators[operators.length - 1] === '(') throw new Error('Invalid arithmetic expression');
-    apply();
-  }
-  if (values.length !== 1 || !Number.isFinite(values[0])) throw new Error('Invalid arithmetic expression');
-  return values[0];
-}
+const dns = require('dns').promises;
+const net = require('net');
 
 // These three SDKs are not in package.json (no live LLM credentials exist in this
 // environment, by design — see core/aiOrchestrator.js's PROVIDER_ENV/callProvider()
@@ -115,23 +54,23 @@ class AIAgentService {
 
     // Agent registry
     this.agents = new Map();
-    
+
     // Task queue
     this.taskQueue = [];
-    
+
     // Agent memory
     this.agentMemory = new Map();
-    
+
     // Tool registry
     this.tools = new Map();
-    
+
     // Initialize default tools
     this.initializeDefaultTools();
-    
+
     // Initialize default agents
     this.initializeDefaultAgents();
   }
-  
+
   /**
    * Initialize default tools for agents
    */
@@ -143,16 +82,16 @@ class AIAgentService {
         type: 'object',
         properties: {
           query: { type: 'string', description: 'SQL query to execute' },
-          params: { type: 'object', description: 'Query parameters' }
+          params: { type: 'object', description: 'Query parameters' },
         },
-        required: ['query']
+        required: ['query'],
       },
       handler: async (params) => {
         // Implementation for database query
         return { success: true, data: [] };
-      }
+      },
     });
-    
+
     // API tools
     this.registerTool('call_api', {
       description: 'Make an API call to external services',
@@ -161,63 +100,112 @@ class AIAgentService {
         properties: {
           url: { type: 'string', description: 'API endpoint URL' },
           method: { type: 'string', description: 'HTTP method' },
-          data: { type: 'object', description: 'Request data' }
+          data: { type: 'object', description: 'Request data' },
         },
-        required: ['url', 'method']
+        required: ['url', 'method'],
       },
       handler: async (params) => {
-        const target = new URL(params.url);
-        const allowedHosts = (process.env.AI_AGENT_ALLOWED_API_HOSTS || '')
-          .split(',').map(host => host.trim()).filter(Boolean);
-        if (!['http:', 'https:'].includes(target.protocol)
-          || !allowedHosts.includes(target.hostname)) {
-          throw new Error('API destination is not allowlisted');
+        const target = new URL(String(params.url || ''));
+        if (!['http:', 'https:'].includes(target.protocol)) {
+          throw new Error('Only HTTP and HTTPS URLs are allowed');
         }
+        if (target.username || target.password) throw new Error('URL credentials are not allowed');
+        const blockedHostnames = new Set(['localhost', 'localhost.localdomain', 'metadata.google.internal', '169.254.169.254']);
+        if (blockedHostnames.has(target.hostname.toLowerCase())) throw new Error('Private or metadata destinations are not allowed');
+        const addresses = await dns.lookup(target.hostname, { all: true });
+        if (addresses.some(({ address }) => {
+          const normalized = address.toLowerCase();
+          return normalized === '::1' ||
+            normalized.startsWith('127.') ||
+            normalized.startsWith('10.') ||
+            normalized.startsWith('192.168.') ||
+            normalized.startsWith('169.254.') ||
+            (normalized.startsWith('172.') && Number(normalized.split('.')[1]) >= 16 && Number(normalized.split('.')[1]) <= 31) ||
+            (net.isIPv6(address) && (normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('fe80:')));
+        })) throw new Error('Private or metadata destinations are not allowed');
+
         const response = await axios({
-          method: params.method,
-          url: params.url,
-          data: params.data
+          method: String(params.method || 'GET').toUpperCase(),
+          url: target.toString(),
+          data: params.data,
+          timeout: 10000,
+          maxContentLength: 1024 * 1024,
+          maxBodyLength: 1024 * 1024,
+          maxRedirects: 0,
         });
         return { success: true, data: response.data };
-      }
+      },
     });
 
-    // Calculation tools
+    // Calculation tools use a deliberately narrow parser. Never evaluate
+    // caller-supplied JavaScript inside an API process.
     this.registerTool('calculate', {
       description: 'Perform mathematical calculations',
       parameters: {
         type: 'object',
         properties: {
-          expression: { type: 'string', description: 'Mathematical expression' }
+          expression: { type: 'string', description: 'Mathematical expression' },
         },
-        required: ['expression']
+        required: ['expression'],
       },
       handler: async (params) => {
         try {
-          const result = evaluateArithmetic(params.expression);
+          const expression = String(params.expression || '').replace(/\s+/g, '');
+          if (!/^[0-9+\-*/().]+$/.test(expression) || expression.length > 200) {
+            throw new Error('Only numeric arithmetic expressions are allowed');
+          }
+          const tokens = expression.match(/(?:\d+(?:\.\d+)?|[()+\-*/])/g) || [];
+          if (tokens.join('') !== expression) throw new Error('Invalid arithmetic expression');
+          const values = [];
+          const operators = [];
+          const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
+          const apply = () => {
+            const operator = operators.pop();
+            const right = values.pop();
+            const left = values.pop();
+            if (operator === '/' && right === 0) throw new Error('Division by zero');
+            values.push(operator === '+' ? left + right : operator === '-' ? left - right : operator === '*' ? left * right : left / right);
+          };
+          for (const token of tokens) {
+            if (!Number.isNaN(Number(token))) values.push(Number(token));
+            else if (token === '(') operators.push(token);
+            else if (token === ')') {
+              while (operators.length && operators[operators.length - 1] !== '(') apply();
+              if (operators.pop() !== '(') throw new Error('Unbalanced parentheses');
+            } else {
+              while (operators.length && operators[operators.length - 1] !== '(' && precedence[operators[operators.length - 1]] >= precedence[token]) apply();
+              operators.push(token);
+            }
+          }
+          while (operators.length) {
+            if (operators[operators.length - 1] === '(') throw new Error('Unbalanced parentheses');
+            apply();
+          }
+          if (values.length !== 1 || !Number.isFinite(values[0])) throw new Error('Invalid arithmetic expression');
+          const result = values[0];
           return { success: true, result };
         } catch (error) {
           return { success: false, error: error.message };
         }
-      }
+      },
     });
-    
+
     // File operations
     this.registerTool('read_file', {
       description: 'Read a file from the system',
       parameters: {
         type: 'object',
         properties: {
-          path: { type: 'string', description: 'File path' }
+          path: { type: 'string', description: 'File path' },
         },
-        required: ['path']
+        required: ['path'],
       },
       handler: async (params) => {
         // Implementation for file reading
         return { success: true, content: '' };
-      }
+      },
     });
-    
+
     // Analysis tools
     this.registerTool('analyze_data', {
       description: 'Analyze data patterns and trends',
@@ -225,17 +213,17 @@ class AIAgentService {
         type: 'object',
         properties: {
           data: { type: 'array', description: 'Data to analyze' },
-          analysis_type: { type: 'string', description: 'Type of analysis' }
+          analysis_type: { type: 'string', description: 'Type of analysis' },
         },
-        required: ['data', 'analysis_type']
+        required: ['data', 'analysis_type'],
       },
       handler: async (params) => {
         // Implementation for data analysis
         return { success: true, analysis: {} };
-      }
+      },
     });
   }
-  
+
   /**
    * Initialize default agents
    */
@@ -250,9 +238,9 @@ class AIAgentService {
 2. Plan the execution steps
 3. Use available tools to complete the task
 4. Report results and any issues
-5. Learn from execution to improve future performance`
+5. Learn from execution to improve future performance`,
     });
-    
+
     // Data analysis agent
     this.registerAgent('data_analyst', {
       description: 'Analyzes data and provides insights',
@@ -263,9 +251,9 @@ class AIAgentService {
 2. Identify anomalies and insights
 3. Generate reports and visualizations
 4. Provide actionable recommendations
-5. Communicate findings clearly`
+5. Communicate findings clearly`,
     });
-    
+
     // Decision support agent
     this.registerAgent('decision_support', {
       description: 'Provides decision support and recommendations',
@@ -276,9 +264,9 @@ class AIAgentService {
 2. Assess risks and benefits
 3. Provide data-driven recommendations
 4. Consider multiple scenarios
-5. Support informed decision-making`
+5. Support informed decision-making`,
     });
-    
+
     // Monitoring agent
     this.registerAgent('monitor', {
       description: 'Monitors system health and performance',
@@ -289,9 +277,9 @@ class AIAgentService {
 2. Detect anomalies and issues
 3. Generate alerts when needed
 4. Provide diagnostic information
-5. Suggest remediation actions`
+5. Suggest remediation actions`,
     });
-    
+
     // Learning agent
     this.registerAgent('learner', {
       description: 'Learns from interactions and improves performance',
@@ -302,17 +290,17 @@ class AIAgentService {
 2. Adapt to new information
 3. Optimize performance over time
 4. Identify improvement opportunities
-5. Share learnings with other agents`
+5. Share learnings with other agents`,
     });
   }
-  
+
   /**
    * Register a new tool
    */
   registerTool(name, tool) {
     this.tools.set(name, tool);
   }
-  
+
   /**
    * Register a new agent
    */
@@ -325,11 +313,11 @@ class AIAgentService {
       performance_metrics: {
         tasks_completed: 0,
         success_rate: 0,
-        average_execution_time: 0
-      }
+        average_execution_time: 0,
+      },
     });
   }
-  
+
   /**
    * Execute an agent task
    */
@@ -338,27 +326,27 @@ class AIAgentService {
     if (!agent) {
       throw new Error(`Agent ${agentName} not found`);
     }
-    
+
     try {
       // Get agent memory
       const memory = this.agentMemory.get(agentName) || [];
-      
+
       // Prepare messages
       const messages = [
         { role: 'system', content: agent.system_prompt },
         ...memory.map(m => ({ role: m.role, content: m.content })),
-        { role: 'user', content: JSON.stringify({ task, context }) }
+        { role: 'user', content: JSON.stringify({ task, context }) },
       ];
-      
+
       // Execute with appropriate model
       let response;
       if (agent.model === 'gpt-4') {
         if (!this.openai) throw new Error('OPENAI_API_KEY not configured — gpt-4 agent unavailable');
         response = await this.openai.chat.completions.create({
           model: 'gpt-4',
-          messages: messages,
+          messages,
           tools: this.getToolDefinitions(),
-          tool_choice: 'auto'
+          tool_choice: 'auto',
         });
       } else if (agent.model === 'gemini') {
         if (!this.gemini) throw new Error('GEMINI_API_KEY not configured — gemini agent unavailable');
@@ -370,63 +358,63 @@ class AIAgentService {
         response = await this.anthropic.messages.create({
           model: 'claude-3-opus-20240229',
           max_tokens: 4096,
-          messages: messages.slice(1)
+          messages: messages.slice(1),
         });
       } else {
         throw new Error(`Unknown agent model: ${agent.model}`);
       }
-      
+
       // Handle tool calls if present
       if (response.choices[0].message.tool_calls) {
         const toolResults = await this.handleToolCalls(response.choices[0].message.tool_calls);
-        
+
         // Continue conversation with tool results
         messages.push(response.choices[0].message);
         messages.push({
           role: 'tool',
           tool_call_id: response.choices[0].message.tool_calls[0].id,
-          content: JSON.stringify(toolResults)
+          content: JSON.stringify(toolResults),
         });
-        
+
         const finalResponse = await this.openai.chat.completions.create({
           model: 'gpt-4',
-          messages: messages
+          messages,
         });
-        
+
         response = finalResponse;
       }
-      
+
       // Update agent memory
       memory.push({ role: 'user', content: JSON.stringify({ task, context }) });
       memory.push({ role: 'assistant', content: response.choices[0].message.content });
       this.agentMemory.set(agentName, memory.slice(-20)); // Keep last 20 messages
-      
+
       // Update performance metrics
       agent.performance_metrics.tasks_completed++;
-      
+
       return {
         success: true,
         agent: agentName,
         result: response.choices[0].message.content,
-        tool_calls: response.choices[0].message.tool_calls
+        tool_calls: response.choices[0].message.tool_calls,
       };
-      
+
     } catch (error) {
       console.error(`Error executing agent ${agentName}:`, error);
       return {
         success: false,
         agent: agentName,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Handle tool calls from agent
    */
   async handleToolCalls(toolCalls) {
     const results = [];
-    
+
     for (const toolCall of toolCalls) {
       const tool = this.tools.get(toolCall.function.name);
       if (tool) {
@@ -435,20 +423,20 @@ class AIAgentService {
           const result = await tool.handler(args);
           results.push({
             tool_call_id: toolCall.id,
-            result: result
+            result,
           });
         } catch (error) {
           results.push({
             tool_call_id: toolCall.id,
-            result: { success: false, error: error.message }
+            result: { success: false, error: error.message },
           });
         }
       }
     }
-    
+
     return results;
   }
-  
+
   /**
    * Get tool definitions for OpenAI
    */
@@ -456,45 +444,45 @@ class AIAgentService {
     return Array.from(this.tools.entries()).map(([name, tool]) => ({
       type: 'function',
       function: {
-        name: name,
+        name,
         description: tool.description,
-        parameters: tool.parameters
-      }
+        parameters: tool.parameters,
+      },
     }));
   }
-  
+
   /**
    * Coordinate multiple agents for complex tasks
    */
   async coordinateAgents(agentNames, task, context = {}) {
     const results = {};
-    
+
     for (const agentName of agentNames) {
       results[agentName] = await this.executeAgentTask(agentName, task, context);
     }
-    
+
     // Synthesize results
     const synthesisAgent = this.agents.get('learner');
     if (synthesisAgent) {
       const synthesis = await this.executeAgentTask('learner', {
         type: 'synthesize_results',
         agent_results: results,
-        original_task: task
+        original_task: task,
       }, context);
-      
+
       return {
         success: true,
         agent_results: results,
-        synthesis: synthesis.result
+        synthesis: synthesis.result,
       };
     }
-    
+
     return {
       success: true,
-      agent_results: results
+      agent_results: results,
     };
   }
-  
+
   /**
    * Get agent status
    */
@@ -503,7 +491,7 @@ class AIAgentService {
     if (!agent) {
       return null;
     }
-    
+
     return {
       id: agent.id,
       description: agent.description,
@@ -511,17 +499,17 @@ class AIAgentService {
       model: agent.model,
       status: agent.status,
       performance_metrics: agent.performance_metrics,
-      memory_size: this.agentMemory.get(agentName)?.length || 0
+      memory_size: this.agentMemory.get(agentName)?.length || 0,
     };
   }
-  
+
   /**
    * Get all agents
    */
   getAllAgents() {
     return Array.from(this.agents.values()).map(agent => this.getAgentStatus(agent.id));
   }
-  
+
   /**
    * Update agent configuration
    */
@@ -530,13 +518,13 @@ class AIAgentService {
     if (!agent) {
       throw new Error(`Agent ${agentName} not found`);
     }
-    
+
     Object.assign(agent, updates);
     this.agents.set(agentName, agent);
-    
+
     return { success: true, agent: this.getAgentStatus(agentName) };
   }
-  
+
   /**
    * Clear agent memory
    */

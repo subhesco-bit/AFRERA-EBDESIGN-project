@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Building2 } from 'lucide-react'
-import { comprehensiveERPAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { Building2 } from 'lucide-react';
+import { comprehensiveERPAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/comprehensiveERPRoutes.js +
@@ -16,10 +16,10 @@ const TABS = [
   ['sd', 'Sales & Distribution'], ['pp', 'Production Planning'], ['qm', 'Quality Mgmt'],
   ['pm', 'Plant Maintenance'], ['hr', 'Human Resources'], ['ps', 'Project System'],
   ['tr', 'Treasury'], ['am', 'Asset Mgmt'], ['bi', 'Business Intelligence'],
-]
+];
 
 function ComprehensiveERPPage() {
-  const [tab, setTab] = useState('gl')
+  const [tab, setTab] = useState('gl');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -146,7 +146,7 @@ function ComprehensiveERPPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default ComprehensiveERPPage
+export default ComprehensiveERPPage;

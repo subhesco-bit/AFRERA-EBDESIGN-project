@@ -28,7 +28,7 @@ async function createTrainingProgram(programData) {
       target_audience,
       max_participants,
       certification_offered,
-      certification_details
+      certification_details,
     } = programData;
 
     const program = {
@@ -50,7 +50,7 @@ async function createTrainingProgram(programData) {
       certification_offered: certification_offered || false,
       certification_details: certification_details || {},
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered content analysis
@@ -60,8 +60,8 @@ async function createTrainingProgram(programData) {
         program_data: programData,
         industry_standards: await getIndustryStandards(category),
         skill_requirements: await getSkillRequirements(category),
-        learning_outcomes: await predictLearningOutcomes(programData)
-      }
+        learning_outcomes: await predictLearningOutcomes(programData),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -82,8 +82,8 @@ async function createTrainingProgram(programData) {
         JSON.stringify(program.curriculum), program.instructor_id, program.language,
         JSON.stringify(program.target_audience), program.max_participants, program.certification_offered,
         JSON.stringify(program.certification_details), JSON.stringify(program.ai_content_analysis),
-        program.status, program.created_at
-      ]
+        program.status, program.created_at,
+      ],
     );
 
     logger.info(`Training program created: ${program.program_id}`);
@@ -112,7 +112,7 @@ async function createTrainingSession(sessionData) {
       schedule,
       max_participants,
       registration_deadline,
-      materials_provided
+      materials_provided,
     } = sessionData;
 
     const session = {
@@ -132,7 +132,7 @@ async function createTrainingSession(sessionData) {
       status: 'scheduled',
       registration_deadline,
       materials_provided: materials_provided || [],
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const result = await pool.query(
@@ -147,8 +147,8 @@ async function createTrainingSession(sessionData) {
         session.end_date, session.location, session.location_type, session.district,
         session.state, session.instructor_id, JSON.stringify(session.schedule),
         session.max_participants, session.current_participants, session.status,
-        session.registration_deadline, JSON.stringify(session.materials_provided), session.created_at
-      ]
+        session.registration_deadline, JSON.stringify(session.materials_provided), session.created_at,
+      ],
     );
 
     logger.info(`Training session created: ${session.session_id}`);
@@ -167,7 +167,7 @@ async function enrollFarmer(sessionId, farmerId) {
     // Check session availability
     const session = await pool.query(
       'SELECT * FROM training_sessions WHERE session_id = $1',
-      [sessionId]
+      [sessionId],
     );
 
     if (session.rows.length === 0) {
@@ -182,7 +182,7 @@ async function enrollFarmer(sessionId, farmerId) {
     // Check if already enrolled
     const existingEnrollment = await pool.query(
       'SELECT * FROM farmer_enrollments WHERE session_id = $1 AND farmer_id = $2',
-      [sessionId, farmerId]
+      [sessionId, farmerId],
     );
 
     if (existingEnrollment.rows.length > 0) {
@@ -199,7 +199,7 @@ async function enrollFarmer(sessionId, farmerId) {
       completion_percentage: 0,
       assessment_score: 0,
       certificate_issued: false,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered learning path
@@ -210,8 +210,8 @@ async function enrollFarmer(sessionId, farmerId) {
         session_id: sessionId,
         farmer_profile: await getFarmerProfile(farmerId),
         program_requirements: await getProgramRequirements(sessionData.program_id),
-        learning_style: await assessLearningStyle(farmerId)
-      }
+        learning_style: await assessLearningStyle(farmerId),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -228,14 +228,14 @@ async function enrollFarmer(sessionId, farmerId) {
         enrollment.enrollment_id, enrollment.session_id, enrollment.farmer_id,
         enrollment.enrollment_date, enrollment.enrollment_status, enrollment.attendance_percentage,
         enrollment.completion_percentage, enrollment.assessment_score, enrollment.certificate_issued,
-        JSON.stringify(enrollment.ai_learning_path), enrollment.created_at
-      ]
+        JSON.stringify(enrollment.ai_learning_path), enrollment.created_at,
+      ],
     );
 
     // Update session participant count
     await pool.query(
       'UPDATE training_sessions SET current_participants = current_participants + 1 WHERE session_id = $1',
-      [sessionId]
+      [sessionId],
     );
 
     logger.info(`Farmer enrolled: ${enrollment.enrollment_id}`);
@@ -261,7 +261,7 @@ async function recordAttendance(sessionId, farmerId, attendanceData) {
       attendance_date,
       status,
       notes,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const result = await pool.query(
@@ -272,8 +272,8 @@ async function recordAttendance(sessionId, farmerId, attendanceData) {
       [
         attendance.attendance_id, attendance.session_id, attendance.enrollment_id,
         attendance.farmer_id, attendance.attendance_date, attendance.status,
-        attendance.notes, attendance.created_at
-      ]
+        attendance.notes, attendance.created_at,
+      ],
     );
 
     // Update enrollment attendance percentage
@@ -294,7 +294,7 @@ async function submitAssessment(assessmentId, farmerId, answers) {
   try {
     const assessment = await pool.query(
       'SELECT * FROM training_assessments WHERE assessment_id = $1',
-      [assessmentId]
+      [assessmentId],
     );
 
     if (assessment.rows.length === 0) {
@@ -320,7 +320,7 @@ async function submitAssessment(assessmentId, farmerId, answers) {
       passed,
       answers,
       time_taken_minutes: answers.time_taken_minutes || 0,
-      attempted_at: new Date().toISOString()
+      attempted_at: new Date().toISOString(),
     };
 
     // AI-powered performance analysis
@@ -329,10 +329,10 @@ async function submitAssessment(assessmentId, farmerId, answers) {
       parameters: {
         farmer_id: farmerId,
         assessment_data: assessmentData,
-        answers: answers,
+        answers,
         performance_data: await getFarmerPerformanceHistory(farmerId),
-        benchmark_data: await getAssessmentBenchmarks(assessmentId)
-      }
+        benchmark_data: await getAssessmentBenchmarks(assessmentId),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -348,14 +348,14 @@ async function submitAssessment(assessmentId, farmerId, answers) {
         result.result_id, result.assessment_id, result.enrollment_id, result.farmer_id,
         result.score, result.total_score, result.percentage, result.passed,
         JSON.stringify(result.answers), result.time_taken_minutes, result.attempted_at,
-        JSON.stringify(result.ai_performance_analysis), result.created_at
-      ]
+        JSON.stringify(result.ai_performance_analysis), result.created_at,
+      ],
     );
 
     // Update enrollment assessment score
     await pool.query(
       'UPDATE farmer_enrollments SET assessment_score = $1 WHERE enrollment_id = $2',
-      [percentage, enrollment.enrollment_id]
+      [percentage, enrollment.enrollment_id],
     );
 
     // Issue certificate if passed and certification offered
@@ -388,8 +388,8 @@ async function getRecommendedPrograms(farmerId) {
         completed_programs: completedPrograms,
         available_programs: await getAvailablePrograms(),
         industry_trends: await getIndustryTrends(),
-        skill_gaps: await identifySkillGaps(farmerId)
-      }
+        skill_gaps: await identifySkillGaps(farmerId),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -398,7 +398,7 @@ async function getRecommendedPrograms(farmerId) {
       farmer_id: farmerId,
       recommendations: aiResponse.recommendations || [],
       reasoning: aiResponse.reasoning,
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
   } catch (error) {
     logger.error('Error getting recommended programs', { error: error.message, stack: error.stack });
@@ -422,7 +422,7 @@ async function getTrainingAnalytics({ startDate, endDate, category, district } =
       attendance_rate: await getAttendanceRate(startDate, endDate),
       top_programs: await getTopPrograms(startDate, endDate),
       district_performance: await getDistrictPerformance(startDate, endDate),
-      ai_insights: await generateTrainingInsights(startDate, endDate)
+      ai_insights: await generateTrainingInsights(startDate, endDate),
     };
 
     return analytics;
@@ -441,7 +441,7 @@ async function getIndustryStandards(category) {
   return {
     best_practices: ['hands_on_training', 'field_demonstrations'],
     required_hours: 20,
-    certification_requirements: ['final_assessment', 'practical_exam']
+    certification_requirements: ['final_assessment', 'practical_exam'],
   };
 }
 
@@ -449,7 +449,7 @@ async function getSkillRequirements(category) {
   return {
     technical_skills: ['soil_management', 'crop_selection'],
     practical_skills: ['equipment_operation', 'safety_protocols'],
-    knowledge_areas: ['pest_management', 'irrigation_techniques']
+    knowledge_areas: ['pest_management', 'irrigation_techniques'],
   };
 }
 
@@ -457,7 +457,7 @@ async function predictLearningOutcomes(programData) {
   return {
     skill_improvement: 0.8,
     knowledge_gain: 0.75,
-    practical_application: 0.7
+    practical_application: 0.7,
   };
 }
 
@@ -465,7 +465,7 @@ async function getFarmerProfile(farmerId) {
   try {
     const result = await pool.query(
       'SELECT * FROM farmer_profiles WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -477,7 +477,7 @@ async function getProgramRequirements(programId) {
   try {
     const result = await pool.query(
       'SELECT * FROM training_programs WHERE program_id = $1',
-      [programId]
+      [programId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -489,7 +489,7 @@ async function assessLearningStyle(farmerId) {
   return {
     preferred_format: 'visual',
     learning_pace: 'moderate',
-    interaction_level: 'high'
+    interaction_level: 'high',
   };
 }
 
@@ -497,7 +497,7 @@ async function getEnrollmentId(sessionId, farmerId) {
   try {
     const result = await pool.query(
       'SELECT enrollment_id FROM farmer_enrollments WHERE session_id = $1 AND farmer_id = $2',
-      [sessionId, farmerId]
+      [sessionId, farmerId],
     );
     return result.rows[0]?.enrollment_id || null;
   } catch (error) {
@@ -513,7 +513,7 @@ async function updateAttendancePercentage(enrollmentId) {
         COUNT(*) as total
        FROM training_attendance
        WHERE enrollment_id = $1`,
-      [enrollmentId]
+      [enrollmentId],
     );
 
     const attendance = result.rows[0];
@@ -521,7 +521,7 @@ async function updateAttendancePercentage(enrollmentId) {
 
     await pool.query(
       'UPDATE farmer_enrollments SET attendance_percentage = $1 WHERE enrollment_id = $2',
-      [percentage, enrollmentId]
+      [percentage, enrollmentId],
     );
   } catch (error) {
     logger.error('Error updating attendance percentage', { error: error.message });
@@ -535,7 +535,7 @@ async function getEnrollmentByFarmerAndProgram(farmerId, programId) {
        JOIN training_sessions ts ON fe.session_id = ts.session_id
        WHERE fe.farmer_id = $1 AND ts.program_id = $2
        LIMIT 1`,
-      [farmerId, programId]
+      [farmerId, programId],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -557,7 +557,7 @@ async function getFarmerPerformanceHistory(farmerId) {
   try {
     const result = await pool.query(
       'SELECT * FROM assessment_results WHERE farmer_id = $1 ORDER BY attempted_at DESC LIMIT 10',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -569,7 +569,7 @@ async function getAssessmentBenchmarks(assessmentId) {
   return {
     average_score: 75,
     top_score: 95,
-    pass_rate: 0.8
+    pass_rate: 0.8,
   };
 }
 
@@ -580,7 +580,7 @@ async function issueCertificate(enrollmentId) {
       `UPDATE farmer_enrollments 
        SET certificate_issued = true, certificate_id = $1, certificate_issue_date = CURRENT_DATE
        WHERE enrollment_id = $2`,
-      [certificateId, enrollmentId]
+      [certificateId, enrollmentId],
     );
   } catch (error) {
     logger.error('Error issuing certificate', { error: error.message });
@@ -591,7 +591,7 @@ async function getFarmerSkills(farmerId) {
   try {
     const result = await pool.query(
       'SELECT * FROM farmer_skills WHERE profile_id IN (SELECT profile_id FROM farmer_profiles WHERE farmer_id = $1)',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -606,7 +606,7 @@ async function getCompletedPrograms(farmerId) {
        JOIN training_sessions ts ON tp.program_id = ts.program_id
        JOIN farmer_enrollments fe ON ts.session_id = fe.session_id
        WHERE fe.farmer_id = $1 AND fe.enrollment_status = 'completed'`,
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -618,7 +618,7 @@ async function getAvailablePrograms() {
   try {
     const result = await pool.query(
       'SELECT * FROM training_programs WHERE status = $1',
-      ['active']
+      ['active'],
     );
     return result.rows;
   } catch (error) {
@@ -629,14 +629,14 @@ async function getAvailablePrograms() {
 async function getIndustryTrends() {
   return {
     emerging_topics: ['precision_farming', 'organic_certification'],
-    in_demand_skills: ['soil_health_management', 'water_conservation']
+    in_demand_skills: ['soil_health_management', 'water_conservation'],
   };
 }
 
 async function identifySkillGaps(farmerId) {
   return {
     technical_gaps: ['modern_irrigation', 'pest_management'],
-    knowledge_gaps: ['market_trends', 'regulatory_compliance']
+    knowledge_gaps: ['market_trends', 'regulatory_compliance'],
   };
 }
 
@@ -814,7 +814,7 @@ async function getTopPrograms(startDate, endDate) {
        GROUP BY tp.program_name
        ORDER BY enrollment_count DESC
        LIMIT 5`,
-      [startDate, endDate]
+      [startDate, endDate],
     );
     return result.rows;
   } catch (error) {
@@ -832,7 +832,7 @@ async function getDistrictPerformance(startDate, endDate) {
        WHERE fe.enrollment_date >= $1 AND fe.enrollment_date <= $2
        GROUP BY ts.district
        ORDER BY enrollment_count DESC`,
-      [startDate, endDate]
+      [startDate, endDate],
     );
     return result.rows;
   } catch (error) {
@@ -847,8 +847,8 @@ async function generateTrainingInsights(startDate, endDate) {
       period: { startDate, endDate },
       enrollment_data: await getTotalEnrollments(startDate, endDate),
       completion_data: await getCompletionRate(startDate, endDate),
-      performance_data: await getAverageAssessmentScore(startDate, endDate)
-    }
+      performance_data: await getAverageAssessmentScore(startDate, endDate),
+    },
   };
 
   const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -862,6 +862,6 @@ module.exports = {
   recordAttendance,
   submitAssessment,
   getRecommendedPrograms,
-  getTrainingAnalytics
+  getTrainingAnalytics,
 };
 

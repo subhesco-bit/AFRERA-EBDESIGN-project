@@ -33,7 +33,7 @@ async function createExperience(data) {
     target_entity_type,
     thumbnail_url,
     experience_data,
-    platform_requirements
+    platform_requirements,
   } = data;
 
   console.log('TEST-ARVR: createExperience data=', JSON.stringify({ experience_name, experience_type, experience_category, target_entity_id, target_entity_type }));
@@ -55,8 +55,8 @@ async function createExperience(data) {
         thumbnail_url,
         JSON.stringify(experience_data),
         JSON.stringify(platform_requirements),
-        data.created_by
-      ]
+        data.created_by,
+      ],
     );
 
     console.log('TEST-ARVR: createExperience result=', JSON.stringify(result && result.rows ? result.rows[0] : result));
@@ -75,7 +75,7 @@ async function createExperience(data) {
       experience_data: experience_data || {},
       platform_requirements: platform_requirements || {},
       is_published: false,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
     // Persist fallback into test-store so subsequent operations (publish, interaction points) can find it
     persistTestFallback('arvr_experiences', fallback.id, fallback);
@@ -93,7 +93,7 @@ router.post('/experiences', authMiddleware, async (req, res) => {
   try {
     const result = await createExperience({
       ...req.body,
-      created_by: req.user.id
+      created_by: req.user.id,
     });
     res.status(201).json(result);
   } catch (error) {
@@ -111,17 +111,17 @@ async function getExperiences(filters = {}) {
     const params = [];
 
     if (filters.experience_type) {
-      query += ' AND experience_type = $' + (params.length + 1);
+      query += ` AND experience_type = $${ params.length + 1}`;
       params.push(filters.experience_type);
     }
 
     if (filters.experience_category) {
-      query += ' AND experience_category = $' + (params.length + 1);
+      query += ` AND experience_category = $${ params.length + 1}`;
       params.push(filters.experience_category);
     }
 
     if (filters.target_entity_id && filters.target_entity_type) {
-      query += ' AND target_entity_id = $' + (params.length + 1) + ' AND target_entity_type = $' + (params.length + 2);
+      query += ` AND target_entity_id = $${ params.length + 1 } AND target_entity_type = $${ params.length + 2}`;
       params.push(filters.target_entity_id, filters.target_entity_type);
     }
 
@@ -156,7 +156,7 @@ async function publishExperience(experienceId) {
   try {
     const result = await pool.query(
       'UPDATE ar_vr_experiences SET is_published = true, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
-      [experienceId]
+      [experienceId],
     );
 
     if (result.rows && result.rows.length > 0) {
@@ -181,14 +181,14 @@ async function publishExperience(experienceId) {
 router.patch('/experiences/:experienceId/publish', authMiddleware,
   requireResourceOwner({ table: 'ar_vr_experiences', idParam: 'experienceId', ownerColumn: 'created_by' }),
   async (req, res) => {
-  try {
-    const result = await publishExperience(req.params.experienceId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Publish experience API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to publish experience' });
-  }
-});
+    try {
+      const result = await publishExperience(req.params.experienceId);
+      res.json(result);
+    } catch (error) {
+      logger.error('Publish experience API error', { error: error.message, stack: error.stack });
+      res.status(500).json({ error: 'Failed to publish experience' });
+    }
+  });
 
 // ============================================================================
 // 3D ASSETS
@@ -205,7 +205,7 @@ async function createAsset(data) {
     file_url,
     file_size_bytes,
     thumbnail_url,
-    metadata
+    metadata,
   } = data;
 
   try {
@@ -222,8 +222,8 @@ async function createAsset(data) {
         file_size_bytes,
         thumbnail_url,
         JSON.stringify(metadata),
-        data.created_by
-      ]
+        data.created_by,
+      ],
     );
 
     console.log('TEST-ARVR: createAsset result=', JSON.stringify(result && result.rows ? result.rows[0] : result));
@@ -246,7 +246,7 @@ router.post('/assets', authMiddleware, async (req, res) => {
   try {
     const result = await createAsset({
       ...req.body,
-      created_by: req.user.id
+      created_by: req.user.id,
     });
     res.status(201).json(result);
   } catch (error) {
@@ -307,7 +307,7 @@ async function createInteractionPoint(data) {
     position_x,
     position_y,
     position_z,
-    interaction_data
+    interaction_data,
   } = data;
 
   try {
@@ -323,8 +323,8 @@ async function createInteractionPoint(data) {
         position_x,
         position_y,
         position_z,
-        JSON.stringify(interaction_data)
-      ]
+        JSON.stringify(interaction_data),
+      ],
     );
 
     console.log('TEST-ARVR: createInteractionPoint result=', JSON.stringify(result && result.rows ? result.rows[0] : result));
@@ -359,7 +359,7 @@ async function getInteractionPoints(experienceId) {
   try {
     const result = await pool.query(
       'SELECT * FROM interaction_points WHERE experience_id = $1 AND is_active = true ORDER BY created_at ASC',
-      [experienceId]
+      [experienceId],
     );
 
     return result.rows;
@@ -395,7 +395,7 @@ async function createSession(data) {
     experience_id,
     session_type,
     device_type,
-    session_data
+    session_data,
   } = data;
 
   try {
@@ -404,7 +404,7 @@ async function createSession(data) {
        (user_id, experience_id, session_type, device_type, session_data)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [user_id, experience_id, session_type, device_type, JSON.stringify(session_data)]
+      [user_id, experience_id, session_type, device_type, JSON.stringify(session_data)],
     );
 
     console.log('TEST-ARVR: createSession result=', JSON.stringify(result && result.rows ? result.rows[0] : result));
@@ -426,7 +426,7 @@ router.post('/sessions', authMiddleware, async (req, res) => {
   try {
     const result = await createSession({
       ...req.body,
-      user_id: req.user.id
+      user_id: req.user.id,
     });
     res.status(201).json(result);
   } catch (error) {
@@ -447,7 +447,7 @@ async function endSession(sessionId, interactionCount) {
            interaction_count = $1
        WHERE id = $2
        RETURNING *`,
-      [interactionCount || 0, sessionId]
+      [interactionCount || 0, sessionId],
     );
 
     if (result.rows && result.rows.length > 0) {
@@ -472,15 +472,15 @@ async function endSession(sessionId, interactionCount) {
 router.patch('/sessions/:sessionId/end', authMiddleware,
   requireResourceOwner({ table: 'ar_vr_sessions', idParam: 'sessionId', ownerColumn: 'user_id' }),
   async (req, res) => {
-  try {
-    const { interaction_count } = req.body;
-    const result = await endSession(req.params.sessionId, interaction_count);
-    res.json(result);
-  } catch (error) {
-    logger.error('End session API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to end session' });
-  }
-});
+    try {
+      const { interaction_count } = req.body;
+      const result = await endSession(req.params.sessionId, interaction_count);
+      res.json(result);
+    } catch (error) {
+      logger.error('End session API error', { error: error.message, stack: error.stack });
+      res.status(500).json({ error: 'Failed to end session' });
+    }
+  });
 
 // ============================================================================
 // AR/VR ANALYTICS
@@ -507,8 +507,8 @@ async function recordArVrAnalytics(metrics) {
         metrics.avg_duration || 0,
         metrics.total_interactions || 0,
         JSON.stringify(metrics.most_viewed || {}),
-        JSON.stringify(metrics.device_distribution || {})
-      ]
+        JSON.stringify(metrics.device_distribution || {}),
+      ],
     );
 
     if (result && result.rows && result.rows[0]) return result.rows[0];
@@ -518,7 +518,7 @@ async function recordArVrAnalytics(metrics) {
       total_sessions: metrics && metrics.total_sessions ? Number(metrics.total_sessions) : 0,
       unique_users: metrics && metrics.unique_users ? Number(metrics.unique_users) : 0,
       avg_duration: metrics && metrics.avg_duration ? Number(metrics.avg_duration) : 0,
-      total_interactions: metrics && metrics.total_interactions ? Number(metrics.total_interactions) : 0
+      total_interactions: metrics && metrics.total_interactions ? Number(metrics.total_interactions) : 0,
     };
     persistTestFallback('arvr_analytics', `arva-${Date.now()}`, fallback, true);
     return fallback;
@@ -562,5 +562,6 @@ module.exports = {
   createSession,
   endSession,
   recordArVrAnalytics,
-  isHealthy
+  isHealthy,
 };
+

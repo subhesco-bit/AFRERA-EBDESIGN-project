@@ -1,6 +1,6 @@
-import { Building2 } from 'lucide-react'
-import { villageAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Building2 } from 'lucide-react';
+import { villageAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * M041 (backend/src/modules/M041, real functions verified). Rebuilt
@@ -48,7 +48,7 @@ function VillageRegistryPage() {
         onRun={(v) => villageAPI.getVillageAnalytics(v.villageId)}
       />
     </div>
-  )
+  );
 }
 
-export default VillageRegistryPage
+export default VillageRegistryPage;

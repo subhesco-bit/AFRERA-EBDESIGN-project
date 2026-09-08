@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
-import { MessageCircle, Mic, X } from 'lucide-react'
-import Header from './Header'
-import Footer from './Footer'
-import Sidebar from './Sidebar'
-import BottomNav from './BottomNav'
-import { useAuthStore } from '../store/authStore'
-import ChatInterface from './ConversationalAI/ChatInterface'
-import VoiceAssistant from './VoiceAI/VoiceAssistant'
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { MessageCircle, Mic, X } from 'lucide-react';
+import Header from './Header';
+import Footer from './Footer';
+import Sidebar from './Sidebar';
+import BottomNav from './BottomNav';
+import { useAuthStore } from '../store/authStore';
+import ChatInterface from './ConversationalAI/ChatInterface';
+import VoiceAssistant from './VoiceAI/VoiceAssistant';
 
 // Global AI assistant widgets: both ChatInterface and VoiceAssistant were
 // fully built (real conversational-ai/voice-ai API calls) but had no parent
@@ -18,11 +18,11 @@ import VoiceAssistant from './VoiceAI/VoiceAssistant'
 // (authMiddleware on /conversational-ai/sessions and /voice-ai/voice-sessions),
 // so the widgets only render for logged-in users.
 function Layout({ children }) {
-  const { isAuthenticated } = useAuthStore()
-  const [openWidget, setOpenWidget] = useState(null) // null | 'chat' | 'voice'
+  const { isAuthenticated } = useAuthStore();
+  const [openWidget, setOpenWidget] = useState(null); // null | 'chat' | 'voice'
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-skiplink focus:bg-white focus:text-green-700 focus:px-4 focus:py-2 focus:rounded focus:shadow-lg"
@@ -30,9 +30,9 @@ function Layout({ children }) {
         Skip to main content
       </a>
       <Header />
-      <div className="flex-1 max-w-7xl mx-auto w-full flex">
+      <div className="flex-1 max-w-7xl mx-auto w-full flex min-w-0">
         <Sidebar />
-        <main id="main-content" tabIndex={-1} className="flex-1 p-4">
+        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 p-3 sm:p-4 lg:p-6">
           {children || <Outlet />}
         </main>
       </div>
@@ -71,7 +71,7 @@ function Layout({ children }) {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default Layout
+export default Layout;

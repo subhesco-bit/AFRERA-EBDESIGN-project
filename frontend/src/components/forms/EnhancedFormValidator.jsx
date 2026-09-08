@@ -1,7 +1,7 @@
 /**
  * Enhanced Form Validation System
  * Production-level form validation with comprehensive user feedback
- * 
+ *
  * Features:
  * - Real-time validation with debouncing
  * - Field-level error messages
@@ -25,48 +25,48 @@ export const commonSchemas = {
     .min(1, 'Email is required')
     .email('Invalid email address')
     .refine(val => !val.includes('+'), 'Email aliases not allowed'),
-  
+
   password: z.string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number')
     .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
-  
+
   phone: z.string()
     .min(10, 'Phone number must be at least 10 digits')
     .regex(/^[0-9+\-\s()]+$/, 'Invalid phone number format'),
-  
+
   name: z.string()
     .min(2, 'Name must be at least 2 characters')
     .max(100, 'Name must not exceed 100 characters')
     .regex(/^[a-zA-Z\s\-']+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
-  
+
   price: z.string()
     .min(1, 'Price is required')
     .regex(/^\d+(\.\d{1,2})?$/, 'Invalid price format')
     .refine(val => parseFloat(val) > 0, 'Price must be greater than 0'),
-  
+
   quantity: z.string()
     .min(1, 'Quantity is required')
     .regex(/^\d+$/, 'Quantity must be a whole number')
     .refine(val => parseInt(val) > 0, 'Quantity must be greater than 0'),
-  
+
   url: z.string()
     .url('Invalid URL format')
     .refine(val => val.startsWith('http://') || val.startsWith('https://'), 'URL must start with http:// or https://'),
-  
+
   date: z.string()
     .min(1, 'Date is required')
     .refine(val => !isNaN(Date.parse(val)), 'Invalid date format'),
-  
+
   required: z.string()
     .min(1, 'This field is required')
     .max(500, 'Field must not exceed 500 characters'),
-  
+
   optional: z.string()
     .max(500, 'Field must not exceed 500 characters')
-    .optional()
+    .optional(),
 };
 
 // Form field configuration
@@ -79,7 +79,7 @@ export const createFieldConfig = (schema, options = {}) => ({
   disabled: options.disabled || false,
   className: options.className || '',
   asyncValidation: options.asyncValidation || null,
-  dependencies: options.dependencies || []
+  dependencies: options.dependencies || [],
 });
 
 // Enhanced form component
@@ -91,7 +91,7 @@ export const EnhancedForm = ({
   submitButton = { text: 'Submit', variant: 'primary' },
   showProgress = true,
   progressiveValidation = true,
-  className = ''
+  className = '',
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitCount, setSubmitCount] = useState(0);
@@ -103,11 +103,11 @@ export const EnhancedForm = ({
     handleSubmit,
     formState: { errors, isDirty, isValid },
     trigger,
-    watch
+    watch,
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues,
-    mode: progressiveValidation ? 'onChange' : 'onSubmit'
+    mode: progressiveValidation ? 'onChange' : 'onSubmit',
   });
 
   // Watch for field changes to trigger dependent validations
@@ -128,7 +128,7 @@ export const EnhancedForm = ({
   const calculateProgress = useCallback(() => {
     const totalFields = Object.keys(fields).length;
     const completedFields = Object.keys(defaultValues).filter(
-      key => defaultValues[key] && defaultValues[key].length > 0
+      key => defaultValues[key] && defaultValues[key].length > 0,
     ).length;
     return Math.round((completedFields / totalFields) * 100);
   }, [fields, defaultValues]);
@@ -353,21 +353,21 @@ export const PasswordStrengthIndicator = ({ password }) => {
         <span className="text-sm font-medium text-gray-700">Password Strength</span>
         <span className={`text-sm font-medium ${
           strength < 40 ? 'text-red-600' :
-          strength < 60 ? 'text-yellow-600' :
-          strength < 80 ? 'text-blue-600' : 'text-green-600'
+            strength < 60 ? 'text-yellow-600' :
+              strength < 80 ? 'text-blue-600' : 'text-green-600'
         }`}>
           {getStrengthLabel()}
         </span>
       </div>
-      
+
       <div className="w-full bg-gray-200 rounded-full h-2">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${strength}%` }}
           className={`h-2 rounded-full transition-colors ${
             strength < 40 ? 'bg-red-500' :
-            strength < 60 ? 'bg-yellow-500' :
-            strength < 80 ? 'bg-blue-500' : 'bg-green-500'
+              strength < 60 ? 'bg-yellow-500' :
+                strength < 80 ? 'bg-blue-500' : 'bg-green-500'
           }`}
         />
       </div>
@@ -413,10 +413,10 @@ export const FieldValidationFeedback = ({ errors, _touched }) => {
 // Async validation wrapper
 export const withAsyncValidation = (validationFn, debounceMs = 500) => {
   let timeoutId;
-  
+
   return async (value, formData) => {
     clearTimeout(timeoutId);
-    
+
     return new Promise((resolve, reject) => {
       timeoutId = setTimeout(async () => {
         try {
@@ -436,5 +436,5 @@ export default {
   createFieldConfig,
   PasswordStrengthIndicator,
   FieldValidationFeedback,
-  withAsyncValidation
+  withAsyncValidation,
 };

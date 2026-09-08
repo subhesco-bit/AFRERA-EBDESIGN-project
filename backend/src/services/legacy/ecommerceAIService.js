@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce AI Service
- * 
+ *
  * Comprehensive AI integration for E-commerce marketplace:
  * - Customer Segmentation (RFM analysis, behavioral clustering)
  * - Demand Forecasting (time series, seasonal patterns)
@@ -27,7 +27,7 @@ const { signalBus } = require('../../core/signalBus');
  */
 async function segmentCustomersRFM() {
   const pg = getPostgreSQL();
-  
+
   try {
     // Calculate RFM scores for all customers
     const rfmQuery = `
@@ -71,9 +71,9 @@ async function segmentCustomersRFM() {
         END as segment
       FROM rfm_scores
     `;
-    
+
     const result = await pg.query(rfmQuery);
-    
+
     // Update customer segments in database
     for (const customer of result.rows) {
       await pg.query(`
@@ -83,7 +83,7 @@ async function segmentCustomersRFM() {
         DO UPDATE SET segment_data = $2, updated_at = NOW()
       `, [customer.user_id, JSON.stringify(customer)]);
     }
-    
+
     // Emit signal bus event
     await signalBus.emit('ai.customer_segmentation.completed', {
       total_customers: result.rows.length,
@@ -91,15 +91,15 @@ async function segmentCustomersRFM() {
         acc[c.segment] = (acc[c.segment] || 0) + 1;
         return acc;
       }, {}),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('Customer RFM segmentation completed', { total_customers: result.rows.length });
-    
+
     return {
       success: true,
       total_customers: result.rows.length,
-      segments: result.rows
+      segments: result.rows,
     };
   } catch (error) {
     logger.error('Error in customer RFM segmentation', { error: error.message });
@@ -112,7 +112,7 @@ async function segmentCustomersRFM() {
  */
 async function segmentCustomersBehavioral() {
   const pg = getPostgreSQL();
-  
+
   try {
     // Analyze customer behavior patterns
     const behaviorQuery = `
@@ -152,9 +152,9 @@ async function segmentCustomersBehavioral() {
         END as behavioral_segment
       FROM customer_behavior
     `;
-    
+
     const result = await pg.query(behaviorQuery);
-    
+
     // Update behavioral segments
     for (const customer of result.rows) {
       await pg.query(`
@@ -164,13 +164,13 @@ async function segmentCustomersBehavioral() {
         DO UPDATE SET segment_data = $2, updated_at = NOW()
       `, [customer.user_id, JSON.stringify(customer)]);
     }
-    
+
     logger.info('Customer behavioral segmentation completed', { total_customers: result.rows.length });
-    
+
     return {
       success: true,
       total_customers: result.rows.length,
-      segments: result.rows
+      segments: result.rows,
     };
   } catch (error) {
     logger.error('Error in customer behavioral segmentation', { error: error.message });
@@ -187,7 +187,7 @@ async function segmentCustomersBehavioral() {
  */
 async function forecastProductDemand(productId, horizonDays = 30) {
   const pg = getPostgreSQL();
-  
+
   try {
     // Get historical sales data
     const historicalQuery = `
@@ -203,15 +203,15 @@ async function forecastProductDemand(productId, horizonDays = 30) {
       GROUP BY DATE_TRUNC('day', o.created_at)
       ORDER BY date ASC
     `;
-    
+
     const historical = await pg.query(historicalQuery, [productId]);
-    
+
     if (historical.rows.length < 7) {
       // Not enough data for forecasting, use simple average
-      const avgQuantity = historical.rows.length > 0 
-        ? historical.rows.reduce((sum, r) => sum + parseFloat(r.quantity_sold), 0) / historical.rows.length
-        : 0;
-      
+      const avgQuantity = historical.rows.length > 0 ?
+        historical.rows.reduce((sum, r) => sum + parseFloat(r.quantity_sold), 0) / historical.rows.length :
+        0;
+
       return {
         success: true,
         product_id: productId,
@@ -219,38 +219,38 @@ async function forecastProductDemand(productId, horizonDays = 30) {
         forecast: Array.from({ length: horizonDays }, (_, i) => ({
           date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           predicted_quantity: Math.round(avgQuantity),
-          confidence: 0.3
-        }))
+          confidence: 0.3,
+        })),
       };
     }
-    
+
     // Calculate moving average and trend
     const quantities = historical.rows.map(r => parseFloat(r.quantity_sold));
     const movingAverage = calculateMovingAverage(quantities, 7);
     const trend = calculateTrend(quantities);
     const seasonality = detectSeasonality(quantities);
-    
+
     // Generate forecast
     const forecast = [];
-    let baseQuantity = movingAverage[movingAverage.length - 1] || quantities[quantities.length - 1];
-    
+    const baseQuantity = movingAverage[movingAverage.length - 1] || quantities[quantities.length - 1];
+
     for (let i = 0; i < horizonDays; i++) {
       const forecastDate = new Date(Date.now() + i * 24 * 60 * 60 * 1000);
       const dayOfWeek = forecastDate.getDay();
       const seasonalFactor = seasonality[dayOfWeek] || 1.0;
-      
+
       // Apply trend and seasonality
       const predictedQuantity = Math.max(0, Math.round(
-        baseQuantity * (1 + trend * (i + 1) / 30) * seasonalFactor
+        baseQuantity * (1 + trend * (i + 1) / 30) * seasonalFactor,
       ));
-      
+
       forecast.push({
         date: forecastDate.toISOString().split('T')[0],
         predicted_quantity: predictedQuantity,
-        confidence: Math.max(0.5, 0.9 - (i * 0.015)) // Confidence decreases with horizon
+        confidence: Math.max(0.5, 0.9 - (i * 0.015)), // Confidence decreases with horizon
       });
     }
-    
+
     // Store forecast
     await pg.query(`
       INSERT INTO demand_forecasts (product_id, forecast_data, horizon_days, forecast_method, created_at)
@@ -258,15 +258,15 @@ async function forecastProductDemand(productId, horizonDays = 30) {
       ON CONFLICT (product_id) 
       DO UPDATE SET forecast_data = $2, horizon_days = $3, updated_at = NOW()
     `, [productId, JSON.stringify(forecast), horizonDays]);
-    
+
     // Emit signal bus event
     await signalBus.emit('ai.demand_forecast.generated', {
       product_id: productId,
       horizon_days: horizonDays,
       forecast_method: 'time_series_trend',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     return {
       success: true,
       product_id: productId,
@@ -274,7 +274,7 @@ async function forecastProductDemand(productId, horizonDays = 30) {
       historical_data_points: historical.rows.length,
       trend,
       seasonality,
-      forecast
+      forecast,
     };
   } catch (error) {
     logger.error('Error in product demand forecasting', { error: error.message, productId });
@@ -301,20 +301,20 @@ function calculateMovingAverage(data, window) {
  */
 function calculateTrend(data) {
   if (data.length < 2) return 0;
-  
+
   const n = data.length;
   let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-  
+
   for (let i = 0; i < n; i++) {
     sumX += i;
     sumY += data[i];
     sumXY += i * data[i];
     sumX2 += i * i;
   }
-  
+
   const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
   const avg = data.reduce((sum, val) => sum + val, 0) / n;
-  
+
   return slope / avg; // Return trend as percentage of average
 }
 
@@ -325,15 +325,15 @@ function detectSeasonality(data) {
   // Simplified seasonality detection
   // In production, use more sophisticated methods
   const seasonalFactors = {
-    0: 0.9,  // Sunday
-    1: 1.1,  // Monday
-    2: 1.2,  // Tuesday
-    3: 1.1,  // Wednesday
-    4: 1.0,  // Thursday
-    5: 1.3,  // Friday
-    6: 0.8   // Saturday
+    0: 0.9, // Sunday
+    1: 1.1, // Monday
+    2: 1.2, // Tuesday
+    3: 1.1, // Wednesday
+    4: 1.0, // Thursday
+    5: 1.3, // Friday
+    6: 0.8, // Saturday
   };
-  
+
   return seasonalFactors;
 }
 
@@ -346,7 +346,7 @@ function detectSeasonality(data) {
  */
 async function optimizeInventory(productId) {
   const pg = getPostgreSQL();
-  
+
   try {
     // Get current inventory and demand forecast
     const inventoryQuery = `
@@ -360,34 +360,34 @@ async function optimizeInventory(productId) {
       FROM product_listings
       WHERE id = $1
     `;
-    
+
     const product = await pg.query(inventoryQuery, [productId]);
-    
+
     if (product.rows.length === 0) {
       throw new Error('Product not found');
     }
-    
+
     const currentStock = parseFloat(product.rows[0].current_stock);
-    
+
     // Get demand forecast
     const forecast = await forecastProductDemand(productId, 30);
-    
+
     // Calculate optimal inventory levels
     const totalPredictedDemand = forecast.forecast.reduce((sum, f) => sum + f.predicted_quantity, 0);
     const avgDailyDemand = totalPredictedDemand / 30;
-    
+
     // Calculate safety stock (30 days of demand as safety buffer)
     const safetyStock = Math.round(avgDailyDemand * 30);
-    
+
     // Calculate reorder point (15 days of demand)
     const reorderPoint = Math.round(avgDailyDemand * 15);
-    
+
     // Calculate economic order quantity (simplified EOQ)
     const holdingCost = 0.25; // 25% annual holding cost
     const orderingCost = 50; // Fixed ordering cost
     const annualDemand = totalPredictedDemand * 12;
     const eoq = Math.round(Math.sqrt((2 * annualDemand * orderingCost) / (currentStock * holdingCost)));
-    
+
     const optimization = {
       current_stock: currentStock,
       predicted_30_day_demand: totalPredictedDemand,
@@ -397,9 +397,9 @@ async function optimizeInventory(productId) {
       economic_order_quantity: eoq,
       order_recommendation: currentStock < reorderPoint ? 'ORDER NOW' : 'HOLD',
       recommended_order_quantity: currentStock < reorderPoint ? Math.max(eoq, reorderPoint - currentStock) : 0,
-      stock_health: currentStock > safetyStock ? 'HEALTHY' : currentStock > reorderPoint ? 'LOW' : 'CRITICAL'
+      stock_health: currentStock > safetyStock ? 'HEALTHY' : currentStock > reorderPoint ? 'LOW' : 'CRITICAL',
     };
-    
+
     // Store optimization results
     await pg.query(`
       INSERT INTO inventory_optimization (product_id, optimization_data, created_at)
@@ -407,7 +407,7 @@ async function optimizeInventory(productId) {
       ON CONFLICT (product_id) 
       DO UPDATE SET optimization_data = $2, updated_at = NOW()
     `, [productId, JSON.stringify(optimization)]);
-    
+
     // Emit signal bus event for critical stock
     if (optimization.stock_health === 'CRITICAL') {
       await signalBus.emit('ai.inventory.critical', {
@@ -415,16 +415,16 @@ async function optimizeInventory(productId) {
         current_stock: currentStock,
         reorder_point: reorderPoint,
         recommended_order_quantity: optimization.recommended_order_quantity,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-    
+
     logger.info('Inventory optimization completed', { productId, optimization });
-    
+
     return {
       success: true,
       product_id: productId,
-      optimization
+      optimization,
     };
   } catch (error) {
     logger.error('Error in inventory optimization', { error: error.message, productId });
@@ -441,7 +441,7 @@ async function optimizeInventory(productId) {
  */
 async function getPersonalizedRecommendations(userId, limit = 10) {
   const pg = getPostgreSQL();
-  
+
   try {
     // Get user's purchase history
     const purchaseHistory = await pg.query(`
@@ -461,7 +461,7 @@ async function getPersonalizedRecommendations(userId, limit = 10) {
       ORDER BY purchase_count DESC
       LIMIT 20
     `, [userId]);
-    
+
     // Get user's segment
     const segment = await pg.query(`
       SELECT segment_data 
@@ -470,9 +470,9 @@ async function getPersonalizedRecommendations(userId, limit = 10) {
       ORDER BY created_at DESC 
       LIMIT 1
     `, [userId]);
-    
+
     const userSegment = segment.rows[0]?.segment_data || {};
-    
+
     // Build recommendation query based on user preferences
     let query = `
       SELECT 
@@ -485,10 +485,10 @@ async function getPersonalizedRecommendations(userId, limit = 10) {
       WHERE pl.listing_status = 'active'
         AND pl.quantity > 0
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     // Filter by categories user frequently purchases
     if (purchaseHistory.rows.length > 0) {
       const preferredCategories = purchaseHistory.rows.map(p => p.category_id).slice(0, 3);
@@ -496,63 +496,63 @@ async function getPersonalizedRecommendations(userId, limit = 10) {
       query += ` AND pl.category_id = ANY($${paramCount})`;
       params.push(preferredCategories);
     }
-    
+
     // Filter by nutrition grade if user prefers high quality
     if (userSegment.segment === 'Premium Shopper' || userSegment.segment === 'Champions') {
       paramCount++;
       query += ` AND pl.nutrition_grade IN ($${paramCount})`;
       params.push(['A+', 'A', 'A-']);
     }
-    
+
     query += ` GROUP BY pl.id, pl.nutrition_score, pl.nutrition_grade
                ORDER BY pl.visibility_score DESC, pl.nutrition_score DESC
                LIMIT $${paramCount + 1}`;
     params.push(limit);
-    
+
     const result = await pg.query(query, params);
-    
+
     // Calculate recommendation scores
     const recommendations = result.rows.map(product => {
       let score = 0.5;
-      
+
       // Category affinity
       const categoryMatch = purchaseHistory.rows.find(p => p.category_id === product.category_id);
       if (categoryMatch) {
         score += 0.2;
       }
-      
+
       // Nutrition score bonus
       if (product.nutrition_score > 0.8) {
         score += 0.15;
       }
-      
+
       // Sales popularity
       const salesScore = Math.min(1, product.total_sales / 100);
       score += salesScore * 0.15;
-      
+
       return {
         ...product,
         recommendation_score: Math.round(score * 100) / 100,
-        recommendation_reason: getRecommendationReason(product, userSegment)
+        recommendation_reason: getRecommendationReason(product, userSegment),
       };
     });
-    
+
     // Sort by recommendation score
     recommendations.sort((a, b) => b.recommendation_score - a.recommendation_score);
-    
+
     // Emit signal bus event
     await signalBus.emit('ai.recommendations.generated', {
       user_id: userId,
       recommendation_count: recommendations.length,
       user_segment: userSegment.segment,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     return {
       success: true,
       user_id: userId,
       user_segment: userSegment.segment,
-      recommendations: recommendations.slice(0, limit)
+      recommendations: recommendations.slice(0, limit),
     };
   } catch (error) {
     logger.error('Error in personalized recommendations', { error: error.message, userId });
@@ -562,23 +562,23 @@ async function getPersonalizedRecommendations(userId, limit = 10) {
 
 function getRecommendationReason(product, userSegment) {
   const reasons = [];
-  
+
   if (product.nutrition_grade === 'A+' || product.nutrition_grade === 'A') {
     reasons.push('High nutrition quality');
   }
-  
+
   if (product.gi_tagged) {
     reasons.push('Premium GI product');
   }
-  
+
   if (product.organic) {
     reasons.push('Organic certification');
   }
-  
+
   if (product.demand_prediction === 'high') {
     reasons.push('Popular choice');
   }
-  
+
   return reasons.length > 0 ? reasons.join(', ') : 'Recommended for you';
 }
 
@@ -591,7 +591,7 @@ function getRecommendationReason(product, userSegment) {
  */
 async function predictSales(categoryId = null, periodDays = 30) {
   const pg = getPostgreSQL();
-  
+
   try {
     // Get historical sales data
     let historicalQuery = `
@@ -606,67 +606,67 @@ async function predictSales(categoryId = null, periodDays = 30) {
       WHERE o.status = 'completed'
         AND o.created_at > NOW() - INTERVAL '90 days'
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (categoryId) {
       paramCount++;
       historicalQuery += ` AND pl.category_id = $${paramCount}`;
       params.push(categoryId);
     }
-    
+
     historicalQuery += ` GROUP BY DATE_TRUNC('day', o.created_at)
                      ORDER BY date ASC`;
-    
+
     const historical = await pg.query(historicalQuery, params);
-    
+
     if (historical.rows.length < 7) {
       return {
         success: true,
         forecast_method: 'simple_average',
-        forecast: []
+        forecast: [],
       };
     }
-    
+
     // Calculate predictions
     const revenues = historical.rows.map(r => parseFloat(r.daily_revenue));
     const trend = calculateTrend(revenues);
     const avgRevenue = revenues.reduce((sum, r) => sum + r, 0) / revenues.length;
-    
+
     const forecast = [];
     for (let i = 0; i < periodDays; i++) {
       const forecastDate = new Date(Date.now() + i * 24 * 60 * 60 * 1000);
       const dayOfWeek = forecastDate.getDay();
       const seasonalFactor = detectSeasonality(revenues)[dayOfWeek] || 1.0;
-      
+
       const predictedRevenue = Math.max(0, Math.round(
-        avgRevenue * (1 + trend * (i + 1) / 30) * seasonalFactor
+        avgRevenue * (1 + trend * (i + 1) / 30) * seasonalFactor,
       ));
-      
+
       forecast.push({
         date: forecastDate.toISOString().split('T')[0],
         predicted_revenue: predictedRevenue,
         predicted_orders: Math.round(predictedRevenue / (avgRevenue / (historical.rows.reduce((sum, r) => sum + r.daily_orders, 0) / historical.rows.length))),
-        confidence: Math.max(0.5, 0.9 - (i * 0.015))
+        confidence: Math.max(0.5, 0.9 - (i * 0.015)),
       });
     }
-    
+
     // Store forecast
     await pg.query(`
       INSERT INTO sales_forecasts (category_id, forecast_data, period_days, forecast_method, created_at)
       VALUES ($1, $2, $3, 'time_series_trend', NOW())
     `, [categoryId, JSON.stringify(forecast), periodDays]);
-    
+
     logger.info('Sales prediction completed', { categoryId, periodDays });
-    
+
     return {
       success: true,
       category_id: categoryId,
       forecast_method: 'time_series_trend',
       historical_data_points: historical.rows.length,
       trend,
-      forecast
+      forecast,
     };
   } catch (error) {
     logger.error('Error in sales prediction', { error: error.message, categoryId });
@@ -683,7 +683,7 @@ async function predictSales(categoryId = null, periodDays = 30) {
  */
 async function calculateCustomerLifetimeValue(userId) {
   const pg = getPostgreSQL();
-  
+
   try {
     // Get customer's purchase history
     const customerData = await pg.query(`
@@ -699,42 +699,42 @@ async function calculateCustomerLifetimeValue(userId) {
         AND o.status = 'completed'
       GROUP BY o.user_id
     `, [userId]);
-    
+
     if (customerData.rows.length === 0) {
       return {
         success: true,
         user_id: userId,
         clv: 0,
-        status: 'new_customer'
+        status: 'new_customer',
       };
     }
-    
+
     const data = customerData.rows[0];
-    
+
     // Calculate customer lifetime (in days)
-    const customerLifetime = data.last_purchase 
-      ? Math.round((new Date(data.last_purchase) - new Date(data.first_purchase)) / (1000 * 60 * 60 * 24))
-      : 0;
-    
+    const customerLifetime = data.last_purchase ?
+      Math.round((new Date(data.last_purchase) - new Date(data.first_purchase)) / (1000 * 60 * 60 * 24)) :
+      0;
+
     // Calculate purchase frequency (orders per month)
-    const purchaseFrequency = customerLifetime > 0 
-      ? (data.total_orders / (customerLifetime / 30))
-      : 0;
-    
+    const purchaseFrequency = customerLifetime > 0 ?
+      (data.total_orders / (customerLifetime / 30)) :
+      0;
+
     // Calculate CLV (simplified formula)
     // CLV = (Average Order Value × Purchase Frequency × Customer Lifetime in Months)
     const clv = data.avg_order_value * purchaseFrequency * (customerLifetime / 30);
-    
+
     // Predict future value (12 months)
     const predictedFutureValue = data.avg_order_value * purchaseFrequency * 12;
-    
+
     // Calculate churn risk (based on inactivity)
-    const daysSinceLastPurchase = data.last_purchase 
-      ? Math.round((new Date() - new Date(data.last_purchase)) / (1000 * 60 * 60 * 24))
-      : 0;
-    
+    const daysSinceLastPurchase = data.last_purchase ?
+      Math.round((new Date() - new Date(data.last_purchase)) / (1000 * 60 * 60 * 24)) :
+      0;
+
     const churnRisk = daysSinceLastPurchase > 90 ? 'high' : daysSinceLastPurchase > 60 ? 'medium' : 'low';
-    
+
     const clvData = {
       user_id: userId,
       total_orders: data.total_orders,
@@ -746,9 +746,9 @@ async function calculateCustomerLifetimeValue(userId) {
       predicted_12_month_value: Math.round(predictedFutureValue),
       churn_risk: churnRisk,
       days_since_last_purchase: daysSinceLastPurchase,
-      customer_tier: clv > 10000 ? 'Platinum' : clv > 5000 ? 'Gold' : clv > 1000 ? 'Silver' : 'Bronze'
+      customer_tier: clv > 10000 ? 'Platinum' : clv > 5000 ? 'Gold' : clv > 1000 ? 'Silver' : 'Bronze',
     };
-    
+
     // Store CLV data
     await pg.query(`
       INSERT INTO customer_ltv (user_id, ltv_data, created_at)
@@ -756,22 +756,22 @@ async function calculateCustomerLifetimeValue(userId) {
       ON CONFLICT (user_id) 
       DO UPDATE SET ltv_data = $2, updated_at = NOW()
     `, [userId, JSON.stringify(clvData)]);
-    
+
     // Emit signal bus event for high-value customers
     if (clvData.customer_tier === 'Platinum' || clvData.customer_tier === 'Gold') {
       await signalBus.emit('ai.high_value_customer.identified', {
         user_id: userId,
         customer_tier: clvData.customer_tier,
         clv: clvData.clv,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-    
+
     logger.info('Customer CLV calculated', { userId, clv: clvData.clv, tier: clvData.customer_tier });
-    
+
     return {
       success: true,
-      ...clvData
+      ...clvData,
     };
   } catch (error) {
     logger.error('Error in CLV calculation', { error: error.message, userId });
@@ -788,7 +788,7 @@ async function calculateCustomerLifetimeValue(userId) {
  */
 async function analyzeMarketBasket(categoryId = null) {
   const pg = getPostgreSQL();
-  
+
   try {
     // Find products frequently purchased together
     const basketQuery = `
@@ -822,31 +822,31 @@ async function analyzeMarketBasket(categoryId = null) {
       ORDER BY lift_ratio DESC
       LIMIT 20
     `;
-    
+
     const result = await pg.query(basketQuery);
-    
+
     const recommendations = result.rows.map(pair => ({
       product_a: {
         id: pair.product_a,
         name: pair.product_a_name,
-        price: pair.product_a_price
+        price: pair.product_a_price,
       },
       product_b: {
         id: pair.product_b,
         name: pair.product_b_name,
-        price: pair.product_b_price
+        price: pair.product_b_price,
       },
       co_occurrence: pair.co_occurrence,
       lift_ratio: pair.lift_ratio,
-      cross_sell_confidence: pair.lift_ratio > 2 ? 'high' : pair.lift_ratio > 1.5 ? 'medium' : 'low'
+      cross_sell_confidence: pair.lift_ratio > 2 ? 'high' : pair.lift_ratio > 1.5 ? 'medium' : 'low',
     }));
-    
+
     logger.info('Market basket analysis completed', { recommendations: recommendations.length });
-    
+
     return {
       success: true,
       category_id: categoryId,
-      recommendations
+      recommendations,
     };
   } catch (error) {
     logger.error('Error in market basket analysis', { error: error.message });
@@ -862,22 +862,23 @@ module.exports = {
   // Customer Segmentation
   segmentCustomersRFM,
   segmentCustomersBehavioral,
-  
+
   // Demand Forecasting
   forecastProductDemand,
-  
+
   // Inventory Optimization
   optimizeInventory,
-  
+
   // Product Recommendations
   getPersonalizedRecommendations,
-  
+
   // Sales Prediction
   predictSales,
-  
+
   // Customer Lifetime Value
   calculateCustomerLifetimeValue,
-  
+
   // Market Basket Analysis
-  analyzeMarketBasket
+  analyzeMarketBasket,
 };
+

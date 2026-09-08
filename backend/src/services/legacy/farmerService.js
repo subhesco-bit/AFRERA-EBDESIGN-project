@@ -13,7 +13,7 @@ const { authMiddleware } = require('../../middleware/auth');
 async function getFarmerById(farmerId) {
   try {
     const pg = getPostgreSQL();
-    
+
     const query = `
       SELECT f.*, u.name, u.email, u.phone, u.status as user_status,
              fpo.name as fpo_name, fpo.registration_number as fpo_reg
@@ -22,13 +22,13 @@ async function getFarmerById(farmerId) {
       LEFT JOIN fpos fpo ON f.fpo_id = fpo.id
       WHERE f.id = $1
     `;
-    
+
     const result = await pg.query(query, [farmerId]);
-    
+
     if (result.rows.length === 0) {
       throw new Error('Farmer not found');
     }
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error fetching farmer', { error: error.message, stack: error.stack });
@@ -42,12 +42,15 @@ async function getFarmerById(farmerId) {
 async function getFarmers(filters = {}, pagination = {}) {
   try {
     const pg = getPostgreSQL();
-    
+
     const { fpo_id, min_fdi, max_fdi, certification_count_min, status } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
-    
+    const sortableFields = new Set(['created_at', 'fdi_score', 'status', 'certification_count', 'land_size']);
+    const safeSortBy = sortableFields.has(sort_by) ? sort_by : 'created_at';
+    const safeSortOrder = String(sort_order).toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
     const offset = (page - 1) * limit;
-    
+
     let query = `
       SELECT f.*, u.name, u.email, u.phone, fpo.name as fpo_name
       FROM farmers f
@@ -55,57 +58,57 @@ async function getFarmers(filters = {}, pagination = {}) {
       LEFT JOIN fpos fpo ON f.fpo_id = fpo.id
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (fpo_id) {
       paramCount++;
       query += ` AND f.fpo_id = $${paramCount}`;
       params.push(fpo_id);
     }
-    
+
     if (min_fdi) {
       paramCount++;
       query += ` AND f.fdi_score >= $${paramCount}`;
       params.push(min_fdi);
     }
-    
+
     if (max_fdi) {
       paramCount++;
       query += ` AND f.fdi_score <= $${paramCount}`;
       params.push(max_fdi);
     }
-    
+
     if (certification_count_min) {
       paramCount++;
       query += ` AND f.certification_count >= $${paramCount}`;
       params.push(certification_count_min);
     }
-    
+
     if (status) {
       paramCount++;
       query += ` AND f.status = $${paramCount}`;
       params.push(status);
     }
-    
+
     const countQuery = query.replace(/SELECT f\.\*, u\.name, u\.email, u\.phone, fpo\.name as fpo_name/, 'SELECT COUNT(*)');
     const countResult = await pg.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
-    
-    query += ` ORDER BY f.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+
+    query += ` ORDER BY f.${safeSortBy} ${safeSortOrder} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
-    
+
     const result = await pg.query(query, params);
-    
+
     return {
       farmers: result.rows,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching farmers', { error: error.message, stack: error.stack });
@@ -119,7 +122,7 @@ async function getFarmers(filters = {}, pagination = {}) {
 async function calculateFDI(farmerId) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Get farmer data
     const farmerQuery = `
       SELECT f.*, 
@@ -129,73 +132,73 @@ async function calculateFDI(farmerId) {
       FROM farmers f
       WHERE f.id = $1
     `;
-    
+
     const farmerResult = await pg.query(farmerQuery, [farmerId]);
     const farmer = farmerResult.rows[0];
-    
+
     if (!farmer) {
       throw new Error('Farmer not found');
     }
-    
+
     // FDI Calculation Factors
     const factors = {
       certifications: {
         weight: 0.25,
-        score: Math.min(farmer.cert_count * 10, 25)
+        score: Math.min(farmer.cert_count * 10, 25),
       },
       training: {
         weight: 0.15,
-        score: Math.min(farmer.training_count * 5, 15)
+        score: Math.min(farmer.training_count * 5, 15),
       },
       fulfilledOrders: {
         weight: 0.20,
-        score: Math.min(farmer.fulfilled_orders * 2, 20)
+        score: Math.min(farmer.fulfilled_orders * 2, 20),
       },
       farmSize: {
         weight: 0.15,
-        score: Math.min(farmer.farm_size_hectares * 3, 15)
+        score: Math.min(farmer.farm_size_hectares * 3, 15),
       },
       yearsActive: {
         weight: 0.10,
-        score: Math.min(farmer.years_active * 2, 10)
+        score: Math.min(farmer.years_active * 2, 10),
       },
       disputes: {
         weight: 0.15,
-        score: Math.max(15 - (farmer.disputes * 5), 0)
-      }
+        score: Math.max(15 - (farmer.disputes * 5), 0),
+      },
     };
-    
+
     // Calculate weighted score
     const fdiScore = Object.values(factors).reduce((sum, factor) => sum + factor.score, 0);
-    
+
     // Determine grade
     let grade;
     if (fdiScore >= 80) grade = 'A';
     else if (fdiScore >= 60) grade = 'B';
     else if (fdiScore >= 40) grade = 'C';
     else grade = 'D';
-    
+
     // Calculate advance percentage based on FDI
     const advancePercentage = Math.round(fdiScore * 0.4);
-    
+
     // Update farmer record
     await pg.query(
       `UPDATE farmers 
        SET fdi_score = $1, fdi_grade = $2, fdi_last_calculated = NOW(), 
            max_advance_percentage = $3, certification_count = $4
        WHERE id = $5`,
-      [fdiScore, grade, advancePercentage, farmer.cert_count, farmerId]
+      [fdiScore, grade, advancePercentage, farmer.cert_count, farmerId],
     );
-    
+
     logger.info(`FDI calculated for farmer ${farmerId}: ${fdiScore} (${grade})`);
-    
+
     return {
       farmer_id: farmerId,
       fdi_score: fdiScore,
       fdi_grade: grade,
       advance_percentage: advancePercentage,
-      factors: factors,
-      calculated_at: new Date()
+      factors,
+      calculated_at: new Date(),
     };
   } catch (error) {
     logger.error('Error calculating FDI', { error: error.message, stack: error.stack });
@@ -209,14 +212,14 @@ async function calculateFDI(farmerId) {
 async function addFarmerCertification(farmerId, certificationData) {
   try {
     const pg = getPostgreSQL();
-    
+
     const query = `
       INSERT INTO farmer_certifications (farmer_id, certification_type, certificate_number,
                                          issuing_authority, issue_date, expiry_date, document_url)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `;
-    
+
     const result = await pg.query(query, [
       farmerId,
       certificationData.certification_type,
@@ -224,20 +227,20 @@ async function addFarmerCertification(farmerId, certificationData) {
       certificationData.issuing_authority,
       certificationData.issue_date,
       certificationData.expiry_date,
-      certificationData.document_url || null
+      certificationData.document_url || null,
     ]);
-    
+
     // Update farmer certification count
     await pg.query(
       'UPDATE farmers SET certification_count = certification_count + 1 WHERE id = $1',
-      [farmerId]
+      [farmerId],
     );
-    
+
     // Recalculate FDI
     await calculateFDI(farmerId);
-    
+
     logger.info(`Certification added for farmer ${farmerId}: ${certificationData.certification_type}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error adding certification', { error: error.message, stack: error.stack });
@@ -251,15 +254,15 @@ async function addFarmerCertification(farmerId, certificationData) {
 async function getFarmerCertifications(farmerId) {
   try {
     const pg = getPostgreSQL();
-    
+
     const query = `
       SELECT * FROM farmer_certifications
       WHERE farmer_id = $1
       ORDER BY issue_date DESC
     `;
-    
+
     const result = await pg.query(query, [farmerId]);
-    
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching certifications', { error: error.message, stack: error.stack });
@@ -396,7 +399,7 @@ async function getWalletTransactions(farmerId, filters = {}) {
 
     return {
       transactions: result.rows,
-      pagination: { page, limit }
+      pagination: { page, limit },
     };
   } catch (error) {
     logger.error('Error getting wallet transactions', { error: error.message, stack: error.stack });
@@ -431,7 +434,7 @@ async function depositToWallet(farmerId, amount, paymentMethod, reference) {
       const updateResult = await txClient.query(
         `UPDATE farmer_wallets SET balance = balance + $1, updated_at = NOW()
          WHERE id = $2 RETURNING balance`,
-        [amt, wallet.id]
+        [amt, wallet.id],
       );
       const newBalance = updateResult.rows[0].balance;
 
@@ -440,7 +443,7 @@ async function depositToWallet(farmerId, amount, paymentMethod, reference) {
            (wallet_id, type, amount, balance_after, description, reference_id, payment_method, status)
          VALUES ($1, 'credit', $2, $3, $4, $5, $6, 'completed')
          RETURNING *`,
-        [wallet.id, amt, newBalance, `Deposit via ${paymentMethod}`, reference, paymentMethod]
+        [wallet.id, amt, newBalance, `Deposit via ${paymentMethod}`, reference, paymentMethod],
       );
 
       await txClient.query('COMMIT');
@@ -487,7 +490,7 @@ async function withdrawFromWallet(farmerId, amount, bankAccount, reference) {
       const updateResult = await txClient.query(
         `UPDATE farmer_wallets SET balance = balance - $1, updated_at = NOW()
          WHERE id = $2 AND balance >= $1 RETURNING balance`,
-        [amt, wallet.id]
+        [amt, wallet.id],
       );
 
       if (updateResult.rows.length === 0) {
@@ -500,7 +503,7 @@ async function withdrawFromWallet(farmerId, amount, bankAccount, reference) {
            (wallet_id, type, amount, balance_after, description, reference_id, bank_account, status)
          VALUES ($1, 'debit', $2, $3, $4, $5, $6, 'completed')
          RETURNING *`,
-        [wallet.id, amt, newBalance, 'Withdrawal to bank account', reference, bankAccount]
+        [wallet.id, amt, newBalance, 'Withdrawal to bank account', reference, bankAccount],
       );
 
       await txClient.query('COMMIT');
@@ -565,7 +568,7 @@ async function transferFromWallet(senderId, recipientId, amount, description) {
       const lockIds = [senderWallet.id, recipientWalletId].sort();
       const { rows: locked } = await txClient.query(
         'SELECT id, balance FROM farmer_wallets WHERE id = ANY($1) ORDER BY id FOR UPDATE',
-        [lockIds]
+        [lockIds],
       );
       const byId = Object.fromEntries(locked.map((w) => [String(w.id), w]));
       const senderBal = parseFloat(byId[String(senderWallet.id)]?.balance ?? 0);
@@ -585,7 +588,7 @@ async function transferFromWallet(senderId, recipientId, amount, description) {
            (wallet_id, type, amount, balance_after, description, recipient_id, status)
          VALUES ($1, 'transfer', $2, $3, $4, $5, 'completed')
          RETURNING *`,
-        [senderWallet.id, amount, senderNewBalance, description || 'Transfer', recipientId]
+        [senderWallet.id, amount, senderNewBalance, description || 'Transfer', recipientId],
       );
 
       await txClient.query(
@@ -594,7 +597,7 @@ async function transferFromWallet(senderId, recipientId, amount, description) {
          VALUES ($1, 'transfer', $2, $3, $4, $5, 'completed')
          RETURNING *`,
         [recipientWalletId, amount, recipientNewBalance,
-          description || 'Transfer received', debitResult.rows[0].id]
+          description || 'Transfer received', debitResult.rows[0].id],
       );
 
       // Balances themselves move inside the same boundary, or the ledger and
@@ -628,7 +631,7 @@ async function getWalletBalance(farmerId) {
     return {
       balance: wallet.balance,
       currency: wallet.currency,
-      status: wallet.status
+      status: wallet.status,
     };
   } catch (error) {
     logger.error('Error getting wallet balance', { error: error.message, stack: error.stack });
@@ -648,7 +651,7 @@ async function linkBankAccount(farmerId, bankName, accountNumber, ifscCode, acco
     // primary; later ones don't, until there's an explicit "set primary" flow.
     const existing = await pg.query(
       'SELECT COUNT(*) FROM farmer_bank_accounts WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     const isPrimary = parseInt(existing.rows[0].count, 10) === 0;
 
@@ -665,7 +668,7 @@ async function linkBankAccount(farmerId, bankName, accountNumber, ifscCode, acco
       accountNumber,
       ifscCode,
       accountHolder,
-      isPrimary
+      isPrimary,
     ]);
 
     logger.info(`Bank account linked for farmer ${farmerId}`);
@@ -689,5 +692,6 @@ module.exports = {
   withdrawFromWallet,
   transferFromWallet,
   getWalletBalance,
-  linkBankAccount
+  linkBankAccount,
 };
+

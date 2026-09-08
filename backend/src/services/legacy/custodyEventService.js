@@ -1,13 +1,13 @@
 /**
  * Custody Event Service
- * 
+ *
  * Implements custody chain tracking with state machine validation and hash-based integrity.
- * 
+ *
  * ASSUMPTIONS FLAGGED:
  * The state machine transitions and event vocabulary below are based on assumed
  * logistics patterns since the original source only specified 5 named milestones
  * and mentioned 11 status + 8 exception types without full detail.
- * 
+ *
  * Key Features:
  * - State machine validation for custody event transitions
  * - Hash-chain integrity verification (tamper evidence)
@@ -26,7 +26,7 @@ const { logger } = require('../../utils/logger');
 const STATE_TRANSITIONS = {
   // Initial state can transition to these
   null: ['job_offered'],
-  
+
   // Lifecycle transitions
   job_offered: ['job_accepted', 'carrier_rejected'],
   job_accepted: ['pickup_scheduled', 'carrier_rejected'],
@@ -39,7 +39,7 @@ const STATE_TRANSITIONS = {
   settlement_pending: ['settlement_ready'],
   settlement_ready: ['settlement_complete'],
   settlement_complete: [], // Terminal state
-  
+
   // Exception transitions (can be raised from multiple states)
   pickup_delayed: ['pickup_confirmed', 'carrier_rejected'],
   transit_delayed: ['out_for_delivery', 'delivery_failed', 'goods_damaged'],
@@ -48,7 +48,7 @@ const STATE_TRANSITIONS = {
   goods_lost: ['dispute_raised'],
   carrier_rejected: [], // Terminal state - job cancelled
   documentation_missing: ['pickup_confirmed', 'carrier_rejected'],
-  dispute_raised: ['settlement_pending', 'settlement_complete']
+  dispute_raised: ['settlement_pending', 'settlement_complete'],
 };
 
 // Helper: Compute SHA-256 hash of event data
@@ -58,7 +58,7 @@ function computeEventHash(eventData, previousHash) {
     event_type: eventData.event_type,
     event_timestamp: eventData.event_timestamp,
     event_data: eventData.event_data,
-    previous_hash: previousHash
+    previous_hash: previousHash,
   });
   return crypto.createHash('sha256').update(hashInput).digest('hex');
 }
@@ -87,7 +87,7 @@ async function appendEvent(eventData) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    
+
     // Get latest event for this shipment to determine previous state
     const latestEventQuery = `
       SELECT event_type, current_event_hash
@@ -98,27 +98,27 @@ async function appendEvent(eventData) {
     `;
     const latestEventResult = await client.query(latestEventQuery, [eventData.shipment_id]);
     const latestEvent = latestEventResult.rows[0];
-    
+
     const previousEventType = latestEvent ? latestEvent.event_type : null;
     const previousHash = latestEvent ? latestEvent.current_event_hash : null;
-    
+
     // Validate state machine transition
     if (!isValidTransition(previousEventType, eventData.event_type)) {
       throw new Error(
         `Invalid state transition from ${previousEventType} to ${eventData.event_type}. ` +
-        `Valid transitions: ${(STATE_TRANSITIONS[previousEventType] || STATE_TRANSITIONS.null).join(', ')}`
+        `Valid transitions: ${(STATE_TRANSITIONS[previousEventType] || STATE_TRANSITIONS.null).join(', ')}`,
       );
     }
-    
+
     // Compute hash for this event
     const eventTimestamp = eventData.event_timestamp || new Date().toISOString();
     const currentHash = computeEventHash({
       shipment_id: eventData.shipment_id,
       event_type: eventData.event_type,
       event_timestamp: eventTimestamp,
-      event_data: eventData.event_data
+      event_data: eventData.event_data,
     }, previousHash);
-    
+
     // Insert the event
     const insertQuery = `
       INSERT INTO custody_chain_events (
@@ -127,7 +127,7 @@ async function appendEvent(eventData) {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `;
-    
+
     const result = await client.query(insertQuery, [
       eventData.shipment_id,
       eventData.event_type,
@@ -135,24 +135,24 @@ async function appendEvent(eventData) {
       JSON.stringify(eventData.event_data || {}),
       previousHash,
       currentHash,
-      eventData.recorded_by
+      eventData.recorded_by,
     ]);
-    
+
     await client.query('COMMIT');
-    
-    logger.info(`Custody event appended`, {
+
+    logger.info('Custody event appended', {
       shipment_id: eventData.shipment_id,
       event_type: eventData.event_type,
-      event_id: result.rows[0].event_id
+      event_id: result.rows[0].event_id,
     });
-    
+
     return result.rows[0];
   } catch (error) {
     await client.query('ROLLBACK');
     logger.error('Error appending custody event', {
       error: error.message,
       shipment_id: eventData.shipment_id,
-      event_type: eventData.event_type
+      event_type: eventData.event_type,
     });
     throw error;
   } finally {
@@ -184,35 +184,35 @@ async function getChain(shipmentId, verifyHash = true) {
       WHERE shipment_id = $1
       ORDER BY event_timestamp ASC
     `;
-    
+
     const result = await pool.query(query, [shipmentId]);
     const events = result.rows;
-    
+
     if (events.length === 0) {
       return {
         shipment_id: shipmentId,
         events: [],
         chain_integrity: 'empty',
-        verification_details: null
+        verification_details: null,
       };
     }
-    
+
     let verificationDetails = null;
     let chainIntegrity = 'verified';
-    
+
     if (verifyHash) {
       verificationDetails = {
         total_events: events.length,
         verified_events: 0,
         tampered_events: [],
-        errors: []
+        errors: [],
       };
-      
+
       let previousHash = null;
-      
+
       for (let i = 0; i < events.length; i++) {
         const event = events[i];
-        
+
         // Verify previous hash matches
         if (event.previous_event_hash !== previousHash) {
           chainIntegrity = 'tampered';
@@ -221,18 +221,18 @@ async function getChain(shipmentId, verifyHash = true) {
             event_type: event.event_type,
             issue: 'previous_hash_mismatch',
             expected: previousHash,
-            actual: event.previous_event_hash
+            actual: event.previous_event_hash,
           });
         }
-        
+
         // Recompute and verify current hash
         const recomputedHash = computeEventHash({
           shipment_id: event.shipment_id,
           event_type: event.event_type,
           event_timestamp: event.event_timestamp,
-          event_data: event.event_data
+          event_data: event.event_data,
         }, previousHash);
-        
+
         if (recomputedHash !== event.current_event_hash) {
           chainIntegrity = 'tampered';
           verificationDetails.tampered_events.push({
@@ -240,34 +240,34 @@ async function getChain(shipmentId, verifyHash = true) {
             event_type: event.event_type,
             issue: 'current_hash_mismatch',
             expected: recomputedHash,
-            actual: event.current_event_hash
+            actual: event.current_event_hash,
           });
         } else {
           verificationDetails.verified_events++;
         }
-        
+
         previousHash = event.current_event_hash;
       }
-      
+
       if (verificationDetails.tampered_events.length > 0) {
-        logger.error(`Custody chain tampered`, {
+        logger.error('Custody chain tampered', {
           shipment_id: shipmentId,
-          tampered_count: verificationDetails.tampered_events.length
+          tampered_count: verificationDetails.tampered_events.length,
         });
       }
     }
-    
+
     return {
       shipment_id: shipmentId,
-      events: events,
+      events,
       chain_integrity: chainIntegrity,
       verification_details: verificationDetails,
-      current_state: events.length > 0 ? events[events.length - 1].event_type : null
+      current_state: events.length > 0 ? events[events.length - 1].event_type : null,
     };
   } catch (error) {
     logger.error('Error getting custody chain', {
       error: error.message,
-      shipment_id: shipmentId
+      shipment_id: shipmentId,
     });
     throw error;
   }
@@ -287,10 +287,10 @@ async function issueSettlementInstruction(instructionData) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    
+
     // Generate reference number
     const referenceNumber = `SETTLE-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-    
+
     const query = `
       INSERT INTO settlement_instructions (
         shipment_id, custody_event_id, amount, currency,
@@ -299,7 +299,7 @@ async function issueSettlementInstruction(instructionData) {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'issued')
       RETURNING *
     `;
-    
+
     const result = await client.query(query, [
       instructionData.shipment_id,
       instructionData.custody_event_id,
@@ -309,29 +309,29 @@ async function issueSettlementInstruction(instructionData) {
       instructionData.payee_account || null,
       instructionData.settlement_type,
       referenceNumber,
-      instructionData.notes || null
+      instructionData.notes || null,
     ]);
-    
+
     // Update custody event with settlement instruction reference
     await client.query(
       'UPDATE custody_chain_events SET settlement_instruction_id = $1 WHERE event_id = $2',
-      [result.rows[0].instruction_id, instructionData.custody_event_id]
+      [result.rows[0].instruction_id, instructionData.custody_event_id],
     );
-    
+
     await client.query('COMMIT');
-    
-    logger.info(`Settlement instruction issued`, {
+
+    logger.info('Settlement instruction issued', {
       instruction_id: result.rows[0].instruction_id,
       reference_number: referenceNumber,
-      amount: instructionData.amount
+      amount: instructionData.amount,
     });
-    
+
     return result.rows[0];
   } catch (error) {
     await client.query('ROLLBACK');
     logger.error('Error issuing settlement instruction', {
       error: error.message,
-      shipment_id: instructionData.shipment_id
+      shipment_id: instructionData.shipment_id,
     });
     throw error;
   } finally {
@@ -355,23 +355,23 @@ async function confirmSettlementExecution(instructionId, confirmedBy) {
       WHERE instruction_id = $2
       RETURNING *
     `;
-    
+
     const result = await pool.query(query, [confirmedBy, instructionId]);
-    
+
     if (result.rows.length === 0) {
       throw new Error(`Settlement instruction not found: ${instructionId}`);
     }
-    
-    logger.info(`Settlement execution confirmed`, {
+
+    logger.info('Settlement execution confirmed', {
       instruction_id: instructionId,
-      confirmed_by: confirmedBy
+      confirmed_by: confirmedBy,
     });
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error confirming settlement execution', {
       error: error.message,
-      instruction_id: instructionId
+      instruction_id: instructionId,
     });
     throw error;
   }
@@ -392,18 +392,18 @@ async function getSettlementInstruction(instructionId) {
       LEFT JOIN custody_chain_events ce ON si.custody_event_id = ce.event_id
       WHERE si.instruction_id = $1
     `;
-    
+
     const result = await pool.query(query, [instructionId]);
-    
+
     if (result.rows.length === 0) {
       throw new Error(`Settlement instruction not found: ${instructionId}`);
     }
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error getting settlement instruction', {
       error: error.message,
-      instruction_id: instructionId
+      instruction_id: instructionId,
     });
     throw error;
   }
@@ -416,5 +416,6 @@ module.exports = {
   confirmSettlementExecution,
   getSettlementInstruction,
   isValidTransition,
-  STATE_TRANSITIONS
+  STATE_TRANSITIONS,
 };
+

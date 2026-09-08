@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import Modal from '../components/common/Modal';
 import {
   Calendar,
   Sprout,
@@ -8,8 +8,8 @@ import {
   TrendingUp,
   AlertTriangle,
   CheckCircle,
-  Info
-} from 'lucide-react'
+  Info,
+} from 'lucide-react';
 
 // farmersAPI.getHarvestPlans/getWeatherForecast/getCropRecommendations never
 // existed on frontend/src/services/api.js — this page was calling
@@ -19,11 +19,11 @@ import {
 // fabricate those numbers client-side, this page is left as an honest
 // not-built placeholder — see ClimateAdvisoryPage.jsx for the same pattern.
 function HarvestPlanPage() {
-  const [selectedSeason, setSelectedSeason] = useState('current')
-  const [selectedCrop, setSelectedCrop] = useState(null)
-  const harvestPlans = undefined
-  const weatherForecast = undefined
-  const cropRecommendations = undefined
+  const [selectedSeason, setSelectedSeason] = useState('current');
+  const [selectedCrop, setSelectedCrop] = useState(null);
+  const harvestPlans = undefined;
+  const weatherForecast = undefined;
+  const cropRecommendations = undefined;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -43,15 +43,15 @@ function HarvestPlanPage() {
         {[
           { id: 'current', label: 'Current Season' },
           { id: 'next', label: 'Next Season' },
-          { id: 'annual', label: 'Annual View' }
+          { id: 'annual', label: 'Annual View' },
         ].map((season) => (
           <button
             key={season.id}
             onClick={() => setSelectedSeason(season.id)}
             className={`px-4 py-2 rounded-lg font-medium transition ${
-              selectedSeason === season.id
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              selectedSeason === season.id ?
+                'bg-green-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             {season.label}
@@ -93,8 +93,8 @@ function HarvestPlanPage() {
                   <div className="font-medium text-gray-800">{plan.harvest_date}</div>
                   <div className={`text-sm ${
                     plan.days_remaining <= 7 ? 'text-red-600' :
-                    plan.days_remaining <= 14 ? 'text-orange-600' :
-                    'text-green-600'
+                      plan.days_remaining <= 14 ? 'text-orange-600' :
+                        'text-green-600'
                   }`}>
                     {plan.days_remaining} days remaining
                   </div>
@@ -147,7 +147,7 @@ function HarvestPlanPage() {
               onKeyDown={(e) => {
                 // Enter and Space are what a native <button> responds to.
                 // Without this the card is unreachable by keyboard entirely.
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click() }
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); }
               }}
               className="border rounded-lg p-4 hover:shadow-md transition cursor-pointer"
               onClick={() => setSelectedCrop(crop)}
@@ -179,8 +179,8 @@ function HarvestPlanPage() {
                   <div
                     className={`h-1.5 rounded-full ${
                       crop.demand === 'High' ? 'bg-green-600' :
-                      crop.demand === 'Medium' ? 'bg-yellow-600' :
-                      'bg-red-600'
+                        crop.demand === 'Medium' ? 'bg-yellow-600' :
+                          'bg-red-600'
                     }`}
                     style={{ width: crop.demand === 'High' ? '90%' : crop.demand === 'Medium' ? '60%' : '30%' }}
                   />
@@ -279,7 +279,7 @@ function HarvestPlanPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default HarvestPlanPage
+export default HarvestPlanPage;

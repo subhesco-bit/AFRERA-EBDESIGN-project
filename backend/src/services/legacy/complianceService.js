@@ -65,22 +65,17 @@ async function deductTds({ deducteeId, deducteeName, deducteePan, deducteeType, 
         payment_amount_inr, tds_rate_pct, higher_rate_no_pan, quarter, financial_year)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
     [deducteeId ?? null, deducteeName, deducteePan ?? null, deducteeType, cfg.section,
-      paymentAmountInr, rate, noPan, quarterOf(when), financialYearOf(when)]
+      paymentAmountInr, rate, noPan, quarterOf(when), financialYearOf(when)],
   );
   const row = rows[0];
-  // tds_amount_inr is a Postgres GENERATED ALWAYS AS (...) STORED column
-  // (migration 056) - real Postgres computes and returns it via RETURNING *,
-  // but computing it here too (same formula) keeps this function correct
-  // even against a mock/test double that doesn't emulate generated columns.
-  const tdsAmountInr = row.tds_amount_inr != null ? Number(row.tds_amount_inr) : r2(paymentAmountInr * rate / 100);
   return {
     ...row,
-    tds_amount_inr: tdsAmountInr,
-    netPayableInr: r2(paymentAmountInr - tdsAmountInr),
-    explanation: noPan
-      ? `No PAN on record, so s.206AA applies a flat ${NO_PAN_RATE}% instead of the `
-      + `usual ${cfg.rate}% under ${cfg.section}. Furnishing a PAN reduces this.`
-      : `${cfg.rate}% under ${cfg.section}. ${cfg.note}`,
+    tds_amount_inr: Number(row.tds_amount_inr),
+    netPayableInr: r2(paymentAmountInr - Number(row.tds_amount_inr)),
+    explanation: noPan ?
+      `No PAN on record, so s.206AA applies a flat ${NO_PAN_RATE}% instead of the ` +
+      `usual ${cfg.rate}% under ${cfg.section}. Furnishing a PAN reduces this.` :
+      `${cfg.rate}% under ${cfg.section}. ${cfg.note}`,
   };
 }
 
@@ -97,18 +92,18 @@ async function tdsSummary({ financialYear, quarter } = {}) {
        FROM tds_deductions
       WHERE financial_year = $1 AND quarter = $2
       GROUP BY section`,
-    [fy, q]
+    [fy, q],
   );
   const undeposited = rows.reduce((s, r) => s + Number(r.undeposited), 0);
   return {
     financialYear: fy, quarter: q, bySection: rows,
     totalTdsInr: rows.reduce((s, r) => s + Number(r.tds_deducted || 0), 0),
     undepositedCount: undeposited,
-    warning: undeposited
-      ? `${undeposited} deduction(s) have no challan recorded. TDS deducted but not `
-      + 'deposited attracts interest at 1.5% per month and is a personal liability of '
-      + 'the principal officer, not just a company one.'
-      : null,
+    warning: undeposited ?
+      `${undeposited} deduction(s) have no challan recorded. TDS deducted but not ` +
+      'deposited attracts interest at 1.5% per month and is a personal liability of ' +
+      'the principal officer, not just a company one.' :
+      null,
   };
 }
 
@@ -129,14 +124,14 @@ async function registerIrn({ invoiceRef, environment = 'sandbox' }) {
      VALUES ($1,$2,'pending')
      ON CONFLICT (invoice_ref) DO UPDATE SET environment = EXCLUDED.environment
      RETURNING *`,
-    [invoiceRef, environment]
+    [invoiceRef, environment],
   );
   return {
     ...rows[0],
-    warning: environment === 'sandbox'
-      ? 'SANDBOX. This IRN is not legally valid and the buyer cannot claim input credit '
-      + 'against it. Set environment to production before issuing to a customer.'
-      : null,
+    warning: environment === 'sandbox' ?
+      'SANDBOX. This IRN is not legally valid and the buyer cannot claim input credit ' +
+      'against it. Set environment to production before issuing to a customer.' :
+      null,
   };
 }
 
@@ -149,7 +144,7 @@ async function recordIrnResult({ invoiceRef, irn, ackNo, ackDate, signedQr, erro
       WHERE invoice_ref = $1 RETURNING *`,
     [invoiceRef, irn ?? null, ackNo ?? null, ackDate ?? null, signedQr ?? null,
       ok ? 'generated' : 'failed', errorCode ?? null,
-      ok ? null : (errorMessage || 'IRP rejected the invoice without a message')]
+      ok ? null : (errorMessage || 'IRP rejected the invoice without a message')],
   );
   if (!rows.length) throw new Error(`No IRN registration for invoice ${invoiceRef}`);
   return rows[0];
@@ -181,7 +176,7 @@ async function buildGstrDraft({ returnType, period, gstin }) {
          COALESCE(SUM(igst_amount), 0) AS igst
        FROM gst_invoices
       WHERE to_char(invoice_date, 'MM-YYYY') = $1`,
-      [period]
+      [period],
     );
     const t = rows[0] || {};
     totals = {
@@ -207,16 +202,16 @@ async function buildGstrDraft({ returnType, period, gstin }) {
        status = 'draft'
      RETURNING *`,
     [returnType, period, gstin, totals.b2b, totals.b2c, totals.cgst, totals.sgst,
-      totals.igst, JSON.stringify(totals)]
+      totals.igst, JSON.stringify(totals)],
   );
 
   return {
     ...rows[0],
     status: 'draft',
     filed: false,
-    note: 'DRAFT only. Nothing is filed automatically — an incorrect auto-filed return is '
-        + 'far more expensive to unwind than one never filed, and the signatory carries '
-        + 'personal liability for it.',
+    note: 'DRAFT only. Nothing is filed automatically — an incorrect auto-filed return is ' +
+        'far more expensive to unwind than one never filed, and the signatory carries ' +
+        'personal liability for it.',
   };
 }
 
@@ -239,16 +234,16 @@ async function recordRcm({ invoiceRef, supplierName, supplyDescription, taxableV
         gst_rate_pct, period, itc_eligible)
      VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
     [invoiceRef ?? null, supplierName, supplyDescription, taxableValueInr,
-      gstRatePct, period, itcEligible]
+      gstRatePct, period, itcEligible],
   );
   const row = rows[0];
   return {
     ...row,
     rcm_liability_inr: Number(row.rcm_liability_inr),
-    note: 'Liability sits with the BUYER, not the farmer. '
-        + (itcEligible
-          ? 'Input credit is claimable once discharged, so the net cost is timing, not tax.'
-          : 'Input credit is NOT available on this supply — this is a real cost, not a timing difference.'),
+    note: `Liability sits with the BUYER, not the farmer. ${
+      itcEligible ?
+        'Input credit is claimable once discharged, so the net cost is timing, not tax.' :
+        'Input credit is NOT available on this supply — this is a real cost, not a timing difference.'}`,
   };
 }
 
@@ -256,15 +251,15 @@ async function rcmOutstanding(period) {
   const { rows } = await pool.query(
     `SELECT COUNT(*) AS items, SUM(rcm_liability_inr) AS liability_inr
        FROM rcm_liabilities WHERE period = $1 AND discharged = FALSE`,
-    [period]
+    [period],
   );
   const r = rows[0];
   return {
     period,
     items: Number(r.items),
     liabilityInr: Number(r.liability_inr || 0),
-    note: Number(r.items) ? 'Undischarged RCM must be paid in cash — it cannot be set off '
-                          + 'against input credit.' : null,
+    note: Number(r.items) ? 'Undischarged RCM must be paid in cash — it cannot be set off ' +
+                          'against input credit.' : null,
   };
 }
 
@@ -278,14 +273,15 @@ module.exports = {
 
 // Merged from backend/src/modules/M008
 {
-  const m008 = require("../../modules/M008/service");
+  const m008 = require('../../modules/M008/service');
   const { ...rest } = m008;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M077
 {
-  const m077 = require("../../modules/M077/service");
+  const m077 = require('../../modules/M077/service');
   const { ...rest } = m077;
   Object.assign(module.exports, rest);
 }
+

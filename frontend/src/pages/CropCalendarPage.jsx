@@ -1,8 +1,8 @@
-import { CalendarRange } from 'lucide-react'
-import { cropCalendarAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { CalendarRange } from 'lucide-react';
+import { cropCalendarAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const SEASONS = ['Kharif', 'Rabi', 'Zaid', 'Perennial']
+const SEASONS = ['Kharif', 'Rabi', 'Zaid', 'Perennial'];
 
 const initialForm = {
   crop_name: '',
@@ -13,7 +13,7 @@ const initialForm = {
   harvest_start: '',
   harvest_end: '',
   notes: '',
-}
+};
 
 function CropCalendarPage() {
   return (
@@ -57,7 +57,7 @@ function CropCalendarPage() {
         { label: 'Seasons in use', value: new Set(items.map((i) => i.season).filter(Boolean)).size },
       ]}
     />
-  )
+  );
 }
 
-export default CropCalendarPage
+export default CropCalendarPage;

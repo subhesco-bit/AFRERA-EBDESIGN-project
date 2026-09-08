@@ -1,6 +1,6 @@
 /**
  * System Administration Page (M006) - AI Enhanced
- * 
+ *
  * This page provides AI-powered system administration capabilities:
  * - System settings management
  * - Audit log viewing
@@ -43,13 +43,13 @@ const SystemAdministrationPage = () => {
         const data = await userManagementAPI.getSettings();
         setSettings(data.data);
       } else if (activeTab === 'analytics') {
-        const data = await userManagementAPI.getSystemAnalytics();
+        let data = await userManagementAPI.getSystemAnalytics();
         setAnalytics(data.data);
       } else if (activeTab === 'anomalies') {
-        const data = await userManagementAPI.detectAnomalies();
+        let data = await userManagementAPI.detectAnomalies();
         setAnomalies(data.data);
       } else if (activeTab === 'maintenance') {
-        const data = await userManagementAPI.getPredictiveMaintenance();
+        let data = await userManagementAPI.getPredictiveMaintenance();
         setMaintenance(data.data);
       } else if (activeTab === 'audit') {
         const [logsRes, anomaliesRes] = await Promise.all([
@@ -76,7 +76,7 @@ const SystemAdministrationPage = () => {
         setSecurityScore(scoreRes?.data?.data || null);
       }
     } catch (err) {
-      setError('Failed to load system data: ' + err.message);
+      setError(`Failed to load system data: ${ err.message}`);
     } finally {
       setLoading(false);
     }
@@ -87,7 +87,7 @@ const SystemAdministrationPage = () => {
       const res = await auditComplianceAPI.verifyAuditLogIntegrity(id);
       alert(res.data?.data?.valid ? 'Log integrity verified.' : `Log integrity check failed: ${res.data?.data?.error || 'unknown reason'}`);
     } catch (err) {
-      alert('Failed to verify log integrity: ' + err.message);
+      alert(`Failed to verify log integrity: ${ err.message}`);
     }
   };
 
@@ -97,14 +97,14 @@ const SystemAdministrationPage = () => {
       alert('Setting updated successfully!');
       loadSystemData();
     } catch (err) {
-      alert('Failed to update setting: ' + err.message);
+      alert(`Failed to update setting: ${ err.message}`);
     }
   };
 
   return (
     <div className="p-8 space-y-6">
       <h1 className="text-3xl font-bold">System Administration</h1>
-      
+
       {/* Tabs */}
       <div className="flex space-x-4 border-b">
         {['settings', 'analytics', 'anomalies', 'maintenance', 'audit', 'security'].map(tab => (

@@ -1,68 +1,68 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { kycAPI } from '../services/api'
-import { ShieldCheck, Plus, X, CheckCircle2, XCircle, Clock } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { kycAPI } from '../services/api';
+import { ShieldCheck, Plus, X, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const ID_TYPES = ['Aadhaar', 'Voter ID', 'PAN', 'Ration Card', 'Kisan Credit Card']
-const STATUS_FILTERS = ['', 'pending', 'verified', 'rejected']
+const ID_TYPES = ['Aadhaar', 'Voter ID', 'PAN', 'Ration Card', 'Kisan Credit Card'];
+const STATUS_FILTERS = ['', 'pending', 'verified', 'rejected'];
 
-const emptyForm = { farmer_name: '', phone: '', id_type: 'Aadhaar', id_number: '', village: '', land_holding_hectares: '' }
+const emptyForm = { farmer_name: '', phone: '', id_type: 'Aadhaar', id_number: '', village: '', land_holding_hectares: '' };
 
 function statusBadge(status) {
   const map = {
     verified: { cls: 'bg-green-100 text-green-800', icon: CheckCircle2 },
     pending: { cls: 'bg-yellow-100 text-yellow-800', icon: Clock },
     rejected: { cls: 'bg-red-100 text-red-800', icon: XCircle },
-  }
-  const cfg = map[status] || map.pending
-  const Icon = cfg.icon
+  };
+  const cfg = map[status] || map.pending;
+  const Icon = cfg.icon;
   return (
     <span className={`text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${cfg.cls}`}>
       <Icon className="w-3 h-3" />{status || 'pending'}
     </span>
-  )
+  );
 }
 
 function FarmerKycPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(emptyForm)
-  const [statusFilter, setStatusFilter] = useState('')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [statusFilter, setStatusFilter] = useState('');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['kyc-applications', statusFilter],
     queryFn: async () => (await kycAPI.getApplications(statusFilter ? { status: statusFilter } : {})).data?.data ?? [],
-  })
+  });
 
   const submitMutation = useMutation({
     mutationFn: (payload) => kycAPI.submitApplication(payload),
     onSuccess: () => {
-      toast.success('KYC application submitted')
-      queryClient.invalidateQueries({ queryKey: ['kyc-applications'] })
-      setShowForm(false)
-      setForm(emptyForm)
+      toast.success('KYC application submitted');
+      queryClient.invalidateQueries({ queryKey: ['kyc-applications'] });
+      setShowForm(false);
+      setForm(emptyForm);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to submit application'),
-  })
+  });
 
   const verifyMutation = useMutation({
     mutationFn: ({ id, notes }) => kycAPI.verifyApplication(id, { notes }),
-    onSuccess: () => { toast.success('Application verified'); queryClient.invalidateQueries({ queryKey: ['kyc-applications'] }) },
+    onSuccess: () => { toast.success('Application verified'); queryClient.invalidateQueries({ queryKey: ['kyc-applications'] }); },
     onError: () => toast.error('Failed to verify application'),
-  })
+  });
 
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }) => kycAPI.rejectApplication(id, { reason }),
-    onSuccess: () => { toast.success('Application rejected'); queryClient.invalidateQueries({ queryKey: ['kyc-applications'] }) },
+    onSuccess: () => { toast.success('Application rejected'); queryClient.invalidateQueries({ queryKey: ['kyc-applications'] }); },
     onError: () => toast.error('Failed to reject application'),
-  })
+  });
 
-  const applications = data || []
-  const pending = applications.filter((a) => (a.status || 'pending') === 'pending').length
-  const verified = applications.filter((a) => a.status === 'verified').length
+  const applications = data || [];
+  const pending = applications.filter((a) => (a.status || 'pending') === 'pending').length;
+  const verified = applications.filter((a) => a.status === 'verified').length;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -138,7 +138,7 @@ function FarmerKycPage() {
                       <>
                         <button onClick={() => verifyMutation.mutate({ id: a.id })} className="p-2 text-green-600 hover:bg-green-50 rounded" title="Verify"><CheckCircle2 className="w-4 h-4" /></button>
                         <button
-                          onClick={() => { const reason = prompt('Reason for rejection?'); if (reason) rejectMutation.mutate({ id: a.id, reason }) }}
+                          onClick={() => { const reason = prompt('Reason for rejection?'); if (reason) rejectMutation.mutate({ id: a.id, reason }); }}
                           className="p-2 text-red-600 hover:bg-red-50 rounded" title="Reject"
                         >
                           <XCircle className="w-4 h-4" />
@@ -163,12 +163,12 @@ function FarmerKycPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.farmer_name || !form.id_number) { toast.error('Farmer name and ID number are required'); return }
+                  e.preventDefault();
+                  if (!form.farmer_name || !form.id_number) { toast.error('Farmer name and ID number are required'); return; }
                   submitMutation.mutate({
                     ...form,
                     land_holding_hectares: form.land_holding_hectares === '' ? null : Number(form.land_holding_hectares),
-                  })
+                  });
                 }}
                 className="space-y-4"
               >
@@ -220,7 +220,7 @@ function FarmerKycPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default FarmerKycPage
+export default FarmerKycPage;

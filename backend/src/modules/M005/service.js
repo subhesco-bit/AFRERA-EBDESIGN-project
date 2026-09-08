@@ -19,7 +19,7 @@ async function createEnvironment(envData) {
       infrastructure_config,
       database_config,
       security_config,
-      monitoring_config
+      monitoring_config,
     } = envData;
 
     const env = {
@@ -32,7 +32,7 @@ async function createEnvironment(envData) {
       security_config,
       monitoring_config,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered environment setup
@@ -42,8 +42,8 @@ async function createEnvironment(envData) {
         env_data: envData,
         best_practices: await getEnvironmentBestPractices(env_type),
         resource_requirements: await calculateResourceRequirements(env_type),
-        security_configurations: await getSecurityConfigurations(env_type)
-      }
+        security_configurations: await getSecurityConfigurations(env_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -66,8 +66,8 @@ async function createEnvironment(envData) {
         JSON.stringify(env.monitoring_config),
         env.status,
         JSON.stringify(env.ai_setup),
-        env.created_at
-      ]
+        env.created_at,
+      ],
     );
 
     logger.info(`Environment created: ${env.env_id}`);
@@ -85,9 +85,9 @@ async function getEnvironment(envId) {
   try {
     const result = await pool.query(
       'SELECT * FROM environments WHERE env_id = $1',
-      [envId]
+      [envId],
     );
-    
+
     if (result.rows.length === 0) {
       throw new Error('Environment not found');
     }
@@ -120,8 +120,8 @@ async function updateEnvironment(envId, updates) {
         updates.security_config ? JSON.stringify(updates.security_config) : null,
         updates.monitoring_config ? JSON.stringify(updates.monitoring_config) : null,
         updates.status,
-        envId
-      ]
+        envId,
+      ],
     );
 
     logger.info(`Environment updated: ${envId}`);
@@ -138,7 +138,7 @@ async function updateEnvironment(envId, updates) {
 async function listEnvironments(filters) {
   try {
     const { env_type, status, limit, offset } = filters;
-    
+
     let query = 'SELECT * FROM environments WHERE 1=1';
     const params = [];
     let paramIndex = 1;
@@ -172,7 +172,7 @@ async function listEnvironments(filters) {
 
     return {
       total: result.rows.length,
-      environments: result.rows
+      environments: result.rows,
     };
   } catch (error) {
     logger.error('Error listing environments', { error: error.message, stack: error.stack });
@@ -188,7 +188,7 @@ async function getEnvironmentBestPractices(envType) {
   return {
     development: ['feature_flags', 'mock_services', 'fast_feedback'],
     staging: ['integration_testing', 'performance_testing', 'security_scanning'],
-    production: ['high_availability', 'disaster_recovery', 'compliance_logging']
+    production: ['high_availability', 'disaster_recovery', 'compliance_logging'],
   };
 }
 
@@ -196,7 +196,7 @@ async function calculateResourceRequirements(envType) {
   const requirements = {
     development: { cpu: 2, memory: 4, storage: 50 },
     staging: { cpu: 4, memory: 8, storage: 100 },
-    production: { cpu: 8, memory: 16, storage: 500 }
+    production: { cpu: 8, memory: 16, storage: 500 },
   };
   return requirements[envType] || requirements.development;
 }
@@ -206,7 +206,7 @@ async function getSecurityConfigurations(envType) {
     ssl_enabled: envType !== 'development',
     firewall_rules: envType === 'production' ? 'strict' : 'basic',
     audit_logging: envType === 'production',
-    encryption_level: envType === 'production' ? 'aes256' : 'aes128'
+    encryption_level: envType === 'production' ? 'aes256' : 'aes128',
   };
 }
 
@@ -214,6 +214,6 @@ module.exports = {
   createEnvironment,
   getEnvironment,
   updateEnvironment,
-  listEnvironments
+  listEnvironments,
 };
 

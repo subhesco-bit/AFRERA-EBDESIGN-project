@@ -576,7 +576,18 @@ CREATE TABLE IF NOT EXISTS crop_recommendations (
   last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_crop_recommendations_crop_region ON crop_recommendations(crop_name, region);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS crop_name VARCHAR(100);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS region VARCHAR(100);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS recommended_seed_variety VARCHAR(100);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS standard_fertilizer_schedule JSONB DEFAULT '{}';
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS standard_irrigation_schedule JSONB DEFAULT '{}';
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS standard_pest_management JSONB DEFAULT '{}';
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS expected_yield DECIMAL(10,2);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS growing_season VARCHAR(50);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS data_source VARCHAR(100);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+CREATE INDEX IF NOT EXISTS idx_crop_recommendations_crop_region ON crop_recommendations(crop_name, region);
 
 -- ============================================================
 -- TRIGGERS FOR UPDATED_AT
@@ -591,49 +602,37 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply trigger to all relevant tables
-CREATE TRIGGER update_pre_season_agreements_updated_at BEFORE UPDATE ON pre_season_agreements
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_pre_season_milestones_updated_at BEFORE UPDATE ON pre_season_milestones
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_contract_farming_agreements_updated_at BEFORE UPDATE ON contract_farming_agreements
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_contract_quality_tests_updated_at BEFORE UPDATE ON contract_quality_tests
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_household_procurement_plans_updated_at BEFORE UPDATE ON household_procurement_plans
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_household_aggregation_groups_updated_at BEFORE UPDATE ON household_aggregation_groups
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_government_subsidy_programs_updated_at BEFORE UPDATE ON government_subsidy_programs
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_subsidy_disbursements_updated_at BEFORE UPDATE ON subsidy_disbursements
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_subsidy_applications_updated_at BEFORE UPDATE ON government_subsidy_applications
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_technical_packages_updated_at BEFORE UPDATE ON technical_packages
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_households_updated_at BEFORE UPDATE ON households
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_suppliers_updated_at BEFORE UPDATE ON suppliers
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_buyers_updated_at BEFORE UPDATE ON buyers
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- 2026-08-31: guarded with DROP TRIGGER IF EXISTS - laboratories is a
--- pre-existing deferred collision (schema-decisions.json), and
--- 033_laboratory_erp_schema.sql already creates a trigger of this exact
--- name on the same real (winning) table, using the same guard pattern.
-DROP TRIGGER IF EXISTS update_laboratories_updated_at ON laboratories;
-CREATE TRIGGER update_laboratories_updated_at BEFORE UPDATE ON laboratories
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DO $$
+DECLARE
+  target RECORD;
+BEGIN
+  FOR target IN SELECT * FROM (VALUES
+    ('pre_season_agreements'),
+    ('pre_season_milestones'),
+    ('contract_farming_agreements'),
+    ('contract_quality_tests'),
+    ('household_procurement_plans'),
+    ('household_aggregation_groups'),
+    ('government_subsidy_programs'),
+    ('subsidy_disbursements'),
+    ('government_subsidy_applications'),
+    ('technical_packages'),
+    ('households'),
+    ('suppliers'),
+    ('buyers'),
+    ('laboratories')
+  ) AS tables(table_name) LOOP
+    IF to_regclass(target.table_name) IS NOT NULL
+       AND NOT EXISTS (
+         SELECT 1 FROM pg_trigger
+         WHERE tgname = 'update_' || target.table_name || '_updated_at'
+         AND tgrelid = target.table_name::regclass
+       ) THEN
+      EXECUTE format(
+        'CREATE TRIGGER %I BEFORE UPDATE ON %I FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()',
+        'update_' || target.table_name || '_updated_at', target.table_name
+      );
+    END IF;
+  END LOOP;
+END
+$$;

@@ -9,17 +9,16 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
+import { operationsAPI } from '../services/api';
 
 const OperationalDashboard = () => {
   const [selectedRegion, setSelectedRegion] = useState('all');
 
   // Operational data
-  const { data: operationalData, isLoading: operationalLoading } = useQuery({
+  const { data: operationalData, isLoading: operationalLoading, error: operationalError } = useQuery({
     queryKey: ['operationalData', selectedRegion],
-    queryFn: () => fetch(`/api/operations/overview?region=${selectedRegion}`)
-      .then(res => res.json())
-      .then(res => res.data),
-    refetchInterval: 120000 // 2 minutes
+    queryFn: () => operationsAPI.getOverview({ region: selectedRegion }).then(res => res.data.data),
+    refetchInterval: 120000, // 2 minutes
   });
 
   const regions = ['all', 'assam', 'meghalaya', 'manipur', 'nagaland', 'tripura'];
@@ -44,6 +43,10 @@ const OperationalDashboard = () => {
 
       {operationalLoading ? (
         <LoadingSkeleton variant="rectangular" lines={4} />
+      ) : operationalError ? (
+        <p className="rounded border border-red-200 bg-red-50 p-4 text-red-700">
+          Unable to load operational data: {operationalError.message}
+        </p>
       ) : (
         <>
           {/* Key Operational Metrics */}

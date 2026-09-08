@@ -1,6 +1,6 @@
-import { Link2 } from 'lucide-react'
-import { completeERPIntegrationAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Link2 } from 'lucide-react';
+import { completeERPIntegrationAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/completeERPIntegrationRoutes.js +
@@ -118,7 +118,7 @@ function CompleteERPIntegrationPage() {
         onRun={(_, payload) => completeERPIntegrationAPI.forceSyncAllERPIntegrations(payload)}
       />
     </div>
-  )
+  );
 }
 
-export default CompleteERPIntegrationPage
+export default CompleteERPIntegrationPage;

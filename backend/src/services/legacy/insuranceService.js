@@ -14,9 +14,9 @@ const { PLATFORM_STAFF_ROLES } = require('../../middleware/roleGroups');
 async function createPolicy(policyData) {
   try {
     const pg = getPostgreSQL();
-    
+
     const policyNumber = generatePolicyNumber();
-    
+
     const query = `
       INSERT INTO policies (policy_number, user_id, farmer_id, product_id, master_policy_id,
                            coverage_amount, premium_amount, policy_start_date, policy_end_date,
@@ -24,7 +24,7 @@ async function createPolicy(policyData) {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *
     `;
-    
+
     const result = await pg.query(query, [
       policyNumber,
       policyData.user_id || null,
@@ -37,11 +37,11 @@ async function createPolicy(policyData) {
       policyData.policy_end_date,
       policyData.insurer_name,
       policyData.insurer_policy_number || null,
-      JSON.stringify(policyData.beneficiaries || [])
+      JSON.stringify(policyData.beneficiaries || []),
     ]);
-    
+
     logger.info(`Insurance policy created: ${policyNumber}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error creating policy', { error: error.message, stack: error.stack });
@@ -55,7 +55,7 @@ async function createPolicy(policyData) {
 async function getPolicyById(policyId) {
   try {
     const pg = getPostgreSQL();
-    
+
     const query = `
       SELECT p.*, ip.name as product_name, ip.type as product_type, ip.scheme,
              u.name as insured_name, u.email as insured_email,
@@ -66,13 +66,13 @@ async function getPolicyById(policyId) {
       LEFT JOIN master_policies mp ON p.master_policy_id = mp.id
       WHERE p.id = $1
     `;
-    
+
     const result = await pg.query(query, [policyId]);
-    
+
     if (result.rows.length === 0) {
       throw new Error('Policy not found');
     }
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error fetching policy', { error: error.message, stack: error.stack });
@@ -86,12 +86,12 @@ async function getPolicyById(policyId) {
 async function getPolicies(filters = {}, pagination = {}) {
   try {
     const pg = getPostgreSQL();
-    
+
     const { user_id, farmer_id, product_id, status } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
-    
+
     const offset = (page - 1) * limit;
-    
+
     let query = `
       SELECT p.*, ip.name as product_name, ip.type as product_type, u.name as insured_name
       FROM policies p
@@ -99,51 +99,51 @@ async function getPolicies(filters = {}, pagination = {}) {
       LEFT JOIN users u ON p.user_id = u.id
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (user_id) {
       paramCount++;
       query += ` AND p.user_id = $${paramCount}`;
       params.push(user_id);
     }
-    
+
     if (farmer_id) {
       paramCount++;
       query += ` AND p.farmer_id = $${paramCount}`;
       params.push(farmer_id);
     }
-    
+
     if (product_id) {
       paramCount++;
       query += ` AND p.product_id = $${paramCount}`;
       params.push(product_id);
     }
-    
+
     if (status) {
       paramCount++;
       query += ` AND p.status = $${paramCount}`;
       params.push(status);
     }
-    
+
     const countQuery = query.replace(/SELECT p\.\*, ip\.name as product_name, ip\.type as product_type, u\.name as insured_name/, 'SELECT COUNT(*)');
     const countResult = await pg.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
-    
+
     query += ` ORDER BY p.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
-    
+
     const result = await pg.query(query, params);
-    
+
     return {
       policies: result.rows,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching policies', { error: error.message, stack: error.stack });
@@ -157,24 +157,24 @@ async function getPolicies(filters = {}, pagination = {}) {
 async function submitClaim(claimData) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Verify policy exists and is active
     const policyQuery = 'SELECT * FROM policies WHERE id = $1 AND status = $2';
     const policyResult = await pg.query(policyQuery, [claimData.policy_id, 'active']);
-    
+
     if (policyResult.rows.length === 0) {
       throw new Error('Policy not found or not active');
     }
-    
+
     const claimNumber = generateClaimNumber();
-    
+
     const query = `
       INSERT INTO claims (claim_number, policy_id, user_id, claim_amount, incident_date,
                          incident_description, incident_location, supporting_documents, status)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'submitted')
       RETURNING *
     `;
-    
+
     const result = await pg.query(query, [
       claimNumber,
       claimData.policy_id,
@@ -183,11 +183,11 @@ async function submitClaim(claimData) {
       claimData.incident_date,
       claimData.incident_description,
       claimData.incident_location || null,
-      JSON.stringify(claimData.supporting_documents || [])
+      JSON.stringify(claimData.supporting_documents || []),
     ]);
-    
+
     logger.info(`Insurance claim submitted: ${claimNumber}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error submitting claim', { error: error.message, stack: error.stack });
@@ -201,7 +201,7 @@ async function submitClaim(claimData) {
 async function getClaimById(claimId) {
   try {
     const pg = getPostgreSQL();
-    
+
     const query = `
       SELECT c.*, p.policy_number, p.coverage_amount, p.insurer_name,
              u.name as claimant_name
@@ -210,13 +210,13 @@ async function getClaimById(claimId) {
       JOIN users u ON c.user_id = u.id
       WHERE c.id = $1
     `;
-    
+
     const result = await pg.query(query, [claimId]);
-    
+
     if (result.rows.length === 0) {
       throw new Error('Claim not found');
     }
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error fetching claim', { error: error.message, stack: error.stack });
@@ -230,12 +230,12 @@ async function getClaimById(claimId) {
 async function getClaims(filters = {}, pagination = {}) {
   try {
     const pg = getPostgreSQL();
-    
+
     const { user_id, policy_id, status } = filters;
     const { page = 1, limit = 20, sort_by = 'submitted_date', sort_order = 'DESC' } = pagination;
-    
+
     const offset = (page - 1) * limit;
-    
+
     let query = `
       SELECT c.*, p.policy_number, u.name as claimant_name
       FROM claims c
@@ -243,45 +243,45 @@ async function getClaims(filters = {}, pagination = {}) {
       JOIN users u ON c.user_id = u.id
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (user_id) {
       paramCount++;
       query += ` AND c.user_id = $${paramCount}`;
       params.push(user_id);
     }
-    
+
     if (policy_id) {
       paramCount++;
       query += ` AND c.policy_id = $${paramCount}`;
       params.push(policy_id);
     }
-    
+
     if (status) {
       paramCount++;
       query += ` AND c.status = $${paramCount}`;
       params.push(status);
     }
-    
+
     const countQuery = query.replace(/SELECT c\.\*, p\.policy_number, u\.name as claimant_name/, 'SELECT COUNT(*)');
     const countResult = await pg.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
-    
+
     query += ` ORDER BY c.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
-    
+
     const result = await pg.query(query, params);
-    
+
     return {
       claims: result.rows,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching claims', { error: error.message, stack: error.stack });
@@ -295,9 +295,9 @@ async function getClaims(filters = {}, pagination = {}) {
 async function processClaim(claimId, decisionData) {
   try {
     const pg = getPostgreSQL();
-    
+
     const { status, approved_amount, rejection_reason, settlement_reference } = decisionData;
-    
+
     const query = `
       UPDATE claims
       SET status = $1,
@@ -309,21 +309,21 @@ async function processClaim(claimId, decisionData) {
       WHERE id = $5
       RETURNING *
     `;
-    
+
     const result = await pg.query(query, [
       status,
       approved_amount || null,
       rejection_reason || null,
       settlement_reference || null,
-      claimId
+      claimId,
     ]);
-    
+
     if (result.rows.length === 0) {
       throw new Error('Claim not found');
     }
-    
+
     logger.info(`Claim processed: ${claimId} - ${status}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error processing claim', { error: error.message, stack: error.stack });
@@ -337,14 +337,14 @@ async function processClaim(claimId, decisionData) {
 async function createMasterPolicy(policyData) {
   try {
     const pg = getPostgreSQL();
-    
+
     const query = `
       INSERT INTO master_policies (organization_type, organization_id, coverage_type, sum_insured,
                                   premium_amount, insurer_name, policy_number, start_date, end_date, terms)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `;
-    
+
     const result = await pg.query(query, [
       policyData.organization_type,
       policyData.organization_id || null,
@@ -355,11 +355,11 @@ async function createMasterPolicy(policyData) {
       policyData.policy_number,
       policyData.start_date,
       policyData.end_date,
-      JSON.stringify(policyData.terms || {})
+      JSON.stringify(policyData.terms || {}),
     ]);
-    
+
     logger.info(`Master policy created: ${policyData.policy_number}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error creating master policy', { error: error.message, stack: error.stack });
@@ -373,42 +373,42 @@ async function createMasterPolicy(policyData) {
 async function getMasterPolicies(filters = {}) {
   try {
     const pg = getPostgreSQL();
-    
+
     const { organization_type, organization_id, coverage_type, status } = filters;
-    
+
     let query = 'SELECT * FROM master_policies WHERE 1=1';
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (organization_type) {
       paramCount++;
       query += ` AND organization_type = $${paramCount}`;
       params.push(organization_type);
     }
-    
+
     if (organization_id) {
       paramCount++;
       query += ` AND organization_id = $${paramCount}`;
       params.push(organization_id);
     }
-    
+
     if (coverage_type) {
       paramCount++;
       query += ` AND coverage_type = $${paramCount}`;
       params.push(coverage_type);
     }
-    
+
     if (status) {
       paramCount++;
       query += ` AND status = $${paramCount}`;
       params.push(status);
     }
-    
+
     query += ' ORDER BY created_at DESC';
-    
+
     const result = await pg.query(query, params);
-    
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching master policies', { error: error.message, stack: error.stack });
@@ -422,30 +422,30 @@ async function getMasterPolicies(filters = {}) {
 async function getInsuranceProducts(filters = {}) {
   try {
     const pg = getPostgreSQL();
-    
+
     const { type, status } = filters;
-    
+
     let query = 'SELECT * FROM insurance_products WHERE 1=1';
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (type) {
       paramCount++;
       query += ` AND type = $${paramCount}`;
       params.push(type);
     }
-    
+
     if (status) {
       paramCount++;
       query += ` AND status = $${paramCount}`;
       params.push(status);
     }
-    
+
     query += ' ORDER BY name';
-    
+
     const result = await pg.query(query, params);
-    
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching insurance products', { error: error.message, stack: error.stack });
@@ -459,38 +459,38 @@ async function getInsuranceProducts(filters = {}) {
 async function calculatePremium(product_id, coverage_amount, farmer_id = null) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Get product details
     const productQuery = 'SELECT * FROM insurance_products WHERE id = $1';
     const productResult = await pg.query(productQuery, [product_id]);
-    
+
     if (productResult.rows.length === 0) {
       throw new Error('Insurance product not found');
     }
-    
+
     const product = productResult.rows[0];
-    
+
     // Base premium calculation
     let premium = coverage_amount * (product.premium_rate / 100);
-    
+
     // Apply farmer discount if applicable
     if (farmer_id) {
       const farmerQuery = 'SELECT fdi_score FROM farmers WHERE id = $1';
       const farmerResult = await pg.query(farmerQuery, [farmer_id]);
-      
+
       if (farmerResult.rows.length > 0) {
         const fdi = farmerResult.rows[0].fdi_score;
         const discount = Math.min(fdi * 0.1, 20); // Max 20% discount based on FDI
         premium = premium * (1 - discount / 100);
       }
     }
-    
+
     return {
       product_id,
       coverage_amount,
       premium_amount: Math.round(premium),
       premium_rate: product.premium_rate,
-      farmer_share: product.farmer_share
+      farmer_share: product.farmer_share,
     };
   } catch (error) {
     logger.error('Error calculating premium', { error: error.message, stack: error.stack });
@@ -550,13 +550,13 @@ router.get('/policies', async (req, res) => {
       user_id: req.query.user_id,
       farmer_id: req.query.farmer_id,
       product_id: req.query.product_id,
-      status: req.query.status
+      status: req.query.status,
     };
     const pagination = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 20,
       sort_by: req.query.sort_by,
-      sort_order: req.query.sort_order
+      sort_order: req.query.sort_order,
     };
     const result = await getPolicies(filters, pagination);
     res.json(result);
@@ -595,13 +595,13 @@ router.get('/claims', async (req, res) => {
     const filters = {
       user_id: req.query.user_id,
       policy_id: req.query.policy_id,
-      status: req.query.status
+      status: req.query.status,
     };
     const pagination = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 20,
       sort_by: req.query.sort_by,
-      sort_order: req.query.sort_order
+      sort_order: req.query.sort_order,
     };
     const result = await getClaims(filters, pagination);
     res.json(result);
@@ -637,7 +637,7 @@ router.get('/master-policies', async (req, res) => {
       organization_type: req.query.organization_type,
       organization_id: req.query.organization_id,
       coverage_type: req.query.coverage_type,
-      status: req.query.status
+      status: req.query.status,
     };
     const policies = await getMasterPolicies(filters);
     res.json(policies);
@@ -651,7 +651,7 @@ router.get('/products', async (req, res) => {
   try {
     const filters = {
       type: req.query.type,
-      status: req.query.status
+      status: req.query.status,
     };
     const products = await getInsuranceProducts(filters);
     res.json(products);
@@ -683,5 +683,6 @@ module.exports = {
   createMasterPolicy,
   getMasterPolicies,
   getInsuranceProducts,
-  calculatePremium
+  calculatePremium,
 };
+

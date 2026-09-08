@@ -1,16 +1,3 @@
-/**
- * FILENAME COLLISION NOTE (2026-09-08, do not merge): this shares a
- * basename with backend/src/services/legacy/aiGatewayService.js but is a
- * GENUINELY DIFFERENT feature - see the matching note in that file for the
- * full explanation. In short: this is a small, tested "governed AI
- * gateway" (run/buildGovernedPrompt/loadLibraryContext) that layers
- * library-context governance on top of legacy/aiBackboneService.js;
- * legacy/aiGatewayService.js is an unrelated class-based AI/ML prediction
- * hub. Neither copy is currently wired into a mounted route. Left
- * unmerged per the merge-not-delete / do-not-force-a-merge policy; see
- * .ai/tasks/ACTIVE.md.
- */
-
 'use strict';
 
 const aiBackbone = require('./legacy/aiBackboneService');

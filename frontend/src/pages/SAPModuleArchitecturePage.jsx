@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Layers } from 'lucide-react'
-import { sapModuleArchitectureAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { Layers } from 'lucide-react';
+import { sapModuleArchitectureAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/sapModuleArchitectureRoutes.js +
@@ -17,10 +17,10 @@ const TABS = [
   ['lifecycle', 'Lifecycle & Versioning'],
   ['configuration', 'Configuration'],
   ['overview', 'Architecture Overview'],
-]
+];
 
 function SAPModuleArchitecturePage() {
-  const [tab, setTab] = useState('registry')
+  const [tab, setTab] = useState('registry');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -85,7 +85,7 @@ function SAPModuleArchitecturePage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default SAPModuleArchitecturePage
+export default SAPModuleArchitecturePage;

@@ -63,7 +63,7 @@ async function createProject(userId, data) {
      RETURNING *`,
     [generateProjectNumber(), userId, fpoId || null, projectType, projectSubtype || null,
       industrySector || null, name, description || null, JSON.stringify(location),
-      capacity || null, capacityUnit || null, budget || null, timeline || null]
+      capacity || null, capacityUnit || null, budget || null, timeline || null],
   );
   return result.rows[0];
 }
@@ -94,7 +94,7 @@ async function listProjects(userId, { status, projectType, page = 1, limit = 20 
      WHERE ${conditions.join(' AND ')}
      ORDER BY created_at DESC
      LIMIT $${params.length - 1} OFFSET $${params.length}`,
-    params
+    params,
   );
   return result.rows;
 }
@@ -116,7 +116,7 @@ async function updateProjectPhase(projectId, userId, isAdmin, { phase, phaseProg
   params.push(projectId);
   const result = await pool.query(
     `UPDATE engineering_projects SET ${sets.join(', ')} WHERE id = $${params.length} RETURNING *`,
-    params
+    params,
   );
   return result.rows[0];
 }
@@ -128,14 +128,14 @@ async function updateProjectPhase(projectId, userId, isAdmin, { phase, phaseProg
  */
 async function lookupReferenceRate(client, { rateSource, code, region }) {
   if (!code) return null;
-  const table = rateSource === 'labor' ? 'labor_rates'
-    : rateSource === 'equipment' ? 'equipment_rates'
-    : 'material_prices';
+  const table = rateSource === 'labor' ? 'labor_rates' :
+    rateSource === 'equipment' ? 'equipment_rates' :
+      'material_prices';
 
   if (table === 'material_prices') {
     const r = await client.query(
-      `SELECT base_price, regional_prices FROM material_prices WHERE material_code = $1`,
-      [code]
+      'SELECT base_price, regional_prices FROM material_prices WHERE material_code = $1',
+      [code],
     );
     if (r.rows.length === 0) return null;
     const row = r.rows[0];
@@ -146,11 +146,11 @@ async function lookupReferenceRate(client, { rateSource, code, region }) {
     const r = await client.query(
       `SELECT daily_rate FROM labor_rates WHERE skill_category = $1 AND ($2::text IS NULL OR region = $2)
        ORDER BY (region = $2) DESC LIMIT 1`,
-      [code, region || null]
+      [code, region || null],
     );
     return r.rows.length ? Number(r.rows[0].daily_rate) : null;
   }
-  const r = await client.query(`SELECT daily_rate FROM equipment_rates WHERE equipment_code = $1`, [code]);
+  const r = await client.query('SELECT daily_rate FROM equipment_rates WHERE equipment_code = $1', [code]);
   return r.rows.length ? Number(r.rows[0].daily_rate) : null;
 }
 
@@ -172,7 +172,7 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
   return withTransaction(async (client) => {
     const projectResult = await client.query(
       `SELECT * FROM engineering_projects WHERE id = $1 AND deleted_at IS NULL ${isAdmin ? '' : 'AND user_id = $2'}`,
-      isAdmin ? [projectId] : [projectId, userId]
+      isAdmin ? [projectId] : [projectId, userId],
     );
     if (projectResult.rows.length === 0) throw new Error('Project not found');
 
@@ -207,7 +207,7 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
         [projectId, boqId, item.category, item.subcategory || null, item.itemCode || null,
           item.description, item.specifications ? JSON.stringify(item.specifications) : null,
-          item.brand || null, item.model || null, item.unit, item.quantity, unitRate, totalAmount]
+          item.brand || null, item.model || null, item.unit, item.quantity, unitRate, totalAmount],
       );
       resolvedItems.push(inserted.rows[0]);
     }
@@ -230,7 +230,7 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
           assumptions, contingency_percentage, contingency_amount)
        VALUES ($1,$2,$3,$4,0,$5,$6,$7,$8) RETURNING *`,
       [projectId, estimateType, region || null, totalCapex, JSON.stringify(breakdown),
-        JSON.stringify({ boqId, lineCount: resolvedItems.length }), contingencyPercentage, contingencyAmount]
+        JSON.stringify({ boqId, lineCount: resolvedItems.length }), contingencyPercentage, contingencyAmount],
     );
 
     logger.info('Cost estimate created', { projectId, estimateId: estimateResult.rows[0].id, totalCapex });
@@ -241,8 +241,8 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
 async function getCostEstimates(projectId, userId, isAdmin = false) {
   await getProject(projectId, userId, isAdmin);
   const result = await pool.query(
-    `SELECT * FROM cost_estimates WHERE project_id = $1 ORDER BY created_at DESC`,
-    [projectId]
+    'SELECT * FROM cost_estimates WHERE project_id = $1 ORDER BY created_at DESC',
+    [projectId],
   );
   return result.rows;
 }
@@ -256,3 +256,4 @@ module.exports = {
   createCostEstimate,
   getCostEstimates,
 };
+

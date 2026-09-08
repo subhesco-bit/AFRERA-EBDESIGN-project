@@ -35,7 +35,7 @@ router.get('/fleet/vehicles', authMiddleware, async (req, res) => {
   try {
     const filters = {
       type: req.query.type,
-      status: req.query.status
+      status: req.query.status,
     };
     const result = await logisticsService.getFleet(filters);
     res.json(result);
@@ -177,7 +177,7 @@ router.get('/temperature/:shipmentId', authMiddleware, async (req, res) => {
     const filters = {
       startDate: req.query.startDate,
       endDate: req.query.endDate,
-      zone: req.query.zone
+      zone: req.query.zone,
     };
     const result = await logisticsService.getTemperatureData(req.params.shipmentId, filters);
     res.json(result);
@@ -225,7 +225,7 @@ router.get('/warehouse/locations', authMiddleware, async (req, res) => {
     const filters = {
       warehouseId: req.query.warehouseId,
       zone: req.query.zone,
-      status: req.query.status
+      status: req.query.status,
     };
     const result = await logisticsService.getWarehouses(filters);
     res.json(result);

@@ -40,7 +40,7 @@ async function createWatershedPlan(planData) {
       degradation_level,
       conservation_priorities,
       funding_available,
-      timeline_years
+      timeline_years,
     } = planData;
 
     const plan = {
@@ -59,7 +59,7 @@ async function createWatershedPlan(planData) {
       funding_available,
       timeline_years,
       status: 'draft',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered watershed planning
@@ -73,8 +73,8 @@ async function createWatershedPlan(planData) {
         biodiversity_inventory: await getBiodiversityInventory(watershed_id),
         climate_impact: await getClimateImpact(state, district),
         stakeholder_analysis: await getStakeholderAnalysis(watershed_id),
-        restoration_opportunities: await getRestorationOpportunities(watershed_id)
-      }
+        restoration_opportunities: await getRestorationOpportunities(watershed_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -106,8 +106,8 @@ async function createWatershedPlan(planData) {
         plan.timeline_years,
         plan.status,
         JSON.stringify(plan.ai_recommendations),
-        plan.created_at
-      ]
+        plan.created_at,
+      ],
     );
 
     logger.info(`Watershed plan created: ${plan.plan_id}`);
@@ -134,7 +134,7 @@ async function monitorWatershedHealth(watershedId) {
       soil_health: await assessSoilHealth(watershedId),
       conservation_status: await getConservationStatus(watershedId),
       threats: await identifyThreats(watershedId),
-      recommendations: await generateHealthRecommendations(watershedId)
+      recommendations: await generateHealthRecommendations(watershedId),
     };
 
     return health;
@@ -156,7 +156,7 @@ async function implementConservationMeasures(watershedId, measuresData) {
       budget_allocation,
       implementation_date,
       expected_outcomes,
-      monitoring_schedule
+      monitoring_schedule,
     } = measuresData;
 
     const implementation = {
@@ -170,7 +170,7 @@ async function implementConservationMeasures(watershedId, measuresData) {
       expected_outcomes,
       monitoring_schedule,
       status: 'initiated',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered conservation planning
@@ -178,14 +178,14 @@ async function implementConservationMeasures(watershedId, measuresData) {
       task: 'conservation_implementation_planning',
       parameters: {
         watershed_id: watershedId,
-        measure_type: measure_type,
-        location: location,
-        area_hectares: area_hectares,
+        measure_type,
+        location,
+        area_hectares,
         ecosystem_requirements: await getEcosystemRequirements(watershedId),
         best_practices: await getConservationBestPractices(measure_type),
         success_factors: await getSuccessFactors(watershedId, measure_type),
-        risk_assessment: await assessImplementationRisks(watershedId, measure_type)
-      }
+        risk_assessment: await assessImplementationRisks(watershedId, measure_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -211,8 +211,8 @@ async function implementConservationMeasures(watershedId, measuresData) {
         JSON.stringify(monitoring_schedule),
         implementation.status,
         JSON.stringify(implementation.ai_planning),
-        implementation.created_at
-      ]
+        implementation.created_at,
+      ],
     );
 
     logger.info(`Conservation measure implemented: ${implementation.implementation_id}`);
@@ -238,7 +238,7 @@ async function generateWatershedReport(watershedId, reportType) {
       conservation_status: await getConservationStatus(watershedId),
       community_impact: await getCommunityImpact(watershedId),
       economic_valuation: await getEconomicValuation(watershedId),
-      recommendations: await generateWatershedRecommendations(watershedId)
+      recommendations: await generateWatershedRecommendations(watershedId),
     };
 
     return report;
@@ -257,7 +257,7 @@ async function getEcologicalAssessment(watershedId) {
   try {
     const result = await pool.query(
       'SELECT * FROM ecological_assessments WHERE watershed_id = $1 ORDER BY assessment_date DESC LIMIT 1',
-      [watershedId]
+      [watershedId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -269,7 +269,7 @@ async function getHydrologicalData(watershedId) {
   try {
     const result = await pool.query(
       'SELECT * FROM hydrological_data WHERE watershed_id = $1 ORDER BY record_date DESC LIMIT 12',
-      [watershedId]
+      [watershedId],
     );
     return result.rows;
   } catch (error) {
@@ -281,7 +281,7 @@ async function getLandUsePatterns(watershedId) {
   try {
     const result = await pool.query(
       'SELECT * FROM land_use_patterns WHERE watershed_id = $1',
-      [watershedId]
+      [watershedId],
     );
     return result.rows;
   } catch (error) {
@@ -293,7 +293,7 @@ async function getBiodiversityInventory(watershedId) {
   try {
     const result = await pool.query(
       'SELECT * FROM biodiversity_inventory WHERE watershed_id = $1',
-      [watershedId]
+      [watershedId],
     );
     return result.rows;
   } catch (error) {
@@ -306,7 +306,7 @@ async function getClimateImpact(state, district) {
     temperature_change: '+1.5°C',
     rainfall_variability: 'high',
     extreme_events_frequency: 'increasing',
-    season_shift: 'moderate'
+    season_shift: 'moderate',
   };
 }
 
@@ -315,7 +315,7 @@ async function getStakeholderAnalysis(watershedId) {
     farmers: { count: 500, influence: 'high', needs: 'water_security' },
     local_communities: { count: 2000, influence: 'medium', needs: 'clean_water' },
     government_agencies: { count: 5, influence: 'high', needs: 'compliance' },
-    ngos: { count: 3, influence: 'medium', needs: 'conservation' }
+    ngos: { count: 3, influence: 'medium', needs: 'conservation' },
   };
 }
 
@@ -323,7 +323,7 @@ async function getRestorationOpportunities(watershedId) {
   return [
     { opportunity: 'riparian_restoration', priority: 'high', estimated_cost: 500000 },
     { opportunity: 'afforestation', priority: 'medium', estimated_cost: 300000 },
-    { opportunity: 'wetland_protection', priority: 'high', estimated_cost: 200000 }
+    { opportunity: 'wetland_protection', priority: 'high', estimated_cost: 200000 },
   ];
 }
 
@@ -333,7 +333,7 @@ async function assessEcologicalHealth(watershedId) {
     vegetation_cover: 68,
     wildlife_habitat: 75,
     water_retention: 80,
-    soil_stability: 70
+    soil_stability: 70,
   };
 }
 
@@ -342,7 +342,7 @@ async function assessHydrologicalHealth(watershed) {
     groundwater_recharge: 65,
     surface_water_availability: 70,
     flow_regime: 'moderate',
-    water_quality: 75
+    water_quality: 75,
   };
 }
 
@@ -351,7 +351,7 @@ async function assessBiodiversityHealth(watershedId) {
     species_richness: 75,
     habitat_connectivity: 60,
     endangered_species_protection: 70,
-    invasive_species_pressure: 'low'
+    invasive_species_pressure: 'low',
   };
 }
 
@@ -360,7 +360,7 @@ async function calculateWaterQualityIndex(watershedId) {
     overall_index: 74,
     chemical_quality: 70,
     biological_quality: 78,
-    physical_quality: 75
+    physical_quality: 75,
   };
 }
 
@@ -369,7 +369,7 @@ async function assessSoilHealth(watershedId) {
     organic_matter: 2.5,
     erosion_risk: 'moderate',
     fertility: 'high',
-    compaction: 'low'
+    compaction: 'low',
   };
 }
 
@@ -377,12 +377,12 @@ async function getConservationStatus(watershedId) {
   try {
     const result = await pool.query(
       'SELECT COUNT(*) as active_measures FROM conservation_implementations WHERE watershed_id = $1 AND status = $2',
-      [watershedId, 'active']
+      [watershedId, 'active'],
     );
     return {
       active_measures: result.rows[0]?.active_measures || 0,
       total_measures: 10,
-      completion_percentage: (result.rows[0]?.active_measures || 0) * 10
+      completion_percentage: (result.rows[0]?.active_measures || 0) * 10,
     };
   } catch (error) {
     return { active_measures: 0, total_measures: 10, completion_percentage: 0 };
@@ -394,7 +394,7 @@ async function identifyThreats(watershedId) {
     { threat: 'deforestation', severity: 'high', trend: 'increasing' },
     { threat: 'pollution', severity: 'medium', trend: 'stable' },
     { threat: 'climate_change', severity: 'high', trend: 'increasing' },
-    { threat: 'overgrazing', severity: 'medium', trend: 'stable' }
+    { threat: 'overgrazing', severity: 'medium', trend: 'stable' },
   ];
 }
 
@@ -403,7 +403,7 @@ async function generateHealthRecommendations(watershedId) {
     'Strengthen riparian buffer zones',
     'Implement sustainable land use practices',
     'Enhance community monitoring',
-    'Protect critical wildlife habitats'
+    'Protect critical wildlife habitats',
   ];
 }
 
@@ -412,7 +412,7 @@ async function getEcosystemRequirements(watershedId) {
     native_species: ['oak', 'pine', 'bamboo'],
     soil_type: 'loamy',
     water_requirements: 'moderate',
-    fire_resilience: 'low'
+    fire_resilience: 'low',
   };
 }
 
@@ -420,7 +420,7 @@ async function getConservationBestPractices(measureType) {
   const practices = {
     afforestation: ['select_native_species', 'maintain_diversity', 'monitor_growth'],
     riparian_restoration: ['native_planting', 'erosion_control', 'water_flow_maintenance'],
-    wetland_protection: ['buffer_zones', 'water_quality_monitoring', 'invasive_species_control']
+    wetland_protection: ['buffer_zones', 'water_quality_monitoring', 'invasive_species_control'],
   };
   return practices[measureType] || [];
 }
@@ -430,7 +430,7 @@ async function getSuccessFactors(watershedId, measureType) {
     community_participation: 'high',
     technical_expertise: 'medium',
     funding_stability: 'high',
-    policy_support: 'medium'
+    policy_support: 'medium',
   };
 }
 
@@ -438,7 +438,7 @@ async function assessImplementationRisks(watershedId, measureType) {
   return [
     { risk: 'weather_events', probability: 'high', impact: 'high' },
     { risk: 'funding_shortage', probability: 'medium', impact: 'high' },
-    { risk: 'community_opposition', probability: 'low', impact: 'medium' }
+    { risk: 'community_opposition', probability: 'low', impact: 'medium' },
   ];
 }
 
@@ -446,7 +446,7 @@ async function getWatershedOverview(watershedId) {
   try {
     const result = await pool.query(
       'SELECT * FROM watershed_plans WHERE watershed_id = $1',
-      [watershedId]
+      [watershedId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -463,7 +463,7 @@ async function getCommunityImpact(watershedId) {
     water_access_improvement: 85,
     livelihood_improvement: 70,
     health_improvement: 60,
-    education_awareness: 75
+    education_awareness: 75,
   };
 }
 
@@ -473,7 +473,7 @@ async function getEconomicValuation(watershedId) {
     water_provisioning_value: 2000000,
     carbon_sequestration_value: 1000000,
     recreational_value: 500000,
-    total_annual_value: 8500000
+    total_annual_value: 8500000,
   };
 }
 
@@ -482,7 +482,7 @@ async function generateWatershedRecommendations(watershedId) {
     'Prioritize critical conservation areas',
     'Strengthen community-based monitoring',
     'Integrate climate adaptation measures',
-    'Develop sustainable financing mechanisms'
+    'Develop sustainable financing mechanisms',
   ];
 }
 
@@ -490,6 +490,6 @@ module.exports = {
   createWatershedPlan,
   monitorWatershedHealth,
   implementConservationMeasures,
-  generateWatershedReport
+  generateWatershedReport,
 };
 

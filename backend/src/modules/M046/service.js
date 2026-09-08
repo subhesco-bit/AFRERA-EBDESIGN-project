@@ -15,7 +15,7 @@ async function createNursery(nurseryData) {
     `INSERT INTO nurseries (farmer_id, nursery_name, village, location, area, nursery_type, capacity, irrigation_type, notes, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active', NOW(), NOW())
      RETURNING *`,
-    [farmerId, name, location?.village || location?.district || 'Unknown', JSON.stringify(location || null), area, type, capacity, irrigationType, notes]
+    [farmerId, name, location?.village || location?.district || 'Unknown', JSON.stringify(location || null), area, type, capacity, irrigationType, notes],
   );
 
   // Emit signal for nursery creation
@@ -23,11 +23,11 @@ async function createNursery(nurseryData) {
     entityType: 'nursery',
     nurseryId: res.rows[0].id,
     farmerId,
-    name
+    name,
   }, {
     severity: SEVERITY.INFO,
     source: 'nursery_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
 
   return res.rows[0];
@@ -67,10 +67,10 @@ async function listNurseries({ page = 1, limit = 20, farmerId, type, status } = 
   params.push(limit, offset);
 
   const res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace(`SELECT * FROM nurseries`, 'SELECT COUNT(*) FROM nurseries').split('LIMIT')[0], params.slice(0, -2));
+  const totalRes = await pg.query(query.replace('SELECT * FROM nurseries', 'SELECT COUNT(*) FROM nurseries').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
 
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function updateNursery(nurseryId, updates) {
@@ -94,18 +94,18 @@ async function updateNursery(nurseryId, updates) {
      WHERE id = $10
      RETURNING *`,
     [name, location?.village || location?.district || null, location ? JSON.stringify(location) : null,
-      area, type, capacity, irrigationType, notes, status, nurseryId]
+      area, type, capacity, irrigationType, notes, status, nurseryId],
   );
 
   // Emit signal for nursery update
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'nursery',
     nurseryId,
-    action: 'updated'
+    action: 'updated',
   }, {
     severity: SEVERITY.INFO,
     source: 'nursery_service',
-    entityId: nurseryId
+    entityId: nurseryId,
   });
 
   return res.rows[0] || null;
@@ -120,15 +120,15 @@ async function deleteNursery(nurseryId) {
   if (res.rows[0]) {
     signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED, {
       entityType: 'nursery',
-      nurseryId
+      nurseryId,
     }, {
       severity: SEVERITY.INFO,
       source: 'nursery_service',
-      entityId: nurseryId
+      entityId: nurseryId,
     });
   }
 
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 // Seedling batch management
@@ -142,7 +142,7 @@ async function createSeedlingBatch(batchData) {
     `INSERT INTO seedling_batches (nursery_id, crop_id, variety_id, quantity, sowing_date, expected_transplant_date, notes, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW(), NOW())
      RETURNING *`,
-    [nurseryId, cropId, varietyId, quantity, sowingDate, expectedTransplantDate, notes]
+    [nurseryId, cropId, varietyId, quantity, sowingDate, expectedTransplantDate, notes],
   );
 
   // Emit signal for batch creation
@@ -150,11 +150,11 @@ async function createSeedlingBatch(batchData) {
     entityType: 'seedling_batch',
     batchId: res.rows[0].id,
     nurseryId,
-    cropId
+    cropId,
   }, {
     severity: SEVERITY.INFO,
     source: 'nursery_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
 
   return res.rows[0];
@@ -170,7 +170,7 @@ async function updateSeedlingHealth(batchId, healthData) {
     `INSERT INTO seedling_health_records (batch_id, health_score, growth_stage, issues, observations, recorded_at)
      VALUES ($1, $2, $3, $4, $5, NOW())
      RETURNING *`,
-    [batchId, healthScore, growthStage, JSON.stringify(issues || []), observations]
+    [batchId, healthScore, growthStage, JSON.stringify(issues || []), observations],
   );
 
   // Emit alert for poor health
@@ -179,11 +179,11 @@ async function updateSeedlingHealth(batchId, healthData) {
       entityType: 'seedling_health',
       batchId,
       healthScore,
-      issues
+      issues,
     }, {
       severity: SEVERITY.WARNING,
       source: 'nursery_service',
-      entityId: batchId
+      entityId: batchId,
     });
   }
 
@@ -207,7 +207,7 @@ async function optimizeNurseryEnvironment(nurseryId) {
     recommendedLight: 'medium',
     irrigationSchedule: generateIrrigationSchedule(nursery),
     nutrientSchedule: generateNutrientSchedule(nursery),
-    riskFactors: assessNurseryRisks(nursery)
+    riskFactors: assessNurseryRisks(nursery),
   };
 
   return { success: true, data: optimization };
@@ -218,7 +218,7 @@ function generateIrrigationSchedule(nursery) {
     frequency: 'daily',
     time: 'morning',
     duration: '30_minutes',
-    method: nursery.irrigation_type || 'sprinkler'
+    method: nursery.irrigation_type || 'sprinkler',
   };
 }
 
@@ -226,7 +226,7 @@ function generateNutrientSchedule(nursery) {
   return [
     { week: 1, nutrients: ['NPK_balanced'], frequency: 'twice_weekly' },
     { week: 2, nutrients: ['NPK_balanced', 'micronutrients'], frequency: 'twice_weekly' },
-    { week: 3, nutrients: ['phosphorus_boost'], frequency: 'weekly' }
+    { week: 3, nutrients: ['phosphorus_boost'], frequency: 'weekly' },
   ];
 }
 
@@ -238,7 +238,7 @@ function assessNurseryRisks(nursery) {
       type: 'water_stress',
       severity: 'medium',
       description: 'Manual irrigation may lead to inconsistent watering',
-      mitigation: 'Consider automated irrigation system'
+      mitigation: 'Consider automated irrigation system',
     });
   }
 
@@ -275,7 +275,7 @@ async function getNurseryAnalytics({ startDate, endDate, nurseryId } = {}) {
     params.push(nurseryId);
   }
 
-  query += ` GROUP BY type ORDER BY count DESC`;
+  query += ' GROUP BY type ORDER BY count DESC';
 
   const res = await pg.query(query, params);
 
@@ -283,7 +283,7 @@ async function getNurseryAnalytics({ startDate, endDate, nurseryId } = {}) {
     byType: res.rows,
     totalNurseries: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
     totalCapacity: res.rows.reduce((sum, row) => sum + (parseFloat(row.total_capacity) || 0), 0),
-    recommendations: generateNurseryAnalyticsRecommendations(res.rows)
+    recommendations: generateNurseryAnalyticsRecommendations(res.rows),
   };
 }
 
@@ -295,7 +295,7 @@ function generateNurseryAnalyticsRecommendations(nurseryData) {
     recommendations.push({
       type: 'capacity_expansion',
       message: `Nurseries of type ${lowCapacity.map(n => n.type).join(', ')} have low capacity. Consider expansion.`,
-      priority: 'medium'
+      priority: 'medium',
     });
   }
 

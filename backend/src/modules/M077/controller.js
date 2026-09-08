@@ -45,5 +45,5 @@ module.exports = {
   recordWaterQualityMeasurement,
   getComplianceReport,
   monitorWaterQuality,
-  generateTreatmentRecommendations
+  generateTreatmentRecommendations,
 };

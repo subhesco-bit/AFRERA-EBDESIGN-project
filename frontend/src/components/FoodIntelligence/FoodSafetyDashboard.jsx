@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { foodIntelligenceAPI } from '../../services/api';
+import { foodIntelligenceAPI } from '../../services/componentApi';
 
 /**
  * Food Safety Dashboard Component
@@ -51,7 +51,7 @@ const FoodSafetyDashboard = ({ activeRecalls: recallsProp }) => {
       {/* Active Recalls */}
       <div className="mb-8">
         <h3 className="text-lg font-semibold text-gray-700 mb-4">Active Food Recalls</h3>
-        
+
         {loading ? (
           <div className="animate-pulse h-64 bg-gray-200 rounded-lg"></div>
         ) : activeRecalls.length === 0 ? (

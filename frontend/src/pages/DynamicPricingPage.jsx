@@ -1,27 +1,27 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { Activity, Zap, Target, BarChart3, Clock, ArrowUp, ArrowDown, Minus } from 'lucide-react'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import { Activity, Zap, Target, BarChart3, Clock, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
 function DynamicPricingPage() {
-  const [selectedTimeframe, setSelectedTimeframe] = useState('7d')
-  const [selectedCommodity, setSelectedCommodity] = useState('all')
+  const [selectedTimeframe, setSelectedTimeframe] = useState('7d');
+  const [selectedCommodity, setSelectedCommodity] = useState('all');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: priceDynamics } = useQuery({
     queryKey: ['price-dynamics', selectedTimeframe, selectedCommodity],
     queryFn: () => farmersAPI.getPriceDynamics(selectedTimeframe, selectedCommodity).then(r => r.data),
-  })
+  });
 
   const { data: demandForecast } = useQuery({
     queryKey: ['demand-forecast'],
     queryFn: () => farmersAPI.getDemandForecast().then(r => r.data),
-  })
+  });
 
   const { data: priceSignals } = useQuery({
     queryKey: ['price-signals'],
     queryFn: () => farmersAPI.getPriceSignals().then(r => r.data),
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -36,15 +36,15 @@ function DynamicPricingPage() {
           { id: '24h', label: '24 Hours' },
           { id: '7d', label: '7 Days' },
           { id: '30d', label: '30 Days' },
-          { id: '90d', label: '90 Days' }
+          { id: '90d', label: '90 Days' },
         ].map((timeframe) => (
           <button
             key={timeframe.id}
             onClick={() => setSelectedTimeframe(timeframe.id)}
             className={`px-4 py-2 rounded-lg font-medium transition ${
-              selectedTimeframe === timeframe.id
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              selectedTimeframe === timeframe.id ?
+                'bg-green-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             {timeframe.label}
@@ -59,8 +59,8 @@ function DynamicPricingPage() {
             key={signal.id}
             className={`rounded-lg p-4 ${
               signal.signal === 'buy' ? 'bg-green-50 border border-green-200' :
-              signal.signal === 'sell' ? 'bg-red-50 border border-red-200' :
-              'bg-gray-50 border border-gray-200'
+                signal.signal === 'sell' ? 'bg-red-50 border border-red-200' :
+                  'bg-gray-50 border border-gray-200'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
@@ -177,22 +177,22 @@ function DynamicPricingPage() {
               action: 'Increase price by 5%',
               reason: 'High demand expected in next 2 weeks due to festival season',
               confidence: 85,
-              urgency: 'high'
+              urgency: 'high',
             },
             {
               commodity: 'Wheat',
               action: 'Hold current price',
               reason: 'Market stable, no significant demand changes expected',
               confidence: 72,
-              urgency: 'low'
+              urgency: 'low',
             },
             {
               commodity: 'Mustard',
               action: 'Consider discount of 3%',
               reason: 'Oversupply in regional markets, competitive pressure',
               confidence: 68,
-              urgency: 'medium'
-            }
+              urgency: 'medium',
+            },
           ].map((rec, index) => (
             <div key={index} className="border rounded-lg p-4">
               <div className="flex items-start justify-between mb-2">
@@ -202,8 +202,8 @@ function DynamicPricingPage() {
                 </div>
                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                   rec.urgency === 'high' ? 'bg-red-100 text-red-800' :
-                  rec.urgency === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-green-100 text-green-800'
+                    rec.urgency === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-green-100 text-green-800'
                 }`}>
                   {rec.urgency} urgency
                 </span>
@@ -224,7 +224,7 @@ function DynamicPricingPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default DynamicPricingPage
+export default DynamicPricingPage;

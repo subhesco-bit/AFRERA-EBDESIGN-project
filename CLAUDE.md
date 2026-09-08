@@ -1,6 +1,6 @@
 # CLAUDE.md — Project Intelligence
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Last Updated:** 24 August 2026
 
 ## START HERE
@@ -36,7 +36,7 @@
 ## PROJECT OVERVIEW
 
 **What This Project Is:**
-SVESCO/EBDESIGN is a comprehensive agricultural digital operating system designed to empower farmers across Northeast India through technology, fair trade practices, and intelligent decision-making. The platform connects farmers directly with consumers, provides financial services, logistics support, insurance coverage, and integrates with enterprise ERP systems.
+Subhesco/EBDESIGN is a comprehensive agricultural digital operating system designed to empower farmers across Northeast India through technology, fair trade practices, and intelligent decision-making. The platform connects farmers directly with consumers, provides financial services, logistics support, insurance coverage, and integrates with enterprise ERP systems.
 
 **Why It Exists:**
 To bridge the gap between rural farmers and urban markets, provide fair pricing, enable financial inclusion, offer agricultural advisory services, and create a transparent supply chain.

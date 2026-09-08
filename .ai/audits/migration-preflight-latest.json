@@ -1,0 +1,1381 @@
+{
+  "migrationCount": 352,
+  "tableDefinitions": 1343,
+  "duplicatePrefixes": [
+    {
+      "prefix": "013",
+      "files": [
+        "013_escrow_transactions.sql",
+        "013_farmer_health_welfare_module.sql",
+        "013_logistics_enhancements.sql"
+      ]
+    },
+    {
+      "prefix": "014",
+      "files": [
+        "014_audit_system.sql",
+        "014_custody_chain_events.sql",
+        "014_horticulture_module.sql",
+        "014_platform_foundation_modules.sql"
+      ]
+    },
+    {
+      "prefix": "015",
+      "files": [
+        "015_advanced_features.sql",
+        "015_authorization_service.sql"
+      ]
+    },
+    {
+      "prefix": "016",
+      "files": [
+        "016_advanced_ponds_iot.sql",
+        "016_ai_copilot_schema.sql"
+      ]
+    },
+    {
+      "prefix": "3000",
+      "files": [
+        "3000_M001_generated.sql",
+        "3000_M002_generated.sql",
+        "3000_M003_generated.sql",
+        "3000_M004_generated.sql",
+        "3000_M005_generated.sql",
+        "3000_M006_generated.sql",
+        "3000_M007_generated.sql",
+        "3000_M008_generated.sql",
+        "3000_M009_generated.sql",
+        "3000_M010_generated.sql",
+        "3000_M011_generated.sql",
+        "3000_M012_generated.sql",
+        "3000_M013_generated.sql",
+        "3000_M014_generated.sql",
+        "3000_M015_generated.sql",
+        "3000_M016_generated.sql",
+        "3000_M017_generated.sql",
+        "3000_M018_generated.sql",
+        "3000_M019_generated.sql",
+        "3000_M020_generated.sql",
+        "3000_M021_generated.sql",
+        "3000_M022_generated.sql",
+        "3000_M023_generated.sql",
+        "3000_M024_generated.sql",
+        "3000_M025_generated.sql",
+        "3000_M026_generated.sql",
+        "3000_M027_generated.sql",
+        "3000_M028_generated.sql",
+        "3000_M029_generated.sql",
+        "3000_M030_generated.sql",
+        "3000_M031_generated.sql",
+        "3000_M032_generated.sql",
+        "3000_M033_generated.sql",
+        "3000_M034_generated.sql",
+        "3000_M035_generated.sql",
+        "3000_M036_generated.sql",
+        "3000_M037_generated.sql",
+        "3000_M038_generated.sql",
+        "3000_M039_generated.sql",
+        "3000_M040_generated.sql",
+        "3000_M041_generated.sql",
+        "3000_M042_generated.sql",
+        "3000_M043_generated.sql",
+        "3000_M044_generated.sql",
+        "3000_M045_generated.sql",
+        "3000_M046_generated.sql",
+        "3000_M047_generated.sql",
+        "3000_M048_generated.sql",
+        "3000_M049_generated.sql",
+        "3000_M050_generated.sql",
+        "3000_M051_generated.sql",
+        "3000_M052_generated.sql",
+        "3000_M053_generated.sql",
+        "3000_M054_generated.sql",
+        "3000_M055_generated.sql",
+        "3000_M056_generated.sql",
+        "3000_M057_generated.sql",
+        "3000_M058_generated.sql",
+        "3000_M059_generated.sql",
+        "3000_M060_generated.sql",
+        "3000_M061_generated.sql",
+        "3000_M062_generated.sql",
+        "3000_M063_generated.sql",
+        "3000_M064_generated.sql",
+        "3000_M065_generated.sql",
+        "3000_M066_generated.sql",
+        "3000_M067_generated.sql",
+        "3000_M068_generated.sql",
+        "3000_M069_generated.sql",
+        "3000_M070_generated.sql",
+        "3000_M071_generated.sql",
+        "3000_M072_generated.sql",
+        "3000_M073_generated.sql",
+        "3000_M074_generated.sql",
+        "3000_M075_generated.sql",
+        "3000_M076_generated.sql",
+        "3000_M077_generated.sql",
+        "3000_M078_generated.sql",
+        "3000_M079_generated.sql",
+        "3000_M080_generated.sql",
+        "3000_M081_generated.sql",
+        "3000_M082_generated.sql",
+        "3000_M083_generated.sql",
+        "3000_M084_generated.sql",
+        "3000_M085_generated.sql",
+        "3000_M086_generated.sql",
+        "3000_M087_generated.sql",
+        "3000_M088_generated.sql",
+        "3000_M089_generated.sql",
+        "3000_M090_generated.sql",
+        "3000_M091_generated.sql",
+        "3000_M092_generated.sql",
+        "3000_M093_generated.sql",
+        "3000_M094_generated.sql",
+        "3000_M095_generated.sql",
+        "3000_M096_generated.sql",
+        "3000_M097_generated.sql",
+        "3000_M098_generated.sql",
+        "3000_M099_generated.sql",
+        "3000_M100_generated.sql",
+        "3000_M101_generated.sql",
+        "3000_M102_generated.sql",
+        "3000_M103_generated.sql",
+        "3000_M104_generated.sql",
+        "3000_M105_generated.sql",
+        "3000_M106_generated.sql",
+        "3000_M107_generated.sql",
+        "3000_M108_generated.sql",
+        "3000_M109_generated.sql",
+        "3000_M110_generated.sql",
+        "3000_M111_generated.sql",
+        "3000_M112_generated.sql",
+        "3000_M113_generated.sql",
+        "3000_M114_generated.sql",
+        "3000_M115_generated.sql",
+        "3000_M116_generated.sql",
+        "3000_M117_generated.sql",
+        "3000_M118_generated.sql",
+        "3000_M119_generated.sql",
+        "3000_M120_generated.sql",
+        "3000_M121_generated.sql",
+        "3000_M122_generated.sql",
+        "3000_M123_generated.sql",
+        "3000_M124_generated.sql",
+        "3000_M125_generated.sql",
+        "3000_M126_generated.sql",
+        "3000_M127_generated.sql",
+        "3000_M128_generated.sql",
+        "3000_M129_generated.sql",
+        "3000_M130_generated.sql",
+        "3000_M131_generated.sql",
+        "3000_M132_generated.sql",
+        "3000_M133_generated.sql",
+        "3000_M134_generated.sql",
+        "3000_M135_generated.sql",
+        "3000_M136_generated.sql",
+        "3000_M137_generated.sql",
+        "3000_M138_generated.sql",
+        "3000_M139_generated.sql",
+        "3000_M140_generated.sql",
+        "3000_M141_generated.sql",
+        "3000_M142_generated.sql",
+        "3000_M143_generated.sql",
+        "3000_M144_generated.sql",
+        "3000_M145_generated.sql",
+        "3000_M146_generated.sql",
+        "3000_M147_generated.sql",
+        "3000_M148_generated.sql",
+        "3000_M149_generated.sql",
+        "3000_M150_generated.sql"
+      ]
+    },
+    {
+      "prefix": "9997",
+      "files": [
+        "9997_enterprise_memory_schema.sql",
+        "9997_geofencing.sql"
+      ]
+    },
+    {
+      "prefix": "9999",
+      "files": [
+        "9999_erp_foundation_seed.sql",
+        "9999_zz_copilot_sessions_uuid_fix.sql",
+        "9999_zz_product_media_ai_schema.sql",
+        "9999_zzz_regional_variety_directory_schema.sql",
+        "9999_zzzz_regional_variety_directory_seed.sql",
+        "9999_zzzzz_civil_disruption_schema.sql",
+        "9999_zzzzz_disruption_routing_tables.sql",
+        "9999_zzzzz_products_from_regional_variety_seed.sql",
+        "9999_zzzzzz_seed_vault_schema.sql",
+        "9999_zzzzzzz_freight_pooling_schema.sql",
+        "9999_zzzzzzzz_return_load_board_schema.sql",
+        "9999_zzzzzzzzz_equipment_exchange_schema.sql",
+        "9999_zzzzzzzzzz_ai_proposal_ownership.sql",
+        "9999_zzzzzzzzzz_unified_ledger_schema.sql",
+        "9999_zzzzzzzzzzz_wearable_integration_schema.sql",
+        "9999_zzzzzzzzzzzz_defense_fitness_prep_schema.sql",
+        "9999_zzzzzzzzzzzz_module_events.sql",
+        "9999_zzzzzzzzzzzzz_crop_value_compound_reference_schema.sql",
+        "9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+        "9999_zzzzzzzzzzzzzzz_m012_session_security_schema.sql",
+        "9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzz_roles_collision_repair.sql",
+        "9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzz_missing_fk_indexes.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzz_nursery_management_columns.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzz_preventive_maintenance_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_erp_production_order_bom_routing.sql",
+        "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_farms_crop_plantings_schema.sql"
+      ]
+    },
+    {
+      "prefix": "999",
+      "files": [
+        "999_farmer_credit_risk_resolution.sql",
+        "999_schema_reconciliation.sql",
+        "999_zz_tender_bids_collision_repair.sql"
+      ]
+    }
+  ],
+  "duplicateTableOwnership": [
+    {
+      "table": "users",
+      "files": [
+        "000_base_schema.sql",
+        "1000_user_management.sql",
+        "3000_M011_generated.sql"
+      ]
+    },
+    {
+      "table": "user_profiles",
+      "files": [
+        "000_base_schema.sql",
+        "3019_m019_profile_management.sql"
+      ]
+    },
+    {
+      "table": "roles",
+      "files": [
+        "000_base_schema.sql",
+        "014_platform_foundation_modules.sql",
+        "015_authorization_service.sql",
+        "1000_user_management.sql"
+      ]
+    },
+    {
+      "table": "user_roles",
+      "files": [
+        "000_base_schema.sql",
+        "014_platform_foundation_modules.sql",
+        "1000_user_management.sql"
+      ]
+    },
+    {
+      "table": "farmers",
+      "files": [
+        "000_base_schema.sql",
+        "3021_m021_farmer_registration.sql"
+      ]
+    },
+    {
+      "table": "training_records",
+      "files": [
+        "000_base_schema.sql",
+        "3200_hr_module_schema.sql"
+      ]
+    },
+    {
+      "table": "shipment_tracking",
+      "files": [
+        "000_base_schema.sql",
+        "013_logistics_enhancements.sql",
+        "034_logistics_enhancement_schema.sql"
+      ]
+    },
+    {
+      "table": "contract_milestones",
+      "files": [
+        "000_base_schema.sql",
+        "3102_ecommerce_ai_erp_business_marketing.sql"
+      ]
+    },
+    {
+      "table": "audit_logs",
+      "files": [
+        "000_base_schema.sql",
+        "014_audit_system.sql",
+        "014_platform_foundation_modules.sql",
+        "1002_system_administration.sql"
+      ]
+    },
+    {
+      "table": "product_reviews",
+      "files": [
+        "009_marketplace_enhancements.sql",
+        "3100_ecommerce_tables.sql"
+      ]
+    },
+    {
+      "table": "review_reports",
+      "files": [
+        "009_marketplace_enhancements.sql",
+        "3100_ecommerce_tables.sql"
+      ]
+    },
+    {
+      "table": "bulk_orders",
+      "files": [
+        "009_marketplace_enhancements.sql",
+        "3100_ecommerce_tables.sql"
+      ]
+    },
+    {
+      "table": "fleet_vehicles",
+      "files": [
+        "013_logistics_enhancements.sql",
+        "034_logistics_enhancement_schema.sql"
+      ]
+    },
+    {
+      "table": "vehicle_maintenance",
+      "files": [
+        "013_logistics_enhancements.sql",
+        "034_logistics_enhancement_schema.sql"
+      ]
+    },
+    {
+      "table": "shipment_geofences",
+      "files": [
+        "013_logistics_enhancements.sql",
+        "034_logistics_enhancement_schema.sql"
+      ]
+    },
+    {
+      "table": "temperature_readings",
+      "files": [
+        "013_logistics_enhancements.sql",
+        "034_logistics_enhancement_schema.sql"
+      ]
+    },
+    {
+      "table": "temperature_alerts",
+      "files": [
+        "013_logistics_enhancements.sql",
+        "034_logistics_enhancement_schema.sql"
+      ]
+    },
+    {
+      "table": "warehouse_inventory",
+      "files": [
+        "013_logistics_enhancements.sql",
+        "034_logistics_enhancement_schema.sql",
+        "3102_ecommerce_ai_erp_business_marketing.sql"
+      ]
+    },
+    {
+      "table": "consents",
+      "files": [
+        "014_platform_foundation_modules.sql",
+        "3017_m017_consent_management.sql"
+      ]
+    },
+    {
+      "table": "smart_contracts",
+      "files": [
+        "015_advanced_features.sql",
+        "019_blockchain_traceability_schema.sql"
+      ]
+    },
+    {
+      "table": "iot_devices",
+      "files": [
+        "015_advanced_features.sql",
+        "031_iot_integration_schema.sql",
+        "3030_m030_farmer_advisory.sql"
+      ]
+    },
+    {
+      "table": "demand_forecasts",
+      "files": [
+        "015_advanced_features.sql",
+        "030_institutional_procurement_schema.sql",
+        "052_economic_layer.sql",
+        "3102_ecommerce_ai_erp_business_marketing.sql"
+      ]
+    },
+    {
+      "table": "ar_vr_experiences",
+      "files": [
+        "015_advanced_features.sql",
+        "017_ar_vr_schema.sql"
+      ]
+    },
+    {
+      "table": "voice_commands",
+      "files": [
+        "015_advanced_features.sql",
+        "045_voice_ai_schema.sql"
+      ]
+    },
+    {
+      "table": "dietary_profiles",
+      "files": [
+        "020_consumer_health_schema.sql",
+        "036_nutrition_intelligence_schema.sql"
+      ]
+    },
+    {
+      "table": "dpr_documents",
+      "files": [
+        "023_engineering_schema.sql",
+        "3105_dpr_documents_schema.sql"
+      ]
+    },
+    {
+      "table": "gi_marketplace_listings",
+      "files": [
+        "027_gi_intelligence_schema.sql",
+        "3100_ecommerce_tables.sql"
+      ]
+    },
+    {
+      "table": "gst_invoices",
+      "files": [
+        "028_gst_schema.sql",
+        "047_gst_tables.sql",
+        "3102_ecommerce_ai_erp_business_marketing.sql"
+      ]
+    },
+    {
+      "table": "gst_invoice_items",
+      "files": [
+        "028_gst_schema.sql",
+        "047_gst_tables.sql"
+      ]
+    },
+    {
+      "table": "tender_bids",
+      "files": [
+        "030_institutional_procurement_schema.sql",
+        "999_zz_tender_bids_collision_repair.sql"
+      ]
+    },
+    {
+      "table": "laboratories",
+      "files": [
+        "033_laboratory_erp_schema.sql",
+        "strategic_services_schema.sql"
+      ]
+    },
+    {
+      "table": "buyers",
+      "files": [
+        "041_rural_life_os_schema.sql",
+        "strategic_services_schema.sql"
+      ]
+    },
+    {
+      "table": "climate_risk_assessments",
+      "files": [
+        "057_climate_weather_d14.sql",
+        "9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql"
+      ]
+    },
+    {
+      "table": "mfa_secrets",
+      "files": [
+        "3015_m015_mfa.sql",
+        "mfa_schema.sql"
+      ]
+    },
+    {
+      "table": "profile_views",
+      "files": [
+        "3018_m018_privacy_controls.sql",
+        "3019_m019_profile_management.sql"
+      ]
+    },
+    {
+      "table": "profile_activity",
+      "files": [
+        "3018_m018_privacy_controls.sql",
+        "3019_m019_profile_management.sql"
+      ]
+    },
+    {
+      "table": "journal_entries",
+      "files": [
+        "3102_ecommerce_ai_erp_business_marketing.sql",
+        "996_enterprise_foundation.sql"
+      ]
+    },
+    {
+      "table": "purchase_orders",
+      "files": [
+        "3102_ecommerce_ai_erp_business_marketing.sql",
+        "995_erp_process_layer.sql"
+      ]
+    },
+    {
+      "table": "production_orders",
+      "files": [
+        "3102_ecommerce_ai_erp_business_marketing.sql",
+        "995_erp_process_layer.sql"
+      ]
+    },
+    {
+      "table": "cold_storage_bookings",
+      "files": [
+        "3104_cold_storage_schema.sql",
+        "994_recovered_capabilities.sql"
+      ]
+    }
+  ],
+  "foreignKeyMismatches": [
+    {
+      "filename": "000_base_schema.sql",
+      "table": "farmer_certifications",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "000_base_schema.sql",
+      "table": "training_records",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "000_base_schema.sql",
+      "table": "credit_scores",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "000_base_schema.sql",
+      "table": "loans",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "000_base_schema.sql",
+      "table": "advances",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "000_base_schema.sql",
+      "table": "policies",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "000_base_schema.sql",
+      "table": "contracts",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "000_base_schema.sql",
+      "table": "subsidy_claims",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "011_farmer_portal_enhancements.sql",
+      "table": "land_records",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "011_farmer_portal_enhancements.sql",
+      "table": "crop_plans",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "011_farmer_portal_enhancements.sql",
+      "table": "farmer_wallets",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "011_farmer_portal_enhancements.sql",
+      "table": "wallet_transactions",
+      "column": "recipient_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "011_farmer_portal_enhancements.sql",
+      "table": "farmer_bank_accounts",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "013_farmer_health_welfare_module.sql",
+      "table": "farmer_health_records",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "013_farmer_health_welfare_module.sql",
+      "table": "welfare_enrollments",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "014_audit_system.sql",
+      "table": "audit_alert_log",
+      "column": "audit_log_id",
+      "localType": "uuid",
+      "target": "audit_logs.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "014_horticulture_module.sql",
+      "table": "orchards",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "014_horticulture_module.sql",
+      "table": "vegetable_crops",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "014_horticulture_module.sql",
+      "table": "floriculture",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "014_horticulture_module.sql",
+      "table": "greenhouses",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "014_horticulture_module.sql",
+      "table": "hydroponics_systems",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "014_horticulture_module.sql",
+      "table": "horticulture_analytics",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "014_platform_foundation_modules.sql",
+      "table": "user_roles",
+      "column": "user_id",
+      "localType": "integer",
+      "target": "users.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "014_platform_foundation_modules.sql",
+      "table": "user_roles",
+      "column": "assigned_by",
+      "localType": "integer",
+      "target": "users.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "014_platform_foundation_modules.sql",
+      "table": "audit_logs",
+      "column": "user_id",
+      "localType": "integer",
+      "target": "users.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "016_advanced_ponds_iot.sql",
+      "table": "ponds",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "017_ar_vr_schema.sql",
+      "table": "experience_assets",
+      "column": "experience_id",
+      "localType": "integer",
+      "target": "ar_vr_experiences.id",
+      "targetTypes": [
+        "integer",
+        "uuid"
+      ]
+    },
+    {
+      "filename": "017_ar_vr_schema.sql",
+      "table": "interaction_points",
+      "column": "experience_id",
+      "localType": "integer",
+      "target": "ar_vr_experiences.id",
+      "targetTypes": [
+        "integer",
+        "uuid"
+      ]
+    },
+    {
+      "filename": "017_ar_vr_schema.sql",
+      "table": "ar_vr_sessions",
+      "column": "experience_id",
+      "localType": "integer",
+      "target": "ar_vr_experiences.id",
+      "targetTypes": [
+        "integer",
+        "uuid"
+      ]
+    },
+    {
+      "filename": "027_gi_intelligence_schema.sql",
+      "table": "gi_producers",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "031_iot_integration_schema.sql",
+      "table": "sensor_data",
+      "column": "device_id",
+      "localType": "integer",
+      "target": "iot_devices.id",
+      "targetTypes": [
+        "integer",
+        "uuid"
+      ]
+    },
+    {
+      "filename": "031_iot_integration_schema.sql",
+      "table": "device_commands",
+      "column": "device_id",
+      "localType": "integer",
+      "target": "iot_devices.id",
+      "targetTypes": [
+        "integer",
+        "uuid"
+      ]
+    },
+    {
+      "filename": "031_iot_integration_schema.sql",
+      "table": "device_alerts",
+      "column": "device_id",
+      "localType": "integer",
+      "target": "iot_devices.id",
+      "targetTypes": [
+        "integer",
+        "uuid"
+      ]
+    },
+    {
+      "filename": "031_iot_integration_schema.sql",
+      "table": "device_group_members",
+      "column": "device_id",
+      "localType": "integer",
+      "target": "iot_devices.id",
+      "targetTypes": [
+        "integer",
+        "uuid"
+      ]
+    },
+    {
+      "filename": "036_nutrition_intelligence_schema.sql",
+      "table": "nutrition_recommendations",
+      "column": "dietary_profile_id",
+      "localType": "uuid",
+      "target": "dietary_profiles.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "038_organic_traceability_schema.sql",
+      "table": "organic_farms",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "045_voice_ai_schema.sql",
+      "table": "voice_responses",
+      "column": "command_id",
+      "localType": "integer",
+      "target": "voice_commands.id",
+      "targetTypes": [
+        "integer",
+        "uuid"
+      ]
+    },
+    {
+      "filename": "072_tier1_m025_m030_schema.sql",
+      "table": "digital_twins",
+      "column": "owner_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3017_m017_consent_management.sql",
+      "table": "consents",
+      "column": "user_id",
+      "localType": "integer",
+      "target": "users.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "3019_m019_profile_management.sql",
+      "table": "user_profiles",
+      "column": "user_id",
+      "localType": "integer",
+      "target": "users.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "3019_m019_profile_management.sql",
+      "table": "profile_views",
+      "column": "profile_user_id",
+      "localType": "integer",
+      "target": "users.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "3019_m019_profile_management.sql",
+      "table": "profile_activity",
+      "column": "user_id",
+      "localType": "integer",
+      "target": "users.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "3021_m021_farmer_registration.sql",
+      "table": "farmer_verifications",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3021_m021_farmer_registration.sql",
+      "table": "farmer_onboarding",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3030_m030_farmer_advisory.sql",
+      "table": "farmer_advisories",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3030_m030_farmer_advisory.sql",
+      "table": "iot_devices",
+      "column": "farmer_id",
+      "localType": "integer",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3030_m030_farmer_advisory.sql",
+      "table": "farmer_alerts",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3100_ecommerce_tables.sql",
+      "table": "gi_marketplace_listings",
+      "column": "gi_product_id",
+      "localType": "integer",
+      "target": "gi_products.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "3100_ecommerce_tables.sql",
+      "table": "gi_marketplace_listings",
+      "column": "location_id",
+      "localType": "integer",
+      "target": "addresses.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "3104_cold_storage_schema.sql",
+      "table": "cold_storage_bookings",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3105_dpr_documents_schema.sql",
+      "table": "dpr_documents",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3106_fpo_member_shares_schema.sql",
+      "table": "fpo_member_shares",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "3106_fpo_member_shares_schema.sql",
+      "table": "fpo_profit_distribution_lines",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "991_aeos_folu_ne_policy.sql",
+      "table": "yield_actuals",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "991_aeos_folu_ne_policy.sql",
+      "table": "farmer_revenue",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "991_aeos_folu_ne_policy.sql",
+      "table": "farmer_cash_flow",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "991_aeos_folu_ne_policy.sql",
+      "table": "farmer_value_index",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "991_aeos_folu_ne_policy.sql",
+      "table": "folu_land_parcels",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "991_aeos_folu_ne_policy.sql",
+      "table": "ne_organic_enrolment",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "991_aeos_folu_ne_policy.sql",
+      "table": "farmer_listings",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "991_aeos_folu_ne_policy.sql",
+      "table": "facility_bookings",
+      "column": "booked_by",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "9999_zzzzzz_seed_vault_schema.sql",
+      "table": "seed_vault_items",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "table": "equipment_breakdowns",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "table": "implement_registry",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "table": "equipment_inventory",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "table": "fuel_purchases",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "table": "spare_parts_inventory",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_farms_crop_plantings_schema.sql",
+      "table": "farms",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_farms_crop_plantings_schema.sql",
+      "table": "crop_plantings",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "mfa_schema.sql",
+      "table": "mfa_secrets",
+      "column": "user_id",
+      "localType": "integer",
+      "target": "users.id",
+      "targetTypes": [
+        "uuid"
+      ]
+    },
+    {
+      "filename": "strategic_services_schema.sql",
+      "table": "pre_season_agreements",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "strategic_services_schema.sql",
+      "table": "contract_farming_agreements",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "strategic_services_schema.sql",
+      "table": "subsidy_disbursements",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    },
+    {
+      "filename": "strategic_services_schema.sql",
+      "table": "government_subsidy_applications",
+      "column": "farmer_id",
+      "localType": "uuid",
+      "target": "farmers.id",
+      "targetTypes": [
+        "uuid",
+        "integer"
+      ]
+    }
+  ],
+  "incompatibleSchemaMigrations": [
+    {
+      "file": "migrate.js",
+      "columns": [
+        "id",
+        "filename",
+        "executed_at"
+      ]
+    },
+    {
+      "file": "migrations/enhanced_migrate.js",
+      "columns": [
+        "id",
+        "filename",
+        "version",
+        "checksum",
+        "executed_at",
+        "execution_time_ms",
+        "success",
+        "rollback_filename",
+        "dependencies",
+        "description"
+      ]
+    }
+  ],
+  "findings": 124
+}

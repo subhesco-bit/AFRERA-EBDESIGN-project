@@ -1,6 +1,6 @@
 /**
  * Analytics and Monitoring Service
- * 
+ *
  * Provides comprehensive analytics, monitoring, and observability
  * for production-ready system health and performance tracking
  */
@@ -15,7 +15,7 @@ class AnalyticsMonitoringService {
       responseTime: [],
       errors: [],
       activeUsers: new Set(),
-      systemHealth: {}
+      systemHealth: {},
     };
     this.startTime = Date.now();
   }
@@ -24,12 +24,12 @@ class AnalyticsMonitoringService {
     try {
       // Create analytics tables if they don't exist
       await this.createAnalyticsTables();
-      
+
       logger.info('Analytics monitoring service initialized');
-      
+
       // Start periodic metrics collection
       this.startMetricsCollection();
-      
+
       return true;
     } catch (error) {
       logger.error('Failed to initialize analytics monitoring', { error: error.message });
@@ -82,16 +82,16 @@ class AnalyticsMonitoringService {
     try {
       // Store in memory for real-time analytics
       this.metrics.requests.total++;
-      
+
       // Store in database for historical analysis
       const query = `
         INSERT INTO analytics_events (event_type, user_id, session_id, properties)
         VALUES ($1, $2, $3, $4)
       `;
-      
+
       pool.query(query, [eventType, userId, sessionId, JSON.stringify(properties)])
         .catch(error => logger.error('Failed to store analytics event', { error: error.message }));
-      
+
       logger.debug('Event tracked', { eventType, userId });
     } catch (error) {
       logger.error('Failed to track event', { error: error.message });
@@ -105,7 +105,7 @@ class AnalyticsMonitoringService {
         endpoint,
         responseTime,
         statusCode,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       // Keep only last 1000 response times in memory
@@ -125,7 +125,7 @@ class AnalyticsMonitoringService {
         INSERT INTO performance_metrics (endpoint, response_time, status_code, user_id)
         VALUES ($1, $2, $3, $4)
       `;
-      
+
       pool.query(query, [endpoint, responseTime, statusCode, userId])
         .catch(error => logger.error('Failed to store performance metric', { error: error.message }));
     } catch (error) {
@@ -139,7 +139,7 @@ class AnalyticsMonitoringService {
         message: error.message,
         stack: error.stack,
         context,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       this.metrics.errors.push(errorData);
@@ -169,9 +169,9 @@ class AnalyticsMonitoringService {
 
     // Calculate average response time
     const recentResponseTimes = this.metrics.responseTime.slice(-100);
-    const avgResponseTime = recentResponseTimes.length > 0
-      ? Math.round(recentResponseTimes.reduce((sum, m) => sum + m.responseTime, 0) / recentResponseTimes.length)
-      : 0;
+    const avgResponseTime = recentResponseTimes.length > 0 ?
+      Math.round(recentResponseTimes.reduce((sum, m) => sum + m.responseTime, 0) / recentResponseTimes.length) :
+      0;
 
     // Calculate error rate
     const totalRequests = this.metrics.requests.total || 1;
@@ -183,23 +183,23 @@ class AnalyticsMonitoringService {
         total: this.metrics.requests.total,
         success: this.metrics.requests.success,
         error: this.metrics.requests.error,
-        errorRate: errorRate.toFixed(2)
+        errorRate: errorRate.toFixed(2),
       },
       performance: {
         avgResponseTime,
         p95ResponseTime: this.calculatePercentile(recentResponseTimes, 95),
-        p99ResponseTime: this.calculatePercentile(recentResponseTimes, 99)
+        p99ResponseTime: this.calculatePercentile(recentResponseTimes, 99),
       },
       users: {
-        active: this.metrics.activeUsers.size
+        active: this.metrics.activeUsers.size,
       },
-      system: this.metrics.systemHealth
+      system: this.metrics.systemHealth,
     };
   }
 
   calculatePercentile(metrics, percentile) {
     if (metrics.length === 0) return 0;
-    
+
     const sorted = metrics.map(m => m.responseTime).sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;
     return sorted[index] || 0;
@@ -211,7 +211,7 @@ class AnalyticsMonitoringService {
         '1h': '1 hour',
         '24h': '24 hours',
         '7d': '7 days',
-        '30d': '30 days'
+        '30d': '30 days',
       };
 
       const timeCondition = timeRangeMap[timeRange] || '24 hours';
@@ -258,14 +258,14 @@ class AnalyticsMonitoringService {
       const [eventsResult, performanceResult, healthResult] = await Promise.all([
         pool.query(eventsQuery),
         pool.query(performanceQuery),
-        pool.query(healthQuery)
+        pool.query(healthQuery),
       ]);
 
       return {
         events: eventsResult.rows,
         performance: performanceResult.rows,
         systemHealth: healthResult.rows,
-        timeRange
+        timeRange,
       };
     } catch (error) {
       logger.error('Failed to get historical analytics', { error: error.message });
@@ -277,13 +277,13 @@ class AnalyticsMonitoringService {
     try {
       const [realtimeMetrics, historicalAnalytics] = await Promise.all([
         this.getRealtimeMetrics(),
-        this.getHistoricalAnalytics('24h')
+        this.getHistoricalAnalytics('24h'),
       ]);
 
       return {
         realtime: realtimeMetrics,
         historical: historicalAnalytics,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Failed to get dashboard data', { error: error.message });
@@ -318,13 +318,13 @@ class AnalyticsMonitoringService {
       'auth',
       'ai',
       'logistics',
-      'financial'
+      'financial',
     ];
 
     for (const service of services) {
       try {
         const startTime = Date.now();
-        
+
         // Check service health (this would be expanded based on actual service health checks)
         const isHealthy = await this.checkServiceHealth(service);
         const responseTime = Date.now() - startTime;
@@ -333,13 +333,13 @@ class AnalyticsMonitoringService {
           INSERT INTO system_health (service_name, status, response_time)
           VALUES ($1, $2, $3)
         `;
-        
+
         await pool.query(query, [service, isHealthy ? 'healthy' : 'unhealthy', responseTime]);
 
         this.metrics.systemHealth[service] = {
           status: isHealthy ? 'healthy' : 'unhealthy',
           responseTime,
-          lastChecked: new Date().toISOString()
+          lastChecked: new Date().toISOString(),
         };
       } catch (error) {
         logger.error(`Failed to check ${service} health`, { error: error.message });
@@ -426,4 +426,5 @@ module.exports = analyticsMonitoringService;
 
 // Merged unique operations from backend/src/modules/M086 (see git history there for
 // full context) - complementary functionality this service did not have.
-Object.assign(module.exports, require("../../modules/M086/service"));
+Object.assign(module.exports, require('../../modules/M086/service'));
+

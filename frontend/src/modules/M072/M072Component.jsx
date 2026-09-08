@@ -1,1 +1,1 @@
-﻿import React from 'react'; export default function M072Component(){ return <div>M072 component</div>; }
+﻿import React from 'react'; export default function M072Component() { return <div>M072 component</div>; }

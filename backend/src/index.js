@@ -1,6 +1,202 @@
+const index = require('./routes/index.js');
+const yieldManagement = require('./routes/yieldManagement.js');
+const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
+const weatherRoutes = require('./routes/weatherRoutes.js');
+const weatherAdvisory = require('./routes/weatherAdvisory.js');
+const wearableIntegrationRoutes = require('./routes/wearableIntegrationRoutes.js');
+const waterManagementRoutes = require('./routes/waterManagementRoutes.js');
+const warehouseManagement = require('./routes/warehouseManagement.js');
+const walletRoutes = require('./routes/walletRoutes.js');
+const vr = require('./routes/vr.js');
+const visionRoutes = require('./routes/visionRoutes.js');
+const videoAnalytics = require('./routes/videoAnalytics.js');
+const vendorRoutes = require('./routes/vendorRoutes.js');
+const userRoutes = require('./routes/userRoutes.js');
+const unifiedAIRoutes = require('./routes/unifiedAIRoutes.js');
+const unifiedAIGateway = require('./routes/unifiedAIGateway.js');
+const transactionRoutes = require('./routes/transactionRoutes.js');
+const trackDartRoutes = require('./routes/trackDartRoutes.js');
+const tenantManagementRoutes = require('./routes/tenantManagementRoutes.js');
+const systemAdministrationRoutes = require('./routes/systemAdministrationRoutes.js');
+const supplyChainTracking = require('./routes/supplyChainTracking.js');
+const supplyChainAnalytics = require('./routes/supplyChainAnalytics.js');
+const supplyChainDecisionRoutes = require('./routes/supplyChainDecisionRoutes.js');
+const subscriptions = require('./routes/subscriptions.js');
+const soilManagementRoutes = require('./routes/soilManagementRoutes.js');
+const soilHealth = require('./routes/soilHealth.js');
+const sheepRoutes = require('./routes/sheepRoutes.js');
+const sellerVerifications = require('./routes/sellerVerifications.js');
+const sellerRankingRoutes = require('./routes/sellerRankingRoutes.js');
+const seedVaultRoutes = require('./routes/seedVaultRoutes.js');
+const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes.js');
+const roleManagementRoutes = require('./routes/roleManagementRoutes.js');
+const riskPricingRoutes = require('./routes/riskPricingRoutes.js');
+const riskAssessment = require('./routes/riskAssessment.js');
+const rfqRoutes = require('./routes/rfqRoutes.js');
+const revenueRoutes = require('./routes/revenueRoutes.js');
+const returnLoadBoardRoutes = require('./routes/returnLoadBoardRoutes.js');
+const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes.js');
+const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes.js');
+const neVarietiesRoutes = require('./routes/neVarietiesRoutes.js');
+const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes.js');
+const realtimeMonitoringRoutes = require('./routes/realtimeMonitoringRoutes.js');
+const qualityAssurance = require('./routes/qualityAssurance.js');
+const projectSystemsRoutes = require('./routes/projectSystemsRoutes.js');
+const productRoutes = require('./routes/productRoutes.js');
+const productReviewRoutes = require('./routes/productReviewRoutes.js');
+const productMediaAIRoutes = require('./routes/productMediaAIRoutes.js');
+const publicDataRoutes = require('./routes/publicDataRoutes.js');
+const productCertifications = require('./routes/productCertifications.js');
+const priceForecasting = require('./routes/priceForecasting.js');
+const preventiveMaintenanceRoutes = require('./routes/preventiveMaintenanceRoutes.js');
+const predictiveIntelligenceRoutes = require('./routes/predictiveIntelligenceRoutes.js');
+const predictiveAnalytics = require('./routes/predictiveAnalytics.js');
+const poultryRoutes = require('./routes/poultryRoutes.js');
+const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes.js');
+const platformCoreRoutes = require('./routes/platformCoreRoutes.js');
+const platformConfigurationRoutes = require('./routes/platformConfigurationRoutes.js');
+const pigRoutes = require('./routes/pigRoutes.js');
+const phase9 = require('./routes/phase9.js');
+const phase8 = require('./routes/phase8.js');
+const phase12 = require('./routes/phase12.js');
+const phase11 = require('./routes/phase11.js');
+const phase10 = require('./routes/phase10.js');
+const paymentRoutes = require('./routes/paymentRoutes.js');
+const paymentGatewayRoutes = require('./routes/paymentGatewayRoutes.js');
+const ORPHANED_SERVICES_MOUNT = require('./routes/ORPHANED_SERVICES_MOUNT.js');
+const organizationManagementRoutes = require('./routes/organizationManagementRoutes.js');
+const orderRoutes = require('./routes/orderRoutes.js');
+const operationsRouteSupport = require('./routes/operationsRouteSupport.js');
+const operationsManagementRoutes = require('./routes/operationsManagementRoutes.js');
+const nutritionIntelligenceRoutes = require('./routes/nutritionIntelligenceRoutes.js');
+const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes.js');
+const nlp = require('./routes/nlp.js');
+const nervousSystemRoutes = require('./routes/nervousSystemRoutes.js');
+const mlOptimization = require('./routes/mlOptimization.js');
+const marketplaceEnhancements = require('./routes/marketplaceEnhancements.js');
+const marketDataRoutes = require('./routes/marketDataRoutes.js');
+const marketAnalytics = require('./routes/marketAnalytics.js');
+const m400AiBackboneRoutes = require('./routes/m400AiBackboneRoutes.js');
+const logisticsEnhancements = require('./routes/logisticsEnhancements.js');
+const logisticsEnhancementRoutes = require('./routes/logisticsEnhancementRoutes.js');
+const loanManagement = require('./routes/loanManagement.js');
+const livestockRouteSupport = require('./routes/livestockRouteSupport.js');
+const livestockManagementRoutes = require('./routes/livestockManagementRoutes.js');
+const livestock = require('./routes/livestock.js');
+const libraryRoutes = require('./routes/libraryRoutes.js');
+const landRecordsRoutes = require('./routes/landRecordsRoutes.js');
+const landManagementRoutes = require('./routes/landManagementRoutes.js');
+const knowledgeRoutes = require('./routes/knowledgeRoutes.js');
+const irrigationManagementRoutes = require('./routes/irrigationManagementRoutes.js');
+const iotSensors = require('./routes/iotSensors.js');
+const iotIntegrationRoutes = require('./routes/iotIntegrationRoutes.js');
+const insuranceEnhancements = require('./routes/insuranceEnhancements.js');
+const inputSupplyManagementRoutes = require('./routes/inputSupplyManagementRoutes.js');
+const informationSharingRoutes = require('./routes/informationSharingRoutes.js');
+const identityManagementRoutes = require('./routes/identityManagementRoutes.js');
+const hrRoutes = require('./routes/hrRoutes.js');
+const horticultureManagementRoutes = require('./routes/horticultureManagementRoutes.js');
+const horticulture = require('./routes/horticulture.js');
+const gstRoutes = require('./routes/gstRoutes.js');
+const greenhouse = require('./routes/greenhouse.js');
+const governanceModule = require('./routes/governanceModule.js');
+const goatRoutes = require('./routes/goatRoutes.js');
+const glutWarningRoutes = require('./routes/glutWarningRoutes.js');
+const geofencingRoutes = require('./routes/geofencingRoutes.js');
+const freightPoolingRoutes = require('./routes/freightPoolingRoutes.js');
+const freightPooling = require('./routes/freightPooling.js');
+const foodRoutes = require('./routes/foodRoutes.js');
+const foluRoutes = require('./routes/foluRoutes.js');
+const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes.js');
+const fisheriesManagementRoutes = require('./routes/fisheriesManagementRoutes.js');
+const financialAnalytics = require('./routes/financialAnalytics.js');
+const fertilizerRoutes = require('./routes/fertilizerRoutes.js');
+const farmerValueRoutes = require('./routes/farmerValueRoutes.js');
+const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes.js');
+const farmerRoutes = require('./routes/farmerRoutes.js');
+const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements.js');
+const farmerHealthRoutes = require('./routes/farmerHealthRoutes.js');
+const farmerFamilyRoutes = require('./routes/farmerFamilyRoutes.js');
+const farmCosting = require('./routes/farmCosting.js');
+const farmAnalytics = require('./routes/farmAnalytics.js');
+const experienceRoutes = require('./routes/experienceRoutes.js');
+const escrowRoutes = require('./routes/escrowRoutes.js');
+const equipmentExchangeRoutes = require('./routes/equipmentExchangeRoutes.js');
+const enterpriseRouteSupport = require('./routes/enterpriseRouteSupport.js');
+const enterpriseIntegrationRoutes = require('./routes/enterpriseIntegrationRoutes.js');
+const enterpriseAIRoutes = require('./routes/enterpriseAIRoutes.js');
+const engineeringProjectRoutes = require('./routes/engineeringProjectRoutes.js');
+const energyRoutes = require('./routes/energyRoutes.js');
+const ecommerceRoutes = require('./routes/ecommerceRoutes.js');
+const ecommerceMarketingRoutes = require('./routes/ecommerceMarketingRoutes.js');
+const ecommerceIntegrationRoutes = require('./routes/ecommerceIntegrationRoutes.js');
+const ecommerceERPRoutes = require('./routes/ecommerceERPRoutes.js');
+const ecommerceBusinessSalesRoutes = require('./routes/ecommerceBusinessSalesRoutes.js');
+const ecommerceAIRoutes = require('./routes/ecommerceAIRoutes.js');
+const dprGenerationRoutes = require('./routes/dprGenerationRoutes.js');
+const digitalTwinRoutes = require('./routes/digitalTwinRoutes.js');
+const dietTherapyRoutes = require('./routes/dietTherapyRoutes.js');
+const demandRoutes = require('./routes/demandRoutes.js');
+const defenseFitnessPrepRoutes = require('./routes/defenseFitnessPrepRoutes.js');
+const decisionSupportRoutes = require('./routes/decisionSupportRoutes.js');
+const dataVisualization = require('./routes/dataVisualization.js');
+const dashboardRoutes = require('./routes/dashboardRoutes.js');
+const dairyRoutes = require('./routes/dairyRoutes.js');
+const cropValueResearchRoutes = require('./routes/cropValueResearchRoutes.js');
+const cropRecommendations = require('./routes/cropRecommendations.js');
+const cropPlanningRoutes = require('./routes/cropPlanningRoutes.js');
+const cropManagementRoutes = require('./routes/cropManagementRoutes.js');
+const costRoutes = require('./routes/costRoutes.js');
+const costControlRoutes = require('./routes/costControlRoutes.js');
+const cooperativeShareRoutes = require('./routes/cooperativeShareRoutes.js');
+const comprehensiveERPRoutes = require('./routes/comprehensiveERPRoutes.js');
+const complianceTracking = require('./routes/complianceTracking.js');
+const complianceRoutes = require('./routes/complianceRoutes.js');
+const completeERPIntegrationRoutes = require('./routes/completeERPIntegrationRoutes.js');
+const completeAIIntegrationRoutes = require('./routes/completeAIIntegrationRoutes.js');
+const companyRoutes = require('./routes/companyRoutes.js');
+const communityManagementRoutes = require('./routes/communityManagementRoutes.js');
+const coldStorageRoutes = require('./routes/coldStorageRoutes.js');
+const coldChainMonitoring = require('./routes/coldChainMonitoring.js');
+const climateRouteSupport = require('./routes/climateRouteSupport.js');
+const climateMonitoringRoutes = require('./routes/climateMonitoringRoutes.js');
+const climateAdvisoryRoutes = require('./routes/climateAdvisoryRoutes.js');
+const climateAdvisory = require('./routes/climateAdvisory.js');
+const civilDisruptionRoutes = require('./routes/civilDisruptionRoutes.js');
+const certificationManagement = require('./routes/certificationManagement.js');
+const buyerTrust = require('./routes/buyerTrust.js');
+const bulkOrders = require('./routes/bulkOrders.js');
+const bulkOrderRoutes = require('./routes/bulkOrderRoutes.js');
+const blockchainVerificationRoutes = require('./routes/blockchainVerificationRoutes.js');
+const blockchainTrace = require('./routes/blockchainTrace.js');
+const biometric = require('./routes/biometric.js');
+const automation = require('./routes/automation.js');
+const authRoutes = require('./routes/authRoutes.js');
+const auditTrail = require('./routes/auditTrail.js');
+const auditRoutes = require('./routes/auditRoutes.js');
+const assetAccountingRoutes = require('./routes/assetAccountingRoutes.js');
+const ar = require('./routes/ar.js');
+const apiCompatibilityRoutes = require('./routes/apiCompatibilityRoutes.js');
+const animalHealthRoutes = require('./routes/animalHealthRoutes.js');
+const analyticsReportRoutes = require('./routes/analyticsReportRoutes.js');
+const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes.js');
+const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes.js');
+const aiGatewayRoutes = require('./routes/aiGatewayRoutes.js');
+const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes.js');
+const aiBrainRoutes = require('./routes/aiBrainRoutes.js');
+const aiBackboneRoutes = require('./routes/aiBackboneRoutes.js');
+const aiApprovalRoutes = require('./routes/aiApprovalRoutes.js');
+const aiAgentRoutes = require('./routes/aiAgentRoutes.js');
+const agriculturalIntelligenceRoutes = require('./routes/agriculturalIntelligenceRoutes.js');
+const advancedSearchRoutes = require('./routes/advancedSearchRoutes.js');
+const advancedFeatures = require('./routes/advancedFeatures.js');
+const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 /**
- * AFRERA Platform Backend - Main Entry Point
- * Microservices Architecture with API Gateway
+ * EBDESIGN Platform Backend - Main Entry Point
+ * Auto-Discovery Architecture: Supports 200K+ services & routes
+ *
+ * Replaces manual imports with dynamic service/route discovery
+ * Enables lazy loading, scales to enterprise requirements
  */
 
 require('dotenv').config();
@@ -9,1218 +205,562 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
-const fs = require('fs');
-const path = require('path');
-const { createServer } = require('http');
+const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
 
-// Import services
-const authService = require('./services/authService');
-const productService = require('./services/productService');
-const orderService = require('./services/orderService');
-const financialService = require('./services/financialService');
-const logisticsService = require('./services/logisticsService');
-const insuranceService = require('./services/insuranceService');
-const aiService = require('./services/aiService');
-const erpService = require('./services/erpService');
-const multilingualService = require('./services/multilingualService');
-const organicTraceabilityService = require('./services/organicTraceabilityService');
-const nutritionIntelligenceService = require('./services/nutritionIntelligenceService');
-const conversationalAIService = require('./services/conversationalAIService');
-const laboratoryERPService = require('./services/laboratoryERPService');
-const giIntelligenceService = require('./services/giIntelligenceService');
-const foodIntelligenceService = require('./services/foodIntelligenceService');
-const valueCommerceService = require('./services/valueCommerceService');
-const consumerHealthService = require('./services/consumerHealthService');
-const voiceAIService = require('./services/voiceAIService');
-const blockchainTraceabilityService = require('./services/blockchainTraceabilityService');
-const knowledgeGraphService = require('./services/knowledgeGraphService');
-// Enterprise Memory ("Hippocampus" — AFRERA_CLAUDE_BUILD_DIRECTIVE.md §2.3):
-// case/episode log, real full-text retrieval. Was "missing" in
-// core/aiOrchestrator.js before 2026-08-09 — see that file's ENGINES.enterprise_memory
-// entry and migration 9997_enterprise_memory_schema.sql for the full rationale.
-const enterpriseMemoryService = require('./services/enterpriseMemoryService');
-const predictiveAnalyticsService = require('./services/predictiveAnalyticsService');
-const iotIntegrationService = require('./services/iotIntegrationService');
-const arVrService = require('./services/arVrService');
-const smsAuthService = require('./services/smsAuthService');
-// Real Twilio WhatsApp integration (outbound send + inbound webhook). Mirrors
-// smsAuthService's mock-mode-when-unconfigured pattern. See service header.
-const whatsappService = require('./services/whatsappService');
-const advancedVoiceAI = require('./services/advancedVoiceAI');
-// Escrow service for secure fund holding in transactions
-const escrowService = require('./services/escrowService');
-// Custody event service - chain tracking and settlement instructions
-const custodyEventRoutes = require('./services/custodyEventRoutes');
-// Health check routes for monitoring
-const healthRoutes = require('./routes/healthRoutes');
-const offlinePaymentService = require('./services/offlinePaymentService');
-const advancedAIService = require('./services/advancedAIService');
-const offlineSyncService = require('./services/offlineSyncService');
-const formService = require('./services/formService');
-const analyticsService = require('./services/analyticsService');
-const moduleCatalogService = require('./services/moduleCatalogService');
-// User management module (M011)
-const userModule = require('./modules/M011');
-// System Administration module (M006)
-const adminModule = require('./modules/M006');
-const indigenousKnowledgeService = require('./services/indigenousKnowledgeService');
-const biodiversityService = require('./services/biodiversityService');
-const aiCopilotService = require('./services/aiCopilotService');
-const omnichannelAIService = require('./services/omnichannelAIService');
-const foodSafetyService = require('./services/foodSafetyService');
-const shelfLifeService = require('./services/shelfLifeService');
-const institutionalProcurementService = require('./services/institutionalProcurementService');
-const millCircuitService = require('./services/millCircuitService');
-const digitalProductPassportService = require('./services/digitalProductPassportService');
-const recipeIntelligenceService = require('./services/recipeIntelligenceService');
-// Business rules recovered from the v43 prototype (see service header).
-const decisionSupportService = require('./services/decisionSupportService');
-// Recovered from the pre-v43 ne_harvest lineage (see service header).
-const neProductIntelligenceService = require('./services/neProductIntelligenceService');
-const commerceRulesService = require('./services/commerceRulesService');
-const catalogIntelligenceService = require('./services/catalogIntelligenceService');
-const enterpriseControlService = require('./services/enterpriseControlService');
-const v42IntelligenceService = require('./services/v42IntelligenceService');
-// Farmer Value Engine (991): the decision layer above every other module.
-const farmerValueService = require('./services/farmerValueService');
-const merchandisingService = require('./services/merchandisingService');
+// Core auto-discovery modules
+const DynamicServiceLoader = require('./core/dynamicServiceLoader');
+const DynamicRouteLoader = require('./core/dynamicRouteLoader');
+const ServiceLocator = require('./core/serviceLocator');
+const ConfigRegistry = require('./core/configRegistry');
 
-// Previously-orphaned services: each of these exports its own setupRoutes(app)
-// function that was never being called anywhere, so none of them had a live route.
-const dynamicPricingService = require('./services/dynamicPricingService');
-const farmerTrainingService = require('./services/farmerTrainingService');
-const governmentSchemeService = require('./services/governmentSchemeService');
-const greenhouseService = require('./services/greenhouseService');
-const insuranceClaimsService = require('./services/insuranceClaimsService');
-const preSeasonOrderService = require('./services/preSeasonOrderService');
-const sharedInfraService = require('./services/sharedInfraService');
-const soilTestingService = require('./services/soilTestingService');
-const subsidyService = require('./services/subsidyService');
-
-// Import enhancement routes
-const marketplaceEnhancements = require('./routes/marketplaceEnhancements');
-const ecommerceRoutes = require('./routes/ecommerceRoutes');
-const ecommerceIntegrationRoutes = require('./routes/ecommerceIntegrationRoutes');
-const ecommerceAIRoutes = require('./routes/ecommerceAIRoutes');
-const ecommerceERPRoutes = require('./routes/ecommerceERPRoutes');
-const ecommerceBusinessSalesRoutes = require('./routes/ecommerceBusinessSalesRoutes');
-const ecommerceMarketingRoutes = require('./routes/ecommerceMarketingRoutes');
-const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes');
-const nervousSystemRoutes = require('./routes/nervousSystemRoutes');
-const insuranceEnhancements = require('./routes/insuranceEnhancements');
-const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements');
-const governanceModule = require('./routes/governanceModule');
-const logisticsEnhancements = require('./routes/logisticsEnhancements');
-const logisticsEnhancementRoutes = require('./routes/logisticsEnhancementRoutes');
-const advancedFeatures = require('./routes/advancedFeatures');
-const enterpriseAIRoutes = require('./routes/enterpriseAIRoutes');
-const gstRoutes = require('./routes/gstRoutes');
-// REMOVED: logisticsOpsRoutes - was imported from logisticsEnhancementRoutes but route removed to prevent crash
-const farmerRoutes = require('./routes/farmerRoutes');
-const auditRoutes = require('./routes/auditRoutes');
-// M121 Dairy Management + M112 Fertilizer Inventory (Livestock / Input
-// Supply, wave 1) — real backends for two pages that were UI-only until now.
-const dairyRoutes = require('./routes/dairyRoutes');
-const fertilizerRoutes = require('./routes/fertilizerRoutes');
-const revenueRoutes = require('./routes/revenueRoutes');
-// M123-M127 Livestock Management — Poultry, Goat, Sheep, Pig, Animal Health
-const poultryRoutes = require('./routes/poultryRoutes');
-const goatRoutes = require('./routes/goatRoutes');
-const sheepRoutes = require('./routes/sheepRoutes');
-const pigRoutes = require('./routes/pigRoutes');
-const animalHealthRoutes = require('./routes/animalHealthRoutes');
-// Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993).
-// enterpriseControlRoutes.js was deleted 2026-08-24: it imported
-// createWorkflow/createLegalCase/createRisk/etc from
-// services/enterpriseControlService.js, none of which exist there (the real
-// exports are startWorkflow/actOnWorkflow/listPendingApprovals/createLead/
-// convertLead/assessRisk/raiseIncident/etc) - every route in it would have
-// thrown TypeError on first call. Nothing called it (EnterpriseControlPage.jsx
-// / enterpriseControlAPI in api.js call /control/* - see the real,
-// already-working mountRoute('/api/v1/control', enterpriseControlService)
-// below, which exports its own correct router).
-// unifiedLedgerRoutes/unifiedLedgerService (migration 998, "One Ledger + 9
-// Economies") were deleted here (2026-08-17): the build directive explicitly
-// rejects a separate ledger per economy in favor of the canonical
-// journal_entries/journal_lines ledger tagged by cost center, this service
-// wrote through a signalBus instance disconnected from the real reflex
-// engine, and the route was already fully blocked. See
-// AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C. UnifiedLedgerPage.jsx now points
-// users at the real /ledger page instead of calling this.
-// Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
-const villageProfileService = require('./services/villageProfileService');
-// Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)
-const procurementSubscriptionService = require('./services/procurementSubscriptionService');
-// Buying Club Service (REOS Missing Layer 1.10-1.11 - Group Buying / Community Buying)
-const buyingClubService = require('./services/buyingClubService');
-// Rural Enterprise Service (REOS Rural Life OS - rural_enterprises table)
-const ruralEnterpriseService = require('./services/ruralEnterpriseService');
-// Renewable Energy Service (REOS Rural Life OS - renewable_energy_systems table)
-const renewableEnergyService = require('./services/renewableEnergyService');
-// Household Economy Service (REOS Rural Life OS - household_economy table)
-const householdEconomyService = require('./services/householdEconomyService');
-// Shared Infrastructure Service (REOS Rural Life OS - shared_infrastructure_access table)
-const sharedInfrastructureService = require('./services/sharedInfrastructureService');
-// Machinery Access Service (REOS Rural Life OS - machinery_access table)
-const machineryAccessService = require('./services/machineryAccessService');
-// Rural Finance Service (REOS Rural Life OS - rural_finance table)
-const ruralFinanceService = require('./services/ruralFinanceService');
-// AI Advisory Service (REOS Rural Life OS - ai_advisories table)
-const aiAdvisoryService = require('./services/aiAdvisoryService');
-// Market Access Service (REOS Rural Life OS - market_access table)
-const marketAccessService = require('./services/marketAccessService');
-// Market Intelligence Service (REOS Rural Life OS - market_intelligence table)
-const marketIntelligenceService = require('./services/marketIntelligenceService');
-// Mobility Rides Service (REOS Rural Life OS - mobility_rides table)
-const mobilityRidesService = require('./services/mobilityRidesService');
-// Backup and Disaster Recovery Service
-const backupService = require('./services/backupService');
-// Analytics and Monitoring Service
-const analyticsMonitoringService = require('./services/analyticsMonitoringService');
-// AI Agentic Companion Service
-const aiAgenticCompanionService = require('./services/aiAgenticCompanionService');
-// Digital Twin Service
-const digitalTwinService = require('./services/digitalTwinService');
-// AI Gateway Service - Real AI Backbone System
-const aiGatewayService = require('./services/aiGatewayService');
-// AI Agent Service - Agentic AI Capabilities
-const aiAgentService = require('./services/aiAgentService');
-// AI Brain Service - Cognitive Processing Layer
-const aiBrainService = require('./services/aiBrainService');
-// AI Self-Healing Service - Autonomous Error Recovery Layer
-const aiSelfHealingService = require('./services/aiSelfHealingService');
-// AI Operation Intelligence Service - Real-Time Optimization Layer
-const aiOperationIntelligenceService = require('./services/aiOperationIntelligenceService');
-// MFA Service - Multi-Factor Authentication
-const mfaService = require('./services/mfaService');
-const mfaRoutes = require('./routes/mfaRoutes');
-// GDPR Compliance Service
-const gdprService = require('./services/gdprService');
-const gdprRoutes = require('./routes/gdprRoutes');
-// M001 Platform Core Service
-const platformCoreService = require('./services/platformCoreService');
-const platformCoreRoutes = require('./routes/platformCoreRoutes');
-// Unified Claude AI Coordinator
-const claudeAICoordinator = require('./core/claudeAICoordinator');
-const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
-// SAP Module Architecture Service require REMOVED 2026-08-24 (route
-// reconciliation) — fake in-memory module registry, never mounted from
-// this require site anyway (dead duplicate require). See
-// docs/registry/ROUTE_RECONCILIATION.md.
-// Advance Rate Pricing — forward curves, basis, commitment advice.
-// Recovered from afrera_platform_v44.html (migration 051).
-const riskPricingRoutes = require('./routes/riskPricingRoutes');
-// GST, hash-chained ledger, scheme matching, eNWR, freight, risk (migration 053).
-const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes');
-// REMOVED: Climate monitoring routes - droughtMonitoringRoutes, floodMonitoringRoutes, diseaseForecastingRoutes, climateRiskRoutes, agroMeteorologyRoutes (missing files - would crash app)
-// Farm activities/tasks/contractors/machinery ops/equipment scheduling/input
-// consumption/productivity/ops dashboard CRUD - same "shipped frontend form,
-// no backend" gap as the climate batch above (2026-08-17).
-const {
-  farmActivityRoutes, farmTaskRoutes, contractorRoutes, machineryOperationsRoutes,
-  equipmentSchedulingRoutes, inputConsumptionRoutes, farmProductivityRoutes,
-  farmOperationsDashboardRoutes,
-} = require('./routes/operationsManagementRoutes');
-// Water budgeting/quality/rainwater-harvesting-structures/watersheds/analytics
-// CRUD - same gap as the batches above (2026-08-17). Distinct from
-// backend/src/modules/M078's rainwater_harvesting_systems engineering API -
-// see waterManagementService.js.
-const {
-  waterBudgetingRoutes, waterQualityRoutes, rainwaterHarvestingRoutes,
-  watershedManagementRoutes, waterAnalyticsRoutes,
-} = require('./routes/waterManagementRoutes');
-// Soil health cards/nutrient plans/fertility records CRUD - same gap as the
-// batches above (2026-08-17). M072 Soil Testing is real and untouched.
-const {
-  soilHealthRoutes, nutrientManagementRoutes, fertilityManagementRoutes,
-} = require('./routes/soilManagementRoutes');
-// Block/district/state/producer-group/community-asset/rural-development CRUD
-// - same gap as the batches above (2026-08-17). Panchayat/Cooperative are
-// real via /api/v1/governance and untouched.
-const {
-  blockManagementRoutes, districtManagementRoutes, stateManagementRoutes,
-  producerGroupRoutes, communityAssetRoutes, ruralDevelopmentRoutes,
-} = require('./routes/communityManagementRoutes');
-// Biofertilizer/pesticide/bio-pesticide/micronutrient/organic-input/
-// input-procurement/input-distribution/input-traceability CRUD - same gap
-// as the batches above (2026-08-17).
-const {
-  biofertilizerRoutes, pesticideInventoryRoutes, bioPesticideRoutes, micronutrientRoutes,
-  organicInputRoutes, inputProcurementRoutes, inputDistributionRoutes, inputTraceabilityRoutes,
-} = require('./routes/inputSupplyManagementRoutes');
-// Cattle registry/feed/analytics CRUD (2026-08-17). Poultry/Goat/Sheep/Pig
-// and Breeding deliberately excluded - see livestockManagementService.js
-// header for why (real backends already exist at different paths, or need
-// investigation before building). M127 Animal Health is real and untouched
-// (frontend caller was fixed instead - see LivestockManagementPage.jsx).
-const {
-  cattleRegistryRoutes, feedManagementRoutes, livestockAnalyticsRoutes,
-} = require('./routes/livestockManagementRoutes');
-// Farmer family CRUD (2026-08-17).
-const farmerFamilyRoutes = require('./routes/farmerFamilyRoutes');
-// Land lease/GIS mapping/soil mapping/water resource mapping/geo boundary/
-// survey CRUD - same gap as the batches above (2026-08-17).
-const {
-  landLeaseRoutes, gisLandMappingRoutes, soilMappingRoutes,
-  waterResourceMappingRoutes, geoBoundaryRoutes, surveyManagementRoutes,
-} = require('./routes/landManagementRoutes');
-// Crop registration/variety/seed-planning/nursery/sowing/monitoring CRUD -
-// same gap as the batches above (2026-08-17).
-const {
-  cropRegistrationRoutes, cropVarietyRoutes, seedPlanningRoutes,
-  nurseryManagementRoutes, sowingManagementRoutes, cropMonitoringRoutes,
-} = require('./routes/cropManagementRoutes');
-// Preventive maintenance CRUD (2026-08-17). The other 7
-// MachineryManagementPage.jsx tabs (implements/inventory/rental/breakdown/
-// fuel/parts/lifecycle) are deliberately not built - see
-// preventiveMaintenanceService.js for why (real, differently-shaped
-// backends already exist for those at modules M102/M103/M104/M107/M108/
-// M109/M110).
-const preventiveMaintenanceRoutes = require('./routes/preventiveMaintenanceRoutes');
-// Vegetable/floriculture/polyhouse/hydroponics/aeroponics/precision-horticulture/
-// protected-cultivation/horticulture-analytics CRUD - same gap as the
-// batches above (2026-08-17). M144 Greenhouse is real and untouched.
-const {
-  vegetableProductionRoutes, floricultureRoutes, polyhouseManagementRoutes,
-  hydroponicsRoutes, aeroponicsRoutes, precisionHorticultureRoutes,
-  protectedCultivationRoutes, horticultureAnalyticsRoutes,
-} = require('./routes/horticultureManagementRoutes');
-// Drought/flood/disease-forecast/climate-risk/agro-meteorology CRUD - same
-// gap as the batches above (2026-08-21). Real ClimateMonitoringPage.jsx
-// tabs shipped with a working form and an honest "backend not built yet"
-// note; service/routes already existed but were never mounted.
-const {
-  droughtMonitoringRoutes, floodMonitoringRoutes, diseaseForecastingRoutes,
-  climateRiskRoutes, agroMeteorologyRoutes,
-} = require('./routes/climateMonitoringRoutes');
-// Biofloc/hatchery/fish-feed/fisheries-water-quality/fish-health/
-// fisheries-harvest/fish-processing/cold-fish-chain/aquaculture-analytics
-// CRUD - same gap as the batches above (2026-08-21). Pond Management
-// (M132) already has a real, incompatibly-shaped backend and is untouched
-// - see fisheriesManagementService.js.
-const {
-  biofloccFarmRoutes, hatcheryManagementRoutes, fishFeedRoutes,
-  fisheriesWaterQualityRoutes, fishHealthRoutes, fisheriesHarvestRoutes,
-  fishProcessingRoutes, coldFishChainRoutes, aquacultureAnalyticsRoutes,
-} = require('./routes/fisheriesManagementRoutes');
-// Permission/SSO/MFA/digital-identity/consent CRUD + a real admin view over
-// M012's sessions table (2026-08-21). M014 Role Management already real.
-const {
-  permissionManagementRoutes, ssoRoutes, mfaManagementRoutes,
-  digitalIdentityRoutes, consentManagementRoutes, sessionManagementRoutes,
-} = require('./routes/identityManagementRoutes');
-// Role management (M014) — real service, real frontend caller
-// (frontend/src/services/api.js getRoles/createRole/updateRole/deleteRole
-// against /roles), but no backend anywhere until now (2026-08-21).
-const roleManagementRoutes = require('./routes/roleManagementRoutes');
-// Domain D14 Climate & Weather (057) — was completely empty before today.
-const weatherRoutes = require('./routes/weatherRoutes');
-// M083 Climate Advisory (Operations wave 2) — CRUD for agromet_advisories,
-// the migration-057 table ClimateAdvisoryPage.jsx has been waiting on.
-const climateAdvisoryRoutes = require('./routes/climateAdvisoryRoutes');
-// TDS, e-invoice IRN, GSTR, RCM (056).
-const complianceRoutes = require('./routes/complianceRoutes');
-// RFQ sealed bidding, quote outcomes, QC holds, FPO cost centres (056).
-const rfqRoutes = require('./routes/rfqRoutes');
-// energyRoutes existed but was never mounted, and its service failed to
-// parse, so nothing would have noticed. Both fixed 2026-08-05.
-const energyRoutes = require('./routes/energyRoutes');
-// Agmarknet/e-NAM ingestion + DBT reconciliation (056).
-const marketDataRoutes = require('./routes/marketDataRoutes');
-// FOLU land use + NE organic schemes (991). Logic lives in
-// organicTraceabilityService — these are routes only, no parallel service.
-const foluRoutes = require('./routes/foluRoutes');
-// Geofencing — circular zone check-ins on top of real mobile GPS (useGeolocation)
-// and the existing driver_location pipeline. See services/geofencingService.js.
-const geofencingRoutes = require('./routes/geofencingRoutes');
-// Experience Layer / DXP — the 15 engines (migration 060).
-const experienceRoutes = require('./routes/experienceRoutes');
-const demandRoutes = require('./routes/demandRoutes');
-const costRoutes = require('./routes/costRoutes');
-// AF-AA (Asset Accounting) / AF-CO (Controlling) — named MISSING in
-// docs/registry/12_ERP_COVERAGE.md and AFRERA_CLAUDE_BUILD_DIRECTIVE.md §8.6.
-// Schema (fixed_assets, depreciation_schedule, cost_centers, budgets) already
-// existed in migration 996; these give it a service/route layer for the
-// first time.
-const assetAccountingRoutes = require('./routes/assetAccountingRoutes');
-const costControlRoutes = require('./routes/costControlRoutes');
-// AF-PS (Project Systems) — the third domain named MISSING alongside AF-AA/
-// AF-CO. Unlike those two, AF-PS had no schema at all; it is created fresh
-// in migration 9996_project_systems_schema.sql (see that file's header for
-// why it is numbered after 996 rather than in the 060s sequence).
-const projectSystemsRoutes = require('./routes/projectSystemsRoutes');
-const coldStorageRoutes = require('./routes/coldStorageRoutes');
-const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
-const cooperativeShareRoutes = require('./routes/cooperativeShareRoutes');
-const wikipediaRoutes = require('./routes/wikipediaRoutes');
-// Found built but with zero HTTP exposure (2026-08-15 junk/orphan sweep) —
-// see each route file's header comment for what was verified before wiring.
-const agriculturalIntelligenceRoutes = require('./routes/agriculturalIntelligenceRoutes');
-const farmerHealthRoutes = require('./routes/farmerHealthRoutes');
-const foodRoutes = require('./routes/foodRoutes');
-const iotSensorService = require('./services/iotSensorService');
-const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes');
-const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes');
-const civilDisruptionRoutes = require('./routes/civilDisruptionRoutes');
-const sellerRankingRoutes = require('./routes/sellerRankingRoutes');
-const seedVaultRoutes = require('./routes/seedVaultRoutes');
-const freightPoolingRoutes = require('./routes/freightPoolingRoutes');
-const returnLoadBoardRoutes = require('./routes/returnLoadBoardRoutes');
-const glutWarningRoutes = require('./routes/glutWarningRoutes');
-const trackDartRoutes = require('./routes/trackDartRoutes');
-const equipmentExchangeRoutes = require('./routes/equipmentExchangeRoutes');
-// Vision (sharp) + OCR (tesseract.js) — real image-quality/metadata/
-// thumbnail and text-extraction dispatch behind core/aiOrchestrator.js's
-// vision_engine / ocr_engine, which were "missing" before 2026-08-09.
-const visionRoutes = require('./routes/visionRoutes');
-// AI Gateway Routes - Real AI Backbone System
-const aiGatewayRoutes = require('./routes/aiGatewayRoutes');
-// AI Intelligence Fabric - Professional AI module with unique IDs (EBD-MOD-00000001)
-const { initializeAI, handleAIRequest } = require('./core/ai/index');
-// AI Agent Routes - Agentic AI Capabilities
-const aiAgentRoutes = require('./routes/aiAgentRoutes');
-// AI Brain Routes - Cognitive Processing Layer
-const aiBrainRoutes = require('./routes/aiBrainRoutes');
-// AI Self-Healing Routes - Autonomous Error Recovery Layer
-const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes');
-// AI Operation Intelligence Routes - Real-Time Optimization Layer
-const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes');
-// SAP Module Architecture Routes - REMOVED 2026-08-24 (route reconciliation):
-// fully fake, in-memory-Map-only self-referential module registry
-// (registers fake "AF-FI"/"AF-HR"/"AF-SC" entries, "quantum-enhanced
-// modules"), zero frontend caller anywhere. See docs/registry/ROUTE_RECONCILIATION.md.
-// Research and Development Routes - R&D Management with AI Integration
-const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes');
-// Information Sharing Routes - Document and Knowledge Sharing with AI Integration
-const informationSharingRoutes = require('./routes/informationSharingRoutes');
-// Community Routes - Community Management with AI Integration
-// Knowledge Routes - Knowledge Management with AI Integration
-const knowledgeRoutes = require('./routes/knowledgeRoutes');
-// Company lookup — resolves accounting UI gap for companyId/fiscalYear/chart-of-accounts
-const companyRoutes = require('./routes/companyRoutes');
-// Platform Foundation Routes - AI Enhanced Platform Foundation (D01)
-const platformConfigurationRoutes = require('./routes/platformConfigurationRoutes');
-const tenantManagementRoutes = require('./routes/tenantManagementRoutes');
-const organizationManagementRoutes = require('./routes/organizationManagementRoutes');
-const systemAdministrationRoutes = require('./routes/systemAdministrationRoutes');
-// Poultry/Goat/Sheep/Pig/Animal Health (M123-M127) already required above.
-
-// Cross-module nervous system + decision layer.
-// Services emit signals; the engine correlates them across module boundaries
-// and emits decisions that effectors act on. See src/core/ for the rationale.
-const { signalBus, SIGNAL } = require('./core/signalBus');
-const { decisionEngine } = require('./core/decisionEngine');
-// ERP domain agents: 10 rules across 8 ERP domains. Each PROPOSES only —
-// the ai_proposals CHECK constraint makes approval impossible without a
-// named human. See src/core/erpAgents.js.
-const erpAgents = require('./core/erpAgents');
-
-// Import middleware
-const { errorHandler } = require('./middleware/errorHandler');
-const { rateLimiters } = require('./middleware/rateLimit');
-const { responseFormatter } = require('./middleware/responseFormatter');
-const { requestLogger, errorLogger } = require('./middleware/requestLogger');
-const { validateBody, validateQuery, validateParams } = require('./middleware/validation');
-const { authMiddleware } = require('./middleware/auth');
-const { validateBody: validateBodyOld } = require('./middleware/inputValidation');
-const { requestId } = require('./middleware/requestId');
-const { securityHeaders, productionSecurityHeaders } = require('./middleware/securityHeaders');
-const { routeMonitoring, criticalRouteMonitoring, healthCheckMonitoring } = require('./middleware/routeMonitoring');
+// Core infrastructure
 const { logger } = require('./utils/logger');
+const { errorHandler } = require('./middleware/errorHandler');
+const { securityHeaders, rateLimit } = require('./middleware/securityMiddleware');
+const { requestId } = require('./middleware/requestId');
+const { responseFormatter } = require('./middleware/responseFormatter');
+const { routeMonitoring } = require('./middleware/routeMonitoring');
+const mfaMiddleware = require('./middleware/dual-use/mfaMiddleware');
+const loggingService = require('./services/loggingService');
+const libraryKnowledgeService = require('./services/libraryKnowledgeService');
+const websocketService = require('./services/websocketService');
+const { initializeAI } = require('./core/ai');
+const disruptionRoutingAgent = require('./core/disruptionRoutingAgent');
 
-// Database Enhancements Integration
-const { initializeDatabaseEnhancements, shutdownDatabaseEnhancements, getDatabaseEnhancements } = require('./database/database_enhancements');
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
 
-// Initialize Express app
 const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
-  }
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: process.env.FRONTEND_URL || '*' },
 });
 
-// Trust proxy configuration for rate limiting security
-// Rate limiters key on req.ip, which is attacker-controlled via X-Forwarded-For
-// behind a reverse proxy without this setting. TRUST_PROXY_HOPS configures how
-// many proxy layers to trust (default: 1 for a single load balancer).
-const trustProxyHops = process.env.TRUST_PROXY_HOPS ? parseInt(process.env.TRUST_PROXY_HOPS, 10) : 1;
-app.set('trust proxy', trustProxyHops);
-logger.info(`Trust proxy configured: ${trustProxyHops} hop(s)`);
+// Store on app for access in route handlers
+app.io = io;
+
+// ============================================================================
+// MIDDLEWARE SETUP
+// ============================================================================
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: false // Disable default CSP, use our custom securityHeaders
-}));
-
-// Enterprise-grade security headers (replaces default helmet CSP)
-app.use(process.env.NODE_ENV === 'production' ? productionSecurityHeaders() : securityHeaders());
-
-// CORS configuration - Production-ready with environment-based origins
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-  : [process.env.FRONTEND_URL || 'http://localhost:3000'];
-
+app.use(helmet());
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS policy: Origin not allowed'));
-    }
-  },
+  origin: (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean),
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['X-Total-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset', 'X-Request-ID', 'X-Correlation-ID'],
-  maxAge: 86400 // 24 hours
 }));
 
-// General middleware
+// Parsing middleware
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(compression());
-app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Request ID middleware for distributed tracing (must come before other middleware)
+// Logging middleware
+app.use(morgan('combined'));
 app.use(requestId);
-
-// Route monitoring middleware
+app.use(responseFormatter);
 app.use(routeMonitoring);
 
-// Request/response logging
-app.use(requestLogger);
+// Security enhancements
+app.use(securityHeaders);
+app.use(rateLimit);
 
-// Response formatting
-app.use(responseFormatter);
+// ============================================================================
+// STARTUP SEQUENCE
+// ============================================================================
 
-// Rate limiting (use new middleware)
-app.use('/api/v1/auth', rateLimiters.auth);
-app.use('/api/v1/', rateLimiters.api);
-
-// Error logger middleware (must be before error handler)
-app.use(errorLogger);
-
-// API Routes
-const mountRoute = (pathPrefix, serviceModule) => {
-  if (serviceModule && serviceModule.router) {
-    app.use(pathPrefix, serviceModule.router);
-    return true;
-  }
-
-  logger.warn(`Skipping route mount for ${pathPrefix} because no router was exported.`);
-  return false;
-};
-
-app.use('/api/v1/auth', criticalRouteMonitoring, authService.router);
-mountRoute('/api/v1/products', productService);
-app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
-// NOTE: farmerService and gstService export plain functions, not a .router,
-// so mountRoute() silently no-ops for them (see farmerRoutes/gstRoutes mounts below).
-app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
-app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
-app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
-mountRoute('/api/v1/ai', aiService);
-mountRoute('/api/v1/erp', erpService);
-mountRoute('/api/v1/multilingual', multilingualService);
-mountRoute('/api/v1/organic-traceability', organicTraceabilityService);
-mountRoute('/api/v1/nutrition-intelligence', nutritionIntelligenceService);
-mountRoute('/api/v1/conversational-ai', conversationalAIService);
-mountRoute('/api/v1/laboratory-erp', laboratoryERPService);
-mountRoute('/api/v1/gi-intelligence', giIntelligenceService);
-mountRoute('/api/v1/food-intelligence', foodIntelligenceService);
-mountRoute('/api/v1/value-commerce', valueCommerceService);
-mountRoute('/api/v1/consumer-health', consumerHealthService);
-mountRoute('/api/v1/voice-ai', voiceAIService);
-mountRoute('/api/v1/blockchain-traceability', blockchainTraceabilityService);
-mountRoute('/api/v1/knowledge-graph', knowledgeGraphService);
-mountRoute('/api/v1/enterprise-memory', enterpriseMemoryService);
-mountRoute('/api/v1/predictive-analytics', predictiveAnalyticsService);
-mountRoute('/api/v1/iot-integration', iotIntegrationService);
-mountRoute('/api/v1/ar-vr', arVrService);
-mountRoute('/api/v1/sms-auth', smsAuthService);
-mountRoute('/api/v1/whatsapp', whatsappService);
-mountRoute('/api/v1/advanced-voice', advancedVoiceAI);
-mountRoute('/api/v1/offline-payment', offlinePaymentService);
-mountRoute('/api/v1/advanced-ai', advancedAIService);
-mountRoute('/api/v1/offline-sync', offlineSyncService);
-mountRoute('/api/v1/indigenous-knowledge', indigenousKnowledgeService);
-mountRoute('/api/v1/biodiversity', biodiversityService);
-mountRoute('/api/v1/ai-copilot', aiCopilotService);
-mountRoute('/api/v1/omnichannel-ai', omnichannelAIService);
-mountRoute('/api/v1/food-safety', foodSafetyService);
-mountRoute('/api/v1/shelf-life', shelfLifeService);
-mountRoute('/api/v1/institutional-procurement', institutionalProcurementService);
-mountRoute('/api/v1/mill-fpo', millCircuitService);
-mountRoute('/api/v1/digital-product-passport', digitalProductPassportService);
-mountRoute('/api/v1/recipe-intelligence', recipeIntelligenceService);
-mountRoute('/api/v1/forms', formService);
-mountRoute('/api/v1/analytics', analyticsService);
-mountRoute('/api/v1/modules', moduleCatalogService);
-// decisionSupportService uses setupRoutes instead of mountRoute
-decisionSupportService.setupRoutes(app);
-mountRoute('/api/v1/ne-intelligence', neProductIntelligenceService);
-mountRoute('/api/v1/commerce-rules', commerceRulesService);
-mountRoute('/api/v1/catalog-intelligence', catalogIntelligenceService);
-// Enterprise control layer (993): workflow, CRM, clients, legal, risk, emergency.
-mountRoute('/api/v1/control', enterpriseControlService);
-// v42 recovered intelligence (992): crop semantics, freight, promos, engines.
-mountRoute('/api/v1/intel', v42IntelligenceService);
-mountRoute('/api/v1/value', farmerValueService);
-mountRoute('/api/v1/merchandising', merchandisingService);
-mountRoute('/api/v1/engineering', require('./routes/engineeringProjectRoutes'));
-// Mount User Management (M011)
-mountRoute('/api/v1/users', userModule);
-// Mount System Administration (M006)
-mountRoute('/api/v1/admin', adminModule);
-
-// Mount generated module scaffolds for every M001..M150 module.
-const generatedModuleRoot = path.join(__dirname, 'modules');
-const generatedModuleNames = fs.readdirSync(generatedModuleRoot)
-  .filter(name => /^M\d{3}$/.test(name))
-  .sort(); // Note: Synchronous I/O at module load is acceptable for one-time initialization
-
-for (const moduleName of generatedModuleNames) {
-  const resolvedModule = require(path.join(generatedModuleRoot, moduleName));
-  if (resolvedModule && resolvedModule.router) {
-    mountRoute(`/api/v1/modules/${moduleName.toLowerCase()}`, resolvedModule);
-  }
-}
-
-// Enhancement routes
-app.use('/api/v1/marketplace', marketplaceEnhancements);
-app.use('/api/v1/ecommerce', ecommerceRoutes);
-app.use('/api/v1/ecommerce-integration', ecommerceIntegrationRoutes);
-app.use('/api/v1/ecommerce-ai', ecommerceAIRoutes);
-app.use('/api/v1/ecommerce-erp', ecommerceERPRoutes);
-app.use('/api/v1/ecommerce-business', ecommerceBusinessSalesRoutes);
-app.use('/api/v1/ecommerce-marketing', ecommerceMarketingRoutes);
-app.use('/api/v1/nutrient-value', nutrientValueSalesRoutes);
-app.use('/api/v1/nervous', nervousSystemRoutes);
-// Bulk Order Service - Bulk/wholesale orders for marketplace
-const bulkOrderRoutes = require('./routes/bulkOrderRoutes');
-app.use('/api/v1/bulk-orders', bulkOrderRoutes);
-// Complete ERP Integration - Comprehensive ERP integration with all modules
-const completeERPIntegrationRoutes = require('./routes/completeERPIntegrationRoutes');
-app.use('/api/v1/complete-erp-integration', completeERPIntegrationRoutes);
-// Complete AI Integration - Comprehensive AI integration with all modules
-const completeAIIntegrationRoutes = require('./routes/completeAIIntegrationRoutes');
-app.use('/api/v1/complete-ai-integration', completeAIIntegrationRoutes);
-// Comprehensive ERP - Oracle/SAP standards complete ERP system
-const comprehensiveERPRoutes = require('./routes/comprehensiveERPRoutes');
-app.use('/api/v1/comprehensive-erp', comprehensiveERPRoutes);
-// AI Backbone - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face)
-const aiBackboneRoutes = require('./routes/aiBackboneRoutes');
-app.use('/api/v1/ai-backbone', aiBackboneRoutes);
-// Product Media AI - AI product-image generation, nutrient-comparison video generation
-const productMediaAIRoutes = require('./routes/productMediaAIRoutes');
-app.use('/api/v1/product-media-ai', productMediaAIRoutes);
-// Wearable Integration - Fitbit (real OAuth2 API), Apple Health / Samsung Health (device-push)
-const wearableIntegrationRoutes = require('./routes/wearableIntegrationRoutes');
-app.use('/api/v1/wearable-integration', wearableIntegrationRoutes);
-// Defense/Police/BSF Fitness Prep - self-prep comparison against real, cited published standards
-const defenseFitnessPrepRoutes = require('./routes/defenseFitnessPrepRoutes');
-app.use('/api/v1/defense-fitness-prep', defenseFitnessPrepRoutes);
-// Crop Value-Compound Research - AI-assisted, human-reviewed published reference data
-const cropValueResearchRoutes = require('./routes/cropValueResearchRoutes');
-app.use('/api/v1/crop-value-research', cropValueResearchRoutes);
-// Platform Telemetry - real system/business metrics for admin dashboard
-const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes');
-app.use('/api/v1/platform-telemetry', platformTelemetryRoutes);
-// Farmer Training - Agricultural training and FOLU compliance
-const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes');
-app.use('/api/v1/training', farmerTrainingRoutes);
-app.use('/api/v1/insurance', insuranceEnhancements);
-app.use('/api/v1/farmer-portal', farmerPortalEnhancements);
-app.use('/api/v1/governance', governanceModule);
-app.use('/api/v1/logistics', logisticsEnhancements);
-app.use('/api/v1/logistics-enhancement', logisticsEnhancementRoutes);
-app.use('/api/v1/mfa', mfaRoutes);
-app.use('/api/v1/privacy', gdprRoutes);
-app.use('/api/v1/platform', platformCoreRoutes);
-app.use('/api/v1/ai', unifiedAIRoutes);
-app.use('/api/v1/advanced', advancedFeatures);
-app.use('/api/v1/enterprise-ai', enterpriseAIRoutes);
-
-// Routes that existed but were never mounted anywhere
-app.use('/api/v1/gst', gstRoutes);
-// REMOVED: logisticsOpsRoutes - missing file, will crash app
-// app.use('/api/v1/logistics-ops', logisticsOpsRoutes);
-
-// Newly created routes covering previously-orphaned services
-app.use('/api/v1/farmers', farmerRoutes);
-app.use('/api/v1/admin/audit', auditRoutes);
-// M121 Dairy Management + M112 Fertilizer Inventory — see dairyRoutes.js /
-// fertilizerRoutes.js. Frontend already calls these exact paths
-// (dairyAPI / fertilizerAPI in frontend/src/services/api.js); this is the
-// first time either has had a real backend.
-app.use('/api/v1/dairy', dairyRoutes);
-app.use('/api/v1/fertilizer', fertilizerRoutes);
-// M123-M127 Livestock Management — Poultry, Goat, Sheep, Pig, Animal Health
-app.use('/api/v1/poultry', poultryRoutes);
-app.use('/api/v1/goat', goatRoutes);
-app.use('/api/v1/sheep', sheepRoutes);
-app.use('/api/v1/pig', pigRoutes);
-app.use('/api/v1/animal-health', animalHealthRoutes);
-// Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
-villageProfileService.setupRoutes(app);
-// Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)
-procurementSubscriptionService.setupRoutes(app);
-// Buying Club Service (REOS Missing Layer 1.10-1.11 - Group Buying / Community Buying)
-buyingClubService.setupRoutes(app);
-// Rural Enterprise Service (REOS Rural Life OS - rural_enterprises table)
-ruralEnterpriseService.setupRoutes(app);
-// Renewable Energy Service (REOS Rural Life OS - renewable_energy_systems table)
-renewableEnergyService.setupRoutes(app);
-// Household Economy Service (REOS Rural Life OS - household_economy table)
-householdEconomyService.setupRoutes(app);
-// Shared Infrastructure Service (REOS Rural Life OS - shared_infrastructure_access table)
-sharedInfrastructureService.setupRoutes(app);
-// Machinery Access Service (REOS Rural Life OS - machinery_access table)
-machineryAccessService.setupRoutes(app);
-// Rural Finance Service (REOS Rural Life OS - rural_finance table)
-ruralFinanceService.setupRoutes(app);
-// AI Advisory Service (REOS Rural Life OS - ai_advisories table)
-aiAdvisoryService.setupRoutes(app);
-// Market Access Service (REOS Rural Life OS - market_access table)
-marketAccessService.setupRoutes(app);
-// Market Intelligence Service (REOS Rural Life OS - market_intelligence table)
-marketIntelligenceService.setupRoutes(app);
-// Mobility Rides Service (REOS Rural Life OS - mobility_rides table)
-mobilityRidesService.setupRoutes(app);
-// Vendor-facing routes (corporate buyers, logistics providers, processors, retailers)
-const vendorRoutes = require('./routes/vendorRoutes');
-app.use('/api/v1/vendors', vendorRoutes);
-// HR Module with AI Integration - Complete AI-powered HR management
-const hrRoutes = require('./routes/hrRoutes');
-app.use('/api/v1/hr', hrRoutes);
-
-// Economic Layer routes (scaffolded) - RESTORED: These routes ARE exported from existing aggregate files
-app.use('/api/v1/revenue', revenueRoutes);
-app.use('/api/v1/pricing', riskPricingRoutes);
-app.use('/api/v1/finance', recoveredFinanceRoutes);
-// Climate monitoring routes - REMOVED: droughtMonitoringRoutes, floodMonitoringRoutes, diseaseForecastingRoutes, climateRiskRoutes, agroMeteorologyRoutes (missing files)
-// Farm operations routes - RESTORED: Exported from operationsManagementRoutes.js
-app.use('/api/v1/farm-activities', farmActivityRoutes);
-app.use('/api/v1/farm-tasks', farmTaskRoutes);
-app.use('/api/v1/contractors', contractorRoutes);
-app.use('/api/v1/machinery-operations', machineryOperationsRoutes);
-app.use('/api/v1/equipment-scheduling', equipmentSchedulingRoutes);
-app.use('/api/v1/input-consumption', inputConsumptionRoutes);
-app.use('/api/v1/farm-productivity', farmProductivityRoutes);
-app.use('/api/v1/farm-operations-dashboard', farmOperationsDashboardRoutes);
-// Water management routes - RESTORED: Exported from waterManagementRoutes.js
-app.use('/api/v1/water-budgeting/budgets', waterBudgetingRoutes);
-app.use('/api/v1/water-quality/readings', waterQualityRoutes);
-app.use('/api/v1/rainwater-harvesting/structures', rainwaterHarvestingRoutes);
-app.use('/api/v1/watersheds', watershedManagementRoutes);
-app.use('/api/v1/water-analytics/records', waterAnalyticsRoutes);
-// Soil management routes - RESTORED: Exported from soilManagementRoutes.js
-app.use('/api/v1/soil-health/cards', soilHealthRoutes);
-app.use('/api/v1/nutrient-management/plans', nutrientManagementRoutes);
-app.use('/api/v1/fertility-management/records', fertilityManagementRoutes);
-// Community management routes - RESTORED: Exported from communityManagementRoutes.js
-app.use('/api/v1/blocks', blockManagementRoutes);
-app.use('/api/v1/districts', districtManagementRoutes);
-app.use('/api/v1/states', stateManagementRoutes);
-app.use('/api/v1/producer-groups', producerGroupRoutes);
-app.use('/api/v1/community-assets', communityAssetRoutes);
-app.use('/api/v1/rural-development/projects', ruralDevelopmentRoutes);
-// Input supply routes - RESTORED: Exported from inputSupplyManagementRoutes.js
-app.use('/api/v1/biofertilizers', biofertilizerRoutes);
-app.use('/api/v1/pesticide-inventory', pesticideInventoryRoutes);
-app.use('/api/v1/bio-pesticides', bioPesticideRoutes);
-app.use('/api/v1/micronutrients', micronutrientRoutes);
-app.use('/api/v1/organic-inputs', organicInputRoutes);
-app.use('/api/v1/input-procurement/orders', inputProcurementRoutes);
-app.use('/api/v1/input-distribution/records', inputDistributionRoutes);
-app.use('/api/v1/input-traceability/records', inputTraceabilityRoutes);
-// Livestock routes - RESTORED: Exported from livestockManagementRoutes.js
-app.use('/api/v1/cattle-registry/animals', cattleRegistryRoutes);
-app.use('/api/v1/livestock-feed/records', feedManagementRoutes);
-app.use('/api/v1/livestock-analytics/records', livestockAnalyticsRoutes);
-// Other routes - RESTORED: Exported from existing files
-app.use('/api/v1/farmer-family/members', farmerFamilyRoutes);
-app.use('/api/v1/land-leases', landLeaseRoutes);
-app.use('/api/v1/gis-land-mapping/parcels', gisLandMappingRoutes);
-app.use('/api/v1/soil-mapping/zones', soilMappingRoutes);
-app.use('/api/v1/water-resource-mapping/resources', waterResourceMappingRoutes);
-app.use('/api/v1/geo-boundaries', geoBoundaryRoutes);
-app.use('/api/v1/land-surveys', surveyManagementRoutes);
-app.use('/api/v1/crop-registration/crops', cropRegistrationRoutes);
-app.use('/api/v1/crop-varieties', cropVarietyRoutes);
-app.use('/api/v1/seed-planning/plans', seedPlanningRoutes);
-app.use('/api/v1/nurseries', nurseryManagementRoutes);
-app.use('/api/v1/sowing/records', sowingManagementRoutes);
-app.use('/api/v1/crop-monitoring/observations', cropMonitoringRoutes);
-app.use('/api/v1/preventive-maintenance', preventiveMaintenanceRoutes);
-app.use('/api/v1/vegetable-production', vegetableProductionRoutes);
-app.use('/api/v1/floriculture', floricultureRoutes);
-app.use('/api/v1/polyhouse-management', polyhouseManagementRoutes);
-app.use('/api/v1/hydroponics', hydroponicsRoutes);
-app.use('/api/v1/aeroponics', aeroponicsRoutes);
-app.use('/api/v1/precision-horticulture', precisionHorticultureRoutes);
-app.use('/api/v1/protected-cultivation', protectedCultivationRoutes);
-app.use('/api/v1/horticulture-analytics', horticultureAnalyticsRoutes);
-app.use('/api/v1/drought-monitoring', droughtMonitoringRoutes);
-app.use('/api/v1/flood-monitoring', floodMonitoringRoutes);
-app.use('/api/v1/disease-forecasting', diseaseForecastingRoutes);
-app.use('/api/v1/climate-risk', climateRiskRoutes);
-app.use('/api/v1/agro-meteorology', agroMeteorologyRoutes);
-app.use('/api/v1/biofloc-farms', biofloccFarmRoutes);
-app.use('/api/v1/hatchery-management', hatcheryManagementRoutes);
-app.use('/api/v1/fish-feed', fishFeedRoutes);
-app.use('/api/v1/fisheries-water-quality', fisheriesWaterQualityRoutes);
-app.use('/api/v1/fish-health', fishHealthRoutes);
-app.use('/api/v1/fisheries-harvest', fisheriesHarvestRoutes);
-app.use('/api/v1/fish-processing', fishProcessingRoutes);
-app.use('/api/v1/cold-fish-chain', coldFishChainRoutes);
-app.use('/api/v1/aquaculture-analytics', aquacultureAnalyticsRoutes);
-app.use('/api/v1/permissions', permissionManagementRoutes);
-app.use('/api/v1/sso-providers', ssoRoutes);
-app.use('/api/v1/mfa-devices', mfaManagementRoutes);
-app.use('/api/v1/digital-identities', digitalIdentityRoutes);
-app.use('/api/v1/consent-records', consentManagementRoutes);
-app.use('/api/v1/sessions', sessionManagementRoutes);
-app.use('/api/v1/roles', roleManagementRoutes);
-app.use('/api/v1/weather', weatherRoutes);
-app.use('/api/v1/climate-advisory', climateAdvisoryRoutes);
-app.use('/api/v1/compliance', complianceRoutes);
-app.use('/api/v1/rfq', rfqRoutes);
-app.use('/api/v1/energy', energyRoutes);
-app.use('/api/v1/market-data', marketDataRoutes);
-app.use('/api/v1/folu', foluRoutes);
-app.use('/api/v1/geofencing', geofencingRoutes);
-app.use('/api/v1/experience', experienceRoutes);
-app.use('/api/v1/demand', demandRoutes);
-app.use('/api/v1/costs', costRoutes);
-// AF-AA / AF-CO — see require comments above.
-app.use('/api/v1/erp/assets', assetAccountingRoutes);
-app.use('/api/v1/erp/controlling', costControlRoutes);
-app.use('/api/v1/erp/projects', projectSystemsRoutes);
-app.use('/api/v1/cold-storage', coldStorageRoutes);
-app.use('/api/v1/dpr', dprGenerationRoutes);
-app.use('/api/v1/cooperative-shares', cooperativeShareRoutes);
-// Real Wikimedia REST API reference lookups (see services/wikipediaService.js).
-app.use('/api/v1/wikipedia', wikipediaRoutes);
-app.use('/api/v1/agri-intelligence', agriculturalIntelligenceRoutes);
-// farmerHealthRoutes has real welfare-program/health-summary endpoints not
-// covered by the generic M029 CRUD scaffold at /api/v1/modules/m029 — kept
-// distinct rather than merged to avoid touching the generated scaffold.
-app.use('/api/v1/farmer-health', farmerHealthRoutes);
-app.use('/api/v1/food', foodRoutes);
-app.use('/api/v1/variety-directory', regionalVarietyRoutes);
-app.use('/api/v1/folu-benchmark', foluBenchmarkRoutes);
-app.use('/api/v1/civil-disruptions', civilDisruptionRoutes);
-app.use('/api/v1/seller-ranking', sellerRankingRoutes);
-app.use('/api/v1/seed-vault', seedVaultRoutes);
-app.use('/api/v1/freight-pooling', freightPoolingRoutes);
-app.use('/api/v1/return-load-board', returnLoadBoardRoutes);
-app.use('/api/v1/glut-warning', glutWarningRoutes);
-app.use('/api/v1/track', trackDartRoutes);
-app.use('/api/v1/equipment-exchange', equipmentExchangeRoutes);
-// Vision + OCR (real sharp / tesseract.js dispatch, see routes/visionRoutes.js).
-app.use('/api/v1/vision', visionRoutes);
-// AI Gateway - Real AI Backbone System
-app.use('/api/v1/ai-gateway', aiGatewayRoutes);
-// AI Intelligence Fabric Routes (EBD-MOD-00000001)
-app.post('/api/v1/ai/orchestrate', handleAIRequest);
-app.post('/api/v1/ai/classify', handleAIRequest);
-app.get('/api/v1/ai/capabilities', (req, res) => {
-  const { getAIStatus } = require('./core/ai/index');
-  res.json({ success: true, data: getAIStatus() });
-});
-app.get('/api/v1/ai/audit', (req, res) => {
-  const { getAIStatus } = require('./core/ai/index');
-  res.json({ success: true, data: getAIStatus() });
-});
-// AI Agent - Agentic AI Capabilities
-app.use('/api/v1/ai-agent', aiAgentRoutes);
-// AI Brain - Cognitive Processing Layer
-app.use('/api/v1/ai-brain', aiBrainRoutes);
-// AI Self-Healing - Autonomous Error Recovery Layer
-app.use('/api/v1/ai-self-healing', aiSelfHealingRoutes);
-// AI Operation Intelligence - Real-Time Optimization Layer
-app.use('/api/v1/ai-operation-intelligence', aiOperationIntelligenceRoutes);
-// SAP Module Architecture mount REMOVED 2026-08-24 (route reconciliation) — see require-site comment above.
-// Research and Development - R&D Management with AI Integration
-app.use('/api/v1/research-and-development', researchAndDevelopmentRoutes);
-// Information Sharing - Document and Knowledge Sharing with AI Integration
-app.use('/api/v1/information-sharing', informationSharingRoutes);
-// Community - Community Management with AI Integration
-// Knowledge - Knowledge Management with AI Integration
-app.use('/api/v1/knowledge', knowledgeRoutes);
-// Company lookup — resolves accounting UI gap
-app.use('/api/v1/companies', companyRoutes);
-// Platform Foundation - AI Enhanced Platform Foundation (D01)
-app.use('/api/v1/platform-core', platformCoreRoutes);
-app.use('/api/v1/platform-configuration', platformConfigurationRoutes);
-app.use('/api/v1/tenant-management', tenantManagementRoutes);
-app.use('/api/v1/organization-management', organizationManagementRoutes);
-app.use('/api/v1/system-administration', systemAdministrationRoutes);
-// Escrow service - secure fund holding for transactions
-escrowService.setupRoutes(app);
-// Custody event service - chain tracking and settlement instructions
-custodyEventRoutes.setupRoutes(app);
-// Health check endpoints for monitoring with specialized monitoring
-app.use('/health', healthCheckMonitoring, healthRoutes);
-// iotSensorService.setupRoutes registers full paths directly on `app`
-// (not a sub-router) — see services/iotSensorService.js line ~600.
-iotSensorService.initialize().catch((error) => logger.warn('iotSensorService initialize failed', { error: error.message }));
-iotSensorService.setupRoutes(app);
-// Poultry/Goat/Sheep/Pig/Animal Health (M123-M127) already mounted above.
-
-// Services that self-register their routes directly on `app`
-dynamicPricingService.setupRoutes(app);
-farmerTrainingService.setupRoutes(app);
-governmentSchemeService.setupRoutes(app);
-greenhouseService.setupRoutes(app);
-insuranceClaimsService.setupRoutes(app);
-preSeasonOrderService.setupRoutes(app);
-sharedInfraService.setupRoutes(app);
-soilTestingService.setupRoutes(app);
-subsidyService.setupRoutes(app);
-
-// GraphQL endpoint — disabled by default (ENABLE_GRAPHQL unset). Never actually
-// built: no schema file exists under src/graphql/ and express-graphql isn't in
-// package.json, so this throws MODULE_NOT_FOUND if ever enabled. Left as a
-// clearly-failing stub rather than silently no-op-ing.
-if (process.env.ENABLE_GRAPHQL === 'true') {
-  const { graphqlHTTP } = require('express-graphql');
-  const schema = require('./graphql/schema');
-  app.use('/graphql', graphqlHTTP({
-    schema: schema,
-    graphiql: process.env.NODE_ENV === 'development'
-  }));
-}
-
-// WebSocket connection handling
-io.on('connection', (socket) => {
-  logger.info(`Client connected: ${socket.id}`);
-
-  // Join user-specific room for notifications
-  socket.on('join', (userId) => {
-    socket.join(`user:${userId}`);
-    logger.info(`User ${userId} joined their room`);
-  });
-
-  // Real-time order updates
-  socket.on('subscribe:orders', (orderId) => {
-    socket.join(`order:${orderId}`);
-  });
-
-  // Real-time shipment tracking
-  socket.on('subscribe:shipment', (shipmentId) => {
-    socket.join(`shipment:${shipmentId}`);
-  });
-
-  socket.on('disconnect', () => {
-    logger.info(`Client disconnected: ${socket.id}`);
-  });
-});
-
-// Export io for use in services
-app.set('io', io);
-
-// Module-scoped so gracefulShutdown() (inside startServer(), a separate
-// function declared later) can still clear them - they used to be `let`
-// inside initializeDecisionLayer() only, out of scope the moment that
-// function returned, so shutdown itself threw ReferenceError instead of
-// clearing the timers and exiting cleanly.
-let learningTimer = null;
-let mandiTimer = null;
-
-// ---------------------------------------------------------------------------
-// Activate the decision layer and connect it to the realtime channel.
-// ---------------------------------------------------------------------------
-function initializeDecisionLayer() {
-  decisionEngine.start();
-
-  // Effectors: the efferent (motor) half of the nervous system. Before this,
-  // 4 modules emitted signals and NOTHING subscribed — a temperature breach was
-  // published to an empty room. See core/effectors.js for why each reaction
-  // exists and why most modules are deliberately left unwired.
-  const { registerEffectors } = require('./core/effectors');
-  registerEffectors();
-
-  // Close the learning loop. effectors.js has always exposed setOutcomeSink();
-  // nothing ever supplied one, so every reaction was logged and forgotten —
-  // which is why the AI learning loop measured 0%% in every audit. One wire.
-  require('./core/outcomeSink').install();
-
-  // Enterprise Memory: records a case entry the moment TEMPERATURE_BREACH /
-  // RECALL_ISSUED / FRAUD_SUSPECTED fires, then best-effort links it to the
-  // ai_outcomes row the effectors above write for the same signal. See
-  // services/enterpriseMemoryService.js's module header for why this is a
-  // read-only subscriber (signalBus/effectors/outcomeSink are untouched) and
-  // why the link is best-effort rather than transactional.
-  enterpriseMemoryService.installSignalHooks();
-
-  // Autonomous learning cycle. Resolves predictions against ground truth the
-  // platform already holds and re-derives every agent's calibration gate, with
-  // no human in the path. Seven of the eight prediction types close themselves
-  // this way; only conflict-route risk is marked human_only, because rerouting a
-  // truck means the original road was never driven and no data can say what
-  // would have happened on it.
-  if (process.env.NODE_ENV !== 'test' && process.env.AI_LEARNING_CYCLE !== 'off') {
-    const resolver = require('./core/outcomeResolver');
-    const everyMinutes = Number(process.env.AI_LEARNING_CYCLE_MINUTES || 60);
-    learningTimer = setInterval(() => {
-      resolver.runCycle().catch((error) => {
-        logger.warn('learning cycle skipped', { error: error.message });
-      });
-    }, everyMinutes * 60 * 1000);
-    learningTimer.unref();   // never hold the process open for this
-    logger.info('autonomous learning cycle scheduled', { everyMinutes });
-  }
-
-  // Daily Agmarknet (data.gov.in) mandi price refresh. jobs/loadMandiPrices.js
-  // was built as a standalone CLI script (`node src/jobs/loadMandiPrices.js`)
-  // with no in-process scheduling — real and working, but only ever ran
-  // manually. Same disable/interval-override convention as the learning
-  // cycle above.
-  if (process.env.NODE_ENV !== 'test' && process.env.MANDI_PRICE_REFRESH !== 'off') {
-    const mandiJob = require('./jobs/loadMandiPrices');
-    const everyHours = Number(process.env.MANDI_PRICE_REFRESH_HOURS || 24);
-    const runMandiRefresh = () => {
-      mandiJob.run({}).then((summary) => {
-        logger.info('mandi price refresh complete', { fetched: summary.fetched, neRecords: summary.neRecords, neCoverageNote: summary.neCoverageNote });
-      }).catch((error) => {
-        logger.warn('mandi price refresh failed', { error: error.message });
-      });
-    };
-    mandiTimer = setInterval(runMandiRefresh, everyHours * 60 * 60 * 1000);
-    mandiTimer.unref();
-    logger.info('Agmarknet mandi price refresh scheduled', { everyHours });
-  }
-
-  // Efferent path: every decision is pushed to connected operators in realtime.
-  // Decisions requiring a human go to an explicit escalation room so they are not
-  // lost in the general feed.
-  signalBus.onSignal(SIGNAL.DECISION_MADE, (signal) => {
-    const decision = signal.payload;
-    io.to('operations').emit('decision', decision);
-    if (decision.requiresHuman) {
-      io.to('escalations').emit('escalation', decision);
-    }
-  });
-}
-
-initializeDecisionLayer();
-
-// Initialize AFRERA Nervous System - Enterprise Route Control
-const { initializeNervousSystem, startSensorDataCollection } = require('./core/nervousSystem');
-initializeNervousSystem();
-startSensorDataCollection();
-
-// Initialize backup and disaster recovery service
-backupService.initialize().catch(error => {
-  logger.warn('Backup service initialization failed', { error: error.message });
-});
-
-// Initialize analytics and monitoring service
-analyticsMonitoringService.initialize().catch(error => {
-  logger.warn('Analytics monitoring service initialization failed', { error: error.message });
-});
-
-// Initialize AI Agentic Companion service
-aiAgenticCompanionService.initialize().catch(error => {
-  logger.warn('AI Agentic Companion service initialization failed', { error: error.message });
-});
-
-// Initialize Digital Twin service
-digitalTwinService.initialize().catch(error => {
-  logger.warn('Digital Twin service initialization failed', { error: error.message });
-});
-
-// Setup analytics monitoring routes
-analyticsMonitoringService.setupRoutes(app);
-
-// Setup AI Agentic Companion routes
-aiAgenticCompanionService.setupRoutes(app);
-
-// Setup Digital Twin routes
-digitalTwinService.setupRoutes(app);
-
-// Observability for the decision layer.
-// ERP agent catalogue and evaluation.
-app.get('/api/v1/erp-agents', authMiddleware, (req, res) => {
-  res.json({ success: true, data: { agents: erpAgents.listAgents(), domains: erpAgents.DOMAIN } });
-});
-
-// Run a single agent against a supplied context. Returns a PROPOSAL only.
-app.post('/api/v1/erp-agents/:agentId/evaluate', authMiddleware, (req, res) => {
+async function startup() {
   try {
-    const result = erpAgents.runAgent(req.params.agentId, req.body || {});
-    res.json({
-      success: true,
-      data: result,
-      note: result
-        ? 'Proposal only. Requires a named human approver before any action is taken.'
-        : 'Agent had nothing to propose for this context.'
-    });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
+    const startTime = Date.now();
 
-app.get('/api/v1/decisions', authMiddleware, (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      decisions: decisionEngine.recentDecisions(Number(req.query.limit) || 50),
-      rules: decisionEngine.rules.map((r) => ({ id: r.id, description: r.description })),
-      signals: signalBus.stats()
+    logger.info('🚀 EBDESIGN Platform Starting...');
+
+    // Step 1: Initialize database connection (required for ConfigRegistry)
+    logger.info('📦 Connecting to database...');
+    let db = null;
+    try {
+      const { initialize, getPostgreSQL } = require('./database/connection');
+      await initialize();
+      db = getPostgreSQL();
+      if (!db) throw new Error('PostgreSQL is not connected');
+      logger.info('✅ Database connected');
+    } catch (error) {
+      logger.warn('⚠️  Database connection deferred (will retry on first use)');
     }
-  });
-});
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `Route ${req.method} ${req.path} not found`,
-    timestamp: new Date().toISOString()
-  });
-});
+    // Step 2: Initialize service loader
+    logger.info('🔍 Initializing service auto-discovery...');
+    const serviceLoader = new DynamicServiceLoader(db);
+    const servicesDir = path.join(__dirname, 'services');
 
-// Error handling middleware (must be last)
-app.use(errorHandler);
+    const discoveryStats = await serviceLoader.discoverServicesFromDirectory(servicesDir);
+    logger.info('✅ Service discovery complete', discoveryStats);
 
-async function startServer() {
-  try {
-    // Initialize Database Enhancements
-    logger.info('Initializing database enhancements...');
-    await initializeDatabaseEnhancements({
-      enableAdvancedPooling: true,
-      enableCaching: true,
-      enableTransactions: true,
-      enableMonitoring: true,
-      enableSecurity: true,
-      enableBackup: process.env.NODE_ENV === 'production',
-      enableOptimization: true,
-      environment: process.env.NODE_ENV || 'development',
-      poolConfig: {
-        min: parseInt(process.env.DATABASE_POOL_MIN) || 10,
-        max: parseInt(process.env.DATABASE_POOL_MAX) || 20,
-        idleTimeoutMillis: parseInt(process.env.DATABASE_POOL_IDLE_TIMEOUT) || 30000
-      },
-      cacheConfig: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT) || 6379,
-        password: process.env.REDIS_PASSWORD,
-        defaultTTL: 3600
-      },
-      monitoringConfig: {
-        slowQueryThreshold: 1000,
-        enableAlerting: true
-      },
-      securityConfig: {
-        enableColumnEncryption: true,
-        encryptionKey: process.env.ENCRYPTION_KEY,
-        enableRowLevelSecurity: true,
-        enableAuditLogging: true
-      },
-      backupConfig: {
-        backupInterval: 86400000,
-        retentionDays: parseInt(process.env.BACKUP_RETENTION_DAYS) || 30,
-        enableCloudStorage: !!process.env.AWS_S3_BUCKET,
-        enableEncryption: true
+    // Step 3: Create service locator
+    const serviceLocator = new ServiceLocator(serviceLoader);
+    app.locals.serviceLocator = serviceLocator;
+
+    // Step 4: Initialize configuration registry
+    logger.info('⚙️  Initializing configuration registry...');
+    const configRegistry = new ConfigRegistry(db);
+    try {
+      await configRegistry.initialize();
+      await configRegistry.loadAllConfigs();
+      await configRegistry.loadAllFeatureFlags();
+      configRegistry.startAutoSync();
+      app.locals.configRegistry = configRegistry;
+      logger.info('✅ Configuration registry initialized');
+    } catch (error) {
+      logger.warn('⚠️  Config registry initialization deferred (in-memory only)');
+      app.locals.configRegistry = configRegistry;
+    }
+
+    // Index the project library before AI requests are accepted. The service
+    // remains usable in memory when PostgreSQL is unavailable and reports sync
+    // failures without blocking backend startup.
+    try {
+      await libraryKnowledgeService.initialize({ syncDatabase: Boolean(db) });
+      app.locals.libraryKnowledgeService = libraryKnowledgeService;
+      logger.info('✅ Library knowledge service initialized', libraryKnowledgeService.getStatistics());
+    } catch (error) {
+      logger.warn('⚠️  Library knowledge initialization deferred', { error: error.message });
+      app.locals.libraryKnowledgeService = libraryKnowledgeService;
+    }
+
+    // Step 5: Load critical services (fast boot)
+    logger.info('⚡ Loading critical services...');
+    const criticalServices = [
+      'authService',
+      'userService',
+      'errorHandlerService',
+      'monitoringService',
+      'cacheService',
+    ];
+
+    try {
+      await serviceLocator.preload(criticalServices);
+      logger.info('✅ Critical services loaded');
+    } catch (error) {
+      logger.warn('⚠️  Some critical services failed to load (continuing with partial startup)');
+    }
+
+    const cacheService = require('./services/cacheService');
+    const jobService = require('./services/jobService');
+    const infrastructure = { cache: 'disabled', jobs: 'disabled' };
+    try {
+      await cacheService.init();
+      infrastructure.cache = 'connected';
+    } catch (error) {
+      logger.warn('⚠️  Redis cache unavailable; continuing in degraded mode');
+    }
+    try {
+      await jobService.init();
+      infrastructure.jobs = 'connected';
+    } catch (error) {
+      logger.warn('⚠️  Background jobs unavailable; continuing in degraded mode');
+    }
+    app.locals.infrastructure = infrastructure;
+
+    // Step 6: Initialize route loader
+    logger.info('🛣️  Initializing route auto-discovery...');
+    const routeLoader = new DynamicRouteLoader(app);
+    const routesDir = path.join(__dirname, 'routes');
+
+    const routeStats = await routeLoader.discoverAndMountRoutes(
+      routesDir,
+      '/api/v1',
+    );
+    await routeLoader.discoverServiceEmbeddedRoutes(servicesDir, '/api/v1');
+    const serviceRouteStats = await serviceLoader.mountServiceRoutes(app);
+    logger.info('✅ Routes mounted', { ...routeStats, serviceSetupRoutes: serviceRouteStats.mounted });
+
+    // Step 7: Make loaders available to middleware/handlers
+    app.locals.serviceLoader = serviceLoader;
+    app.locals.routeLoader = routeLoader;
+    app.locals.db = db;
+    app.locals.mfaMiddleware = mfaMiddleware;
+    app.locals.loggingService = loggingService;
+
+    try {
+      websocketService.attach(io);
+      app.locals.websocketService = websocketService;
+      logger.info('✅ WebSocket service attached');
+    } catch (error) {
+      logger.warn('⚠️  WebSocket service attach skipped', { error: error.message });
+    }
+
+    try {
+      await initializeAI();
+      logger.info('✅ AI intelligence fabric initialized');
+    } catch (error) {
+      logger.warn('⚠️  AI fabric initialization deferred', { error: error.message });
+    }
+
+    try {
+      if (typeof disruptionRoutingAgent.initialize === 'function') {
+        disruptionRoutingAgent.initialize();
+      }
+      app.locals.disruptionRoutingAgent = disruptionRoutingAgent;
+      logger.info('✅ Disruption routing agent initialized');
+    } catch (error) {
+      logger.warn('⚠️  Disruption routing agent deferred', { error: error.message });
+    }
+
+    // Step 8: Health check endpoint
+    app.get('/health', async (req, res) => {
+      try {
+        res.json({
+          status: db && infrastructure.cache === 'connected' && infrastructure.jobs === 'connected' ?
+            'operational' :
+            'degraded',
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        logger.error('Health check failed', error);
+        res.status(503).json({ status: 'unhealthy', error: error.message });
       }
     });
-    logger.info('Database enhancements initialized successfully');
+
+    // Step 9: Status/stats endpoint
+    app.get('/api/v1/system/stats', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
+      try {
+        res.json({
+          services: serviceLoader.getStats(),
+          routes: routeLoader.getStats(),
+          config: configRegistry.getStats(),
+          locator: serviceLocator.getStats(),
+          memory: process.memoryUsage(),
+          uptime: process.uptime(),
+        });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Step 10: Service discovery API (for debugging)
+    app.get('/api/v1/system/services', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
+      try {
+        const { limit = 50, offset = 0, category, subfolder } = req.query;
+        const result = serviceLoader.listServices({
+          limit: parseInt(limit),
+          offset: parseInt(offset),
+          category,
+          subfolder,
+        });
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Step 11: Route discovery API (for debugging)
+    app.get('/api/v1/system/routes', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
+      try {
+        const result = routeLoader.getMountedRoutes();
+        res.json({
+          total: result.length,
+          routes: result.slice(0, 100),
+        });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // WebSocket handlers are registered by websocketService.attach(io)
+
+    // Mount health check routes
+    logger.info('🏥 Mounting health check routes...');
+    const healthRoutes = require('./routes/healthRoutes');
+    app.use('/api/yieldmanagement', yieldManagement);
+    app.use('/api/wikipedia', wikipediaRoutes);
+    app.use('/api/weather', weatherRoutes);
+    app.use('/api/weatheradvisory', weatherAdvisory);
+    app.use('/api/wearableintegration', wearableIntegrationRoutes);
+    app.use('/api/watermanagement', waterManagementRoutes);
+    app.use('/api/warehousemanagement', warehouseManagement);
+    app.use('/api/wallet', walletRoutes);
+    app.use('/api/vr', vr);
+    app.use('/api/vision', visionRoutes);
+    app.use('/api/videoanalytics', videoAnalytics);
+    app.use('/api/vendor', vendorRoutes);
+    app.use('/api/user', userRoutes);
+    app.use('/api/unifiedai', unifiedAIRoutes);
+    app.use('/api/ai', unifiedAIRoutes);
+    app.use('/api/v1/ai', unifiedAIRoutes);
+    app.use('/api/unifiedaigateway', unifiedAIGateway);
+    app.use('/api/transaction', transactionRoutes);
+    app.use('/api/trackdart', trackDartRoutes);
+    app.use('/api/tenantmanagement', tenantManagementRoutes);
+    app.use('/api/systemadministration', systemAdministrationRoutes);
+    app.use('/api/supplychaintracking', supplyChainTracking);
+    app.use('/api/supplychainanalytics', supplyChainAnalytics);
+    app.use('/api/supply-chain', supplyChainDecisionRoutes);
+    app.use('/api/v1/supply-chain', supplyChainDecisionRoutes);
+    app.use('/api/subscriptions', subscriptions);
+    app.use('/api/soilmanagement', soilManagementRoutes);
+    app.use('/api/soilhealth', soilHealth);
+    app.use('/api/sheep', sheepRoutes);
+    app.use('/api/sellerverifications', sellerVerifications);
+    app.use('/api/sellerranking', sellerRankingRoutes);
+    app.use('/api/seedvault', seedVaultRoutes);
+    app.use('/api/sapmodulearchitecture', sapModuleArchitectureRoutes);
+    app.use('/api/rolemanagement', roleManagementRoutes);
+    app.use('/api/riskpricing', riskPricingRoutes);
+    app.use('/api/riskassessment', riskAssessment);
+    app.use('/api/rfq', rfqRoutes);
+    app.use('/api/revenue', revenueRoutes);
+    app.use('/api/returnloadboard', returnLoadBoardRoutes);
+    app.use('/api/researchanddevelopment', researchAndDevelopmentRoutes);
+    app.use('/api/regionalvariety', regionalVarietyRoutes);
+    app.use('/api/v1/varieties', neVarietiesRoutes);
+    app.use('/api/recoveredfinance', recoveredFinanceRoutes);
+    app.use('/api/realtimemonitoring', realtimeMonitoringRoutes);
+    app.use('/api/qualityassurance', qualityAssurance);
+    app.use('/api/projectsystems', projectSystemsRoutes);
+    app.use('/api/product', productRoutes);
+    app.use('/api/productreview', productReviewRoutes);
+    app.use('/api/productmediaai', productMediaAIRoutes);
+    app.use('/api/publicdata', publicDataRoutes);
+    app.use('/api/productcertifications', productCertifications);
+    app.use('/api/priceforecasting', priceForecasting);
+    app.use('/api/preventivemaintenance', preventiveMaintenanceRoutes);
+    app.use('/api/predictiveintelligence', predictiveIntelligenceRoutes);
+    app.use('/api/predictiveanalytics', predictiveAnalytics);
+    app.use('/api/poultry', poultryRoutes);
+    app.use('/api/platformtelemetry', platformTelemetryRoutes);
+    app.use('/api/platformcore', platformCoreRoutes);
+    app.use('/api/platformconfiguration', platformConfigurationRoutes);
+    app.use('/api/pig', pigRoutes);
+    app.use('/api/phase9', phase9);
+    app.use('/api/phase8', phase8);
+    app.use('/api/phase12', phase12);
+    app.use('/api/phase11', phase11);
+    app.use('/api/phase10', phase10);
+    app.use('/api/payment', paymentRoutes);
+    app.use('/api/paymentgateway', paymentGatewayRoutes);
+    app.use('/api/orphaned_services_mount', ORPHANED_SERVICES_MOUNT);
+    app.use('/api/organizationmanagement', organizationManagementRoutes);
+    app.use('/api/order', orderRoutes);
+    app.use('/api/operationsroutesupport', operationsRouteSupport.router);
+    app.use('/api/operationsmanagement', operationsManagementRoutes);
+    app.use('/api/nutritionintelligence', nutritionIntelligenceRoutes);
+    app.use('/api/nutrientvaluesales', nutrientValueSalesRoutes);
+    app.use('/api/nlp', nlp);
+    app.use('/api/nervoussystem', nervousSystemRoutes);
+    app.use('/api/mloptimization', mlOptimization);
+    app.use('/api/marketplaceenhancements', marketplaceEnhancements);
+    app.use('/api/marketdata', marketDataRoutes);
+    app.use('/api/marketanalytics', marketAnalytics);
+    app.use('/api/m400aibackbone', m400AiBackboneRoutes);
+    app.use('/api/logisticsenhancements', logisticsEnhancements);
+    app.use('/api/logisticsenhancement', logisticsEnhancementRoutes);
+    app.use('/api/loanmanagement', loanManagement);
+    app.use('/api/livestockroutesupport', livestockRouteSupport.router);
+    app.use('/api/livestockmanagement', livestockManagementRoutes);
+    app.use('/api/livestock', livestock);
+    app.use('/api/library', libraryRoutes);
+    app.use('/api/landrecords', landRecordsRoutes);
+    app.use('/api/landmanagement', landManagementRoutes);
+    app.use('/api/knowledge', knowledgeRoutes);
+    app.use('/api/irrigationmanagement', irrigationManagementRoutes);
+    app.use('/api/iotsensors', iotSensors);
+    app.use('/api/iotintegration', iotIntegrationRoutes);
+    app.use('/api/insuranceenhancements', insuranceEnhancements);
+    app.use('/api/inputsupplymanagement', inputSupplyManagementRoutes);
+    app.use('/api/informationsharing', informationSharingRoutes);
+    app.use('/api/identitymanagement', identityManagementRoutes);
+    app.use('/api/hr', hrRoutes);
+    app.use('/api/horticulturemanagement', horticultureManagementRoutes);
+    app.use('/api/horticulture', horticulture);
+    app.use('/api/gst', gstRoutes);
+    app.use('/api/greenhouse', greenhouse);
+    app.use('/api/governancemodule', governanceModule);
+    app.use('/api/goat', goatRoutes);
+    app.use('/api/glutwarning', glutWarningRoutes);
+    app.use('/api/geofencing', geofencingRoutes);
+    app.use('/api/freightpooling', freightPoolingRoutes);
+    app.use('/api/freightpooling', freightPooling);
+    app.use('/api/food', foodRoutes);
+    app.use('/api/folu', foluRoutes);
+    app.use('/api/folubenchmark', foluBenchmarkRoutes);
+    app.use('/api/fisheriesmanagement', fisheriesManagementRoutes);
+    app.use('/api/financialanalytics', financialAnalytics);
+    app.use('/api/fertilizer', fertilizerRoutes);
+    app.use('/api/farmervalue', farmerValueRoutes);
+    app.use('/api/farmertraining', farmerTrainingRoutes);
+    app.use('/api/farmer', farmerRoutes);
+    app.use('/api/farmerportalenhancements', farmerPortalEnhancements);
+    app.use('/api/farmerhealth', farmerHealthRoutes);
+    app.use('/api/farmerfamily', farmerFamilyRoutes);
+    app.use('/api/farmcosting', farmCosting);
+    app.use('/api/farmanalytics', farmAnalytics);
+    app.use('/api/experience', experienceRoutes);
+    app.use('/api/escrow', escrowRoutes);
+    app.use('/api/equipmentexchange', equipmentExchangeRoutes);
+    app.use('/api/enterpriseroutesupport', enterpriseRouteSupport.router);
+    app.use('/api/enterpriseintegration', enterpriseIntegrationRoutes);
+    app.use('/api/enterpriseai', enterpriseAIRoutes);
+    app.use('/api/engineeringproject', engineeringProjectRoutes);
+    app.use('/api/energy', energyRoutes);
+    app.use('/api/ecommerce', ecommerceRoutes);
+    app.use('/api/ecommercemarketing', ecommerceMarketingRoutes);
+    app.use('/api/ecommerceintegration', ecommerceIntegrationRoutes);
+    app.use('/api/ecommerceerp', ecommerceERPRoutes);
+    app.use('/api/ecommercebusinesssales', ecommerceBusinessSalesRoutes);
+    app.use('/api/ecommerceai', ecommerceAIRoutes);
+    app.use('/api/dprgeneration', dprGenerationRoutes);
+    app.use('/api/digitaltwin', digitalTwinRoutes);
+    app.use('/api/diettherapy', dietTherapyRoutes);
+    app.use('/api/demand', demandRoutes);
+    app.use('/api/defensefitnessprep', defenseFitnessPrepRoutes);
+    app.use('/api/decisionsupport', decisionSupportRoutes);
+    app.use('/api/datavisualization', dataVisualization);
+    app.use('/api/dashboard', dashboardRoutes);
+    app.use('/api/dairy', dairyRoutes);
+    app.use('/api/cropvalueresearch', cropValueResearchRoutes);
+    app.use('/api/croprecommendations', cropRecommendations);
+    app.use('/api/cropplanning', cropPlanningRoutes);
+    app.use('/api/cropmanagement', cropManagementRoutes);
+    app.use('/api/cost', costRoutes);
+    app.use('/api/costcontrol', costControlRoutes);
+    app.use('/api/cooperativeshare', cooperativeShareRoutes);
+    app.use('/api/comprehensiveerp', comprehensiveERPRoutes);
+    app.use('/api/compliancetracking', complianceTracking);
+    app.use('/api/compliance', complianceRoutes);
+    app.use('/api/completeerpintegration', completeERPIntegrationRoutes);
+    app.use('/api/completeaiintegration', completeAIIntegrationRoutes);
+    app.use('/api/company', companyRoutes);
+    app.use('/api/communitymanagement', communityManagementRoutes);
+    app.use('/api/coldstorage', coldStorageRoutes);
+    app.use('/api/coldchainmonitoring', coldChainMonitoring);
+    app.use('/api/climateroutesupport', climateRouteSupport.router);
+    app.use('/api/climatemonitoring', climateMonitoringRoutes);
+    app.use('/api/climateadvisory', climateAdvisoryRoutes);
+    app.use('/api/climateadvisory', climateAdvisory);
+    app.use('/api/civildisruption', civilDisruptionRoutes);
+    app.use('/api/certificationmanagement', certificationManagement);
+    app.use('/api/buyertrust', buyerTrust);
+    app.use('/api/bulkorders', bulkOrders);
+    app.use('/api/bulkorder', bulkOrderRoutes);
+    app.use('/api/blockchainverification', blockchainVerificationRoutes);
+    app.use('/api/blockchaintrace', blockchainTrace);
+    app.use('/api/biometric', biometric);
+    app.use('/api/automation', automation);
+    app.use('/api/auth', authRoutes);
+    app.use('/api/audittrail', auditTrail);
+    app.use('/api/audit', auditRoutes);
+    app.use('/api/assetaccounting', assetAccountingRoutes);
+    app.use('/api/ar', ar);
+    app.use('/api/apicompatibility', apiCompatibilityRoutes);
+    app.use('/api/animalhealth', animalHealthRoutes);
+    app.use('/api/analyticsreport', analyticsReportRoutes);
+    app.use('/api/aiselfhealing', aiSelfHealingRoutes);
+    app.use('/api/aioperationintelligence', aiOperationIntelligenceRoutes);
+    app.use('/api/aigateway', aiGatewayRoutes);
+    app.use('/api/aicollaboration', aiCollaborationRoutes);
+    app.use('/api/aibrain', aiBrainRoutes);
+    app.use('/api/aibackbone', aiBackboneRoutes);
+    app.use('/api/aiapproval', aiApprovalRoutes);
+    app.use('/api/aiagent', aiAgentRoutes);
+    app.use('/api/agriculturalintelligence', agriculturalIntelligenceRoutes);
+    app.use('/api/advancedsearch', advancedSearchRoutes);
+    app.use('/api/advancedfeatures', advancedFeatures);
+    app.use('/api/advancedanalytics', advancedAnalyticsRoutes);
+
+    // Routes index is a module exporter, not a router - don't mount it
+    // app.use('/api/index', index);
+
+    app.use('/health', healthRoutes);
+    logger.info('✅ Health check routes mounted at /health');
+
+    // Error handling must follow every route registration.
+    app.use(errorHandler);
+
+    // ========================================================================
+    // START SERVER
+    // ========================================================================
+
+    const PORT = process.env.PORT || 3000;
+    server.listen(PORT, () => {
+      const elapsed = Date.now() - startTime;
+
+      logger.info(`
+        ╔══════════════════════════════════════════╗
+        ║     EBDESIGN Platform Running 🌱        ║
+        ║                                          ║
+        ║  Server:     http://localhost:${PORT}      ║
+        ║  Services:   ${serviceLoader.discoveredCount} discovered, ${serviceLoader.loadedCount} loaded    ║
+        ║  Routes:     ${routeLoader.mountedCount} mounted              ║
+        ║  Startup:    ${elapsed}ms                 ║
+        ║                                          ║
+        ║  🔗 Health:  /health                     ║
+        ║  📊 Stats:   /api/v1/system/stats        ║
+        ║  🔍 Services: /api/v1/system/services    ║
+        ║  🛣️  Routes:  /api/v1/system/routes      ║
+        ╚══════════════════════════════════════════╝
+      `);
+
+      // Emit startup event
+      if (global.eventBus) {
+        global.eventBus.emit('platform:started', {
+          services: serviceLoader.discoveredCount,
+          routes: routeLoader.mountedCount,
+          startup: elapsed,
+        });
+      }
+    });
+
+    // ========================================================================
+    // GRACEFUL SHUTDOWN
+    // ========================================================================
+
+    process.on('SIGTERM', async () => {
+      logger.info('SIGTERM received, shutting down gracefully...');
+
+      server.close(async () => {
+        logger.info('HTTP server closed');
+
+        if (db) {
+          try {
+            await db.end();
+            logger.info('Database connection closed');
+          } catch (error) {
+            logger.error('Error closing database', error);
+          }
+        }
+
+        process.exit(0);
+      });
+
+      // Force shutdown after 30 seconds
+      setTimeout(() => {
+        logger.error('Forced shutdown after 30 second timeout');
+        process.exit(1);
+      }, 30000);
+    });
+
+    return { app, server, serviceLocator, configRegistry };
   } catch (error) {
-    logger.error('Failed to initialize database enhancements', { error: error.message });
-    logger.warn('Continuing without database enhancements...');
+    logger.error('Failed to start platform', error);
+    process.exit(1);
   }
-
-  const PORT = process.env.PORT || 3001;
-  
-  // Initialize AI Intelligence Fabric (EBD-MOD-00000001)
-  try {
-    await initializeAI();
-    logger.info('AI Intelligence Fabric initialized successfully');
-  } catch (error) {
-    logger.error('Failed to initialize AI Intelligence Fabric', { error: error.message });
-    logger.warn('Continuing without AI Intelligence Fabric...');
-  }
-  
-  httpServer.listen(PORT, async () => {
-    logger.info(`AFRERA Backend Server running on port ${PORT}`);
-    logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    logger.info(`API Gateway: http://localhost:${PORT}/api/v1`);
-    
-    // Log database enhancements status
-    try {
-      const enhancements = getDatabaseEnhancements();
-      const health = await enhancements.getHealthStatus();
-      logger.info('Database enhancements health status', { healthy: health.healthy });
-    } catch (error) {
-      logger.warn('Could not get database enhancements health status');
-    }
-  });
-
-  // Graceful shutdown
-  const gracefulShutdown = async (signal) => {
-    logger.info(`${signal} signal received: starting graceful shutdown`);
-    
-    // Clear timers
-    if (learningTimer) clearInterval(learningTimer);
-    if (mandiTimer) clearInterval(mandiTimer);
-    
-    // Shutdown database enhancements
-    try {
-      logger.info('Shutting down database enhancements...');
-      await shutdownDatabaseEnhancements();
-      logger.info('Database enhancements shutdown complete');
-    } catch (error) {
-      logger.error('Error shutting down database enhancements', { error: error.message });
-    }
-    
-    // Close HTTP server
-    httpServer.close(() => {
-      logger.info('HTTP server closed');
-      process.exit(0);
-    });
-    
-    // Force exit after timeout
-    setTimeout(() => {
-      logger.error('Forced shutdown after timeout');
-      process.exit(1);
-    }, 30000);
-  };
-
-  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-  // A single missed .catch() outside a route handler would otherwise take down
-  // the whole process with no log line explaining why. Log first, then shut
-  // down through the same graceful path so in-flight requests aren't severed.
-  process.on('unhandledRejection', (reason) => {
-    logger.error('Unhandled promise rejection', {
-      error: reason instanceof Error ? reason.message : String(reason),
-      stack: reason instanceof Error ? reason.stack : undefined
-    });
-  });
-
-  process.on('uncaughtException', (error) => {
-    // The process is in an undefined state after this point; log and restart.
-    logger.error('Uncaught exception - shutting down', {
-      error: error.message,
-      stack: error.stack
-    });
-    gracefulShutdown('uncaughtException');
-  });
 }
+
+// ============================================================================
+// START PLATFORM
+// ============================================================================
 
 if (require.main === module) {
-  startServer();
+  startup().catch(error => {
+    logger.error('Fatal startup error', error);
+    process.exit(1);
+  });
 }
 
-module.exports = { app, io };
-
+module.exports = { app, startup };

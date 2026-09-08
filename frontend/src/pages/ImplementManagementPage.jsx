@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Implement Management (backend/src/modules/M102). Generic operation panel -
@@ -12,5 +12,5 @@ export default function ImplementManagementPage() {
       title="Implement Management"
       description="Agricultural implement inventory and maintenance."
     />
-  )
+  );
 }

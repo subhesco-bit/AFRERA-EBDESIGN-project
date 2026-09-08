@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Landmark, Building2, MapPin, Flag, Users, Home, TreePine, HeartHandshake } from 'lucide-react'
+import { useState } from 'react';
+import { Landmark, Building2, MapPin, Flag, Users, Home, TreePine, HeartHandshake } from 'lucide-react';
 import {
   panchayatAPI,
   blockManagementAPI,
@@ -9,8 +9,8 @@ import {
   producerGroupAPI,
   communityAssetAPI,
   ruralDevelopmentAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Community domain sub-modules: M042 (Panchayat), M043 (Block),
@@ -45,13 +45,13 @@ const TABS = [
   { id: 'producer-group', label: 'Producer Group', icon: Users },
   { id: 'community-asset', label: 'Community Asset', icon: Home },
   { id: 'rural-development', label: 'Rural Development', icon: TreePine },
-]
+];
 
-const ASSET_TYPES = ['Community Hall', 'Water Tank', 'Godown/Warehouse', 'Grading Center', 'Playground', 'Other']
-const PROJECT_STATUS = ['Proposed', 'Approved', 'In Progress', 'Completed']
+const ASSET_TYPES = ['Community Hall', 'Water Tank', 'Godown/Warehouse', 'Grading Center', 'Playground', 'Other'];
+const PROJECT_STATUS = ['Proposed', 'Approved', 'In Progress', 'Completed'];
 
 function CommunityManagementPage() {
-  const [activeTab, setActiveTab] = useState('panchayat')
+  const [activeTab, setActiveTab] = useState('panchayat');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -358,7 +358,7 @@ function CommunityManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default CommunityManagementPage
+export default CommunityManagementPage;

@@ -21,8 +21,8 @@ router.post('/events', controller.logMonitoringEvent);
 
 router.get('/alerts/:id/history', controller.getAlertHistory);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

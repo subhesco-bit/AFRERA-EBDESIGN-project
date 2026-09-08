@@ -6,6 +6,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const projectSystemsService = require('../services/legacy/projectSystemsService');
 const { authMiddleware } = require('../middleware/auth');
@@ -44,7 +46,7 @@ router.post('/:projectId/status', authMiddleware, adminMiddleware, async (req, r
   try {
     const { status, actualStartDate, actualEndDate } = req.body;
     const project = await projectSystemsService.updateProjectStatus(
-      req.params.projectId, status, { actualStartDate, actualEndDate }
+      req.params.projectId, status, { actualStartDate, actualEndDate },
     );
     res.json({ success: true, data: project });
   } catch (error) {
@@ -93,7 +95,7 @@ router.post('/wbs/:wbsId/status', authMiddleware, adminMiddleware, async (req, r
   try {
     const { status, actualStartDate, actualEndDate } = req.body;
     const wbs = await projectSystemsService.updateWbsStatus(
-      req.params.wbsId, status, { actualStartDate, actualEndDate }
+      req.params.wbsId, status, { actualStartDate, actualEndDate },
     );
     res.json({ success: true, data: wbs });
   } catch (error) {

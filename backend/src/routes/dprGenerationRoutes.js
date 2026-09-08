@@ -39,7 +39,7 @@ router.post('/', authMiddleware, async (req, res) => {
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { farmerId, fpoId } = req.query;
-    const list = await dprGenerationService.list({ farmerId, fpoId });
+    const list = await dprGenerationService.list({ farmerId, fpoId }, { userId: req.user.id, isAdmin: req.user.role === 'admin' });
     res.json({ success: true, data: list });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -48,7 +48,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const dpr = await dprGenerationService.getById(req.params.id);
+    const dpr = await dprGenerationService.getById(req.params.id, { userId: req.user.id, isAdmin: req.user.role === 'admin' });
     res.json({ success: true, data: dpr });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -59,7 +59,7 @@ router.get('/:id/pdf', authMiddleware, async (req, res) => {
   try {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="DPR-${req.params.id}.pdf"`);
-    await dprGenerationService.streamPdf(req.params.id, res);
+    await dprGenerationService.streamPdf(req.params.id, res, { userId: req.user.id, isAdmin: req.user.role === 'admin' });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
   }

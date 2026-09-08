@@ -83,7 +83,7 @@ async function getSeasonLedger(farmerId, season, year) {
       WHERE f.id = $1
         AND ($2::text IS NULL OR fc.season = $2)
         AND ($3::int  IS NULL OR fc.year   = $3)`,
-    [farmerId, season ?? null, year ?? null]
+    [farmerId, season ?? null, year ?? null],
   );
 
   // REVENUE — new in 991. Before this the platform could not see earnings.
@@ -98,7 +98,7 @@ async function getSeasonLedger(farmerId, season, year) {
       WHERE farmer_id = $1
         AND ($2::text IS NULL OR season = $2)
         AND ($3::int  IS NULL OR year   = $3)`,
-    [farmerId, season ?? null, year ?? null]
+    [farmerId, season ?? null, year ?? null],
   );
 
   // YIELD — carries the measurement basis, which sets the confidence floor.
@@ -111,7 +111,7 @@ async function getSeasonLedger(farmerId, season, year) {
       WHERE farmer_id = $1
         AND ($2::text IS NULL OR season = $2)
         AND ($3::int  IS NULL OR year   = $3)`,
-    [farmerId, season ?? null, year ?? null]
+    [farmerId, season ?? null, year ?? null],
   );
 
   return { cost: cost[0], revenue: rev[0], yield: yld[0] };
@@ -137,7 +137,7 @@ async function detectUnclaimedSubsidy(farmerId) {
             conversion_status, certificate_expiring, inspection_overdue
        FROM v_ne_organic_status
       WHERE farmer_id = $1 AND unclaimed_support > 0`,
-    [farmerId]
+    [farmerId],
   );
   for (const o of organic) {
     items.push({
@@ -148,12 +148,12 @@ async function detectUnclaimedSubsidy(farmerId) {
       // A certified farm can claim now; one still in conversion cannot yet.
       // Saying "you can claim ₹X" to someone who cannot is worse than silence.
       claimable_now: o.conversion_status === 'certified',
-      blocker: o.conversion_status !== 'certified'
-        ? `Enrolment is "${o.conversion_status}" — support is claimable once certified.`
-        : o.inspection_overdue
-          ? 'Inspection is overdue; clear it before claiming.'
-          : null,
-      confidence: 'real',   // scheme rate x recorded area, both stored facts
+      blocker: o.conversion_status !== 'certified' ?
+        `Enrolment is "${o.conversion_status}" — support is claimable once certified.` :
+        o.inspection_overdue ?
+          'Inspection is overdue; clear it before claiming.' :
+          null,
+      confidence: 'real', // scheme rate x recorded area, both stored facts
     });
   }
 
@@ -175,7 +175,7 @@ async function detectUnclaimedSubsidy(farmerId) {
       WHERE sc.farmer_id = $1
         AND sc.status IN ('draft','pending','incomplete','submitted')
         AND COALESCE(sc.application_date, sc.created_at) < CURRENT_DATE - INTERVAL '30 days'`,
-    [farmerId]
+    [farmerId],
   );
   for (const s of stalled) {
     items.push({
@@ -184,7 +184,7 @@ async function detectUnclaimedSubsidy(farmerId) {
       title: s.scheme_name,
       amount: round2(s.amount),
       claimable_now: true,
-      blocker: `Claim has been "${s.status}" since ${new Date(s.application_date).toISOString().slice(0,10)}.`,
+      blocker: `Claim has been "${s.status}" since ${new Date(s.application_date).toISOString().slice(0, 10)}.`,
       confidence: 'real',
     });
   }
@@ -199,9 +199,9 @@ async function detectUnclaimedSubsidy(farmerId) {
     items,
     // Stated plainly: absence of a detection is not proof there is nothing.
     // The detector only sees schemes the platform has data for.
-    coverage_note: 'Covers NE organic schemes and started-but-unfinished claims '
-      + 'recorded on this platform. It cannot see schemes the farmer is eligible '
-      + 'for but has never been enrolled in.',
+    coverage_note: 'Covers NE organic schemes and started-but-unfinished claims ' +
+      'recorded on this platform. It cannot see schemes the farmer is eligible ' +
+      'for but has never been enrolled in.',
   };
 }
 
@@ -248,15 +248,15 @@ async function computeFVI({ farmerId, season, year, persist = false }) {
     {
       name: 'Post-harvest loss avoided',
       weight: 0.20,
-      score: Math.max(0, 100 - lossPct * 4),   // 25% loss => 0
+      score: Math.max(0, 100 - lossPct * 4), // 25% loss => 0
       dataQuality: yieldQuality,
     },
     {
       name: 'Cash received vs outstanding',
       weight: 0.20,
-      score: num(revenue.gross_revenue) > 0
-        ? Math.max(0, 100 - (num(revenue.pending_amount) / num(revenue.gross_revenue)) * 100)
-        : 0,
+      score: num(revenue.gross_revenue) > 0 ?
+        Math.max(0, 100 - (num(revenue.pending_amount) / num(revenue.gross_revenue)) * 100) :
+        0,
       dataQuality: revenueQuality,
     },
     {
@@ -264,9 +264,9 @@ async function computeFVI({ farmerId, season, year, persist = false }) {
       weight: 0.20,
       // Unclaimed money the farmer is owed pulls the score DOWN — the index
       // measures value realised, not value theoretically available.
-      score: unclaimed.claimable_now_total > 0
-        ? Math.max(0, 100 - Math.min(100, (unclaimed.claimable_now_total / Math.max(totalCost, 1)) * 100))
-        : 100,
+      score: unclaimed.claimable_now_total > 0 ?
+        Math.max(0, 100 - Math.min(100, (unclaimed.claimable_now_total / Math.max(totalCost, 1)) * 100)) :
+        100,
       dataQuality: 'real',
     },
   ];
@@ -313,7 +313,7 @@ async function computeFVI({ farmerId, season, year, persist = false }) {
          computed_at = CURRENT_TIMESTAMP`,
       [farmerId, season, year, totalCost, totalRevenue,
         unclaimed.claimable_now_total, result.total, result.confidence,
-        JSON.stringify(breakdown)]
+        JSON.stringify(breakdown)],
     );
   }
 
@@ -332,25 +332,25 @@ function buildStatement(netMargin, mcdaResult, unclaimed, lossPct) {
 
   if (mcdaResult.confidence < 60) {
     parts.push(
-      `These figures are based mostly on estimated or recalled data `
-      + `(confidence ${mcdaResult.confidence}%). Treat them as indicative, not final.`
+      'These figures are based mostly on estimated or recalled data ' +
+      `(confidence ${mcdaResult.confidence}%). Treat them as indicative, not final.`,
     );
   }
 
-  parts.push(netMargin >= 0
-    ? `Net position this season: ₹${Math.round(netMargin).toLocaleString('en-IN')} ahead.`
-    : `Net position this season: ₹${Math.round(Math.abs(netMargin)).toLocaleString('en-IN')} behind.`);
+  parts.push(netMargin >= 0 ?
+    `Net position this season: ₹${Math.round(netMargin).toLocaleString('en-IN')} ahead.` :
+    `Net position this season: ₹${Math.round(Math.abs(netMargin)).toLocaleString('en-IN')} behind.`);
 
   if (unclaimed.claimable_now_total > 0) {
     parts.push(
-      `₹${Math.round(unclaimed.claimable_now_total).toLocaleString('en-IN')} of support `
-      + `you are entitled to has not been claimed.`
+      `₹${Math.round(unclaimed.claimable_now_total).toLocaleString('en-IN')} of support ` +
+      'you are entitled to has not been claimed.',
     );
   }
   if (unclaimed.blocked_total > 0) {
     parts.push(
-      `A further ₹${Math.round(unclaimed.blocked_total).toLocaleString('en-IN')} becomes `
-      + `claimable once the blockers listed are cleared.`
+      `A further ₹${Math.round(unclaimed.blocked_total).toLocaleString('en-IN')} becomes ` +
+      'claimable once the blockers listed are cleared.',
     );
   }
   if (lossPct > 10) {
@@ -373,7 +373,7 @@ async function getCashFlow(farmerId, fromDate, toDate) {
         AND ($2::date IS NULL OR flow_date >= $2)
         AND ($3::date IS NULL OR flow_date <= $3)
       ORDER BY flow_date ASC`,
-    [farmerId, fromDate ?? null, toDate ?? null]
+    [farmerId, fromDate ?? null, toDate ?? null],
   );
 
   let running = 0;
@@ -391,12 +391,12 @@ async function getCashFlow(farmerId, fromDate, toDate) {
     closing_balance: round2(running),
     actual_rows: series.filter((s) => s.is_actual).length,
     projected_rows: series.filter((s) => !s.is_actual).length,
-    first_shortfall: firstShortfall
-      ? { date: firstShortfall.flow_date, balance: firstShortfall.running_balance }
-      : null,
-    note: firstShortfall
-      ? 'A projected shortfall is not a certainty — check which rows are projections.'
-      : null,
+    first_shortfall: firstShortfall ?
+      { date: firstShortfall.flow_date, balance: firstShortfall.running_balance } :
+      null,
+    note: firstShortfall ?
+      'A projected shortfall is not a certainty — check which rows are projections.' :
+      null,
   };
 }
 
@@ -443,7 +443,7 @@ router.get('/farmers/:farmerId/cash-flow', authMiddleware, async (req, res) => {
 router.get('/farmers/:farmerId/ledger', authMiddleware, async (req, res) => {
   try {
     const data = await getSeasonLedger(
-      req.params.farmerId, req.query.season, req.query.year ? Number(req.query.year) : undefined
+      req.params.farmerId, req.query.season, req.query.year ? Number(req.query.year) : undefined,
     );
     res.json({ success: true, data });
   } catch (e) { return fail(res, e, 'getSeasonLedger'); }
@@ -459,3 +459,4 @@ module.exports = {
   BASIS_QUALITY,
   DATA_QUALITY_WEIGHT,
 };
+

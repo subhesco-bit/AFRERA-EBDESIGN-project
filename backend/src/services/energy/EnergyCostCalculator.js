@@ -30,18 +30,18 @@ class EnergyCostCalculator {
 
     for (let year = 1; year <= projectionYears; year++) {
       // Calculate year-specific costs
-      const yearlyGridCost = gridTariffPerUnit * (gridHoursPerDay * 365) * 
+      const yearlyGridCost = gridTariffPerUnit * (gridHoursPerDay * 365) *
         (outageHoursPerYear / 8760);
-      
-      const yearlyDieselCost = dieselCostPerLiter * dieselLitersPerYear * 
+
+      const yearlyDieselCost = dieselCostPerLiter * dieselLitersPerYear *
         (year <= 5 ? 1 : 1.05); // 5% inflation after year 5
-      
-      const yearlyBatteryCost = batteryReplacementCostPerYear * 
+
+      const yearlyBatteryCost = batteryReplacementCostPerYear *
         (year % 5 === 0 ? 1 : 0); // Battery replacement every 5 years
-      
+
       const yearlyMaintenanceCost = (gridTariffPerUnit * gridHoursPerDay * 365 * 0.02);
 
-      const yearlyTotal = yearlyGridCost + yearlyDieselCost + 
+      const yearlyTotal = yearlyGridCost + yearlyDieselCost +
         yearlyBatteryCost + yearlyMaintenanceCost;
 
       totalGridCost += yearlyGridCost;
@@ -59,7 +59,7 @@ class EnergyCostCalculator {
       });
     }
 
-    const lifetimeTotalCost = totalGridCost + totalDieselCost + 
+    const lifetimeTotalCost = totalGridCost + totalDieselCost +
       totalBatteryCost + totalMaintenanceCost;
 
     return {
@@ -88,9 +88,9 @@ class EnergyCostCalculator {
       gridAvailability,
       solarIrradiation,
       biomassAvailable,
-      biogasAvailable,   // was 'biogas Available' — a stray space made this a
-                         // syntax error, so the whole module failed to load and
-                         // every route in energyRoutes.js threw on require.
+      biogasAvailable, // was 'biogas Available' — a stray space made this a
+      // syntax error, so the whole module failed to load and
+      // every route in energyRoutes.js threw on require.
       villagePopulation,
       agriculturalArea,
       industrialDemand,
@@ -145,15 +145,15 @@ class EnergyCostCalculator {
         other: Math.max(0, renewablePercentage - solarPercentage - biomassPotential - biogasPotential),
       },
       recommendation: this._generateStackRecommendation(
-        gridPercentage, 
-        solarPercentage, 
-        gridAvailability
+        gridPercentage,
+        solarPercentage,
+        gridAvailability,
       ),
       reliabilityScore: this._calculateReliabilityScore(
-        gridPercentage, 
-        solarPercentage, 
-        batteryCapacityKwh, 
-        averageDailyDemandKwh
+        gridPercentage,
+        solarPercentage,
+        batteryCapacityKwh,
+        averageDailyDemandKwh,
       ),
       scalability: {
         canAddSolar: solarPercentage < 60,
@@ -177,7 +177,7 @@ class EnergyCostCalculator {
         stack.gridPercentage,
         stack.solarPercentage,
         stack.batteryCapacityKwh,
-        stack.demandKwh
+        stack.demandKwh,
       );
 
       return {
@@ -196,8 +196,8 @@ class EnergyCostCalculator {
 
     return {
       comparison,
-      recommended: comparison.reduce((a, b) => 
-        a['25YearCost'] < b['25YearCost'] ? a : b
+      recommended: comparison.reduce((a, b) =>
+        a['25YearCost'] < b['25YearCost'] ? a : b,
       ),
     };
   }
@@ -223,7 +223,7 @@ class EnergyCostCalculator {
     const coldChainDemand = coldChainFacilities * 20; // 20 kWh per facility/day
     const evChargingDemandKwh = evChargingDemand * 50; // 50 kWh per charging point/day
 
-    const totalDailyDemand = irrigationDemand + processingDemand + 
+    const totalDailyDemand = irrigationDemand + processingDemand +
       coldChainDemand + evChargingDemandKwh;
 
     const totalMonthlyDemand = totalDailyDemand * 30;

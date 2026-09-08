@@ -81,5 +81,5 @@ module.exports = {
   updateOrderStatus,
   cancelOrder,
   processPayment,
-  trackOrder
+  trackOrder,
 };

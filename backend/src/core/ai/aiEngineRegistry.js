@@ -70,7 +70,7 @@ const AI_ENGINES = {
     max_tokens: 8192,
     confidence_threshold: 0.75,
   },
-  
+
   // Vision Engines
   vision_quality: {
     id: 'EBD-ENG-00000004',
@@ -92,7 +92,7 @@ const AI_ENGINES = {
     cost_per_request: 0.002,
     confidence_threshold: 0.85,
   },
-  
+
   // Speech Engines
   speech_google: {
     id: 'EBD-ENG-00000006',
@@ -114,7 +114,7 @@ const AI_ENGINES = {
     cost_per_minute: 0.008,
     confidence_threshold: 0.85,
   },
-  
+
   // Domain-Specific Engines
   recommendation: {
     id: 'EBD-ENG-00000008',
@@ -166,8 +166,8 @@ function getEnginesByType(type) {
  * Get engines by capability
  */
 function getEnginesByCapability(capability) {
-  return Object.values(AI_ENGINES).filter(engine => 
-    engine.capabilities.includes(capability)
+  return Object.values(AI_ENGINES).filter(engine =>
+    engine.capabilities.includes(capability),
   );
 }
 
@@ -182,8 +182,8 @@ function listEngines() {
  * Get ready engines only
  */
 function listReadyEngines() {
-  return Object.values(AI_ENGINES).filter(engine => 
-    engine.status === 'ready' || engine.status === 'configured'
+  return Object.values(AI_ENGINES).filter(engine =>
+    engine.status === 'ready' || engine.status === 'configured',
   );
 }
 
@@ -192,7 +192,7 @@ function listReadyEngines() {
  */
 function registerEngine(engineConfig) {
   const engineId = engineConfig.id || `EBD-ENG-${generateEngineId()}`;
-  
+
   AI_ENGINES[engineConfig.name] = {
     id: engineId,
     name: engineConfig.name,
@@ -204,7 +204,7 @@ function registerEngine(engineConfig) {
     max_tokens: engineConfig.max_tokens || 4096,
     confidence_threshold: engineConfig.confidence_threshold || 0.8,
   };
-  
+
   logger.info(`Registered AI engine: ${engineConfig.name} (${engineId})`);
   return engineId;
 }
@@ -221,21 +221,21 @@ function generateEngineId() {
  */
 function findBestEngine(capability, options = {}) {
   const { preferProvider, maxCost, minConfidence } = options;
-  
+
   let candidates = getEnginesByCapability(capability);
-  
+
   if (preferProvider) {
     candidates = candidates.filter(e => e.provider === preferProvider);
   }
-  
+
   if (maxCost) {
     candidates = candidates.filter(e => e.cost_per_1k_tokens <= maxCost);
   }
-  
+
   if (minConfidence) {
     candidates = candidates.filter(e => e.confidence_threshold >= minConfidence);
   }
-  
+
   // Sort by confidence and cost
   candidates.sort((a, b) => {
     if (b.confidence_threshold !== a.confidence_threshold) {
@@ -243,7 +243,7 @@ function findBestEngine(capability, options = {}) {
     }
     return a.cost_per_1k_tokens - b.cost_per_1k_tokens;
   });
-  
+
   return candidates[0] || null;
 }
 

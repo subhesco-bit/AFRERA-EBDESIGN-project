@@ -4,16 +4,16 @@ services:
     image: postgres:15
     container_name: afrera-postgres
     environment:
-      POSTGRES_USER: afrera
-      POSTGRES_PASSWORD: afrera_password
-      POSTGRES_DB: afrera_db
+      POSTGRES_USER: ${DB_USER:?DB_USER must be set}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+      POSTGRES_DB: ${DB_NAME:?DB_NAME must be set}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "afrera"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -83,12 +83,12 @@ services:
       # migrate step below would silently fail to actually run. PG_* vars
       # are kept too since database/connection.js (the app's own runtime
       # pool) supports both, preferring DATABASE_URL when present.
-      DATABASE_URL: postgresql://afrera:afrera_password@postgres:5432/afrera_db
+      DATABASE_URL: postgresql://${DB_USER:?DB_USER must be set}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:?DB_NAME must be set}
       PG_HOST: postgres
       PG_PORT: 5432
       PG_DATABASE: afrera_db
       PG_USER: afrera
-      PG_PASSWORD: afrera_password
+      PG_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
       MONGO_URI: mongodb://afrera:afrera_password@mongodb:27017/afrera_mongo?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379

@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Sprout, Bug, Leaf, FlaskConical, Recycle, ShoppingCart, Truck, ScanLine, Package } from 'lucide-react'
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Sprout, Bug, Leaf, FlaskConical, Recycle, ShoppingCart, Truck, ScanLine, Package } from 'lucide-react';
 import {
   biofertilizerAPI,
   pesticideInventoryAPI,
@@ -10,8 +10,8 @@ import {
   inputProcurementAPI,
   inputDistributionAPI,
   inputTraceabilityAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Input Supply domain sub-modules: M113 (Biofertilizer),
@@ -39,19 +39,19 @@ const TABS = [
   { id: 'procurement', label: 'Procurement', icon: ShoppingCart },
   { id: 'distribution', label: 'Distribution', icon: Truck },
   { id: 'traceability', label: 'Traceability', icon: ScanLine },
-]
+];
 
-const BIOFERT_TYPES = ['Rhizobium', 'Azotobacter', 'PSB (Phosphate Solubilizing)', 'Azospirillum', 'Mycorrhiza', 'Other']
-const PESTICIDE_CATEGORIES = ['Insecticide', 'Fungicide', 'Herbicide', 'Rodenticide', 'Nematicide']
-const BIOPESTICIDE_TYPES = ['Neem-based', 'Trichoderma', 'Bacillus thuringiensis (Bt)', 'Pheromone Trap', 'Beauveria bassiana', 'Other']
-const MICRONUTRIENTS = ['Zinc', 'Boron', 'Iron', 'Manganese', 'Copper', 'Molybdenum', 'Multi-micronutrient Mix']
-const ORGANIC_TYPES = ['Vermicompost', 'FYM (Farmyard Manure)', 'Compost', 'Green Manure', 'Bone Meal', 'Neem Cake', 'Other']
-const PROCUREMENT_STATUS = ['Requested', 'Ordered', 'Received', 'Cancelled']
-const DISTRIBUTION_CHANNELS = ['Dealer', 'FPO', 'Direct to Farmer', 'Govt. Scheme']
-const TRACE_STAGES = ['Manufactured', 'In Transit', 'Warehoused', 'Distributed', 'Applied on Field']
+const BIOFERT_TYPES = ['Rhizobium', 'Azotobacter', 'PSB (Phosphate Solubilizing)', 'Azospirillum', 'Mycorrhiza', 'Other'];
+const PESTICIDE_CATEGORIES = ['Insecticide', 'Fungicide', 'Herbicide', 'Rodenticide', 'Nematicide'];
+const BIOPESTICIDE_TYPES = ['Neem-based', 'Trichoderma', 'Bacillus thuringiensis (Bt)', 'Pheromone Trap', 'Beauveria bassiana', 'Other'];
+const MICRONUTRIENTS = ['Zinc', 'Boron', 'Iron', 'Manganese', 'Copper', 'Molybdenum', 'Multi-micronutrient Mix'];
+const ORGANIC_TYPES = ['Vermicompost', 'FYM (Farmyard Manure)', 'Compost', 'Green Manure', 'Bone Meal', 'Neem Cake', 'Other'];
+const PROCUREMENT_STATUS = ['Requested', 'Ordered', 'Received', 'Cancelled'];
+const DISTRIBUTION_CHANNELS = ['Dealer', 'FPO', 'Direct to Farmer', 'Govt. Scheme'];
+const TRACE_STAGES = ['Manufactured', 'In Transit', 'Warehoused', 'Distributed', 'Applied on Field'];
 
 function InputSupplyManagementPage() {
-  const [activeTab, setActiveTab] = useState('biofertilizer')
+  const [activeTab, setActiveTab] = useState('biofertilizer');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -389,7 +389,7 @@ function InputSupplyManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default InputSupplyManagementPage
+export default InputSupplyManagementPage;

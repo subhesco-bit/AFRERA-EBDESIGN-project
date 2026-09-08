@@ -244,7 +244,7 @@ function confidenceInterval(point, residualStdDev, z = 1.96) {
     lower: Math.max(0, point - margin),
     point,
     upper: point + margin,
-    margin
+    margin,
   };
 }
 
@@ -331,6 +331,6 @@ module.exports = {
   rmse,
   mape,
   normalize,
-  weightedScore
+  weightedScore,
 };
 

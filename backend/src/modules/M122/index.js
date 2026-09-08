@@ -9,8 +9,8 @@ router.get('/cattle/:id/performance', controller.trackCattlePerformance);
 router.get('/farmer/:farmerId/report', controller.generateRegistryReport);
 router.get('/cattle/:id/breeding', controller.getBreedingRecommendations);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

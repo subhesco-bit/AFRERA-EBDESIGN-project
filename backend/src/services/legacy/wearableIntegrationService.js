@@ -34,7 +34,7 @@ async function getConnectionStatus(userId) {
   const { rows } = await pg.query(
     `SELECT provider, sync_method, status, connected_at, last_synced_at
      FROM wearable_connections WHERE user_id = $1`,
-    [userId]
+    [userId],
   );
   const byProvider = Object.fromEntries(rows.map((r) => [r.provider, r]));
   return {
@@ -112,7 +112,7 @@ async function handleFitbitCallback(userId, code) {
      ON CONFLICT (user_id, provider) DO UPDATE SET
        access_token = EXCLUDED.access_token, refresh_token = EXCLUDED.refresh_token,
        token_expires_at = EXCLUDED.token_expires_at, status = 'active', connected_at = CURRENT_TIMESTAMP`,
-    [userId, tokenData.access_token, tokenData.refresh_token, expiresAt]
+    [userId, tokenData.access_token, tokenData.refresh_token, expiresAt],
   );
 
   logger.info('Fitbit connected', { userId });
@@ -123,8 +123,8 @@ async function handleFitbitCallback(userId, code) {
 async function syncFitbitActivity(userId) {
   const pg = getPostgreSQL();
   const { rows } = await pg.query(
-    `SELECT access_token FROM wearable_connections WHERE user_id = $1 AND provider = 'fitbit' AND status = 'active'`,
-    [userId]
+    'SELECT access_token FROM wearable_connections WHERE user_id = $1 AND provider = \'fitbit\' AND status = \'active\'',
+    [userId],
   );
   if (rows.length === 0) {
     const err = new Error('No active Fitbit connection for this user');
@@ -156,10 +156,10 @@ async function syncFitbitActivity(userId) {
       userId, today, summary.steps ?? null, summary.caloriesOut ?? null,
       (summary.fairlyActiveMinutes || 0) + (summary.veryActiveMinutes || 0),
       summary.restingHeartRate ?? null, JSON.stringify(data),
-    ]
+    ],
   );
 
-  await pg.query(`UPDATE wearable_connections SET last_synced_at = CURRENT_TIMESTAMP WHERE user_id = $1 AND provider = 'fitbit'`, [userId]);
+  await pg.query('UPDATE wearable_connections SET last_synced_at = CURRENT_TIMESTAMP WHERE user_id = $1 AND provider = \'fitbit\'', [userId]);
 
   return { provider: 'fitbit', activity_date: today, steps: summary.steps ?? null, calories_burned: summary.caloriesOut ?? null };
 }
@@ -179,7 +179,7 @@ async function ingestDeviceActivity(userId, provider, activityDate, activity = {
     `INSERT INTO wearable_connections (user_id, provider, sync_method, status, connected_at, last_synced_at)
      VALUES ($1, $2, 'device_push', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
      ON CONFLICT (user_id, provider) DO UPDATE SET status = 'active', last_synced_at = CURRENT_TIMESTAMP`,
-    [userId, provider]
+    [userId, provider],
   );
 
   await pg.query(
@@ -193,7 +193,7 @@ async function ingestDeviceActivity(userId, provider, activityDate, activity = {
       userId, provider, activityDate,
       activity.steps ?? null, activity.caloriesBurned ?? null, activity.activeMinutes ?? null,
       activity.restingHeartRate ?? null, activity.sleepMinutes ?? null, JSON.stringify(activity),
-    ]
+    ],
   );
 
   logger.info('Device wearable activity ingested', { userId, provider, activityDate });
@@ -213,7 +213,7 @@ async function getRecentActivitySummary(userId, days = 7) {
             AVG(active_minutes)::int AS avg_active_minutes, COUNT(*) AS days_with_data
      FROM wearable_activity_data
      WHERE user_id = $1 AND activity_date >= CURRENT_DATE - $2::int`,
-    [userId, days]
+    [userId, days],
   );
   const row = rows[0];
   if (!row || Number(row.days_with_data) === 0) return null;
@@ -229,8 +229,8 @@ async function getRecentActivitySummary(userId, days = 7) {
 async function disconnectProvider(userId, provider) {
   const pg = getPostgreSQL();
   await pg.query(
-    `UPDATE wearable_connections SET status = 'revoked' WHERE user_id = $1 AND provider = $2`,
-    [userId, provider]
+    'UPDATE wearable_connections SET status = \'revoked\' WHERE user_id = $1 AND provider = $2',
+    [userId, provider],
   );
   return { provider, status: 'revoked' };
 }

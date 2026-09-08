@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce Business Sales Service
- * 
+ *
  * Comprehensive B2B marketplace and business sales features:
  * - Bulk Order Management (institutional procurement, B2B sales)
  * - Contract Farming Integration (long-term agreements, milestones)
@@ -27,7 +27,7 @@ const { signalBus } = require('../../core/signalBus');
  */
 async function createBulkOrder(buyerId, orderData) {
   const pg = getPostgreSQL();
-  
+
   try {
     const {
       title,
@@ -41,12 +41,12 @@ async function createBulkOrder(buyerId, orderData) {
       specifications,
       business_type,
       payment_terms,
-      delivery_terms
+      delivery_terms,
     } = orderData;
-    
+
     // Generate bulk order ID
     const bulkOrderId = `BO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const bulkOrder = {
       id: bulkOrderId,
       buyer_id: buyerId,
@@ -64,9 +64,9 @@ async function createBulkOrder(buyerId, orderData) {
       delivery_terms,
       status: 'pending',
       quotation_count: 0,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    
+
     // Store bulk order
     await pg.query(`
       INSERT INTO bulk_orders 
@@ -74,26 +74,26 @@ async function createBulkOrder(buyerId, orderData) {
        delivery_location, required_by, specifications, business_type, payment_terms, delivery_terms, status, created_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
     `, [bulkOrderId, buyerId, title, description, category_id, required_quantity, unit, target_price,
-        delivery_location, required_by, JSON.stringify(specifications), business_type, payment_terms, delivery_terms, 'pending']);
-    
+      delivery_location, required_by, JSON.stringify(specifications), business_type, payment_terms, delivery_terms, 'pending']);
+
     // Find potential sellers
     const sellers = await findPotentialSellers(category_id, required_quantity, target_price);
-    
+
     // Emit signal bus event
     await signalBus.emit('b2b.bulk_order.created', {
       bulk_order_id: bulkOrderId,
       buyer_id: buyerId,
       category_id,
       potential_sellers: sellers.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('B2B bulk order created', { bulkOrderId, buyerId });
-    
+
     return {
       success: true,
       bulk_order: bulkOrder,
-      potential_sellers: sellers
+      potential_sellers: sellers,
     };
   } catch (error) {
     logger.error('Error creating B2B bulk order', { error: error.message });
@@ -106,7 +106,7 @@ async function createBulkOrder(buyerId, orderData) {
  */
 async function findPotentialSellers(categoryId, quantity, targetPrice) {
   const pg = getPostgreSQL();
-  
+
   try {
     const sellers = await pg.query(`
       SELECT 
@@ -127,7 +127,7 @@ async function findPotentialSellers(categoryId, quantity, targetPrice) {
       ORDER BY u.rating DESC, total_available_quantity DESC
       LIMIT 10
     `, [categoryId, targetPrice * 1.2, quantity]);
-    
+
     return sellers.rows;
   } catch (error) {
     logger.error('Error finding potential sellers', { error: error.message });
@@ -140,7 +140,7 @@ async function findPotentialSellers(categoryId, quantity, targetPrice) {
  */
 async function submitQuotation(bulkOrderId, sellerId, quotationData) {
   const pg = getPostgreSQL();
-  
+
   try {
     const {
       quoted_price,
@@ -149,12 +149,12 @@ async function submitQuotation(bulkOrderId, sellerId, quotationData) {
       delivery_date,
       delivery_cost,
       notes,
-      quotation_validity_days
+      quotation_validity_days,
     } = quotationData;
-    
+
     // Generate quotation ID
     const quotationId = `QT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const quotation = {
       id: quotationId,
       bulk_order_id: bulkOrderId,
@@ -167,38 +167,38 @@ async function submitQuotation(bulkOrderId, sellerId, quotationData) {
       notes,
       status: 'pending',
       expires_at: new Date(Date.now() + (quotation_validity_days || 30) * 24 * 60 * 60 * 1000).toISOString(),
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    
+
     // Store quotation
     await pg.query(`
       INSERT INTO quotations 
       (id, bulk_order_id, seller_id, quoted_price, available_quantity, unit, delivery_date, delivery_cost, notes, status, expires_at, created_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
-    `, [quotationId, bulkOrderId, sellerId, quoted_price, available_quantity, unit, delivery_date, 
-        delivery_cost, notes, 'pending', quotation.expires_at]);
-    
+    `, [quotationId, bulkOrderId, sellerId, quoted_price, available_quantity, unit, delivery_date,
+      delivery_cost, notes, 'pending', quotation.expires_at]);
+
     // Update bulk order quotation count
     await pg.query(`
       UPDATE bulk_orders 
       SET quotation_count = quotation_count + 1, updated_at = NOW()
       WHERE id = $1
     `, [bulkOrderId]);
-    
+
     // Emit signal bus event
     await signalBus.emit('b2b.quotation.submitted', {
       quotation_id: quotationId,
       bulk_order_id: bulkOrderId,
       seller_id: sellerId,
       quoted_price,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('Quotation submitted', { quotationId, bulkOrderId, sellerId });
-    
+
     return {
       success: true,
-      quotation
+      quotation,
     };
   } catch (error) {
     logger.error('Error submitting quotation', { error: error.message });
@@ -211,7 +211,7 @@ async function submitQuotation(bulkOrderId, sellerId, quotationData) {
  */
 async function acceptQuotation(quotationId, buyerId) {
   const pg = getPostgreSQL();
-  
+
   try {
     // Get quotation details
     const quotation = await pg.query(`
@@ -221,23 +221,23 @@ async function acceptQuotation(quotationId, buyerId) {
       JOIN users u ON q.seller_id = u.id
       WHERE q.id = $1
     `, [quotationId]);
-    
+
     if (quotation.rows.length === 0) {
       throw new Error('Quotation not found');
     }
-    
+
     const qtData = quotation.rows[0];
-    
+
     // Update quotation status
     await pg.query(`
       UPDATE quotations 
       SET status = 'accepted', updated_at = NOW()
       WHERE id = $1
     `, [quotationId]);
-    
+
     // Create actual order from quotation
     const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const order = {
       id: orderId,
       user_id: buyerId,
@@ -251,24 +251,24 @@ async function acceptQuotation(quotationId, buyerId) {
       delivery_date: qtData.delivery_date,
       delivery_cost: qtData.delivery_cost,
       status: 'confirmed',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    
+
     // Store order
     await pg.query(`
       INSERT INTO orders 
       (id, user_id, seller_id, order_type, bulk_order_id, quotation_id, total_amount, quantity, unit, delivery_date, delivery_cost, status, created_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
-    `, [orderId, buyerId, qtData.seller_id, 'B2B', qtData.bulk_order_id, quotationId, order.total_amount, 
-        order.quantity, order.unit, order.delivery_date, order.delivery_cost, 'confirmed']);
-    
+    `, [orderId, buyerId, qtData.seller_id, 'B2B', qtData.bulk_order_id, quotationId, order.total_amount,
+      order.quantity, order.unit, order.delivery_date, order.delivery_cost, 'confirmed']);
+
     // Update bulk order status
     await pg.query(`
       UPDATE bulk_orders 
       SET status = 'accepted', updated_at = NOW()
       WHERE id = $1
     `, [qtData.bulk_order_id]);
-    
+
     // Emit signal bus event
     await signalBus.emit('b2b.order.created', {
       order_id: orderId,
@@ -277,14 +277,14 @@ async function acceptQuotation(quotationId, buyerId) {
       buyer_id: buyerId,
       seller_id: qtData.seller_id,
       total_amount: order.total_amount,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('Quotation accepted and order created', { orderId, quotationId });
-    
+
     return {
       success: true,
-      order
+      order,
     };
   } catch (error) {
     logger.error('Error accepting quotation', { error: error.message });
@@ -301,7 +301,7 @@ async function acceptQuotation(quotationId, buyerId) {
  */
 async function createContractFarming(buyerId, contractData) {
   const pg = getPostgreSQL();
-  
+
   try {
     const {
       farmer_id,
@@ -315,12 +315,12 @@ async function createContractFarming(buyerId, contractData) {
       quality_standards,
       delivery_schedule,
       payment_terms,
-      milestone_payments
+      milestone_payments,
     } = contractData;
-    
+
     // Generate contract ID
     const contractId = `CF-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const contract = {
       id: contractId,
       buyer_id: buyerId,
@@ -337,9 +337,9 @@ async function createContractFarming(buyerId, contractData) {
       payment_terms,
       milestone_payments: JSON.stringify(milestone_payments),
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    
+
     // Store contract
     await pg.query(`
       INSERT INTO contract_farming 
@@ -347,8 +347,8 @@ async function createContractFarming(buyerId, contractData) {
        contract_start_date, contract_end_date, quality_standards, delivery_schedule, payment_terms, milestone_payments, status, created_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
     `, [contractId, buyerId, farmer_id, crop_type, variety, contract_quantity, unit, agreed_price,
-        contract_start_date, contract_end_date, JSON.stringify(quality_standards), JSON.stringify(delivery_schedule),
-        payment_terms, JSON.stringify(milestone_payments), 'active']);
+      contract_start_date, contract_end_date, JSON.stringify(quality_standards), JSON.stringify(delivery_schedule),
+      payment_terms, JSON.stringify(milestone_payments), 'active']);
 
     // Emit signal bus event
     await signalBus.emit('b2b.contract_farming.created', {
@@ -356,14 +356,14 @@ async function createContractFarming(buyerId, contractData) {
       buyer_id: buyerId,
       farmer_id,
       contract_value: contract_quantity * agreed_price,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('Contract farming agreement created', { contractId });
-    
+
     return {
       success: true,
-      contract
+      contract,
     };
   } catch (error) {
     logger.error('Error creating contract farming agreement', { error: error.message });
@@ -376,7 +376,7 @@ async function createContractFarming(buyerId, contractData) {
  */
 async function recordContractMilestone(contractId, milestoneData) {
   const pg = getPostgreSQL();
-  
+
   try {
     const {
       milestone_name,
@@ -384,12 +384,12 @@ async function recordContractMilestone(contractId, milestoneData) {
       quantity_delivered,
       quality_verified,
       payment_amount,
-      payment_status
+      payment_status,
     } = milestoneData;
-    
+
     // Generate milestone ID
     const milestoneId = `MS-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const milestone = {
       id: milestoneId,
       contract_id: contractId,
@@ -399,17 +399,17 @@ async function recordContractMilestone(contractId, milestoneData) {
       quality_verified,
       payment_amount,
       payment_status,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    
+
     // Store milestone
     await pg.query(`
       INSERT INTO contract_milestones 
       (id, contract_id, milestone_name, milestone_date, quantity_delivered, quality_verified, payment_amount, payment_status, created_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
-    `, [milestoneId, contractId, milestone_name, milestone_date, quantity_delivered, quality_verified, 
-        payment_amount, payment_status]);
-    
+    `, [milestoneId, contractId, milestone_name, milestone_date, quantity_delivered, quality_verified,
+      payment_amount, payment_status]);
+
     // Update contract status if all milestones complete
     await pg.query(`
       UPDATE contract_farming 
@@ -417,12 +417,12 @@ async function recordContractMilestone(contractId, milestoneData) {
       WHERE id = $1 AND (SELECT COUNT(*) FROM contract_milestones WHERE contract_id = $1) = 
         (SELECT milestone_payments::jsonb->>'length' FROM contract_farming WHERE id = $1)
     `, [contractId]);
-    
+
     logger.info('Contract milestone recorded', { milestoneId, contractId });
-    
+
     return {
       success: true,
-      milestone
+      milestone,
     };
   } catch (error) {
     logger.error('Error recording contract milestone', { error: error.message });
@@ -439,16 +439,16 @@ async function recordContractMilestone(contractId, milestoneData) {
  */
 async function getSalesAnalytics(filters = {}) {
   const pg = getPostgreSQL();
-  
+
   try {
     const {
       start_date,
       end_date,
       category_id,
       seller_id,
-      business_type
+      business_type,
     } = filters;
-    
+
     // Build base query
     let query = `
       SELECT 
@@ -463,45 +463,45 @@ async function getSalesAnalytics(filters = {}) {
       JOIN product_listings pl ON oi.product_id = pl.id
       WHERE o.status = 'completed'
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (start_date) {
       paramCount++;
       query += ` AND o.created_at >= $${paramCount}`;
       params.push(start_date);
     }
-    
+
     if (end_date) {
       paramCount++;
       query += ` AND o.created_at <= $${paramCount}`;
       params.push(end_date);
     }
-    
+
     if (category_id) {
       paramCount++;
       query += ` AND pl.category_id = $${paramCount}`;
       params.push(category_id);
     }
-    
+
     if (seller_id) {
       paramCount++;
       query += ` AND o.seller_id = $${paramCount}`;
       params.push(seller_id);
     }
-    
+
     if (business_type) {
       paramCount++;
       query += ` AND o.order_type = $${paramCount}`;
       params.push(business_type);
     }
-    
+
     query += ` GROUP BY DATE_TRUNC('day', o.created_at)
                ORDER BY date ASC`;
-    
+
     const result = await pg.query(query, params);
-    
+
     // Calculate summary statistics
     const summary = result.rows.reduce((acc, row) => {
       acc.total_orders += parseInt(row.total_orders);
@@ -510,14 +510,14 @@ async function getSalesAnalytics(filters = {}) {
       acc.total_quantity += parseFloat(row.total_quantity_sold);
       return acc;
     }, { total_orders: 0, total_revenue: 0, unique_customers: 0, total_quantity: 0 });
-    
+
     logger.info('Sales analytics generated', { summary });
-    
+
     return {
       success: true,
       filters,
       summary,
-      daily_data: result.rows
+      daily_data: result.rows,
     };
   } catch (error) {
     logger.error('Error generating sales analytics', { error: error.message });
@@ -530,7 +530,7 @@ async function getSalesAnalytics(filters = {}) {
  */
 async function getB2BConversionMetrics(periodDays = 30) {
   const pg = getPostgreSQL();
-  
+
   try {
     const metrics = await pg.query(`
       WITH funnel AS (
@@ -558,11 +558,11 @@ async function getB2BConversionMetrics(periodDays = 30) {
           ELSE 0 END as completion_rate
       FROM funnel
     `);
-    
+
     return {
       success: true,
       period_days: periodDays,
-      metrics: metrics.rows[0]
+      metrics: metrics.rows[0],
     };
   } catch (error) {
     logger.error('Error getting B2B conversion metrics', { error: error.message });
@@ -579,7 +579,7 @@ async function getB2BConversionMetrics(periodDays = 30) {
  */
 async function calculateCommission(orderId) {
   const pg = getPostgreSQL();
-  
+
   try {
     // Get order details
     const order = await pg.query(`
@@ -591,26 +591,26 @@ async function calculateCommission(orderId) {
       JOIN users u ON o.seller_id = u.id
       WHERE o.id = $1
     `, [orderId]);
-    
+
     if (order.rows.length === 0) {
       throw new Error('Order not found');
     }
-    
+
     const orderData = order.rows[0];
     const totalAmount = parseFloat(orderData.total_amount);
-    
+
     // Calculate commission based on seller tier
     const commissionRates = {
-      'platinum': 0.05,  // 5%
-      'gold': 0.07,      // 7%
-      'silver': 0.10,    // 10%
-      'bronze': 0.12     // 12%
+      platinum: 0.05, // 5%
+      gold: 0.07, // 7%
+      silver: 0.10, // 10%
+      bronze: 0.12, // 12%
     };
-    
+
     const commissionRate = commissionRates[orderData.seller_tier] || 0.10;
     const commissionAmount = totalAmount * commissionRate;
     const sellerPayout = totalAmount - commissionAmount;
-    
+
     const commission = {
       order_id: orderId,
       total_amount: totalAmount,
@@ -618,9 +618,9 @@ async function calculateCommission(orderId) {
       commission_amount: Math.round(commissionAmount * 100) / 100,
       seller_payout: Math.round(sellerPayout * 100) / 100,
       seller_tier: orderData.seller_tier,
-      calculated_at: new Date().toISOString()
+      calculated_at: new Date().toISOString(),
     };
-    
+
     // Store commission
     await pg.query(`
       INSERT INTO platform_commissions 
@@ -629,12 +629,12 @@ async function calculateCommission(orderId) {
       ON CONFLICT (order_id) 
       DO UPDATE SET commission_amount = $4, seller_payout = $5, updated_at = NOW()
     `, [orderId, totalAmount, commissionRate, commissionAmount, sellerPayout, orderData.seller_tier]);
-    
+
     logger.info('Commission calculated', { orderId, commission_amount: commissionAmount });
-    
+
     return {
       success: true,
-      commission
+      commission,
     };
   } catch (error) {
     logger.error('Error calculating commission', { error: error.message, orderId });
@@ -652,15 +652,16 @@ module.exports = {
   findPotentialSellers,
   submitQuotation,
   acceptQuotation,
-  
+
   // Contract Farming
   createContractFarming,
   recordContractMilestone,
-  
+
   // Sales Analytics
   getSalesAnalytics,
   getB2BConversionMetrics,
-  
+
   // Commission Management
-  calculateCommission
+  calculateCommission,
 };
+

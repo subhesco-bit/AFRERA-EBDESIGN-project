@@ -51,7 +51,7 @@ async function deleteItem(id) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 module.exports = { listItems, getItem, createItem, updateItem, deleteItem };

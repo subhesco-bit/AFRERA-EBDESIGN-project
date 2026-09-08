@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Spare Parts Management (backend/src/modules/M109). Generic operation panel -
@@ -12,5 +12,5 @@ export default function SparePartsManagementPage() {
       title="Spare Parts Management"
       description="Spare parts inventory and consumption tracking."
     />
-  )
+  );
 }

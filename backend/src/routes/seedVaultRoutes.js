@@ -8,6 +8,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const pool = require('../database/pool');
 const seedVaultService = require('../services/legacy/seedVaultService');

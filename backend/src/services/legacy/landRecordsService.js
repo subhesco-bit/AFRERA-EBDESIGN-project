@@ -30,7 +30,7 @@ class LandRecordsService {
       khasraNumber,
       boundaryDetails,
       gpsCoordinates,
-      documents
+      documents,
     } = landData;
 
     try {
@@ -58,7 +58,7 @@ class LandRecordsService {
         khasraNumber,
         JSON.stringify(boundaryDetails),
         JSON.stringify(gpsCoordinates),
-        JSON.stringify(documents || [])
+        JSON.stringify(documents || []),
       ]);
 
       logger.info(`Land record added for farmer ${farmerId}`);
@@ -125,7 +125,7 @@ class LandRecordsService {
       return {
         records: result.rows,
         totals: totalResult.rows[0],
-        pagination: { page, limit }
+        pagination: { page, limit },
       };
     } catch (error) {
       logger.error('Error getting farmer land records', { error: error.message, stack: error.stack });
@@ -214,7 +214,7 @@ class LandRecordsService {
         updateData.gpsCoordinates ? JSON.stringify(updateData.gpsCoordinates) : null,
         updateData.documents ? JSON.stringify(updateData.documents) : null,
         recordId,
-        farmerId
+        farmerId,
       ]);
 
       if (result.rows.length === 0) {
@@ -253,7 +253,7 @@ class LandRecordsService {
         adminId,
         governmentReference,
         notes,
-        recordId
+        recordId,
       ]);
 
       if (result.rows.length === 0) {
@@ -326,14 +326,14 @@ class LandRecordsService {
             khasraNumber: govRecord.khasraNumber,
             boundaryDetails: govRecord.boundaryDetails,
             gpsCoordinates: govRecord.gpsCoordinates,
-            documents: []
+            documents: [],
           });
 
           // Auto-verify government records
           await this.verifyLandRecord(newRecord.id, null, {
             verified: true,
             governmentReference: govRecord.referenceNumber,
-            notes: 'Auto-verified from government records'
+            notes: 'Auto-verified from government records',
           });
 
           syncedCount++;
@@ -345,7 +345,7 @@ class LandRecordsService {
         farmerId,
         syncedCount,
         newRecords,
-        syncedAt: new Date()
+        syncedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error syncing with government land records', { error: error.message, stack: error.stack });
@@ -369,8 +369,8 @@ class LandRecordsService {
     return {
       configured: false,
       records: [],
-      reason: 'No government land-records API (e.g. DILRMP) is configured in this deployment. '
-        + 'No live call was attempted.',
+      reason: 'No government land-records API (e.g. DILRMP) is configured in this deployment. ' +
+        'No live call was attempted.',
     };
   }
 
@@ -483,7 +483,8 @@ module.exports = new LandRecordsService();
 
 // Merged from backend/src/modules/M031
 {
-  const m031 = require("../../modules/M031/service");
+  const m031 = require('../../modules/M031/service');
   const { ...rest } = m031;
   Object.assign(module.exports, rest);
 }
+

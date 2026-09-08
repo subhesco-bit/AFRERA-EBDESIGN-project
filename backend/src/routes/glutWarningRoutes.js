@@ -12,7 +12,7 @@ router.get('/check', authMiddleware, async (req, res) => {
     const { categoryId, stateId } = req.query;
     const result = await glutWarningService.checkGlutRisk(
       categoryId ? Number(categoryId) : undefined,
-      stateId ? Number(stateId) : undefined
+      stateId ? Number(stateId) : undefined,
     );
     res.json({ success: true, data: result });
   } catch (error) {

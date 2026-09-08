@@ -66,5 +66,5 @@ module.exports = {
   registerImplement,
   updateImplementMaintenance,
   trackImplementUsage,
-  generateImplementReport
+  generateImplementReport,
 };

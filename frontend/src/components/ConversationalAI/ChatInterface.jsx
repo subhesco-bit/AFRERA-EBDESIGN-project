@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { conversationalAIAPI } from '../../services/api';
+import { conversationalAIAPI } from '../../services/componentApi';
 
 /**
  * Chat Interface Component
@@ -36,7 +36,7 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
 
       const sessionResponse = await conversationalAIAPI.createSession({
         domain_id: selectedDomain?.id,
-        language
+        language,
       });
 
       const sessionData = sessionResponse.data;
@@ -46,7 +46,7 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
       setMessages([{
         role: 'assistant',
         content: `Hello! I'm your ${domain} assistant. How can I help you today?`,
-        timestamp: new Date()
+        timestamp: new Date(),
       }]);
     } catch (error) {
       console.error('Failed to initialize session:', error);
@@ -68,7 +68,7 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
     const newMessages = [...messages, {
       role: 'user',
       content: userMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
     }];
     setMessages(newMessages);
 
@@ -84,8 +84,8 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
           content: data.content,
           timestamp: new Date(),
           intent: data.intent,
-          confidence: data.confidence
-        }
+          confidence: data.confidence,
+        },
       ]);
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -94,8 +94,8 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
         {
           role: 'assistant',
           content: 'I apologize, but I encountered an error. Please try again.',
-          timestamp: new Date()
-        }
+          timestamp: new Date(),
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -156,9 +156,9 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
           >
             <div
               className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                message.role === 'user'
-                  ? 'bg-blue-600 text-white rounded-br-sm'
-                  : 'bg-white text-gray-800 rounded-bl-sm shadow-sm'
+                message.role === 'user' ?
+                  'bg-blue-600 text-white rounded-br-sm' :
+                  'bg-white text-gray-800 rounded-bl-sm shadow-sm'
               }`}
             >
               <p className="text-sm">{message.content}</p>
@@ -173,7 +173,7 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
             </div>
           </div>
         ))}
-        
+
         {isTyping && (
           <div className="flex justify-start">
             <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
@@ -185,7 +185,7 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 

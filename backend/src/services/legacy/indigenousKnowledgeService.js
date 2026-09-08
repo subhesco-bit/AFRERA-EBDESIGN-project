@@ -1,6 +1,6 @@
 /**
  * Indigenous Knowledge Platform Service
- * CAP-209 to CAP-216: Traditional Recipes, Traditional Medicine, Indigenous Farming, 
+ * CAP-209 to CAP-216: Traditional Recipes, Traditional Medicine, Indigenous Farming,
  * Oral History, Tribal Knowledge, Documentation System, Protection System, IP Management
  */
 
@@ -36,7 +36,7 @@ router.post('/traditional-recipes', authMiddleware, async (req, res) => {
       nutritional_info,
       media_files,
       contributor_id,
-      verified_by
+      verified_by,
     } = req.body;
 
     const result = await pool.query(
@@ -50,8 +50,8 @@ router.post('/traditional-recipes', authMiddleware, async (req, res) => {
         name, indigenous_community, region, JSON.stringify(ingredients),
         preparation_method, cultural_significance, seasonal_relevance,
         JSON.stringify(nutritional_info), JSON.stringify(media_files),
-        contributor_id, verified_by
-      ]
+        contributor_id, verified_by,
+      ],
     );
 
     logger.info(`Traditional recipe created: ${result.rows[0].id}`);
@@ -68,7 +68,7 @@ router.post('/traditional-recipes', authMiddleware, async (req, res) => {
 router.get('/traditional-recipes', authMiddleware, async (req, res) => {
   try {
     const { community, region, season, search } = req.query;
-    
+
     let query = 'SELECT * FROM traditional_recipes WHERE is_verified = true';
     const params = [];
     let paramCount = 0;
@@ -112,7 +112,7 @@ router.get('/traditional-recipes/:id', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
       'SELECT * FROM traditional_recipes WHERE id = $1',
-      [req.params.id]
+      [req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -148,7 +148,7 @@ router.post('/traditional-medicine', authMiddleware, async (req, res) => {
       practitioner_notes,
       media_files,
       contributor_id,
-      verified_by
+      verified_by,
     } = req.body;
 
     const result = await pool.query(
@@ -162,8 +162,8 @@ router.post('/traditional-medicine', authMiddleware, async (req, res) => {
         name, indigenous_community, region, JSON.stringify(medicinal_plants),
         preparation_method, JSON.stringify(traditional_uses), dosage,
         contraindications, JSON.stringify(scientific_validation),
-        practitioner_notes, JSON.stringify(media_files), contributor_id, verified_by
-      ]
+        practitioner_notes, JSON.stringify(media_files), contributor_id, verified_by,
+      ],
     );
 
     logger.info(`Traditional medicine created: ${result.rows[0].id}`);
@@ -180,7 +180,7 @@ router.post('/traditional-medicine', authMiddleware, async (req, res) => {
 router.get('/traditional-medicine', authMiddleware, async (req, res) => {
   try {
     const { community, region, ailment, search } = req.query;
-    
+
     let query = 'SELECT * FROM traditional_medicine WHERE is_verified = true';
     const params = [];
     let paramCount = 0;
@@ -241,7 +241,7 @@ router.post('/indigenous-farming', authMiddleware, async (req, res) => {
       modern_applications,
       media_files,
       contributor_id,
-      verified_by
+      verified_by,
     } = req.body;
 
     const result = await pool.query(
@@ -257,8 +257,8 @@ router.post('/indigenous-farming', authMiddleware, async (req, res) => {
         JSON.stringify(techniques), JSON.stringify(seasonal_calendar),
         soil_management, water_management, pest_management,
         climate_adaptation, cultural_context, JSON.stringify(modern_applications),
-        JSON.stringify(media_files), contributor_id, verified_by
-      ]
+        JSON.stringify(media_files), contributor_id, verified_by,
+      ],
     );
 
     logger.info(`Indigenous farming practice created: ${result.rows[0].id}`);
@@ -275,7 +275,7 @@ router.post('/indigenous-farming', authMiddleware, async (req, res) => {
 router.get('/indigenous-farming', authMiddleware, async (req, res) => {
   try {
     const { community, region, crop, technique } = req.query;
-    
+
     let query = 'SELECT * FROM indigenous_farming_practices WHERE is_verified = true';
     const params = [];
     let paramCount = 0;
@@ -330,7 +330,7 @@ router.post('/oral-history', authMiddleware, async (req, res) => {
       narrator_role,
       recording_date,
       language,
-    transcript,
+      transcript,
       summary,
       topics,
       historical_period,
@@ -338,7 +338,7 @@ router.post('/oral-history', authMiddleware, async (req, res) => {
       audio_file,
       video_file,
       contributor_id,
-      verified_by
+      verified_by,
     } = req.body;
 
     const result = await pool.query(
@@ -353,8 +353,8 @@ router.post('/oral-history', authMiddleware, async (req, res) => {
         title, indigenous_community, region, narrator, narrator_age, narrator_role,
         recording_date, language, transcript, summary, JSON.stringify(topics),
         historical_period, cultural_significance, audio_file, video_file,
-        contributor_id, verified_by
-      ]
+        contributor_id, verified_by,
+      ],
     );
 
     logger.info(`Oral history created: ${result.rows[0].id}`);
@@ -371,7 +371,7 @@ router.post('/oral-history', authMiddleware, async (req, res) => {
 router.get('/oral-history', authMiddleware, async (req, res) => {
   try {
     const { community, region, topic, period } = req.query;
-    
+
     let query = 'SELECT * FROM oral_history WHERE is_verified = true';
     const params = [];
     let paramCount = 0;
@@ -430,7 +430,7 @@ router.post('/tribal-knowledge', authMiddleware, async (req, res) => {
       cross_references,
       media_files,
       contributor_id,
-      verified_by
+      verified_by,
     } = req.body;
 
     const result = await pool.query(
@@ -444,8 +444,8 @@ router.post('/tribal-knowledge', authMiddleware, async (req, res) => {
         knowledge_type, indigenous_community, region, title, description,
         JSON.stringify(knowledge_holders), transmission_method, restrictions,
         JSON.stringify(applications), JSON.stringify(cross_references),
-        JSON.stringify(media_files), contributor_id, verified_by
-      ]
+        JSON.stringify(media_files), contributor_id, verified_by,
+      ],
     );
 
     logger.info(`Tribal knowledge created: ${result.rows[0].id}`);
@@ -462,7 +462,7 @@ router.post('/tribal-knowledge', authMiddleware, async (req, res) => {
 router.get('/tribal-knowledge', authMiddleware, async (req, res) => {
   try {
     const { community, region, type, search } = req.query;
-    
+
     let query = 'SELECT * FROM tribal_knowledge WHERE is_verified = true';
     const params = [];
     let paramCount = 0;
@@ -519,7 +519,7 @@ router.post('/documentation', authMiddleware, async (req, res) => {
       access_level,
       contributors,
       reviewed_by,
-      approved_by
+      approved_by,
     } = req.body;
 
     const result = await pool.query(
@@ -532,8 +532,8 @@ router.post('/documentation', authMiddleware, async (req, res) => {
       [
         knowledge_id, knowledge_type, documentation_type, document_format,
         content, JSON.stringify(metadata), location, access_level,
-        JSON.stringify(contributors), reviewed_by, approved_by
-      ]
+        JSON.stringify(contributors), reviewed_by, approved_by,
+      ],
     );
 
     logger.info(`Documentation created: ${result.rows[0].id}`);
@@ -550,7 +550,7 @@ router.post('/documentation', authMiddleware, async (req, res) => {
 router.get('/documentation', authMiddleware, async (req, res) => {
   try {
     const { knowledge_type, access_level, format } = req.query;
-    
+
     let query = 'SELECT * FROM indigenous_documentation WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -600,7 +600,7 @@ router.post('/protection', authMiddleware, async (req, res) => {
       legal_basis,
       scope,
       duration,
-      conditions
+      conditions,
     } = req.body;
 
     const result = await pool.query(
@@ -612,8 +612,8 @@ router.post('/protection', authMiddleware, async (req, res) => {
        RETURNING *`,
       [
         knowledge_id, knowledge_type, protection_type, reason, requested_by,
-        community_consent, legal_basis, scope, duration, JSON.stringify(conditions)
-      ]
+        community_consent, legal_basis, scope, duration, JSON.stringify(conditions),
+      ],
     );
 
     logger.info(`Protection request created: ${result.rows[0].id}`);
@@ -636,7 +636,7 @@ router.put('/protection/:id/status', authMiddleware, requireRole(...PLATFORM_STA
        SET status = $1, reviewed_by = $2, review_notes = $3, reviewed_at = NOW(), updated_at = NOW()
        WHERE id = $4
        RETURNING *`,
-      [status, reviewed_by, notes, req.params.id]
+      [status, reviewed_by, notes, req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -657,7 +657,7 @@ router.put('/protection/:id/status', authMiddleware, requireRole(...PLATFORM_STA
 router.get('/protection', authMiddleware, async (req, res) => {
   try {
     const { status, knowledge_type, requested_by } = req.query;
-    
+
     let query = 'SELECT * FROM indigenous_protection WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -710,7 +710,7 @@ router.post('/ip-management', authMiddleware, async (req, res) => {
       prior_informed_consent,
       legal_protection_status,
       expiry_date,
-      jurisdiction
+      jurisdiction,
     } = req.body;
 
     const result = await pool.query(
@@ -726,8 +726,8 @@ router.post('/ip-management', authMiddleware, async (req, res) => {
         indigenous_community, JSON.stringify(ownership_structure),
         JSON.stringify(commercial_rights), JSON.stringify(licensing_terms),
         JSON.stringify(benefit_sharing), prior_informed_consent,
-        legal_protection_status, expiry_date, jurisdiction
-      ]
+        legal_protection_status, expiry_date, jurisdiction,
+      ],
     );
 
     logger.info(`IP registration created: ${result.rows[0].id}`);
@@ -744,7 +744,7 @@ router.post('/ip-management', authMiddleware, async (req, res) => {
 router.get('/ip-management', authMiddleware, async (req, res) => {
   try {
     const { community, ip_type, status } = req.query;
-    
+
     let query = 'SELECT * FROM indigenous_ip_management WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -781,7 +781,7 @@ router.get('/ip-management', authMiddleware, async (req, res) => {
 router.put('/ip-management/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const {
-      legal_protection_status, licensing_terms, benefit_sharing, expiry_date
+      legal_protection_status, licensing_terms, benefit_sharing, expiry_date,
     } = req.body;
 
     const result = await pool.query(
@@ -798,8 +798,8 @@ router.put('/ip-management/:id', authMiddleware, requireRole(...PLATFORM_STAFF_R
         licensing_terms ? JSON.stringify(licensing_terms) : null,
         benefit_sharing ? JSON.stringify(benefit_sharing) : null,
         expiry_date,
-        req.params.id
-      ]
+        req.params.id,
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -821,5 +821,6 @@ function isHealthy() {
 
 module.exports = {
   router,
-  isHealthy
+  isHealthy,
 };
+

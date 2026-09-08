@@ -8,8 +8,8 @@ router.post('/payments', controller.create);
 router.put('/payments/:id/status', controller.updateStatus);
 router.post('/payments/:id/refund', controller.refund);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

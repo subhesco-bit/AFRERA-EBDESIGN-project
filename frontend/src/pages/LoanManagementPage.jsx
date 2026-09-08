@@ -8,29 +8,20 @@ import { useQuery } from '@tanstack/react-query';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
+import { NativeSelect as Select } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
+import { financialAPI } from '../services/api';
 
 const LoanManagementPage = () => {
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [activeTab, setActiveTab] = useState('my-loans');
 
   // Get user's loans
-  const { data: loansData, isLoading: loansLoading } = useQuery({
+  const { data: loansData, isLoading: loansLoading, error: loansError } = useQuery({
     queryKey: ['userLoans'],
-    queryFn: () => fetch('/api/financial/loans')
-      .then(res => res.json())
-      .then(res => res.data),
-    refetchInterval: 180000 // 3 minutes
-  });
-
-  // Get loan products
-  const { data: loanProducts } = useQuery({
-    queryKey: ['loanProducts'],
-    queryFn: () => fetch('/api/financial/loan-products')
-      .then(res => res.json())
-      .then(res => res.data)
+    queryFn: () => financialAPI.getLoans().then(res => res.data.data),
+    refetchInterval: 180000, // 3 minutes
   });
 
   const loans = loansData?.loans || [];
@@ -95,6 +86,10 @@ const LoanManagementPage = () => {
 
       {loansLoading ? (
         <LoadingSkeleton variant="rectangular" lines={4} />
+      ) : loansError ? (
+        <p className="rounded border border-red-200 bg-red-50 p-4 text-red-700">
+          Unable to load loans: {loansError.message}
+        </p>
       ) : (
         <>
           {/* My Loans Tab */}
@@ -141,40 +136,9 @@ const LoanManagementPage = () => {
           {activeTab === 'products' && (
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Available Loan Products</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 border rounded">
-                  <h3 className="font-semibold">Crop Loan</h3>
-                  <p className="text-sm text-gray-600 mb-2">For seeds, fertilizers, and cultivation costs</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Up to ₹5,00,000</span>
-                    <Button size="sm">Apply</Button>
-                  </div>
-                </div>
-                <div className="p-4 border rounded">
-                  <h3 className="font-semibold">Equipment Loan</h3>
-                  <p className="text-sm text-gray-600 mb-2">For agricultural machinery and equipment</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Up to ₹10,00,000</span>
-                    <Button size="sm">Apply</Button>
-                  </div>
-                </div>
-                <div className="p-4 border rounded">
-                  <h3 className="font-semibold">Land Development</h3>
-                  <p className="text-sm text-gray-600 mb-2">For land improvement and irrigation</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Up to ₹15,00,000</span>
-                    <Button size="sm">Apply</Button>
-                  </div>
-                </div>
-                <div className="p-4 border rounded">
-                  <h3 className="font-semibold">Working Capital</h3>
-                  <p className="text-sm text-gray-600 mb-2">For operational expenses</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Up to ₹2,00,000</span>
-                    <Button size="sm">Apply</Button>
-                  </div>
-                </div>
-              </div>
+              <p className="rounded border border-amber-200 bg-amber-50 p-4 text-amber-800">
+                Loan products are currently unavailable because no verified loan-product catalog is configured.
+              </p>
             </Card>
           )}
 

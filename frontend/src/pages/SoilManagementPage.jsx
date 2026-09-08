@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { Layers, FlaskConical, Leaf, TestTube2 } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { soilHealthAPI, nutrientManagementAPI, fertilityManagementAPI, soilTestingOpsAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Layers, FlaskConical, Leaf, TestTube2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { soilHealthAPI, nutrientManagementAPI, fertilityManagementAPI, soilTestingOpsAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Soil domain sub-modules: M071 (Soil Health), M073 (Nutrient
@@ -31,33 +31,33 @@ const TABS = [
   { id: 'nutrient', label: 'Nutrient Management', icon: FlaskConical },
   { id: 'fertility', label: 'Fertility Management', icon: Leaf },
   { id: 'testing', label: 'Soil Testing (Lab)', icon: TestTube2 },
-]
+];
 
 function SoilTestingTab() {
-  const [sampleForm, setSampleForm] = useState({ plot_name: '', crop: '', sample_date: '' })
-  const [lastSampleId, setLastSampleId] = useState(null)
-  const [trackId, setTrackId] = useState('')
+  const [sampleForm, setSampleForm] = useState({ plot_name: '', crop: '', sample_date: '' });
+  const [lastSampleId, setLastSampleId] = useState(null);
+  const [trackId, setTrackId] = useState('');
 
   const submitSampleMutation = useMutation({
     mutationFn: (data) => soilTestingOpsAPI.submitSample(data),
     onSuccess: (res) => {
-      const id = res.data?.data?.id ?? res.data?.id
-      setLastSampleId(id)
-      toast.success(id ? `Sample submitted (ID ${id})` : 'Sample submitted')
+      const id = res.data?.data?.id ?? res.data?.id;
+      setLastSampleId(id);
+      toast.success(id ? `Sample submitted (ID ${id})` : 'Sample submitted');
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to submit sample'),
-  })
+  });
 
   const { data: tracked, refetch: refetchTrack, isFetching: trackLoading } = useQuery({
     queryKey: ['soil-sample-track', trackId],
     queryFn: () => soilTestingOpsAPI.trackSample(trackId).then((r) => r.data?.data ?? r.data),
     enabled: false,
-  })
+  });
 
   const { data: healthCard } = useQuery({
     queryKey: ['soil-testing-health-card'],
     queryFn: () => soilTestingOpsAPI.getHealthCard({}).then((r) => r.data?.data ?? r.data),
-  })
+  });
 
   return (
     <div className="space-y-6">
@@ -70,12 +70,12 @@ function SoilTestingTab() {
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Submit a Soil Sample</h3>
         <form
           onSubmit={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             if (!sampleForm.plot_name) {
-              toast.error('Plot / field name is required')
-              return
+              toast.error('Plot / field name is required');
+              return;
             }
-            submitSampleMutation.mutate(sampleForm)
+            submitSampleMutation.mutate(sampleForm);
           }}
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
         >
@@ -141,15 +141,15 @@ function SoilTestingTab() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-const HEALTH_RATINGS = ['Excellent', 'Good', 'Moderate', 'Poor', 'Degraded']
-const NUTRIENT_FOCUS = ['Nitrogen (N)', 'Phosphorus (P)', 'Potassium (K)', 'Balanced NPK', 'Secondary/Micronutrients']
-const FERTILITY_STATUS = ['High', 'Medium', 'Low']
+const HEALTH_RATINGS = ['Excellent', 'Good', 'Moderate', 'Poor', 'Degraded'];
+const NUTRIENT_FOCUS = ['Nitrogen (N)', 'Phosphorus (P)', 'Potassium (K)', 'Balanced NPK', 'Secondary/Micronutrients'];
+const FERTILITY_STATUS = ['High', 'Medium', 'Low'];
 
 function SoilManagementPage() {
-  const [activeTab, setActiveTab] = useState('health')
+  const [activeTab, setActiveTab] = useState('health');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -288,7 +288,7 @@ function SoilManagementPage() {
 
       {activeTab === 'testing' && <SoilTestingTab />}
     </div>
-  )
+  );
 }
 
-export default SoilManagementPage
+export default SoilManagementPage;

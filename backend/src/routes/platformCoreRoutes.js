@@ -16,16 +16,16 @@ const { adminMiddleware } = require('../middleware/admin');
 router.get('/config', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const config = await platformCoreService.getPlatformConfig();
-    
+
     res.json({
       success: true,
-      data: config
+      data: config,
     });
   } catch (error) {
     console.error('Get platform config error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get platform configuration'
+      error: 'Failed to get platform configuration',
     });
   }
 });
@@ -39,19 +39,19 @@ router.put('/config/:key', authMiddleware, adminMiddleware, async (req, res) => 
     const { key } = req.params;
     const { value } = req.body;
     const updatedBy = req.user.id;
-    
+
     const updatedConfig = await platformCoreService.updatePlatformConfig(key, value, updatedBy);
-    
+
     res.json({
       success: true,
       data: updatedConfig,
-      message: 'Platform configuration updated successfully'
+      message: 'Platform configuration updated successfully',
     });
   } catch (error) {
     console.error('Update platform config error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to update platform configuration'
+      error: 'Failed to update platform configuration',
     });
   }
 });
@@ -63,17 +63,17 @@ router.put('/config/:key', authMiddleware, adminMiddleware, async (req, res) => 
 router.get('/health', async (req, res) => {
   try {
     const health = await platformCoreService.getPlatformHealth();
-    
+
     const statusCode = health.status === 'healthy' ? 200 : 503;
     res.status(statusCode).json({
       success: health.status === 'healthy',
-      data: health
+      data: health,
     });
   } catch (error) {
     console.error('Get platform health error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get platform health'
+      error: 'Failed to get platform health',
     });
   }
 });
@@ -85,16 +85,16 @@ router.get('/health', async (req, res) => {
 router.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const stats = await platformCoreService.getPlatformStats();
-    
+
     res.json({
       success: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     console.error('Get platform stats error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get platform statistics'
+      error: 'Failed to get platform statistics',
     });
   }
 });
@@ -107,16 +107,16 @@ router.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
 router.get('/optimizations', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const optimizations = await platformCoreService.getPlatformOptimizations();
-    
+
     res.json({
       success: true,
-      data: optimizations
+      data: optimizations,
     });
   } catch (error) {
     console.error('Get platform optimizations error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get platform optimizations'
+      error: 'Failed to get platform optimizations',
     });
   }
 });

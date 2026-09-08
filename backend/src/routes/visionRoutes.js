@@ -24,6 +24,8 @@ const multer = require('multer');
 const { authMiddleware } = require('../middleware/auth');
 const { route } = require('../core/aiOrchestrator');
 
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 
 const upload = multer({
@@ -54,7 +56,7 @@ router.post('/analyze-quality', upload.single('image'), async (req, res, next) =
     const result = await route(
       'vision_engine',
       { buffer: req.file.buffer, operation: 'analyze_quality' },
-      { actorId: 'visionRoutes:analyze-quality' }
+      { actorId: 'visionRoutes:analyze-quality' },
     );
     res.status(result.ok ? 200 : 422).json(result);
   } catch (error) {
@@ -69,7 +71,7 @@ router.post('/metadata', upload.single('image'), async (req, res, next) => {
     const result = await route(
       'vision_engine',
       { buffer: req.file.buffer, operation: 'metadata' },
-      { actorId: 'visionRoutes:metadata' }
+      { actorId: 'visionRoutes:metadata' },
     );
     res.status(result.ok ? 200 : 422).json(result);
   } catch (error) {
@@ -92,7 +94,7 @@ router.post('/thumbnail', upload.single('image'), async (req, res, next) => {
         fit,
         format,
       },
-      { actorId: 'visionRoutes:thumbnail' }
+      { actorId: 'visionRoutes:thumbnail' },
     );
 
     if (!result.ok) return res.status(422).json(result);
@@ -117,7 +119,7 @@ router.post('/ocr', upload.single('image'), async (req, res, next) => {
     const result = await route(
       'ocr_engine',
       { buffer: req.file.buffer, language, reportNumber },
-      { actorId: 'visionRoutes:ocr' }
+      { actorId: 'visionRoutes:ocr' },
     );
     res.status(result.ok ? 200 : 422).json(result);
   } catch (error) {

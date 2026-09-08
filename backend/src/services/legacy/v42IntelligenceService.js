@@ -61,7 +61,7 @@ async function resolveCrop(query, limit = 10) {
                     ELSE 3 END,
                length(t.term)
       LIMIT 200`,
-    [q]
+    [q],
   );
 
   // Collapse to one entry per concept, keeping the strongest match and every
@@ -75,7 +75,7 @@ async function resolveCrop(query, limit = 10) {
         label: r.label,
         scientificName: r.scientific_name,
         matchType: r.match_type,
-        matchedVia: []
+        matchedVia: [],
       });
     }
     const e = byConcept.get(r.concept_key);
@@ -94,7 +94,7 @@ async function getConceptTerms(conceptKey) {
        LEFT JOIN crop_concept_terms t ON t.concept_key = c.concept_key
       WHERE c.concept_key = $1
       ORDER BY t.lang, t.term`,
-    [conceptKey]
+    [conceptKey],
   );
   if (rows.length === 0) throw new Error(`Unknown crop concept "${conceptKey}"`);
 
@@ -108,7 +108,7 @@ async function getConceptTerms(conceptKey) {
     label: rows[0].label,
     scientificName: rows[0].scientific_name,
     termsByLanguage: byLang,
-    totalTerms: rows.filter((r) => r.term).length
+    totalTerms: rows.filter((r) => r.term).length,
   };
 }
 
@@ -131,14 +131,14 @@ async function quoteFreight({ laneCode, weightKg, perishable }) {
 
   const db = getPostgreSQL();
   const { rows: lanes } = await db.query(
-    'SELECT * FROM freight_lanes WHERE lane_code = $1 AND is_active = TRUE', [laneCode]
+    'SELECT * FROM freight_lanes WHERE lane_code = $1 AND is_active = TRUE', [laneCode],
   );
   if (lanes.length === 0) throw new Error(`Unknown or inactive lane "${laneCode}"`);
   const lane = lanes[0];
 
   const { rows: modes } = await db.query(
-    `SELECT * FROM transport_modes WHERE is_active = TRUE AND mode_code = ANY($1)`,
-    [lane.modes]
+    'SELECT * FROM transport_modes WHERE is_active = TRUE AND mode_code = ANY($1)',
+    [lane.modes],
   );
 
   const quotes = modes.map((m) => {
@@ -156,7 +156,7 @@ async function quoteFreight({ laneCode, weightKg, perishable }) {
       costIndex,
       estimatedTransitDays: transitDays,
       // Perishables cannot sit on a slow mode however cheap it is.
-      suitableForPerishable: speed >= 1.0
+      suitableForPerishable: speed >= 1.0,
     };
   });
 
@@ -168,14 +168,14 @@ async function quoteFreight({ laneCode, weightKg, perishable }) {
   return {
     lane: {
       code: lane.lane_code, origin: lane.origin,
-      destination: lane.destination, distanceKm: lane.distance_km
+      destination: lane.destination, distanceKm: lane.distance_km,
     },
     weightKg: w,
     quotes: viable,
     cheapest: viable[0] || null,
     fastest: [...viable].sort((a, b) => a.estimatedTransitDays - b.estimatedTransitDays)[0] || null,
     excludedForPerishability: excluded,
-    basis: 'costIndex is a relative comparison index recovered from v42 rate factors, not a rupee tariff. Use it to rank modes, not to quote a customer.'
+    basis: 'costIndex is a relative comparison index recovered from v42 rate factors, not a rupee tariff. Use it to rank modes, not to quote a customer.',
   };
 }
 
@@ -203,7 +203,7 @@ async function bookFreightSlot({ slotCode, weightKg, isFpo, bookedBy }) {
   try {
     await client.query('BEGIN');
     const { rows } = await client.query(
-      'SELECT * FROM freight_slots WHERE slot_code = $1 FOR UPDATE', [slotCode]
+      'SELECT * FROM freight_slots WHERE slot_code = $1 FOR UPDATE', [slotCode],
     );
     if (rows.length === 0) throw new Error(`Slot ${slotCode} not found`);
     const s = rows[0];
@@ -222,7 +222,7 @@ async function bookFreightSlot({ slotCode, weightKg, isFpo, bookedBy }) {
       genTake = w - fpoTake;
       if (genTake > genFree) {
         throw new Error(
-          `Slot ${slotCode} has ${fpoFree} kg reserved + ${genFree} kg general free; ${w} kg requested`
+          `Slot ${slotCode} has ${fpoFree} kg reserved + ${genFree} kg general free; ${w} kg requested`,
         );
       }
     } else {
@@ -230,10 +230,10 @@ async function bookFreightSlot({ slotCode, weightKg, isFpo, bookedBy }) {
       const availableToGeneral = s.released ? genFree + fpoFree : genFree;
       if (w > availableToGeneral) {
         throw new Error(
-          s.released
-            ? `Slot ${slotCode} has ${availableToGeneral} kg free; ${w} kg requested`
-            : `Slot ${slotCode} has ${genFree} kg in the general pool; ${w} kg requested. ` +
-              `A further ${fpoFree} kg is reserved for FPOs and is not yet released.`
+          s.released ?
+            `Slot ${slotCode} has ${availableToGeneral} kg free; ${w} kg requested` :
+            `Slot ${slotCode} has ${genFree} kg in the general pool; ${w} kg requested. ` +
+              `A further ${fpoFree} kg is reserved for FPOs and is not yet released.`,
         );
       }
       genTake = Math.min(w, genFree);
@@ -245,7 +245,7 @@ async function bookFreightSlot({ slotCode, weightKg, isFpo, bookedBy }) {
           SET fpo_used_kg = fpo_used_kg + $2,
               general_used_kg = general_used_kg + $3
         WHERE slot_code = $1`,
-      [slotCode, fpoTake, genTake]
+      [slotCode, fpoTake, genTake],
     );
     await client.query('COMMIT');
 
@@ -256,7 +256,7 @@ async function bookFreightSlot({ slotCode, weightKg, isFpo, bookedBy }) {
       fromFpoReservation: fpoTake,
       fromGeneralPool: genTake,
       remainingFpoKg: fpoFree - fpoTake,
-      remainingGeneralKg: genFree - genTake
+      remainingGeneralKg: genFree - genTake,
     };
   } catch (err) {
     await client.query('ROLLBACK');
@@ -272,7 +272,7 @@ async function listSlotAvailability(laneCode) {
   let where = '';
   if (laneCode) { params.push(laneCode); where = 'WHERE lane_code = $1'; }
   const { rows } = await db.query(
-    `SELECT * FROM v_freight_slot_availability ${where} ORDER BY departure_at ASC NULLS LAST`, params
+    `SELECT * FROM v_freight_slot_availability ${where} ORDER BY departure_at ASC NULLS LAST`, params,
   );
   return rows;
 }
@@ -289,7 +289,7 @@ async function listSlotAvailability(laneCode) {
 async function validatePromo({ code, orderValue, hasGiItems }) {
   const db = getPostgreSQL();
   const { rows } = await db.query(
-    'SELECT * FROM promo_codes WHERE upper(code) = upper($1) AND is_active = TRUE', [code]
+    'SELECT * FROM promo_codes WHERE upper(code) = upper($1) AND is_active = TRUE', [code],
   );
   if (rows.length === 0) return { valid: false, reason: 'No such promotion code.' };
   const p = rows[0];
@@ -311,16 +311,16 @@ async function validatePromo({ code, orderValue, hasGiItems }) {
     return {
       valid: false,
       reason: `Minimum order value is ₹${p.min_order_value}. Add ₹${short.toFixed(2)} to qualify.`,
-      shortfall: short
+      shortfall: short,
     };
   }
   if (p.gi_only && !hasGiItems) {
     return { valid: false, reason: 'This promotion applies only to GI-registered products.' };
   }
 
-  const discount = p.discount_type === 'pct'
-    ? Number((value * Number(p.value)).toFixed(2))
-    : Number(p.value);
+  const discount = p.discount_type === 'pct' ?
+    Number((value * Number(p.value)).toFixed(2)) :
+    Number(p.value);
 
   // A flat discount must never exceed the order itself.
   const applied = Math.min(discount, value);
@@ -331,7 +331,7 @@ async function validatePromo({ code, orderValue, hasGiItems }) {
     label: p.label,
     discountType: p.discount_type,
     discount: applied,
-    payable: Number((value - applied).toFixed(2))
+    payable: Number((value - applied).toFixed(2)),
   };
 }
 
@@ -350,7 +350,7 @@ async function getEngineRules(engineCode) {
        LEFT JOIN handling_engine_rules r ON r.engine_code = e.engine_code
        ${where}
       ORDER BY e.engine_code, r.rule_order`,
-    params
+    params,
   );
   const out = {};
   rows.forEach((r) => {
@@ -383,7 +383,7 @@ router.get('/freight/quote', async (req, res) => {
     const data = await quoteFreight({
       laneCode: req.query.lane,
       weightKg: req.query.weightKg,
-      perishable: req.query.perishable === 'true'
+      perishable: req.query.perishable === 'true',
     });
     res.json({ success: true, data });
   } catch (e) { return fail(res, e, 'quoteFreight'); }
@@ -398,7 +398,7 @@ router.get('/freight/slots', async (req, res) => {
 router.post('/freight/slots/:slotCode/book', authMiddleware, async (req, res) => {
   try {
     const data = await bookFreightSlot({
-      slotCode: req.params.slotCode, ...req.body, bookedBy: req.user?.id
+      slotCode: req.params.slotCode, ...req.body, bookedBy: req.user?.id,
     });
     res.json({ success: true, data });
   } catch (e) { return fail(res, e, 'bookFreightSlot'); }
@@ -428,7 +428,7 @@ router.get('/insurance-plans', async (req, res) => {
   try {
     const db = getPostgreSQL();
     const { rows } = await db.query(
-      'SELECT * FROM insurance_plan_catalog WHERE is_active = TRUE ORDER BY plan_name'
+      'SELECT * FROM insurance_plan_catalog WHERE is_active = TRUE ORDER BY plan_name',
     );
     res.json({ success: true, data: rows });
   } catch (e) { return fail(res, e, 'insurancePlans'); }
@@ -447,7 +447,7 @@ router.post('/freight/slots/:slotCode/release', authMiddleware, adminMiddleware,
     const db = getPostgreSQL();
     const { rows } = await db.query(
       'UPDATE freight_slots SET released = TRUE WHERE slot_code = $1 RETURNING *',
-      [req.params.slotCode]
+      [req.params.slotCode],
     );
     if (rows.length === 0) throw new Error(`Slot ${req.params.slotCode} not found`);
     res.json({ success: true, data: rows[0] });
@@ -462,5 +462,6 @@ module.exports = {
   bookFreightSlot,
   listSlotAvailability,
   validatePromo,
-  getEngineRules
+  getEngineRules,
 };
+

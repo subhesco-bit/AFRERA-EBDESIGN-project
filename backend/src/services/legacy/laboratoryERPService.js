@@ -36,7 +36,7 @@ async function registerLaboratory(data) {
     contact_email,
     contact_phone,
     testing_capabilities,
-    equipment_list
+    equipment_list,
   } = data;
 
   try {
@@ -60,8 +60,8 @@ async function registerLaboratory(data) {
         contact_email,
         contact_phone,
         JSON.stringify(testing_capabilities),
-        JSON.stringify(equipment_list)
-      ]
+        JSON.stringify(equipment_list),
+      ],
     );
 
     return result.rows[0];
@@ -94,7 +94,7 @@ async function getLaboratories() {
        FROM laboratories l
        LEFT JOIN addresses a ON l.location_id = a.id
        WHERE l.status = 'active'
-       ORDER BY l.lab_name`
+       ORDER BY l.lab_name`,
     );
     return result.rows;
   } catch (error) {
@@ -126,7 +126,7 @@ router.get('/laboratories', async (req, res) => {
 async function getTestCategories() {
   try {
     const result = await pool.query(
-      'SELECT * FROM test_categories WHERE is_active = true ORDER BY name'
+      'SELECT * FROM test_categories WHERE is_active = true ORDER BY name',
     );
     return result.rows;
   } catch (error) {
@@ -205,12 +205,12 @@ async function registerSample(data) {
     batch_number,
     priority,
     requested_tests,
-    special_instructions
+    special_instructions,
   } = data;
 
   try {
     // Generate sample number
-    const sampleNumber = `SMP-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const sampleNumber = `SMP-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
     const result = await pool.query(
       `INSERT INTO sample_registrations 
@@ -232,8 +232,8 @@ async function registerSample(data) {
         batch_number,
         priority,
         JSON.stringify(requested_tests),
-        special_instructions
-      ]
+        special_instructions,
+      ],
     );
 
     return result.rows[0];
@@ -250,7 +250,7 @@ router.post('/samples', authMiddleware, async (req, res) => {
   try {
     const result = await registerSample({
       ...req.body,
-      submitted_by: req.user.id
+      submitted_by: req.user.id,
     });
     res.status(201).json(result);
   } catch (error) {
@@ -312,7 +312,7 @@ async function getSampleByNumber(sampleNumber) {
        LEFT JOIN laboratories l ON sr.laboratory_id = l.id
        LEFT JOIN addresses a ON l.location_id = a.id
        WHERE sr.sample_number = $1`,
-      [sampleNumber]
+      [sampleNumber],
     );
 
     if (result.rows.length === 0) {
@@ -353,7 +353,7 @@ async function assignTest(sampleId, testMethodId, assignedTo) {
        (sample_id, test_method_id, assigned_to, status)
        VALUES ($1, $2, $3, 'assigned')
        RETURNING *`,
-      [sampleId, testMethodId, assignedTo]
+      [sampleId, testMethodId, assignedTo],
     );
 
     return result.rows[0];
@@ -387,7 +387,7 @@ async function updateTestResults(assignmentId, results, comments) {
        SET results = $1, comments = $2, status = 'completed', completed_at = CURRENT_TIMESTAMP
        WHERE id = $3
        RETURNING *`,
-      [JSON.stringify(results), comments, assignmentId]
+      [JSON.stringify(results), comments, assignmentId],
     );
 
     return result.rows[0];
@@ -420,12 +420,12 @@ router.put('/test-assignments/:assignmentId/results', authMiddleware, requireRol
  */
 async function generateCertificationReport(sampleId, reportType) {
   try {
-    const reportNumber = `RPT-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const reportNumber = `RPT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
     // Get sample data
     const sample = await pool.query(
       'SELECT * FROM sample_registrations WHERE id = $1',
-      [sampleId]
+      [sampleId],
     );
 
     if (sample.rows.length === 0) {
@@ -435,13 +435,13 @@ async function generateCertificationReport(sampleId, reportType) {
     // Get test assignments and results
     const assignments = await pool.query(
       'SELECT * FROM test_assignments WHERE sample_id = $1',
-      [sampleId]
+      [sampleId],
     );
 
     const reportData = {
       sample: sample.rows[0],
       tests: assignments.rows,
-      generated_at: new Date()
+      generated_at: new Date(),
     };
 
     const result = await pool.query(
@@ -449,7 +449,7 @@ async function generateCertificationReport(sampleId, reportType) {
        (sample_id, report_number, report_type, report_data, status)
        VALUES ($1, $2, $3, $4, 'draft')
        RETURNING *`,
-      [sampleId, reportNumber, reportType, JSON.stringify(reportData)]
+      [sampleId, reportNumber, reportType, JSON.stringify(reportData)],
     );
 
     return result.rows[0];
@@ -480,7 +480,7 @@ async function getCertificationReport(reportNumber) {
   try {
     const result = await pool.query(
       'SELECT * FROM certification_reports WHERE report_number = $1',
-      [reportNumber]
+      [reportNumber],
     );
 
     if (result.rows.length === 0) {
@@ -521,7 +521,7 @@ async function addSampleTracking(sampleId, status, location, handledBy, notes) {
        (sample_id, status, location, handled_by, notes)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [sampleId, status, location, handledBy, notes]
+      [sampleId, status, location, handledBy, notes],
     );
 
     return result.rows[0];
@@ -552,7 +552,7 @@ async function getSampleTracking(sampleId) {
   try {
     const result = await pool.query(
       'SELECT * FROM sample_tracking WHERE sample_id = $1 ORDER BY timestamp ASC',
-      [sampleId]
+      [sampleId],
     );
 
     return result.rows;
@@ -598,5 +598,6 @@ module.exports = {
   getCertificationReport,
   addSampleTracking,
   getSampleTracking,
-  isHealthy
+  isHealthy,
 };
+

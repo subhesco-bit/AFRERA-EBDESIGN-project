@@ -8,8 +8,8 @@ router.post('/vaccinations', controller.scheduleVaccination);
 router.get('/farmers/:farmerId/herd-health', controller.monitorHerdHealth);
 router.get('/farmers/:farmerId/health-report', controller.generateHealthReport);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

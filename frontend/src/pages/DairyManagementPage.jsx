@@ -1,74 +1,74 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { dairyAPI, dairyAIAPI } from '../services/api'
-import { Milk, Plus, X, Trash2, Edit } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { dairyAPI, dairyAIAPI } from '../services/api';
+import { Milk, Plus, X, Trash2, Edit } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
+import ActionCard from '../components/common/ActionCard';
 
-const BREEDS = ['Jersey', 'Holstein Friesian', 'Sahiwal', 'Gir', 'Local / Desi', 'Crossbred']
-const STATUSES = ['Lactating', 'Dry', 'Pregnant', 'Calf', 'Sold']
+const BREEDS = ['Jersey', 'Holstein Friesian', 'Sahiwal', 'Gir', 'Local / Desi', 'Crossbred'];
+const STATUSES = ['Lactating', 'Dry', 'Pregnant', 'Calf', 'Sold'];
 
-const emptyAnimal = { tag_id: '', breed: 'Local / Desi', dob: '', status: 'Lactating', notes: '' }
+const emptyAnimal = { tag_id: '', breed: 'Local / Desi', dob: '', status: 'Lactating', notes: '' };
 
 function DairyManagementPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyAnimal)
-  const [milkForm, setMilkForm] = useState({ animal_id: '', date: '', session: 'morning', quantity_liters: '' })
-  const [tab, setTab] = useState('animals')
-  const [aiAnimalId, setAiAnimalId] = useState('')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyAnimal);
+  const [milkForm, setMilkForm] = useState({ animal_id: '', date: '', session: 'morning', quantity_liters: '' });
+  const [tab, setTab] = useState('animals');
+  const [aiAnimalId, setAiAnimalId] = useState('');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: animalsData, isLoading, error } = useQuery({
     queryKey: ['dairy-animals'],
     queryFn: async () => (await dairyAPI.getAnimals()).data?.data ?? [],
-  })
+  });
 
   const { data: milkData, isLoading: milkLoading, error: milkError } = useQuery({
     queryKey: ['dairy-milk-records'],
     queryFn: async () => (await dairyAPI.getMilkRecords()).data?.data ?? [],
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? dairyAPI.updateAnimal(editingId, payload) : dairyAPI.createAnimal(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Animal updated' : 'Animal registered')
-      queryClient.invalidateQueries({ queryKey: ['dairy-animals'] })
-      closeForm()
+      toast.success(editingId ? 'Animal updated' : 'Animal registered');
+      queryClient.invalidateQueries({ queryKey: ['dairy-animals'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save animal'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => dairyAPI.deleteAnimal(id),
-    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['dairy-animals'] }) },
+    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['dairy-animals'] }); },
     onError: () => toast.error('Failed to remove animal'),
-  })
+  });
 
   const recordMilkMutation = useMutation({
     mutationFn: (payload) => dairyAPI.recordMilk(payload),
     onSuccess: () => {
-      toast.success('Milk record added')
-      queryClient.invalidateQueries({ queryKey: ['dairy-milk-records'] })
-      setMilkForm({ animal_id: '', date: '', session: 'morning', quantity_liters: '' })
+      toast.success('Milk record added');
+      queryClient.invalidateQueries({ queryKey: ['dairy-milk-records'] });
+      setMilkForm({ animal_id: '', date: '', session: 'morning', quantity_liters: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record milk yield'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyAnimal) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyAnimal); };
 
   const openEdit = (a) => {
-    setForm({ tag_id: a.tag_id || '', breed: a.breed || 'Local / Desi', dob: a.dob ? a.dob.slice(0, 10) : '', status: a.status || 'Lactating', notes: a.notes || '' })
-    setEditingId(a.id)
-    setShowForm(true)
-  }
+    setForm({ tag_id: a.tag_id || '', breed: a.breed || 'Local / Desi', dob: a.dob ? a.dob.slice(0, 10) : '', status: a.status || 'Lactating', notes: a.notes || '' });
+    setEditingId(a.id);
+    setShowForm(true);
+  };
 
-  const animals = animalsData || []
-  const milkRecords = milkData || []
-  const lactating = animals.filter((a) => a.status === 'Lactating').length
-  const totalMilkToday = milkRecords.reduce((s, m) => s + (Number(m.quantity_liters) || 0), 0)
+  const animals = animalsData || [];
+  const milkRecords = milkData || [];
+  const lactating = animals.filter((a) => a.status === 'Lactating').length;
+  const totalMilkToday = milkRecords.reduce((s, m) => s + (Number(m.quantity_liters) || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -81,7 +81,7 @@ function DairyManagementPage() {
           <p className="text-gray-600">Track herd health, lactation status and daily milk yield</p>
         </div>
         {tab === 'animals' && (
-          <button onClick={() => { setForm(emptyAnimal); setEditingId(null); setShowForm(true) }}
+          <button onClick={() => { setForm(emptyAnimal); setEditingId(null); setShowForm(true); }}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center">
             <Plus className="w-5 h-5 mr-2" />Register Animal
           </button>
@@ -142,7 +142,7 @@ function DairyManagementPage() {
                       <td className="px-4 py-3"><span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-800">{a.status}</span></td>
                       <td className="px-4 py-3 text-right space-x-2">
                         <button onClick={() => openEdit(a)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
-                        <button onClick={() => { if (confirm('Remove this animal?')) deleteMutation.mutate(a.id) }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                        <button onClick={() => { if (confirm('Remove this animal?')) deleteMutation.mutate(a.id); }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                       </td>
                     </tr>
                   ))}
@@ -159,9 +159,9 @@ function DairyManagementPage() {
             <h2 className="font-semibold text-gray-800 mb-4">Record Milk Yield</h2>
             <form
               onSubmit={(e) => {
-                e.preventDefault()
-                if (!milkForm.animal_id || !milkForm.date || !milkForm.quantity_liters) { toast.error('Animal, date and quantity are required'); return }
-                recordMilkMutation.mutate({ ...milkForm, quantity_liters: Number(milkForm.quantity_liters) })
+                e.preventDefault();
+                if (!milkForm.animal_id || !milkForm.date || !milkForm.quantity_liters) { toast.error('Animal, date and quantity are required'); return; }
+                recordMilkMutation.mutate({ ...milkForm, quantity_liters: Number(milkForm.quantity_liters) });
               }}
               className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end"
             >
@@ -284,7 +284,7 @@ function DairyManagementPage() {
                 <button onClick={closeForm} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
               </div>
               <form
-                onSubmit={(e) => { e.preventDefault(); if (!form.tag_id) { toast.error('Tag ID is required'); return } saveMutation.mutate(form) }}
+                onSubmit={(e) => { e.preventDefault(); if (!form.tag_id) { toast.error('Tag ID is required'); return; } saveMutation.mutate(form); }}
                 className="space-y-4"
               >
                 <div>
@@ -330,7 +330,7 @@ function DairyManagementPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default DairyManagementPage
+export default DairyManagementPage;

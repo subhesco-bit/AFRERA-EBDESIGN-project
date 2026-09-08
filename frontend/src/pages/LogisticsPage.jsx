@@ -1,12 +1,66 @@
-import { useState } from 'react'
-import { Truck, Package, MapPin, Clock, Search } from 'lucide-react'
-import DeviceMonitor from '../components/IoTIntegration/DeviceMonitor'
-import RealTimeTracking from '../components/Logistics/RealTimeTracking'
-import CustodyChainViewer from '../components/Logistics/CustodyChainViewer'
+import { useMemo, useState } from 'react';
+import { Truck, Package, MapPin, Clock, Search } from 'lucide-react';
+import DeviceMonitor from '../components/IoTIntegration/DeviceMonitor';
+import RealTimeTracking from '../components/Logistics/RealTimeTracking';
+import CustodyChainViewer from '../components/Logistics/CustodyChainViewer';
+import AIInsightsPanel from '../components/ui/AIInsightsPanel';
+import { aiDecisionService } from '../services/aiDecisionService';
 
 function LogisticsPage() {
-  const [shipmentIdInput, setShipmentIdInput] = useState('')
-  const [trackedShipmentId, setTrackedShipmentId] = useState(null)
+  const [shipmentIdInput, setShipmentIdInput] = useState('');
+  const [trackedShipmentId, setTrackedShipmentId] = useState(null);
+
+  const aiInsights = useMemo(
+    () => [
+      aiDecisionService.buildDecision({
+        id: 'logistics-route-optimization',
+        title: 'Route optimization opportunity',
+        description: 'Two outbound loads are trending slower than expected. Rebalancing them to the north corridor could reduce fuel spend and protect SLA targets.',
+        status: 'pending',
+        confidence: 0.87,
+        impact: 'high',
+        category: 'logistics',
+        icon: '🚚',
+        severity: 'warning',
+        metadata: { source: 'fallback', module: 'logistics' },
+        context: { route: 'north-corridor', loads: 2 },
+        timestamp: new Date().toISOString(),
+      }),
+      aiDecisionService.buildDecision({
+        id: 'logistics-cold-chain-risk',
+        title: 'Cold-chain risk watch',
+        description: 'Temperature variance is above the normal range for one reefer batch. A quick inspection before dispatch is recommended.',
+        status: 'pending',
+        confidence: 0.81,
+        impact: 'medium',
+        category: 'logistics',
+        icon: '❄️',
+        severity: 'critical',
+        metadata: { source: 'fallback', module: 'cold-chain' },
+        context: { reeferBatch: 'RF-104', variance: '4.2C' },
+        timestamp: new Date().toISOString(),
+      }),
+      aiDecisionService.buildDecision({
+        id: 'logistics-capacity-planning',
+        title: 'Capacity plan suggestion',
+        description: 'Fleet utilization is expected to peak during the next 12 hours. Consider shifting one vehicle from local dispatch to long-haul coverage.',
+        status: 'pending',
+        confidence: 0.76,
+        impact: 'medium',
+        category: 'logistics',
+        icon: '📦',
+        severity: 'info',
+        metadata: { source: 'fallback', module: 'fleet' },
+        context: { utilization: '88%' },
+        timestamp: new Date().toISOString(),
+      }),
+    ],
+    [],
+  );
+
+  const handleApplyRecommendation = (insight) => {
+    alert(`Applied recommendation: ${insight.title}`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -52,6 +106,15 @@ function LogisticsPage() {
         </div>
       </div>
 
+      <div className="mb-8">
+        <AIInsightsPanel
+          insights={aiInsights}
+          loading={false}
+          onRefresh={() => window.location.reload()}
+          onApplyRecommendation={handleApplyRecommendation}
+        />
+      </div>
+
       {/* Recent Shipments */}
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Shipments</h2>
@@ -65,8 +128,8 @@ function LogisticsPage() {
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Track a Shipment</h2>
         <form
           onSubmit={(e) => {
-            e.preventDefault()
-            if (shipmentIdInput.trim()) setTrackedShipmentId(shipmentIdInput.trim())
+            e.preventDefault();
+            if (shipmentIdInput.trim()) setTrackedShipmentId(shipmentIdInput.trim());
           }}
           className="flex gap-3 mb-4"
         >
@@ -98,7 +161,7 @@ function LogisticsPage() {
         <DeviceMonitor />
       </div>
     </div>
-  )
+  );
 }
 
-export default LogisticsPage
+export default LogisticsPage;

@@ -43,7 +43,7 @@ const JWT_CONFIG = {
   accessTokenExpiry: process.env.JWT_ACCESS_EXPIRY || '15m',
   refreshTokenExpiry: process.env.JWT_REFRESH_EXPIRY || '7d',
   issuer: process.env.JWT_ISSUER || 'afrera-platform',
-  audience: process.env.JWT_AUDIENCE || 'afrera-users'
+  audience: process.env.JWT_AUDIENCE || 'afrera-users',
 };
 
 // OAuth2 Configuration
@@ -52,21 +52,21 @@ const OAUTH_PROVIDERS = {
     enabled: process.env.GOOGLE_OAUTH_ENABLED === 'true',
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    redirectUri: process.env.GOOGLE_REDIRECT_URI
+    redirectUri: process.env.GOOGLE_REDIRECT_URI,
   },
   facebook: {
     enabled: process.env.FACEBOOK_OAUTH_ENABLED === 'true',
     clientId: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    redirectUri: process.env.FACEBOOK_REDIRECT_URI
-  }
+    redirectUri: process.env.FACEBOOK_REDIRECT_URI,
+  },
 };
 
 const AUTH_STORE_PATH = path.join(__dirname, '..', '..', 'database', 'auth_store.json');
 
 function ensureAuthStore() {
   return {
-    users: []
+    users: [],
   };
 }
 
@@ -87,7 +87,7 @@ async function readAuthStore() {
     const raw = await fs.promises.readFile(AUTH_STORE_PATH, 'utf8');
     const parsed = JSON.parse(raw);
     return {
-      users: Array.isArray(parsed.users) ? parsed.users : []
+      users: Array.isArray(parsed.users) ? parsed.users : [],
     };
   } catch (error) {
     logger.warn('Unable to read auth store, resetting it', { error: error.message });
@@ -102,6 +102,12 @@ async function writeAuthStore(store) {
   } catch (error) {
     logger.error('Unable to persist auth store', { error: error.message, stack: error.stack });
     return false;
+  }
+}
+
+function assertFallbackAuthStoreAllowed() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Authentication service unavailable');
   }
 }
 
@@ -122,14 +128,14 @@ function generateAccessToken(user) {
     userId: user.id,
     email: user.email,
     role: user.role,
-    permissions: getUserPermissions(user.role)
+    permissions: getUserPermissions(user.role),
   };
 
   return jwt.sign(payload, JWT_CONFIG.secret, {
     expiresIn: JWT_CONFIG.accessTokenExpiry,
     issuer: JWT_CONFIG.issuer,
     audience: JWT_CONFIG.audience,
-    subject: user.id.toString()
+    subject: user.id.toString(),
   });
 }
 
@@ -139,14 +145,14 @@ function generateAccessToken(user) {
 function generateRefreshToken(user) {
   const payload = {
     userId: user.id,
-    tokenType: 'refresh'
+    tokenType: 'refresh',
   };
 
   return jwt.sign(payload, JWT_CONFIG.secret, {
     expiresIn: JWT_CONFIG.refreshTokenExpiry,
     issuer: JWT_CONFIG.issuer,
     audience: JWT_CONFIG.audience,
-    subject: user.id.toString()
+    subject: user.id.toString(),
   });
 }
 
@@ -162,7 +168,7 @@ function verifyToken(token) {
     }
     return jwt.verify(token, secret, {
       issuer: JWT_CONFIG.issuer,
-      audience: JWT_CONFIG.audience
+      audience: JWT_CONFIG.audience,
     });
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
@@ -223,7 +229,7 @@ function getUserPermissions(role) {
       'orders:read',
       'orders:create',
       'contracts:read',
-      'contracts:create'
+      'contracts:create',
     ],
     fpo: [
       'marketplace:read',
@@ -236,7 +242,7 @@ function getUserPermissions(role) {
       'orders:manage',
       'contracts:read',
       'contracts:create',
-      'contracts:approve'
+      'contracts:approve',
     ],
     corporate: [
       'marketplace:read',
@@ -247,13 +253,13 @@ function getUserPermissions(role) {
       'procurement:create',
       'contracts:read',
       'contracts:create',
-      'contracts:approve'
+      'contracts:approve',
     ],
     consumer: [
       'marketplace:read',
       'marketplace:buy',
       'orders:read',
-      'orders:create'
+      'orders:create',
     ],
     logistics: [
       'logistics:read',
@@ -261,15 +267,15 @@ function getUserPermissions(role) {
       'shipments:read',
       'shipments:update',
       'vehicles:read',
-      'drivers:read'
+      'drivers:read',
     ],
     horeca: [
       'marketplace:read',
       'marketplace:buy',
       'orders:read',
       'orders:create',
-      'procurement:read'
-    ]
+      'procurement:read',
+    ],
   };
 
   return permissions[role] || [];
@@ -290,45 +296,32 @@ async function registerUser(userData) {
   try {
     const pg = getPostgreSQL();
 
+    const registrationData = {
+      ...userData,
+      role: 'consumer',
+      status: 'pending',
+    };
+
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       const store = await readAuthStore();
-      const normalizedEmail = (userData.email || '').toLowerCase();
+      const normalizedEmail = (registrationData.email || '').toLowerCase();
       const existing = store.users.find((entry) => entry.email === normalizedEmail);
       if (existing) {
-        // Idempotent in test/fallback mode: return tokens for existing user
-        const accessToken = generateAccessToken(existing);
-        const refreshToken = generateRefreshToken(existing);
-        return {
-          user: {
-            id: existing.id,
-            email: existing.email,
-            phone: existing.phone,
-            role: existing.role,
-            status: existing.status,
-            profile: {
-              first_name: existing.first_name,
-              last_name: existing.last_name,
-              phone: existing.phone
-            }
-          },
-          token: accessToken,
-          accessToken,
-          refreshToken,
-          expiresIn: JWT_CONFIG.accessTokenExpiry
-        };
+        throw new Error('Email already registered');
       }
 
-      const passwordHash = await hashPassword(userData.password);
+      const passwordHash = await hashPassword(registrationData.password);
       const user = {
         id: `user-${Date.now()}`,
         email: normalizedEmail,
-        phone: userData.phone || '',
-        role: userData.role || 'consumer',
-        status: userData.status || 'active',
+        phone: registrationData.phone || '',
+        role: registrationData.role,
+        status: registrationData.status,
         password_hash: passwordHash,
-        first_name: userData.first_name || '',
-        last_name: userData.last_name || '',
-        created_at: new Date().toISOString()
+        first_name: registrationData.first_name || '',
+        last_name: registrationData.last_name || '',
+        created_at: new Date().toISOString(),
       };
 
       store.users.push(user);
@@ -349,78 +342,78 @@ async function registerUser(userData) {
           profile: {
             first_name: user.first_name,
             last_name: user.last_name,
-            phone: user.phone
-          }
+            phone: user.phone,
+          },
         },
         token: accessToken,
         accessToken,
         refreshToken,
-        expiresIn: JWT_CONFIG.accessTokenExpiry
+        expiresIn: JWT_CONFIG.accessTokenExpiry,
       };
     }
-    
+
     // Check if email already exists
     const existingUser = await pg.query(
       'SELECT id FROM users WHERE email = $1',
-      [userData.email.toLowerCase()]
+      [registrationData.email.toLowerCase()],
     );
-    
+
     if (existingUser.rows.length > 0) {
       throw new Error('Email already registered');
     }
-    
+
     // Check if phone already exists
-    if (userData.phone) {
+    if (registrationData.phone) {
       const existingPhone = await pg.query(
         'SELECT id FROM users WHERE phone = $1',
-        [userData.phone]
+        [registrationData.phone],
       );
-      
+
       if (existingPhone.rows.length > 0) {
         throw new Error('Phone number already registered');
       }
     }
-    
+
     // Hash password
-    const passwordHash = await hashPassword(userData.password);
-    
+    const passwordHash = await hashPassword(registrationData.password);
+
     // Insert user
     const userQuery = `
       INSERT INTO users (email, phone, password_hash, role, status)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING id, email, phone, role, status, created_at
     `;
-    
+
     const userResult = await pg.query(userQuery, [
-      userData.email.toLowerCase(),
-      userData.phone || null,
+      registrationData.email.toLowerCase(),
+      registrationData.phone || null,
       passwordHash,
-      userData.role || 'consumer',
-      userData.status || 'active'
+      registrationData.role,
+      registrationData.status,
     ]);
-    
+
     const user = userResult.rows[0];
-    
+
     // Insert user profile
     const profileQuery = `
       INSERT INTO user_profiles (user_id, first_name, last_name, phone)
       VALUES ($1, $2, $3, $4)
       RETURNING *
     `;
-    
+
     const profileResult = await pg.query(profileQuery, [
       user.id,
-      userData.first_name || '',
-      userData.last_name || '',
-      userData.phone || ''
+      registrationData.first_name || '',
+      registrationData.last_name || '',
+      registrationData.phone || '',
     ]);
-    
+
     // Generate tokens
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    
+
     logger.info(`User registered: ${user.email} (${user.role})`);
-    
+
     return {
       user: {
         id: user.id,
@@ -428,12 +421,12 @@ async function registerUser(userData) {
         phone: user.phone,
         role: user.role,
         status: user.status,
-        profile: profileResult.rows[0]
+        profile: profileResult.rows[0],
       },
       token: accessToken,
       accessToken,
       refreshToken,
-      expiresIn: JWT_CONFIG.accessTokenExpiry
+      expiresIn: JWT_CONFIG.accessTokenExpiry,
     };
   } catch (error) {
     logger.error('User registration failed', { error: error.message, stack: error.stack });
@@ -449,6 +442,7 @@ async function loginUser(email, password, deviceInfo = {}) {
     const pg = getPostgreSQL();
 
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       const user = await getFallbackUserByEmail(email);
       if (!user) {
         throw new Error('Invalid credentials');
@@ -475,15 +469,15 @@ async function loginUser(email, password, deviceInfo = {}) {
           firstName: user.first_name,
           lastName: user.last_name,
           profileImage: user.profile_image_url,
-          permissions: getUserPermissions(user.role)
+          permissions: getUserPermissions(user.role),
         },
         token: accessToken,
         accessToken,
         refreshToken,
-        expiresIn: JWT_CONFIG.accessTokenExpiry
+        expiresIn: JWT_CONFIG.accessTokenExpiry,
       };
     }
-    
+
     // Get user by email
     const userQuery = `
       SELECT u.*, up.first_name, up.last_name, up.profile_image_url
@@ -491,66 +485,66 @@ async function loginUser(email, password, deviceInfo = {}) {
       LEFT JOIN user_profiles up ON u.id = up.user_id
       WHERE u.email = $1
     `;
-    
+
     const userResult = await pg.query(userQuery, [email.toLowerCase()]);
-    
+
     if (userResult.rows.length === 0) {
       throw new Error('Invalid credentials');
     }
-    
+
     const user = userResult.rows[0];
-    
+
     // Check if account is locked
     if (user.locked_until && new Date(user.locked_until) > new Date()) {
       throw new Error('Account temporarily locked due to multiple failed attempts');
     }
-    
+
     // Check if account is active
     if (user.status !== 'active') {
       throw new Error('Account is not active');
     }
-    
+
     // Verify password
     const passwordHash = getUserPasswordHash(user);
     const passwordValid = passwordHash ? await comparePassword(password, passwordHash) : false;
-    
+
     if (!passwordValid) {
       // Increment failed login attempts
       const failedAttempts = (user.failed_login_attempts || 0) + 1;
-      
+
       if (failedAttempts >= 5) {
         // Lock account for 30 minutes
         const lockedUntil = new Date(Date.now() + 30 * 60 * 1000);
         await pg.query(
           'UPDATE users SET failed_login_attempts = $1, locked_until = $2 WHERE id = $3',
-          [failedAttempts, lockedUntil, user.id]
+          [failedAttempts, lockedUntil, user.id],
         );
         throw new Error('Account locked due to multiple failed attempts');
       } else {
         await pg.query(
           'UPDATE users SET failed_login_attempts = $1 WHERE id = $2',
-          [failedAttempts, user.id]
+          [failedAttempts, user.id],
         );
       }
-      
+
       throw new Error('Invalid credentials');
     }
-    
+
     // Reset failed login attempts
     await pg.query(
       'UPDATE users SET failed_login_attempts = 0, last_login_at = NOW() WHERE id = $1',
-      [user.id]
+      [user.id],
     );
-    
+
     // Generate tokens
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    
+
     // Store refresh token in database (optional, for revocation)
     await storeRefreshToken(user.id, refreshToken, deviceInfo);
-    
+
     logger.info(`User logged in: ${user.email} (${user.role})`);
-    
+
     return {
       user: {
         id: user.id,
@@ -561,12 +555,12 @@ async function loginUser(email, password, deviceInfo = {}) {
         firstName: user.first_name,
         lastName: user.last_name,
         profileImage: user.profile_image_url,
-        permissions: getUserPermissions(user.role)
+        permissions: getUserPermissions(user.role),
       },
       token: accessToken,
       accessToken,
       refreshToken,
-      expiresIn: JWT_CONFIG.accessTokenExpiry
+      expiresIn: JWT_CONFIG.accessTokenExpiry,
     };
   } catch (error) {
     logger.error('User login failed', { error: error.message, stack: error.stack });
@@ -581,13 +575,14 @@ async function refreshAccessToken(refreshToken) {
   try {
     // Verify refresh token
     const payload = verifyToken(refreshToken);
-    
+
     if (payload.tokenType !== 'refresh') {
       throw new Error('Invalid refresh token');
     }
 
     const pg = getPostgreSQL();
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       const user = await getFallbackUserByEmail(payload.email || '');
       if (!user) {
         throw new Error('User not found');
@@ -598,10 +593,10 @@ async function refreshAccessToken(refreshToken) {
       return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
-        expiresIn: JWT_CONFIG.accessTokenExpiry
+        expiresIn: JWT_CONFIG.accessTokenExpiry,
       };
     }
-    
+
     // Check if refresh token exists and is valid
     const tokenQuery = `
       SELECT * FROM refresh_tokens
@@ -609,13 +604,13 @@ async function refreshAccessToken(refreshToken) {
       ORDER BY created_at DESC
       LIMIT 1
     `;
-    
+
     const tokenResult = await pg.query(tokenQuery, [payload.userId, refreshToken]);
-    
+
     if (tokenResult.rows.length === 0) {
       throw new Error('Invalid or expired refresh token');
     }
-    
+
     // Get user
     const userQuery = `
       SELECT u.*, up.first_name, up.last_name
@@ -623,30 +618,30 @@ async function refreshAccessToken(refreshToken) {
       LEFT JOIN user_profiles up ON u.id = up.user_id
       WHERE u.id = $1
     `;
-    
+
     const userResult = await pg.query(userQuery, [payload.userId]);
     const user = userResult.rows[0];
-    
+
     if (!user || user.status !== 'active') {
       throw new Error('User not found or inactive');
     }
-    
+
     // Generate new tokens
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken(user);
-    
+
     // Revoke old refresh token
     await revokeRefreshToken(refreshToken);
-    
+
     // Store new refresh token
     await storeRefreshToken(user.id, newRefreshToken);
-    
+
     logger.info(`Token refreshed for user: ${user.email}`);
-    
+
     return {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
-      expiresIn: JWT_CONFIG.accessTokenExpiry
+      expiresIn: JWT_CONFIG.accessTokenExpiry,
     };
   } catch (error) {
     logger.error('Token refresh failed', { error: error.message, stack: error.stack });
@@ -661,23 +656,24 @@ async function logoutUser(userId, refreshToken) {
   try {
     const pg = getPostgreSQL();
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       logger.info(`User logged out in fallback mode: ${userId}`);
       return { success: true, message: 'Logged out successfully' };
     }
-    
+
     // Revoke refresh token
     if (refreshToken) {
       await revokeRefreshToken(refreshToken);
     }
-    
+
     // Revoke all refresh tokens for user (optional, for complete logout)
     await pg.query(
       'UPDATE refresh_tokens SET revoked = TRUE WHERE user_id = $1',
-      [userId]
+      [userId],
     );
-    
+
     logger.info(`User logged out: ${userId}`);
-    
+
     return { success: true, message: 'Logged out successfully' };
   } catch (error) {
     logger.error('User logout failed', { error: error.message, stack: error.stack });
@@ -691,13 +687,13 @@ async function logoutUser(userId, refreshToken) {
 async function storeRefreshToken(userId, token, deviceInfo = {}) {
   try {
     const pg = getPostgreSQL();
-    
+
     const query = `
       INSERT INTO refresh_tokens (user_id, token, device_info, expires_at)
       VALUES ($1, $2, $3, NOW() + INTERVAL '7 days')
       RETURNING id
     `;
-    
+
     await pg.query(query, [userId, token, JSON.stringify(deviceInfo)]);
   } catch (error) {
     logger.error('Failed to store refresh token', { error: error.message, stack: error.stack });
@@ -711,10 +707,10 @@ async function storeRefreshToken(userId, token, deviceInfo = {}) {
 async function revokeRefreshToken(token) {
   try {
     const pg = getPostgreSQL();
-    
+
     await pg.query(
       'UPDATE refresh_tokens SET revoked = TRUE WHERE token = $1',
-      [token]
+      [token],
     );
   } catch (error) {
     logger.error('Failed to revoke refresh token', { error: error.message, stack: error.stack });
@@ -727,23 +723,23 @@ async function revokeRefreshToken(token) {
 async function setupTwoFactor(userId) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Generate a real, unique-per-user TOTP secret
     const secret = generateTOTPSecret();
 
     // Store secret
     await pg.query(
       'UPDATE users SET two_factor_secret = $1, two_factor_enabled = FALSE WHERE id = $2',
-      [secret, userId]
+      [secret, userId],
     );
 
     // Generate a real scannable QR code image
     const qrCode = await generateQRCode(secret, userId);
-    
+
     return {
       secret,
       qrCode,
-      backupCodes: generateBackupCodes()
+      backupCodes: generateBackupCodes(),
     };
   } catch (error) {
     logger.error('2FA setup failed', { error: error.message, stack: error.stack });
@@ -757,34 +753,34 @@ async function setupTwoFactor(userId) {
 async function verifyTwoFactor(userId, code) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Get user's 2FA secret
     const userResult = await pg.query(
       'SELECT two_factor_secret FROM users WHERE id = $1',
-      [userId]
+      [userId],
     );
-    
+
     if (userResult.rows.length === 0 || !userResult.rows[0].two_factor_secret) {
       throw new Error('2FA not set up for user');
     }
-    
+
     const secret = userResult.rows[0].two_factor_secret;
-    
+
     // Verify TOTP code (in production, use speakeasy or similar library)
     const isValid = verifyTOTPCode(secret, code);
-    
+
     if (!isValid) {
       throw new Error('Invalid 2FA code');
     }
-    
+
     // Enable 2FA
     await pg.query(
       'UPDATE users SET two_factor_enabled = TRUE WHERE id = $1',
-      [userId]
+      [userId],
     );
-    
+
     logger.info(`2FA enabled for user: ${userId}`);
-    
+
     return { success: true, message: '2FA enabled successfully' };
   } catch (error) {
     logger.error('2FA verification failed', { error: error.message, stack: error.stack });
@@ -798,27 +794,27 @@ async function verifyTwoFactor(userId, code) {
 async function disableTwoFactor(userId, password) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Verify password
     const userResult = await pg.query(
       'SELECT password_hash FROM users WHERE id = $1',
-      [userId]
+      [userId],
     );
-    
+
     const passwordValid = await comparePassword(password, userResult.rows[0].password_hash);
-    
+
     if (!passwordValid) {
       throw new Error('Invalid password');
     }
-    
+
     // Disable 2FA
     await pg.query(
       'UPDATE users SET two_factor_enabled = FALSE, two_factor_secret = NULL WHERE id = $1',
-      [userId]
+      [userId],
     );
-    
+
     logger.info(`2FA disabled for user: ${userId}`);
-    
+
     return { success: true, message: '2FA disabled successfully' };
   } catch (error) {
     logger.error('2FA disable failed', { error: error.message, stack: error.stack });
@@ -834,75 +830,75 @@ async function oauthAuthenticate(provider, code, redirectUri) {
     if (!OAUTH_PROVIDERS[provider] || !OAUTH_PROVIDERS[provider].enabled) {
       throw new Error(`${provider} OAuth not enabled`);
     }
-    
+
     // Exchange code for access token
     const tokens = await exchangeOAuthCode(provider, code, redirectUri);
-    
+
     // Get user info from OAuth provider
     const userInfo = await getOAuthUserInfo(provider, tokens.access_token);
-    
+
     // Check if user exists
     const pg = getPostgreSQL();
     const userQuery = 'SELECT * FROM users WHERE email = $1';
     const userResult = await pg.query(userQuery, [userInfo.email]);
-    
+
     let user;
-    
+
     if (userResult.rows.length > 0) {
       // Existing user
       user = userResult.rows[0];
-      
+
       // Update OAuth info
       await pg.query(
         `UPDATE user_profiles 
          SET oauth_provider = $1, oauth_id = $2 
          WHERE user_id = $3`,
-        [provider, userInfo.id, user.id]
+        [provider, userInfo.id, user.id],
       );
     } else {
       // Create new user
       const passwordHash = await hashPassword(generateRandomPassword());
-      
+
       const newUserQuery = `
         INSERT INTO users (email, password_hash, role, status, email_verified)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id, email, role, status
       `;
-      
+
       const newUserResult = await pg.query(newUserQuery, [
         userInfo.email.toLowerCase(),
         passwordHash,
         'consumer',
         'active',
-        true
+        true,
       ]);
-      
+
       user = newUserResult.rows[0];
-      
+
       // Create profile
       await pg.query(
         `INSERT INTO user_profiles (user_id, first_name, last_name, oauth_provider, oauth_id)
          VALUES ($1, $2, $3, $4, $5)`,
-        [user.id, userInfo.first_name || '', userInfo.last_name || '', provider, userInfo.id]
+        [user.id, userInfo.first_name || '', userInfo.last_name || '', provider, userInfo.id],
       );
     }
-    
+
     // Generate tokens
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    
+
     logger.info(`OAuth login: ${user.email} via ${provider}`);
-    
+
     return {
       user: {
         id: user.id,
         email: user.email,
         role: user.role,
-        status: user.status
+        status: user.status,
       },
       accessToken,
       refreshToken,
-      expiresIn: JWT_CONFIG.accessTokenExpiry
+      expiresIn: JWT_CONFIG.accessTokenExpiry,
     };
   } catch (error) {
     logger.error('OAuth authentication failed', { error: error.message, stack: error.stack });
@@ -947,29 +943,29 @@ function verifyOAuthState(state) {
  */
 function getOAuthAuthUrl(provider, state) {
   const config = OAUTH_PROVIDERS[provider];
-  
+
   if (!config || !config.enabled) {
     throw new Error(`${provider} OAuth not enabled`);
   }
-  
+
   if (!config.clientId) {
     throw new Error(`${provider} OAuth clientId not configured`);
   }
-  
+
   if (!config.redirectUri) {
     throw new Error(`${provider} OAuth redirectUri not configured`);
   }
-  
+
   const urls = {
     google: `https://accounts.google.com/o/oauth2/v2/auth?client_id=${config.clientId}&redirect_uri=${encodeURIComponent(config.redirectUri)}&response_type=code&scope=openid email profile&state=${state}`,
-    facebook: `https://www.facebook.com/v18.0/dialog/oauth?client_id=${config.clientId}&redirect_uri=${encodeURIComponent(config.redirectUri)}&response_type=code&scope=email&state=${state}`
+    facebook: `https://www.facebook.com/v18.0/dialog/oauth?client_id=${config.clientId}&redirect_uri=${encodeURIComponent(config.redirectUri)}&response_type=code&scope=email&state=${state}`,
   };
-  
+
   const url = urls[provider];
   if (!url) {
     throw new Error(`Unsupported OAuth provider: ${provider}`);
   }
-  
+
   return url;
 }
 
@@ -1039,7 +1035,7 @@ function generateBackupCodes() {
   // Cryptographically random 10 backup codes (was Math.random(), which is not
   // safe for anything security-sensitive)
   return Array.from({ length: 10 }, () =>
-    crypto.randomBytes(5).toString('hex').toUpperCase()
+    crypto.randomBytes(5).toString('hex').toUpperCase(),
   );
 }
 
@@ -1081,12 +1077,12 @@ function generateRandomPassword() {
 
 const OAUTH_TOKEN_ENDPOINTS = {
   google: 'https://oauth2.googleapis.com/token',
-  facebook: 'https://graph.facebook.com/v18.0/oauth/access_token'
+  facebook: 'https://graph.facebook.com/v18.0/oauth/access_token',
 };
 
 const OAUTH_USERINFO_ENDPOINTS = {
   google: 'https://www.googleapis.com/oauth2/v2/userinfo',
-  facebook: 'https://graph.facebook.com/me?fields=id,email,first_name,last_name'
+  facebook: 'https://graph.facebook.com/me?fields=id,email,first_name,last_name',
 };
 
 async function exchangeOAuthCode(provider, code, redirectUri) {
@@ -1102,9 +1098,9 @@ async function exchangeOAuthCode(provider, code, redirectUri) {
     client_secret: config.clientSecret,
     code,
     redirect_uri: redirectUri,
-    grant_type: 'authorization_code'
+    grant_type: 'authorization_code',
   }, {
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
   });
 
   return response.data;
@@ -1118,7 +1114,7 @@ async function getOAuthUserInfo(provider, accessToken) {
   }
 
   const response = await axios.get(userInfoUrl, {
-    headers: { Authorization: `Bearer ${accessToken}` }
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   const data = response.data;
@@ -1126,7 +1122,7 @@ async function getOAuthUserInfo(provider, accessToken) {
     id: data.id,
     email: data.email,
     first_name: data.first_name || data.given_name || '',
-    last_name: data.last_name || data.family_name || ''
+    last_name: data.last_name || data.family_name || '',
   };
 }
 
@@ -1138,10 +1134,10 @@ const router = express.Router();
 // The dedicated 5-req/60s brute-force limiter existed but was never
 // attached here — these routes fell back to the generic 100 req/min
 // limiter, far too permissive for login/register/2FA.
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 
 // Register
-router.post('/register', authRateLimit, async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
     const result = await registerUser(req.body);
     res.status(201).json(result);
@@ -1151,7 +1147,7 @@ router.post('/register', authRateLimit, async (req, res) => {
 });
 
 // Login
-router.post('/login', authRateLimit, async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password, device_info } = req.body;
     const result = await loginUser(email, password, device_info);
@@ -1162,7 +1158,7 @@ router.post('/login', authRateLimit, async (req, res) => {
 });
 
 // Refresh token
-router.post('/refresh', authRateLimit, async (req, res) => {
+router.post('/refresh', authLimiter, async (req, res) => {
   try {
     const { refresh_token } = req.body;
     const result = await refreshAccessToken(refresh_token);
@@ -1197,7 +1193,7 @@ router.post('/2fa/setup', lazyAuth, async (req, res) => {
 // Verify 2FA — a raw 6-digit code with no auth gate (the user isn't fully
 // logged in yet at this step of the flow), so the rate limiter is this
 // route's only real defense against brute-forcing the ~1,000,000 codes.
-router.post('/2fa/verify', authRateLimit, async (req, res) => {
+router.post('/2fa/verify', authLimiter, async (req, res) => {
   try {
     const { user_id, code } = req.body;
     const result = await verifyTwoFactor(user_id, code);
@@ -1252,11 +1248,12 @@ router.get('/me', async (req, res) => {
     if (!token) {
       return res.status(401).json({ error: 'No token provided' });
     }
-    
+
     const payload = verifyToken(token);
     const pg = getPostgreSQL();
 
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       const user = await getFallbackUserByEmail(payload.email || '');
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -1265,11 +1262,11 @@ router.get('/me', async (req, res) => {
       return res.json({
         user: {
           ...user,
-          permissions: getUserPermissions(user.role)
-        }
+          permissions: getUserPermissions(user.role),
+        },
       });
     }
-    
+
     const userQuery = `
       SELECT u.id, u.email, u.phone, u.role, u.status, u.email_verified, u.phone_verified,
              up.first_name, up.last_name, up.profile_image_url, up.kyc_status
@@ -1277,20 +1274,20 @@ router.get('/me', async (req, res) => {
       LEFT JOIN user_profiles up ON u.id = up.user_id
       WHERE u.id = $1
     `;
-    
+
     const userResult = await pg.query(userQuery, [payload.userId]);
-    
+
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     const user = userResult.rows[0];
-    
+
     res.json({
       user: {
         ...user,
-        permissions: getUserPermissions(user.role)
-      }
+        permissions: getUserPermissions(user.role),
+      },
     });
   } catch (error) {
     res.status(401).json({ error: error.message });
@@ -1311,5 +1308,5 @@ module.exports = {
   verifyToken,
   hasPermission,
   generateAccessToken,
-  generateRefreshToken
+  generateRefreshToken,
 };

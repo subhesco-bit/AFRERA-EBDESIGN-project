@@ -17,107 +17,107 @@
  * elsewhere on this page remain manual — this task's scope was specifically
  * companyId, fiscalYearId and accountId.
  */
-import React, { useState, useEffect, useCallback } from 'react'
-import { costControlAPI, companyAPI } from '../services/api'
-import { ModulePage, Section, Field, Rupees, DataTable } from '../components/common/DataPrimitives'
-import ResourceManager from '../components/common/ResourceManager'
+import React, { useState, useEffect, useCallback } from 'react';
+import { costControlAPI, companyAPI } from '../services/api';
+import { ModulePage, Section, Field, Rupees, DataTable } from '../components/common/DataPrimitives';
+import ResourceManager from '../components/common/ResourceManager';
 
-const BUDGET_TYPES = ['operating', 'capital', 'cash', 'project']
+const BUDGET_TYPES = ['operating', 'capital', 'cash', 'project'];
 
 export default function CostControlPage() {
-  const [companyId, setCompanyId] = useState('')
-  const [companies, setCompanies] = useState([])
-  const [companiesError, setCompaniesError] = useState(null)
-  const [fiscalYears, setFiscalYears] = useState([])
-  const [chartOfAccounts, setChartOfAccounts] = useState([])
+  const [companyId, setCompanyId] = useState('');
+  const [companies, setCompanies] = useState([]);
+  const [companiesError, setCompaniesError] = useState(null);
+  const [fiscalYears, setFiscalYears] = useState([]);
+  const [chartOfAccounts, setChartOfAccounts] = useState([]);
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
     companyAPI.listCompanies()
       .then((res) => {
-        if (cancelled) return
-        const list = res.data?.data || []
-        setCompanies(list)
-        if (list.length === 1) setCompanyId(String(list[0].id))
+        if (cancelled) return;
+        const list = res.data?.data || [];
+        setCompanies(list);
+        if (list.length === 1) setCompanyId(String(list[0].id));
       })
-      .catch((e) => { if (!cancelled) setCompaniesError(e.response?.data?.error || e.message) })
-    return () => { cancelled = true }
-  }, [])
+      .catch((e) => { if (!cancelled) setCompaniesError(e.response?.data?.error || e.message); });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
-    if (!companyId) { setFiscalYears([]); setChartOfAccounts([]); return }
-    let cancelled = false
+    if (!companyId) { setFiscalYears([]); setChartOfAccounts([]); return; }
+    let cancelled = false;
     Promise.all([
       companyAPI.getFiscalYears(companyId),
       companyAPI.getChartOfAccounts(companyId),
     ]).then(([fyRes, coaRes]) => {
-      if (cancelled) return
-      setFiscalYears(fyRes.data?.data || [])
-      setChartOfAccounts(coaRes.data?.data || [])
-    }).catch(() => { if (!cancelled) { setFiscalYears([]); setChartOfAccounts([]) } })
-    return () => { cancelled = true }
-  }, [companyId])
+      if (cancelled) return;
+      setFiscalYears(fyRes.data?.data || []);
+      setChartOfAccounts(coaRes.data?.data || []);
+    }).catch(() => { if (!cancelled) { setFiscalYears([]); setChartOfAccounts([]); } });
+    return () => { cancelled = true; };
+  }, [companyId]);
 
-  const [costCenters, setCostCenters] = useState([])
-  const [selectedCostCenterId, setSelectedCostCenterId] = useState('')
-  const [fiscalPeriodId, setFiscalPeriodId] = useState('')
-  const [actuals, setActuals] = useState(null)
+  const [costCenters, setCostCenters] = useState([]);
+  const [selectedCostCenterId, setSelectedCostCenterId] = useState('');
+  const [fiscalPeriodId, setFiscalPeriodId] = useState('');
+  const [actuals, setActuals] = useState(null);
 
-  const [budgets, setBudgets] = useState([])
-  const [selectedBudgetId, setSelectedBudgetId] = useState('')
-  const [budgetLines, setBudgetLines] = useState(null)
-  const [vsActual, setVsActual] = useState(null)
-  const [budgetActionMsg, setBudgetActionMsg] = useState(null)
+  const [budgets, setBudgets] = useState([]);
+  const [selectedBudgetId, setSelectedBudgetId] = useState('');
+  const [budgetLines, setBudgetLines] = useState(null);
+  const [vsActual, setVsActual] = useState(null);
+  const [budgetActionMsg, setBudgetActionMsg] = useState(null);
 
   const loadCostCenters = useCallback(async () => {
-    if (!companyId) { setCostCenters([]); return }
+    if (!companyId) { setCostCenters([]); return; }
     try {
-      const res = await costControlAPI.getCostCenters(companyId)
-      setCostCenters(res.data?.data || [])
-    } catch { setCostCenters([]) }
-  }, [companyId])
+      const res = await costControlAPI.getCostCenters(companyId);
+      setCostCenters(res.data?.data || []);
+    } catch { setCostCenters([]); }
+  }, [companyId]);
 
   const loadBudgets = useCallback(async () => {
-    if (!companyId) { setBudgets([]); return }
+    if (!companyId) { setBudgets([]); return; }
     try {
-      const res = await costControlAPI.getBudgets(companyId)
-      setBudgets(res.data?.data || [])
-    } catch { setBudgets([]) }
-  }, [companyId])
+      let res = await costControlAPI.getBudgets(companyId);
+      setBudgets(res.data?.data || []);
+    } catch { setBudgets([]); }
+  }, [companyId]);
 
-  useEffect(() => { loadCostCenters(); loadBudgets() }, [loadCostCenters, loadBudgets])
+  useEffect(() => { loadCostCenters(); loadBudgets(); }, [loadCostCenters, loadBudgets]);
 
   const loadActuals = async (e) => {
-    e.preventDefault()
-    if (!selectedCostCenterId) return
+    e.preventDefault();
+    if (!selectedCostCenterId) return;
     try {
-      const res = await costControlAPI.getCostCenterActuals(selectedCostCenterId, fiscalPeriodId ? { fiscalPeriodId } : {})
-      setActuals(res.data?.data || [])
+      let res = await costControlAPI.getCostCenterActuals(selectedCostCenterId, fiscalPeriodId ? { fiscalPeriodId } : {});
+      setActuals(res.data?.data || []);
     } catch (err) {
-      setActuals({ error: err.response?.data?.error || err.message })
+      setActuals({ error: err.response?.data?.error || err.message });
     }
-  }
+  };
 
   const loadBudgetLines = useCallback(async (budgetId) => {
-    if (!budgetId) { setBudgetLines(null); setVsActual(null); return }
+    if (!budgetId) { setBudgetLines(null); setVsActual(null); return; }
     try {
       const [linesRes, vsRes] = await Promise.all([
         costControlAPI.getBudgetLines(budgetId),
         costControlAPI.getBudgetVsActual(budgetId),
-      ])
-      setBudgetLines(linesRes.data?.data || [])
-      setVsActual(vsRes.data?.data || null)
+      ]);
+      setBudgetLines(linesRes.data?.data || []);
+      setVsActual(vsRes.data?.data || null);
     } catch (err) {
-      setBudgetLines({ error: err.response?.data?.error || err.message })
+      setBudgetLines({ error: err.response?.data?.error || err.message });
     }
-  }, [])
+  }, []);
 
-  useEffect(() => { loadBudgetLines(selectedBudgetId) }, [selectedBudgetId, loadBudgetLines])
+  useEffect(() => { loadBudgetLines(selectedBudgetId); }, [selectedBudgetId, loadBudgetLines]);
 
-  const [lineForm, setLineForm] = useState({ accountId: '', costCenterId: '', profitCenterId: '', fiscalPeriodId: '', budgetedAmount: '', notes: '' })
+  const [lineForm, setLineForm] = useState({ accountId: '', costCenterId: '', profitCenterId: '', fiscalPeriodId: '', budgetedAmount: '', notes: '' });
   const submitLine = async (e) => {
-    e.preventDefault()
-    if (!selectedBudgetId || !lineForm.accountId || lineForm.budgetedAmount === '') return
+    e.preventDefault();
+    if (!selectedBudgetId || !lineForm.accountId || lineForm.budgetedAmount === '') return;
     try {
       await costControlAPI.addBudgetLine(selectedBudgetId, {
         accountId: Number(lineForm.accountId),
@@ -126,33 +126,33 @@ export default function CostControlPage() {
         fiscalPeriodId: lineForm.fiscalPeriodId ? Number(lineForm.fiscalPeriodId) : undefined,
         budgetedAmount: Number(lineForm.budgetedAmount),
         notes: lineForm.notes || undefined,
-      })
-      setLineForm({ accountId: '', costCenterId: '', profitCenterId: '', fiscalPeriodId: '', budgetedAmount: '', notes: '' })
-      loadBudgetLines(selectedBudgetId)
+      });
+      setLineForm({ accountId: '', costCenterId: '', profitCenterId: '', fiscalPeriodId: '', budgetedAmount: '', notes: '' });
+      loadBudgetLines(selectedBudgetId);
     } catch (err) {
-      setBudgetActionMsg(err.response?.data?.error || err.message)
+      setBudgetActionMsg(err.response?.data?.error || err.message);
     }
-  }
+  };
 
   const submitBudget = async () => {
-    if (!selectedBudgetId) return
-    setBudgetActionMsg(null)
+    if (!selectedBudgetId) return;
+    setBudgetActionMsg(null);
     try {
-      await costControlAPI.submitBudget(selectedBudgetId)
-      setBudgetActionMsg('Budget submitted.')
-      loadBudgets()
-    } catch (err) { setBudgetActionMsg(err.response?.data?.error || err.message) }
-  }
+      await costControlAPI.submitBudget(selectedBudgetId);
+      setBudgetActionMsg('Budget submitted.');
+      loadBudgets();
+    } catch (err) { setBudgetActionMsg(err.response?.data?.error || err.message); }
+  };
 
   const approveBudget = async (approved) => {
-    if (!selectedBudgetId) return
-    setBudgetActionMsg(null)
+    if (!selectedBudgetId) return;
+    setBudgetActionMsg(null);
     try {
-      await costControlAPI.approveBudget(selectedBudgetId, approved)
-      setBudgetActionMsg(approved ? 'Budget approved.' : 'Budget rejected.')
-      loadBudgets()
-    } catch (err) { setBudgetActionMsg(err.response?.data?.error || err.message) }
-  }
+      await costControlAPI.approveBudget(selectedBudgetId, approved);
+      setBudgetActionMsg(approved ? 'Budget approved.' : 'Budget rejected.');
+      loadBudgets();
+    } catch (err) { setBudgetActionMsg(err.response?.data?.error || err.message); }
+  };
 
   return (
     <ModulePage
@@ -168,7 +168,7 @@ export default function CostControlPage() {
           </select>
         </Field>
         {companiesError && (
-          <p role="alert" style={{ color: '#cf222e', fontSize: 13, marginTop: 8 }}>{companiesError}</p>
+          <p role="alert" style={{ color: 'hsl(var(--destructive))', fontSize: 13, marginTop: 8 }}>{companiesError}</p>
         )}
       </Section>
 
@@ -233,7 +233,7 @@ export default function CostControlPage() {
               <button type="submit" disabled={!selectedCostCenterId}>Load actuals</button>
             </form>
             {actuals?.error ? (
-              <p role="alert" style={{ color: '#cf222e', marginTop: 8 }}>{actuals.error}</p>
+              <p role="alert" style={{ color: 'hsl(var(--destructive))', marginTop: 8 }}>{actuals.error}</p>
             ) : (
               <DataTable
                 caption="Actuals by account type"
@@ -341,7 +341,7 @@ export default function CostControlPage() {
                 </div>
                 {budgetActionMsg && <p role="status" style={{ fontSize: 13, marginTop: 6 }}>{budgetActionMsg}</p>}
 
-                <form onSubmit={submitLine} style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap', marginTop: 16, padding: 12, background: '#f6f8fa', border: '1px solid #d0d7de', borderRadius: 6 }}>
+                <form onSubmit={submitLine} style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap', marginTop: 16, padding: 12, background: 'hsl(var(--muted))', border: '1px solid hsl(var(--border))', borderRadius: 6 }}>
                   <Field label="Account" id="line-account" hint="Postable accounts only">
                     <select id="line-account" value={lineForm.accountId} onChange={(e) => setLineForm((f) => ({ ...f, accountId: e.target.value }))} style={{ minWidth: 220 }}>
                       <option value="">— select —</option>
@@ -356,7 +356,7 @@ export default function CostControlPage() {
                 </form>
 
                 {budgetLines?.error ? (
-                  <p role="alert" style={{ color: '#cf222e', marginTop: 12 }}>{budgetLines.error}</p>
+                  <p role="alert" style={{ color: 'hsl(var(--destructive))', marginTop: 12 }}>{budgetLines.error}</p>
                 ) : (
                   <DataTable
                     caption="Budget lines"
@@ -378,7 +378,7 @@ export default function CostControlPage() {
                       Budgeted <strong><Rupees value={vsActual.totalBudgeted} /></strong>
                       {' · '}Actual <strong><Rupees value={vsActual.totalActual} /></strong>
                       {' · '}
-                      <strong style={{ color: vsActual.totalVariance > 0 ? '#cf222e' : '#1a7f37' }}>
+                      <strong style={{ color: vsActual.totalVariance > 0 ? 'hsl(var(--destructive))' : 'hsl(var(--data-real))' }}>
                         variance <Rupees value={vsActual.totalVariance} />
                       </strong>
                     </p>
@@ -404,5 +404,5 @@ export default function CostControlPage() {
         </>
       )}
     </ModulePage>
-  )
+  );
 }

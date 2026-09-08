@@ -1,13 +1,13 @@
 # Frontend ↔ Backend API Contract Drift
 
-**Generated:** 2026-08-04 by `tools/frontend-boundaries.js`
+**Generated:** 2026-09-03 by `tools/frontend-boundaries.js`
 **Status:** DESCRIPTIVE — measured from source.
 **Do not edit by hand.**
 
 ---
 
-The frontend calls **70** distinct API endpoints by raw fetch().
-**15** have no matching backend route.
+The frontend calls **0** distinct API endpoints by raw fetch().
+**0** have no matching backend route.
 
 A call to a route that does not exist returns 404. The page renders empty
 and logs to a console nobody is watching — so the screen looks "built"
@@ -15,31 +15,13 @@ while showing nothing. This is the most expensive kind of gap to find late.
 
 ## Endpoints with no backend route
 
-- `/api/v1/blockchain-traceability/traceability-events/${productId}${batchNumber `
-- `/api/v1/blockchain-traceability/chain-of-custody/verify/${productId}${batchNumber `
-- `/api/v1/insurance/calculate/${type}`
-- `/api/v1/predictive-analytics/predictions/${productId}/product`
-- `/api/v1/analytics/platform-stats`
-- `/api/v1/admin/audit/recent`
-- `/api/v1/banker/portfolio`
-- `/api/v1/banker/risk-dashboard`
-- `/api/v1/ca/audit-stats`
-- `/api/v1/fpo/stats`
-- `/api/v1/government/scheme-analytics`
-- `/api/v1/government/compliance-status`
-- `/api/v1/research/stats`
-- `/api/v1/subsidy/stats`
-- `/api/v1/subsidy/pending`
+_none_
 
 ## Mounted API prefixes (backend)
 
-- `/api/v1/auth`
+- `/api/v1/control`
 - `/api/v1/products`
-- `/api/v1/orders`
-- `/api/v1/financial`
-- `/api/v1/logistics`
-- `/api/v1/insurance`
-- `/api/v1/ai`
+- `/api/v1/ai-legacy`
 - `/api/v1/erp`
 - `/api/v1/multilingual`
 - `/api/v1/organic-traceability`
@@ -53,10 +35,12 @@ while showing nothing. This is the most expensive kind of gap to find late.
 - `/api/v1/voice-ai`
 - `/api/v1/blockchain-traceability`
 - `/api/v1/knowledge-graph`
+- `/api/v1/enterprise-memory`
 - `/api/v1/predictive-analytics`
 - `/api/v1/iot-integration`
 - `/api/v1/ar-vr`
 - `/api/v1/sms-auth`
+- `/api/v1/whatsapp`
 - `/api/v1/advanced-voice`
 - `/api/v1/offline-payment`
 - `/api/v1/advanced-ai`
@@ -68,6 +52,7 @@ while showing nothing. This is the most expensive kind of gap to find late.
 - `/api/v1/food-safety`
 - `/api/v1/shelf-life`
 - `/api/v1/institutional-procurement`
+- `/api/v1/mill-fpo`
 - `/api/v1/digital-product-passport`
 - `/api/v1/recipe-intelligence`
 - `/api/v1/forms`
@@ -80,14 +65,232 @@ while showing nothing. This is the most expensive kind of gap to find late.
 - `/api/v1/intel`
 - `/api/v1/value`
 - `/api/v1/merchandising`
+- `/api/v1/users`
+- `/api/v1/admin`
+- `/api/v1/auth`
+- `/api/v1/`
+- `/api/v1/auth`
+- `/api/v1/dashboard`
+- `/api/v1/orders`
+- `/api/v1/financial`
+- `/api/v1/logistics`
+- `/api/v1/insurance`
+- `/api/v1/ai`
+- `/api/v1/ai-approvals`
+- `/api/v1/diet-therapy`
+- `/api/v1/search`
+- `/api/v1/claude/ai-decision`
+- `/api/v1/claude/agent`
+- `/api/v1/claude/coordination`
+- `/api/v1/claude/copilot`
+- `/api/v1/claude/provider`
+- `/api/v1/claude/strategy`
+- `/api/v1/claude/financial`
+- `/api/v1/claude/insurance`
+- `/api/v1/claude/logistics`
+- `/api/v1/claude/order`
+- `/api/v1/claude/product`
+- `/api/v1/analytics`
+- `/api/v1/engineering`
 - `/api/v1/marketplace`
+- `/api/v1/ecommerce`
+- `/api/v1/ecommerce-integration`
+- `/api/v1/ecommerce-ai`
+- `/api/v1/ecommerce-erp`
+- `/api/v1/ecommerce-business`
+- `/api/v1/ecommerce-marketing`
+- `/api/v1/nutrient-value`
+- `/api/v1/nervous`
+- `/api/v1/bulk-orders`
+- `/api/v1/complete-erp-integration`
+- `/api/v1/complete-ai-integration`
+- `/api/v1/comprehensive-erp`
+- `/api/v1/ai-backbone`
+- `/api/v1/product-media-ai`
+- `/api/v1/wearable-integration`
+- `/api/v1/defense-fitness-prep`
+- `/api/v1/crop-value-research`
+- `/api/v1/platform-telemetry`
+- `/api/v1/training`
 - `/api/v1/insurance`
 - `/api/v1/farmer-portal`
 - `/api/v1/governance`
 - `/api/v1/logistics`
+- `/api/v1/logistics-enhancement`
+- `/api/v1/mfa`
+- `/api/v1/privacy`
+- `/api/v1/platform`
+- `/api/v1/ai/modules`
+- `/api/v1/backend-modules`
+- `/api/v1/library`
+- `/api/v1/ai-collaboration`
 - `/api/v1/advanced`
+- `/api/v1/enterprise-ai`
+- `/api/v1/analytics`
+- `/api/v1/predictive`
+- `/api/v1/iot`
+- `/api/v1/blockchain`
+- `/api/v1/digital-twin`
+- `/api/v1/enterprise`
+- `/api/v1`
 - `/api/v1/gst`
 - `/api/v1/logistics-ops`
 - `/api/v1/farmers`
 - `/api/v1/admin/audit`
+- `/api/v1/dairy`
+- `/api/v1/fertilizer`
+- `/api/v1/poultry`
+- `/api/v1/goat`
+- `/api/v1/sheep`
+- `/api/v1/pig`
+- `/api/v1/animal-health`
 - `/api/v1/vendors`
+- `/api/v1/hr`
+- `/api/v1/revenue`
+- `/api/v1/pricing`
+- `/api/v1/finance`
+- `/api/v1/farm-activities`
+- `/api/v1/farm-tasks`
+- `/api/v1/contractors`
+- `/api/v1/machinery-operations`
+- `/api/v1/equipment-scheduling`
+- `/api/v1/input-consumption`
+- `/api/v1/farm-productivity`
+- `/api/v1/farm-operations-dashboard`
+- `/api/v1/water-budgeting/budgets`
+- `/api/v1/water-quality/readings`
+- `/api/v1/rainwater-harvesting/structures`
+- `/api/v1/watersheds`
+- `/api/v1/water-analytics/records`
+- `/api/v1/soil-health/cards`
+- `/api/v1/nutrient-management/plans`
+- `/api/v1/fertility-management/records`
+- `/api/v1/blocks`
+- `/api/v1/districts`
+- `/api/v1/states`
+- `/api/v1/producer-groups`
+- `/api/v1/community-assets`
+- `/api/v1/rural-development/projects`
+- `/api/v1/biofertilizers`
+- `/api/v1/pesticide-inventory`
+- `/api/v1/bio-pesticides`
+- `/api/v1/micronutrients`
+- `/api/v1/organic-inputs`
+- `/api/v1/input-procurement/orders`
+- `/api/v1/input-distribution/records`
+- `/api/v1/input-traceability/records`
+- `/api/v1/cattle-registry/animals`
+- `/api/v1/livestock-feed/records`
+- `/api/v1/livestock-analytics/records`
+- `/api/v1/farmer-family/members`
+- `/api/v1/land-leases`
+- `/api/v1/gis-land-mapping/parcels`
+- `/api/v1/soil-mapping/zones`
+- `/api/v1/water-resource-mapping/resources`
+- `/api/v1/geo-boundaries`
+- `/api/v1/land-surveys`
+- `/api/v1/crop-registration/crops`
+- `/api/v1/crop-varieties`
+- `/api/v1/seed-planning/plans`
+- `/api/v1/nurseries`
+- `/api/v1/sowing/records`
+- `/api/v1/crop-monitoring/observations`
+- `/api/v1/preventive-maintenance`
+- `/api/v1/vegetable-production`
+- `/api/v1/floriculture`
+- `/api/v1/polyhouse-management`
+- `/api/v1/hydroponics`
+- `/api/v1/aeroponics`
+- `/api/v1/precision-horticulture`
+- `/api/v1/protected-cultivation`
+- `/api/v1/strategic/pre-season`
+- `/api/v1/strategic/contract-farming`
+- `/api/v1/strategic/household`
+- `/api/v1/strategic/government`
+- `/api/v1/horticulture-analytics`
+- `/api/v1/drought-monitoring`
+- `/api/v1/flood-monitoring`
+- `/api/v1/disease-forecasting`
+- `/api/v1/climate-risk`
+- `/api/v1/agro-meteorology`
+- `/api/v1/biofloc-farms`
+- `/api/v1/hatchery-management`
+- `/api/v1/fish-feed`
+- `/api/v1/fisheries-water-quality`
+- `/api/v1/fish-health`
+- `/api/v1/fisheries-harvest`
+- `/api/v1/fish-processing`
+- `/api/v1/cold-fish-chain`
+- `/api/v1/aquaculture-analytics`
+- `/api/v1/permissions`
+- `/api/v1/sso-providers`
+- `/api/v1/mfa-devices`
+- `/api/v1/digital-identities`
+- `/api/v1/consent-records`
+- `/api/v1/sessions`
+- `/api/v1/roles`
+- `/api/v1/irrigation/schedules`
+- `/api/v1/irrigation/water-sources`
+- `/api/v1/irrigation/logs`
+- `/api/v1/realtime-monitoring`
+- `/api/v1/weather`
+- `/api/v1/climate-advisory`
+- `/api/v1/compliance`
+- `/api/v1/rfq`
+- `/api/v1/energy`
+- `/api/v1/market-data`
+- `/api/v1/folu`
+- `/api/v1/geofencing`
+- `/api/v1/experience`
+- `/api/v1/demand`
+- `/api/v1/costs`
+- `/api/v1/erp/assets`
+- `/api/v1/erp/controlling`
+- `/api/v1/erp/projects`
+- `/api/v1/cold-storage`
+- `/api/v1/dpr`
+- `/api/v1/decision-support`
+- `/api/v1/m400-ai-backbone`
+- `/api/v1/crop-planning`
+- `/api/v1/land-records`
+- `/api/v1/nutrition-intelligence`
+- `/api/v1/apiculture`
+- `/api/v1/fisheries`
+- `/api/v1/forestry`
+- `/api/v1/mushroom`
+- `/api/v1/sericulture`
+- `/api/v1/vermicompost`
+- `/api/v1/product-reviews`
+- `/api/v1/cooperative-shares`
+- `/api/v1/wikipedia`
+- `/api/v1/agri-intelligence`
+- `/api/v1/farmer-health`
+- `/api/v1/food`
+- `/api/v1/variety-directory`
+- `/api/v1/folu-benchmark`
+- `/api/v1/civil-disruptions`
+- `/api/v1/escrow`
+- `/api/v1/farmer-value`
+- `/api/v1/seller-ranking`
+- `/api/v1/seed-vault`
+- `/api/v1/freight-pooling`
+- `/api/v1/return-load-board`
+- `/api/v1/glut-warning`
+- `/api/v1/track`
+- `/api/v1/equipment-exchange`
+- `/api/v1/vision`
+- `/api/v1/ai-gateway`
+- `/api/v1/ai-agent`
+- `/api/v1/ai-brain`
+- `/api/v1/ai-self-healing`
+- `/api/v1/ai-operation-intelligence`
+- `/api/v1/sap-module-architecture`
+- `/api/v1/research-and-development`
+- `/api/v1/information-sharing`
+- `/api/v1/knowledge`
+- `/api/v1/companies`
+- `/api/v1/platform-core`
+- `/api/v1/platform-configuration`
+- `/api/v1/tenant-management`
+- `/api/v1/organization-management`
+- `/api/v1/system-administration`

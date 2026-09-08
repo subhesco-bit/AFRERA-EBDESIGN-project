@@ -7,7 +7,7 @@ const router = express.Router();
 const loanManagementService = require('../services/loanManagementService');
 const { authMiddleware: authenticateToken, requireRole: authorize } = require('../middleware/auth');
 const { validateBody: validateRequest } = require('../middleware/validation');
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 router.post('/loans/apply',
   authenticateToken,

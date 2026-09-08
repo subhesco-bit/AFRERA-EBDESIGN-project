@@ -108,5 +108,5 @@ module.exports = {
   addEscalation,
   createSuppression,
   createMaintenanceWindow,
-  calculateAlertStatistics
+  calculateAlertStatistics,
 };

@@ -66,5 +66,5 @@ module.exports = {
   reportBreakdown,
   scheduleEmergencyRepair,
   trackDowntime,
-  generateBreakdownReport
+  generateBreakdownReport,
 };

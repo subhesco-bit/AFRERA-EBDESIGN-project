@@ -44,7 +44,7 @@ router.get('/work-history/:aiSource', async (req, res) => {
   try {
     const history = await aiCollaborationService.getWorkHistory(
       req.params.aiSource,
-      parseInt(req.query.limit, 10) || 20
+      parseInt(req.query.limit, 10) || 20,
     );
     res.json({ success: true, data: { ai_source: req.params.aiSource, work_history: history, count: history.length } });
   } catch (error) {

@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
 import {
   Sprout,
   TrendingUp,
@@ -10,20 +10,20 @@ import {
   Store,
   Users,
   Bell,
-  ArrowRight
-} from 'lucide-react'
+  ArrowRight,
+} from 'lucide-react';
 
 function FarmerHomePage() {
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: farmerData } = useQuery({
     queryKey: ['farmer-dashboard'],
     queryFn: () => farmersAPI.getFarmerDashboard('current-farmer-id').then(r => r.data),
-  })
+  });
 
   const { data: notifications } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => farmersAPI.getNotifications('current-farmer-id').then(r => r.data),
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -231,7 +231,7 @@ function FarmerHomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmerHomePage
+export default FarmerHomePage;

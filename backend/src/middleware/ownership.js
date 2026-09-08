@@ -80,7 +80,7 @@ function requireResourceOwner({ table, idParam, ownerColumn, idColumn = 'id', ow
 
       const result = await pool.query(
         `SELECT ${ownerColumn} AS owner_id FROM ${table} WHERE ${idColumn} = $1`,
-        [rowId]
+        [rowId],
       );
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });
@@ -110,4 +110,36 @@ async function farmerIdOf(req) {
   return result.rows.length ? result.rows[0].id : null;
 }
 
-module.exports = { requireSelfOrAdmin, requireResourceOwner, farmerIdOf };
+/**
+ * Resolves the caller's farmer id and replaces any caller-supplied farmer id
+ * for non-admins. This prevents IDOR when a service accepts farmerId in a
+ * request body or query string instead of a path parameter.
+ */
+function requireFarmerOwner(location = 'query') {
+  return async (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required', code: 'AUTH_REQUIRED' });
+    }
+    if (req.user.role === 'admin') return next();
+
+    try {
+      const farmerId = await farmerIdOf(req);
+      if (farmerId === null || farmerId === undefined) {
+        return res.status(403).json({ error: 'Farmer ownership required', code: 'NOT_RESOURCE_OWNER' });
+      }
+
+      if (location === 'body') {
+        req.body = req.body || {};
+        req.body.farmerId = farmerId;
+      } else {
+        req.query.farmerId = farmerId;
+      }
+      return next();
+    } catch (error) {
+      logger.error('Farmer ownership check failed', { error: error.message });
+      return res.status(500).json({ error: 'Authorization check failed' });
+    }
+  };
+}
+
+module.exports = { requireSelfOrAdmin, requireResourceOwner, farmerIdOf, requireFarmerOwner };

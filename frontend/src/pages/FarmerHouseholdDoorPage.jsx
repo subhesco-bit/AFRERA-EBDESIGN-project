@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { Home, ArrowLeft, ArrowRight, LogIn } from 'lucide-react'
+import { Link } from 'react-router-dom';
+import { Home, ArrowLeft, ArrowRight, LogIn } from 'lucide-react';
 
 // Public door #2 of 4 — "My household". See FarmerEntranceHubPage.jsx for
 // background on why this exists. This page is intentionally NOT wrapped in
@@ -22,7 +22,7 @@ const ACTIONS = [
     to: '/farmerhome',
     note: 'Requires signing in to this section',
   },
-]
+];
 
 function FarmerHouseholdDoorPage() {
   return (
@@ -90,7 +90,7 @@ function FarmerHouseholdDoorPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmerHouseholdDoorPage
+export default FarmerHouseholdDoorPage;

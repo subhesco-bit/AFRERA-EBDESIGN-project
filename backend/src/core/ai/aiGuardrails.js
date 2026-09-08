@@ -2,7 +2,7 @@
  * AI Guardrails
  * Component ID: EBD-CMP-00000006
  * Purpose: AI input/output validation and policy enforcement
- * 
+ *
  * This module provides comprehensive guardrails for AI operations including
  * input validation, output validation, policy enforcement, and security checks.
  */
@@ -42,7 +42,7 @@ const OUTPUT_RULES = {
  */
 function validateInput(input, context = {}) {
   const violations = [];
-  
+
   // Check text length
   if (typeof input === 'string' && input.length > INPUT_RULES.MAX_TEXT_LENGTH) {
     violations.push({
@@ -51,7 +51,7 @@ function validateInput(input, context = {}) {
       severity: 'error',
     });
   }
-  
+
   // Check for blocked patterns
   if (typeof input === 'string') {
     for (const pattern of INPUT_RULES.BLOCKED_PATTERNS) {
@@ -64,7 +64,7 @@ function validateInput(input, context = {}) {
       }
     }
   }
-  
+
   // Check MIME type for file inputs
   if (context.mimeType && !INPUT_RULES.ALLOWED_MIME_TYPES.includes(context.mimeType)) {
     violations.push({
@@ -73,7 +73,7 @@ function validateInput(input, context = {}) {
       severity: 'error',
     });
   }
-  
+
   return {
     valid: violations.length === 0,
     violations,
@@ -86,7 +86,7 @@ function validateInput(input, context = {}) {
  */
 function validateOutput(output, context = {}) {
   const violations = [];
-  
+
   // Check text length
   if (typeof output === 'string' && output.length > OUTPUT_RULES.MAX_TEXT_LENGTH) {
     violations.push({
@@ -95,7 +95,7 @@ function validateOutput(output, context = {}) {
       severity: 'warning',
     });
   }
-  
+
   // Check for blocked patterns
   if (typeof output === 'string') {
     for (const pattern of OUTPUT_RULES.BLOCKED_PATTERNS) {
@@ -108,7 +108,7 @@ function validateOutput(output, context = {}) {
       }
     }
   }
-  
+
   // Check for structured output if required
   if (OUTPUT_RULES.REQUIRE_STRUCTURED_OUTPUT && context.requireStructured) {
     try {
@@ -121,7 +121,7 @@ function validateOutput(output, context = {}) {
       });
     }
   }
-  
+
   return {
     valid: violations.length === 0,
     violations,
@@ -133,7 +133,7 @@ function validateOutput(output, context = {}) {
  */
 function sanitizeInput(input, violations) {
   let sanitized = input;
-  
+
   for (const violation of violations) {
     if (violation.type === 'length') {
       sanitized = sanitized.substring(0, INPUT_RULES.MAX_TEXT_LENGTH);
@@ -144,7 +144,7 @@ function sanitizeInput(input, violations) {
       }
     }
   }
-  
+
   return sanitized;
 }
 
@@ -160,21 +160,21 @@ function checkAuthorization(user, operation, resource) {
   }
 
   const permissions = {
-    'text_generation': ['user', 'admin', 'system'],
-    'image_analysis': ['user', 'admin', 'system'],
-    'classification': ['user', 'admin', 'system'],
-    'admin_operations': ['admin', 'system'],
+    text_generation: ['user', 'admin', 'system'],
+    image_analysis: ['user', 'admin', 'system'],
+    classification: ['user', 'admin', 'system'],
+    admin_operations: ['admin', 'system'],
   };
-  
+
   const allowedRoles = permissions[operation] || ['system'];
-  
+
   if (!allowedRoles.includes(user.role)) {
     return {
       authorized: false,
       reason: `User role ${user.role} not authorized for ${operation}`,
     };
   }
-  
+
   return { authorized: true };
 }
 
@@ -184,15 +184,15 @@ function checkAuthorization(user, operation, resource) {
 function checkRateLimit(userId, operation) {
   // This would typically integrate with the rate limiter
   // For now, we'll implement basic in-memory checks
-  
+
   const limits = {
-    'text_generation': { perMinute: 10, perHour: 100 },
-    'image_analysis': { perMinute: 5, perHour: 50 },
-    'classification': { perMinute: 20, perHour: 200 },
+    text_generation: { perMinute: 10, perHour: 100 },
+    image_analysis: { perMinute: 5, perHour: 50 },
+    classification: { perMinute: 20, perHour: 200 },
   };
-  
+
   const limit = limits[operation] || { perMinute: 10, perHour: 100 };
-  
+
   // In production, this would check against Redis or similar
   return {
     withinLimit: true,
@@ -206,7 +206,7 @@ function checkRateLimit(userId, operation) {
  */
 function applyContentPolicy(content, policy) {
   const violations = [];
-  
+
   if (policy.blockProfanity) {
     const profanityPattern = /\b(damn|hell|shit)\b/gi;
     if (profanityPattern.test(content)) {
@@ -217,7 +217,7 @@ function applyContentPolicy(content, policy) {
       });
     }
   }
-  
+
   if (policy.blockPII) {
     const piiPattern = /\b\d{3}-\d{2}-\d{4}\b/g; // SSN pattern
     if (piiPattern.test(content)) {
@@ -228,7 +228,7 @@ function applyContentPolicy(content, policy) {
       });
     }
   }
-  
+
   return {
     violations,
     filtered: violations.length === 0 ? content : filterContent(content, violations),
@@ -240,7 +240,7 @@ function applyContentPolicy(content, policy) {
  */
 function filterContent(content, violations) {
   let filtered = content;
-  
+
   for (const violation of violations) {
     if (violation.type === 'content_policy') {
       // Apply content filtering
@@ -248,7 +248,7 @@ function filterContent(content, violations) {
       filtered = filtered.replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[REDACTED]');
     }
   }
-  
+
   return filtered;
 }
 

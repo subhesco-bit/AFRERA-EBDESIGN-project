@@ -1,6 +1,6 @@
-import { Users } from 'lucide-react'
-import { cooperativeShareAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Users } from 'lucide-react';
+import { cooperativeShareAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/cooperativeShareRoutes.js +
@@ -71,7 +71,7 @@ function CooperativeSharePage() {
         onRun={(v) => cooperativeShareAPI.getDistribution(v.id)}
       />
     </div>
-  )
+  );
 }
 
-export default CooperativeSharePage
+export default CooperativeSharePage;

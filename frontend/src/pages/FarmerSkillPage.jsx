@@ -1,9 +1,9 @@
-import { GraduationCap } from 'lucide-react'
-import { farmerSkillAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { GraduationCap } from 'lucide-react';
+import { farmerSkillAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const SKILL_CATEGORIES = ['Crop Production', 'Livestock', 'Machinery Operation', 'Post-Harvest', 'Financial Literacy', 'Digital Literacy', 'Organic Farming']
-const PROFICIENCY = ['Beginner', 'Intermediate', 'Advanced', 'Trainer']
+const SKILL_CATEGORIES = ['Crop Production', 'Livestock', 'Machinery Operation', 'Post-Harvest', 'Financial Literacy', 'Digital Literacy', 'Organic Farming'];
+const PROFICIENCY = ['Beginner', 'Intermediate', 'Advanced', 'Trainer'];
 
 const initialForm = {
   farmer_name: '',
@@ -14,7 +14,7 @@ const initialForm = {
   certified: 'No',
   acquired_date: '',
   notes: '',
-}
+};
 
 function FarmerSkillPage() {
   return (
@@ -59,7 +59,7 @@ function FarmerSkillPage() {
         { label: 'Farmers covered', value: new Set(items.map((i) => i.farmer_name).filter(Boolean)).size },
       ]}
     />
-  )
+  );
 }
 
-export default FarmerSkillPage
+export default FarmerSkillPage;

@@ -9,6 +9,8 @@
 'use strict';
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const productReviewService = require('../services/legacy/productReviewService');
 const { authMiddleware } = require('../middleware/auth');

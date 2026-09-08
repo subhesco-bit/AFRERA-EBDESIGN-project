@@ -8,8 +8,8 @@ router.post('/equipment/:equipmentId/usage', controller.recordEquipmentUsage);
 router.get('/owners/:ownerId/equipment', controller.getEquipmentByOwner);
 router.get('/maintenance/predictions', controller.getMaintenancePredictions);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

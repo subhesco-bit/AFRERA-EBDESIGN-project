@@ -8,8 +8,8 @@ router.get('/environments/:id', controller.getEnvironment);
 router.put('/environments/:id', controller.updateEnvironment);
 router.get('/environments', controller.listEnvironments);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

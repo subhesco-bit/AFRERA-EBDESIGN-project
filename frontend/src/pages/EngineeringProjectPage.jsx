@@ -1,6 +1,6 @@
-import { HardHat } from 'lucide-react'
-import { engineeringProjectAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { HardHat } from 'lucide-react';
+import { engineeringProjectAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/engineeringProjectRoutes.js +
@@ -64,7 +64,7 @@ function EngineeringProjectPage() {
         onRun={(v) => engineeringProjectAPI.getCostEstimates(v.id)}
       />
     </div>
-  )
+  );
 }
 
-export default EngineeringProjectPage
+export default EngineeringProjectPage;

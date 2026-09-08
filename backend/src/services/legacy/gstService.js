@@ -59,25 +59,25 @@ class GSTService {
    */
   getGSTRate(productCategory) {
     const gstRates = {
-      'fruits': 0,           // 0% - Fresh fruits
-      'vegetables': 0,       // 0% - Fresh vegetables
-      'cereals': 0,          // 0% - Cereals
-      'pulses': 0,           // 0% - Pulses
-      'milk': 0,             // 0% - Milk
-      'flour': 0,            // 0% - Flour
-      'processed_food': 5,   // 5% - Processed food
-      'spices': 5,           // 5% - Spices
-      'honey': 5,            // 5% - Honey
-      'tea': 5,              // 5% - Tea
-      'coffee': 5,           // 5% - Coffee
-      'dairy_products': 12, // 12% - Dairy products
-      'oil': 12,             // 12% - Edible oil
-      'sugar': 12,           // 12% - Sugar
-      'value_added': 18,    // 18% - Value added products
-      'packaged_food': 18,   // 18% - Packaged food
-      'beverages': 18,      // 18% - Beverages
-      'snacks': 18,          // 18% - Snacks
-      'services': 18        // 18% - Services
+      fruits: 0, // 0% - Fresh fruits
+      vegetables: 0, // 0% - Fresh vegetables
+      cereals: 0, // 0% - Cereals
+      pulses: 0, // 0% - Pulses
+      milk: 0, // 0% - Milk
+      flour: 0, // 0% - Flour
+      processed_food: 5, // 5% - Processed food
+      spices: 5, // 5% - Spices
+      honey: 5, // 5% - Honey
+      tea: 5, // 5% - Tea
+      coffee: 5, // 5% - Coffee
+      dairy_products: 12, // 12% - Dairy products
+      oil: 12, // 12% - Edible oil
+      sugar: 12, // 12% - Sugar
+      value_added: 18, // 18% - Value added products
+      packaged_food: 18, // 18% - Packaged food
+      beverages: 18, // 18% - Beverages
+      snacks: 18, // 18% - Snacks
+      services: 18, // 18% - Services
     };
 
     return gstRates[productCategory] || 18; // Default 18%
@@ -92,16 +92,16 @@ class GSTService {
    * body (the /calculate/product route passes req.body directly).
    */
   isBrandedPackaged(product = {}) {
-    const isPackaged = product.is_branded_packaged !== undefined
-      ? product.is_branded_packaged
-      : product.isBrandedPackaged;
-    const brandName = product.registered_brand_name !== undefined
-      ? product.registered_brand_name
-      : product.registeredBrandName;
+    const isPackaged = product.is_branded_packaged !== undefined ?
+      product.is_branded_packaged :
+      product.isBrandedPackaged;
+    const brandName = product.registered_brand_name !== undefined ?
+      product.registered_brand_name :
+      product.registeredBrandName;
     return Boolean(
       isPackaged === true &&
       typeof brandName === 'string' &&
-      brandName.trim().length > 0
+      brandName.trim().length > 0,
     );
   }
 
@@ -129,7 +129,7 @@ class GSTService {
           return {
             rate: Number(rate),
             source: branded ? 'hsn_branded_packaged' : 'hsn_loose_unbranded',
-            hsnCode: hsnRow.hsn_code || null
+            hsnCode: hsnRow.hsn_code || null,
           };
         }
       } else if (hsnRow.gst_rate !== null && hsnRow.gst_rate !== undefined) {
@@ -161,7 +161,7 @@ class GSTService {
       const { rows } = await this.pool.query(
         `SELECT hsn_code, gst_rate, branding_dependent, rate_loose_unbranded, rate_branded_packaged
          FROM hsn_gst_mapping WHERE hsn_code = $1`,
-        [hsnCode]
+        [hsnCode],
       );
       hsnRow = rows[0] || null;
     }
@@ -227,7 +227,7 @@ class GSTService {
           gst_rate: item.hsn_flat_rate,
           branding_dependent: item.branding_dependent,
           rate_loose_unbranded: item.rate_loose_unbranded,
-          rate_branded_packaged: item.rate_branded_packaged
+          rate_branded_packaged: item.rate_branded_packaged,
         } : null;
 
         const classification = this.resolveGSTRate({
@@ -236,9 +236,9 @@ class GSTService {
             gst_rate: item.product_gst_rate,
             hsn_code: item.hsn_code,
             is_branded_packaged: item.is_branded_packaged,
-            registered_brand_name: item.registered_brand_name
+            registered_brand_name: item.registered_brand_name,
           },
-          categoryName: item.category_name
+          categoryName: item.category_name,
         });
 
         const gstRate = classification.rate;
@@ -258,10 +258,10 @@ class GSTService {
           rateSource: classification.source,
           isBrandedPackaged: this.isBrandedPackaged({
             is_branded_packaged: item.is_branded_packaged,
-            registered_brand_name: item.registered_brand_name
+            registered_brand_name: item.registered_brand_name,
           }),
           itemValue: r2(itemValue),
-          gstAmount
+          gstAmount,
         });
       }
 
@@ -269,7 +269,7 @@ class GSTService {
         orderId,
         totalGST: totalGST.toFixed(2),
         gstBreakdown,
-        calculatedAt: new Date()
+        calculatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error calculating order GST', { error: error.message, stack: error.stack });
@@ -298,7 +298,7 @@ class GSTService {
       rateSource: classification.source,
       isBrandedPackaged: this.isBrandedPackaged(product),
       gstAmount: gstAmount.toFixed(2),
-      totalPrice: (price + gstAmount).toFixed(2)
+      totalPrice: (price + gstAmount).toFixed(2),
     };
   }
 
@@ -335,7 +335,7 @@ class GSTService {
 
       return {
         period: { startDate, endDate },
-        summary: result.rows
+        summary: result.rows,
       };
     } catch (error) {
       logger.error('Error getting GST summary', { error: error.message, stack: error.stack });
@@ -358,7 +358,7 @@ class GSTService {
    */
   async resolveDefaultCompanyId() {
     const { rows } = await this.pool.query(
-      'SELECT id FROM companies WHERE is_active = TRUE ORDER BY id ASC LIMIT 1'
+      'SELECT id FROM companies WHERE is_active = TRUE ORDER BY id ASC LIMIT 1',
     );
     return rows[0] ? rows[0].id : null;
   }
@@ -373,7 +373,7 @@ class GSTService {
   async findOrCreateAccount(client, companyId, accountCode, accountName, accountType, normalBalance) {
     const existing = await client.query(
       'SELECT id FROM chart_of_accounts WHERE company_id = $1 AND account_code = $2',
-      [companyId, accountCode]
+      [companyId, accountCode],
     );
     if (existing.rows[0]) return existing.rows[0].id;
 
@@ -382,14 +382,14 @@ class GSTService {
        VALUES ($1, $2, $3, $4, $5, TRUE)
        ON CONFLICT (company_id, account_code) DO NOTHING
        RETURNING id`,
-      [companyId, accountCode, accountName, accountType, normalBalance]
+      [companyId, accountCode, accountName, accountType, normalBalance],
     );
     if (inserted.rows[0]) return inserted.rows[0].id;
 
     // Lost a race with a concurrent create — the row exists now, read it back.
     const reread = await client.query(
       'SELECT id FROM chart_of_accounts WHERE company_id = $1 AND account_code = $2',
-      [companyId, accountCode]
+      [companyId, accountCode],
     );
     return reread.rows[0].id;
   }
@@ -425,7 +425,7 @@ class GSTService {
     }
 
     const arAccountId = await this.findOrCreateAccount(
-      client, companyId, 'GST-AR-TAX', 'Accounts Receivable - GST Component', 'asset', 'DR'
+      client, companyId, 'GST-AR-TAX', 'Accounts Receivable - GST Component', 'asset', 'DR',
     );
 
     const creditLines = [];
@@ -448,7 +448,7 @@ class GSTService {
          (company_id, entry_number, entry_date, journal_type, description, reference_type, reference_id, status, posted_at)
        VALUES ($1, $2, $3, 'sales', $4, 'gst_invoice', $5, 'posted', NOW())
        RETURNING id`,
-      [companyId, entryNumber, invoiceDate, `Output GST on GST invoice ${invoiceNumber}`, String(invoiceId)]
+      [companyId, entryNumber, invoiceDate, `Output GST on GST invoice ${invoiceNumber}`, String(invoiceId)],
     );
     const journalEntryId = entryResult.rows[0].id;
 
@@ -456,13 +456,13 @@ class GSTService {
     await client.query(
       `INSERT INTO journal_lines (journal_entry_id, line_number, account_id, debit, credit, base_debit, base_credit, description)
        VALUES ($1, $2, $3, $4, 0, $4, 0, $5)`,
-      [journalEntryId, lineNumber++, arAccountId, totalGST, `GST receivable component - invoice ${invoiceNumber}`]
+      [journalEntryId, lineNumber++, arAccountId, totalGST, `GST receivable component - invoice ${invoiceNumber}`],
     );
     for (const line of creditLines) {
       await client.query(
         `INSERT INTO journal_lines (journal_entry_id, line_number, account_id, debit, credit, base_debit, base_credit, description)
          VALUES ($1, $2, $3, 0, $4, 0, $4, $5)`,
-        [journalEntryId, lineNumber++, line.accountId, line.amount, `Output ${line.label} payable - invoice ${invoiceNumber}`]
+        [journalEntryId, lineNumber++, line.accountId, line.amount, `Output ${line.label} payable - invoice ${invoiceNumber}`],
       );
     }
 
@@ -517,13 +517,13 @@ class GSTService {
       if (order.shipping_address_id) {
         const addrResult = await this.pool.query(
           'SELECT state FROM addresses WHERE id = $1',
-          [order.shipping_address_id]
+          [order.shipping_address_id],
         );
         buyerState = addrResult.rows[0] ? addrResult.rows[0].state : null;
       }
-      const isIntraState = buyerState
-        ? buyerState.trim().toLowerCase() === HOME_STATE_NAME.toLowerCase()
-        : false;
+      const isIntraState = buyerState ?
+        buyerState.trim().toLowerCase() === HOME_STATE_NAME.toLowerCase() :
+        false;
 
       let cgstAmount = 0, sgstAmount = 0, igstAmount = 0;
       let taxableValue = 0;
@@ -555,8 +555,8 @@ class GSTService {
             invoiceNumber, orderId, order.customer_name, order.customer_gst,
             buyerState, HOME_STATE_NAME, taxableValue, totalGSTNum,
             cgstAmount, sgstAmount, igstAmount, r2(taxableValue + totalGSTNum),
-            JSON.stringify(gstCalculation)
-          ]
+            JSON.stringify(gstCalculation),
+          ],
         );
         const invoice = invoiceInsert.rows[0];
 
@@ -577,8 +577,8 @@ class GSTService {
             [
               invoice.id, item.productId, item.productName, item.hsnCode, item.category,
               item.quantity, item.unitPrice, item.itemValue, item.gstRate,
-              itemCgst, itemSgst, itemIgst, itemGST, r2(item.itemValue + itemGST), item.itemValue
-            ]
+              itemCgst, itemSgst, itemIgst, itemGST, r2(item.itemValue + itemGST), item.itemValue,
+            ],
           );
         }
 
@@ -591,7 +591,7 @@ class GSTService {
             invoiceDate: invoice.invoice_date,
             cgstAmount,
             sgstAmount,
-            igstAmount
+            igstAmount,
           });
         }
 
@@ -604,7 +604,7 @@ class GSTService {
         orderDetails: order,
         gstCalculation,
         ledgerPosting: persisted.ledgerPosting,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error generating GST invoice', { error: error.message, stack: error.stack });
@@ -641,7 +641,7 @@ class GSTService {
         gstDetails.totalGST,
         JSON.stringify(gstDetails.gstBreakdown),
         gstDetails.invoiceNumber,
-        orderId
+        orderId,
       ]);
 
       return result.rows[0];
@@ -653,3 +653,4 @@ class GSTService {
 }
 
 module.exports = new GSTService();
+

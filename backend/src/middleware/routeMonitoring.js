@@ -15,7 +15,7 @@ const routeMonitoring = (req, res, next) => {
     method,
     path: routePath,
     ip: req.ip,
-    userAgent: req.get('user-agent')
+    userAgent: req.get('user-agent'),
   });
 
   // Track response time
@@ -28,7 +28,7 @@ const routeMonitoring = (req, res, next) => {
       path: routePath,
       statusCode,
       duration: `${duration}ms`,
-      success: statusCode < 400
+      success: statusCode < 400,
     });
 
     // Alert on slow responses
@@ -36,7 +36,7 @@ const routeMonitoring = (req, res, next) => {
       logger.warn('Slow response detected', {
         method,
         path: routePath,
-        duration: `${duration}ms`
+        duration: `${duration}ms`,
       });
     }
 
@@ -45,7 +45,7 @@ const routeMonitoring = (req, res, next) => {
       logger.error('Server error response', {
         method,
         path: routePath,
-        statusCode
+        statusCode,
       });
     }
   });
@@ -55,7 +55,7 @@ const routeMonitoring = (req, res, next) => {
     logger.error('Response error', {
       method,
       path: routePath,
-      error: error.message
+      error: error.message,
     });
   });
 
@@ -73,7 +73,7 @@ const criticalRouteMonitoring = (req, res, next) => {
     path: routePath,
     ip: req.ip,
     userId: req.user?.id,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 
   // Track response time with detailed metrics
@@ -87,7 +87,7 @@ const criticalRouteMonitoring = (req, res, next) => {
       statusCode,
       duration: `${duration}ms`,
       success: statusCode < 400,
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     // Enhanced alerting for critical routes
@@ -96,7 +96,7 @@ const criticalRouteMonitoring = (req, res, next) => {
         method,
         path: routePath,
         duration: `${duration}ms`,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
     }
 
@@ -105,7 +105,7 @@ const criticalRouteMonitoring = (req, res, next) => {
         method,
         path: routePath,
         statusCode,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
     }
   });
@@ -118,12 +118,12 @@ const healthCheckMonitoring = (req, res, next) => {
 
   res.on('finish', () => {
     const duration = Date.now() - startTime;
-    
+
     // Health checks should be very fast
     if (duration > 100) {
       logger.warn('Health check slow response', {
         path: req.path,
-        duration: `${duration}ms`
+        duration: `${duration}ms`,
       });
     }
   });
@@ -134,5 +134,5 @@ const healthCheckMonitoring = (req, res, next) => {
 module.exports = {
   routeMonitoring,
   criticalRouteMonitoring,
-  healthCheckMonitoring
+  healthCheckMonitoring,
 };

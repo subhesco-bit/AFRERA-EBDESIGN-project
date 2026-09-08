@@ -1,5 +1,5 @@
 // Enterprise Production Service Template - Claude AI Design
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 const { ValidationError, ServerError, NotFoundError } = require('./errorHandler');
 const cache = require('./cache');
 

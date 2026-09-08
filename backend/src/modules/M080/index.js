@@ -8,8 +8,8 @@ router.post('/dashboards', controller.createWaterDashboard);
 router.post('/predictions', controller.generatePredictiveAnalysis);
 router.post('/comparisons', controller.compareWaterPerformance);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

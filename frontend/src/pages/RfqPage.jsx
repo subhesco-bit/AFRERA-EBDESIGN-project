@@ -11,44 +11,44 @@
  *   without one, because the hold exists precisely so that somebody takes
  *   responsibility for overriding it.
  */
-import React, { useState, useEffect } from 'react'
-import { rfqAPI } from '../services/api'
-import { ModulePage, Section, Field, Rupees, Value, AsyncState, DataTable } from '../components/common/DataPrimitives'
+import React, { useState, useEffect } from 'react';
+import { rfqAPI } from '../services/api';
+import { ModulePage, Section, Field, Rupees, Value, AsyncState, DataTable } from '../components/common/DataPrimitives';
 
 export default function RfqPage() {
-  const [holds, setHolds] = useState(null)
-  const [loss, setLoss] = useState(null)
-  const [pnl, setPnl] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [release, setRelease] = useState({ holdId: '', signature: '', justification: '' })
-  const [releaseMsg, setReleaseMsg] = useState(null)
+  const [holds, setHolds] = useState(null);
+  const [loss, setLoss] = useState(null);
+  const [pnl, setPnl] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [release, setRelease] = useState({ holdId: '', signature: '', justification: '' });
+  const [releaseMsg, setReleaseMsg] = useState(null);
 
   const load = async () => {
     try {
       const [h, l, p] = await Promise.all([
         rfqAPI.activeHolds(), rfqAPI.lossAnalysis({ days: 90 }), rfqAPI.centrePnl(),
-      ])
-      setHolds(h.data?.data); setLoss(l.data?.data); setPnl(p.data?.data)
-    } catch (e) { setError(e.response?.data?.error || e.message) } finally { setLoading(false) }
-  }
-  useEffect(() => { load() }, [])
+      ]);
+      setHolds(h.data?.data); setLoss(l.data?.data); setPnl(p.data?.data);
+    } catch (e) { setError(e.response?.data?.error || e.message); } finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, []);
 
-  const canRelease = release.holdId && release.signature.trim() && release.justification.trim()
+  const canRelease = release.holdId && release.signature.trim() && release.justification.trim();
 
   const submitRelease = async (e) => {
-    e.preventDefault()
-    if (!canRelease) return
+    e.preventDefault();
+    if (!canRelease) return;
     try {
       await rfqAPI.releaseQcHold({
         holdId: Number(release.holdId), signature: release.signature,
         justification: release.justification,
-      })
-      setReleaseMsg('Hold released and the signature recorded against it.')
-      setRelease({ holdId: '', signature: '', justification: '' })
-      load()
-    } catch (err) { setReleaseMsg(err.response?.data?.error || err.message) }
-  }
+      });
+      setReleaseMsg('Hold released and the signature recorded against it.');
+      setRelease({ holdId: '', signature: '', justification: '' });
+      load();
+    } catch (err) { setReleaseMsg(err.response?.data?.error || err.message); }
+  };
 
   return (
     <ModulePage title="Procurement, quality and centre performance"
@@ -75,8 +75,8 @@ export default function RfqPage() {
             />
 
             <form onSubmit={submitRelease} style={{ marginTop: 16, display: 'flex', gap: 12,
-              flexWrap: 'wrap', alignItems: 'flex-end', padding: 14, background: '#f6f8fa',
-              border: '1px solid #d0d7de', borderRadius: 6 }}>
+              flexWrap: 'wrap', alignItems: 'flex-end', padding: 14, background: 'hsl(var(--muted))',
+              border: '1px solid hsl(var(--border))', borderRadius: 6 }}>
               <Field label="Hold ID" id="qc-id">
                 <input id="qc-id" type="number" value={release.holdId}
                   onChange={(e) => setRelease((r) => ({ ...r, holdId: e.target.value }))} />
@@ -103,8 +103,8 @@ export default function RfqPage() {
             <p style={{ fontSize: 15 }}>
               Won <Value value={loss?.won} decimals={0} /> · Lost <Value value={loss?.lost} decimals={0} />
               {' · win rate '}
-              <strong>{loss?.winRatePct === null || loss?.winRatePct === undefined
-                ? 'unknown' : `${loss.winRatePct}%`}</strong>
+              <strong>{loss?.winRatePct === null || loss?.winRatePct === undefined ?
+                'unknown' : `${loss.winRatePct}%`}</strong>
             </p>
             {loss?.note && <p role="note" style={{ color: 'var(--muted,#888)', fontSize: 13 }}>{loss.note}</p>}
             <DataTable
@@ -125,8 +125,8 @@ export default function RfqPage() {
           <Section title="FPO centre performance"
             description="Centre-wise P&L. An FPO-level total hides a centre being robbed; the comparison is the control.">
             {pnl?.outliers?.length > 0 && (
-              <div role="alert" style={{ border: '1px solid #bc4c00', borderLeft: '4px solid #bc4c00',
-                background: '#ffece5', borderRadius: 6, padding: '10px 12px', marginBottom: 12 }}>
+              <div role="alert" style={{ border: '1px solid hsl(var(--sev-critical))', borderLeft: '4px solid hsl(var(--sev-critical))',
+                background: 'color-mix(in srgb, hsl(var(--sev-critical)) 12%, transparent)', borderRadius: 6, padding: '10px 12px', marginBottom: 12 }}>
                 <strong>{pnl.outliers.length} centre(s) with wastage far above peers</strong>
                 <ul style={{ margin: '6px 0 0', paddingLeft: 20, fontSize: 14 }}>
                   {pnl.outliers.map((o) => (
@@ -154,5 +154,5 @@ export default function RfqPage() {
         </>
       </AsyncState>
     </ModulePage>
-  )
+  );
 }

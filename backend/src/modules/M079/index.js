@@ -8,8 +8,8 @@ router.get('/watersheds/:id/health', controller.monitorWatershedHealth);
 router.post('/watersheds/:id/conservation', controller.implementConservationMeasures);
 router.get('/watersheds/:id/report', controller.generateWatershedReport);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

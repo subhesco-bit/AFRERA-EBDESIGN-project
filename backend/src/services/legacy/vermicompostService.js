@@ -44,7 +44,7 @@ class VermicompostService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting vermicompost:', error);
@@ -59,11 +59,11 @@ class VermicompostService {
     try {
       const query = 'SELECT * FROM vermicompost WHERE id = $1';
       const result = await this.pool.query(query, [vermicompostId]);
-      
+
       if (result.rows.length === 0) {
         throw new Error('Vermicompost not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting vermicompost by ID:', error);
@@ -84,7 +84,7 @@ class VermicompostService {
         bed_size_sqft,
         earthworm_count,
         waste_input_kg,
-        expected_output_kg
+        expected_output_kg,
       } = vermicompostData;
 
       const query = `
@@ -94,7 +94,7 @@ class VermicompostService {
       `;
 
       const result = await this.pool.query(query, [
-        farmer_id, name, location, worm_type, bed_size_sqft, earthworm_count, waste_input_kg, expected_output_kg
+        farmer_id, name, location, worm_type, bed_size_sqft, earthworm_count, waste_input_kg, expected_output_kg,
       ]);
 
       return result.rows[0];
@@ -144,3 +144,4 @@ class VermicompostService {
 }
 
 module.exports = new VermicompostService();
+

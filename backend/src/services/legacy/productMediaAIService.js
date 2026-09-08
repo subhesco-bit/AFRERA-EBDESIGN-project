@@ -115,12 +115,12 @@ async function requestProductImageGeneration(productId, prompt) {
   await pg.query(
     `UPDATE products SET image_generation_status = $1, image_generated_at = CASE WHEN $1 = 'completed' THEN NOW() ELSE image_generated_at END
      WHERE id = $2`,
-    [status, productId]
+    [status, productId],
   );
   if (result.ok && result.imageUrl) {
     await pg.query(
-      `UPDATE products SET images = images || $1::jsonb WHERE id = $2`,
-      [JSON.stringify([result.imageUrl]), productId]
+      'UPDATE products SET images = images || $1::jsonb WHERE id = $2',
+      [JSON.stringify([result.imageUrl]), productId],
     );
   }
   logger.info('Product image generation requested', { productId, status, provider: 'openai_images' });
@@ -158,8 +158,8 @@ async function requestProductCartoonGeneration(productId, prompt) {
 async function buildNutrientComparisonScript(productId) {
   const pg = getPostgreSQL();
   const { rows: productRows } = await pg.query(
-    `SELECT id, name, category_id, gi_status, organic, usp FROM products WHERE id = $1`,
-    [productId]
+    'SELECT id, name, category_id, gi_status, organic, usp FROM products WHERE id = $1',
+    [productId],
   );
   if (!productRows[0]) throw new Error(`Product ${productId} not found`);
   const product = productRows[0];
@@ -168,7 +168,7 @@ async function buildNutrientComparisonScript(productId) {
     `SELECT id, name FROM products
       WHERE category_id = $1 AND id <> $2 AND is_active = true
       ORDER BY featured DESC, created_at DESC LIMIT 3`,
-    [product.category_id, productId]
+    [product.category_id, productId],
   );
 
   const comparisons = [];
@@ -202,8 +202,8 @@ async function buildNutrientComparisonScript(productId) {
   };
 
   await pg.query(
-    `UPDATE products SET video_script = $1 WHERE id = $2`,
-    [JSON.stringify(script), productId]
+    'UPDATE products SET video_script = $1 WHERE id = $2',
+    [JSON.stringify(script), productId],
   );
 
   return script;
@@ -218,7 +218,7 @@ async function requestProductVideoGeneration(productId) {
   await pg.query(
     `UPDATE products SET video_generation_status = $1, video_generated_at = CASE WHEN $1 = 'completed' THEN NOW() ELSE video_generated_at END, video_url = COALESCE($2, video_url)
      WHERE id = $3`,
-    [status, result.ok ? result.videoUrl : null, productId]
+    [status, result.ok ? result.videoUrl : null, productId],
   );
   logger.info('Product video generation requested', { productId, status, provider: 'runway', scenesInScript: script.scenes.length });
   return { productId, script, ...result, recordedStatus: status };
@@ -234,3 +234,4 @@ module.exports = {
   buildNutrientComparisonScript,
   requestProductVideoGeneration,
 };
+

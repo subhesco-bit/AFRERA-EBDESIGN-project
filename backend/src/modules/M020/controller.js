@@ -149,25 +149,25 @@ module.exports = {
   initiatePasswordReset,
   verifyPasswordResetToken,
   resetPassword,
-  
+
   // Security questions
   setupSecurityQuestions,
   verifySecurityQuestions,
-  
+
   // Account lockout
   lockAccount,
   unlockAccount,
   checkAccountLockStatus,
-  
+
   // Recovery tracking
   getRecoveryAttempts,
-  
+
   // AI-powered fraud detection
   detectRecoveryFraud,
-  
+
   // Temporary password
   generateTemporaryPassword,
-  
+
   // Analytics
   getRecoveryAnalytics,
 };

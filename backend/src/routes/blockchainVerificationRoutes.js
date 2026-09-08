@@ -11,11 +11,11 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * POST /api/blockchain/transactions/product
@@ -34,7 +34,7 @@ router.post('/transactions/product',
       }
 
       const result = await blockchainService.createProductTransaction(productData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Product transaction created on blockchain');
       } else {
@@ -43,7 +43,7 @@ router.post('/transactions/product',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to create product transaction', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -57,7 +57,7 @@ router.post('/transactions/custody',
       const transferData = req.body;
 
       const result = await blockchainService.addCustodyTransfer(transferData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Custody transfer recorded on blockchain');
       } else {
@@ -66,7 +66,7 @@ router.post('/transactions/custody',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to add custody transfer', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -80,7 +80,7 @@ router.get('/products/:productId/verify',
       const { productId } = req.params;
 
       const result = await blockchainService.verifyProductAuthenticity(productId);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Product authenticity verified');
       } else {
@@ -89,7 +89,7 @@ router.get('/products/:productId/verify',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to verify product authenticity', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -103,7 +103,7 @@ router.get('/products/:productId/traceability',
       const { productId } = req.params;
 
       const result = await blockchainService.getProductTraceabilityReport(productId);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Product traceability report generated');
       } else {
@@ -112,7 +112,7 @@ router.get('/products/:productId/traceability',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to generate traceability report', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -126,16 +126,16 @@ router.get('/transactions/:productId/history',
       const { productId } = req.params;
 
       const history = await blockchainService.getProductTransactionHistory(productId);
-      
+
       return apiResponseHandler.sendSuccess(res, {
         productId,
         transactionCount: history.length,
-        transactions: history
+        transactions: history,
       }, 'Product transaction history retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get transaction history', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -147,7 +147,7 @@ router.get('/stats',
   async (req, res) => {
     try {
       const result = await blockchainService.getBlockchainStats();
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Blockchain statistics retrieved');
       } else {
@@ -156,7 +156,7 @@ router.get('/stats',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get blockchain statistics', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -168,7 +168,7 @@ router.post('/transactions/process',
   async (req, res) => {
     try {
       const result = await blockchainService.processPendingTransactions();
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, result.message);
       } else {
@@ -177,7 +177,7 @@ router.post('/transactions/process',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to process pending transactions', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -189,12 +189,12 @@ router.get('/transactions/pending',
   async (req, res) => {
     try {
       const pending = blockchainService.getPendingTransactions();
-      
+
       return apiResponseHandler.sendSuccess(res, pending, 'Pending transactions retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get pending transactions', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 module.exports = router;

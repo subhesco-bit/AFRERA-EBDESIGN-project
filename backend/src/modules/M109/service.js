@@ -25,7 +25,7 @@ async function registerSparePart(partData) {
       supplier,
       location,
       state,
-      district
+      district,
     } = partData;
 
     const part = {
@@ -44,7 +44,7 @@ async function registerSparePart(partData) {
       state,
       district,
       status: 'in_stock',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered inventory optimization
@@ -55,8 +55,8 @@ async function registerSparePart(partData) {
         demand_forecast: await getDemandForecast(part_number, category),
         lead_time_analysis: await analyzeLeadTime(supplier, category),
         consumption_patterns: await getConsumptionPatterns(part_number),
-        optimal_stock_level: await calculateOptimalStock(part_number, category)
-      }
+        optimal_stock_level: await calculateOptimalStock(part_number, category),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -86,8 +86,8 @@ async function registerSparePart(partData) {
         part.district,
         part.status,
         JSON.stringify(part.ai_recommendations),
-        part.created_at
-      ]
+        part.created_at,
+      ],
     );
 
     logger.info(`Spare part registered: ${part.part_id}`);
@@ -110,7 +110,7 @@ async function recordPartConsumption(consumptionData) {
       used_by,
       work_order_id,
       consumption_date,
-      notes
+      notes,
     } = consumptionData;
 
     const consumption = {
@@ -122,7 +122,7 @@ async function recordPartConsumption(consumptionData) {
       work_order_id,
       consumption_date,
       notes,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered consumption analysis
@@ -133,8 +133,8 @@ async function recordPartConsumption(consumptionData) {
         consumption_history: await getConsumptionHistory(part_id),
         abnormal_consumption: await detectAbnormalConsumption(part_id, quantity),
         replacement_prediction: await predictReplacementNeed(part_id, equipment_id),
-        cost_impact: await calculateCostImpact(part_id, quantity)
-      }
+        cost_impact: await calculateCostImpact(part_id, quantity),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -144,7 +144,7 @@ async function recordPartConsumption(consumptionData) {
       `UPDATE spare_parts_inventory 
        SET quantity_in_stock = quantity_in_stock - $1, updated_at = CURRENT_TIMESTAMP
        WHERE part_id = $2`,
-      [quantity, part_id]
+      [quantity, part_id],
     );
 
     const result = await pool.query(
@@ -163,8 +163,8 @@ async function recordPartConsumption(consumptionData) {
         consumption.consumption_date,
         consumption.notes,
         JSON.stringify(consumption.ai_analysis),
-        consumption.created_at
-      ]
+        consumption.created_at,
+      ],
     );
 
     logger.info(`Part consumption recorded: ${consumption.consumption_id}`);
@@ -189,7 +189,7 @@ async function trackInventoryStatus(partId, period) {
       consumption_rate: await getConsumptionRate(partId, period),
       reorder_status: await getReorderStatus(partId),
       lead_time: await getLeadTime(partId),
-      recommendations: await generateInventoryRecommendations(partId, period)
+      recommendations: await generateInventoryRecommendations(partId, period),
     };
 
     return status;
@@ -214,7 +214,7 @@ async function generateInventoryReport(farmerId, reportType) {
       low_stock_items: await getLowStockItems(farmerId),
       consumption_summary: await getConsumptionSummary(farmerId),
       supplier_performance: await getSupplierPerformance(farmerId),
-      recommendations: await generateInventoryRecommendationsReport(farmerId)
+      recommendations: await generateInventoryRecommendationsReport(farmerId),
     };
 
     return report;
@@ -232,14 +232,14 @@ async function getDemandForecast(partNumber, category) {
   return {
     forecast: 'stable',
     expected_demand: 10,
-    confidence: 0.85
+    confidence: 0.85,
   };
 }
 
 async function analyzeLeadTime(supplier, category) {
   return {
     average_lead_time: 7,
-    lead_time_range: { min: 5, max: 10 }
+    lead_time_range: { min: 5, max: 10 },
   };
 }
 
@@ -247,7 +247,7 @@ async function getConsumptionPatterns(partNumber) {
   return {
     average_monthly: 5,
     peak_season: 8,
-    off_season: 2
+    off_season: 2,
   };
 }
 
@@ -255,7 +255,7 @@ async function calculateOptimalStock(partNumber, category) {
   return {
     optimal_level: 20,
     safety_stock: 5,
-    reorder_point: 10
+    reorder_point: 10,
   };
 }
 
@@ -263,7 +263,7 @@ async function getConsumptionHistory(partId) {
   try {
     const result = await pool.query(
       'SELECT * FROM spare_parts_consumption WHERE part_id = $1 ORDER BY consumption_date DESC LIMIT 10',
-      [partId]
+      [partId],
     );
     return result.rows;
   } catch (error) {
@@ -274,14 +274,14 @@ async function getConsumptionHistory(partId) {
 async function detectAbnormalConsumption(partId, quantity) {
   return {
     abnormal: quantity > 5,
-    severity: quantity > 5 ? 'high' : 'normal'
+    severity: quantity > 5 ? 'high' : 'normal',
   };
 }
 
 async function predictReplacementNeed(partId, equipmentId) {
   return {
     next_replacement: '30 days',
-    confidence: 0.8
+    confidence: 0.8,
   };
 }
 
@@ -289,12 +289,12 @@ async function calculateCostImpact(partId, quantity) {
   try {
     const result = await pool.query(
       'SELECT unit_cost FROM spare_parts_inventory WHERE part_id = $1',
-      [partId]
+      [partId],
     );
     const unitCost = result.rows[0]?.unit_cost || 0;
     return {
       total_cost: unitCost * quantity,
-      cost_per_unit: unitCost
+      cost_per_unit: unitCost,
     };
   } catch (error) {
     return { total_cost: 0, cost_per_unit: 0 };
@@ -305,7 +305,7 @@ async function getCurrentStock(partId) {
   try {
     const result = await pool.query(
       'SELECT quantity_in_stock FROM spare_parts_inventory WHERE part_id = $1',
-      [partId]
+      [partId],
     );
     return result.rows[0]?.quantity_in_stock || 0;
   } catch (error) {
@@ -317,7 +317,7 @@ async function getConsumptionRate(partId, period) {
   return {
     total_consumed: 15,
     average_daily: 0.5,
-    trend: 'stable'
+    trend: 'stable',
   };
 }
 
@@ -326,12 +326,12 @@ async function getReorderStatus(partId) {
   try {
     const result = await pool.query(
       'SELECT reorder_level FROM spare_parts_inventory WHERE part_id = $1',
-      [partId]
+      [partId],
     );
     const reorderLevel = result.rows[0]?.reorder_level || 10;
     return {
       needs_reorder: stock <= reorderLevel,
-      urgency: stock < reorderLevel / 2 ? 'high' : 'normal'
+      urgency: stock < reorderLevel / 2 ? 'high' : 'normal',
     };
   } catch (error) {
     return { needs_reorder: false, urgency: 'normal' };
@@ -341,7 +341,7 @@ async function getReorderStatus(partId) {
 async function getLeadTime(partId) {
   return {
     average_days: 7,
-    current_status: 'on_track'
+    current_status: 'on_track',
   };
 }
 
@@ -349,7 +349,7 @@ async function generateInventoryRecommendations(partId, period) {
   return [
     'Monitor stock levels regularly',
     'Consider bulk ordering for discounts',
-    'Maintain safety stock for critical parts'
+    'Maintain safety stock for critical parts',
   ];
 }
 
@@ -357,7 +357,7 @@ async function getTotalParts(farmerId) {
   try {
     const result = await pool.query(
       'SELECT COUNT(*) as count FROM spare_parts_inventory WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -369,7 +369,7 @@ async function getTotalInventoryValue(farmerId) {
   try {
     const result = await pool.query(
       'SELECT SUM(quantity_in_stock * unit_cost) as total FROM spare_parts_inventory WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.total || 0;
   } catch (error) {
@@ -381,7 +381,7 @@ async function getLowStockItems(farmerId) {
   try {
     const result = await pool.query(
       'SELECT * FROM spare_parts_inventory WHERE farmer_id = $1 AND quantity_in_stock <= reorder_level',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -393,14 +393,14 @@ async function getConsumptionSummary(farmerId) {
   return {
     total_consumed: 100,
     total_cost: 50000,
-    average_cost_per_part: 500
+    average_cost_per_part: 500,
   };
 }
 
 async function getSupplierPerformance(farmerId) {
   return [
     { supplier: 'A', rating: 4.5, on_time_delivery: 95 },
-    { supplier: 'B', rating: 4.0, on_time_delivery: 90 }
+    { supplier: 'B', rating: 4.0, on_time_delivery: 90 },
   ];
 }
 
@@ -408,7 +408,7 @@ async function generateInventoryRecommendationsReport(farmerId) {
   return [
     'Implement just-in-time inventory',
     'Diversify supplier base',
-    'Use AI for demand forecasting'
+    'Use AI for demand forecasting',
   ];
 }
 
@@ -429,7 +429,7 @@ async function listSpareParts({ page = 1, limit = 20, farmer_id = null, status =
   const listParams = [...params, limit, offset];
   const res = await pool.query(
     `SELECT * FROM spare_parts_inventory ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams
+    listParams,
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
 }
@@ -445,6 +445,6 @@ module.exports = {
   registerSparePart,
   recordPartConsumption,
   trackInventoryStatus,
-  generateInventoryReport
+  generateInventoryReport,
 };
 

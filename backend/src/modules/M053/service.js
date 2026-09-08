@@ -20,7 +20,7 @@ async function createOrder(orderData) {
       payment_method,
       delivery_method,
       notes,
-      metadata
+      metadata,
     } = orderData;
 
     const order = {
@@ -36,7 +36,7 @@ async function createOrder(orderData) {
       shipping_cost: calculateShippingCost(items, delivery_method),
       total: 0,
       status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     order.total = order.subtotal + order.tax + order.shipping_cost;
@@ -49,8 +49,8 @@ async function createOrder(orderData) {
         inventory_check: await checkInventoryAvailability(items),
         delivery_optimization: await optimizeDeliveryRoute(shipping_address, items),
         payment_risk: await assessPaymentRisk(customer_id, order.total),
-        fraud_detection: await detectFraud(orderData)
-      }
+        fraud_detection: await detectFraud(orderData),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -80,8 +80,8 @@ async function createOrder(orderData) {
         JSON.stringify(order.ai_recommendations),
         notes,
         JSON.stringify(metadata || {}),
-        order.created_at
-      ]
+        order.created_at,
+      ],
     );
 
     // Deduct inventory
@@ -101,39 +101,39 @@ async function createOrder(orderData) {
 async function listOrders({ page = 1, limit = 20, status = null, customerId = null } = {}) {
   try {
     const offset = (page - 1) * limit;
-    
+
     let countQuery = 'SELECT COUNT(*) FROM orders';
-    let countParams = [];
-    let conditions = [];
-    
+    const countParams = [];
+    const conditions = [];
+
     if (status) {
-      conditions.push('status = $' + (conditions.length + 1));
+      conditions.push(`status = $${ conditions.length + 1}`);
       countParams.push(status);
     }
     if (customerId) {
-      conditions.push('customer_id = $' + (conditions.length + 1));
+      conditions.push(`customer_id = $${ conditions.length + 1}`);
       countParams.push(customerId);
     }
-    
+
     if (conditions.length > 0) {
-      countQuery += ' WHERE ' + conditions.join(' AND ');
+      countQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
+
     const totalRes = await pool.query(countQuery, countParams);
     const total = parseInt(totalRes.rows[0].count || '0');
-    
+
     let dataQuery = 'SELECT * FROM orders';
-    let dataParams = [...countParams];
-    
+    const dataParams = [...countParams];
+
     if (conditions.length > 0) {
-      dataQuery += ' WHERE ' + conditions.join(' AND ');
+      dataQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
-    dataQuery += ' ORDER BY created_at DESC LIMIT $' + (dataParams.length + 1) + ' OFFSET $' + (dataParams.length + 2);
+
+    dataQuery += ` ORDER BY created_at DESC LIMIT $${ dataParams.length + 1 } OFFSET $${ dataParams.length + 2}`;
     dataParams.push(limit, offset);
-    
+
     const res = await pool.query(dataQuery, dataParams);
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   } catch (error) {
     logger.error('Error listing orders', { error: error.message });
     throw new Error('Failed to list orders');
@@ -163,7 +163,7 @@ async function updateOrderStatus(orderId, status, notes = null) {
        SET status = $1, notes = COALESCE($2, notes), updated_at = NOW()
        WHERE order_id = $3
        RETURNING *`,
-      [status, notes, orderId]
+      [status, notes, orderId],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -190,7 +190,7 @@ async function cancelOrder(orderId, reason = null) {
        SET status = 'cancelled', cancellation_reason = $1, cancelled_at = NOW()
        WHERE order_id = $2
        RETURNING *`,
-      [reason, orderId]
+      [reason, orderId],
     );
 
     return result.rows[0];
@@ -218,7 +218,7 @@ async function processPayment(orderId, paymentDetails) {
       payment_status: 'processing',
       transaction_id: paymentDetails.transaction_id,
       payment_details: paymentDetails,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered payment risk assessment
@@ -228,8 +228,8 @@ async function processPayment(orderId, paymentDetails) {
         payment_details: paymentDetails,
         order_data: order,
         customer_history: await getCustomerPaymentHistory(order.customer_id),
-        fraud_indicators: await checkFraudIndicators(paymentDetails)
-      }
+        fraud_indicators: await checkFraudIndicators(paymentDetails),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -250,8 +250,8 @@ async function processPayment(orderId, paymentDetails) {
         payment.transaction_id,
         JSON.stringify(payment.payment_details),
         JSON.stringify(payment.risk_assessment),
-        payment.created_at
-      ]
+        payment.created_at,
+      ],
     );
 
     // Update order status
@@ -280,7 +280,7 @@ async function trackOrder(orderId) {
       tracking_info: tracking,
       estimated_delivery: await calculateEstimatedDelivery(orderId),
       current_location: await getCurrentLocation(orderId),
-      milestones: await getOrderMilestones(orderId)
+      milestones: await getOrderMilestones(orderId),
     };
 
     return trackingInfo;
@@ -320,7 +320,7 @@ async function checkInventoryAvailability(items) {
       product_id: item.product_id,
       available: res.rows[0]?.quantity || 0,
       requested: item.quantity,
-      in_stock: (res.rows[0]?.quantity || 0) >= item.quantity
+      in_stock: (res.rows[0]?.quantity || 0) >= item.quantity,
     });
   }
   return availability;
@@ -331,7 +331,7 @@ async function optimizeDeliveryRoute(address, items) {
     estimated_distance: 50,
     estimated_time: '2-3 days',
     recommended_carrier: 'local_logistics',
-    cost_optimization: 'standard'
+    cost_optimization: 'standard',
   };
 }
 
@@ -339,7 +339,7 @@ async function assessPaymentRisk(customerId, amount) {
   return {
     risk_level: 'low',
     confidence: 0.95,
-    factors: ['good_payment_history', 'verified_customer']
+    factors: ['good_payment_history', 'verified_customer'],
   };
 }
 
@@ -347,7 +347,7 @@ async function detectFraud(orderData) {
   return {
     fraud_score: 0.1,
     indicators: [],
-    recommendation: 'approve'
+    recommendation: 'approve',
   };
 }
 
@@ -355,7 +355,7 @@ async function deductInventory(items) {
   for (const item of items) {
     await pool.query(
       'UPDATE products SET quantity = quantity - $1 WHERE product_id = $2',
-      [item.quantity, item.product_id]
+      [item.quantity, item.product_id],
     );
   }
 }
@@ -364,7 +364,7 @@ async function restoreInventory(items) {
   for (const item of items) {
     await pool.query(
       'UPDATE products SET quantity = quantity + $1 WHERE product_id = $2',
-      [item.quantity, item.product_id]
+      [item.quantity, item.product_id],
     );
   }
 }
@@ -395,7 +395,7 @@ async function getOrderMilestones(orderId) {
     { status: 'order_placed', timestamp: new Date().toISOString() },
     { status: 'processing', timestamp: null },
     { status: 'shipped', timestamp: null },
-    { status: 'delivered', timestamp: null }
+    { status: 'delivered', timestamp: null },
   ];
 }
 
@@ -406,6 +406,6 @@ module.exports = {
   updateOrderStatus,
   cancelOrder,
   processPayment,
-  trackOrder
+  trackOrder,
 };
 

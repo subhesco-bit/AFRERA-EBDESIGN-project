@@ -25,7 +25,7 @@ class AuditService {
       ipAddress,
       userAgent,
       status = 'success',
-      metadata = {}
+      metadata = {},
     } = eventData;
 
     try {
@@ -46,7 +46,7 @@ class AuditService {
         ipAddress,
         userAgent,
         status,
-        JSON.stringify(metadata)
+        JSON.stringify(metadata),
       ]);
 
       logger.info(`Audit event logged: ${action} on ${entityType}:${entityId}`);
@@ -249,7 +249,7 @@ class AuditService {
         period: { startDate, endDate },
         filters,
         summary: result.rows,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error generating audit report', { error: error.message, stack: error.stack });
@@ -283,7 +283,7 @@ class AuditService {
         complianceType,
         period,
         events: result.rows,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error getting compliance audit', { error: error.message, stack: error.stack });
@@ -338,7 +338,7 @@ class AuditService {
       return {
         securityEvents: result.rows,
         filters,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error getting security audit', { error: error.message, stack: error.stack });
@@ -354,8 +354,8 @@ class AuditService {
       const logs = await this.getEntityLogs(filters.entityType, filters.entityId, filters);
 
       const csvHeader = 'Timestamp,User,Action,Entity Type,Entity ID,Status,IP Address\n';
-      const csvRows = logs.map(log => 
-        `${log.created_at},${log.user_name || 'System'},${log.action},${log.entity_type},${log.entity_id},${log.status},${log.ip_address}`
+      const csvRows = logs.map(log =>
+        `${log.created_at},${log.user_name || 'System'},${log.action},${log.entity_type},${log.entity_id},${log.status},${log.ip_address}`,
       ).join('\n');
 
       return csvHeader + csvRows;
@@ -367,3 +367,4 @@ class AuditService {
 }
 
 module.exports = new AuditService();
+

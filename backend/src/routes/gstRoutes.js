@@ -103,10 +103,10 @@ router.post('/validate/gst-number', async (req, res) => {
       return res.status(400).json({ error: 'GST number is required' });
     }
     const isValid = gstService.validateGSTNumber(gstNumber);
-    res.json({ 
+    res.json({
       gstNumber,
       isValid,
-      message: isValid ? 'Valid GST number format' : 'Invalid GST number format'
+      message: isValid ? 'Valid GST number format' : 'Invalid GST number format',
     });
   } catch (error) {
     logger.error('Validate GST number API error', { error: error.message, stack: error.stack });
@@ -120,9 +120,9 @@ router.post('/validate/gst-number', async (req, res) => {
 router.get('/rate/:category', async (req, res) => {
   try {
     const rate = gstService.getGSTRate(req.params.category);
-    res.json({ 
+    res.json({
       category: req.params.category,
-      gstRate: rate 
+      gstRate: rate,
     });
   } catch (error) {
     logger.error('Get GST rate API error', { error: error.message, stack: error.stack });
@@ -141,7 +141,7 @@ router.get('/rates', authMiddleware, async (req, res) => {
   try {
     const pool = gstService.pool;
     const result = await pool.query(
-      'SELECT * FROM gst_rates WHERE is_active = true ORDER BY product_category'
+      'SELECT * FROM gst_rates WHERE is_active = true ORDER BY product_category',
     );
     res.json(result.rows);
   } catch (error) {
@@ -156,10 +156,10 @@ router.get('/rates', authMiddleware, async (req, res) => {
 router.post('/rates', authMiddleware, async (req, res) => {
   try {
     const { productCategory, gstRate, hsnCode, description, effectiveDate } = req.body;
-    
+
     if (!productCategory || !gstRate || !effectiveDate) {
-      return res.status(400).json({ 
-        error: 'productCategory, gstRate, and effectiveDate are required' 
+      return res.status(400).json({
+        error: 'productCategory, gstRate, and effectiveDate are required',
       });
     }
 
@@ -177,7 +177,7 @@ router.post('/rates', authMiddleware, async (req, res) => {
          is_active = true,
          updated_at = CURRENT_TIMESTAMP
        RETURNING *`,
-      [productCategory, gstRate, hsnCode, description, effectiveDate]
+      [productCategory, gstRate, hsnCode, description, effectiveDate],
     );
 
     res.status(201).json(result.rows[0]);
@@ -195,7 +195,7 @@ router.delete('/rates/:category', authMiddleware, requireRole(...PLATFORM_STAFF_
     const pool = gstService.pool;
     const result = await pool.query(
       'UPDATE gst_rates SET is_active = false, updated_at = CURRENT_TIMESTAMP WHERE product_category = $1 RETURNING *',
-      [req.params.category]
+      [req.params.category],
     );
 
     if (result.rows.length === 0) {
@@ -226,7 +226,7 @@ router.post('/returns', authMiddleware, async (req, res) => {
       taxpayerState,
       dueDate,
       totalTurnover,
-      totalTaxLiability
+      totalTaxLiability,
     } = req.body;
 
     const pool = gstService.pool;
@@ -236,8 +236,8 @@ router.post('/returns', authMiddleware, async (req, res) => {
         due_date, total_turnover, total_tax_liability, return_status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
        RETURNING *`,
-      [returnPeriod, returnType, taxpayerGstNumber, taxpayerName, taxpayerState, 
-       dueDate, totalTurnover, totalTaxLiability]
+      [returnPeriod, returnType, taxpayerGstNumber, taxpayerName, taxpayerState,
+        dueDate, totalTurnover, totalTaxLiability],
     );
 
     res.status(201).json(result.rows[0]);
@@ -253,7 +253,7 @@ router.post('/returns', authMiddleware, async (req, res) => {
 router.get('/returns', authMiddleware, async (req, res) => {
   try {
     const { taxpayerGstNumber, returnType, status, startDate, endDate } = req.query;
-    
+
     let query = 'SELECT * FROM gst_returns WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -316,7 +316,7 @@ router.put('/returns/:returnId/status', authMiddleware, requireRole(...PLATFORM_
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $4
        RETURNING *`,
-      [returnStatus, acknowledgmentNumber, filedBy, req.params.returnId]
+      [returnStatus, acknowledgmentNumber, filedBy, req.params.returnId],
     );
 
     if (result.rows.length === 0) {
@@ -346,7 +346,7 @@ router.post('/payments', authMiddleware, async (req, res) => {
       amount,
       paymentDate,
       paymentMethod,
-      transactionId
+      transactionId,
     } = req.body;
 
     const pool = gstService.pool;
@@ -355,7 +355,7 @@ router.post('/payments', authMiddleware, async (req, res) => {
        (return_id, payment_type, tax_type, amount, payment_date, payment_method, transaction_id, payment_status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
        RETURNING *`,
-      [returnId, paymentType, taxType, amount, paymentDate, paymentMethod, transactionId]
+      [returnId, paymentType, taxType, amount, paymentDate, paymentMethod, transactionId],
     );
 
     res.status(201).json(result.rows[0]);
@@ -371,7 +371,7 @@ router.post('/payments', authMiddleware, async (req, res) => {
 router.get('/payments', authMiddleware, async (req, res) => {
   try {
     const { returnId, paymentType, status, startDate, endDate } = req.query;
-    
+
     let query = 'SELECT * FROM gst_payments WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -434,7 +434,7 @@ router.put('/payments/:paymentId/status', authMiddleware, requireRole(...PLATFOR
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $5
        RETURNING *`,
-      [paymentStatus, challanNumber, bankName, branchName, req.params.paymentId]
+      [paymentStatus, challanNumber, bankName, branchName, req.params.paymentId],
     );
 
     if (result.rows.length === 0) {

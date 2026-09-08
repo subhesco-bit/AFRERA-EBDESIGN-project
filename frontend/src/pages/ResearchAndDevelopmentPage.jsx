@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { FlaskConical } from 'lucide-react'
-import { researchAndDevelopmentAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { FlaskConical } from 'lucide-react';
+import { researchAndDevelopmentAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/researchAndDevelopmentRoutes.js +
@@ -19,10 +19,10 @@ const TABS = [
   ['publications', 'Publications'],
   ['ai', 'AI Assistance & Knowledge'],
   ['analytics', 'Analytics'],
-]
+];
 
 function ResearchAndDevelopmentPage() {
-  const [tab, setTab] = useState('projects')
+  const [tab, setTab] = useState('projects');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -101,7 +101,7 @@ function ResearchAndDevelopmentPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default ResearchAndDevelopmentPage
+export default ResearchAndDevelopmentPage;

@@ -8,7 +8,7 @@
  * - High-stakes decisions have human approval
  * - Consistent prompt engineering
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class AICoordinator {
   constructor() {

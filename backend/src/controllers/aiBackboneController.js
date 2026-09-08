@@ -1,6 +1,6 @@
 /**
  * AI Backbone Controller - Real AI Integration
- * 
+ *
  * REST API controller for AI backbone with real AI provider integrations
  * Handles HTTP requests and responses for AI operations
  */
@@ -87,7 +87,7 @@ const aiBackboneController = {
       logger.error('Error in livestock optimization', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 module.exports = aiBackboneController;

@@ -59,7 +59,7 @@ CREATE INDEX IF NOT EXISTS idx_product_listings_search ON product_listings USING
 -- GI Marketplace Listings Table (enhanced version)
 CREATE TABLE IF NOT EXISTS gi_marketplace_listings (
     id VARCHAR(50) PRIMARY KEY,
-    gi_product_id INTEGER REFERENCES gi_products(id),
+    gi_product_id UUID REFERENCES gi_products(id),
     product_id VARCHAR(50) REFERENCES product_listings(id),
     seller_id VARCHAR(50) NOT NULL REFERENCES users(id),
     listing_title VARCHAR(255) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS gi_marketplace_listings (
     premium_percentage DECIMAL(5, 2) DEFAULT 0,
     quality_tier VARCHAR(20),
     harvest_date DATE,
-    location_id INTEGER REFERENCES addresses(id),
+    location_id UUID REFERENCES addresses(id),
     listing_status VARCHAR(20) DEFAULT 'active',
     authenticity_verified BOOLEAN DEFAULT FALSE,
     authenticity_score DECIMAL(3, 2),
@@ -262,8 +262,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply trigger to all relevant tables
-CREATE TRIGGER update_product_listings_updated_at BEFORE UPDATE ON product_listings
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'update_product_listings_updated_at'
+          AND tgrelid = 'product_listings'::regclass
+    ) THEN
+        CREATE TRIGGER update_product_listings_updated_at BEFORE UPDATE ON product_listings
+            FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    END IF;
+END
+$$;
 
 CREATE TRIGGER update_gi_marketplace_listings_updated_at BEFORE UPDATE ON gi_marketplace_listings
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -274,8 +284,18 @@ CREATE TRIGGER update_product_reviews_updated_at BEFORE UPDATE ON product_review
 CREATE TRIGGER update_bulk_orders_updated_at BEFORE UPDATE ON bulk_orders
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_quotations_updated_at BEFORE UPDATE ON quotations
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'update_quotations_updated_at'
+          AND tgrelid = 'quotations'::regclass
+    ) THEN
+        CREATE TRIGGER update_quotations_updated_at BEFORE UPDATE ON quotations
+            FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    END IF;
+END
+$$;
 
 -- Comments for documentation
 COMMENT ON TABLE product_listings IS 'Main product listings table with AI-powered features';

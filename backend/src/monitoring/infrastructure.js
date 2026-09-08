@@ -40,7 +40,7 @@ class MonitoringInfrastructure {
       system: this.collectSystemMetrics,
       application: this.collectApplicationMetrics,
       database: this.collectDatabaseMetrics,
-      external: this.collectExternalMetrics
+      external: this.collectExternalMetrics,
     };
   }
 
@@ -52,15 +52,15 @@ class MonitoringInfrastructure {
       error: 0,
       warn: 1,
       info: 2,
-      debug: 3
+      debug: 3,
     };
-    
+
     this.logCategories = {
       system: [],
       application: [],
       security: [],
       performance: [],
-      business: []
+      business: [],
     };
   }
 
@@ -72,18 +72,18 @@ class MonitoringInfrastructure {
       error_threshold: {
         check: (data) => data.error_count > 10,
         severity: 'critical',
-        message: 'High error rate detected'
+        message: 'High error rate detected',
       },
       performance_degradation: {
         check: (data) => data.response_time > 1000,
         severity: 'warning',
-        message: 'Performance degradation detected'
+        message: 'Performance degradation detected',
       },
       resource_exhaustion: {
         check: (data) => data.cpu_usage > 90 || data.memory_usage > 90,
         severity: 'critical',
-        message: 'Resource exhaustion imminent'
-      }
+        message: 'Resource exhaustion imminent',
+      },
     };
   }
 
@@ -105,7 +105,7 @@ class MonitoringInfrastructure {
       total_memory: process.memoryUsage().heapTotal / 1024 / 1024,
       uptime: process.uptime(),
       load_average: require('os').loadavg(),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -118,7 +118,7 @@ class MonitoringInfrastructure {
       error_count: this.metrics.get('error_count') || 0,
       avg_response_time: this.metrics.get('avg_response_time') || 0,
       active_connections: this.metrics.get('active_connections') || 0,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -136,16 +136,16 @@ class MonitoringInfrastructure {
         connection_pool: {
           total: pg.totalCount || 10,
           idle: pg.idleCount || 5,
-          waiting: pg.waitingCount || 0
+          waiting: pg.waitingCount || 0,
         },
         query_latency: latency,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     } catch (error) {
       logger.error('Error collecting database metrics:', error);
       return {
         error: error.message,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
   }
@@ -158,7 +158,7 @@ class MonitoringInfrastructure {
       ai_gateway: this.metrics.get('ai_gateway_calls') || 0,
       analytics: this.metrics.get('analytics_calls') || 0,
       monitoring: this.metrics.get('monitoring_calls') || 0,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -179,7 +179,7 @@ class MonitoringInfrastructure {
       application: this.collectApplicationMetrics(),
       database: this.collectDatabaseMetrics(),
       external: this.collectExternalMetrics(),
-      custom: Object.fromEntries(this.metrics)
+      custom: Object.fromEntries(this.metrics),
     };
   }
 
@@ -193,11 +193,11 @@ class MonitoringInfrastructure {
       category,
       message,
       metadata,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.logs.push(logEntry);
-    
+
     // Add to category
     if (this.logCategories[category]) {
       this.logCategories[category].push(logEntry);
@@ -250,7 +250,7 @@ class MonitoringInfrastructure {
       end_time: null,
       duration: null,
       metadata: {},
-      status: 'active'
+      status: 'active',
     };
 
     this.traceSpans.push(span);
@@ -297,7 +297,7 @@ class MonitoringInfrastructure {
           rule: ruleName,
           severity: rule.severity,
           message: rule.message,
-          triggered_at: new Date().toISOString()
+          triggered_at: new Date().toISOString(),
         });
       }
     }
@@ -329,18 +329,18 @@ class MonitoringInfrastructure {
 
       return {
         status: alertStatus.length === 0 ? 'healthy' : 'degraded',
-        metrics: metrics,
+        metrics,
         alerts: alertStatus,
         log_count: this.logs.length,
         trace_count: this.traceSpans.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Monitoring infrastructure health check failed:', error);
       return {
         status: 'unhealthy',
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }

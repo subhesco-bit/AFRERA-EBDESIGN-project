@@ -8,8 +8,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
+import { NativeSelect as Select } from '../components/ui/select';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
+import { predictiveAnalyticsAPI } from '../services/api';
 
 const PredictiveIntelligencePage = () => {
   const [cropType, setCropType] = useState('rice');
@@ -18,21 +19,17 @@ const PredictiveIntelligencePage = () => {
   const [activeTab, setActiveTab] = useState('demand');
 
   // Demand forecast
-  const { data: demandData, isLoading: demandLoading } = useQuery({
+  const { data: demandData, isLoading: demandLoading, error: demandError } = useQuery({
     queryKey: ['demandForecast', cropType, region, forecastDays],
-    queryFn: () => fetch(`/api/predictive/demand/${cropType}?region=${region}&forecastDays=${forecastDays}`)
-      .then(res => res.json())
-      .then(res => res.data),
-    enabled: activeTab === 'demand'
+    queryFn: () => predictiveAnalyticsAPI.getDemandForecast(cropType, { region, forecastDays }).then(res => res.data.data),
+    enabled: activeTab === 'demand',
   });
 
   // Pricing prediction
-  const { data: pricingData, isLoading: pricingLoading } = useQuery({
+  const { data: pricingData, isLoading: pricingLoading, error: pricingError } = useQuery({
     queryKey: ['pricingPrediction', cropType, region],
-    queryFn: () => fetch(`/api/predictive/pricing/${cropType}?region=${region}`)
-      .then(res => res.json())
-      .then(res => res.data),
-    enabled: activeTab === 'pricing'
+    queryFn: () => predictiveAnalyticsAPI.getPricingPrediction(cropType, { region }).then(res => res.data.data),
+    enabled: activeTab === 'pricing',
   });
 
   const cropTypes = ['rice', 'wheat', 'maize', 'vegetables', 'fruits'];
@@ -64,9 +61,9 @@ const PredictiveIntelligencePage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Forecast Days</label>
-            <Input 
-              type="number" 
-              value={forecastDays} 
+            <Input
+              type="number"
+              value={forecastDays}
               onChange={(e) => setForecastDays(parseInt(e.target.value))}
               min="7"
               max="90"
@@ -97,6 +94,10 @@ const PredictiveIntelligencePage = () => {
           <h2 className="text-xl font-semibold mb-4">Demand Forecast</h2>
           {demandLoading ? (
             <LoadingSkeleton variant="rectangular" lines={4} />
+          ) : demandError ? (
+            <p className="rounded border border-red-200 bg-red-50 p-4 text-red-700">
+              Unable to load demand forecast: {demandError.message}
+            </p>
           ) : demandData ? (
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
@@ -119,7 +120,7 @@ const PredictiveIntelligencePage = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
                 <p className="text-gray-500">Demand forecast chart would render here</p>
               </div>
@@ -132,8 +133,8 @@ const PredictiveIntelligencePage = () => {
                     <span className="font-medium">{Math.round(day.predictedDemand)} units</span>
                     <span className={`text-xs px-2 py-1 rounded ${
                       day.trend === 'increasing' ? 'bg-green-100 text-green-800' :
-                      day.trend === 'decreasing' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
+                        day.trend === 'decreasing' ? 'bg-red-100 text-red-800' :
+                          'bg-gray-100 text-gray-800'
                     }`}>
                       {day.trend}
                     </span>
@@ -153,6 +154,10 @@ const PredictiveIntelligencePage = () => {
           <h2 className="text-xl font-semibold mb-4">Optimal Pricing Prediction</h2>
           {pricingLoading ? (
             <LoadingSkeleton variant="rectangular" lines={4} />
+          ) : pricingError ? (
+            <p className="rounded border border-red-200 bg-red-50 p-4 text-red-700">
+              Unable to load pricing prediction: {pricingError.message}
+            </p>
           ) : pricingData ? (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

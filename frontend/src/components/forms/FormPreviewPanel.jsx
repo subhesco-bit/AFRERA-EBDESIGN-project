@@ -1,12 +1,12 @@
 function FormPreviewPanel({ draft, onSubmit }) {
   const renderInput = (field) => {
-    const commonClassName = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500'
+    const commonClassName = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500';
 
     switch (field.type) {
       case 'number':
-        return <input aria-label="Number" type="number" className={commonClassName} placeholder={field.placeholder || ''} />
+        return <input aria-label="Number" type="number" className={commonClassName} placeholder={field.placeholder || ''} />;
       case 'date':
-        return <input aria-label="Date" type="date" className={commonClassName} />
+        return <input aria-label="Date" type="date" className={commonClassName} />;
       case 'select':
         return (
           <select aria-label="Select an option" className={commonClassName}>
@@ -16,15 +16,15 @@ function FormPreviewPanel({ draft, onSubmit }) {
               </option>
             ))}
           </select>
-        )
+        );
       case 'file':
-        return <input aria-label="File" type="file" className={commonClassName} />
+        return <input aria-label="File" type="file" className={commonClassName} />;
       case 'signature':
-        return <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">Signature capture placeholder</div>
+        return <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">Signature capture placeholder</div>;
       default:
-        return <input aria-label="Text" type="text" className={commonClassName} placeholder={field.placeholder || ''} />
+        return <input aria-label="Text" type="text" className={commonClassName} placeholder={field.placeholder || ''} />;
     }
-  }
+  };
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -72,7 +72,7 @@ function FormPreviewPanel({ draft, onSubmit }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FormPreviewPanel
+export default FormPreviewPanel;

@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import { useAuthStore } from '../store/authStore'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { strategicAPI } from '../services/api'
-import { TrendingUp, Calendar, DollarSign, AlertCircle, CheckCircle, ShoppingBag } from 'lucide-react'
+import { useState } from 'react';
+import { useAuthStore } from '../store/authStore';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { strategicAPI } from '../services/api';
+import { TrendingUp, Calendar, DollarSign, AlertCircle, CheckCircle, ShoppingBag } from 'lucide-react';
 
 function PreSeasonPurchasePage() {
-  const { user } = useAuthStore()
-  const queryClient = useQueryClient()
-  const [selectedTab, setSelectedTab] = useState('agreements')
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  const [selectedTab, setSelectedTab] = useState('agreements');
 
   const { data: agreements, isLoading: agreementsLoading } = useQuery({
     queryKey: ['pre-season-agreements', user?.id],
     queryFn: () => strategicAPI.preSeason.getFarmerAgreements({ userId: user?.id }).then(r => r.data),
-    enabled: !!user?.id && user?.role === 'farmer',
-  })
+    enabled: Boolean(user?.id) && user?.role === 'farmer',
+  });
 
   const { data: opportunities, isLoading: opportunitiesLoading } = useQuery({
     queryKey: ['pre-season-opportunities'],
     queryFn: () => strategicAPI.preSeason.getOpportunities().then(r => r.data),
-  })
+  });
 
   const createAgreementMutation = useMutation({
     mutationFn: (data) => strategicAPI.preSeason.createAgreement(data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['pre-season-agreements'])
-      alert('Agreement created successfully!')
+      queryClient.invalidateQueries(['pre-season-agreements']);
+      alert('Agreement created successfully!');
     },
     onError: (error) => {
-      alert(`Failed to create agreement: ${error.message}`)
+      alert(`Failed to create agreement: ${error.message}`);
     },
-  })
+  });
 
   const handleCreateAgreement = (opportunityId) => {
     const agreementData = {
@@ -41,9 +41,9 @@ function PreSeasonPurchasePage() {
       delivery_date: '2024-12-01',
       risk_sharing_model: 'price_floor',
       price_floor: 2400,
-    }
-    createAgreementMutation.mutate(agreementData)
-  }
+    };
+    createAgreementMutation.mutate(agreementData);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -174,7 +174,7 @@ function PreSeasonPurchasePage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default PreSeasonPurchasePage
+export default PreSeasonPurchasePage;

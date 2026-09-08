@@ -1,27 +1,27 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { Clock, TrendingUp, Calendar, BarChart3, AlertCircle, Info } from 'lucide-react'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import { Clock, TrendingUp, Calendar, BarChart3, AlertCircle, Info } from 'lucide-react';
 
 function SellTimingPage() {
-  const [selectedCrop, setSelectedCrop] = useState('')
-  const [timeframe, setTimeframe] = useState('30')
+  const [selectedCrop, setSelectedCrop] = useState('');
+  const [timeframe, setTimeframe] = useState('30');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: timingRecommendations } = useQuery({
     queryKey: ['timing-recommendations', selectedCrop],
     queryFn: () => farmersAPI.getTimingRecommendations(selectedCrop).then(r => r.data),
-  })
+  });
 
   const { data: priceSeasonality } = useQuery({
     queryKey: ['price-seasonality'],
     queryFn: () => farmersAPI.getPriceSeasonality().then(r => r.data),
-  })
+  });
 
   const { data: marketEvents } = useQuery({
     queryKey: ['market-events'],
     queryFn: () => farmersAPI.getMarketEvents().then(r => r.data),
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -84,8 +84,8 @@ function SellTimingPage() {
                 </div>
                 <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                   rec.urgency === 'high' ? 'bg-red-100 text-red-800' :
-                  rec.urgency === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-green-100 text-green-800'
+                    rec.urgency === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-green-100 text-green-800'
                 }`}>
                   {rec.urgency} priority
                 </div>
@@ -134,7 +134,7 @@ function SellTimingPage() {
           {priceSeasonality?.map((pattern) => (
             <div key={pattern.crop} className="border rounded-lg p-4">
               <h3 className="font-semibold text-gray-800 mb-3">{pattern.crop}</h3>
-              
+
               <div className="space-y-2">
                 {pattern.months.map((month) => (
                   <div key={month.name} className="flex items-center">
@@ -144,8 +144,8 @@ function SellTimingPage() {
                         <div
                           className={`h-2 rounded-full ${
                             month.index >= 80 ? 'bg-green-600' :
-                            month.index >= 60 ? 'bg-yellow-600' :
-                            'bg-red-600'
+                              month.index >= 60 ? 'bg-yellow-600' :
+                                'bg-red-600'
                           }`}
                           style={{ width: `${month.index}%` }}
                         />
@@ -185,8 +185,8 @@ function SellTimingPage() {
             <div key={event.id} className="flex items-start p-4 border rounded-lg">
               <div className={`w-12 h-12 rounded-lg flex items-center justify-center mr-4 ${
                 event.impact === 'positive' ? 'bg-green-100' :
-                event.impact === 'negative' ? 'bg-red-100' :
-                'bg-gray-100'
+                  event.impact === 'negative' ? 'bg-red-100' :
+                    'bg-gray-100'
               }`}>
                 {event.impact === 'positive' ? (
                   <TrendingUp className="w-6 h-6 text-green-600" />
@@ -203,11 +203,11 @@ function SellTimingPage() {
                 </div>
                 <p className="text-sm text-gray-600 mb-2">{event.description}</p>
                 <div className="flex items-center space-x-4 text-sm">
-                  <span className={`text-gray-600`}>Affected: {event.affected_crops.join(', ')}</span>
+                  <span className={'text-gray-600'}>Affected: {event.affected_crops.join(', ')}</span>
                   <span className={`font-medium ${
                     event.impact === 'positive' ? 'text-green-600' :
-                    event.impact === 'negative' ? 'text-red-600' :
-                    'text-gray-600'
+                      event.impact === 'negative' ? 'text-red-600' :
+                        'text-gray-600'
                   }`}>
                     {event.impact} impact
                   </span>
@@ -218,7 +218,7 @@ function SellTimingPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default SellTimingPage
+export default SellTimingPage;

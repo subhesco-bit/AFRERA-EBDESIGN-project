@@ -18,12 +18,12 @@ const {
 function crudRouter(service) {
   const router = express.Router();
   router.get('/', async (req, res) => {
-    try { 
+    try {
       const items = (await service.list(req.query)).items;
       return apiResponseHandler.sendSuccess(res, items, 'Items retrieved successfully');
     }
-    catch (e) { 
-      return apiResponseHandler.sendError(res, 'Failed to retrieve items', 500, 'SERVER_ERROR', e.message); 
+    catch (e) {
+      return apiResponseHandler.sendError(res, 'Failed to retrieve items', 500, 'SERVER_ERROR', e.message);
     }
   });
   router.get('/:id', async (req, res) => {
@@ -31,17 +31,17 @@ function crudRouter(service) {
       const item = await service.get(req.params.id);
       if (!item) return apiResponseHandler.sendError(res, 'Item not found', 404, 'NOT_FOUND');
       return apiResponseHandler.sendSuccess(res, item, 'Item retrieved successfully');
-    } catch (e) { 
-      return apiResponseHandler.sendError(res, 'Failed to retrieve item', 500, 'SERVER_ERROR', e.message); 
+    } catch (e) {
+      return apiResponseHandler.sendError(res, 'Failed to retrieve item', 500, 'SERVER_ERROR', e.message);
     }
   });
   router.post('/', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try { 
+    try {
       const item = await service.create(req.body);
       return apiResponseHandler.sendSuccess(res, item, 'Item created successfully', 201);
     }
-    catch (e) { 
-      return apiResponseHandler.sendError(res, 'Failed to create item', 400, 'VALIDATION_ERROR', e.message); 
+    catch (e) {
+      return apiResponseHandler.sendError(res, 'Failed to create item', 400, 'VALIDATION_ERROR', e.message);
     }
   });
   router.put('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
@@ -49,8 +49,8 @@ function crudRouter(service) {
       const item = await service.update(req.params.id, req.body);
       if (!item) return apiResponseHandler.sendError(res, 'Item not found', 404, 'NOT_FOUND');
       return apiResponseHandler.sendSuccess(res, item, 'Item updated successfully');
-    } catch (e) { 
-      return apiResponseHandler.sendError(res, 'Failed to update item', 400, 'VALIDATION_ERROR', e.message); 
+    } catch (e) {
+      return apiResponseHandler.sendError(res, 'Failed to update item', 400, 'VALIDATION_ERROR', e.message);
     }
   });
   router.delete('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
@@ -58,14 +58,15 @@ function crudRouter(service) {
       const ok = await service.remove(req.params.id);
       if (!ok) return apiResponseHandler.sendError(res, 'Item not found', 404, 'NOT_FOUND');
       return apiResponseHandler.sendSuccess(res, null, 'Item deleted successfully');
-    } catch (e) { 
-      return apiResponseHandler.sendError(res, 'Failed to delete item', 500, 'SERVER_ERROR', e.message); 
+    } catch (e) {
+      return apiResponseHandler.sendError(res, 'Failed to delete item', 500, 'SERVER_ERROR', e.message);
     }
   });
   return router;
 }
 
-module.exports = {
+const router = express.Router();
+const routes = {
   cropRegistrationRoutes: crudRouter(cropRegistration),
   cropVarietyRoutes: crudRouter(cropVariety),
   seedPlanningRoutes: crudRouter(seedPlanning),
@@ -73,3 +74,5 @@ module.exports = {
   sowingManagementRoutes: crudRouter(sowingManagement),
   cropMonitoringRoutes: crudRouter(cropMonitoring),
 };
+
+module.exports = router;

@@ -1,6 +1,6 @@
 /**
  * AI Advisory Service
- * 
+ *
  * Wires the existing `ai_advisories` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for AI-driven agricultural advisories
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getAIAdvisory(advisoryId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM ai_advisories WHERE advisory_id = $1`,
-      [advisoryId]
+      'SELECT * FROM ai_advisories WHERE advisory_id = $1',
+      [advisoryId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`AI advisory not found: ${advisoryId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get AI advisory: ${error.message}`);
@@ -43,10 +43,10 @@ async function getAIAdvisory(advisoryId) {
 async function getAIAdvisoriesByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM ai_advisories WHERE village_id = $1 ORDER BY created_at DESC`,
-      [villageId]
+      'SELECT * FROM ai_advisories WHERE village_id = $1 ORDER BY created_at DESC',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get AI advisories by village: ${error.message}`);
@@ -62,10 +62,10 @@ async function getAIAdvisoriesByVillage(villageId) {
 async function getAIAdvisoriesByFarmer(farmerId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM ai_advisories WHERE farmer_id = $1 ORDER BY created_at DESC`,
-      [farmerId]
+      'SELECT * FROM ai_advisories WHERE farmer_id = $1 ORDER BY created_at DESC',
+      [farmerId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get AI advisories by farmer: ${error.message}`);
@@ -81,10 +81,10 @@ async function getAIAdvisoriesByFarmer(farmerId) {
 async function getAIAdvisoriesByType(advisoryType) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM ai_advisories WHERE advisory_type = $1 ORDER BY created_at DESC`,
-      [advisoryType]
+      'SELECT * FROM ai_advisories WHERE advisory_type = $1 ORDER BY created_at DESC',
+      [advisoryType],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get AI advisories by type: ${error.message}`);
@@ -113,7 +113,7 @@ async function createAIAdvisory(advisory) {
       confidence_score,
       data_sources,
       valid_until,
-      status
+      status,
     } = advisory;
 
     const { rows } = await pool.query(
@@ -124,8 +124,8 @@ async function createAIAdvisory(advisory) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
        RETURNING *`,
       [advisory_id, village_id, district, farmer_id, advisory_type,
-       crop_id, priority_level, title, description, recommended_action,
-       confidence_score, data_sources, valid_until, status]
+        crop_id, priority_level, title, description, recommended_action,
+        confidence_score, data_sources, valid_until, status],
     );
 
     logger.info(`AI advisory created: ${advisory_id}`);
@@ -152,9 +152,9 @@ async function updateAdvisoryStatus(advisoryId, status, feedback) {
            updated_at = NOW()
        WHERE advisory_id = $3
        RETURNING *`,
-      [status, feedback, advisoryId]
+      [status, feedback, advisoryId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`AI advisory not found: ${advisoryId}`);
     }
@@ -175,7 +175,7 @@ async function updateAdvisoryStatus(advisoryId, status, feedback) {
 async function getAIAdvisoryStatistics(filters = {}) {
   try {
     const { district, village_id, advisory_type, status } = filters;
-    
+
     let query = `
       SELECT 
         COUNT(*) as total_advisories,
@@ -190,7 +190,7 @@ async function getAIAdvisoryStatistics(filters = {}) {
       FROM ai_advisories
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramIndex = 1;
 
@@ -230,7 +230,7 @@ async function getAIAdvisoryStatistics(filters = {}) {
       avgConfidenceScore: stats.avg_confidence_score ? r2(stats.avg_confidence_score) : 0,
       highPriorityCount: parseInt(stats.high_priority_count),
       mediumPriorityCount: parseInt(stats.medium_priority_count),
-      lowPriorityCount: parseInt(stats.low_priority_count)
+      lowPriorityCount: parseInt(stats.low_priority_count),
     };
   } catch (error) {
     logger.error(`Failed to get AI advisory statistics: ${error.message}`);
@@ -321,5 +321,6 @@ module.exports = {
   createAIAdvisory,
   updateAdvisoryStatus,
   getAIAdvisoryStatistics,
-  setupRoutes
+  setupRoutes,
 };
+

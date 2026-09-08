@@ -55,7 +55,7 @@ const WEATHER_FALLBACK = { rainfallMm: 1800, meanTempC: 26, heatDaysAboveThresh:
 
 async function cropParams(cropKey) {
   const { rows } = await pool.query(
-    'SELECT * FROM arp_crop_parameters WHERE crop_key = $1', [cropKey]
+    'SELECT * FROM arp_crop_parameters WHERE crop_key = $1', [cropKey],
   );
   if (!rows.length) throw new Error(`Unknown crop: ${cropKey}`);
   const c = rows[0];
@@ -99,9 +99,9 @@ function yieldIndex(c, { rainfallMm, meanTempC, heatDaysAboveThresh = 0 }) {
       { factor: 'mean temperature', value: `${meanTempC}°C vs optimum ${c.optTempC}`, effect: `${r2((tempPenalty - 1) * 100)}%` },
       { factor: 'heat-stress days', value: `${heatDaysAboveThresh} days above ${c.heatThreshC}°C`, effect: `${r2((heatPenalty - 1) * 100)}%` },
     ],
-    caveat: c.provenance === 'real'
-      ? `Coefficients calibrated on ${c.seasonsOfData} seasons.`
-      : 'Coefficients are prototype assumptions, not field-calibrated for this district.',
+    caveat: c.provenance === 'real' ?
+      `Coefficients calibrated on ${c.seasonsOfData} seasons.` :
+      'Coefficients are prototype assumptions, not field-calibrated for this district.',
   };
 }
 
@@ -118,14 +118,14 @@ function priceImpact({ yieldIdx, demandIndex = 1.0, elasticity = -0.45 }) {
   const pct = (supplyShock - demandShock) / elasticity;
   return {
     pricePct: r2(pct * 100),
-    note: supplyShock < -0.1
-      ? 'short crop — upward price pressure, but the farmer has less to sell'
-      : supplyShock > 0.1
-        ? 'glut risk — downward price pressure; this is when a floor matters most'
-        : 'near-normal supply',
+    note: supplyShock < -0.1 ?
+      'short crop — upward price pressure, but the farmer has less to sell' :
+      supplyShock > 0.1 ?
+        'glut risk — downward price pressure; this is when a floor matters most' :
+        'near-normal supply',
     elasticityUsed: elasticity,
-    caveat: 'Elasticity is a district-level assumption. NE hill markets are thin '
-          + 'and may be far more inelastic than this.',
+    caveat: 'Elasticity is a district-level assumption. NE hill markets are thin ' +
+          'and may be far more inelastic than this.',
   };
 }
 
@@ -138,8 +138,8 @@ function priceImpact({ yieldIdx, demandIndex = 1.0, elasticity = -0.45 }) {
 function forwardCurve(c, { spotPerKg, monthsAhead, yieldIdx = 1, demandIndex = 1, confidence = 0.68 }) {
   const impact = priceImpact({ yieldIdx, demandIndex });
   const drift = impact.pricePct / 100;
-  const carry = -(c.perishability * Math.min(monthsAhead, c.storageMonths))
-              - 0.02 * Math.max(0, monthsAhead - c.storageMonths) * 6;
+  const carry = -(c.perishability * Math.min(monthsAhead, c.storageMonths)) -
+              0.02 * Math.max(0, monthsAhead - c.storageMonths) * 6;
   const central = spotPerKg * (1 + drift + carry);
   const sigma = c.volAnnual * Math.sqrt(monthsAhead / 12);
   const z = confidence >= 0.95 ? 1.96 : confidence >= 0.9 ? 1.645 : 1.0;
@@ -155,10 +155,10 @@ function forwardCurve(c, { spotPerKg, monthsAhead, yieldIdx = 1, demandIndex = 1
     sigmaAnnual: c.volAnnual,
     components: { drift: r2(drift * 100), carry: r2(carry * 100), sigmaHorizon: r2(sigma) },
     priceImpact: impact,
-    warning: monthsAhead > c.storageMonths
-      ? `${monthsAhead} months exceeds this crop's ${c.storageMonths}-month storage life. `
-      + 'The carry penalty reflects physical loss, not market opinion.'
-      : null,
+    warning: monthsAhead > c.storageMonths ?
+      `${monthsAhead} months exceeds this crop's ${c.storageMonths}-month storage life. ` +
+      'The carry penalty reflects physical loss, not market opinion.' :
+      null,
   };
 }
 
@@ -178,12 +178,12 @@ function basis({ farmgatePerKg, ncrDeliveredPerKg, freightPerKg, expectedLossPct
     explainedByFreightAndLoss: r2(explained),
     unexplainedResidual: residual,
     residualPctOfDelivered: r2((residual / ncrDeliveredPerKg) * 100),
-    verdict: Math.abs(residual) < 0.1 * ncrDeliveredPerKg
-      ? 'basis is fully explained by freight and loss — the corridor is priced honestly'
-      : residual > 0
-        ? 'residual margin exists beyond freight and loss — either a quality premium, '
-        + 'or value being captured somewhere the farmer cannot see'
-        : 'the corridor is being run below cost on this lane',
+    verdict: Math.abs(residual) < 0.1 * ncrDeliveredPerKg ?
+      'basis is fully explained by freight and loss — the corridor is priced honestly' :
+      residual > 0 ?
+        'residual margin exists beyond freight and loss — either a quality premium, ' +
+        'or value being captured somewhere the farmer cannot see' :
+        'the corridor is being run below cost on this lane',
   };
 }
 
@@ -200,7 +200,7 @@ function valueFloorParticipation(c, { floorPerKg, participationShare, spotPerKg,
   const nd = 0.5 * (1 + Math.tanh(0.8 * d));
   const callPerKg = Math.max(
     0,
-    (spotPerKg - floorPerKg) * nd + spotPerKg * sigma * 0.3989 * Math.exp(-0.5 * d * d)
+    (spotPerKg - floorPerKg) * nd + spotPerKg * sigma * 0.3989 * Math.exp(-0.5 * d * d),
   );
   const farmerValue = floorPerKg + participationShare * callPerKg;
   return {
@@ -210,8 +210,8 @@ function valueFloorParticipation(c, { floorPerKg, participationShare, spotPerKg,
     farmerExpectedPerKg: r2(farmerValue),
     farmerExpectedTotal: qtyKg ? Math.round(farmerValue * qtyKg) : null,
     platformCarryPerKg: r2(callPerKg * (1 - participationShare)),
-    method: 'Bachelier-style approximation. Adequate for a decision aid; not an '
-          + 'exchange-grade option price, and not a tradeable quote.',
+    method: 'Bachelier-style approximation. Adequate for a decision aid; not an ' +
+          'exchange-grade option price, and not a tradeable quote.',
   };
 }
 
@@ -231,8 +231,8 @@ function commitAdvice(c, { qtyKg, floorPerKg, participationShare, spotPerKg, mon
       advice: 'NO RECOMMENDATION',
       commitPct: null,
       declinedReason:
-        `The yield model for this district is uncalibrated (confidence ${Math.round(confidence * 100)}%). `
-        + "Advising a farmer to commit a quantity on this basis would be guessing with someone else's harvest.",
+        `The yield model for this district is uncalibrated (confidence ${Math.round(confidence * 100)}%). ` +
+        'Advising a farmer to commit a quantity on this basis would be guessing with someone else\'s harvest.',
       whatWouldHelp: [
         '3+ seasons of local rainfall and yield data',
         'district-level mandi price history',
@@ -270,8 +270,8 @@ function commitAdvice(c, { qtyKg, floorPerKg, participationShare, spotPerKg, mon
       {
         factor: 'shelf life vs horizon',
         weight: 'HARD CAP on holding',
-        reading: `${c.storageMonths} months storable against a ${monthsAhead}-month horizon — `
-               + `holding is capped at ${Math.round(maxHold * 100)}%`,
+        reading: `${c.storageMonths} months storable against a ${monthsAhead}-month horizon — ` +
+               `holding is capped at ${Math.round(maxHold * 100)}%`,
       },
     ],
     forward: fwd, valuation: val, yieldModel: y,
@@ -287,7 +287,7 @@ async function districtConfidence(state, district, cropKey) {
   const { rows } = await pool.query(
     `SELECT confidence, seasons_observed FROM arp_district_calibration
       WHERE state = $1 AND district = $2 AND crop_key = $3`,
-    [state, district, cropKey]
+    [state, district, cropKey],
   );
   if (!rows.length) {
     // No calibration record is not neutral. It means nobody has ever checked
@@ -324,11 +324,11 @@ async function computeAdvanceRate({ cropKey, monthsAhead, spotPerKg, weather, st
     calibrated: cal.calibrated,
     // An advance is only safe against the LOW end of the band, discounted again.
     advanceCeiling: r2(fwd.low * 0.80),
-    warning: !cal.calibrated
-      ? `Confidence ${Math.round(cal.confidence * 100)}% — this district has `
-      + `${cal.seasonsObserved} season(s) of data. This rate is indicative only and `
-      + 'must not be used to set a binding advance.'
-      : fwd.warning,
+    warning: !cal.calibrated ?
+      `Confidence ${Math.round(cal.confidence * 100)}% — this district has ` +
+      `${cal.seasonsObserved} season(s) of data. This rate is indicative only and ` +
+      'must not be used to set a binding advance.' :
+      fwd.warning,
     parameterProvenance: c.provenance,
   };
 }
@@ -344,7 +344,7 @@ async function publish(rate, publishedBy = null) {
      RETURNING id, advance_ceiling_per_kg`,
     [rate.cropKey, rate.monthsAhead, rate.deliveryMonth, rate.method, rate.spot,
       rate.central, rate.low, rate.high, rate.yieldIndex, rate.confidence,
-      rate.calibrated, rate.warning, JSON.stringify(rate.components), publishedBy]
+      rate.calibrated, rate.warning, JSON.stringify(rate.components), publishedBy],
   );
   return rows[0];
 }
@@ -373,7 +373,7 @@ async function adviseCommitment(input) {
         result.maxHoldPct ?? null,
         result.valuation?.optionValuePerKg ?? null,
         result.valuation?.farmerExpectedPerKg ?? null,
-        cal.confidence]
+        cal.confidence],
     );
   } catch (err) {
     // Advice still returns. Failing to record it is a lost lesson, not a lost
@@ -393,7 +393,7 @@ async function recordBasis(obs) {
      VALUES ($1,$2,$3,$4,$5,$6,$7)
      RETURNING id, gross_basis, explained_by_freight_and_loss, unexplained_residual`,
     [obs.cropKey, obs.lane ?? null, obs.farmgatePerKg, obs.ncrDeliveredPerKg,
-      obs.freightPerKg, obs.expectedLossPct, obs.dataProvenance ?? 'estimated']
+      obs.freightPerKg, obs.expectedLossPct, obs.dataProvenance ?? 'estimated'],
   );
   return { ...computed, id: rows[0].id };
 }
@@ -404,3 +404,4 @@ module.exports = {
   // db-facing
   cropParams, districtConfidence, computeAdvanceRate, publish, adviseCommitment, recordBasis,
 };
+

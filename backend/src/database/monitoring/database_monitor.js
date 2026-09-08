@@ -10,7 +10,7 @@ const EventEmitter = require('events');
 class DatabaseMonitor extends EventEmitter {
   constructor(config = {}) {
     super();
-    
+
     this.config = {
       // Monitoring configuration
       enableQueryLogging: config.enableQueryLogging !== false,
@@ -18,11 +18,11 @@ class DatabaseMonitor extends EventEmitter {
       slowQueryThreshold: config.slowQueryThreshold || 1000, // 1 second
       enableErrorTracking: config.enableErrorTracking !== false,
       enableConnectionTracking: config.enableConnectionTracking !== false,
-      
+
       // Metrics collection
       enableMetrics: config.enableMetrics !== false,
       metricsInterval: config.metricsInterval || 60000, // 1 minute
-      
+
       // Alerting configuration
       enableAlerting: config.enableAlerting !== false,
       alertThresholds: config.alertThresholds || {
@@ -30,18 +30,18 @@ class DatabaseMonitor extends EventEmitter {
         errorRate: 0.05, // 5% of queries fail
         connectionPoolUtilization: 0.9, // 90% pool utilization
         averageQueryTime: 500, // 500ms average query time
-        deadlockCount: 1 // Any deadlock triggers alert
+        deadlockCount: 1, // Any deadlock triggers alert
       },
       alertWebhook: config.alertWebhook || process.env.DB_ALERT_WEBHOOK,
-      
+
       // Retention
       metricsRetentionDays: config.metricsRetentionDays || 30,
       logRetentionDays: config.logRetentionDays || 7,
-      
+
       // Database connection
       databaseUrl: config.databaseUrl || process.env.DATABASE_URL,
-      
-      ...config
+
+      ...config,
     };
 
     this.pool = null;
@@ -57,22 +57,22 @@ class DatabaseMonitor extends EventEmitter {
         failed: 0,
         slow: 0,
         averageTime: 0,
-        totalTime: 0
+        totalTime: 0,
       },
       connections: {
         total: 0,
         active: 0,
         idle: 0,
-        waiting: 0
+        waiting: 0,
       },
       errors: {
         total: 0,
         byType: new Map(),
-        recent: []
+        recent: [],
       },
       slowQueries: [],
       deadlocks: 0,
-      lockWaits: 0
+      lockWaits: 0,
     };
   }
 
@@ -82,7 +82,7 @@ class DatabaseMonitor extends EventEmitter {
   async initialize() {
     try {
       this.pool = new Pool({
-        connectionString: this.config.databaseUrl
+        connectionString: this.config.databaseUrl,
       });
 
       // Create monitoring tables
@@ -115,7 +115,7 @@ class DatabaseMonitor extends EventEmitter {
         user_id VARCHAR(255),
         session_id VARCHAR(255)
       )`,
-      
+
       `CREATE TABLE IF NOT EXISTS slow_queries (
         id SERIAL PRIMARY KEY,
         query_text TEXT NOT NULL,
@@ -125,7 +125,7 @@ class DatabaseMonitor extends EventEmitter {
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         execution_plan TEXT
       )`,
-      
+
       `CREATE TABLE IF NOT EXISTS error_logs (
         id SERIAL PRIMARY KEY,
         error_type VARCHAR(100) NOT NULL,
@@ -136,7 +136,7 @@ class DatabaseMonitor extends EventEmitter {
         user_id VARCHAR(255),
         session_id VARCHAR(255)
       )`,
-      
+
       `CREATE TABLE IF NOT EXISTS connection_metrics (
         id SERIAL PRIMARY KEY,
         total_connections INTEGER NOT NULL,
@@ -145,7 +145,7 @@ class DatabaseMonitor extends EventEmitter {
         waiting_clients INTEGER NOT NULL,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
-      
+
       `CREATE TABLE IF NOT EXISTS performance_metrics (
         id SERIAL PRIMARY KEY,
         metric_name VARCHAR(100) NOT NULL,
@@ -153,7 +153,7 @@ class DatabaseMonitor extends EventEmitter {
         metric_unit VARCHAR(50),
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         tags JSONB DEFAULT '{}'
-      )`
+      )`,
     ];
 
     // Create indexes for monitoring tables
@@ -165,7 +165,7 @@ class DatabaseMonitor extends EventEmitter {
       'CREATE INDEX IF NOT EXISTS idx_error_logs_timestamp ON error_logs(timestamp DESC)',
       'CREATE INDEX IF NOT EXISTS idx_error_logs_type ON error_logs(error_type)',
       'CREATE INDEX IF NOT EXISTS idx_connection_metrics_timestamp ON connection_metrics(timestamp DESC)',
-      'CREATE INDEX IF NOT EXISTS idx_performance_metrics_name_timestamp ON performance_metrics(metric_name, timestamp DESC)'
+      'CREATE INDEX IF NOT EXISTS idx_performance_metrics_name_timestamp ON performance_metrics(metric_name, timestamp DESC)',
     ];
 
     for (const table of tables) {
@@ -268,7 +268,7 @@ class DatabaseMonitor extends EventEmitter {
       success,
       error ? error.message : null,
       metadata.userId || null,
-      metadata.sessionId || null
+      metadata.sessionId || null,
     ]).catch(err => {
       logger.error('Failed to log query', { error: err.message });
     });
@@ -278,7 +278,7 @@ class DatabaseMonitor extends EventEmitter {
       queryHash,
       executionTime,
       success,
-      metadata
+      metadata,
     });
   }
 
@@ -291,7 +291,7 @@ class DatabaseMonitor extends EventEmitter {
       queryHash,
       executionTime,
       timestamp: new Date(),
-      metadata
+      metadata,
     };
 
     this.metrics.slowQueries.push(slowQuery);
@@ -304,7 +304,7 @@ class DatabaseMonitor extends EventEmitter {
     // Get execution plan for analysis
     let executionPlan = null;
     try {
-      const planResult = await this.pool.query('EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ' + queryText);
+      const planResult = await this.pool.query(`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${ queryText}`);
       executionPlan = JSON.stringify(planResult.rows[0]['QUERY PLAN']);
     } catch (error) {
       logger.warn('Failed to get execution plan', { error: error.message });
@@ -318,7 +318,7 @@ class DatabaseMonitor extends EventEmitter {
       queryText.substring(0, 10000),
       queryHash,
       executionTime,
-      executionPlan
+      executionPlan,
     ]).catch(err => {
       logger.error('Failed to log slow query', { error: err.message });
     });
@@ -339,16 +339,16 @@ class DatabaseMonitor extends EventEmitter {
     }
 
     const errorType = error.code || error.name || 'UNKNOWN';
-    
+
     this.metrics.errors.total++;
     this.metrics.errors.byType.set(errorType, (this.metrics.errors.byType.get(errorType) || 0) + 1);
-    
+
     this.metrics.errors.recent.push({
       errorType,
       message: error.message,
       queryText,
       timestamp: new Date(),
-      metadata
+      metadata,
     });
 
     // Keep only recent 50 errors
@@ -366,7 +366,7 @@ class DatabaseMonitor extends EventEmitter {
       queryText ? queryText.substring(0, 10000) : null,
       error.stack,
       metadata.userId || null,
-      metadata.sessionId || null
+      metadata.sessionId || null,
     ]).catch(err => {
       logger.error('Failed to log error', { error: err.message });
     });
@@ -376,7 +376,7 @@ class DatabaseMonitor extends EventEmitter {
       errorType,
       error: error.message,
       queryText,
-      metadata
+      metadata,
     });
 
     // Check if alert needed
@@ -395,7 +395,7 @@ class DatabaseMonitor extends EventEmitter {
       total: poolMetrics.totalCount,
       active: poolMetrics.totalCount - poolMetrics.idleCount,
       idle: poolMetrics.idleCount,
-      waiting: poolMetrics.waitingCount
+      waiting: poolMetrics.waitingCount,
     };
 
     // Log to database
@@ -406,7 +406,7 @@ class DatabaseMonitor extends EventEmitter {
       this.metrics.connections.total,
       this.metrics.connections.active,
       this.metrics.connections.idle,
-      this.metrics.connections.waiting
+      this.metrics.connections.waiting,
     ]).catch(err => {
       logger.error('Failed to log connection metrics', { error: err.message });
     });
@@ -445,8 +445,8 @@ class DatabaseMonitor extends EventEmitter {
             query_hash: row.query,
             calls: row.calls,
             max_time: row.max_exec_time,
-            rows: row.rows
-          })
+            rows: row.rows,
+          }),
         ]);
       }
 
@@ -470,7 +470,7 @@ class DatabaseMonitor extends EventEmitter {
 
       try {
         await this.collectPerformanceMetrics();
-        
+
         // Emit metrics event
         this.emit('metrics', this.getMetrics());
       } catch (error) {
@@ -517,7 +517,7 @@ class DatabaseMonitor extends EventEmitter {
       { table: 'slow_queries', cutoff: queryCutoff },
       { table: 'error_logs', cutoff: queryCutoff },
       { table: 'connection_metrics', cutoff: metricsCutoff },
-      { table: 'performance_metrics', cutoff: metricsCutoff }
+      { table: 'performance_metrics', cutoff: metricsCutoff },
     ];
 
     for (const { table, cutoff } of tables) {
@@ -537,7 +537,7 @@ class DatabaseMonitor extends EventEmitter {
     if (!this.config.enableAlerting) return;
 
     const slowQueryRate = this.metrics.queries.slow / this.metrics.queries.total;
-    
+
     if (slowQueryRate > this.config.alertThresholds.slowQueryRate) {
       this.sendAlert({
         type: 'slow_query_rate',
@@ -547,8 +547,8 @@ class DatabaseMonitor extends EventEmitter {
           slowQueryRate,
           threshold: this.config.alertThresholds.slowQueryRate,
           totalQueries: this.metrics.queries.total,
-          slowQueries: this.metrics.queries.slow
-        }
+          slowQueries: this.metrics.queries.slow,
+        },
       });
     }
   }
@@ -560,7 +560,7 @@ class DatabaseMonitor extends EventEmitter {
     if (!this.config.enableAlerting) return;
 
     const errorRate = this.metrics.queries.failed / this.metrics.queries.total;
-    
+
     if (errorRate > this.config.alertThresholds.errorRate) {
       this.sendAlert({
         type: 'error_rate',
@@ -570,8 +570,8 @@ class DatabaseMonitor extends EventEmitter {
           errorRate,
           threshold: this.config.alertThresholds.errorRate,
           totalQueries: this.metrics.queries.total,
-          failedQueries: this.metrics.queries.failed
-        }
+          failedQueries: this.metrics.queries.failed,
+        },
       });
     }
   }
@@ -583,7 +583,7 @@ class DatabaseMonitor extends EventEmitter {
     if (!this.config.enableAlerting) return;
 
     const utilization = this.metrics.connections.active / this.config.connections.total;
-    
+
     if (utilization > this.config.alertThresholds.connectionPoolUtilization) {
       this.sendAlert({
         type: 'connection_pool_utilization',
@@ -594,8 +594,8 @@ class DatabaseMonitor extends EventEmitter {
           threshold: this.config.alertThresholds.connectionPoolUtilization,
           activeConnections: this.metrics.connections.active,
           totalConnections: this.metrics.connections.total,
-          waitingClients: this.metrics.connections.waiting
-        }
+          waitingClients: this.metrics.connections.waiting,
+        },
       });
     }
   }
@@ -605,7 +605,7 @@ class DatabaseMonitor extends EventEmitter {
    */
   async sendAlert(alert) {
     this.emit('alert', alert);
-    
+
     logger.warn('Database alert triggered', alert);
 
     if (this.config.alertWebhook) {
@@ -613,7 +613,7 @@ class DatabaseMonitor extends EventEmitter {
         const axios = require('axios');
         await axios.post(this.config.alertWebhook, alert, {
           headers: { 'Content-Type': 'application/json' },
-          timeout: 5000
+          timeout: 5000,
         });
       } catch (error) {
         logger.error('Failed to send alert webhook', { error: error.message });
@@ -631,7 +631,7 @@ class DatabaseMonitor extends EventEmitter {
       .replace(/\$\d+/g, '$1')
       .toLowerCase()
       .trim();
-    
+
     return crypto.createHash('md5').update(normalized).digest('hex');
   }
 
@@ -643,8 +643,8 @@ class DatabaseMonitor extends EventEmitter {
       ...this.metrics,
       errors: {
         ...this.metrics.errors,
-        byType: Object.fromEntries(this.metrics.errors.byType)
-      }
+        byType: Object.fromEntries(this.metrics.errors.byType),
+      },
     };
   }
 
@@ -745,5 +745,5 @@ function getDatabaseMonitor(config = {}) {
 
 module.exports = {
   DatabaseMonitor,
-  getDatabaseMonitor
+  getDatabaseMonitor,
 };

@@ -1,10 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Watch, Activity, RefreshCw, Link2, Link2Off } from 'lucide-react'
-import { wearableAPI } from '../services/api'
-import { AsyncState, Section } from '../components/common/DataPrimitives'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Watch, Activity, RefreshCw, Link2, Link2Off } from 'lucide-react';
+import { wearableAPI } from '../services/api';
+import { AsyncState, Section } from '../components/common/DataPrimitives';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 
 /**
  * Wearables — connection status across Fitbit, Apple Health, Samsung Health.
@@ -15,8 +15,8 @@ import { Button } from '../components/ui/button'
  * cannot work. See wearableIntegrationService.js.
  */
 function ProviderCard({ title, note, status, onConnect, onSync, onDisconnect, connectDisabled, syncing }) {
-  const connection = status?.connection
-  const isActive = connection?.status === 'active'
+  const connection = status?.connection;
+  const isActive = connection?.status === 'active';
 
   return (
     <Card>
@@ -55,39 +55,39 @@ function ProviderCard({ title, note, status, onConnect, onSync, onDisconnect, co
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function WearablesPage() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const { data: status, isLoading, error } = useQuery({
     queryKey: ['wearable-status'],
     queryFn: () => wearableAPI.getStatus().then((r) => r.data?.data),
-  })
+  });
 
   const { data: recentActivity } = useQuery({
     queryKey: ['wearable-recent-activity'],
     queryFn: () => wearableAPI.getRecentActivity(7).then((r) => r.data?.data),
-  })
+  });
 
   const connectFitbit = useMutation({
     mutationFn: () => wearableAPI.getFitbitAuthUrl(),
     onSuccess: (res) => {
-      const authUrl = res.data?.data?.authUrl
-      if (authUrl) window.location.href = authUrl
+      const authUrl = res.data?.data?.authUrl;
+      if (authUrl) window.location.href = authUrl;
     },
-  })
+  });
 
   const syncFitbit = useMutation({
     mutationFn: () => wearableAPI.syncFitbit(),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['wearable-status'] }),
-  })
+  });
 
   const disconnect = useMutation({
     mutationFn: (provider) => wearableAPI.disconnect(provider),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['wearable-status'] }),
-  })
+  });
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
@@ -132,5 +132,5 @@ export default function WearablesPage() {
         </Section>
       )}
     </main>
-  )
+  );
 }

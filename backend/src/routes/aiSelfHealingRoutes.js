@@ -1,6 +1,6 @@
 /**
  * AI Self-Healing Routes
- * 
+ *
  * API endpoints for autonomous error recovery capabilities including:
  * - Error detection and classification
  * - Root cause analysis
@@ -21,22 +21,22 @@ const aiSelfHealingService = require('../services/legacy/aiSelfHealingService');
 router.post('/detect', async (req, res) => {
   try {
     const { error } = req.body;
-    
+
     if (!error) {
       return res.status(400).json({
         success: false,
-        error: 'error is required'
+        error: 'error is required',
       });
     }
-    
+
     const result = await aiSelfHealingService.detectAndClassifyError(error);
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error detecting and classifying error:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -48,22 +48,22 @@ router.post('/detect', async (req, res) => {
 router.post('/root-cause', async (req, res) => {
   try {
     const { error, context } = req.body;
-    
+
     if (!error) {
       return res.status(400).json({
         success: false,
-        error: 'error is required'
+        error: 'error is required',
       });
     }
-    
+
     const result = await aiSelfHealingService.performRootCauseAnalysis(error, context || {});
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error in root cause analysis:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -75,22 +75,22 @@ router.post('/root-cause', async (req, res) => {
 router.post('/recover', async (req, res) => {
   try {
     const { error_type, context } = req.body;
-    
+
     if (!error_type) {
       return res.status(400).json({
         success: false,
-        error: 'error_type is required'
+        error: 'error_type is required',
       });
     }
-    
+
     const result = await aiSelfHealingService.executeRecoveryStrategy(error_type, context || {});
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error executing recovery strategy:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -102,43 +102,43 @@ router.post('/recover', async (req, res) => {
 router.post('/heal', async (req, res) => {
   try {
     const { error, context } = req.body;
-    
+
     if (!error) {
       return res.status(400).json({
         success: false,
-        error: 'error is required'
+        error: 'error is required',
       });
     }
-    
+
     // Step 1: Detect and classify
     const detection = await aiSelfHealingService.detectAndClassifyError(error);
     if (!detection.success) {
       return res.json(detection);
     }
-    
+
     // Step 2: Root cause analysis
     const rootCause = await aiSelfHealingService.performRootCauseAnalysis(error, context || {});
-    
+
     // Step 3: Execute recovery
     const recovery = await aiSelfHealingService.executeRecoveryStrategy(
       detection.classification.type,
-      context || {}
+      context || {},
     );
-    
+
     res.json({
       success: true,
       healing_cycle: {
-        detection: detection,
+        detection,
         root_cause: rootCause,
-        recovery: recovery
+        recovery,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } catch (error) {
     console.error('Error in healing cycle:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -150,13 +150,13 @@ router.post('/heal', async (req, res) => {
 router.get('/predict', async (req, res) => {
   try {
     const result = await aiSelfHealingService.predictiveFailurePrevention();
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error in predictive failure prevention:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -169,16 +169,16 @@ router.get('/history', (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 100;
     const history = aiSelfHealingService.getHealingHistory(limit);
-    
+
     res.json({
       success: true,
-      history: history
+      history,
     });
   } catch (error) {
     console.error('Error getting healing history:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -190,16 +190,16 @@ router.get('/history', (req, res) => {
 router.get('/health', (req, res) => {
   try {
     const metrics = aiSelfHealingService.getHealthMetrics();
-    
+
     res.json({
       success: true,
-      metrics: metrics
+      metrics,
     });
   } catch (error) {
     console.error('Error getting health metrics:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -211,29 +211,29 @@ router.get('/health', (req, res) => {
 router.post('/pattern', (req, res) => {
   try {
     const { name, patterns, severity, category } = req.body;
-    
+
     if (!name || !patterns || !severity || !category) {
       return res.status(400).json({
         success: false,
-        error: 'name, patterns, severity, and category are required'
+        error: 'name, patterns, severity, and category are required',
       });
     }
-    
+
     aiSelfHealingService.addErrorPattern(name, {
       patterns,
       severity,
-      category
+      category,
     });
-    
+
     res.json({
       success: true,
-      pattern: { name, patterns, severity, category }
+      pattern: { name, patterns, severity, category },
     });
   } catch (error) {
     console.error('Error adding error pattern:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -245,25 +245,25 @@ router.post('/pattern', (req, res) => {
 router.post('/strategy', (req, res) => {
   try {
     const { error_type, strategies } = req.body;
-    
+
     if (!error_type || !strategies) {
       return res.status(400).json({
         success: false,
-        error: 'error_type and strategies are required'
+        error: 'error_type and strategies are required',
       });
     }
-    
+
     aiSelfHealingService.addRecoveryStrategy(error_type, strategies);
-    
+
     res.json({
       success: true,
-      strategy: { error_type, strategies }
+      strategy: { error_type, strategies },
     });
   } catch (error) {
     console.error('Error adding recovery strategy:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -275,16 +275,16 @@ router.post('/strategy', (req, res) => {
 router.get('/system-state', (req, res) => {
   try {
     const state = aiSelfHealingService.getSystemState();
-    
+
     res.json({
       success: true,
-      state: state
+      state,
     });
   } catch (error) {
     console.error('Error getting system state:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -300,7 +300,7 @@ router.get('/service-health', (req, res) => {
     error_patterns: aiSelfHealingService.errorPatterns.size,
     recovery_strategies: aiSelfHealingService.recoveryStrategies.size,
     healing_history_size: aiSelfHealingService.healingHistory.length,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

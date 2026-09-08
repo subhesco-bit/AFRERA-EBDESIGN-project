@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { CloudDrizzle, Waves, Bug, Stethoscope, ShieldAlert, Thermometer } from 'lucide-react'
+import { useState } from 'react';
+import { CloudDrizzle, Waves, Bug, Stethoscope, ShieldAlert, Thermometer } from 'lucide-react';
 import {
   droughtMonitoringAPI,
   floodMonitoringAPI,
@@ -7,8 +7,8 @@ import {
   diseaseForecastingAPI,
   climateRiskAPI,
   agroMeteorologyAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Climate domain sub-modules, batch 4: M085 (Drought Monitoring),
@@ -19,13 +19,9 @@ import ResourceManager from '../components/common/ResourceManager'
  * (ClimateAdvisoryPage.jsx) — not touched here. Built as one tabbed page
  * rather than 6 standalone pages, matching LandManagementPage.jsx.
  *
- * M087 Pest Forecasting is the one tab with genuine backend support: the
- * D14 climate/weather migration (057) exposes GET /weather/pest-forecast
- * (weatherAPI.pestForecast, already surfaced as a read-only preview on
- * ClimateAdvisoryPage.jsx). There is no create/update/delete route for it,
- * so that tab is read-only here instead of a CRUD form. The other five tabs
- * have no backend route under any name — built against a conventional REST
- * shape, matching the rest of this batch.
+ * M087 Pest Forecasting is read-only because the D14 climate/weather migration
+ * exposes only GET /weather/pest-forecast. The remaining tabs use the mounted
+ * climate CRUD routes and keep the existing REST shape.
  */
 const TABS = [
   { id: 'drought', label: 'Drought Monitoring', icon: Thermometer },
@@ -34,14 +30,14 @@ const TABS = [
   { id: 'disease', label: 'Disease Forecasting', icon: Stethoscope },
   { id: 'risk', label: 'Climate Risk', icon: ShieldAlert },
   { id: 'agromet', label: 'Agro-Meteorology', icon: CloudDrizzle },
-]
+];
 
-const SEVERITY = ['Mild', 'Moderate', 'Severe', 'Extreme']
-const RISK_TYPES = ['Drought', 'Flood', 'Heatwave', 'Cyclone', 'Frost', 'Hailstorm']
-const RISK_LEVELS = ['Low', 'Medium', 'High', 'Critical']
+const SEVERITY = ['Mild', 'Moderate', 'Severe', 'Extreme'];
+const RISK_TYPES = ['Drought', 'Flood', 'Heatwave', 'Cyclone', 'Frost', 'Hailstorm'];
+const RISK_LEVELS = ['Low', 'Medium', 'High', 'Critical'];
 
 function ClimateMonitoringPage() {
-  const [activeTab, setActiveTab] = useState('drought')
+  const [activeTab, setActiveTab] = useState('drought');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -78,7 +74,7 @@ function ClimateMonitoringPage() {
           searchPlaceholder="Search by region..."
           emptyMessage="No drought observations recorded yet."
           newLabel="Log Observation"
-          backendNote="Backend endpoint /drought-monitoring has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Connected to the climate monitoring service."
           initialForm={{ region: '', severity: 'Mild', spi_index: '', start_date: '', affected_area_hectares: '', notes: '' }}
           requiredFields={['region', 'severity']}
           columns={[
@@ -116,7 +112,7 @@ function ClimateMonitoringPage() {
           searchPlaceholder="Search by region..."
           emptyMessage="No flood observations recorded yet."
           newLabel="Log Observation"
-          backendNote="Backend endpoint /flood-monitoring has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Connected to the climate monitoring service."
           initialForm={{ region: '', severity: 'Mild', water_level_m: '', rainfall_mm: '', start_date: '', affected_area_hectares: '', notes: '' }}
           requiredFields={['region', 'severity']}
           columns={[
@@ -176,7 +172,7 @@ function ClimateMonitoringPage() {
           searchPlaceholder="Search by crop or disease..."
           emptyMessage="No disease forecasts recorded yet."
           newLabel="Add Forecast"
-          backendNote="Backend endpoint /disease-forecasting has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Connected to the climate monitoring service."
           initialForm={{ crop: '', disease_name: '', risk_level: 'Low', region: '', forecast_date: '', notes: '' }}
           requiredFields={['crop', 'disease_name']}
           columns={[
@@ -214,7 +210,7 @@ function ClimateMonitoringPage() {
           searchPlaceholder="Search by region..."
           emptyMessage="No risk assessments recorded yet."
           newLabel="Add Assessment"
-          backendNote="Backend endpoint /climate-risk has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Connected to the climate monitoring service."
           initialForm={{ region: '', risk_type: 'Drought', risk_score: '', assessment_date: '', mitigation_plan: '' }}
           requiredFields={['region', 'risk_type']}
           columns={[
@@ -250,7 +246,7 @@ function ClimateMonitoringPage() {
           searchPlaceholder="Search by station or region..."
           emptyMessage="No agro-meteorology readings recorded yet."
           newLabel="Log Reading"
-          backendNote="Backend endpoint /agro-meteorology has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Connected to the climate monitoring service."
           initialForm={{ station_name: '', region: '', temperature_c: '', humidity_pct: '', rainfall_mm: '', wind_speed_kmph: '', recorded_date: '' }}
           requiredFields={['station_name']}
           columns={[
@@ -277,7 +273,7 @@ function ClimateMonitoringPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default ClimateMonitoringPage
+export default ClimateMonitoringPage;

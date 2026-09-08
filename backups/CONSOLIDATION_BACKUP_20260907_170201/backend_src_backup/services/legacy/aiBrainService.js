@@ -1,6 +1,6 @@
 /**
  * AI Brain Service - Cognitive Processing Layer
- * 
+ *
  * This service provides cognitive processing capabilities including:
  * - Knowledge representation and reasoning
  * - Semantic understanding and inference
@@ -18,7 +18,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../../utils/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
+    require('../../utils/logger').warn('aiClient:  is set but its SDK failed to load', { error: error.message });
     return null;
   }
 }
@@ -40,31 +40,31 @@ class AIBrainService {
       const { Anthropic } = require('@anthropic-ai/sdk');
       return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     });
-    
+
     // Knowledge graph
     this.knowledgeGraph = new Map();
-    
+
     // Working memory
     this.workingMemory = new Map();
-    
+
     // Long-term memory
     this.longTermMemory = new Map();
-    
+
     // Cognitive state
     this.cognitiveState = {
       attention: new Map(),
       goals: new Map(),
       context: new Map(),
-      beliefs: new Map()
+      beliefs: new Map(),
     };
-    
+
     // Initialize knowledge base
     this.initializeKnowledgeBase();
-    
+
     // Initialize cognitive processes
     this.initializeCognitiveProcesses();
   }
-  
+
   /**
    * Initialize knowledge base
    */
@@ -74,31 +74,31 @@ class AIBrainService {
       crops: ['wheat', 'rice', 'maize', 'sugarcane', 'cotton'],
       seasons: ['kharif', 'rabi', 'zaid'],
       practices: ['organic', 'conventional', 'regenerative'],
-      challenges: ['climate_change', 'water_scarcity', 'soil_degradation']
+      challenges: ['climate_change', 'water_scarcity', 'soil_degradation'],
     });
-    
+
     // Equipment knowledge
     this.addKnowledge('equipment', {
       types: ['tractors', 'harvesters', 'irrigation', 'processing'],
       maintenance: ['preventive', 'predictive', 'corrective'],
-      utilization: ['rental', 'leasing', 'sharing']
+      utilization: ['rental', 'leasing', 'sharing'],
     });
-    
+
     // Supply chain knowledge
     this.addKnowledge('supply_chain', {
       stages: ['production', 'processing', 'distribution', 'retail'],
       stakeholders: ['farmers', 'processors', 'distributors', 'retailers'],
-      challenges: ['waste', 'inefficiency', 'quality_control']
+      challenges: ['waste', 'inefficiency', 'quality_control'],
     });
-    
+
     // Financial knowledge
     this.addKnowledge('finance', {
       instruments: ['loans', 'insurance', 'subsidies', 'grants'],
       metrics: ['roi', 'cash_flow', 'profitability', 'liquidity'],
-      risks: ['market', 'credit', 'operational', 'strategic']
+      risks: ['market', 'credit', 'operational', 'strategic'],
     });
   }
-  
+
   /**
    * Initialize cognitive processes
    */
@@ -109,10 +109,10 @@ class AIBrainService {
       reasoning: this.reasoningProcess.bind(this),
       learning: this.learningProcess.bind(this),
       decision: this.decisionProcess.bind(this),
-      planning: this.planningProcess.bind(this)
+      planning: this.planningProcess.bind(this),
     };
   }
-  
+
   /**
    * Add knowledge to knowledge graph
    */
@@ -120,17 +120,17 @@ class AIBrainService {
     this.knowledgeGraph.set(domain, {
       ...knowledge,
       timestamp: new Date(),
-      confidence: 1.0
+      confidence: 1.0,
     });
   }
-  
+
   /**
    * Retrieve knowledge from knowledge graph
    */
   getKnowledge(domain) {
     return this.knowledgeGraph.get(domain);
   }
-  
+
   /**
    * Perception process - understand input
    */
@@ -149,32 +149,32 @@ class AIBrainService {
         
         Provide structured output in JSON format.
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const perception = JSON.parse(response.choices[0].message.content);
-      
+
       // Update working memory
       this.workingMemory.set('current_perception', perception);
-      
+
       return {
         success: true,
-        perception: perception
+        perception,
       };
     } catch (error) {
       console.error('Error in perception process:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Attention process - focus on relevant information
    */
@@ -192,32 +192,32 @@ class AIBrainService {
         
         Provide structured output in JSON format.
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const attention = JSON.parse(response.choices[0].message.content);
-      
+
       // Update cognitive state
       this.cognitiveState.attention.set('current', attention);
-      
+
       return {
         success: true,
-        attention: attention
+        attention,
       };
     } catch (error) {
       console.error('Error in attention process:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Reasoning process - draw inferences
    */
@@ -236,32 +236,32 @@ class AIBrainService {
         
         Provide structured output in JSON format with reasoning chains and conclusions.
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const reasoning = JSON.parse(response.choices[0].message.content);
-      
+
       // Update working memory
       this.workingMemory.set('current_reasoning', reasoning);
-      
+
       return {
         success: true,
-        reasoning: reasoning
+        reasoning,
       };
     } catch (error) {
       console.error('Error in reasoning process:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Learning process - acquire and update knowledge
    */
@@ -280,36 +280,36 @@ class AIBrainService {
         
         Provide structured output in JSON format with learned knowledge and updates.
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const learning = JSON.parse(response.choices[0].message.content);
-      
+
       // Update long-term memory
       if (learning.knowledge_updates) {
         learning.knowledge_updates.forEach(update => {
           this.addKnowledge(update.domain, update.knowledge);
         });
       }
-      
+
       return {
         success: true,
-        learning: learning
+        learning,
       };
     } catch (error) {
       console.error('Error in learning process:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Decision process - make informed decisions
    */
@@ -329,32 +329,32 @@ class AIBrainService {
         
         Provide structured output in JSON format with decision recommendations.
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const decision = JSON.parse(response.choices[0].message.content);
-      
+
       // Update cognitive state
       this.cognitiveState.goals.set('current_decision', decision);
-      
+
       return {
         success: true,
-        decision: decision
+        decision,
       };
     } catch (error) {
       console.error('Error in decision process:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Planning process - create action plans
    */
@@ -374,29 +374,29 @@ class AIBrainService {
         
         Provide structured output in JSON format with detailed action plans.
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const planning = JSON.parse(response.choices[0].message.content);
-      
+
       return {
         success: true,
-        planning: planning
+        planning,
       };
     } catch (error) {
       console.error('Error in planning process:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Execute full cognitive cycle
    */
@@ -405,28 +405,28 @@ class AIBrainService {
       // Step 1: Perception
       const perception = await this.perceptionProcess(input, context);
       if (!perception.success) return perception;
-      
+
       // Step 2: Attention
       const attention = await this.attentionProcess(perception.perception, goals);
       if (!attention.success) return attention;
-      
+
       // Step 3: Reasoning
       const relevantKnowledge = this.getRelevantKnowledge(attention.attention);
       const reasoning = await this.reasoningProcess(attention.attention, relevantKnowledge);
       if (!reasoning.success) return reasoning;
-      
+
       // Step 4: Decision
       const decision = await this.decisionProcess(reasoning.reasoning, context, constraints);
       if (!decision.success) return decision;
-      
+
       // Step 5: Planning
       const planning = await this.planningProcess(
         decision.decision,
         context.current_state || {},
-        context.target_state || {}
+        context.target_state || {},
       );
       if (!planning.success) return planning;
-      
+
       return {
         success: true,
         cycle: {
@@ -434,25 +434,25 @@ class AIBrainService {
           attention: attention.attention,
           reasoning: reasoning.reasoning,
           decision: decision.decision,
-          planning: planning.planning
+          planning: planning.planning,
         },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     } catch (error) {
       console.error('Error in cognitive cycle:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Get relevant knowledge based on attention
    */
   getRelevantKnowledge(attention) {
     const knowledge = {};
-    
+
     if (attention.relevant_domains) {
       attention.relevant_domains.forEach(domain => {
         const domainKnowledge = this.getKnowledge(domain);
@@ -461,10 +461,10 @@ class AIBrainService {
         }
       });
     }
-    
+
     return knowledge;
   }
-  
+
   /**
    * Update context
    */
@@ -472,10 +472,10 @@ class AIBrainService {
     this.cognitiveState.context.set('current', {
       ...this.cognitiveState.context.get('current'),
       ...context,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
-  
+
   /**
    * Get cognitive state
    */
@@ -486,10 +486,10 @@ class AIBrainService {
       context: Array.from(this.cognitiveState.context.entries()),
       beliefs: Array.from(this.cognitiveState.beliefs.entries()),
       working_memory: Array.from(this.workingMemory.entries()),
-      long_term_memory_size: this.longTermMemory.size
+      long_term_memory_size: this.longTermMemory.size,
     };
   }
-  
+
   /**
    * Clear working memory
    */
@@ -499,74 +499,8 @@ class AIBrainService {
   }
 }
 
-// Export singleton instance with router for proper mounting
+// Export singleton instance
 const aiBrainService = new AIBrainService();
 
-// Create Express router for AI Brain endpoints
-const express = require('express');
-const router = express.Router();
-const { authMiddleware } = require('../../middleware/auth');
+module.exports = aiBrainService;
 
-// AI Brain health check
-router.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    service: 'ai-brain',
-    models_available: {
-      openai: !!aiBrainService.openai,
-      gemini: !!aiBrainService.gemini,
-      anthropic: !!aiBrainService.anthropic
-    },
-    knowledge_graph_size: aiBrainService.knowledgeGraph.size,
-    working_memory_size: aiBrainService.workingMemory.size,
-    long_term_memory_size: aiBrainService.longTermMemory.size
-  });
-});
-
-// Cognitive process endpoint
-router.post('/process', authMiddleware, async (req, res) => {
-  try {
-    const { input, context } = req.body;
-    const result = await aiBrainService.processCognitiveCycle(input, context);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Knowledge graph operations
-router.get('/knowledge-graph', authMiddleware, (req, res) => {
-  try {
-    const graph = aiBrainService.getKnowledgeGraph();
-    res.json({ knowledge_graph: graph });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Memory operations
-router.post('/memory/working', authMiddleware, (req, res) => {
-  try {
-    const { key, value } = req.body;
-    const result = aiBrainService.addToWorkingMemory(key, value);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.post('/memory/long-term', authMiddleware, (req, res) => {
-  try {
-    const { key, value } = req.body;
-    const result = aiBrainService.addToLongTermMemory(key, value);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-module.exports = {
-  router,
-  aiBrainService,
-  ...aiBrainService
-};

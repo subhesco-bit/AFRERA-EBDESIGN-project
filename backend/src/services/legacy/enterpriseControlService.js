@@ -60,7 +60,7 @@ async function startWorkflow({ workflowCode, entityType, entityId, amount, initi
     `SELECT id, entity_type FROM workflow_definitions
       WHERE workflow_code = $1 AND is_active = TRUE
       ORDER BY version DESC LIMIT 1`,
-    [workflowCode]
+    [workflowCode],
   );
   if (defs.length === 0) throw new Error(`No active workflow definition "${workflowCode}"`);
   const def = defs[0];
@@ -68,7 +68,7 @@ async function startWorkflow({ workflowCode, entityType, entityId, amount, initi
   const { rows: steps } = await db.query(
     `SELECT id, step_number, name, threshold_amount
        FROM workflow_steps WHERE workflow_id = $1 ORDER BY step_number ASC`,
-    [def.id]
+    [def.id],
   );
   if (steps.length === 0) throw new Error(`Workflow "${workflowCode}" has no steps defined`);
 
@@ -81,14 +81,14 @@ async function startWorkflow({ workflowCode, entityType, entityId, amount, initi
        (instance_code, workflow_id, entity_type, entity_id, current_step_id, status, initiated_by, context)
      VALUES ($1,$2,$3,$4,$5,'running',$6,$7) RETURNING *`,
     [makeCode('WF'), def.id, entityType, String(entityId), firstStep.id, initiatedBy ?? null,
-      JSON.stringify(context ?? {})]
+      JSON.stringify(context ?? {})],
   );
   const instance = rows[0];
 
   await db.query(
     `INSERT INTO workflow_actions (instance_id, step_id, action, actor_id)
      VALUES ($1,$2,'submitted',$3)`,
-    [instance.id, firstStep.id, initiatedBy ?? null]
+    [instance.id, firstStep.id, initiatedBy ?? null],
   );
 
   return { ...instance, currentStep: firstStep.name };
@@ -105,7 +105,7 @@ async function actOnWorkflow({ instanceCode, action, actorId, comment, delegated
        FROM workflow_instances wi
        LEFT JOIN workflow_steps ws ON ws.id = wi.current_step_id
       WHERE wi.instance_code = $1`,
-    [instanceCode]
+    [instanceCode],
   );
   if (found.length === 0) throw new Error(`Workflow instance ${instanceCode} not found`);
   const inst = found[0];
@@ -120,7 +120,7 @@ async function actOnWorkflow({ instanceCode, action, actorId, comment, delegated
   await db.query(
     `INSERT INTO workflow_actions (instance_id, step_id, action, actor_id, delegated_from, comment)
      VALUES ($1,$2,$3,$4,$5,$6)`,
-    [inst.id, inst.current_step_id, action, actorId ?? null, delegatedFrom ?? null, comment ?? null]
+    [inst.id, inst.current_step_id, action, actorId ?? null, delegatedFrom ?? null, comment ?? null],
   );
 
   if (action === 'rejected') {
@@ -128,7 +128,7 @@ async function actOnWorkflow({ instanceCode, action, actorId, comment, delegated
       `UPDATE workflow_instances
           SET status='rejected', completed_at=CURRENT_TIMESTAMP, outcome_reason=$2
         WHERE id=$1`,
-      [inst.id, comment]
+      [inst.id, comment],
     );
     return { instanceCode, status: 'rejected' };
   }
@@ -139,7 +139,7 @@ async function actOnWorkflow({ instanceCode, action, actorId, comment, delegated
     `SELECT id, name FROM workflow_steps
       WHERE workflow_id=$1 AND step_number > $2
       ORDER BY step_number ASC LIMIT 1`,
-    [inst.workflow_id, inst.step_number ?? 0]
+    [inst.workflow_id, inst.step_number ?? 0],
   );
 
   if (next.length === 0) {
@@ -147,7 +147,7 @@ async function actOnWorkflow({ instanceCode, action, actorId, comment, delegated
       `UPDATE workflow_instances
           SET status='approved', completed_at=CURRENT_TIMESTAMP, current_step_id=NULL
         WHERE id=$1`,
-      [inst.id]
+      [inst.id],
     );
     return { instanceCode, status: 'approved', complete: true };
   }
@@ -162,7 +162,7 @@ async function listPendingApprovals({ role } = {}) {
   let where = '';
   if (role) { params.push(role); where = 'WHERE required_role = $1'; }
   const { rows } = await db.query(
-    `SELECT * FROM v_pending_approvals ${where} ORDER BY hours_open DESC`, params
+    `SELECT * FROM v_pending_approvals ${where} ORDER BY hours_open DESC`, params,
   );
   return rows;
 }
@@ -179,7 +179,7 @@ async function createLead(payload) {
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
     [makeCode('LEAD'), payload.source ?? null, payload.organisationName ?? null,
       payload.contactName ?? null, payload.email ?? null, payload.phone ?? null,
-      payload.segment ?? null, payload.estimatedValue ?? null, payload.ownerId ?? null]
+      payload.segment ?? null, payload.estimatedValue ?? null, payload.ownerId ?? null],
   );
   return rows[0];
 }
@@ -195,7 +195,7 @@ async function convertLead({ leadCode, name, amount, probabilityPct, expectedClo
   try {
     await client.query('BEGIN');
     const { rows: leads } = await client.query(
-      'SELECT * FROM crm_leads WHERE lead_code=$1 FOR UPDATE', [leadCode]
+      'SELECT * FROM crm_leads WHERE lead_code=$1 FOR UPDATE', [leadCode],
     );
     if (leads.length === 0) throw new Error(`Lead ${leadCode} not found`);
     const lead = leads[0];
@@ -206,7 +206,7 @@ async function convertLead({ leadCode, name, amount, probabilityPct, expectedClo
       const { rows: c } = await client.query(
         `INSERT INTO clients (client_code, legal_name, segment, status, onboarded_at)
          VALUES ($1,$2,$3,'active',CURRENT_DATE) RETURNING id`,
-        [makeCode('CL'), lead.organisation_name, lead.segment ?? null]
+        [makeCode('CL'), lead.organisation_name, lead.segment ?? null],
       );
       clientId = c[0].id;
     }
@@ -217,10 +217,10 @@ async function convertLead({ leadCode, name, amount, probabilityPct, expectedClo
        VALUES ($1,$2,$3,$4,'qualification',$5,$6,$7,$8) RETURNING *`,
       [makeCode('OPP'), lead.id, clientId, name ?? lead.organisation_name ?? 'Untitled',
         amount ?? lead.estimated_value ?? 0, probabilityPct ?? 25,
-        expectedCloseDate ?? null, lead.owner_id]
+        expectedCloseDate ?? null, lead.owner_id],
     );
 
-    await client.query("UPDATE crm_leads SET status='converted' WHERE id=$1", [lead.id]);
+    await client.query('UPDATE crm_leads SET status=\'converted\' WHERE id=$1', [lead.id]);
     await client.query('COMMIT');
     return { opportunity: opp[0], clientId };
   } catch (err) {
@@ -240,7 +240,7 @@ async function getPipeline() {
     byStage: rows,
     totals: { gross, weighted },
     // Stated plainly, because a weighted figure quoted alone reads as certainty.
-    note: 'Weighted value applies each deal\'s own probability; it is a planning figure, not committed revenue.'
+    note: 'Weighted value applies each deal\'s own probability; it is a planning figure, not committed revenue.',
   };
 }
 
@@ -261,13 +261,13 @@ async function computeClientHealth(clientId) {
   const { rows: act } = await db.query(
     `SELECT COUNT(*)::int AS n, MAX(occurred_at) AS last_touch
        FROM crm_activities WHERE subject_type='client' AND subject_id=$1`,
-    [clientId]
+    [clientId],
   );
   const activityCount = act[0]?.n ?? 0;
   const lastTouch = act[0]?.last_touch ? new Date(act[0].last_touch) : null;
-  const daysSinceTouch = lastTouch
-    ? Math.floor((Date.now() - lastTouch.getTime()) / 86400000)
-    : null;
+  const daysSinceTouch = lastTouch ?
+    Math.floor((Date.now() - lastTouch.getTime()) / 86400000) :
+    null;
 
   const factors = [
     { name: 'Engagement recency', weight: 0.35,
@@ -277,7 +277,7 @@ async function computeClientHealth(clientId) {
       score: Math.min(100, activityCount * 10), dataQuality: 'real' },
     { name: 'Account standing', weight: 0.40,
       score: c.status === 'active' ? 100 : c.status === 'on_hold' ? 30 : c.status === 'prospect' ? 50 : 0,
-      dataQuality: 'real' }
+      dataQuality: 'real' },
   ];
 
   const score = Number(factors.reduce((s, f) => s + f.weight * f.score, 0).toFixed(2));
@@ -299,12 +299,12 @@ async function listLegalCalendar({ withinDays = 60 } = {}) {
     `SELECT * FROM v_legal_calendar
       WHERE due_date <= CURRENT_DATE + ($1 || ' days')::interval
       ORDER BY due_date ASC`,
-    [String(withinDays)]
+    [String(withinDays)],
   );
   return rows.map((r) => ({
     ...r,
     daysUntilDue: Math.ceil((new Date(r.due_date) - Date.now()) / 86400000),
-    overdue: new Date(r.due_date) < new Date()
+    overdue: new Date(r.due_date) < new Date(),
   }));
 }
 
@@ -328,7 +328,7 @@ async function assessRisk({ riskCode, residualLikelihood, residualImpact, review
                             WHEN 'annual'  THEN INTERVAL '1 year'
                             ELSE INTERVAL '3 months' END
       WHERE risk_code=$1 RETURNING *`,
-    [riskCode, residualLikelihood, residualImpact]
+    [riskCode, residualLikelihood, residualImpact],
   );
   if (rows.length === 0) throw new Error(`Risk ${riskCode} not found`);
   const risk = rows[0];
@@ -337,7 +337,7 @@ async function assessRisk({ riskCode, residualLikelihood, residualImpact, review
     signalBus.emitSignal(
       SIGNAL.RISK_CRITICAL,
       { riskCode, residualScore: risk.residual_score, title: risk.title, reviewedBy },
-      { severity: SEVERITY.CRITICAL, source: 'enterpriseControlService.assessRisk' }
+      { severity: SEVERITY.CRITICAL, source: 'enterpriseControlService.assessRisk' },
     );
   }
   return risk;
@@ -385,7 +385,7 @@ async function raiseIncident({ typeCode, severity, title, description, affectedE
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'open') RETURNING *`,
     [makeCode('INC'), type?.id ?? null, finalSeverity, title, description,
       affectedEntityType ?? null, affectedEntityIds ?? null,
-      Boolean(peopleAtRisk), detectedBy ?? 'human']
+      Boolean(peopleAtRisk), detectedBy ?? 'human'],
   );
   const incident = rows[0];
 
@@ -396,30 +396,30 @@ async function raiseIncident({ typeCode, severity, title, description, affectedE
       WHERE is_active = TRUE
         AND (covers_category IS NULL OR covers_category = $1)
       ORDER BY escalation_level ASC NULLS LAST`,
-    [type?.category ?? null]
+    [type?.category ?? null],
   );
 
   signalBus.emitSignal(
     SIGNAL.EMERGENCY_RAISED,
     { incidentCode: incident.incident_code, severity: finalSeverity, peopleAtRisk: Boolean(peopleAtRisk) },
-    { severity: finalSeverity === 'critical' ? SEVERITY.EMERGENCY : SEVERITY.CRITICAL, source: 'enterpriseControlService.raiseIncident' }
+    { severity: finalSeverity === 'critical' ? SEVERITY.EMERGENCY : SEVERITY.CRITICAL, source: 'enterpriseControlService.raiseIncident' },
   );
 
   logger.warn('EMERGENCY INCIDENT RAISED', {
-    code: incident.incident_code, severity: finalSeverity, peopleAtRisk: Boolean(peopleAtRisk)
+    code: incident.incident_code, severity: finalSeverity, peopleAtRisk: Boolean(peopleAtRisk),
   });
 
   return {
     incident,
     severityNote,
     // The three things a responder needs in the first sixty seconds.
-    immediateActions: type?.immediate_actions
-      ?? 'No standing instruction is on file for this incident type. Contain first, then notify the escalation chain below.',
+    immediateActions: type?.immediate_actions ??
+      'No standing instruction is on file for this incident type. Contain first, then notify the escalation chain below.',
     acknowledgeWithinMinutes: type?.target_acknowledge_minutes ?? 15,
-    regulatorNotification: type?.requires_regulator_notification
-      ? { required: true, withinHours: type.regulator_notify_within_hours }
-      : { required: false },
-    escalationChain: contacts
+    regulatorNotification: type?.requires_regulator_notification ?
+      { required: true, withinHours: type.regulator_notify_within_hours } :
+      { required: false },
+    escalationChain: contacts,
   };
 }
 
@@ -431,7 +431,7 @@ async function acknowledgeIncident({ incidentCode, userId }) {
             incident_commander = COALESCE(incident_commander, $2),
             status = CASE WHEN status='open' THEN 'acknowledged' ELSE status END
       WHERE incident_code=$1 RETURNING *`,
-    [incidentCode, userId ?? null]
+    [incidentCode, userId ?? null],
   );
   if (rows.length === 0) throw new Error(`Incident ${incidentCode} not found`);
   return rows[0];
@@ -442,9 +442,9 @@ async function listActiveIncidents() {
   const { rows } = await db.query('SELECT * FROM v_active_incidents');
   // Triage order: life safety, then severity, then age.
   return rows.sort((a, b) =>
-    (b.people_at_risk === true) - (a.people_at_risk === true)
-    || (SEVERITY_RANK[b.severity] ?? 0) - (SEVERITY_RANK[a.severity] ?? 0)
-    || Number(b.minutes_open) - Number(a.minutes_open));
+    (b.people_at_risk === true) - (a.people_at_risk === true) ||
+    (SEVERITY_RANK[b.severity] ?? 0) - (SEVERITY_RANK[a.severity] ?? 0) ||
+    Number(b.minutes_open) - Number(a.minutes_open));
 }
 
 // ===========================================================================
@@ -461,7 +461,7 @@ router.post('/workflow/start', authMiddleware, async (req, res) => {
 router.post('/workflow/:instanceCode/act', authMiddleware, async (req, res) => {
   try {
     const data = await actOnWorkflow({
-      instanceCode: req.params.instanceCode, ...req.body, actorId: req.user?.id
+      instanceCode: req.params.instanceCode, ...req.body, actorId: req.user?.id,
     });
     res.json({ success: true, data });
   } catch (e) { return fail(res, e, 'actOnWorkflow'); }
@@ -510,7 +510,7 @@ router.get('/legal/calendar', authMiddleware, adminMiddleware, async (req, res) 
 router.post('/risk/:riskCode/assess', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const data = await assessRisk({
-      riskCode: req.params.riskCode, ...req.body, reviewedBy: req.user?.id
+      riskCode: req.params.riskCode, ...req.body, reviewedBy: req.user?.id,
     });
     res.json({ success: true, data });
   } catch (e) { return fail(res, e, 'assessRisk'); }
@@ -560,5 +560,6 @@ module.exports = {
   raiseIncident,
   acknowledgeIncident,
   listActiveIncidents,
-  SEVERITY_RANK
+  SEVERITY_RANK,
 };
+

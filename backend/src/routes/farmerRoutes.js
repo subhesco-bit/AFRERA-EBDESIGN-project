@@ -17,7 +17,7 @@ const {
   calculateFDI,
   addFarmerCertification,
   getFarmerCertifications,
-  getFPOs
+  getFPOs,
 } = require('../services/legacy/farmerService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');

@@ -1,10 +1,10 @@
-import { Wheat } from 'lucide-react'
-import { seedPlanningAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { Wheat } from 'lucide-react';
+import { seedPlanningAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const SEASONS = ['Kharif', 'Rabi', 'Zaid', 'Perennial']
-const SOURCES = ['Certified Dealer', 'Government Scheme', 'Farm Saved', 'FPO Pooled', 'Research Institute']
-const STATUS = ['Planned', 'Procured', 'Distributed']
+const SEASONS = ['Kharif', 'Rabi', 'Zaid', 'Perennial'];
+const SOURCES = ['Certified Dealer', 'Government Scheme', 'Farm Saved', 'FPO Pooled', 'Research Institute'];
+const STATUS = ['Planned', 'Procured', 'Distributed'];
 
 const initialForm = {
   crop_name: '',
@@ -14,7 +14,7 @@ const initialForm = {
   seed_source: 'Certified Dealer',
   status: 'Planned',
   notes: '',
-}
+};
 
 function SeedPlanningPage() {
   return (
@@ -40,9 +40,9 @@ function SeedPlanningPage() {
         { key: 'season', label: 'Season' },
         { key: 'planned_area_ha', label: 'Planned Area (ha)' },
         { key: 'seed_requirement', label: 'Seed Required (kg)', render: (r) => {
-          const area = Number(r.planned_area_ha) || 0
-          const rate = Number(r.seed_rate_kg_per_ha) || 0
-          return (area * rate) ? (area * rate).toFixed(1) : '—'
+          const area = Number(r.planned_area_ha) || 0;
+          const rate = Number(r.seed_rate_kg_per_ha) || 0;
+          return (area * rate) ? (area * rate).toFixed(1) : '—';
         } },
         { key: 'seed_source', label: 'Source' },
         { key: 'status', label: 'Status' },
@@ -62,7 +62,7 @@ function SeedPlanningPage() {
         { label: 'Distributed', value: items.filter((i) => i.status === 'Distributed').length },
       ]}
     />
-  )
+  );
 }
 
-export default SeedPlanningPage
+export default SeedPlanningPage;

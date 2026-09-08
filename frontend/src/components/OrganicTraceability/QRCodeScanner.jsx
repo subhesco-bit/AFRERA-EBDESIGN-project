@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { organicTraceabilityAPI } from '../../services/api';
+import { organicTraceabilityAPI } from '../../services/componentApi';
 
 /**
  * QR Code Scanner Component

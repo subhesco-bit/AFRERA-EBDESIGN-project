@@ -22,7 +22,7 @@ async function getSecurityEvents(req, res) {
       eventType: req.query.eventType,
       severity: req.query.severity,
       startDate: req.query.startDate,
-      endDate: req.query.endDate
+      endDate: req.query.endDate,
     };
     const result = await service.getSecurityEvents(filters);
     res.json({ success: true, data: result });
@@ -139,22 +139,22 @@ module.exports = {
   // Security event logging
   createSecurityEvent,
   getSecurityEvents,
-  
+
   // IP whitelist/blacklist
   addToIpList,
   removeFromIpList,
   getIpLists,
   checkIpAccess,
-  
+
   // Rate limiting
   checkRateLimit,
-  
+
   // AI-powered threat detection
   detectThreats,
-  
+
   // Security score
   calculateSecurityScore,
-  
+
   // Access control policies
   createAccessPolicy,
   evaluateAccessPolicy,

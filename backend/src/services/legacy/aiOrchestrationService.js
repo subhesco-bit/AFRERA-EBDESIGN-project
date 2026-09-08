@@ -11,7 +11,7 @@ const FALLBACK_SLOTS = [
     data_residency: 'DPDP-compliant',
     enabled: false,
     priority: 0,
-    notes: 'Placeholder slot for model assignment and DPDP residency review.'
+    notes: 'Placeholder slot for model assignment and DPDP residency review.',
   },
   {
     model_key: 'gemini-1.5-flash',
@@ -21,7 +21,7 @@ const FALLBACK_SLOTS = [
     data_residency: 'DPDP-compliant',
     enabled: false,
     priority: 0,
-    notes: 'Reserved for low-latency routing until a residency/llm-cost decision is confirmed.'
+    notes: 'Reserved for low-latency routing until a residency/llm-cost decision is confirmed.',
   },
 ];
 
@@ -60,7 +60,7 @@ async function upsertModelSlot(payload = {}) {
     data_residency,
     enabled = false,
     priority = 0,
-    notes = null
+    notes = null,
   } = payload;
 
   if (!model_key) {
@@ -91,7 +91,7 @@ async function upsertModelSlot(payload = {}) {
           notes = EXCLUDED.notes
         RETURNING *
       `,
-      [model_key, provider_name, provider_type, hosting_region, data_residency, enabled, priority, notes]
+      [model_key, provider_name, provider_type, hosting_region, data_residency, enabled, priority, notes],
     );
     return rows?.[0] || null;
   } catch (error) {
@@ -105,7 +105,7 @@ async function upsertModelSlot(payload = {}) {
       priority,
       notes,
       placeholder: true,
-      warning: 'ai_model_registry is not mounted in the live database; payload restored into the in-memory service layer.'
+      warning: 'ai_model_registry is not mounted in the live database; payload restored into the in-memory service layer.',
     };
   }
 }
@@ -115,3 +115,4 @@ module.exports = {
   listUnservedIntents,
   upsertModelSlot,
 };
+

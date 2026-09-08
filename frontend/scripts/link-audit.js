@@ -12,6 +12,24 @@ const auditResults = {
   issues: [],
   recommendations: []
 };
+let configuredRoutes = new Set();
+
+function normalizeRoute(route) {
+  return route
+    .replace(/\$\{[^}]*\}?/g, ':param')
+    .replace(/:\w+/g, ':param')
+    .replace(/\/+$/, '') || '/';
+}
+
+function loadConfiguredRoutes() {
+  const routesPath = path.join(process.cwd(), 'src/config/routes.js');
+  if (!fs.existsSync(routesPath)) return;
+
+  const content = fs.readFileSync(routesPath, 'utf8');
+  const routes = [...content.matchAll(/path:\s*["']([^"']+)["']/g)]
+    .map((match) => normalizeRoute(match[1]));
+  configuredRoutes = new Set(routes);
+}
 
 function auditDirectory(directory) {
   const items = fs.readdirSync(directory);
@@ -52,8 +70,8 @@ function auditFile(filePath) {
       links.forEach(link => {
         const linkPath = link.match(/to=["']([^"']+)["']/)[1];
         if (linkPath.startsWith('/') && !linkPath.startsWith('/http')) {
-          // Check if route exists in routes config
-          if (!fs.existsSync(path.join(process.cwd(), 'src/config/routes.js'))) {
+          // Check the actual configured route, including parameterised paths.
+          if (!configuredRoutes.has(normalizeRoute(linkPath))) {
             audit.issues.push(`Link to ${linkPath} may not have corresponding route`);
           }
         }
@@ -112,7 +130,7 @@ function auditRoutesConfig() {
     // Check for missing authentication
     if (!content.includes('ProtectedRoute') && !content.includes('auth')) {
       auditResults.issues.push('Routes may not have authentication');
-      auditResults.recommendations.add('Add ProtectedRoute wrapper for authenticated routes');
+      auditResults.recommendations.push('Add ProtectedRoute wrapper for authenticated routes');
     }
     
   } catch (error) {
@@ -148,6 +166,8 @@ function main() {
   
   console.log('Starting frontend link audit...');
   console.log(`Auditing directory: ${srcDir}`);
+
+  loadConfiguredRoutes();
   
   if (fs.existsSync(srcDir)) {
     auditDirectory(srcDir);

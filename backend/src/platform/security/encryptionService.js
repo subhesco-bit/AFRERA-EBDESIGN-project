@@ -2,7 +2,7 @@
  * Encryption Service (Section 23: Security Layer)
  * Handles encryption and decryption operations
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class EncryptionService {
   constructor() {

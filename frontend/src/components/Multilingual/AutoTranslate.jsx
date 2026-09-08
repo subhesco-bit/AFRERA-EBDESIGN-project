@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { multilingualAPI } from '../../services/api';
+import { multilingualAPI } from '../../services/componentApi';
 
 /**
  * Auto Translate Component
@@ -11,11 +11,11 @@ import { multilingualAPI } from '../../services/api';
  * re-run per distinct text. FE-01 (routing through api.js) is fixed below.
  */
 const AutoTranslate = ({
-  text, 
-  targetLanguage, 
-  onTranslated, 
+  text,
+  targetLanguage,
+  onTranslated,
   showOriginal = true,
-  className = '' 
+  className = '',
 }) => {
   const [translatedText, setTranslatedText] = useState('');
   const [detectedLanguage, setDetectedLanguage] = useState(null);
@@ -52,7 +52,7 @@ const AutoTranslate = ({
       const translateResponse = await multilingualAPI.translate({
         text,
         source_language: detectData.iso_code,
-        target_language: targetLanguage
+        target_language: targetLanguage,
       });
 
       const translateData = translateResponse.data;

@@ -66,5 +66,5 @@ module.exports = {
   listEquipmentForRental,
   bookEquipmentRental,
   trackRentalPerformance,
-  generateRentalReport
+  generateRentalReport,
 };

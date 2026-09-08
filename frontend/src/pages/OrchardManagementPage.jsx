@@ -1,57 +1,57 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { orchardAPI } from '../services/api'
-import { TreeDeciduous, Plus, X, Trash2, Edit } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { orchardAPI } from '../services/api';
+import { TreeDeciduous, Plus, X, Trash2, Edit } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const FRUIT_TYPES = ['Orange', 'Pineapple', 'Litchi', 'Guava', 'Mango', 'Assam Lemon', 'Kiwi', 'Passion Fruit']
+const FRUIT_TYPES = ['Orange', 'Pineapple', 'Litchi', 'Guava', 'Mango', 'Assam Lemon', 'Kiwi', 'Passion Fruit'];
 
-const emptyForm = { name: '', fruit_type: 'Orange', area_hectares: '', tree_count: '', planting_year: '', location: '' }
+const emptyForm = { name: '', fruit_type: 'Orange', area_hectares: '', tree_count: '', planting_year: '', location: '' };
 
 function OrchardManagementPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyForm)
-  const [harvestTarget, setHarvestTarget] = useState(null)
-  const [harvestForm, setHarvestForm] = useState({ date: '', quantity_kg: '', grade: 'A' })
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [harvestTarget, setHarvestTarget] = useState(null);
+  const [harvestForm, setHarvestForm] = useState({ date: '', quantity_kg: '', grade: 'A' });
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['orchards'],
     // listOrchards returns { items, pagination }, not a bare array
     queryFn: async () => (await orchardAPI.getOrchards()).data?.data?.items ?? [],
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? orchardAPI.updateOrchard(editingId, payload) : orchardAPI.createOrchard(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Orchard updated' : 'Orchard registered')
-      queryClient.invalidateQueries({ queryKey: ['orchards'] })
-      closeForm()
+      toast.success(editingId ? 'Orchard updated' : 'Orchard registered');
+      queryClient.invalidateQueries({ queryKey: ['orchards'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save orchard'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => orchardAPI.deleteOrchard(id),
-    onSuccess: () => { toast.success('Orchard removed'); queryClient.invalidateQueries({ queryKey: ['orchards'] }) },
+    onSuccess: () => { toast.success('Orchard removed'); queryClient.invalidateQueries({ queryKey: ['orchards'] }); },
     onError: () => toast.error('Failed to remove orchard'),
-  })
+  });
 
   const recordHarvestMutation = useMutation({
     mutationFn: ({ id, payload }) => orchardAPI.recordHarvest(id, payload),
     onSuccess: () => {
-      toast.success('Harvest recorded')
-      queryClient.invalidateQueries({ queryKey: ['orchards'] })
-      setHarvestTarget(null)
-      setHarvestForm({ date: '', quantity_kg: '', grade: 'A' })
+      toast.success('Harvest recorded');
+      queryClient.invalidateQueries({ queryKey: ['orchards'] });
+      setHarvestTarget(null);
+      setHarvestForm({ date: '', quantity_kg: '', grade: 'A' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record harvest'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm); };
 
   const openEdit = (o) => {
     // Real DB columns (see M141 createOrchard/updateOrchard): orchard_type,
@@ -59,14 +59,14 @@ function OrchardManagementPage() {
     setForm({
       name: o.name || '', fruit_type: o.orchard_type || 'Orange', area_hectares: o.area ?? '',
       tree_count: o.tree_count ?? '', planting_year: o.planting_date ?? '', location: o.location || '',
-    })
-    setEditingId(o.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(o.id);
+    setShowForm(true);
+  };
 
-  const orchards = data || []
-  const totalTrees = orchards.reduce((s, o) => s + (Number(o.tree_count) || 0), 0)
-  const totalArea = orchards.reduce((s, o) => s + (Number(o.area) || 0), 0)
+  const orchards = data || [];
+  const totalTrees = orchards.reduce((s, o) => s + (Number(o.tree_count) || 0), 0);
+  const totalArea = orchards.reduce((s, o) => s + (Number(o.area) || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -78,7 +78,7 @@ function OrchardManagementPage() {
           </h1>
           <p className="text-gray-600">Track orchard plots, tree counts and fruit harvest records</p>
         </div>
-        <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true) }}
+        <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }}
           className="px-4 py-2 bg-lime-700 text-white rounded-lg font-semibold hover:bg-lime-800 transition flex items-center">
           <Plus className="w-5 h-5 mr-2" />Register Orchard
         </button>
@@ -133,7 +133,7 @@ function OrchardManagementPage() {
                   <td className="px-4 py-3 text-right space-x-2">
                     <button onClick={() => setHarvestTarget(o)} className="px-2 py-1 text-xs text-lime-700 border border-lime-300 rounded hover:bg-lime-50">Log Harvest</button>
                     <button onClick={() => openEdit(o)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => { if (confirm('Remove this orchard?')) deleteMutation.mutate(o.id) }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => { if (confirm('Remove this orchard?')) deleteMutation.mutate(o.id); }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
@@ -152,8 +152,8 @@ function OrchardManagementPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.name) { toast.error('Orchard name is required'); return }
+                  e.preventDefault();
+                  if (!form.name) { toast.error('Orchard name is required'); return; }
                   // Real backend fields (M141 createOrchard/updateOrchard) don't match this
                   // form's names 1:1 - mapped explicitly rather than spreading form as-is.
                   saveMutation.mutate({
@@ -163,7 +163,7 @@ function OrchardManagementPage() {
                     area: form.area_hectares === '' ? null : Number(form.area_hectares),
                     treeCount: form.tree_count === '' ? null : Number(form.tree_count),
                     plantingDate: form.planting_year === '' ? null : Number(form.planting_year),
-                  })
+                  });
                 }}
                 className="space-y-4"
               >
@@ -225,8 +225,8 @@ function OrchardManagementPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!harvestForm.date || !harvestForm.quantity_kg) { toast.error('Date and quantity are required'); return }
+                  e.preventDefault();
+                  if (!harvestForm.date || !harvestForm.quantity_kg) { toast.error('Date and quantity are required'); return; }
                   // Real backend fields (M141 recordOrchardProduction) don't match this
                   // form's names - mapped explicitly. productionYear/variety aren't
                   // collected by this form; year is derived from the harvest date,
@@ -239,7 +239,7 @@ function OrchardManagementPage() {
                       quantity: Number(harvestForm.quantity_kg),
                       qualityGrade: harvestForm.grade,
                     },
-                  })
+                  });
                 }}
                 className="space-y-4"
               >
@@ -276,7 +276,7 @@ function OrchardManagementPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default OrchardManagementPage
+export default OrchardManagementPage;

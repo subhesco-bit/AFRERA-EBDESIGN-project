@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Truck } from 'lucide-react'
-import { logisticsEnhancementAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { Truck } from 'lucide-react';
+import { logisticsEnhancementAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/logisticsEnhancementRoutes.js +
@@ -15,10 +15,10 @@ import ActionCard from '../components/common/ActionCard'
 const TABS = [
   ['fleet', 'Fleet'], ['tracking', 'Tracking'], ['temperature', 'Temperature'],
   ['warehouse', 'Warehouse'], ['drivers', 'Driver Location'],
-]
+];
 
 function LogisticsEnhancementPage() {
-  const [tab, setTab] = useState('fleet')
+  const [tab, setTab] = useState('fleet');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -83,7 +83,7 @@ function LogisticsEnhancementPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default LogisticsEnhancementPage
+export default LogisticsEnhancementPage;

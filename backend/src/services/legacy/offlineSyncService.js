@@ -18,7 +18,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware } = require('../../middleware/auth');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 const crypto = require('crypto');
 
 const router = express.Router();
@@ -39,8 +39,8 @@ const OFFLINE_SYNC_CONFIG = {
     critical: 1, // Orders, payments
     high: 2, // Inventory, prices
     medium: 3, // User data, preferences
-    low: 4 // Analytics, logs
-  }
+    low: 4, // Analytics, logs
+  },
 };
 
 // Production-readiness audit (2026-08-28): the old fallback was
@@ -93,7 +93,7 @@ async function addToSyncQueue(userId, entityType, entityData, operation, priorit
       JSON.stringify(entityData),
       operation,
       syncToken,
-      priorityValue
+      priorityValue,
     ]);
 
     logger.info(`Added to sync queue: ${entityType} for user ${userId}`);
@@ -102,7 +102,7 @@ async function addToSyncQueue(userId, entityType, entityData, operation, priorit
       success: true,
       queue_id: result.rows[0].id,
       sync_token: result.rows[0].sync_token,
-      priority: priority
+      priority,
     };
   } catch (error) {
     logger.error('Failed to add to sync queue', { error: error.message, stack: error.stack });
@@ -143,7 +143,7 @@ async function processSyncQueue(userId) {
         results.push({
           queue_id: syncItem.id,
           status: 'success',
-          result: syncResult
+          result: syncResult,
         });
 
         logger.info(`Sync item processed: ${syncItem.entity_type} (ID: ${syncItem.id})`);
@@ -154,7 +154,7 @@ async function processSyncQueue(userId) {
           id: syncItem.id,
           retryCount,
           backoffTime,
-          errorMessage: error.message
+          errorMessage: error.message,
         });
 
         failedCount++;
@@ -162,7 +162,7 @@ async function processSyncQueue(userId) {
           queue_id: syncItem.id,
           status: 'failed',
           error: error.message,
-          retry_count: retryCount
+          retry_count: retryCount,
         });
 
         logger.error(`Sync item failed: ${syncItem.entity_type} (ID: ${syncItem.id})`, error);
@@ -175,7 +175,7 @@ async function processSyncQueue(userId) {
         `UPDATE sync_queue 
          SET status = 'completed', synced_at = NOW() 
          WHERE id = ANY($1)`,
-        [completedIds]
+        [completedIds],
       );
     }
 
@@ -197,7 +197,7 @@ async function processSyncQueue(userId) {
              error_message = v.error_message
          FROM (VALUES ${rows}) AS v(id, retry_count, backoff, error_message)
          WHERE sq.id = v.id`,
-        params
+        params,
       );
     }
 
@@ -205,7 +205,7 @@ async function processSyncQueue(userId) {
       success: true,
       processed_count: processedCount,
       failed_count: failedCount,
-      results: results
+      results,
     };
   } catch (error) {
     logger.error('Sync queue processing failed', { error: error.message, stack: error.stack });
@@ -223,7 +223,7 @@ async function processSyncItem(syncItem) {
   } catch (error) {
     throw new Error('Invalid JSON data in sync item');
   }
-  
+
   const syncToken = generateSyncToken(entityData);
 
   // Verify data integrity
@@ -267,7 +267,7 @@ async function syncOrder(orderData, operation) {
           orderData.total_amount,
           orderData.status,
           JSON.stringify(orderData.metadata || {}),
-          orderData.created_at
+          orderData.created_at,
         ]);
         break;
       }
@@ -283,7 +283,7 @@ async function syncOrder(orderData, operation) {
           orderData.id,
           orderData.total_amount,
           orderData.status,
-          JSON.stringify(orderData.metadata || {})
+          JSON.stringify(orderData.metadata || {}),
         ]);
         break;
       }
@@ -320,7 +320,7 @@ async function syncProduct(productData, operation) {
           productData.price,
           productData.stock,
           JSON.stringify(productData.metadata || {}),
-          productData.created_at
+          productData.created_at,
         ]);
         break;
       }
@@ -338,7 +338,7 @@ async function syncProduct(productData, operation) {
           productData.category,
           productData.price,
           productData.stock,
-          JSON.stringify(productData.metadata || {})
+          JSON.stringify(productData.metadata || {}),
         ]);
         break;
       }
@@ -374,7 +374,7 @@ async function syncUserProfile(profileData, operation) {
           profileData.last_name,
           profileData.phone,
           profileData.address,
-          JSON.stringify(profileData.preferences || {})
+          JSON.stringify(profileData.preferences || {}),
         ]);
         break;
       }
@@ -405,7 +405,7 @@ async function syncInventory(inventoryData, operation) {
           inventoryData.quantity,
           inventoryData.location,
           JSON.stringify(inventoryData.metadata || {}),
-          inventoryData.warehouse_id
+          inventoryData.warehouse_id,
         ]);
         break;
       }
@@ -438,7 +438,7 @@ async function syncPayment(paymentData, operation) {
           paymentData.amount,
           paymentData.status,
           JSON.stringify(paymentData.metadata || {}),
-          paymentData.created_at
+          paymentData.created_at,
         ]);
         break;
       }
@@ -453,7 +453,7 @@ async function syncPayment(paymentData, operation) {
         await pool.query(updateQuery, [
           paymentData.transaction_id,
           paymentData.status,
-          JSON.stringify(paymentData.metadata || {})
+          JSON.stringify(paymentData.metadata || {}),
         ]);
         break;
       }
@@ -485,7 +485,7 @@ async function syncGenericEntity(entityData, entityType, operation) {
       entityType,
       entityData.id,
       JSON.stringify(entityData),
-      operation
+      operation,
     ]);
 
     return { success: true, message: 'Generic entity synced successfully' };
@@ -520,7 +520,7 @@ async function resolveSyncConflict(conflictId, resolution, resolvedData) {
           entity_type: conflict.entity_type,
           entity_data: conflict.client_data,
           operation: conflict.operation,
-          sync_token: conflict.client_sync_token
+          sync_token: conflict.client_sync_token,
         });
         break;
 
@@ -534,15 +534,15 @@ async function resolveSyncConflict(conflictId, resolution, resolvedData) {
           entity_type: conflict.entity_type,
           entity_data: resolvedData,
           operation: conflict.operation,
-          sync_token: generateSyncToken(resolvedData)
+          sync_token: generateSyncToken(resolvedData),
         });
         break;
     }
 
     // Mark conflict as resolved
     await pool.query(
-      "UPDATE sync_conflicts SET status = 'resolved', resolution = $1, resolved_at = NOW() WHERE id = $2",
-      [resolution, conflictId]
+      'UPDATE sync_conflicts SET status = \'resolved\', resolution = $1, resolved_at = NOW() WHERE id = $2',
+      [resolution, conflictId],
     );
 
     logger.info(`Sync conflict resolved: ${conflictId} with resolution: ${resolution}`);
@@ -550,7 +550,7 @@ async function resolveSyncConflict(conflictId, resolution, resolvedData) {
     return {
       success: true,
       message: 'Conflict resolved successfully',
-      resolution: resolution
+      resolution,
     };
   } catch (error) {
     logger.error('Conflict resolution failed', { error: error.message, stack: error.stack });
@@ -594,7 +594,7 @@ async function getSyncStatus(userId) {
       queue_status: statusResult.rows[0],
       active_conflicts: conflictsResult.rows,
       sync_enabled: await isSyncEnabled(userId),
-      last_successful_sync: await getLastSuccessfulSync(userId)
+      last_successful_sync: await getLastSuccessfulSync(userId),
     };
   } catch (error) {
     logger.error('Failed to get sync status', { error: error.message, stack: error.stack });
@@ -704,7 +704,7 @@ async function getOfflineDataSnapshot(userId, entityType, lastSyncTimestamp = nu
  * POST /api/v1/offline-sync/queue
  * Add data to sync queue
  */
-router.post('/queue', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/queue', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { entity_type, entity_data, operation, priority } = req.body;
 
@@ -724,7 +724,7 @@ router.post('/queue', authRateLimit, authMiddleware, async (req, res) => {
  * POST /api/v1/offline-sync/process
  * Process sync queue for user
  */
-router.post('/process', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/process', authLimiter, authMiddleware, async (req, res) => {
   try {
     const result = await processSyncQueue(req.user.id);
     res.json(result);
@@ -752,7 +752,7 @@ router.get('/status', authMiddleware, async (req, res) => {
  * POST /api/v1/offline-sync/resolve-conflict
  * Resolve sync conflict
  */
-router.post('/resolve-conflict', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/resolve-conflict', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { conflict_id, resolution, resolved_data } = req.body;
 
@@ -787,7 +787,7 @@ router.get('/snapshot/:entityType', authMiddleware, async (req, res) => {
  * PUT /api/v1/offline-sync/preferences
  * Update sync preferences
  */
-router.put('/preferences', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/preferences', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { sync_enabled, sync_frequency, sync_on_wifi_only } = req.body;
 
@@ -803,7 +803,7 @@ router.put('/preferences', authRateLimit, authMiddleware, async (req, res) => {
       req.user.id,
       sync_enabled !== undefined ? sync_enabled : true,
       sync_frequency || 5,
-      sync_on_wifi_only || false
+      sync_on_wifi_only || false,
     ]);
 
     res.json(result.rows[0]);
@@ -832,7 +832,7 @@ router.get('/preferences', authMiddleware, async (req, res) => {
         user_id: req.user.id,
         sync_enabled: true,
         sync_frequency: 5,
-        sync_on_wifi_only: false
+        sync_on_wifi_only: false,
       });
     } else {
       res.json(result.rows[0]);
@@ -856,8 +856,8 @@ router.get('/health', (req, res) => {
       'conflict_resolution',
       'data_snapshot',
       'sync_preferences',
-      'retry_mechanisms'
-    ]
+      'retry_mechanisms',
+    ],
   });
 });
 
@@ -867,5 +867,6 @@ module.exports = {
   processSyncQueue,
   resolveSyncConflict,
   getSyncStatus,
-  getOfflineDataSnapshot
+  getOfflineDataSnapshot,
 };
+

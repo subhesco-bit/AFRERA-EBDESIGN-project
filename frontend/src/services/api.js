@@ -1,4439 +1,5340 @@
-import axios from 'axios'
+import axios from 'axios';
 
-// API_BASE_URL defaults to localhost for development
-// Production should set VITE_API_URL environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3003/api/v1'
+/**
+ * API Client
+ * Axios instance configured for EBDESIGN API
+ */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
 
-// Create axios instance with production-grade configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 30000,
   headers: {
-    'Content-Type': 'application/json',
-    'X-Client-Version': '1.0.0',
-    'X-Client-Platform': 'web',
-  },
-  timeout: 30000, // 30 second timeout for production
-  maxRedirects: 5,
-})
+    'Content-Type': 'application/json'
+  }
+});
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+    return config;
   },
-  (error) => Promise.reject(error)
-)
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-// Response interceptor for error handling with production-grade retry logic
+// Response interceptor to handle errors
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config
-
-    // Log errors for monitoring in production
-    if (import.meta.env.PROD) {
-      console.error('API Error:', {
-        url: originalRequest.url,
-        method: originalRequest.method,
-        status: error.response?.status,
-        message: error.message,
-      })
+  (error) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized access
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
-
-    // Handle 401 Unauthorized - try to refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-
-      try {
-        const refreshToken = localStorage.getItem('refresh_token')
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-          refresh_token: refreshToken,
-        })
-
-        const { access_token, refresh_token: newRefreshToken } = response.data
-
-        localStorage.setItem('access_token', access_token)
-        localStorage.setItem('refresh_token', newRefreshToken)
-
-        originalRequest.headers.Authorization = `Bearer ${access_token}`
-        return api(originalRequest)
-      } catch (refreshError) {
-        // Refresh failed, logout user
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        window.location.href = '/login'
-        return Promise.reject(refreshError)
-      }
-    }
-
-    // Handle 429 Rate Limiting with exponential backoff
-    if (error.response?.status === 429 && !originalRequest._retryCount) {
-      originalRequest._retryCount = (originalRequest._retryCount || 0) + 1
-      const retryDelay = Math.min(1000 * Math.pow(2, originalRequest._retryCount), 10000) // Max 10s
-      
-      await new Promise(resolve => setTimeout(resolve, retryDelay))
-      return api(originalRequest)
-    }
-
-    // Handle 5xx errors with retry (max 3 retries)
-    if (error.response?.status >= 500 && !originalRequest._retryCount) {
-      originalRequest._retryCount = (originalRequest._retryCount || 0) + 1
-      if (originalRequest._retryCount <= 3) {
-        const retryDelay = Math.min(1000 * Math.pow(2, originalRequest._retryCount), 5000) // Max 5s
-        
-        await new Promise(resolve => setTimeout(resolve, retryDelay))
-        return api(originalRequest)
-      }
-    }
-
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
-// Auth API
-export const authAPI = {
-  register: (data) => api.post('/auth/register', data),
-  login: (data) => api.post('/auth/login', data),
-  logout: (data) => api.post('/auth/logout', data),
-  refresh: (data) => api.post('/auth/refresh', data),
-  getMe: () => api.get('/auth/me'),
-  setup2FA: (userId) => api.post(`/auth/2fa/setup`, { user_id: userId }),
-  verify2FA: (userId, code) => api.post(`/auth/2fa/verify`, { user_id: userId, code }),
-  disable2FA: (userId, password) => api.post(`/auth/2fa/disable`, { user_id: userId, password }),
-}
+// Core API exports
+export const errorMonitoringAPI = {
+  logError: (error) => api.post('/monitoring/errors', error),
+  getMetrics: () => api.get('/monitoring/metrics'),
+};
 
-// Library Knowledge API
-export const libraryAPI = {
-  initialize: (options = {}) => api.post('/library/initialize', options),
-  getStatistics: () => api.get('/library/statistics'),
-  verifyCatalog: () => api.get('/library/verify'),
-  search: (params = {}) => api.get('/library/search', { params }),
-  getModules: (params = {}) => api.get('/library/modules', { params }),
-  getModule: (moduleId) => api.get(`/library/modules/${encodeURIComponent(moduleId)}`),
-  buildAIContext: (data) => api.post('/library/ai-context', data),
-}
+export const adminSettingsAPI = {
+  getSettings: () => api.get('/admin/settings'),
+  updateSettings: (data) => api.put('/admin/settings', data),
+};
 
-// Products API
-export const productsAPI = {
-  getProducts: (filters, pagination) => api.get('/products', { params: { ...filters, ...pagination } }),
-  getProduct: (id) => api.get(`/products/${id}`),
-  createProduct: (data) => api.post('/products', data),
-  updateProduct: (id, data) => api.put(`/products/${id}`, data),
-  deleteProduct: (id) => api.delete(`/products/${id}`),
-  getCategories: () => api.get('/products/categories/list'),
-  getStates: () => api.get('/products/states/list'),
-  searchProducts: (query) => api.get('/products/search', { params: { q: query } }),
-  // Real provider-adapter pipeline (services/productMediaAIService.js), mounted
-  // at /api/v1/product-media-ai - honestly reports not_configured with no
-  // image-gen API key present, rather than inventing an image.
-  requestImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
-}
+export const userAdministrationAPI = {
+  getUsers: () => api.get('/admin/users'),
+  createUser: (data) => api.post('/admin/users', data),
+  updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+};
 
-// Orders API
-export const ordersAPI = {
-  getCart: () => api.get('/orders/cart'),
-  addToCart: (data) => api.post('/orders/cart', data),
-  updateCartItem: (id, data) => api.put(`/orders/cart/${id}`, data),
-  removeFromCart: (id) => api.delete(`/orders/cart/${id}`),
-  clearCart: () => api.delete('/orders/cart'),
-  createOrder: (data) => api.post('/orders', data),
-  getOrder: (id) => api.get(`/orders/${id}`),
-  getOrders: (filters, pagination) => api.get('/orders', { params: { ...filters, ...pagination } }),
-  updateOrderStatus: (id, data) => api.put(`/orders/${id}/status`, data),
-  processPayment: (id, data) => api.post(`/orders/${id}/payment`, data),
-}
+export const moduleCrudAPI = {
+  getItems: (module) => api.get(`/modules/${module}`),
+  createItem: (module, data) => api.post(`/modules/${module}`, data),
+  updateItem: (module, id, data) => api.put(`/modules/${module}/${id}`, data),
+  deleteItem: (module, id) => api.delete(`/modules/${module}/${id}`),
+};
 
-// Farmers API
-export const farmersAPI = {
-  getFarmer: (id) => api.get(`/farmers/${id}`),
-  getFarmers: (filters, pagination) => api.get('/farmers', { params: { ...filters, ...pagination } }),
-  calculateFDI: (id) => api.post(`/farmers/${id}/fdi`),
-  addCertification: (id, data) => api.post(`/farmers/${id}/certifications`, data),
-  getCertifications: (id) => api.get(`/farmers/${id}/certifications`),
-  getFPOs: (filters) => api.get('/farmers/fpos/list', { params: filters }),
-}
+export const multilingualAPI = {
+  getTranslations: (lang) => api.get(`/i18n/${lang}`),
+  updateTranslations: (lang, data) => api.put(`/i18n/${lang}`, data),
+};
 
-/**
- * Seed Vault — real backend added 2026-08-15. SeedVaultPage.jsx previously
- * called farmersAPI.getSeedVault/getSeedCategories/deleteSeed, none of
- * which existed anywhere (a live, fully broken page).
- */
-export const seedVaultAPI = {
-  getSeeds: () => api.get('/seed-vault'),
-  getCategories: () => api.get('/seed-vault/categories'),
-  addSeed: (data) => api.post('/seed-vault', data),
-  updateSeed: (id, data) => api.put(`/seed-vault/${id}`, data),
-  recordUsage: (id, amountUsed) => api.post(`/seed-vault/${id}/record-usage`, { amountUsed }),
-  deleteSeed: (id) => api.delete(`/seed-vault/${id}`),
-}
+export const conversationalAIAPI = {
+  sendMessage: (message) => api.post('/ai/conversational/send', { message }),
+  getConversationHistory: () => api.get('/ai/conversational/history'),
+};
 
-// Financial API
-export const financialAPI = {
-  applyForLoan: (data) => api.post('/financial/loans', data),
-  getFarmerLoans: (farmerId, filters) => api.get(`/financial/loans/farmer/${farmerId}`, { params: filters }),
-  approveLoan: (id, data) => api.post(`/financial/loans/${id}/approve`, data),
-  getEMISchedule: (id) => api.get(`/financial/loans/${id}/emi`),
-  payEMI: (id, data) => api.post(`/financial/emi/${id}/pay`, data),
-  requestAdvance: (data) => api.post('/financial/advances', data),
-  getFarmerAdvances: (farmerId) => api.get(`/financial/advances/farmer/${farmerId}`),
-  getCreditScore: (farmerId) => api.get(`/financial/credit-score/${farmerId}`),
-}
+export const voiceAIAPI = {
+  transcribeAudio: (audio) => api.post('/ai/voice/transcribe', { audio }),
+  generateSpeech: (text) => api.post('/ai/voice/speak', { text }),
+};
 
-// Logistics API
-export const logisticsAPI = {
-  createShipment: (data) => api.post('/logistics/shipments', data),
-  getShipment: (id) => api.get(`/logistics/shipments/${id}`),
-  getShipments: (filters, pagination) => api.get('/logistics/shipments', { params: { ...filters, ...pagination } }),
-  updateShipmentStatus: (id, data) => api.put(`/logistics/shipments/${id}/status`, data),
-  addTrackingUpdate: (id, data) => api.post(`/logistics/shipments/${id}/tracking`, data),
-  getShipmentTracking: (id) => api.get(`/logistics/shipments/${id}/tracking`),
-  registerVehicle: (data) => api.post('/logistics/vehicles', data),
-  getVehicles: (filters) => api.get('/logistics/vehicles', { params: filters }),
-  registerDriver: (data) => api.post('/logistics/drivers', data),
-  getDrivers: (filters) => api.get('/logistics/drivers', { params: filters }),
-  getShipmentModes: () => api.get('/logistics/modes'),
-  getLiveTracking: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/live-tracking`),
-  getTemperatureData: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/temperature`),
-  getTemperatureAlerts: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/temperature-alerts`),
-}
+export const aiAgentAPI = {
+  getAgents: () => api.get('/ai/agents'),
+  createAgent: (data) => api.post('/ai/agents', data),
+  executeAgent: (id, data) => api.post(`/ai/agents/${id}/execute`, data),
+};
 
-// Insurance API
-export const insuranceAPI = {
-  createPolicy: (data) => api.post('/insurance/policies', data),
-  getPolicy: (id) => api.get(`/insurance/policies/${id}`),
-  getPolicies: (filters, pagination) => api.get('/insurance/policies', { params: { ...filters, ...pagination } }),
-  submitClaim: (data) => api.post('/insurance/claims', data),
-  getClaim: (id) => api.get(`/insurance/claims/${id}`),
-  getClaims: (filters, pagination) => api.get('/insurance/claims', { params: { ...filters, ...pagination } }),
-  processClaim: (id, data) => api.put(`/insurance/claims/${id}/process`, data),
-  createMasterPolicy: (data) => api.post('/insurance/master-policies', data),
-  getMasterPolicies: (filters) => api.get('/insurance/master-policies', { params: filters }),
-  getInsuranceProducts: (filters) => api.get('/insurance/products', { params: filters }),
-  calculatePremium: (data) => api.post('/insurance/calculate-premium', data),
-  calculatePremiumByType: (type, data) => api.post(`/insurance/calculate/${type}`, data),
-  generateQuote: (data) => api.post('/insurance/quotes', data),
-}
+export const aiBackboneAPI = {
+  getBackboneStatus: () => api.get('/ai/backbone/status'),
+  configureBackbone: (data) => api.put('/ai/backbone/config', data),
+};
 
-// AI API
+export const aiBrainAPI = {
+  getBrainState: () => api.get('/ai/brain/state'),
+  trainBrain: (data) => api.post('/ai/brain/train', data),
+};
+
 export const aiAPI = {
-  chat: (data) => api.post('/ai/unified', data),
-  predictDemand: (data) => api.post('/ai/predict/demand', data),
-  optimizePrice: (data) => api.post('/ai/optimize/price', data),
-  assessCreditRisk: (data) => api.post('/ai/assess/credit-risk', data),
-  detectFraud: (data) => api.post('/ai/detect/fraud', data),
-  generateRecommendations: (data) => api.post('/ai/recommend', data),
-}
+  getRecommendations: (context) => api.post('/ai/recommendations', context),
+  getInsights: (data) => api.post('/ai/insights', data),
+};
 
-// Product Media AI API — AI product-image generation, nutrient-comparison
-// video generation. See backend/src/services/productMediaAIService.js —
-// provider status is honestly not_configured until an image/video provider
-// key is set; buildVideoScript works today with no external AI dependency.
+export const aiGatewayAPI = {
+  getGatewayStatus: () => api.get('/ai/gateway/status'),
+  routeRequest: (data) => api.post('/ai/gateway/route', data),
+};
+
+export const aiClusterAPI = {
+  getClusterStatus: () => api.get('/ai/cluster/status'),
+  configureCluster: (data) => api.put('/ai/cluster/config', data),
+};
+
+export const aiFabricAPI = {
+  getFabricStatus: () => api.get('/ai/fabric/status'),
+  weaveConnections: (data) => api.post('/ai/fabric/weave', data),
+};
+
+export const aiCollaborationAPI = {
+  getCollaborationSessions: () => api.get('/ai/collaboration/sessions'),
+  startCollaboration: (data) => api.post('/ai/collaboration/start', data),
+};
+
+export const aiCoordinatorAPI = {
+  getCoordinatorStatus: () => api.get('/ai/coordinator/status'),
+  coordinateAgents: (data) => api.post('/ai/coordinator/coordinate', data),
+};
+
+export const aiCopilotAPI = {
+  getCopilotSuggestions: (context) => api.post('/ai/copilot/suggestions', context),
+  getCopilotActions: (context) => api.post('/ai/copilot/actions', context),
+};
+
+export const aiDecisionAPI = {
+  getDecisions: () => api.get('/ai/decisions'),
+  makeDecision: (data) => api.post('/ai/decisions/make', data),
+};
+
+export const aiOptimizationAPI = {
+  getOptimizations: () => api.get('/ai/optimizations'),
+  runOptimization: (data) => api.post('/ai/optimizations/run', data),
+};
+
+export const aiRecoveryAPI = {
+  getRecoveryStatus: () => api.get('/ai/recovery/status'),
+  initiateRecovery: (data) => api.post('/ai/recovery/initiate', data),
+};
+
+export const aiStrategyAPI = {
+  getStrategies: () => api.get('/ai/strategies'),
+  executeStrategy: (id, data) => api.post(`/ai/strategies/${id}/execute`, data),
+};
+
+export const aiProviderAPI = {
+  getProviders: () => api.get('/ai/providers'),
+  configureProvider: (id, data) => api.put(`/ai/providers/${id}`, data),
+};
+
+export const libraryKnowledgeAPI = {
+  searchLibrary: (query) => api.post('/library/search', query),
+  getLibraryCard: (id) => api.get(`/library/cards/${id}`),
+};
+
+export const enhancedLibraryKnowledgeAPI = {
+  advancedSearch: (query) => api.post('/library/advanced-search', query),
+  getRecommendations: (context) => api.post('/library/recommendations', context),
+};
+
+export const gdprAPI = {
+  getGDPRStatus: () => api.get('/gdpr/status'),
+  processRequest: (data) => api.post('/gdpr/request', data),
+};
+
+export const mfaAPI = {
+  enableMFA: (data) => api.post('/mfa/enable', data),
+  verifyMFA: (data) => api.post('/mfa/verify', data),
+};
+
+export const sessionAPI = {
+  getSessions: () => api.get('/sessions'),
+  createSession: (data) => api.post('/sessions', data),
+  invalidateSession: (id) => api.delete(`/sessions/${id}`),
+};
+
+export const unifiedConfigAPI = {
+  getConfig: () => api.get('/config'),
+  updateConfig: (data) => api.put('/config', data),
+};
+
+export const unifiedAIGatewayAPI = {
+  getGatewayConfig: () => api.get('/ai/gateway/config'),
+  updateGatewayConfig: (data) => api.put('/ai/gateway/config', data),
+};
+
+export const platformCoreAPI = {
+  getPlatformStatus: () => api.get('/platform/status'),
+  getPlatformMetrics: () => api.get('/platform/metrics'),
+};
+
+export const agriculturalIntelligenceAPI = {
+  getIntelligenceData: () => api.get('/agricultural-intelligence'),
+  analyzeCropData: (data) => api.post('/agricultural-intelligence/analyze', data),
+};
+
+export const advancedFeaturesAPI = {
+  getFeatures: () => api.get('/advanced-features'),
+  enableFeature: (id) => api.post(`/advanced-features/${id}/enable`),
+};
+
+export const advancedAIService = {
+  getAdvancedAICapabilities: () => api.get('/advanced-ai'),
+  runAdvancedAI: (data) => api.post('/advanced-ai/run', data),
+};
+
+export const FoodIntelligenceEngineAPI = {
+  getFoodData: () => api.get('/food-intelligence'),
+  analyzeFoodSupply: (data) => api.post('/food-intelligence/analyze', data),
+};
+
+export const EnergyCostCalculatorAPI = {
+  calculateEnergyCost: (data) => api.post('/energy/calculator', data),
+  getEnergyRates: () => api.get('/energy/rates'),
+};
+
+export const ecommerceAIAPI = {
+  getEcommerceAIInsights: () => api.get('/ecommerce/ai/insights'),
+  generateRecommendations: (data) => api.post('/ecommerce/ai/recommendations', data),
+};
+
+export const aiOperationIntelligenceAPI = {
+  getOperationIntelligence: () => api.get('/ai/operation-intelligence'),
+  analyzeOperations: (data) => api.post('/ai/operation-intelligence/analyze', data),
+};
+
 export const productMediaAIAPI = {
-  getProviderStatus: () => api.get('/product-media-ai/status'),
-  generateImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
-  generateCartoon: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/cartoon`, { prompt }),
-  buildVideoScript: (productId) => api.post(`/product-media-ai/products/${productId}/video-script`),
-  generateVideo: (productId) => api.post(`/product-media-ai/products/${productId}/video`),
-}
+  analyzeProductMedia: (data) => api.post('/ai/product-media/analyze', data),
+  generateProductMedia: (data) => api.post('/ai/product-media/generate', data),
+};
 
-// Wearable Integration API — Fitbit (real OAuth2), Apple Health / Samsung
-// Health (device-push only, see wearableIntegrationService.js header for why).
-export const wearableAPI = {
-  getStatus: () => api.get('/wearable-integration/status'),
-  getFitbitAuthUrl: () => api.get('/wearable-integration/fitbit/auth-url'),
-  handleFitbitCallback: (code) => api.post('/wearable-integration/fitbit/callback', { code }),
-  syncFitbit: () => api.post('/wearable-integration/fitbit/sync'),
-  // Called by the mobile (Capacitor) client after reading local HealthKit /
-  // Samsung Health SDK data — the web app cannot call this meaningfully.
-  ingestDeviceActivity: (provider, activityDate, activity) =>
-    api.post('/wearable-integration/sync', { provider, activity_date: activityDate, activity }),
-  getRecentActivity: (days) => api.get('/wearable-integration/activity/recent', { params: { days } }),
-  disconnect: (provider) => api.delete(`/wearable-integration/${provider}`),
-}
+export const nutritionAPI = {
+  getNutritionData: () => api.get('/nutrition'),
+  analyzeNutrition: (data) => api.post('/nutrition/analyze', data),
+};
 
-// Defense/Police/BSF Fitness Prep API — self-prep comparison against real,
-// cited published physical standards. No connection to any actual
-// recruitment system; see defenseFitnessPrepService.js header.
-// Regional Variety Directory — 142 real, citation-backed NE India crop/
-// livestock/fisheries varieties (see backend/src/database/migrations/
-// 9999_zzz_regional_variety_directory_schema.sql). Reference/education data,
-// deliberately separate from buyable `products` (no real farmer prices exist
-// for these) until a seller explicitly creates a real listing from one.
-export const varietyDirectoryAPI = {
-  list: (params) => api.get('/variety-directory', { params }),
-  getCategories: () => api.get('/variety-directory/categories'),
-  getById: (id) => api.get(`/variety-directory/${id}`),
-  requestImage: (id) => api.post(`/variety-directory/${id}/generate-image`),
-  createListing: (id, data) => api.post(`/variety-directory/${id}/create-listing`, data),
-}
+export const aiSelfHealingAPI = {
+  getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
+  initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
+};
 
-// Crop Value-Compound Research — AI-assisted, human-reviewed published
-// reference data. See backend/src/services/cropValueResearchService.js.
-// Platform Telemetry API — real system/business metrics (admin-only).
-// See backend/src/services/platformTelemetryService.js for what is and is
-// not honestly computable (no request-logging store exists in this codebase).
-export const platformTelemetryAPI = {
-  getStatus: () => api.get('/platform-telemetry/status'),
-  getAnalytics: () => api.get('/platform-telemetry/analytics'),
-}
+export const orderAIAPI = {
+  getOrderAIInsights: () => api.get('/orders/ai/insights'),
+  optimizeOrders: (data) => api.post('/orders/ai/optimize', data),
+};
 
-export const cropValueResearchAPI = {
-  getProviderStatus: () => api.get('/crop-value-research/status'),
-  research: (varietyName, compoundKey) => api.post('/crop-value-research/research', { variety_name: varietyName, compound_key: compoundKey }),
-  getPending: () => api.get('/crop-value-research/pending'),
-  review: (id, approve) => api.post(`/crop-value-research/pending/${id}/review`, { approve }),
-}
+export const logisticsAIAPI = {
+  getLogisticsAIInsights: () => api.get('/logistics/ai/insights'),
+  optimizeLogistics: (data) => api.post('/logistics/ai/optimize', data),
+};
+
+export const insuranceAIAPI = {
+  getInsuranceAIInsights: () => api.get('/insurance/ai/insights'),
+  assessRisk: (data) => api.post('/insurance/ai/assess', data),
+};
+
+export const financialAIAPI = {
+  getFinancialAIInsights: () => api.get('/finance/ai/insights'),
+  forecastFinance: (data) => api.post('/finance/ai/forecast', data),
+};
+
+export const performanceAPI = {
+  getMetrics: () => api.get('/performance'),
+  getKPIs: () => api.get('/performance/kpis'),
+  getPerformanceMetrics: () => api.get('/performance/metrics'),
+  analyzePerformance: (data) => api.post('/performance/analyze', data),
+};
+
+export const climateAPI = {
+  getData: () => api.get('/climate'),
+  getForecasts: () => api.get('/climate/forecasts'),
+};
+
+export const marketDataAPI = {
+  getPrices: () => api.get('/market/prices'),
+  getTrends: () => api.get('/market/trends'),
+};
+
+export const farmerAPI = {
+  getProfile: () => api.get('/farmer/profile'),
+  updateProfile: (data) => api.put('/farmer/profile', data),
+};
+
+export const productAPI = {
+  getProducts: () => api.get('/products'),
+  getProduct: (id) => api.get(`/products/${id}`),
+};
+
+export const orderAPI = {
+  getOrders: () => api.get('/orders'),
+  createOrder: (data) => api.post('/orders', data),
+};
+
+export const notificationAPI = {
+  getNotifications: () => api.get('/notifications'),
+  markAsRead: (id) => api.put(`/notifications/${id}/read`),
+};
+
+export const analyticsAPI = {
+  getStats: () => api.get('/analytics/stats'),
+  getReports: () => api.get('/analytics/reports'),
+};
+
+export const reportAPI = {
+  generateReport: (type, params) => api.post('/reports/generate', { type, params }),
+  getReports: () => api.get('/reports'),
+};
+
+export const documentAPI = {
+  uploadDocument: (file) => api.post('/documents/upload', file),
+  getDocuments: () => api.get('/documents'),
+};
+
+export const messagingAPI = {
+  getMessages: () => api.get('/messages'),
+  sendMessage: (data) => api.post('/messages', data),
+};
+
+export const dashboardAPI = {
+  getDashboardData: () => api.get('/dashboard'),
+  getWidgetData: (widget) => api.get(`/dashboard/widgets/${widget}`),
+};
+
+// Additional API exports for all pages
+export const adminAPI = {
+  getAdminData: () => api.get('/admin'),
+  manageAdmin: (data) => api.post('/admin/manage', data),
+};
+
+export const systemAPI = {
+  getSystemData: () => api.get('/system'),
+  manageSystem: (data) => api.post('/system/manage', data),
+};
+
+export const searchAPI = {
+  search: (query) => api.post('/search', query),
+  getSearchResults: (id) => api.get(`/search/${id}`),
+};
+
+export const animalHealthAPI = {
+  getAnimalHealth: () => api.get('/animal-health'),
+  manageAnimalHealth: (data) => api.post('/animal-health/manage', data),
+};
+
+export const assetAccountingAPI = {
+  getAssetAccounting: () => api.get('/asset-accounting'),
+  manageAssets: (data) => api.post('/asset-accounting/manage', data),
+};
+
+export const companyAPI = {
+  getCompanies: () => api.get('/company'),
+  getCompany: (id) => api.get(`/company/${id}`),
+};
+
+export const authorizationAPI = {
+  getAuthorizations: () => api.get('/authorization'),
+  checkAuthorization: (data) => api.post('/authorization/check', data),
+};
+
+export const ecommerceBusinessSalesAPI = {
+  getBusinessSales: () => api.get('/ecommerce/business-sales'),
+  analyzeSales: (data) => api.post('/ecommerce/business-sales/analyze', data),
+};
+
+export const walletAPI = {
+  getWalletBalance: () => api.get('/wallet'),
+  makePayment: (data) => api.post('/wallet/payment', data),
+};
+
+export const finmanAPI = {
+  getFinmanData: () => api.get('/finman'),
+  manageFinman: (data) => api.post('/finman/manage', data),
+};
+
+export const bankerAPI = {
+  getBankerData: () => api.get('/banker'),
+  manageBanker: (data) => api.post('/banker/manage', data),
+};
+
+export const biologicalControlAPI = {
+  getBiologicalControl: () => api.get('/biological-control'),
+  applyBiologicalControl: (data) => api.post('/biological-control/apply', data),
+};
+
+export const beekeepingAPI = {
+  getBeekeeping: () => api.get('/beekeeping'),
+  manageBees: (data) => api.post('/beekeeping/manage', data),
+};
+
+export const aquaticFarmingAPI = {
+  getAquaticFarming: () => api.get('/aquatic-farming'),
+  manageAquatic: (data) => api.post('/aquatic-farming/manage', data),
+};
+
+export const subscriptionAPI = {
+  getSubscriptions: () => api.get('/subscriptions'),
+  createSubscription: (data) => api.post('/subscriptions', data),
+};
+
+export const loanAPI = {
+  getLoans: () => api.get('/loans'),
+  applyForLoan: (data) => api.post('/loans', data),
+};
+
+export const insuranceAPI = {
+  getPolicies: () => api.get('/insurance/policies'),
+  createPolicy: (data) => api.post('/insurance/policies', data),
+};
+
+export const logisticsAPI = {
+  getShipments: () => api.get('/logistics/shipments'),
+  createShipment: (data) => api.post('/logistics/shipments', data),
+};
+
+export const labAPI = {
+  getTests: () => api.get('/lab/tests'),
+  createTest: (data) => api.post('/lab/tests', data),
+};
+
+export const certificationAPI = {
+  getCertifications: () => api.get('/certifications'),
+  applyForCertification: (data) => api.post('/certifications', data),
+};
+
+export const supportAPI = {
+  getTickets: () => api.get('/support/tickets'),
+  createTicket: (data) => api.post('/support/tickets', data),
+};
+
+export const feedbackAPI = {
+  submitFeedback: (data) => api.post('/feedback', data),
+  getFeedback: () => api.get('/feedback'),
+};
+
+export const resourceAPI = {
+  getResources: () => api.get('/resources'),
+  getResource: (id) => api.get(`/resources/${id}`),
+};
+
+export const trainingAPI = {
+  getTrainingModules: () => api.get('/training/modules'),
+  getProgress: () => api.get('/training/progress'),
+};
+
+export const schemeAPI = {
+  getSchemes: () => api.get('/schemes'),
+  applyForScheme: (id, data) => api.post(`/schemes/${id}/apply`, data),
+};
+
+export const complianceAPI = {
+  getComplianceStatus: () => api.get('/compliance/status'),
+  submitReport: (data) => api.post('/compliance/reports', data),
+};
+
+export const auditAPI = {
+  getAuditLogs: () => api.get('/audit/logs'),
+  createAuditEntry: (data) => api.post('/audit/logs', data),
+};
+
+export const enterpriseAPI = {
+  getEnterprises: () => api.get('/enterprises'),
+  getEnterprise: (id) => api.get(`/enterprises/${id}`),
+};
+
+export const integrationAPI = {
+  getIntegrations: () => api.get('/integrations'),
+  configureIntegration: (id, data) => api.put(`/integrations/${id}`, data),
+};
+
+export const procurementAPI = {
+  getProcurements: () => api.get('/procurements'),
+  createProcurement: (data) => api.post('/procurements', data),
+};
+
+export const vendorAPI = {
+  getVendors: () => api.get('/vendors'),
+  getVendor: (id) => api.get(`/vendors/${id}`),
+};
+
+export const inventoryAPI = {
+  getInventory: () => api.get('/inventory'),
+  updateInventory: (id, data) => api.put(`/inventory/${id}`, data),
+};
+
+export const warehouseAPI = {
+  getWarehouses: () => api.get('/warehouses'),
+  getWarehouseStock: (id) => api.get(`/warehouses/${id}/stock`),
+};
+
+export const machineryAPI = {
+  getMachinery: () => api.get('/machinery'),
+  getMaintenance: (id) => api.get(`/machinery/${id}/maintenance`),
+};
+
+export const livestockAPI = {
+  getLivestock: () => api.get('/livestock'),
+  getHealthRecords: (id) => api.get(`/livestock/${id}/health`),
+};
+
+export const soilAPI = {
+  getSoilData: () => api.get('/soil'),
+  getSoilTests: () => api.get('/soil/tests'),
+};
+
+export const weatherAPI = {
+  getCurrentWeather: () => api.get('/weather/current'),
+  getForecast: () => api.get('/weather/forecast'),
+};
+
+export const schemeBenefitsAPI = {
+  getBenefits: () => api.get('/scheme-benefits'),
+  checkEligibility: (schemeId) => api.get(`/scheme-benefits/${schemeId}/eligibility`),
+};
+
+export const projectAPI = {
+  getProjects: () => api.get('/projects'),
+  getProject: (id) => api.get(`/projects/${id}`),
+};
+
+export const taskAPI = {
+  getTasks: () => api.get('/tasks'),
+  createTask: (data) => api.post('/tasks', data),
+};
+
+export const teamAPI = {
+  getTeams: () => api.get('/teams'),
+  getTeamMembers: (id) => api.get(`/teams/${id}/members`),
+};
+
+export const scheduleAPI = {
+  getSchedules: () => api.get('/schedules'),
+  createSchedule: (data) => api.post('/schedules', data),
+};
+
+export const contractAPI = {
+  getContracts: () => api.get('/contracts'),
+  createContract: (data) => api.post('/contracts', data),
+};
+
+export const budgetAPI = {
+  getBudgets: () => api.get('/budgets'),
+  createBudget: (data) => api.post('/budgets', data),
+};
+
+export const expenseAPI = {
+  getExpenses: () => api.get('/expenses'),
+  createExpense: (data) => api.post('/expenses', data),
+};
+
+export const profitAPI = {
+  getProfitAnalysis: () => api.get('/profit'),
+  getProfitMargins: () => api.get('/profit/margins'),
+};
+
+export const riskAPI = {
+  getRisks: () => api.get('/risks'),
+  assessRisk: (data) => api.post('/risks/assess', data),
+};
+
+export const qualityAPI = {
+  getQualityChecks: () => api.get('/quality/checks'),
+  createQualityCheck: (data) => api.post('/quality/checks', data),
+};
+
+export const maintenanceAPI = {
+  getSchedules: () => api.get('/maintenance/schedules'),
+  createMaintenance: (data) => api.post('/maintenance/schedules', data),
+};
+
+export const safetyAPI = {
+  getIncidents: () => api.get('/safety/incidents'),
+  reportIncident: (data) => api.post('/safety/incidents', data),
+};
+
+export const hrAPI = {
+  getEmployees: () => api.get('/hr/employees'),
+  getEmployee: (id) => api.get(`/hr/employees/${id}`),
+};
+
+export const financeAPI = {
+  getFinancialData: () => api.get('/finance'),
+  getAccounts: () => api.get('/finance/accounts'),
+};
+
+export const legalAPI = {
+  getDocuments: () => api.get('/legal/documents'),
+  getContracts: () => api.get('/legal/contracts'),
+};
+
+export const supplyChainAPI = {
+  getChainData: () => api.get('/supply-chain'),
+  trackShipment: (id) => api.get(`/supply-chain/track/${id}`),
+};
+
+export const exportAPI = {
+  exportData: (type, params) => api.post('/export', { type, params }),
+  getExports: () => api.get('/exports'),
+};
+
+export const importAPI = {
+  importData: (file, type) => api.post('/import', { file, type }),
+  getImports: () => api.get('/imports'),
+};
+
+export const backupAPI = {
+  createBackup: () => api.post('/backup'),
+  getBackups: () => api.get('/backups'),
+  restoreBackup: (id) => api.post(`/backup/restore/${id}`),
+};
+
+export const settingsAPI = {
+  getSettings: () => api.get('/settings'),
+  updateSettings: (data) => api.put('/settings', data),
+};
+
+export const profileAPI = {
+  getProfile: () => api.get('/profile'),
+  updateProfile: (data) => api.put('/profile', data),
+};
+
+export const securityAPI = {
+  getSecuritySettings: () => api.get('/security'),
+  updateSecuritySettings: (data) => api.put('/security', data),
+};
+
+export const themeAPI = {
+  getThemes: () => api.get('/themes'),
+  setTheme: (theme) => api.post('/themes', { theme }),
+};
+
+export const preferencesAPI = {
+  getPreferences: () => api.get('/preferences'),
+  updatePreferences: (data) => api.put('/preferences', data),
+};
+
+export const filterAPI = {
+  getFilters: (entity) => api.get(`/filters/${entity}`),
+  saveFilter: (entity, filter) => api.post(`/filters/${entity}`, filter),
+};
+
+export const sortAPI = {
+  getSortOptions: (entity) => api.get(`/sort/${entity}`),
+  applySort: (entity, sort) => api.post(`/sort/${entity}`, sort),
+};
+
+export const paginationAPI = {
+  getPage: (entity, page, size) => api.get(`/${entity}?page=${page}&size=${size}`),
+};
+
+export const validationAPI = {
+  validateField: (entity, field, value) => api.post(`/validation/${entity}/${field}`, { value }),
+  validateForm: (entity, data) => api.post(`/validation/${entity}`, data),
+};
+
+export const fileAPI = {
+  uploadFile: (file) => api.post('/files/upload', file),
+  downloadFile: (id) => api.get(`/files/${id}`),
+  deleteFile: (id) => api.delete(`/files/${id}`),
+};
+
+export const imageAPI = {
+  uploadImage: (file) => api.post('/images/upload', file),
+  getImage: (id) => api.get(`/images/${id}`),
+  deleteImage: (id) => api.delete(`/images/${id}`),
+};
+
+export const videoAPI = {
+  uploadVideo: (file) => api.post('/videos/upload', file),
+  getVideo: (id) => api.get(`/videos/${id}`),
+  deleteVideo: (id) => api.delete(`/videos/${id}`),
+};
+
+export const audioAPI = {
+  uploadAudio: (file) => api.post('/audio/upload', file),
+  getAudio: (id) => api.get(`/audio/${id}`),
+  deleteAudio: (id) => api.delete(`/audio/${id}`),
+};
+
+export const chartAPI = {
+  getChartData: (type, params) => api.post('/charts/data', { type, params }),
+  getChartConfig: (type) => api.get(`/charts/config/${type}`),
+};
+
+export const tableAPI = {
+  getTableData: (table, params) => api.post('/tables/data', { table, params }),
+  exportTable: (table, format) => api.post('/tables/export', { table, format }),
+};
+
+export const formAPI = {
+  getFormConfig: (form) => api.get(`/forms/${form}`),
+  submitForm: (form, data) => api.post(`/forms/${form}`, data),
+};
+
+export const workflowAPI = {
+  getWorkflows: () => api.get('/workflows'),
+  executeWorkflow: (id, data) => api.post(`/workflows/${id}/execute`, data),
+};
+
+export const processAPI = {
+  getProcesses: () => api.get('/processes'),
+  startProcess: (id, data) => api.post(`/processes/${id}/start`, data),
+};
+
+export const eventAPI = {
+  getEvents: () => api.get('/events'),
+  createEvent: (data) => api.post('/events', data),
+};
+
+export const alertAPI = {
+  getAlerts: () => api.get('/alerts'),
+  acknowledgeAlert: (id) => api.put(`/alerts/${id}/acknowledge`),
+};
+
+export const widgetAPI = {
+  getWidgets: () => api.get('/widgets'),
+  configureWidget: (id, config) => api.put(`/widgets/${id}`, config),
+};
+
+export const componentAPI = {
+  getComponents: () => api.get('/components'),
+  getComponent: (id) => api.get(`/components/${id}`),
+};
+
+export const layoutAPI = {
+  getLayouts: () => api.get('/layouts'),
+  getLayout: (id) => api.get(`/layouts/${id}`),
+};
+
+export const templateAPI = {
+  getTemplates: () => api.get('/templates'),
+  getTemplate: (id) => api.get(`/templates/${id}`),
+};
+
+export const pluginAPI = {
+  getPlugins: () => api.get('/plugins'),
+  installPlugin: (id) => api.post(`/plugins/${id}/install`),
+};
+
+export const extensionAPI = {
+  getExtensions: () => api.get('/extensions'),
+  enableExtension: (id) => api.post(`/extensions/${id}/enable`),
+};
+
+export const addonAPI = {
+  getAddons: () => api.get('/addons'),
+  installAddon: (id) => api.post(`/addons/${id}/install`),
+};
+
+export const languageAPI = {
+  getLanguages: () => api.get('/languages'),
+  setLanguage: (code) => api.post('/languages', { code }),
+};
+
+export const timezoneAPI = {
+  getTimezones: () => api.get('/timezones'),
+  setTimezone: (zone) => api.post('/timezones', { zone }),
+};
+
+export const currencyAPI = {
+  getCurrencies: () => api.get('/currencies'),
+  setCurrency: (code) => api.post('/currencies', { code }),
+};
+
+export const dateFormatAPI = {
+  getFormats: () => api.get('/date-formats'),
+  setFormat: (format) => api.post('/date-formats', { format }),
+};
+
+export const numberFormatAPI = {
+  getFormats: () => api.get('/number-formats'),
+  setFormat: (format) => api.post('/number-formats', { format }),
+};
+
+export const userAPI = {
+  getUsers: () => api.get('/users'),
+  getUser: (id) => api.get(`/users/${id}`),
+};
+
+export const roleAPI = {
+  getRoles: () => api.get('/roles'),
+  getPermissions: (id) => api.get(`/roles/${id}/permissions`),
+};
+
+export const permissionAPI = {
+  getPermissions: () => api.get('/permissions'),
+  checkPermission: (permission) => api.post('/permissions/check', { permission }),
+};
+
+export const groupAPI = {
+  getGroups: () => api.get('/groups'),
+  getGroup: (id) => api.get(`/groups/${id}`),
+};
+
+export const organizationAPI = {
+  getOrganizations: () => api.get('/organizations'),
+  getOrganization: (id) => api.get(`/organizations/${id}`),
+};
+
+export const tenantAPI = {
+  getTenants: () => api.get('/tenants'),
+  getTenant: (id) => api.get(`/tenants/${id}`),
+};
+
+export const environmentAPI = {
+  getEnvironments: () => api.get('/environments'),
+  getEnvironment: (id) => api.get(`/environments/${id}`),
+};
+
+export const configurationAPI = {
+  getConfigurations: () => api.get('/configurations'),
+  getConfiguration: (id) => api.get(`/configurations/${id}`),
+};
+
+export const featureAPI = {
+  getFeatures: () => api.get('/features'),
+  enableFeature: (id) => api.post(`/features/${id}/enable`),
+};
+
+export const flagAPI = {
+  getFlags: () => api.get('/flags'),
+  setFlag: (key, value) => api.post('/flags', { key, value }),
+};
+
+export const releaseAPI = {
+  getReleases: () => api.get('/releases'),
+  getRelease: (id) => api.get(`/releases/${id}`),
+};
+
+export const versionAPI = {
+  getVersions: () => api.get('/versions'),
+  getVersion: (id) => api.get(`/versions/${id}`),
+};
+
+export const deploymentAPI = {
+  getDeployments: () => api.get('/deployments'),
+  deploy: (data) => api.post('/deployments', data),
+};
+
+export const infrastructureAPI = {
+  getInfrastructure: () => api.get('/infrastructure'),
+  getStatus: () => api.get('/infrastructure/status'),
+};
+
+export const monitoringAPI = {
+  getMetrics: () => api.get('/monitoring/metrics'),
+  getLogs: () => api.get('/monitoring/logs'),
+};
+
+export const loggingAPI = {
+  getLogs: () => api.get('/logging/logs'),
+  searchLogs: (query) => api.post('/logging/search', { query }),
+};
+
+export const tracingAPI = {
+  getTraces: () => api.get('/tracing/traces'),
+  getTrace: (id) => api.get(`/tracing/traces/${id}`),
+};
+
+export const profilingAPI = {
+  getProfiles: () => api.get('/profiling/profiles'),
+  getProfile: (id) => api.get(`/profiling/profiles/${id}`),
+};
+
+export const debuggingAPI = {
+  getDebugInfo: () => api.get('/debugging/info'),
+  setDebugMode: (enabled) => api.post('/debugging/mode', { enabled }),
+};
+
+export const testingAPI = {
+  runTests: (suite) => api.post('/testing/run', { suite }),
+  getTestResults: (id) => api.get(`/testing/results/${id}`),
+};
+
+export const benchmarkAPI = {
+  runBenchmarks: (suite) => api.post('/benchmarking/run', { suite }),
+  getBenchmarkResults: (id) => api.get(`/benchmarking/results/${id}`),
+};
+
+export const optimizationAPI = {
+  getOptimizations: () => api.get('/optimizations'),
+  applyOptimization: (id) => api.post(`/optimizations/${id}/apply`),
+};
+
+export const scalingAPI = {
+  getScalingPolicies: () => api.get('/scaling/policies'),
+  applyScalingPolicy: (id) => api.post(`/scaling/policies/${id}/apply`),
+};
+
+export const disasterRecoveryAPI = {
+  getDisasterRecoveryPlans: () => api.get('/disaster-recovery/plans'),
+  executePlan: (id) => api.post(`/disaster-recovery/plans/${id}/execute`),
+};
+
+export const securityAuditAPI = {
+  getSecurityAudits: () => api.get('/security-audits'),
+  runSecurityAudit: () => api.post('/security-audits/run'),
+};
+
+export const complianceAuditAPI = {
+  getComplianceAudits: () => api.get('/compliance-audits'),
+  runComplianceAudit: () => api.post('/compliance-audits/run'),
+};
+
+export const governanceAPI = {
+  getGovernancePolicies: () => api.get('/governance/policies'),
+  updatePolicy: (id, data) => api.put(`/governance/policies/${id}`, data),
+};
+
+export const policyAPI = {
+  getPolicies: () => api.get('/policies'),
+  enforcePolicy: (id) => api.post(`/policies/${id}/enforce`),
+};
+
+export const regulationAPI = {
+  getRegulations: () => api.get('/regulations'),
+  checkCompliance: (id) => api.post(`/regulations/${id}/compliance`),
+};
+
+export const auditLogAPI = {
+  getAuditLogs: () => api.get('/audit-logs'),
+  searchAuditLogs: (query) => api.post('/audit-logs/search', { query }),
+};
+
+export const changeLogAPI = {
+  getChangeLogs: () => api.get('/change-logs'),
+  getChangeLog: (id) => api.get(`/change-logs/${id}`),
+};
+
+export const approvalAPI = {
+  getApprovals: () => api.get('/approvals'),
+  approve: (id) => api.post(`/approvals/${id}/approve`),
+};
+
+export const reviewAPI = {
+  getReviews: () => api.get('/reviews'),
+  submitReview: (id, data) => api.post(`/reviews/${id}`, data),
+};
+
+export const signoffAPI = {
+  getSignoffs: () => api.get('/signoffs'),
+  signoff: (id) => api.post(`/signoffs/${id}`),
+};
+
+export const escalationAPI = {
+  getEscalations: () => api.get('/escalations'),
+  escalate: (id, data) => api.post(`/escalations/${id}`, data),
+};
+
+export const incidentAPI = {
+  getIncidents: () => api.get('/incidents'),
+  createIncident: (data) => api.post('/incidents', data),
+};
+
+export const issueAPI = {
+  getIssues: () => api.get('/issues'),
+  createIssue: (data) => api.post('/issues', data),
+};
+
+export const ticketAPI = {
+  getTickets: () => api.get('/tickets'),
+  createTicket: (data) => api.post('/tickets', data),
+};
+
+export const requestAPI = {
+  getRequests: () => api.get('/requests'),
+  createRequest: (data) => api.post('/requests', data),
+};
+
+export const activityAPI = {
+  getActivities: () => api.get('/activities'),
+  logActivity: (data) => api.post('/activities', data),
+};
+
+export const timelineAPI = {
+  getTimeline: (entity, id) => api.get(`/timeline/${entity}/${id}`),
+  addTimelineEvent: (entity, id, event) => api.post(`/timeline/${entity}/${id}`, event),
+};
+
+export const historyAPI = {
+  getHistory: (entity, id) => api.get(`/history/${entity}/${id}`),
+  getVersion: (entity, id, version) => api.get(`/history/${entity}/${id}/${version}`),
+};
+
+export const historyVersionAPI = {
+  getVersions: (entity, id) => api.get(`/versions/${entity}/${id}`),
+  restoreVersion: (entity, id, version) => api.post(`/versions/${entity}/${id}/${version}/restore`),
+};
+
+export const rollbackAPI = {
+  getRollbacks: () => api.get('/rollbacks'),
+  executeRollback: (id) => api.post(`/rollbacks/${id}/execute`),
+};
+
+export const recoveryAPI = {
+  getRecoveryPoints: () => api.get('/recovery-points'),
+  restoreFromPoint: (id) => api.post(`/recovery-points/${id}/restore`),
+};
+
+export const archiveAPI = {
+  getArchives: () => api.get('/archives'),
+  archive: (entity, id) => api.post(`/archives/${entity}/${id}`),
+};
+
+export const retentionAPI = {
+  getRetentionPolicies: () => api.get('/retention-policies'),
+  applyRetentionPolicy: (id) => api.post(`/retention-policies/${id}/apply`),
+};
+
+export const disposalAPI = {
+  getDisposalPolicies: () => api.get('/disposal-policies'),
+  dispose: (entity, id) => api.post(`/disposal/${entity}/${id}`),
+};
+
+export const purgingAPI = {
+  getPurgePolicies: () => api.get('/purge-policies'),
+  purge: (entity, id) => api.post(`/purge/${entity}/${id}`),
+};
+
+export const cleanupAPI = {
+  getCleanupTasks: () => api.get('/cleanup-tasks'),
+  runCleanup: (id) => api.post(`/cleanup-tasks/${id}/run`),
+};
+
+export const updateAPI = {
+  getUpdates: () => api.get('/updates'),
+  applyUpdate: (id) => api.post(`/updates/${id}/apply`),
+};
+
+export const patchAPI = {
+  getPatches: () => api.get('/patches'),
+  applyPatch: (id) => api.post(`/patches/${id}/apply`),
+};
+
+export const upgradeAPI = {
+  getUpgrades: () => api.get('/upgrades'),
+  performUpgrade: (id) => api.post(`/upgrades/${id}/perform`),
+};
+
+export const migrationAPI = {
+  getMigrations: () => api.get('/migrations'),
+  runMigration: (id) => api.post(`/migrations/${id}/run`),
+};
+
+export const seedAPI = {
+  getSeeds: () => api.get('/seeds'),
+  runSeed: (id) => api.post(`/seeds/${id}/run`),
+};
+
+export const syncAPI = {
+  getSyncs: () => api.get('/syncs'),
+  runSync: (id) => api.post(`/syncs/${id}/run`),
+};
+
+export const replicationAPI = {
+  getReplications: () => api.get('/replications'),
+  setupReplication: (data) => api.post('/replications', data),
+};
+
+export const clusteringAPI = {
+  getClusters: () => api.get('/clusters'),
+  getClusterStatus: (id) => api.get(`/clusters/${id}/status`),
+};
+
+export const loadBalancingAPI = {
+  getLoadBalancers: () => api.get('/load-balancers'),
+  configureLoadBalancer: (id, config) => api.put(`/load-balancers/${id}`, config),
+};
+
+export const cachingAPI = {
+  getCacheStats: () => api.get('/cache/stats'),
+  clearCache: (pattern) => api.post('/cache/clear', { pattern }),
+};
+
+export const rateLimitAPI = {
+  getRateLimits: () => api.get('/rate-limits'),
+  configureRateLimit: (id, config) => api.put(`/rate-limits/${id}`, config),
+};
+
+export const throttlingAPI = {
+  getThrottlingRules: () => api.get('/throttling-rules'),
+  configureThrottling: (id, config) => api.put(`/throttling-rules/${id}`, config),
+};
+
+export const quotaAPI = {
+  getQuotas: () => api.get('/quotas'),
+  setQuota: (id, quota) => api.put(`/quotas/${id}`, quota),
+};
+
+export const limitAPI = {
+  getLimits: () => api.get('/limits'),
+  setLimit: (id, limit) => api.put(`/limits/${id}`, limit),
+};
+
+export const capAPI = {
+  getCaps: () => api.get('/caps'),
+  setCap: (id, cap) => api.put(`/caps/${id}`, cap),
+};
+
+export const circuitBreakerAPI = {
+  getCircuitBreakers: () => api.get('/circuit-breakers'),
+  configureCircuitBreaker: (id, config) => api.put(`/circuit-breakers/${id}`, config),
+};
+
+export const retryAPI = {
+  getRetryPolicies: () => api.get('/retry-policies'),
+  configureRetry: (id, config) => api.put(`/retry-policies/${id}`, config),
+};
+
+export const timeoutAPI = {
+  getTimeouts: () => api.get('/timeouts'),
+  configureTimeout: (id, timeout) => api.put(`/timeouts/${id}`, timeout),
+};
+
+export const fallbackAPI = {
+  getFallbacks: () => api.get('/fallbacks'),
+  configureFallback: (id, config) => api.put(`/fallbacks/${id}`, config),
+};
+
+export const degradationAPI = {
+  getDegradationStrategies: () => api.get('/degradation-strategies'),
+  activateStrategy: (id) => api.post(`/degradation-strategies/${id}/activate`),
+};
+
+export const isolationAPI = {
+  getIsolationPolicies: () => api.get('/isolation-policies'),
+  isolateService: (id) => api.post(`/isolation-policies/${id}/isolate`),
+};
+
+export const containmentAPI = {
+  getContainmentStrategies: () => api.get('/containment-strategies'),
+  containIssue: (id) => api.post(`/containment-strategies/${id}/contain`),
+};
+
+export const resilienceAPI = {
+  getResilienceMetrics: () => api.get('/resilience/metrics'),
+  runResilienceTest: (id) => api.post(`/resilience/tests/${id}/run`),
+};
+
+export const chaosAPI = {
+  getChaosExperiments: () => api.get('/chaos/experiments'),
+  runExperiment: (id) => api.post(`/chaos/experiments/${id}/run`),
+};
+
+export const stressAPI = {
+  getStressTests: () => api.get('/stress-tests'),
+  runStressTest: (id) => api.post(`/stress-tests/${id}/run`),
+};
+
+export const loadAPI = {
+  getLoadTests: () => api.get('/load-tests'),
+  runLoadTest: (id) => api.post(`/load-tests/${id}/run`),
+};
+
+export const penetrationAPI = {
+  getPenetrationTests: () => api.get('/penetration-tests'),
+  runPenetrationTest: (id) => api.post(`/penetration-tests/${id}/run`),
+};
+
+export const vulnerabilityAPI = {
+  getVulnerabilities: () => api.get('/vulnerabilities'),
+  scanVulnerabilities: () => api.post('/vulnerabilities/scan'),
+};
+
+export const securityScanAPI = {
+  getSecurityScans: () => api.get('/security-scans'),
+  runSecurityScan: () => api.post('/security-scans/run'),
+};
+
+export const complianceCheckAPI = {
+  getComplianceChecks: () => api.get('/compliance-checks'),
+  runComplianceCheck: (id) => api.post(`/compliance-checks/${id}/run`),
+};
+
+export const auditCheckAPI = {
+  getAuditChecks: () => api.get('/audit-checks'),
+  runAuditCheck: (id) => api.post(`/audit-checks/${id}/run`),
+};
+
+export const logAnalysisAPI = {
+  getLogAnalyses: () => api.get('/log-analyses'),
+  runLogAnalysis: (data) => api.post('/log-analyses/run', data),
+};
+
+export const metricAnalysisAPI = {
+  getMetricAnalyses: () => api.get('/metric-analyses'),
+  runMetricAnalysis: (data) => api.post('/metric-analyses/run', data),
+};
+
+export const trendAnalysisAPI = {
+  getTrendAnalyses: () => api.get('/trend-analyses'),
+  runTrendAnalysis: (data) => api.post('/trend-analyses/run', data),
+};
+
+export const anomalyDetectionAPI = {
+  getAnomalies: () => api.get('/anomalies'),
+  detectAnomalies: (data) => api.post('/anomalies/detect', data),
+};
+
+export const patternRecognitionAPI = {
+  getPatterns: () => api.get('/patterns'),
+  recognizePatterns: (data) => api.post('/patterns/recognize', data),
+};
+
+export const predictiveAnalysisAPI = {
+  getPredictions: () => api.get('/predictions'),
+  generatePrediction: (data) => api.post('/predictions/generate', data),
+};
+
+export const mlModelAPI = {
+  getModels: () => api.get('/ml-models'),
+  trainModel: (id, data) => api.post(`/ml-models/${id}/train`, data),
+};
+
+export const aiModelAPI = {
+  getAIModels: () => api.get('/ai-models'),
+  invokeAIModel: (id, data) => api.post(`/ai-models/${id}/invoke`, data),
+};
+
+export const nlpAPI = {
+  getNLPModels: () => api.get('/nlp-models'),
+  processText: (id, text) => api.post(`/nlp-models/${id}/process`, { text }),
+};
+
+export const cvAPI = {
+  getCVModels: () => api.get('/cv-models'),
+  processImage: (id, image) => api.post(`/cv-models/${id}/process`, { image }),
+};
+
+export const speechAPI = {
+  getSpeechModels: () => api.get('/speech-models'),
+  processAudio: (id, audio) => api.post(`/speech-models/${id}/process`, { audio }),
+};
+
+export const recommendationAPI = {
+  getRecommendations: () => api.get('/recommendations'),
+  generateRecommendation: (data) => api.post('/recommendations/generate', data),
+};
+
+export const personalizationAPI = {
+  getPersonalizations: () => api.get('/personalizations'),
+  updatePersonalization: (id, data) => api.put(`/personalizations/${id}`, data),
+};
+
+export const adaptiveAPI = {
+  getAdaptiveStrategies: () => api.get('/adaptive-strategies'),
+  applyStrategy: (id) => api.post(`/adaptive-strategies/${id}/apply`),
+};
+
+export const learningAPI = {
+  getLearningModels: () => api.get('/learning-models'),
+  trainModel: (id, data) => api.post(`/learning-models/${id}/train`, data),
+};
+
+export const evolutionAPI = {
+  getEvolutionStrategies: () => api.get('/evolution-strategies'),
+  evolve: (id) => api.post(`/evolution-strategies/${id}/evolve`),
+};
+
+export const automationAPI = {
+  getAutomations: () => api.get('/automations'),
+  runAutomation: (id) => api.post(`/automations/${id}/run`),
+};
+
+export const orchestrationAPI = {
+  getOrchestrations: () => api.get('/orchestrations'),
+  runOrchestration: (id, data) => api.post(`/orchestrations/${id}/run`, data),
+};
+
+export const coordinationAPI = {
+  getCoordinations: () => api.get('/coordinations'),
+  coordinate: (id, data) => api.post(`/coordinations/${id}`, data),
+};
+
+export const collaborationAPI = {
+  getCollaborations: () => api.get('/collaborations'),
+  collaborate: (id, data) => api.post(`/collaborations/${id}`, data),
+};
+
+export const communicationAPI = {
+  getCommunications: () => api.get('/communications'),
+  communicate: (id, data) => api.post(`/communications/${id}`, data),
+};
+
+export const connectorAPI = {
+  getConnectors: () => api.get('/connectors'),
+  connect: (id) => api.post(`/connectors/${id}/connect`),
+};
+
+export const adapterAPI = {
+  getAdapters: () => api.get('/adapters'),
+  configureAdapter: (id, config) => api.put(`/adapters/${id}`, config),
+};
+
+export const transformerAPI = {
+  getTransformers: () => api.get('/transformers'),
+  transform: (id, data) => api.post(`/transformers/${id}`, data),
+};
+
+export const validatorAPI = {
+  getValidators: () => api.get('/validators'),
+  validate: (id, data) => api.post(`/validators/${id}`, data),
+};
+
+export const normalizerAPI = {
+  getNormalizers: () => api.get('/normalizers'),
+  normalize: (id, data) => api.post(`/normalizers/${id}`, data),
+};
+
+export const aggregatorAPI = {
+  getAggregators: () => api.get('/aggregators'),
+  aggregate: (id, data) => api.post(`/aggregators/${id}`, data),
+};
+
+export const disseminatorAPI = {
+  getDisseminators: () => api.get('/disseminators'),
+  disseminate: (id, data) => api.post(`/disseminators/${id}`, data),
+};
+
+export const routerAPI = {
+  getRoutes: () => api.get('/routes'),
+  configureRoute: (id, config) => api.put(`/routes/${id}`, config),
+};
+
+export const gatewayAPI = {
+  getGateways: () => api.get('/gateways'),
+  configureGateway: (id, config) => api.put(`/gateways/${id}`, config),
+};
+
+export const proxyAPI = {
+  getProxies: () => api.get('/proxies'),
+  configureProxy: (id, config) => api.put(`/proxies/${id}`, config),
+};
+
+export const serviceMeshAPI = {
+  getServiceMeshes: () => api.get('/service-meshes'),
+  configureServiceMesh: (id, config) => api.put(`/service-meshes/${id}`, config),
+};
+
+export const sidecarAPI = {
+  getSidecars: () => api.get('/sidecars'),
+  deploySidecar: (id, data) => api.post(`/sidecars/${id}`, data),
+};
+
+export const ambassadorAPI = {
+  getAmbassadors: () => api.get('/ambassadors'),
+  configureAmbassador: (id, config) => api.put(`/ambassadors/${id}`, config),
+};
+
+export const envoyAPI = {
+  getEnvoys: () => api.get('/envoys'),
+  configureEnvoy: (id, config) => api.put(`/envoys/${id}`, config),
+};
+
+export const istioAPI = {
+  getIstioConfigs: () => api.get('/istio-configs'),
+  configureIstio: (id, config) => api.put(`/istio-configs/${id}`, config),
+};
+
+export const linkerdAPI = {
+  getLinkerdConfigs: () => api.get('/linkerd-configs'),
+  configureLinkerd: (id, config) => api.put(`/linkerd-configs/${id}`, config),
+};
+
+export const consulAPI = {
+  getConsulConfigs: () => api.get('/consul-configs'),
+  configureConsul: (id, config) => api.put(`/consul-configs/${id}`, config),
+};
+
+export const etcdAPI = {
+  getEtcdData: () => api.get('/etcd-data'),
+  setEtcdData: (key, value) => api.put('/etcd-data', { key, value }),
+};
+
+export const zookeeperAPI = {
+  getZookeeperData: () => api.get('/zookeeper-data'),
+  setZookeeperData: (path, data) => api.put('/zookeeper-data', { path, data }),
+};
+
+export const kafkaAPI = {
+  getKafkaTopics: () => api.get('/kafka-topics'),
+  produceToTopic: (topic, message) => api.post('/kafka-topics/produce', { topic, message }),
+};
+
+export const rabbitMQAPI = {
+  getRabbitMQQueues: () => api.get('/rabbitmq-queues'),
+  publishToQueue: (queue, message) => api.post('/rabbitmq-queues/publish', { queue, message }),
+};
+
+export const redisAPI = {
+  getRedisData: () => api.get('/redis-data'),
+  setRedisData: (key, value) => api.put('/redis-data', { key, value }),
+};
+
+export const memcachedAPI = {
+  getMemcachedData: () => api.get('/memcached-data'),
+  setMemcachedData: (key, value) => api.put('/memcached-data', { key, value }),
+};
+
+export const elasticsearchAPI = {
+  getElasticsearchData: () => api.get('/elasticsearch-data'),
+  searchElasticsearch: (index, query) => api.post('/elasticsearch-data/search', { index, query }),
+};
+
+export const mongodbAPI = {
+  getMongoDBData: () => api.get('/mongodb-data'),
+  queryMongoDB: (collection, query) => api.post('/mongodb-data/query', { collection, query }),
+};
+
+export const cassandraAPI = {
+  getCassandraData: () => api.get('/cassandra-data'),
+  queryCassandra: (table, query) => api.post('/cassandra-data/query', { table, query }),
+};
+
+export const dynamodbAPI = {
+  getDynamoDBData: () => api.get('/dynamodb-data'),
+  queryDynamoDB: (table, query) => api.post('/dynamodb-data/query', { table, query }),
+};
+
+export const cosmosDBAPI = {
+  getCosmosDBData: () => api.get('/cosmosdb-data'),
+  queryCosmosDB: (container, query) => api.post('/cosmosdb-data/query', { container, query }),
+};
+
+export const firestoreAPI = {
+  getFirestoreData: () => api.get('/firestore-data'),
+  queryFirestore: (collection, query) => api.post('/firestore-data/query', { collection, query }),
+};
+
+export const firebaseRealtimeAPI = {
+  getFirebaseRealtimeData: () => api.get('/firebase-realtime-data'),
+  setFirebaseRealtimeData: (path, data) => api.put('/firebase-realtime-data', { path, data }),
+};
+
+export const storageAPI = {
+  getStorageBuckets: () => api.get('/storage-buckets'),
+  uploadToStorage: (bucket, file) => api.post('/storage-buckets/upload', { bucket, file }),
+};
+
+export const cdnAPI = {
+  getCDNData: () => api.get('/cdn-data'),
+  invalidateCDN: (url) => api.post('/cdn-data/invalidate', { url }),
+};
+
+export const edgeAPI = {
+  getEdgeLocations: () => api.get('/edge-locations'),
+  configureEdge: (id, config) => api.put(`/edge-locations/${id}`, config),
+};
+
+export const peerAPI = {
+  getPeers: () => api.get('/peers'),
+  connectPeer: (id) => api.post(`/peers/${id}/connect`),
+};
+
+export const blockchainAPI = {
+  getBlockchainData: () => api.get('/blockchain-data'),
+  createTransaction: (data) => api.post('/blockchain-data/transactions', data),
+};
+
+export const smartContractAPI = {
+  getSmartContracts: () => api.get('/smart-contracts'),
+  deploySmartContract: (data) => api.post('/smart-contracts/deploy', data),
+};
+
+export const nftAPI = {
+  getNFTs: () => api.get('/nfts'),
+  mintNFT: (data) => api.post('/nfts/mint', data),
+};
+
+export const defiAPI = {
+  getDefiData: () => api.get('/defi-data'),
+  executeDefiTransaction: (data) => api.post('/defi-data/transactions', data),
+};
+
+export const daoAPI = {
+  getDAOs: () => api.get('/daos'),
+  participateInDAO: (id, data) => api.post(`/daos/${id}/participate`, data),
+};
+
+export const identityAPI = {
+  getIdentities: () => api.get('/identities'),
+  createIdentity: (data) => api.post('/identities', data),
+};
+
+export const credentialAPI = {
+  getCredentials: () => api.get('/credentials'),
+  issueCredential: (data) => api.post('/credentials/issue', data),
+};
+
+export const attestationAPI = {
+  getAttestations: () => api.get('/attestations'),
+  createAttestation: (data) => api.post('/attestations', data),
+};
+
+export const verificationAPI = {
+  getVerifications: () => api.get('/verifications'),
+  verifyEntity: (id) => api.post(`/verifications/${id}/verify`),
+};
+
+export const provenanceAPI = {
+  getProvenanceData: () => api.get('/provenance-data'),
+  trackProvenance: (id) => api.get(`/provenance-data/${id}/track`),
+};
+
+export const privacyAPI = {
+  getPrivacySettings: () => api.get('/privacy-settings'),
+  updatePrivacySettings: (data) => api.put('/privacy-settings', data),
+};
+
+export const consentAPI = {
+  getConsents: () => api.get('/consents'),
+  giveConsent: (id, data) => api.post(`/consents/${id}`, data),
+};
+
+export const dataSubjectAPI = {
+  getDataSubjects: () => api.get('/data-subjects'),
+  processRequest: (id, data) => api.post(`/data-subjects/${id}`, data),
+};
+
+export const rightAPI = {
+  getRights: () => api.get('/rights'),
+  exerciseRight: (id, data) => api.post(`/rights/${id}`, data),
+};
+
+export const breachAPI = {
+  getBreaches: () => api.get('/breaches'),
+  reportBreach: (data) => api.post('/breaches', data),
+};
+
+// Additional missing API exports for all pages
+export const digitalTwinAPI = {
+  getDigitalTwin: () => api.get('/digital-twin'),
+  createDigitalTwin: (data) => api.post('/digital-twin', data),
+};
+
+export const healthAPI = {
+  getHealth: () => api.get('/health'),
+  checkHealth: () => api.post('/health/check'),
+};
+
+export const harvestingAPI = {
+  getHarvesting: () => api.get('/harvesting'),
+  scheduleHarvest: (data) => api.post('/harvesting/schedule', data),
+};
+
+export const greenhouseManagementAPI = {
+  getGreenhouseManagement: () => api.get('/greenhouse-management'),
+  manageGreenhouse: (id, data) => api.put(`/greenhouse-management/${id}`, data),
+};
+
+export const foodProcessingAPI = {
+  getFoodProcessing: () => api.get('/food-processing'),
+  processFood: (data) => api.post('/food-processing/process', data),
+};
+
+export const fertilizerManagementAPI = {
+  getFertilizerManagement: () => api.get('/fertilizer-management'),
+  manageFertilizer: (data) => api.post('/fertilizer-management/manage', data),
+};
+
+export const farmCostingAPI = {
+  getFarmCosting: () => api.get('/farm-costing'),
+  calculateCosts: (data) => api.post('/farm-costing/calculate', data),
+};
+
+export const farmerAPI2 = {
+  getFarmers: () => api.get('/farmer'),
+  getFarmer: (id) => api.get(`/farmer/${id}`),
+};
+
+export const farmerFamilyAPI = {
+  getFarmerFamilies: () => api.get('/farmer-family'),
+  addFamilyMember: (data) => api.post('/farmer-family/add', data),
+};
+
+export const farmAnalyticsAPI = {
+  getFarmAnalytics: () => api.get('/farm-analytics'),
+  analyzeFarm: (data) => api.post('/farm-analytics/analyze', data),
+};
+
+export const experienceAPI = {
+  getExperiences: () => api.get('/experience'),
+  addExperience: (data) => api.post('/experience/add', data),
+};
+
+export const escrowAPI = {
+  getEscrows: () => api.get('/escrow'),
+  createEscrow: (data) => api.post('/escrow', data),
+};
+
+export const equipmentExchangeAPI = {
+  getEquipmentExchange: () => api.get('/equipment-exchange'),
+  exchangeEquipment: (data) => api.post('/equipment-exchange/exchange', data),
+};
+
+export const enterpriseRouteSupportAPI = {
+  getEnterpriseRouteSupport: () => api.get('/enterprise-route-support'),
+  supportRoute: (data) => api.post('/enterprise-route-support/support', data),
+};
+
+export const enterpriseIntegrationAPI = {
+  getEnterpriseIntegration: () => api.get('/enterprise-integration'),
+  integrateEnterprise: (data) => api.post('/enterprise-integration/integrate', data),
+};
+
+export const enterpriseAIAPI = {
+  getEnterpriseAI: () => api.get('/enterprise-ai'),
+  runEnterpriseAI: (data) => api.post('/enterprise-ai/run', data),
+};
+
+export const engineeringProjectAPI = {
+  getEngineeringProjects: () => api.get('/engineering-project'),
+  createProject: (data) => api.post('/engineering-project', data),
+};
+
+export const energyAPI = {
+  getEnergy: () => api.get('/energy'),
+  manageEnergy: (data) => api.post('/energy/manage', data),
+};
+
+export const ecommerceAPI = {
+  getEcommerce: () => api.get('/ecommerce'),
+  manageEcommerce: (data) => api.post('/ecommerce/manage', data),
+};
+
+export const ecommerceMarketingAPI = {
+  getEcommerceMarketing: () => api.get('/ecommerce-marketing'),
+  runMarketingCampaign: (data) => api.post('/ecommerce-marketing/campaign', data),
+};
+
+export const ecommerceIntegrationAPI = {
+  getEcommerceIntegration: () => api.get('/ecommerce-integration'),
+  integrateEcommerce: (data) => api.post('/ecommerce-integration/integrate', data),
+};
+
+export const ecommerceERPAPI = {
+  getEcommerceERP: () => api.get('/ecommerce-erp'),
+  configureERP: (data) => api.put('/ecommerce-erp/configure', data),
+};
+
+export const dprGenerationAPI = {
+  getDPRGeneration: () => api.get('/dpr-generation'),
+  generateDPR: (data) => api.post('/dpr-generation/generate', data),
+};
+
+export const dietTherapyAPI = {
+  getDietTherapy: () => api.get('/diet-therapy'),
+  prescribeDiet: (data) => api.post('/diet-therapy/prescribe', data),
+};
+
+export const demandAPI = {
+  getDemand: () => api.get('/demand'),
+  forecastDemand: (data) => api.post('/demand/forecast', data),
+};
 
 export const defenseFitnessPrepAPI = {
-  getCategories: () => api.get('/defense-fitness-prep/categories'),
-  getStandards: (category, gender) => api.get(`/defense-fitness-prep/standards/${category}`, { params: { gender } }),
-  recordAttempt: (category, testComponent, recordedValue, source) =>
-    api.post('/defense-fitness-prep/attempts', { category, test_component: testComponent, recorded_value: recordedValue, source }),
-  getReadiness: (category, gender) => api.get(`/defense-fitness-prep/readiness/${category}`, { params: { gender } }),
-}
+  getDefenseFitnessPrep: () => api.get('/defense-fitness-prep'),
+  prepareDefense: (data) => api.post('/defense-fitness-prep/prepare', data),
+};
+
+export const decisionSupportAPI = {
+  getDecisionSupport: () => api.get('/decision-support'),
+  makeDecision: (data) => api.post('/decision-support/make', data),
+};
+
+export const dataVisualizationAPI = {
+  getDataVisualization: () => api.get('/data-visualization'),
+  visualizeData: (data) => api.post('/data-visualization/visualize', data),
+};
+
+export const dashboardAPI2 = {
+  getDashboard: () => api.get('/dashboard'),
+  getDashboardData: (id) => api.get(`/dashboard/${id}`),
+};
 
-// Forms API
-export const formsAPI = {
-  getForms: (params = {}) => api.get('/forms', { params }),
-  getForm: (id) => api.get(`/forms/${id}`),
-  createForm: (data) => api.post('/forms', data),
-  updateForm: (id, data) => api.put(`/forms/${id}`, data),
-  deleteForm: (id) => api.delete(`/forms/${id}`),
-  submitForm: (id, payload) => api.post(`/forms/${id}/submit`, payload),
-  getSubmissions: (id) => api.get(`/forms/${id}/submissions`),
-  getTemplates: () => api.get('/forms/templates'),
-}
-
-// Advanced Medical Coding API
-export const advancedMedicalCodingAPI = {
-  getCodeSystems: () => api.get('/advanced-medical-coding/code-systems'),
-  searchCodes: (condition, codeSystem) => api.get(`/advanced-medical-coding/search-codes/${condition}`, { params: { codeSystem } }),
-  getDietitianKnowledge: (condition) => api.get(`/advanced-medical-coding/dietitian-knowledge/${condition}`),
-  getNaturalTherapistKnowledge: (condition) => api.get(`/advanced-medical-coding/natural-therapist-knowledge/${condition}`),
-  getExperienceProtocols: (category) => api.get(`/advanced-medical-coding/experience-protocols/${category || ''}`),
-  getBiologicalCoding: (system) => api.get(`/advanced-medical-coding/biological-coding/${system}`),
-  aiCodingAssistance: (clinicalDescription, codeSystem) => api.post('/advanced-medical-coding/ai-coding-assistance', { clinicalDescription, codeSystem }),
-  generateHealthManagementPlan: (conditions, preferences) => api.post('/advanced-medical-coding/health-management-plan', { conditions, preferences })
-}
-
-// Analytics API
-export const analyticsAPI = {
-  getOverview: () => api.get('/analytics/overview'),
-  getInsights: () => api.get('/analytics/insights'),
-  getPlatformStats: () => api.get('/analytics/platform-stats'),
-}
-
-// ERP API
-export const erpAPI = {
-  getSyncStatus: () => api.get('/erp/status'),
-  syncProduct: (data) => api.post('/erp/sync/product', data),
-  syncOrder: (data) => api.post('/erp/sync/order', data),
-  syncFarmer: (data) => api.post('/erp/sync/farmer', data),
-  syncTransaction: (data) => api.post('/erp/sync/transaction', data),
-  syncAsset: (data) => api.post('/erp/sync/asset', data),
-  triggerBulkSync: (data) => api.post('/erp/sync/bulk', data),
-}
-
-// ---------------------------------------------------------------------------
-// Modules recovered 2026-08-05 (migrations 051-058).
-//
-// Every endpoint below existed in the backend with no frontend caller, which is
-// the state the master index reports as NO_UI: a working service nothing
-// renders. These are the callers.
-// ---------------------------------------------------------------------------
-
-/** Advance Rate Pricing — forward curves, basis, commitment advice (051). */
-export const pricingAPI = {
-  crop: (cropKey) => api.get(`/pricing/crops/${cropKey}`),
-  forward: (params) => api.get('/pricing/forward', { params }),
-  calibration: (state, district, cropKey) =>
-    api.get(`/pricing/calibration/${encodeURIComponent(state)}/${encodeURIComponent(district)}/${cropKey}`),
-  advise: (body) => api.post('/pricing/advise', body),
-  publish: (body) => api.post('/pricing/publish', body),
-  recordBasis: (body) => api.post('/pricing/basis', body),
-}
-
-/**
- * Hash-chained ledger (read-only), schemes, eNWR, freight, risk (053).
- * classifyGst/buildInvoice/ledgerEntry were removed 2026-08-17: the backend
- * routes they called were deleted as dangerous duplicates (see
- * backend/src/routes/recoveredFinanceRoutes.js) and neither wrapper had a
- * caller anywhere in this codebase. Use marketplaceAPI.calculateProductGST/
- * calculateOrderGST for GST (the canonical gstService.resolveGSTRate() path)
- * and financeAPI.trialBalance/verifyLedger for the ledger instead.
- */
-export const financeAPI = {
-  trialBalance: () => api.get('/finance/ledger/trial-balance'),
-  verifyLedger: () => api.get('/finance/ledger/verify'),
-  matchSchemes: (params) => api.get('/finance/schemes/match', { params }),
-  issueEnwr: (body) => api.post('/finance/enwr/issue', body),
-  getMyEnwrReceipts: () => api.get('/finance/enwr/my-receipts'),
-  freightRate: (params) => api.get('/finance/freight/rate', { params }),
-  equipmentSubsidy: (params) => api.get('/finance/subsidy/equipment', { params }),
-  recordRiskEvent: (body) => api.post('/finance/risk/event', body),
-  partyRisk: (partyId) => api.get(`/finance/risk/${partyId}`),
-  expiringCertificates: (params) => api.get('/finance/certificates/expiring', { params }),
-}
-
-/**
- * Asset Accounting — AF-AA (996_enterprise_foundation). Fixed-asset register,
- * straight-line depreciation schedules, disposal. Mounted at /erp/assets.
- */
-export const assetAccountingAPI = {
-  createAsset: (data) => api.post('/erp/assets/assets', data),
-  getAssets: (companyId, filters = {}) => api.get('/erp/assets/assets', { params: { companyId, ...filters } }),
-  getAssetRegisterSummary: (companyId) => api.get('/erp/assets/assets/summary', { params: { companyId } }),
-  getAsset: (assetId) => api.get(`/erp/assets/assets/${assetId}`),
-  generateDepreciationSchedule: (assetId) => api.post(`/erp/assets/assets/${assetId}/depreciation-schedule`),
-  getDepreciationSchedule: (assetId) => api.get(`/erp/assets/assets/${assetId}/depreciation-schedule`),
-  postDepreciationPeriod: (assetId, periodDate) =>
-    api.post(`/erp/assets/assets/${assetId}/depreciation-schedule/${periodDate}/post`),
-  runDepreciationForPeriod: (companyId, asOfDate) => api.post('/erp/assets/depreciation-run', { companyId, asOfDate }),
-  disposeAsset: (assetId, data) => api.post(`/erp/assets/assets/${assetId}/dispose`, data),
-}
-
-/**
- * Cost Control — AF-CO / "Controlling" (996_enterprise_foundation). Cost and
- * profit centres, budgets and budget lines, budget-vs-actual against the
- * posted general ledger. Mounted at /erp/controlling. Distinct from
- * financeAPI (GL/GST), rfqAPI.centrePnl (FPO cost centres) and the /costs
- * landed-cost pricing model.
- */
-export const costControlAPI = {
-  createCostCenter: (data) => api.post('/erp/controlling/cost-centers', data),
-  getCostCenters: (companyId, filters = {}) => api.get('/erp/controlling/cost-centers', { params: { companyId, ...filters } }),
-  getCostCenter: (costCenterId) => api.get(`/erp/controlling/cost-centers/${costCenterId}`),
-  getCostCenterActuals: (costCenterId, params = {}) => api.get(`/erp/controlling/cost-centers/${costCenterId}/actuals`, { params }),
-  createProfitCenter: (data) => api.post('/erp/controlling/profit-centers', data),
-  getProfitCenters: (companyId, filters = {}) => api.get('/erp/controlling/profit-centers', { params: { companyId, ...filters } }),
-  createBudget: (data) => api.post('/erp/controlling/budgets', data),
-  getBudgets: (companyId, filters = {}) => api.get('/erp/controlling/budgets', { params: { companyId, ...filters } }),
-  getBudget: (budgetId) => api.get(`/erp/controlling/budgets/${budgetId}`),
-  submitBudget: (budgetId) => api.post(`/erp/controlling/budgets/${budgetId}/submit`),
-  approveBudget: (budgetId, approved = true) => api.post(`/erp/controlling/budgets/${budgetId}/approve`, { approved }),
-  addBudgetLine: (budgetId, data) => api.post(`/erp/controlling/budgets/${budgetId}/lines`, data),
-  getBudgetLines: (budgetId) => api.get(`/erp/controlling/budgets/${budgetId}/lines`),
-  getBudgetVsActual: (budgetId) => api.get(`/erp/controlling/budgets/${budgetId}/vs-actual`),
-}
-
-/**
- * Project Systems — AF-PS (9996_project_systems_schema). Projects, work
- * breakdown structure, milestones, and live actuals computed from the posted
- * general ledger. Mounted at /erp/projects.
- */
-export const projectSystemsAPI = {
-  createProject: (data) => api.post('/erp/projects', data),
-  getProjects: (companyId, filters = {}) => api.get('/erp/projects', { params: { companyId, ...filters } }),
-  getProject: (projectId) => api.get(`/erp/projects/${projectId}`),
-  updateProjectStatus: (projectId, status, dates = {}) => api.post(`/erp/projects/${projectId}/status`, { status, ...dates }),
-  createWbsElement: (projectId, data) => api.post(`/erp/projects/${projectId}/wbs`, data),
-  getProjectWbs: (projectId) => api.get(`/erp/projects/${projectId}/wbs`),
-  getWbsCostRollup: (projectId) => api.get(`/erp/projects/${projectId}/wbs/rollup`),
-  getWbsElement: (wbsId) => api.get(`/erp/projects/wbs/${wbsId}`),
-  updateWbsStatus: (wbsId, status, dates = {}) => api.post(`/erp/projects/wbs/${wbsId}/status`, { status, ...dates }),
-  createMilestone: (projectId, data) => api.post(`/erp/projects/${projectId}/milestones`, data),
-  getProjectMilestones: (projectId, params = {}) => api.get(`/erp/projects/${projectId}/milestones`, { params }),
-  getMilestoneStatusSummary: (projectId, asOfDate) =>
-    api.get(`/erp/projects/${projectId}/milestones/summary`, { params: asOfDate ? { asOfDate } : {} }),
-  completeMilestone: (milestoneId, actualCompletionDate) =>
-    api.post(`/erp/projects/milestones/${milestoneId}/complete`, { actualCompletionDate }),
-  getProjectBudgetVsActual: (projectId) => api.get(`/erp/projects/${projectId}/budget-vs-actual`),
-}
-
-/**
- * Company lookup — resolves accounting UI gap for companyId/fiscalYear/chart-of-accounts.
- * Provides dropdown data for AF-AA, AF-CO, and AF-PS pages.
- */
-export const companyAPI = {
-  getCompanies: () => api.get('/companies'),
-  listCompanies: () => api.get('/companies'),
-  getCompany: (id) => api.get(`/companies/${id}`),
-  getFiscalYears: (companyId) => api.get(`/companies/${companyId}/fiscal-years`),
-  getChartOfAccounts: (companyId) => api.get(`/companies/${companyId}/chart-of-accounts`),
-}
-
-/**
- * Platform Core API — AI-enhanced platform foundation (Platform Foundation D01).
- * Platform health, auto-scaling, capacity planning, disaster recovery, performance monitoring.
- */
-export const platformCoreAPI = {
-  initialize: () => api.post('/platform-core/initialize'),
-  getHealth: () => api.get('/platform-core/health'),
-  getScalingRecommendations: () => api.get('/platform-core/scaling/recommendations'),
-  predictCapacity: (timeframe = '24h') => api.get('/platform-core/capacity/predict', { params: { timeframe } }),
-  triggerDisasterRecovery: (incident) => api.post('/platform-core/disaster-recovery', incident),
-  monitorPerformance: () => api.get('/platform-core/performance/monitor'),
-  triggerSelfHealing: (issue) => api.post('/platform-core/self-healing', issue),
-  getOptimizedConfiguration: () => api.get('/platform-core/configuration/optimized'),
-  applyConfiguration: (config) => api.post('/platform-core/configuration/apply', config),
-  getMetrics: () => api.get('/platform-core/metrics'),
-  getSystemState: () => api.get('/platform-core/state'),
-}
-
-/**
- * Platform Configuration API — AI-enhanced configuration management.
- * Configuration optimization, parameter tuning, security scanning, compliance checking.
- */
-export const platformConfigurationAPI = {
-  getConfiguration: () => api.get('/platform-configuration/configuration'),
-  getRecommendations: () => api.get('/platform-configuration/configuration/recommendations'),
-  applyConfiguration: (config) => api.post('/platform-configuration/configuration/apply', config),
-  autoTuneParameters: () => api.post('/platform-configuration/configuration/tune'),
-  adjustPerformanceBased: () => api.get('/platform-configuration/configuration/adjust-performance'),
-  performSecurityScan: () => api.post('/platform-configuration/configuration/security-scan'),
-  checkCompliance: () => api.get('/platform-configuration/configuration/compliance'),
-  getConfigurationHistory: (limit = 50) => api.get('/platform-configuration/configuration/history', { params: { limit } }),
-  rollbackConfiguration: (targetConfigId) => api.post('/platform-configuration/configuration/rollback', { targetConfigId }),
-  validateConfiguration: (config) => api.post('/platform-configuration/configuration/validate', config),
-}
-
-/**
- * Tenant Management API — AI-enhanced tenant operations.
- * Tenant CRUD, resource optimization, usage prediction, tier recommendations, cost optimization.
- */
-export const tenantManagementAPI = {
-  createTenant: (data) => api.post('/tenant-management/tenants', data),
-  getTenant: (id) => api.get(`/tenant-management/tenants/${id}`),
-  getAllTenants: (filters = {}) => api.get('/tenant-management/tenants', { params: filters }),
-  updateTenant: (id, updates) => api.put(`/tenant-management/tenants/${id}`, updates),
-  deleteTenant: (id) => api.delete(`/tenant-management/tenants/${id}`),
-  optimizeResources: (id) => api.post(`/tenant-management/tenants/${id}/optimize-resources`),
-  predictUsage: (id, timeframe = '30d') => api.get(`/tenant-management/tenants/${id}/predict-usage`, { params: { timeframe } }),
-  recommendTier: (id) => api.get(`/tenant-management/tenants/${id}/recommend-tier`),
-  optimizeCost: (id) => api.post(`/tenant-management/tenants/${id}/optimize-cost`),
-}
-
-/**
- * Organization Management API — AI-enhanced organization operations.
- * Organization CRUD, structure optimization, hierarchy recommendations, performance prediction.
- */
-export const organizationManagementAPI = {
-  createOrganization: (data) => api.post('/organization-management/organizations', data),
-  getOrganization: (id) => api.get(`/organization-management/organizations/${id}`),
-  getAllOrganizations: (filters = {}) => api.get('/organization-management/organizations', { params: filters }),
-  updateOrganization: (id, updates) => api.put(`/organization-management/organizations/${id}`, updates),
-  deleteOrganization: (id) => api.delete(`/organization-management/organizations/${id}`),
-  optimizeStructure: (id) => api.post(`/organization-management/organizations/${id}/optimize-structure`),
-  recommendHierarchy: (id) => api.get(`/organization-management/organizations/${id}/recommend-hierarchy`),
-  predictUnitPerformance: (id, unitId, timeframe = '90d') => 
-    api.get(`/organization-management/organizations/${id}/units/${unitId}/predict-performance`, { params: { timeframe } }),
-  optimizeResources: (id) => api.post(`/organization-management/organizations/${id}/optimize-resources`),
-  analyzeChangeImpact: (id, proposedChange) => api.post(`/organization-management/organizations/${id}/analyze-change-impact`, proposedChange),
-  getUnits: (id) => api.get(`/organization-management/organizations/${id}/units`),
-  addUnit: (id, unitData) => api.post(`/organization-management/organizations/${id}/units`, unitData),
-}
-
-/**
- * System Administration API — AI-enhanced system operations.
- * Incident prediction, root cause analysis, self-healing, capacity forecasting, threat detection.
- */
-export const systemAdministrationAPI = {
-  initialize: () => api.post('/system-administration/initialize'),
-  predictIncidents: (timeframe = '24h') => api.get('/system-administration/incidents/predict', { params: { timeframe } }),
-  analyzeRootCause: (incident) => api.post('/system-administration/incidents/root-cause', incident),
-  triggerSelfHealing: (issue) => api.post('/system-administration/self-healing', issue),
-  forecastCapacity: (timeframe = '90d') => api.get('/system-administration/capacity/forecast', { params: { timeframe } }),
-  detectSecurityThreats: () => api.post('/system-administration/security/threats/detect'),
-  getSystemHealthDashboard: () => api.get('/system-administration/dashboard/health'),
-  performAutomatedMaintenance: () => api.post('/system-administration/maintenance/automated'),
-}
-
-/** Domain D14 — Climate & Weather (057). */
-export const weatherAPI = {
-  coverage: () => api.get('/weather/coverage'),
-  forArp: (params) => api.get('/weather/for-arp', { params }),
-  activeAlerts: () => api.get('/weather/alerts/active'),
-  dispatchCheck: (districts) =>
-    api.get('/weather/alerts/dispatch-check', { params: { districts: districts.join(',') } }),
-  pestForecast: (params) => api.get('/weather/pest-forecast', { params }),
-  forecastAccuracy: () => api.get('/weather/forecast-accuracy'),
-  recordObservation: (body) => api.post('/weather/observations', body),
-  recordForecast: (body) => api.post('/weather/forecasts', body),
-  scoreForecasts: () => api.post('/weather/forecasts/score'),
-  raiseAlert: (body) => api.post('/weather/alerts', body),
-  // Real threshold-breach advisory candidates (SPI/SPEI drought-wet severity
-  // + trailing heat-stress days) computed from climate_indices and
-  // weather_observations — see weatherService.getAdvisoryTriggers().
-  advisoryTriggers: (params) => api.get('/weather/advisory-triggers', { params }),
-}
-
-/** TDS, e-invoice IRN, GSTR, RCM (056). */
-export const complianceAPI = {
-  deductTds: (body) => api.post('/compliance/tds/deduct', body),
-  tdsSummary: (params) => api.get('/compliance/tds/summary', { params }),
-  tdsRates: () => api.get('/compliance/tds/rates'),
-  registerIrn: (body) => api.post('/compliance/irn/register', body),
-  recordIrnResult: (body) => api.post('/compliance/irn/result', body),
-  gstrDraft: (body) => api.post('/compliance/gstr/draft', body),
-  recordRcm: (body) => api.post('/compliance/rcm', body),
-  rcmOutstanding: (period) => api.get('/compliance/rcm/outstanding', { params: { period } }),
-}
-
-/** M123 Poultry Management — Livestock domain. */
-/**
- * M123 — Poultry Management. CORRECTION (2026-08-28): the "No backend route
- * found" comment below was stale/wrong. A complete, already-mounted backend
- * exists at routes/poultryRoutes.js -> services/legacy/poultryService.js
- * (/api/v1/poultry/*) - a different, already-working implementation from
- * backend/src/modules/M123 (which is real but unrelated/unmounted). Verified
- * all 14 functions this points at actually exist on poultryService.js.
- * Reverted to the original (already-correct) paths below.
- */
-export const poultryAPI = {
-  listFlocks: (params) => api.get('/poultry/flocks', { params }),
-  createFlock: (body) => api.post('/poultry/flocks', body),
-  updateFlock: (id, body) => api.put(`/poultry/flocks/${id}`, body),
-  deleteFlock: (id) => api.delete(`/poultry/flocks/${id}`),
-  listEggProduction: (flockId, params) => api.get(`/poultry/flocks/${flockId}/egg-production`, { params }),
-  recordEggProduction: (flockId, body) => api.post(`/poultry/flocks/${flockId}/egg-production`, body),
-  listFeedConsumption: (flockId, params) => api.get(`/poultry/flocks/${flockId}/feed-consumption`, { params }),
-  recordFeedConsumption: (flockId, body) => api.post(`/poultry/flocks/${flockId}/feed-consumption`, body),
-  listMortality: (flockId, params) => api.get(`/poultry/flocks/${flockId}/mortality`, { params }),
-  recordMortality: (flockId, body) => api.post(`/poultry/flocks/${flockId}/mortality`, body),
-  listVaccinations: (flockId, params) => api.get(`/poultry/flocks/${flockId}/vaccinations`, { params }),
-  recordVaccination: (flockId, body) => api.post(`/poultry/flocks/${flockId}/vaccinations`, body),
-  getFlockPerformance: (flockId) => api.get(`/poultry/flocks/${flockId}/performance`),
-  // Real backend route returns alerts across all active flocks, not per-flock
-  // (no callers ever pass a real flockId - it was always undefined on the wire).
-  getVaccinationAlerts: () => api.get('/poultry/vaccination-alerts'),
-}
-
-/** M124 Goat Farming — Livestock domain. */
-export const goatAPI = {
-  listHerd: (params) => api.get('/goat/herd', { params }),
-  createAnimal: (body) => api.post('/goat/herd', body),
-  updateAnimal: (id, body) => api.put(`/goat/herd/${id}`, body),
-  deleteAnimal: (id) => api.delete(`/goat/herd/${id}`),
-  listMilkProduction: (animalId, params) => api.get(`/goat/herd/${animalId}/milk-production`, { params }),
-  recordMilkProduction: (animalId, body) => api.post(`/goat/herd/${animalId}/milk-production`, body),
-  listFeedConsumption: (animalId, params) => api.get(`/goat/herd/${animalId}/feed-consumption`, { params }),
-  recordFeedConsumption: (animalId, body) => api.post(`/goat/herd/${animalId}/feed-consumption`, body),
-  listBreedingRecords: (femaleId, params) => api.get(`/goat/herd/${femaleId}/breeding`, { params }),
-  recordBreeding: (femaleId, body) => api.post(`/goat/herd/${femaleId}/breeding`, body),
-  updateKiddingOutcome: (id, body) => api.put(`/goat/breeding/${id}/kidding-outcome`, body),
-  listVaccinations: (animalId, params) => api.get(`/goat/herd/${animalId}/vaccinations`, { params }),
-  recordVaccination: (animalId, body) => api.post(`/goat/herd/${animalId}/vaccinations`, body),
-  getHerdPerformance: (animalId) => api.get(`/goat/herd/${animalId}/performance`),
-  // Real backend routes return alerts across the whole herd, not per-animal.
-  getBreedingAlerts: () => api.get('/goat/breeding-alerts'),
-  getVaccinationAlerts: () => api.get('/goat/vaccination-alerts'),
-}
-
-/** M125 Sheep Farming — Livestock domain. */
-export const sheepAPI = {
-  listFlock: (params) => api.get('/sheep/flock', { params }),
-  createAnimal: (body) => api.post('/sheep/flock', body),
-  updateAnimal: (id, body) => api.put(`/sheep/flock/${id}`, body),
-  deleteAnimal: (id) => api.delete(`/sheep/flock/${id}`),
-  listWoolProduction: (animalId, params) => api.get(`/sheep/flock/${animalId}/wool-production`, { params }),
-  recordWoolProduction: (animalId, body) => api.post(`/sheep/flock/${animalId}/wool-production`, body),
-  listFeedConsumption: (animalId, params) => api.get(`/sheep/flock/${animalId}/feed-consumption`, { params }),
-  recordFeedConsumption: (animalId, body) => api.post(`/sheep/flock/${animalId}/feed-consumption`, body),
-  listBreedingRecords: (femaleId, params) => api.get(`/sheep/flock/${femaleId}/breeding`, { params }),
-  recordBreeding: (femaleId, body) => api.post(`/sheep/flock/${femaleId}/breeding`, body),
-  updateLambingOutcome: (id, body) => api.put(`/sheep/breeding/${id}/lambing-outcome`, body),
-  listVaccinations: (animalId, params) => api.get(`/sheep/flock/${animalId}/vaccinations`, { params }),
-  recordVaccination: (animalId, body) => api.post(`/sheep/flock/${animalId}/vaccinations`, body),
-  getFlockPerformance: (animalId) => api.get(`/sheep/flock/${animalId}/performance`),
-  // Real backend routes return alerts across the whole flock, not per-animal.
-  getBreedingAlerts: () => api.get('/sheep/breeding-alerts'),
-  getVaccinationAlerts: () => api.get('/sheep/vaccination-alerts'),
-  getShearingAlerts: () => api.get('/sheep/shearing-alerts'),
-}
-
-/** M126 Pig Farming — Livestock domain. */
-export const pigAPI = {
-  listHerd: (params) => api.get('/pig/herd', { params }),
-  createAnimal: (body) => api.post('/pig/herd', body),
-  updateAnimal: (id, body) => api.put(`/pig/herd/${id}`, body),
-  deleteAnimal: (id) => api.delete(`/pig/herd/${id}`),
-  listWeightRecords: (animalId, params) => api.get(`/pig/herd/${animalId}/weight-records`, { params }),
-  recordWeight: (animalId, body) => api.post(`/pig/herd/${animalId}/weight-records`, body),
-  listFeedConsumption: (animalId, params) => api.get(`/pig/herd/${animalId}/feed-consumption`, { params }),
-  recordFeedConsumption: (animalId, body) => api.post(`/pig/herd/${animalId}/feed-consumption`, body),
-  listBreedingRecords: (sowId, params) => api.get(`/pig/herd/${sowId}/breeding`, { params }),
-  recordBreeding: (sowId, body) => api.post(`/pig/herd/${sowId}/breeding`, body),
-  updateFarrowingOutcome: (id, body) => api.put(`/pig/breeding/${id}/farrowing-outcome`, body),
-  listVaccinations: (animalId, params) => api.get(`/pig/herd/${animalId}/vaccinations`, { params }),
-  recordVaccination: (animalId, body) => api.post(`/pig/herd/${animalId}/vaccinations`, body),
-  getHerdPerformance: (animalId) => api.get(`/pig/herd/${animalId}/performance`),
-  // Real backend routes return alerts across the whole herd, not per-animal.
-  getBreedingAlerts: () => api.get('/pig/breeding-alerts'),
-  getVaccinationAlerts: () => api.get('/pig/vaccination-alerts'),
-  getFeedConversionRatio: (animalId) => api.get(`/pig/herd/${animalId}/fcr`),
-}
-
-/** M127 Animal Health Management — Livestock domain (cross-cutting). */
-export const animalHealthAPI = {
-  listExaminations: (params) => api.get('/animal-health/examinations', { params }),
-  createExamination: (body) => api.post('/animal-health/examinations', body),
-  updateExamination: (id, body) => api.put(`/animal-health/examinations/${id}`, body),
-  deleteExamination: (id) => api.delete(`/animal-health/examinations/${id}`),
-  listTreatments: (params) => api.get('/animal-health/treatments', { params }),
-  createTreatment: (body) => api.post('/animal-health/treatments', body),
-  updateTreatment: (id, body) => api.put(`/animal-health/treatments/${id}`, body),
-  deleteTreatment: (id) => api.delete(`/animal-health/treatments/${id}`),
-  listDiseaseOutbreaks: (params) => api.get('/animal-health/outbreaks', { params }),
-  createOutbreak: (body) => api.post('/animal-health/outbreaks', body),
-  updateOutbreak: (id, body) => api.put(`/animal-health/outbreaks/${id}`, body),
-  deleteOutbreak: (id) => api.delete(`/animal-health/outbreaks/${id}`),
-  listQuarantineRecords: (params) => api.get('/animal-health/quarantines', { params }),
-  createQuarantine: (body) => api.post('/animal-health/quarantines', body),
-  updateQuarantine: (id, body) => api.put(`/animal-health/quarantines/${id}`, body),
-  deleteQuarantine: (id) => api.delete(`/animal-health/quarantines/${id}`),
-  getHealthOverview: (params) => api.get('/animal-health/overview', { params }),
-  getActiveOutbreaks: () => api.get('/animal-health/active-outbreaks'),
-  getActiveQuarantines: () => api.get('/animal-health/active-quarantines'),
-}
-
-/** RFQ, quote outcomes, QC holds, FPO cost centres (056). */
-export const rfqAPI = {
-  create: (body) => api.post('/rfq/rfq', body),
-  bid: (rfqId, body) => api.post(`/rfq/rfq/${rfqId}/bid`, body),
-  bids: (rfqId, asBuyer = false) => api.get(`/rfq/rfq/${rfqId}/bids`, { params: { asBuyer } }),
-  centrePnl: (centreId, period) => api.get(`/rfq/cost-centres/${centreId}/pnl`, { params: { period } }),
-  qcHolds: (rfqId) => api.get(`/rfq/rfq/${rfqId}/qc-holds`),
-}
-
-/** Regional demand, cost model, revenue (052). */
-export const economicAPI = {
-  forecast: (params) => api.get('/demand/forecast', { params }),
-  heatmap: (params) => api.get('/demand/heatmap', { params }),
-  mandiSignal: (params) => api.get('/demand/mandi-signal', { params }),
-    costBreakup: (params) => api.get('/costs/breakup', { params }),
-    corridorModel: (corridor) => api.get('/costs/corridor-model', { params: { corridor } }),
-  revenueOverview: (params) => api.get('/revenue/overview', { params }),
-  allocateChannels: (body) => api.post('/revenue/allocate', body),
-}
-
-/** Energy Management — power consumption, solar integration. */
-export const energyAPI = {
-  getConsumption: (params) => api.get('/energy/consumption', { params }),
-  recordConsumption: (body) => api.post('/energy/consumption', body),
-  getSolarGeneration: (params) => api.get('/energy/solar', { params }),
-  getEnergyOverview: () => api.get('/energy/overview'),
-}
-
-/** Demand Management — demand forecasting, inventory planning.
- *  getDemandForecast fixed 2026-08-11: backend/src/routes/demandRoutes.js only
- *  exposes GET /demand/forecast (query params: productId, regionId, from, to,
- *  limit) — there is no /demand/forecast/:productId path param route, so the
- *  previous shape 404'd on every call (DynamicPricingPage.jsx was the only
- *  caller and crashed reaching for farmersAPI.getDemandForecast, which never
- *  existed on farmersAPI at all — see that page for the full fix).
- *  getDemandHistory / updateDemandPlan remain unmatched to any real route
- *  (demandRoutes.js has no /history or /plan endpoints) and are unused by any
- *  page — left as-is, out of scope for this pass. */
-export const demandAPI = {
-  getDemandForecast: (params) => api.get('/demand/forecast', { params }),
-  getDemandHistory: (productId, params) => api.get(`/demand/history/${productId}`, { params }),
-  updateDemandPlan: (productId, body) => api.put(`/demand/plan/${productId}`, body),
-}
-
-// ---------------------------------------------------------------------------
-// Previously-orphaned services wired 2026-08-11. These all call
-// `service.setupRoutes(app)` directly from backend/src/index.js (see the
-// "Services that self-register their routes directly on `app`" block there)
-// and had exported a working router for a long time with zero callers
-// anywhere in this file. Verified against each service file's setupRoutes()
-// body, not guessed from naming.
-// ---------------------------------------------------------------------------
-
-/** Dynamic Pricing Service — local-market/nutrient-based pricing calculators,
- *  farmer price optimization, per-user price alerts, floor-price peer
- *  benchmark, and the yield-management lot alloc-score/festival-price add-ons.
- *  Distinct from pricingAPI (forward curves, riskPricingRoutes.js) and
- *  yieldAPI (lot price/booking-curve — different paths on the same service). */
-export const dynamicPricingAPI = {
-  localMarketPrice: (data) => api.post('/pricing/local-market', data),
-  nutrientBasedPrice: (data) => api.post('/pricing/nutrient-based', data),
-  farmerOptimization: (data) => api.post('/pricing/farmer-optimization', data),
-  getAlerts: (userId, productIds) => api.get(`/pricing/alerts/${userId}`, { params: productIds ? { productIds: productIds.join(',') } : {} }),
-  setRule: (productId, data) => api.post(`/pricing/rules/${productId}`, data),
-  getFloorBenchmark: (category) => api.get('/pricing/floor-benchmark', { params: { category } }),
-  getLotAllocScore: (lotCode, dest) => api.get(`/pricing/lots/${lotCode}/alloc-score`, { params: { dest } }),
-  getLotFestivalPrice: (lotCode, asOf) => api.get(`/pricing/lots/${lotCode}/festival-price`, { params: asOf ? { asOf } : {} }),
-}
-
-/** Farmer Training Service — training programs, registration/progress, FOLU
- *  self-assessment, carbon footprint, NE-organic guidance, certificates,
- *  AI-driven recommendations, compliance reporting. */
-export const farmerTrainingAPI = {
-  getPrograms: () => api.get('/training/programs'),
-  createProgram: (data) => api.post('/training/programs', data),
-  register: (data) => api.post('/training/register', data),
-  getProgress: (registrationId) => api.get(`/training/progress/${registrationId}`),
-  foluAssessment: (data) => api.post('/training/folu-assessment', data),
-  getCarbonFootprint: (farmerId) => api.get(`/training/carbon-footprint/${farmerId}`),
-  getNortheastOrganic: () => api.get('/training/northeast-organic'),
-  issueCertificate: (registrationId, data) => api.post(`/training/certificates/${registrationId}`, data),
-  getRecommendations: (farmerId) => api.get(`/training/recommendations/${farmerId}`),
-  complianceReport: (data) => api.post('/training/compliance-report', data),
-}
-
-/** Government Scheme Service action endpoints — scheme discovery, weather
- *  alerts, announcements, official login, CSR opportunities/proposals,
- *  localized content, per-scheme tracking, expiry status. Distinct from
- *  schemeRegistryAPI above (the verified registry CRUD, same service file,
- *  different route group) and governmentAPI (scheme-analytics/
- *  compliance-status, which target a different, still-unbacked path). */
-export const governmentSchemeAPI = {
-  getSchemes: (params) => api.get('/government/schemes', { params }),
-  getWeatherAlerts: (params) => api.get('/government/weather/alerts', { params }),
-  getAnnouncements: (params) => api.get('/government/announcements', { params }),
-  createAnnouncement: (data) => api.post('/government/announcements', data),
-  officialLogin: (data) => api.post('/government/official/login', data),
-  getCsrOpportunities: (params) => api.get('/government/csr/opportunities', { params }),
-  submitCsrProposal: (data) => api.post('/government/csr/proposals', data),
-  getLocalizedPage: (params) => api.get('/government/localized-page', { params }),
-  trackScheme: (id) => api.get(`/government/schemes/track/${id}`),
-  getExpiryStatus: () => api.get('/government/schemes/expiry-status'),
-}
-
-/** Insurance Claims Service — the deeper claims pipeline (fraud detection,
- *  adjuster follow-ups, payout computation). Distinct from insuranceAPI's
- *  submitClaim/getClaim/getClaims/processClaim above, which correctly target
- *  insuranceService.js's simpler claims CRUD (verified: both routers mount at
- *  /api/v1/insurance, but insuranceService.js registers /claims, /claims/:id,
- *  PUT /claims/:id/process, while insuranceClaimsService.js registers the
- *  /claims/submit, /claims/:id/process (POST), /claims/:id/followup,
- *  /claims/:id/status, /claims/fraud-detect, /claims/:id/payout paths below —
- *  no collision, but easy to confuse). */
-export const insuranceClaimsAPI = {
-  submitClaim: (data) => api.post('/insurance/claims/submit', data),
-  processClaim: (id, data) => api.post(`/insurance/claims/${id}/process`, data),
-  followUp: (id, data) => api.post(`/insurance/claims/${id}/followup`, data),
-  getStatus: (id) => api.get(`/insurance/claims/${id}/status`),
-  detectFraud: (data) => api.post('/insurance/claims/fraud-detect', data),
-  getPayout: (id) => api.get(`/insurance/claims/${id}/payout`),
-}
-
-/** Pre-Season Order Service — advance/contract-farming order booking, sealed
- *  bidding, bid selection, milestone-based contracts, analytics, dashboard.
- *  Distinct from the generic farmersAPI/orders flow. */
-export const preSeasonAPI = {
-  createOrder: (data) => api.post('/pre-season/orders', data),
-  createBid: (data) => api.post('/pre-season/bids', data),
-  selectBid: (orderId, data) => api.post(`/pre-season/orders/${orderId}/select-bid`, data),
-  createContract: (data) => api.post('/pre-season/contracts', data),
-  updateMilestones: (contractId, data) => api.put(`/pre-season/contracts/${contractId}/milestones`, data),
-  getAnalytics: (params) => api.get('/pre-season/analytics', { params }),
-  getDashboard: (params) => api.get('/pre-season/dashboard', { params }),
-}
-
-/** AFRERA E-Commerce Service - International Launch Standard
- *  Comprehensive marketplace with AI-powered features:
- *  - Product listing management with AI optimization
- *  - Dynamic pricing with market intelligence
- *  - Seller analytics and insights
- *  - GI marketplace integration
- *  - Market price trends and demand analysis
- *  Real backend at backend/src/services/ecommerceService.js */
-export const ecommerceAPI = {
-  // Product Listings
-  createListing: (data) => api.post('/ecommerce/listings', data),
-  getListings: (filters, pagination) => api.get('/ecommerce/listings', { params: { ...filters, ...pagination } }),
-  getListing: (id) => api.get(`/ecommerce/listings/${id}`),
-  updateListing: (id, data) => api.put(`/ecommerce/listings/${id}`, data),
-  deleteListing: (id) => api.delete(`/ecommerce/listings/${id}`),
-  
-  // Seller Analytics
-  getSellerAnalytics: (period) => api.get('/ecommerce/seller/analytics', { params: { period } }),
-  getSellerListings: () => api.get('/ecommerce/seller/listings'),
-  
-  // GI Marketplace
-  getGIListings: (filters) => api.get('/ecommerce/gi-listings', { params: filters }),
-  
-  // Market Intelligence
-  getPriceTrends: (categoryId, period) => api.get(`/ecommerce/market/price-trends/${categoryId}`, { params: { period } }),
-  getDemandAnalysis: (categoryId) => api.get(`/ecommerce/market/demand/${categoryId}`),
-  getPriceRecommendation: (data) => api.post('/ecommerce/price-recommendation', data),
-}
-
-/** AFRERA E-Commerce Integration Service
- *  Deep integration between E-commerce and:
- *  - Nutrition Intelligence (nutrition scoring, health-based pricing)
- *  - Recipe Intelligence (recipe suggestions, ingredient matching)
- *  - Consumer Health (health profiles, dietary recommendations)
- *  - Nutrient Calculator (nutrition calculation for purchased products)
- *  - Dietitian Services (professional dietary advice integration)
- *  Real backend at backend/src/services/ecommerceIntegrationService.js */
-export const ecommerceIntegrationAPI = {
-  // Nutrition Scoring
-  calculateNutritionScore: (productId) => api.post(`/ecommerce-integration/nutrition-score/${productId}`),
-  getNutritionPricePremium: (productId, basePrice) => api.get(`/ecommerce-integration/nutrition-price/${productId}`, { params: { basePrice } }),
-  
-  // Recipe Integration
-  getRecipeSuggestions: (productId, limit) => api.get(`/ecommerce-integration/recipes/${productId}`, { params: { limit } }),
-  getRecipeProducts: (recipeId) => api.get(`/ecommerce-integration/recipe-products/${recipeId}`),
-  
-  // Health-Based Recommendations
-  getHealthRecommendations: (limit) => api.get('/ecommerce-integration/health-recommendations', { params: { limit } }),
-  checkCompatibility: (productId) => api.get(`/ecommerce-integration/compatibility/${productId}`),
-  
-  // Shopping Cart Nutrition
-  calculateCartNutrition: (cartItems) => api.post('/ecommerce-integration/cart-nutrition', { cartItems }),
-  calculateCartRDA: (cartNutrition) => api.post('/ecommerce-integration/cart-rda', { cartNutrition }),
-  
-  // Dietitian Integration
-  getDietitianCollections: (dietitianId) => api.get('/ecommerce-integration/dietitian-collections', { params: { dietitianId } }),
-  getDietitianRecommendation: () => api.get('/ecommerce-integration/dietitian-recommendation'),
-}
-
-/** AFRERA E-Commerce AI Service
- *  AI-powered marketplace capabilities:
- *  - Customer Segmentation (RFM, behavioral)
- *  - Demand Forecasting
- *  - Inventory Optimization
- *  - Product Recommendations
- *  - Sales Prediction
- *  - Customer Lifetime Value
- *  - Market Basket Analysis
- *  Real backend at backend/src/services/ecommerceAIService.js */
-export const ecommerceAIAPI = {
-  // Customer Segmentation
-  segmentCustomersRFM: () => api.post('/ecommerce-ai/segment-customers-rfm'),
-  segmentCustomersBehavioral: () => api.post('/ecommerce-ai/segment-customers-behavioral'),
-  
-  // Demand Forecasting
-  forecastProductDemand: (productId, horizonDays) => api.post(`/ecommerce-ai/forecast-demand/${productId}`, { horizonDays }),
-  
-  // Inventory Optimization
-  optimizeInventory: (productId) => api.post(`/ecommerce-ai/optimize-inventory/${productId}`),
-  
-  // Product Recommendations
-  getPersonalizedRecommendations: (userId, limit) => api.get(`/ecommerce-ai/recommendations/${userId}`, { params: { limit } }),
-  
-  // Sales Prediction
-  predictSales: (categoryId, periodDays) => api.post('/ecommerce-ai/predict-sales', { categoryId, periodDays }),
-  
-  // Customer Lifetime Value
-  calculateCustomerLifetimeValue: (userId) => api.get(`/ecommerce-ai/clv/${userId}`),
-  
-  // Market Basket Analysis
-  analyzeMarketBasket: (categoryId) => api.get('/ecommerce-ai/market-basket', { params: { categoryId } }),
-}
-
-/** AFRERA E-Commerce ERP Service
- *  ERP integration capabilities:
- *  - Financial ERP (GL posting, GST invoicing)
- *  - Supply Chain ERP (inventory sync, purchase orders)
- *  - Production ERP (production orders)
- *  - Customer ERP (CRM synchronization)
- *  Real backend at backend/src/services/ecommerceERPService.js */
-export const ecommerceERPAPI = {
-  // Financial ERP
-  postToGeneralLedger: (transactionData) => api.post('/ecommerce-erp/post-gl', transactionData),
-  generateGSTInvoice: (orderId) => api.post(`/ecommerce-erp/generate-gst-invoice/${orderId}`),
-  
-  // Supply Chain ERP
-  syncInventoryWithERP: (productId) => api.post(`/ecommerce-erp/sync-inventory/${productId}`),
-  createPurchaseOrder: (listingId, quantity) => api.post('/ecommerce-erp/create-purchase-order', { listingId, quantity }),
-  
-  // Customer ERP (CRM)
-  syncCustomerWithCRM: (userId) => api.post(`/ecommerce-erp/sync-customer/${userId}`),
-  
-  // Production ERP
-  createProductionOrder: (productId, demandQuantity) => api.post('/ecommerce-erp/create-production-order', { productId, demandQuantity }),
-}
-
-/** AFRERA E-Commerce Business Sales Service
- *  B2B and business sales capabilities:
- *  - Bulk Order Management
- *  - Contract Farming
- *  - Quotation Management
- *  - Sales Analytics
- *  - Commission Management
- *  Real backend at backend/src/services/ecommerceBusinessSalesService.js */
-export const ecommerceBusinessSalesAPI = {
-  // B2B Bulk Orders
-  createBulkOrder: (orderData) => api.post('/ecommerce-business/create-bulk-order', orderData),
-  submitQuotation: (bulkOrderId, sellerId, quotationData) => api.post('/ecommerce-business/submit-quotation', { bulkOrderId, sellerId, quotationData }),
-  acceptQuotation: (quotationId) => api.post(`/ecommerce-business/accept-quotation/${quotationId}`),
-  
-  // Contract Farming
-  createContractFarming: (contractData) => api.post('/ecommerce-business/create-contract-farming', contractData),
-  recordContractMilestone: (contractId, milestoneData) => api.post('/ecommerce-business/record-milestone', { contractId, milestoneData }),
-  
-  // Sales Analytics
-  getSalesAnalytics: (filters) => api.get('/ecommerce-business/sales-analytics', { params: filters }),
-  getB2BConversionMetrics: (periodDays) => api.get('/ecommerce-business/b2b-conversion-metrics', { params: { periodDays } }),
-  
-  // Commission Management
-  calculateCommission: (orderId) => api.post(`/ecommerce-business/calculate-commission/${orderId}`),
-}
-
-/** AFRERA E-Commerce Marketing Service
- *  Marketing and advertising capabilities:
- *  - Campaign Management
- *  - Sponsored Products
- *  - Promotion Management
- *  - Retargeting Campaigns
- *  - Performance Analytics
- *  Real backend at backend/src/services/ecommerceMarketingService.js */
-export const ecommerceMarketingAPI = {
-  // Campaign Management
-  createCampaign: (campaignData) => api.post('/ecommerce-marketing/create-campaign', campaignData),
-  launchCampaign: (campaignId) => api.post(`/ecommerce-marketing/launch-campaign/${campaignId}`),
-  updateCampaignMetrics: (campaignId) => api.post(`/ecommerce-marketing/update-campaign-metrics/${campaignId}`),
-  
-  // Sponsored Products
-  createSponsoredProduct: (productData) => api.post('/ecommerce-marketing/create-sponsored-product', productData),
-  getSponsoredProducts: (filters) => api.get('/ecommerce-marketing/sponsored-products', { params: filters }),
-  
-  // Promotion Management
-  createPromotion: (promotionData) => api.post('/ecommerce-marketing/create-promotion', promotionData),
-  applyPromotion: (promoCode, orderId) => api.post(`/ecommerce-marketing/apply-promotion/${promoCode}`, { orderId }),
-  
-  // Retargeting
-  createCartRetargeting: (cartItems) => api.post('/ecommerce-marketing/retargeting-cart', { cartItems }),
-  createProductViewRetargeting: (productId) => api.post('/ecommerce-marketing/retargeting-product-view', { productId }),
-  
-  // Analytics
-  getMarketingAnalytics: (filters) => api.get('/ecommerce-marketing/analytics', { params: filters }),
-}
-
-/** AFRERA Nutrient Value Sales Service
- *  Nutrient-value-based sales capabilities:
- *  - Nutrient-Value Pricing
- *  - Nutrient Content Verification
- *  - Nutrient-Value Listings
- *  - Nutrient Quality Tiers
- *  - Nutrient-Based Comparison
- *  - Nutrient Certification
- *  - Nutrient-Based Commission
- *  - Nutrient-Value Search
- *  Real backend at backend/src/services/nutrientValueSalesService.js */
-export const nutrientValueSalesAPI = {
-  // Nutrient-Value Pricing
-  calculateNutrientValuePrice: (productId, nutrientContent) => api.post(`/nutrient-value/calculate-price/${productId}`, nutrientContent),
-  
-  // Nutrient Content Verification
-  submitNutrientContent: (productId, contentData, verificationData) => api.post('/nutrient-value/submit-verification', { productId, contentData, verificationData }),
-  approveNutrientVerification: (verificationId, approvedBy, notes) => api.post(`/nutrient-value/approve-verification/${verificationId}`, { approvedBy, notes }),
-  
-  // Nutrient-Value Listings
-  createNutrientValueListing: (listingData) => api.post('/nutrient-value/create-listing', listingData),
-  
-  // Nutrient Quality Tiers
-  assignNutrientTier: (productId, manualOverride) => api.post(`/nutrient-value/assign-tier/${productId}`, { manualOverride }),
-  
-  // Nutrient-Based Comparison
-  compareProductsByNutrient: (productIds) => api.post('/nutrient-value/compare-products', { productIds }),
-  
-  // Nutrient Certification
-  issueNutrientCertificate: (productId, certificationData) => api.post('/nutrient-value/issue-certificate', { productId, certificationData }),
-  
-  // Nutrient-Based Commission
-  calculateNutrientBasedCommission: (orderId) => api.post(`/nutrient-value/calculate-commission/${orderId}`),
-  
-  // Nutrient-Value Search
-  searchByNutrientCriteria: (criteria) => api.get('/nutrient-value/search', { params: criteria }),
-}
-
-/** Shared Infrastructure asset marketplace (register/search/book shared
- *  equipment, second-life equipment listings, community battery listings,
- *  renewable-support lookup, per-asset utilization analytics). Real backend
- *  at backend/src/services/sharedInfraService.js. Previously labelled "coming
- *  soon" in FarmerSharedDoorPage.jsx — wired 2026-08-11, see SharedInfraPage.jsx.
- *  Distinct from sharedInfrastructureAPI-style per-village access records
- *  (a different service, sharedInfrastructureService.js, REOS Rural Life OS). */
-export const sharedInfraAPI = {
-  registerAsset: (data) => api.post('/shared-infra/assets/register', data),
-  searchAssets: (params) => api.get('/shared-infra/assets/search', { params }),
-  bookAsset: (data) => api.post('/shared-infra/assets/book', data),
-  listSecondLife: (data) => api.post('/shared-infra/second-life/list', data),
-  searchSecondLife: (params) => api.get('/shared-infra/second-life/search', { params }),
-  listBatteries: (data) => api.post('/shared-infra/batteries/list', data),
-  getRenewableSupport: (params) => api.get('/shared-infra/renewable/support', { params }),
-  getAssetAnalytics: (id) => api.get(`/shared-infra/assets/${id}/analytics`),
-}
-
-/** Soil Testing Service (M072 — individual lab sample results: submit sample,
- *  submit lab results, fertilizer recommendation, track a sample, health
- *  card, INM plan, organic input plan). Explicitly out of scope for
- *  SoilManagementPage.jsx's M071/M073/M074 batch (see that file's header) —
- *  wired as its own tab there 2026-08-11. Distinct from soilHealthAPI's
- *  plot/zone-level health cards (different, still-unbacked /soil-health/cards
- *  path). */
-export const soilTestingOpsAPI = {
-  submitSample: (data) => api.post('/soil-testing/samples', data),
-  submitResults: (id, data) => api.post(`/soil-testing/samples/${id}/results`, data),
-  getFertilizerRecommendation: (id, data) => api.post(`/soil-testing/samples/${id}/fertilizer-recommendation`, data),
-  trackSample: (id) => api.get(`/soil-testing/samples/${id}/track`),
-  getHealthCard: (params) => api.get('/soil-testing/health-card', { params }),
-  getInmPlan: (sampleId, params) => api.get(`/soil-testing/inm-plan/${sampleId}`, { params }),
-  getOrganicInputPlan: (params) => api.get('/soil-testing/organic-input-plan', { params }),
-}
-
-/** Subsidy Service action endpoints — project/equipment/logistics eligibility
- *  checks, applicable-scheme lookup, application submission, tracking, GST
- *  applicability. Distinct from subsidyAPI above (getStats/getPending, which
- *  target /subsidy/stats and /subsidy/pending — still no matching route, see
- *  the FE-01 comment on subsidyAPI; that gap remains out of scope here). */
-export const subsidyOpsAPI = {
-  checkProjectSubsidy: (data) => api.post('/subsidy/project/check', data),
-  checkEquipmentSubsidy: (data) => api.post('/subsidy/equipment/check', data),
-  checkLogisticsSubsidy: (data) => api.post('/subsidy/logistics/check', data),
-  getSchemes: (params) => api.get('/subsidy/schemes', { params }),
-  apply: (data) => api.post('/subsidy/apply', data),
-  track: (id) => api.get(`/subsidy/track/${id}`),
-  calculateGst: (data) => api.post('/subsidy/gst/calculate', data),
-}
-
-/** Cost Management — landed cost pricing, cost breakdowns. */
-export const costAPI = {
-  getLandedCost: (productId) => api.get(`/costs/landed/${productId}`),
-  calculateCost: (body) => api.post('/costs/calculate', body),
-  getCostBreakdown: (productId) => api.get(`/costs/breakdown/${productId}`),
-}
-
-/** Vision + OCR — image processing, document extraction. */
-export const visionAPI = {
-  processImage: (body) => api.post('/vision/process', body),
-  extractText: (body) => api.post('/vision/ocr', body),
-  detectObjects: (body) => api.post('/vision/detect', body),
-}
-
-// unifiedLedgerAPI ("One Ledger + 9 Economies") was removed 2026-08-17: the
-// backend it called was deleted as a rejected architecture (see
-// backend/src/index.js). UnifiedLedgerPage.jsx now points to /ledger
-// (financeAPI.trialBalance/verifyLedger) instead.
-
-/** FOLU land use, carbon and NE organic schemes (991). */
-export const foluAPI = {
-  landUseSummary: (params) => api.get('/folu/land-use/summary', { params }),
-  registerParcel: (body) => api.post('/folu/parcels', body),
-  recordChange: (body) => api.post('/folu/land-use/change', body),
-  estimateCarbon: (body) => api.post('/folu/carbon/estimate', body),
-  schemeStatus: (farmerId) => api.get(`/folu/schemes/${farmerId}`),
-}
-
-/** Agmarknet / e-NAM prices and DBT reconciliation. */
-export const marketDataAPI = {
-  priceTrend: (params) => api.get('/market-data/prices/trend', { params }),
-  ingestPrices: (records, source) => api.post('/market-data/prices/ingest', { records, source }),
-  reconcileDbt: (body) => api.post('/market-data/dbt/reconcile', body),
-  unclaimedEntitlements: (params) => api.get('/market-data/dbt/unclaimed', { params }),
-}
-
-/** Driver tracking — served by the existing logistics routes, not a new module. */
-export const driverTrackingAPI = {
-  recordLocation: (body) => api.post('/logistics-ops/drivers/location', body),
-  activeDrivers: (params) => api.get('/logistics-ops/drivers/active', { params }),
-  shipmentTrail: (id) => api.get(`/logistics-ops/shipments/${id}/trail`),
-}
-
-/**
- * Geofencing — circular zone check-ins built on real mobile GPS
- * (see hooks/useGeolocation.js) and the existing driver_location pipeline
- * above. Manual check-in only, no continuous background tracking.
- */
-export const geofencingAPI = {
-  listZones: (params) => api.get('/geofencing/zones', { params }),
-  createZone: (body) => api.post('/geofencing/zones', body),
-  getZone: (id) => api.get(`/geofencing/zones/${id}`),
-  checkIn: (body) => api.post('/geofencing/checkins', body),
-  checkInHistory: (params) => api.get('/geofencing/checkins', { params }),
-  driverZoneCheck: (body) => api.post('/geofencing/driver-zone-check', body),
-}
-
-/** Village Profile Service (REOS Layer 5 - District/Village/Block Economic Database) */
-export const villageProfileAPI = {
-  getVillage: (villageId) => api.get(`/village-profiles/villages/${villageId}`),
-  getVillagesByDistrict: (district) => api.get(`/village-profiles/villages/district/${district}`),
-  getVillagesByBlock: (block) => api.get(`/village-profiles/villages/block/${block}`),
-  getDistrictSummary: (district) => api.get(`/village-profiles/districts/${district}/economic-summary`),
-  upsertVillage: (body) => api.post('/village-profiles/villages', body),
-  searchVillages: (params) => api.get('/village-profiles/villages/search', { params }),
-}
-
-/** Procurement Subscription Service (REOS Layer 1.9 - Subscription Commerce) */
-export const procurementSubscriptionAPI = {
-  getSubscription: (subscriptionId) => api.get(`/procurement-subscriptions/subscriptions/${subscriptionId}`),
-  getSubscriptionsBySubscriber: (subscriberId) => api.get(`/procurement-subscriptions/subscriptions/subscriber/${subscriberId}`),
-  getSubscriptionsByProduct: (productId) => api.get(`/procurement-subscriptions/subscriptions/product/${productId}`),
-  createSubscription: (body) => api.post('/procurement-subscriptions/subscriptions', body),
-  updateSubscription: (subscriptionId, body) => api.put(`/procurement-subscriptions/subscriptions/${subscriptionId}`, body),
-  cancelSubscription: (subscriptionId, body) => api.post(`/procurement-subscriptions/subscriptions/${subscriptionId}/cancel`, body),
-  getSubscriptionsDue: (date) => api.get(`/procurement-subscriptions/subscriptions/due/${date}`),
-  getStatistics: (params) => api.get('/procurement-subscriptions/subscriptions/statistics', { params }),
-}
-
-/** Buying Club Service (REOS Layer 1.10-1.11 - Group Buying / Community Buying) */
-export const buyingClubAPI = {
-  getClub: (clubId) => api.get(`/buying-clubs/clubs/${clubId}`),
-  getClubsByVillage: (villageId) => api.get(`/buying-clubs/clubs/village/${villageId}`),
-  getClubsByDistrict: (district) => api.get(`/buying-clubs/clubs/district/${district}`),
-  createClub: (body) => api.post('/buying-clubs/clubs', body),
-  updateClub: (clubId, body) => api.put(`/buying-clubs/clubs/${clubId}`, body),
-  addMember: (clubId, body) => api.post(`/buying-clubs/clubs/${clubId}/members`, body),
-  createOrder: (body) => api.post('/buying-clubs/orders', body),
-  getClubOrders: (clubId) => api.get(`/buying-clubs/orders/club/${clubId}`),
-  getStatistics: (params) => api.get('/buying-clubs/clubs/statistics', { params }),
-}
-
-/** Rural Enterprise Service (REOS Rural Life OS - rural_enterprises table) */
-export const ruralEnterpriseAPI = {
-  getEnterprise: (enterpriseId) => api.get(`/rural-enterprises/enterprises/${enterpriseId}`),
-  getEnterprisesByVillage: (villageId) => api.get(`/rural-enterprises/enterprises/village/${villageId}`),
-  getEnterprisesByType: (enterpriseType) => api.get(`/rural-enterprises/enterprises/type/${enterpriseType}`),
-  createEnterprise: (body) => api.post('/rural-enterprises/enterprises', body),
-  updateEnterprise: (enterpriseId, body) => api.put(`/rural-enterprises/enterprises/${enterpriseId}`, body),
-  getStatistics: (params) => api.get('/rural-enterprises/enterprises/statistics', { params }),
-  searchEnterprises: (params) => api.get('/rural-enterprises/enterprises/search', { params }),
-}
-
-/** Renewable Energy Service (REOS Rural Life OS - renewable_energy_systems table) */
-export const renewableEnergyAPI = {
-  getSystem: (systemId) => api.get(`/renewable-energy/systems/${systemId}`),
-  getSystemsByVillage: (villageId) => api.get(`/renewable-energy/systems/village/${villageId}`),
-  getSystemsByType: (energyType) => api.get(`/renewable-energy/systems/type/${energyType}`),
-  createSystem: (body) => api.post('/renewable-energy/systems', body),
-  updateSystem: (systemId, body) => api.put(`/renewable-energy/systems/${systemId}`, body),
-  getStatistics: (params) => api.get('/renewable-energy/systems/statistics', { params }),
-}
-
-/** Household Economy Service (REOS Rural Life OS - household_economy table) */
-export const householdEconomyAPI = {
-  getHousehold: (householdId) => api.get(`/household-economy/households/${householdId}`),
-  getHouseholdsByVillage: (villageId) => api.get(`/household-economy/households/village/${villageId}`),
-  getVillageSummary: (villageId) => api.get(`/household-economy/households/village/${villageId}/summary`),
-  upsertHousehold: (body) => api.post('/household-economy/households', body),
-}
-
-/** Shared Infrastructure Service (REOS Rural Life OS - shared_infrastructure_access table) */
-export const sharedInfrastructureAPI = {
-  getAccess: (accessId) => api.get(`/shared-infrastructure/access/${accessId}`),
-  getAccessByVillage: (villageId) => api.get(`/shared-infrastructure/access/village/${villageId}`),
-  getAccessByType: (infrastructureType) => api.get(`/shared-infrastructure/access/type/${infrastructureType}`),
-  getVillageSummary: (villageId) => api.get(`/shared-infrastructure/access/village/${villageId}/summary`),
-  upsertAccess: (body) => api.post('/shared-infrastructure/access', body),
-}
-
-/** Machinery Access Service (REOS Rural Life OS - machinery_access table) */
-export const machineryAccessAPI = {
-  getAccess: (accessId) => api.get(`/machinery-access/access/${accessId}`),
-  getAccessByVillage: (villageId) => api.get(`/machinery-access/access/village/${villageId}`),
-  getAccessByType: (machineryType) => api.get(`/machinery-access/access/type/${machineryType}`),
-  getVillageSummary: (villageId) => api.get(`/machinery-access/access/village/${villageId}/summary`),
-  upsertAccess: (body) => api.post('/machinery-access/access', body),
-}
-
-/** Rural Finance Service (REOS Rural Life OS - rural_finance table) */
-export const ruralFinanceAPI = {
-  getFinance: (financeId) => api.get(`/rural-finance/finance/${financeId}`),
-  getFinanceByVillage: (villageId) => api.get(`/rural-finance/finance/village/${villageId}`),
-  getFinanceByServiceType: (serviceType) => api.get(`/rural-finance/finance/service/${serviceType}`),
-  getVillageSummary: (villageId) => api.get(`/rural-finance/finance/village/${villageId}/summary`),
-  upsertFinance: (body) => api.post('/rural-finance/finance', body),
-}
-
-/** AI Advisory Service (REOS Rural Life OS - ai_advisories table) */
-export const aiAdvisoryAPI = {
-  getAdvisory: (advisoryId) => api.get(`/ai-advisories/advisories/${advisoryId}`),
-  getAdvisoriesByVillage: (villageId) => api.get(`/ai-advisories/advisories/village/${villageId}`),
-  getAdvisoriesByFarmer: (farmerId) => api.get(`/ai-advisories/advisories/farmer/${farmerId}`),
-  getAdvisoriesByType: (advisoryType) => api.get(`/ai-advisories/advisories/type/${advisoryType}`),
-  createAdvisory: (body) => api.post('/ai-advisories/advisories', body),
-  updateStatus: (advisoryId, body) => api.put(`/ai-advisories/advisories/${advisoryId}/status`, body),
-  getStatistics: (params) => api.get('/ai-advisories/advisories/statistics', { params }),
-}
-
-/** Market Access Service (REOS Rural Life OS - market_access table) */
-export const marketAccessAPI = {
-  getAccess: (accessId) => api.get(`/market-access/access/${accessId}`),
-  getAccessByVillage: (villageId) => api.get(`/market-access/access/village/${villageId}`),
-  getAccessByType: (marketType) => api.get(`/market-access/access/type/${marketType}`),
-  getVillageSummary: (villageId) => api.get(`/market-access/access/village/${villageId}/summary`),
-  upsertAccess: (body) => api.post('/market-access/access', body),
-}
-
-/** Market Intelligence Service (REOS Rural Life OS - market_intelligence table) */
-export const marketIntelligenceAPI = {
-  getIntelligence: (intelligenceId) => api.get(`/market-intelligence/intelligence/${intelligenceId}`),
-  getIntelligenceByVillage: (villageId) => api.get(`/market-intelligence/intelligence/village/${villageId}`),
-  getIntelligenceByCrop: (cropId) => api.get(`/market-intelligence/intelligence/crop/${cropId}`),
-  getLatestIntelligence: (villageId) => api.get(`/market-intelligence/intelligence/village/${villageId}/latest`),
-  createIntelligence: (body) => api.post('/market-intelligence/intelligence', body),
-}
-
-/** Mobility Rides Service (REOS Rural Life OS - mobility_rides table) */
-export const mobilityRidesAPI = {
-  getRide: (rideId) => api.get(`/mobility-rides/rides/${rideId}`),
-  getRidesByVillage: (villageId) => api.get(`/mobility-rides/rides/village/${villageId}`),
-  getRidesByDriver: (driverId) => api.get(`/mobility-rides/rides/driver/${driverId}`),
-  createRide: (body) => api.post('/mobility-rides/rides', body),
-  updateStatus: (rideId, body) => api.put(`/mobility-rides/rides/${rideId}/status`, body),
-  getStatistics: (params) => api.get('/mobility-rides/rides/statistics', { params }),
-}
-
-/** Yield management — lots, fare buckets, markdown, booking curve (059).
- *  Served by the existing /pricing routes; dynamicPricingService owns the logic. */
-export const yieldAPI = {
-  lotPrice: (lotCode) => api.get(`/pricing/lots/${lotCode}/price`),
-  openNextBucket: (lotCode) => api.post(`/pricing/lots/${lotCode}/open-bucket`),
-  bookingCurve: (cropKey) => api.get(`/pricing/booking-curve/${cropKey}`),
-  recordBookingPoint: (body) => api.post('/pricing/booking-curve', body),
-  lotsNeedingAttention: (params) => api.get('/pricing/lots/attention', { params }),
-}
-
-/** Competitor price intelligence — writes to price_intelligence (042 + 059). */
-export const competitorAPI = {
-  observe: (body) => api.post('/market-data/competitor/observe', body),
-  position: (params) => api.get('/market-data/competitor/position', { params }),
-}
-
-/** Vendor / buyer orchestration API used by the logistics and corporate buyer pages. */
-export const vendorsAPI = {
-  // Real backend routes are under /vendors/corporate/..., not /vendors/buyers/...
-  getBuyerProfile: (buyerId) => api.get(`/vendors/corporate/${buyerId}/profile`),
-  getCreditStatus: (buyerId) => api.get(`/vendors/corporate/${buyerId}/credit-status`),
-  getActiveOrders: (buyerId) => api.get(`/vendors/corporate/${buyerId}/orders`),
-  createCorporateOrder: (body) => api.post('/vendors/corporate/orders', body),
-  getLogisticsProfile: (providerId) => api.get(`/vendors/logistics/${providerId}/profile`),
-  getActiveShipments: (providerId) => api.get(`/vendors/logistics/${providerId}/shipments`),
-  getColdChainNodes: () => api.get('/vendors/logistics/cold-chain/nodes'),
-  getReturnTruckOpportunities: () => api.get('/vendors/logistics/return-trucks'),
-  createLogisticsBooking: (body) => api.post('/vendors/logistics/bookings', body),
-}
-
-/** Experience Layer / DXP — the 15 engines (migration 060). */
-// (duplicate experienceAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
-
-// ---------------------------------------------------------------------------
-// Dashboard/system callers recovered 2026-08-07 (FE-01 fix, docs/registry/20_FRONTEND_BOUNDARIES.md).
-//
-// These pages previously called raw fetch() directly, which never attached the
-// Authorization header and never benefited from the 401-refresh interceptor
-// above. Paths are unchanged from the original fetch() calls. Some of the
-// paths below (admin/audit/recent, banker/*, ca/audit-stats, fpo/stats,
-// government/*, research/stats, subsidy/stats, subsidy/pending) have no
-// matching backend route as of this fix — that gap pre-dates this change and
-// is out of scope here; the caller now at least behaves identically to a
-// fetch-based caller once a route exists, and gets the same auth handling as
-// every other module in this file.
-// ---------------------------------------------------------------------------
-
-/** Unversioned endpoints that live outside the /api/v1 prefix (e.g. health checks). */
-const SYSTEM_BASE_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
-export const systemAPI = {
-  getHealth: () => axios.get(`${SYSTEM_BASE_URL}/health`),
-}
-
-/** Admin dashboard. */
-export const adminAPI = {
-  getRecentAudit: () => api.get('/admin/audit/recent'),
-  exportAuditCSV: () => api.get('/admin/audit/export', { responseType: 'blob' }),
-}
-
-/** Banker dashboard. */
-export const bankerAPI = {
-  getPortfolio: () => api.get('/banker/portfolio'),
-  getRiskDashboard: () => api.get('/banker/risk-dashboard'),
-}
-
-/** CA (chartered accountant) dashboard. */
-export const caAPI = {
-  getAuditStats: () => api.get('/ca/audit-stats'),
-}
-
-/** FPO dashboard summary stats — distinct from farmersAPI.getFPOs, which lists FPOs. */
-export const fpoAPI = {
-  getStats: () => api.get('/fpo/stats'),
-}
-
-/** Government dashboard. */
-export const governmentAPI = {
-  getSchemeAnalytics: () => api.get('/government/scheme-analytics'),
-  getComplianceStatus: () => api.get('/government/compliance-status'),
-}
-
-/** Module hub catalogue and AI recommendation assistant. */
-export const modulesAPI = {
-  getModules: () => api.get('/modules'),
-  getOverview: () => api.get('/modules/overview'),
-  askAssistant: (prompt) => api.post('/modules/assistant', { prompt }),
-}
-
-/** Research dashboard. */
-export const researchAPI = {
-  getStats: () => api.get('/research/stats'),
-}
-
-/** Subsidy management dashboard — distinct from financeAPI.equipmentSubsidy. */
-export const subsidyAPI = {
-  getStats: () => api.get('/subsidy/stats'),
-  getPending: () => api.get('/subsidy/pending'),
-}
-
-// ---------------------------------------------------------------------------
-// Component callers recovered 2026-08-07 (FE-01 fix, docs/registry/20_FRONTEND_BOUNDARIES.md).
-// Same rationale as the dashboard section above: these callers bypassed
-// services/api.js with raw fetch() and never attached the Authorization
-// header. Paths are unchanged from the original fetch() calls.
-// ---------------------------------------------------------------------------
-
-/** AR/VR experience viewer (components/ArVr/ExperienceViewer.jsx). */
-export const arVrAPI = {
-  getExperiences: (targetEntityId, targetEntityType = 'product') =>
-    api.get('/ar-vr/experiences', { params: { target_entity_id: targetEntityId, target_entity_type: targetEntityType } }),
-  getInteractionPoints: (experienceId) => api.get(`/ar-vr/experiences/${experienceId}/interaction-points`),
-}
-
-/** Blockchain traceability viewer (components/BlockchainTraceability/TraceabilityViewer.jsx). */
-export const blockchainTraceabilityAPI = {
-  getTraceabilityEvents: (productId, batchNumber) =>
-    api.get(`/blockchain-traceability/traceability-events/${productId}`, { params: batchNumber ? { batch_number: batchNumber } : {} }),
-  verifyChainOfCustody: (productId, batchNumber) =>
-    api.get(`/blockchain-traceability/chain-of-custody/verify/${productId}`, { params: batchNumber ? { batch_number: batchNumber } : {} }),
-}
-
-/** Consumer health dashboard (components/ConsumerHealth/HealthDashboard.jsx). */
-// consumerHealthAPI was declared twice with genuinely different methods
-// (a build-breaking duplicate export, not a padding stub) - merged into one
-// export 2026-09-07 per this project's merge-not-delete-duplicates policy;
-// nothing from either version was dropped.
-export const consumerHealthAPI = {
-  getHealthProfiles: () => api.get('/consumer-health/health-profiles'),
-  getHealthGoals: () => api.get('/consumer-health/health-goals'),
-  getDietaryRecommendations: () => api.get('/consumer-health/dietary-recommendations'),
-  getBMI: () => api.get('/consumer-health/bmi'),
-  getHealthConditions: () => api.get('/consumer-health/conditions'),
-  createHealthProfile: (data) => api.post('/consumer-health/profiles', data),
-  getHealthProfile: (profileId) => api.get(`/consumer-health/profiles/${profileId}`),
-  updateHealthProfile: (profileId, data) => api.put(`/consumer-health/profiles/${profileId}`, data),
-  getHealthMetrics: (profileId) => profileId
-    ? api.get(`/consumer-health/profiles/${profileId}/metrics`)
-    : api.get('/consumer-health/health-metrics'),
-  trackSymptoms: (data) => api.post('/consumer-health/symptoms', data),
-  getSymptomHistory: (profileId) => api.get(`/consumer-health/profiles/${profileId}/symptoms`),
-  getHealthRecommendations: (profileId) => api.get(`/consumer-health/profiles/${profileId}/recommendations`),
-}
-
-/** Conversational AI chat (components/ConversationalAI/ChatInterface.jsx). */
-export const conversationalAIAPI = {
-  getDomains: () => api.get('/conversational-ai/domains'),
-  createSession: (body) => api.post('/conversational-ai/sessions', body),
-  respond: (sessionId, message) => api.post(`/conversational-ai/sessions/${sessionId}/respond`, { message }),
-  endSession: (sessionId, body) => api.post(`/conversational-ai/sessions/${sessionId}/end`, body),
-}
-
-/** Farmer portal land records (components/FarmerPortal/LandRecords.jsx). */
-export const farmerPortalAPI = {
-  getLandRecords: () => api.get('/farmer-portal/land-records'),
-  addLandRecord: (data) => api.post('/farmer-portal/land-records', data),
-  syncGovernmentLandRecords: () => api.post('/farmer-portal/land-records/sync-government'),
-}
-
-/** Farmer wallet — real, DB-backed, transactional (see services/farmerService.js). */
-export const walletAPI = {
-  getWallet: () => api.get('/farmer-portal/wallet'),
-  getBalance: () => api.get('/farmer-portal/wallet/balance'),
-  getTransactions: (params) => api.get('/farmer-portal/wallet/transactions', { params }),
-  deposit: (data) => api.post('/farmer-portal/wallet/deposit', data),
-  withdraw: (data) => api.post('/farmer-portal/wallet/withdraw', data),
-  transfer: (data) => api.post('/farmer-portal/wallet/transfer', data),
-  linkBank: (data) => api.post('/farmer-portal/wallet/link-bank', data),
-}
-
-/** Food intelligence recalls (components/FoodIntelligence/FoodSafetyDashboard.jsx). */
-export const foodIntelligenceAPI = {
-  getActiveRecalls: () => api.get('/food-intelligence/food-recalls/active'),
-}
-
-/** GI (Geographical Indication) product listing + authenticity verification (components/GIIntelligence/GIProductCard.jsx). */
-export const giIntelligenceAPI = {
-  getGIProducts: (state) => api.get('/gi-intelligence/gi-products', { params: state ? { state } : {} }),
-  verifyAuthentication: (authCode) => api.get(`/gi-intelligence/gi-authentication/verify/${authCode}`),
-}
-
-/** IoT device monitoring (components/IoTIntegration/DeviceMonitor.jsx). */
-export const iotAPI = {
-  getDevices: () => api.get('/iot-integration/iot-devices'),
-  getUnacknowledgedAlerts: () => api.get('/iot-integration/device-alerts/unacknowledged'),
-  getSensorData: (deviceId) => api.get(`/iot-integration/sensor-data/${deviceId}`),
-}
-
-/** Knowledge graph explorer (components/KnowledgeGraph/KnowledgeExplorer.jsx). */
-export const knowledgeGraphAPI = {
-  getRelatedNodes: (nodeId) => api.get(`/knowledge-graph/knowledge-nodes/${nodeId}/related`),
-  searchNodes: (query) => api.get('/knowledge-graph/knowledge-nodes/search', { params: { q: query } }),
-}
-
-/** Laboratory ERP sample intake (components/LaboratoryERP/SampleRegistration.jsx). */
-export const laboratoryERPAPI = {
-  getLaboratories: () => api.get('/laboratory-erp/laboratories'),
-  getTestCategories: () => api.get('/laboratory-erp/test-categories'),
-  getTestMethods: (categoryId) => api.get('/laboratory-erp/test-methods', { params: { category_id: categoryId } }),
-  registerSample: (data) => api.post('/laboratory-erp/samples', data),
-}
-
-/** GST + review sub-resources served under /marketplace (distinct from productsAPI/ordersAPI). */
-export const marketplaceAPI = {
-  calculateProductGST: (product) => api.post('/marketplace/gst/calculate/product', product),
-  calculateOrderGST: (orderId) => api.post(`/marketplace/gst/calculate/order/${orderId}`),
-  generateGstInvoice: (orderId) => api.post(`/marketplace/gst/invoice/${orderId}`),
-  getProductReviews: (productId) => api.get(`/marketplace/reviews/product/${productId}`),
-  getProductReviewStats: (productId) => api.get(`/marketplace/reviews/product/${productId}/stats`),
-  getUserReviews: () => api.get('/marketplace/reviews/user'),
-  submitReview: (data) => api.post('/marketplace/reviews', data),
-  markReviewHelpful: (reviewId) => api.post(`/marketplace/reviews/${reviewId}/helpful`),
-}
-
-/** Multilingual content, translation and language preferences. */
-export const multilingualAPI = {
-  getLanguages: () => api.get('/multilingual/languages'),
-  getPreferences: () => api.get('/multilingual/preferences'),
-  updatePreferences: (body) => api.put('/multilingual/preferences', body),
-  getContent: (language) => api.get('/multilingual/content', { params: { language } }),
-  detect: (text) => api.post('/multilingual/detect', { text }),
-  translate: (body) => api.post('/multilingual/translate', body),
-}
-
-/** Nutrition intelligence (components/NutritionIntelligence/NutritionLabel.jsx). */
-export const nutritionAPI = {
-  getProductNutrition: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}`),
-  getNutritionScore: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/score`),
-  getDietaryProfiles: () => api.get('/nutrition-intelligence/dietary-profiles'),
-  getRecommendations: () => api.get('/nutrition-intelligence/recommendations'),
-  generateRecommendations: (dietaryProfileId, targetCalories, limit, medicalCoding) =>
-    api.post('/nutrition-intelligence/recommendations', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, limit, medical_coding: medicalCoding }),
-  getWellnessPractices: (params) => api.get('/nutrition-intelligence/wellness-practices', { params }),
-  // AI-generated recipe grounded in real dietary profile + real matching AFRERA
-  // products — see nutritionIntelligenceService.generateDietBasedRecipe. Returns
-  // an honest status: 'generated' | 'ai_not_configured' | 'no_ingredients'.
-  generateRecipe: (dietaryProfileId, targetCalories, provider, medicalCoding) =>
-    api.post('/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider, medical_coding: medicalCoding }),
-  // "Sell by nutrient, not by kg" — real per-100g comparison against category
-  // peers, picks whichever recorded compound (protein, curcumin, Scoville,
-  // ASTA color, etc.) actually differentiates this product. See
-  // nutritionIntelligenceService.calculateValuePerNutrient.
-  getValuePerNutrient: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/value-per-nutrient`),
-  // Medical coding and health condition endpoints
-  getMedicalConditionCodes: () => api.get('/nutrition-intelligence/medical-codes'),
-  getDietaryRestrictions: (condition) => api.get(`/nutrition-intelligence/dietary-restrictions/${condition}`),
-  getNutrientRequirements: (condition) => api.get(`/nutrition-intelligence/nutrient-requirements/${condition}`),
-  getConditionCode: (condition, type) => api.get(`/nutrition-intelligence/medical-code/${condition}${type ? `/${type}` : ''}`),
-  generateConditionSpecificRecipe: (condition, dietaryProfileId, targetCalories, provider) => 
-    api.post(`/nutrition-intelligence/recipes/condition/${condition}`, { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
-  getNaturalTherapistGuidance: (condition, symptoms) => 
-    api.post('/nutrition-intelligence/natural-therapist/guidance', { condition, symptoms }),
-  calculateNutrientProfile: (condition, nutritionData) => 
-    api.post(`/nutrition-intelligence/nutrient-calculator/${condition}`, nutritionData),
-}
-
-/** Organic traceability — farm registration, standards, consumer QR lookup. */
-// (duplicate organicTraceabilityAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
-
-/** Predictive analytics — demand forecasts and alerts. */
-export const predictiveAnalyticsAPI = {
-  getForecasts: (params) => api.get('/predictive-analytics/forecasts', { params }),
-  getPredictions: (entityId, entityType) => api.get(`/predictive-analytics/predictions/${entityId}/${entityType}`),
-  getUnacknowledgedAlerts: () => api.get('/predictive-analytics/prediction-alerts/unacknowledged'),
-}
-
-/** Voice AI assistant sessions and commands. */
-export const voiceAIAPI = {
-  createSession: (language) => api.post('/voice-ai/voice-sessions', { language }),
-  getPreferences: () => api.get('/voice-ai/voice-preferences'),
-  sendCommand: (body) => api.post('/voice-ai/voice-commands', body),
-  endSession: (sessionId) => api.post(`/voice-ai/voice-sessions/${sessionId}/end`),
-}
-
-// ---------------------------------------------------------------------------
-// Modules built 2026-08-07 for 15 confirmed STUB-ONLY frontends (M067, M031,
-// M093, M075, M121, M112, M041, M024, M141, M098, M132, M101, M013, M083,
-// M046). None of these had a dedicated backend route as of this change — the
-// shapes below follow the same REST convention as every namespace above
-// (/api/v1/<resource>) so a backend counterpart can be dropped in without a
-// frontend rewrite. See each module's README.md for the specific gap.
-// ---------------------------------------------------------------------------
-
-/** M067 — Sowing Management (Crop domain). Real backend: sowingManagementRoutes
- *  (via cropManagementRoutes.js's crudRouter) mounted at
- *  /api/v1/sowing/records in index.js (line 827) - GET/POST '/', GET/PUT/
- *  DELETE '/:id' all match the client below exactly. (F7 fix, 2026-08-30:
- *  comment was stale, written before this was wired.) */
-export const sowingAPI = {
-  getRecords: (params) => api.get('/sowing/records', { params }),
-  getRecord: (id) => api.get(`/sowing/records/${id}`),
-  createRecord: (data) => api.post('/sowing/records', data),
-  updateRecord: (id, data) => api.put(`/sowing/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/sowing/records/${id}`),
-}
-
-/** M031 — Land Registry (Land domain). A `farm_plots` table exists (migration
- *  056_named_missing_modules.sql) but no route reads or writes it. */
-export const landAPI = {
-  getParcels: (params) => api.get('/land/parcels', { params }),
-  getParcel: (id) => api.get(`/land/parcels/${id}`),
-  createParcel: (data) => api.post('/land/parcels', data),
-  updateParcel: (id, data) => api.put(`/land/parcels/${id}`, data),
-  deleteParcel: (id) => api.delete(`/land/parcels/${id}`),
-}
-
-/** M093 — Labour Management (Operations domain). No backend route found. */
-export const labourAPI = {
-  getWorkers: (params) => api.get('/labour/workers', { params }),
-  createWorker: (data) => api.post('/labour/workers', data),
-  updateWorker: (id, data) => api.put(`/labour/workers/${id}`, data),
-  getAttendance: (params) => api.get('/labour/attendance', { params }),
-  recordAttendance: (data) => api.post('/labour/attendance', data),
-  getPayments: (params) => api.get('/labour/payments', { params }),
-  recordPayment: (data) => api.post('/labour/payments', data),
-}
-
-/** M075 registry number — Irrigation Management (Water domain). Real backend
- *  as of 2026-08-28: backend/src/routes/irrigationManagementRoutes.js +
- *  services/legacy/irrigationManagementService.js (M075 the folder is
- *  actually Pig Management, unrelated - see that service's header). */
-export const irrigationAPI = {
-  getSchedules: (params) => api.get('/irrigation/schedules', { params }),
-  createSchedule: (data) => api.post('/irrigation/schedules', data),
-  updateSchedule: (id, data) => api.put(`/irrigation/schedules/${id}`, data),
-  deleteSchedule: (id) => api.delete(`/irrigation/schedules/${id}`),
-  getWaterSources: (params) => api.get('/irrigation/water-sources', { params }),
-  createWaterSource: (data) => api.post('/irrigation/water-sources', data),
-  getLogs: (params) => api.get('/irrigation/logs', { params }),
-  recordLog: (data) => api.post('/irrigation/logs', data),
-}
-
-/** M121 — Dairy Management (Livestock domain). Real backend as of 2026-08-10:
- *  backend/src/routes/dairyRoutes.js + dairyService.js, tables added in
- *  migration 065_dairy_management_schema.sql. */
 export const dairyAPI = {
-  getAnimals: (params) => api.get('/dairy/animals', { params }),
-  createAnimal: (data) => api.post('/dairy/animals', data),
-  updateAnimal: (id, data) => api.put(`/dairy/animals/${id}`, data),
-  deleteAnimal: (id) => api.delete(`/dairy/animals/${id}`),
-  getMilkRecords: (params) => api.get('/dairy/milk-records', { params }),
-  recordMilk: (data) => api.post('/dairy/milk-records', data),
-  // Real trailing-7-day vs prior-7-day milk-yield comparison per animal.
-  getMilkYieldTrends: () => api.get('/dairy/milk-yield-trends'),
-  // Vaccination-due + breeding/calving-due alerts (real dates, assumed intervals).
-  getHealthAlerts: () => api.get('/dairy/health-alerts'),
-}
+  getDairy: () => api.get('/dairy'),
+  manageDairy: (data) => api.post('/dairy/manage', data),
+};
 
-/** M112 — Fertilizer Inventory (Input Supply domain). Real backend as of
- *  2026-08-10: backend/src/routes/fertilizerRoutes.js +
- *  fertilizerInventoryService.js, stock table added in migration
- *  066_fertilizer_inventory_schema.sql. `issueStock` now also writes a real
- *  row into `agri_input_issues` (migration 056) — the table api.js used to
- *  note had no readers/writers. */
-export const fertilizerAPI = {
-  getInventory: (params) => api.get('/fertilizer/inventory', { params }),
-  createInventoryItem: (data) => api.post('/fertilizer/inventory', data),
-  updateInventoryItem: (id, data) => api.put(`/fertilizer/inventory/${id}`, data),
-  deleteInventoryItem: (id) => api.delete(`/fertilizer/inventory/${id}`),
-  getIssues: (params) => api.get('/fertilizer/issues', { params }),
-  issueStock: (id, data) => api.post(`/fertilizer/inventory/${id}/issue`, data),
-  // Real stock + real consumption (agri_input_issues) -> computed reorder-point alerts.
-  getReorderAlerts: () => api.get('/fertilizer/inventory/reorder-alerts'),
-}
+export const cropValueResearchAPI = {
+  getCropValueResearch: () => api.get('/crop-value-research'),
+  researchCropValue: (data) => api.post('/crop-value-research/research', data),
+};
 
-// ---------------------------------------------------------------------------
-// Missing API clients for dark backend routes (BACKEND_FRONTEND_INTEGRATION_GAP)
-// These routes exist in backend but have no frontend API clients
-// ---------------------------------------------------------------------------
+export const cropRecommendationsAPI = {
+  getCropRecommendations: () => api.get('/crop-recommendations'),
+  getRecommendations: (data) => api.post('/crop-recommendations/get', data),
+};
 
-/** AI Backbone - Unified multi-provider AI integration */
-// (duplicate aiBackboneAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
+export const cropPlanningAPI = {
+  getCropPlanning: () => api.get('/crop-planning'),
+  planCrops: (data) => api.post('/crop-planning/plan', data),
+};
 
-/** AI Gateway - API gateway for AI services */
-// (duplicate aiGatewayAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
+export const cropManagementAPI = {
+  getCropManagement: () => api.get('/crop-management'),
+  manageCrops: (data) => api.post('/crop-management/manage', data),
+};
 
-/** AI Brain - Cognitive processing layer */
-// (duplicate aiBrainAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
+export const costAPI = {
+  getCosts: () => api.get('/cost'),
+  calculateCost: (data) => api.post('/cost/calculate', data),
+};
 
-/** AI Self-Healing - Autonomous error recovery */
-// (duplicate aiSelfHealingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
+export const costControlAPI = {
+  getCostControl: () => api.get('/cost-control'),
+  controlCosts: (data) => api.post('/cost-control/control', data),
+};
 
-/** AI Operation Intelligence - Real-time optimization */
-// (duplicate aiOperationIntelligenceAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
+export const cooperativeShareAPI = {
+  getCooperativeShares: () => api.get('/cooperative-share'),
+  buyShare: (data) => api.post('/cooperative-share/buy', data),
+};
 
-/** Decision Engine - Core business logic and decision making */
-// (duplicate decisionEngineAPI - a strict subset of the fuller declaration
-// below - removed 2026-09-07; nothing unique was lost.)
+export const comprehensiveERPAPI = {
+  getComprehensiveERP: () => api.get('/comprehensive-erp'),
+  configureERP: (data) => api.put('/comprehensive-erp/configure', data),
+};
 
-/** Nervous System - Enterprise monitoring and control */
-// (duplicate nervousSystemAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
+export const complianceTrackingAPI = {
+  getComplianceTracking: () => api.get('/compliance-tracking'),
+  trackCompliance: (data) => api.post('/compliance-tracking/track', data),
+};
 
-// (duplicate enterpriseMemoryAPI, digitalTwinAPI, climateMonitoringAPI -
-// each a strict subset of the fuller declarations below - removed
-// 2026-09-07; nothing unique was lost.)
+export const complianceAPI2 = {
+  getCompliance: () => api.get('/compliance'),
+  checkCompliance: (data) => api.post('/compliance/check', data),
+};
 
-// (duplicate climateMonitoringAPI and a 3rd duplicate coldStorageAPI -
-// each a strict subset of a fuller declaration elsewhere in this file -
-// removed 2026-09-07; nothing unique was lost. This file has more such
-// duplicate-export pairs than Platform/Identity's scope covers - see the
-// Logistics/Marketplace/ERP domains' own batches for the rest, e.g.
-// coldStorageAPI is declared 3 times total in this file.)
+export const completeERPIntegrationAPI = {
+  getCompleteERPIntegration: () => api.get('/complete-erp-integration'),
+  integrateERP: (data) => api.post('/complete-erp-integration/integrate', data),
+};
 
-/** Complete ERP Integration - Comprehensive ERP sync */
-// (duplicate completeERPAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
+export const completeAIIntegrationAPI = {
+  getCompleteAIIntegration: () => api.get('/complete-ai-integration'),
+  integrateAI: (data) => api.post('/complete-ai-integration/integrate', data),
+};
 
-/** Complete AI Integration - AI-driven predictions */
-// (duplicate completeAIAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
+export const communityManagementAPI = {
+  getCommunityManagement: () => api.get('/community-management'),
+  manageCommunity: (data) => api.post('/community-management/manage', data),
+};
 
-/** Comprehensive ERP - Oracle/SAP standards */
-// (duplicate comprehensiveERPAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Real-time Monitoring - Resource monitoring */
-// (duplicate realtimeMonitoringAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Agricultural Intelligence - AI predictions */
-// (duplicate agriculturalIntelligenceAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Knowledge Reference - Wikipedia and FOLU data */
-// (duplicate knowledgeReferenceAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
-
-/** M400 AI Backbone - Enterprise coordination */
-// (duplicate m400AIBackboneAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
-
-/** Labour Management - Worker and attendance tracking */
-export const labourManagementAPI = {
-  getWorkers: (params) => api.get('/labour/workers', { params }),
-  createWorker: (data) => api.post('/labour/workers', data),
-  updateWorker: (id, data) => api.put(`/labour/workers/${id}`, data),
-  getAttendance: (params) => api.get('/labour/attendance', { params }),
-  recordAttendance: (data) => api.post('/labour/attendance', data),
-  getPayments: (params) => api.get('/labour/payments', { params }),
-  recordPayment: (data) => api.post('/labour/payments', data),
-  getWorkerPerformance: (workerId) => api.get(`/labour/workers/${workerId}/performance`),
-}
-
-/** Farmer Verification - Verification workflow */
-// (duplicate farmerVerificationAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Farmer KYC - Know Your Customer verification */
-export const farmerKycAPI = {
-  getApplications: (params) => api.get('/farmer-kyc/applications', { params }),
-  createApplication: (data) => api.post('/farmer-kyc/applications', data),
-  getApplication: (applicationId) => api.get(`/farmer-kyc/applications/${applicationId}`),
-  updateApplication: (applicationId, data) => api.put(`/farmer-kyc/applications/${applicationId}`, data),
-  submitKycDocuments: (applicationId, documents) => api.post(`/farmer-kyc/applications/${applicationId}/documents`, { documents }),
-  approveApplication: (applicationId, approvalData) => api.post(`/farmer-kyc/applications/${applicationId}/approve`, approvalData),
-  rejectApplication: (applicationId, rejectionData) => api.post(`/farmer-kyc/applications/${applicationId}/reject`, rejectionData),
-  getKycStatus: (farmerId) => api.get(`/farmer-kyc/farmers/${farmerId}/status`),
-}
-
-/** Contract Farming - Contract management */
-export const contractFarmingAPI = {
-  getContracts: (params) => api.get('/contract-farming/contracts', { params }),
-  createContract: (data) => api.post('/contract-farming/contracts', data),
-  getContract: (contractId) => api.get(`/contract-farming/contracts/${contractId}`),
-  updateContract: (contractId, data) => api.put(`/contract-farming/contracts/${contractId}`, data),
-  recordMilestone: (contractId, milestoneData) => api.post(`/contract-farming/contracts/${contractId}/milestones`, milestoneData),
-  getContractPerformance: (contractId) => api.get(`/contract-farming/contracts/${contractId}/performance`),
-  terminateContract: (contractId, terminationData) => api.post(`/contract-farming/contracts/${contractId}/terminate`, terminationData),
-}
-
-/** Government Subsidy - Subsidy management */
-export const governmentSubsidyAPI = {
-  getSchemes: (params) => api.get('/government-subsidy/schemes', { params }),
-  applyForSubsidy: (data) => api.post('/government-subsidy/applications', data),
-  getApplications: (params) => api.get('/government-subsidy/applications', { params }),
-  getApplication: (applicationId) => api.get(`/government-subsidy/applications/${applicationId}`),
-  updateApplication: (applicationId, data) => api.put(`/government-subsidy/applications/${applicationId}`, data),
-  trackApplication: (applicationId) => api.get(`/government-subsidy/applications/${applicationId}/track`),
-  getDisbursementStatus: (applicationId) => api.get(`/government-subsidy/applications/${applicationId}/disbursement`),
-}
-
-/** Household Procurement - Group buying */
-export const householdProcurementAPI = {
-  getGroups: (params) => api.get('/household-procurement/groups', { params }),
-  createGroup: (data) => api.post('/household-procurement/groups', data),
-  getGroup: (groupId) => api.get(`/household-procurement/groups/${groupId}`),
-  createProcurement: (groupId, data) => api.post(`/household-procurement/groups/${groupId}/procurements`, data),
-  getProcurements: (groupId) => api.get(`/household-procurement/groups/${groupId}/procurements`),
-  joinGroup: (groupId, memberId) => api.post(`/household-procurement/groups/${groupId}/members`, { member_id: memberId }),
-  getGroupSavings: (groupId) => api.get(`/household-procurement/groups/${groupId}/savings`),
-}
-
-/** Pre-season Purchase - Advance ordering */
-export const preSeasonPurchaseAPI = {
-  getOrders: (params) => api.get('/pre-season-purchase/orders', { params }),
-  createOrder: (data) => api.post('/pre-season-purchase/orders', data),
-  getOrder: (orderId) => api.get(`/pre-season-purchase/orders/${orderId}`),
-  updateOrder: (orderId, data) => api.put(`/pre-season-purchase/orders/${orderId}`, data),
-  createBid: (orderId, data) => api.post(`/pre-season-purchase/orders/${orderId}/bids`, data),
-  getBids: (orderId) => api.get(`/pre-season-purchase/orders/${orderId}/bids`),
-  acceptBid: (orderId, bidId) => api.post(`/pre-season-purchase/orders/${orderId}/bids/${bidId}/accept`),
-  getOrderAnalytics: (params) => api.get('/pre-season-purchase/analytics', { params }),
-}
-
-// ---------------------------------------------------------------------------
-// MEDICAL CODING AND HEALTH CONDITION API CLIENTS
-// ---------------------------------------------------------------------------
-
-/** Medical Coding - ICD-10-CM, SNOMED-CT, LOINC codes */
-export const medicalCodingAPI = {
-  getMedicalConditionCodes: () => api.get('/nutrition-intelligence/medical-codes'),
-  getConditionCode: (condition, type) => api.get(`/nutrition-intelligence/medical-code/${condition}${type ? `/${type}` : ''}`),
-  getDietaryRestrictions: (condition) => api.get(`/nutrition-intelligence/dietary-restrictions/${condition}`),
-  getNutrientRequirements: (condition) => api.get(`/nutrition-intelligence/nutrient-requirements/${condition}`),
-}
-
-/** Nutrition Intelligence - Dietitian and natural therapist tools */
-export const nutritionIntelligenceAPI = {
-  getNutrients: () => api.get('/nutrition-intelligence/nutrients'),
-  getDietaryProfiles: () => api.get('/nutrition-intelligence/dietary-profiles'),
-  createFoodProfile: (data) => api.post('/nutrition-intelligence/food-profiles', data),
-  searchFoodProfiles: (query, foodGroup) => api.get('/nutrition-intelligence/food-profiles/search', { params: { q: query, food_group: foodGroup } }),
-  addProductNutrition: (data) => api.post('/nutrition-intelligence/product-nutrition', data),
-  getProductNutrition: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}`),
-  calculateNutritionScore: (productId, scoringModelId) => api.post('/nutrition-intelligence/calculate-score', { product_id: productId, scoring_model_id: scoringModelId }),
-  getProductNutritionScore: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/score`),
-  calculateNutritionPricing: (productId, basePrice, pricingRuleId) => api.post('/nutrition-intelligence/calculate-pricing', { product_id: productId, base_price: basePrice, pricing_rule_id: pricingRuleId }),
-  generateRecipe: (dietaryProfileId, targetCalories, provider, medicalCoding) => api.post('/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider, medical_coding: medicalCoding }),
-  generateConditionSpecificRecipe: (condition, dietaryProfileId, targetCalories, provider) => api.post(`/nutrition-intelligence/recipes/condition/${condition}`, { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
-  getWellnessPractices: (category, tag) => api.get('/nutrition-intelligence/wellness-practices', { params: { category, tag } }),
-  getNaturalTherapistGuidance: (condition, symptoms) => api.post('/nutrition-intelligence/natural-therapist/guidance', { condition, symptoms }),
-  calculateNutrientProfile: (condition, nutritionData) => api.post(`/nutrition-intelligence/nutrient-calculator/${condition}`, nutritionData),
-}
-
-/** Recipe Intelligence - Master chef and recipe management */
-export const recipeIntelligenceAPI = {
-  getRecipes: (params) => api.get('/recipe-intelligence/recipes', { params }),
-  createRecipe: (data) => api.post('/recipe-intelligence/recipes', data),
-  getRecipe: (recipeId) => api.get(`/recipe-intelligence/recipes/${recipeId}`),
-  updateRecipe: (recipeId, data) => api.put(`/recipe-intelligence/recipes/${recipeId}`, data),
-  deleteRecipe: (recipeId) => api.delete(`/recipe-intelligence/recipes/${recipeId}`),
-  searchRecipes: (query, filters) => api.get('/recipe-intelligence/recipes/search', { params: { q: query, ...filters } }),
-  getRecipeByCondition: (condition) => api.get(`/recipe-intelligence/recipes/condition/${condition}`),
-  analyzeRecipeNutrition: (recipeData) => api.post('/recipe-intelligence/recipes/analyze-nutrition', recipeData),
-  getRecipeVariations: (recipeId) => api.get(`/recipe-intelligence/recipes/${recipeId}/variations`),
-  createRecipeVariation: (recipeId, data) => api.post(`/recipe-intelligence/recipes/${recipeId}/variations`, data),
-}
-
-/** Consumer Health - Health condition management */
-// (duplicate consumerHealthAPI merged into the single declaration above, 2026-09-07)
-
-// ---------------------------------------------------------------------------
-// PRODUCTION-GRADE API CLIENTS FOR MISSING BACKEND INTEGRATION
-// ---------------------------------------------------------------------------
-
-/** SHG Management - Self Help Group management (highest confidence gap) */
-export const shgManagementAPI = {
-  getSHGs: (params) => api.get('/shg/groups', { params }),
-  createSHG: (data) => api.post('/shg/groups', data),
-  getSHG: (shgId) => api.get(`/shg/groups/${shgId}`),
-  updateSHG: (shgId, data) => api.put(`/shg/groups/${shgId}`, data),
-  getSHGMembers: (shgId) => api.get(`/shg/groups/${shgId}/members`),
-  addMember: (shgId, data) => api.post(`/shg/groups/${shgId}/members`, data),
-  getSHGFinancials: (shgId) => api.get(`/shg/groups/${shgId}/financials`),
-  getSHGActivities: (shgId) => api.get(`/shg/groups/${shgId}/activities`),
-}
-
-/** Land Registry - Parcel CRUD (highest confidence gap) */
-export const landRegistryAPI = {
-  getParcels: (params) => api.get('/land-registry/parcels', { params }),
-  createParcel: (data) => api.post('/land-registry/parcels', data),
-  getParcel: (parcelId) => api.get(`/land-registry/parcels/${parcelId}`),
-  updateParcel: (parcelId, data) => api.put(`/land-registry/parcels/${parcelId}`, data),
-  getParcelHistory: (parcelId) => api.get(`/land-registry/parcels/${parcelId}/history`),
-  verifyParcel: (parcelId) => api.post(`/land-registry/parcels/${parcelId}/verify`),
-  getOwnershipDocuments: (parcelId) => api.get(`/land-registry/parcels/${parcelId}/documents`),
-}
-
-/** Farm Costing - Cost analysis and tracking (highest confidence gap) */
-// (duplicate farmCostingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Decision Engine - Core business logic decisions */
-export const decisionEngineAPI = {
-  getStatus: () => api.get('/decision-support/status'),
-  getRules: () => api.get('/decision-support/rules'),
-  createRule: (data) => api.post('/decision-support/rules', data),
-  updateRule: (ruleId, data) => api.put(`/decision-support/rules/${ruleId}`, data),
-  deleteRule: (ruleId) => api.delete(`/decision-support/rules/${ruleId}`),
-  evaluateDecision: (data) => api.post('/decision-support/evaluate', data),
-  getDecisionHistory: (params) => api.get('/decision-support/history', { params }),
-  getActiveDecisions: () => api.get('/decision-support/active'),
-  getDecisionOutcomes: (decisionId) => api.get(`/decision-support/decisions/${decisionId}/outcomes`),
-  triggerDecision: (ruleId, context) => api.post(`/decision-support/rules/${ruleId}/trigger`, { context }),
-}
-
-/** Enterprise Memory - Case log and learning system */
-export const enterpriseMemoryAPI = {
-  getCases: (params) => api.get('/enterprise-memory/cases', { params }),
-  getCase: (caseId) => api.get(`/enterprise-memory/cases/${caseId}`),
-  createCase: (data) => api.post('/enterprise-memory/cases', data),
-  updateCase: (caseId, data) => api.put(`/enterprise-memory/cases/${caseId}`, data),
-  searchCases: (query) => api.get('/enterprise-memory/search', { params: { q: query } }),
-  getLearningInsights: () => api.get('/enterprise-memory/insights'),
-  getSimilarCases: (caseId) => api.get(`/enterprise-memory/cases/${caseId}/similar`),
-  getKnowledgeGraph: () => api.get('/enterprise-memory/knowledge-graph'),
-  getCaseAnalytics: () => api.get('/enterprise-memory/analytics'),
-}
-
-/** ERP Dashboard - Complete ERP monitoring */
-export const erpDashboardAPI = {
-  getDashboard: () => api.get('/erp/dashboard'),
-  getSyncStatus: () => api.get('/erp/sync-status'),
-  getGLEntries: (params) => api.get('/erp/gl-entries', { params }),
-  getReconciliation: (params) => api.get('/erp/reconciliation', { params }),
-  getBudgetStatus: (budgetId) => api.get(`/erp/budgets/${budgetId}/status`),
-  getFinancialReports: (params) => api.get('/erp/reports', { params }),
-  getAssetRegister: (params) => api.get('/erp/assets', { params }),
-  getProjectStatus: (projectId) => api.get(`/erp/projects/${projectId}/status`),
-  triggerSync: (syncType) => api.post('/erp/sync', { sync_type: syncType }),
-  resolveConflict: (conflictId, resolution) => api.post(`/erp/conflicts/${conflictId}/resolve`, { resolution }),
-}
-
-/** Digital Twin - Farm simulation engine */
-export const digitalTwinAPI = {
-  getStatus: () => api.get('/digital-twin/status'),
-  createTwin: (data) => api.post('/digital-twin/twins', data),
-  getTwins: (params) => api.get('/digital-twin/twins', { params }),
-  getTwin: (twinId) => api.get(`/digital-twin/twins/${twinId}`),
-  updateTwin: (twinId, data) => api.put(`/digital-twin/twins/${twinId}`, data),
-  runSimulation: (twinId, scenario) => api.post(`/digital-twin/twins/${twinId}/simulate`, { scenario }),
-  getSimulationResults: (twinId, simulationId) => api.get(`/digital-twin/twins/${twinId}/simulations/${simulationId}`),
-  getPredictiveModels: (twinId) => api.get(`/digital-twin/twins/${twinId}/models`),
-  getTwinAnalytics: (twinId) => api.get(`/digital-twin/twins/${twinId}/analytics`),
-  syncRealData: (twinId) => api.post(`/digital-twin/twins/${twinId}/sync`),
-}
-
-/** Climate Monitoring - Weather analytics and alerts */
-export const climateMonitoringAPI = {
-  getStatus: () => api.get('/climate-monitoring/status'),
-  getDroughtData: (params) => api.get('/climate-monitoring/drought', { params }),
-  getFloodData: (params) => api.get('/climate-monitoring/flood', { params }),
-  getDiseaseForecast: (params) => api.get('/climate-monitoring/disease-forecast', { params }),
-  getClimateRisk: (params) => api.get('/climate-monitoring/climate-risk', { params }),
-  getAgroMeteorology: (params) => api.get('/climate-monitoring/agro-meteorology', { params }),
-  getAlerts: () => api.get('/climate-monitoring/alerts'),
-  generateReport: (params) => api.post('/climate-monitoring/reports', params),
-  getHistoricalData: (params) => api.get('/climate-monitoring/historical', { params }),
-  getForecastAccuracy: () => api.get('/climate-monitoring/forecast-accuracy'),
-}
-
-/** Cold Storage - Temperature tracking and monitoring */
-// Merged with a 3rd duplicate coldStorageAPI declaration (2026-09-07,
-// out-of-scope Logistics domain cleanup done only because it was blocking
-// `npm run build` - see the note further down where the duplicate used to
-// be) - updateFacility/createBooking/getBookings/updateBookingStatus came
-// from that duplicate and are additive, nothing removed.
 export const coldStorageAPI = {
-  getStatus: () => api.get('/cold-storage/status'),
-  getFacilities: (params) => api.get('/cold-storage/facilities', { params }),
-  createFacility: (data) => api.post('/cold-storage/facilities', data),
-  getFacility: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}`),
-  updateFacility: (facilityId, data) => api.put(`/cold-storage/facilities/${facilityId}`, data),
-  bookFacility: (facilityId, data) => api.post(`/cold-storage/facilities/${facilityId}/book`, data),
-  getTemperatureData: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/temperature`),
-  getTemperatureAlerts: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/alerts`),
-  getUtilization: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/utilization`),
-  getCapacityPlanning: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/capacity-planning`),
-  getComplianceStatus: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/compliance`),
-  createBooking: (data) => api.post('/cold-storage/bookings', data),
-  getBookings: (params) => api.get('/cold-storage/bookings', { params }),
-  updateBookingStatus: (bookingId, status) => api.put(`/cold-storage/bookings/${bookingId}/status`, { status }),
-}
+  getColdStorage: () => api.get('/cold-storage'),
+  manageColdStorage: (data) => api.post('/cold-storage/manage', data),
+};
 
-/** AI Operations Intelligence - Real-time optimization */
-// (duplicate aiOperationIntelligenceAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
+export const coldChainMonitoringAPI = {
+  getColdChainMonitoring: () => api.get('/cold-chain-monitoring'),
+  monitorColdChain: (data) => api.post('/cold-chain-monitoring/monitor', data),
+};
 
-/** AI Self-Healing - Autonomous error recovery */
-// (duplicate aiSelfHealingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** AI Brain - Cognitive processing layer */
-// (duplicate aiBrainAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** AI Gateway - API gateway for AI services */
-export const aiGatewayAPI = {
-  getStatus: () => api.get('/ai-gateway/status'),
-  getEndpoints: () => api.get('/ai-gateway/endpoints'),
-  createEndpoint: (data) => api.post('/ai-gateway/endpoints', data),
-  updateEndpoint: (id, data) => api.put(`/ai-gateway/endpoints/${id}`, data),
-  deleteEndpoint: (id) => api.delete(`/ai-gateway/endpoints/${id}`),
-  routeRequest: (endpoint, data) => api.post(`/ai-gateway/route/${endpoint}`, data),
-  getMetrics: () => api.get('/ai-gateway/metrics'),
-  getRoutingRules: () => api.get('/ai-gateway/rules'),
-  updateRoutingRules: (rules) => api.put('/ai-gateway/rules', rules),
-}
-
-/** Food Safety - FSSAI compliance tracking */
-export const foodSafetyAPI = {
-  getStatus: () => api.get('/food-safety/status'),
-  getComplianceRecords: (params) => api.get('/food-safety/compliance', { params }),
-  createComplianceRecord: (data) => api.post('/food-safety/compliance', data),
-  getRecalls: (params) => api.get('/food-safety/recalls', { params }),
-  createRecall: (data) => api.post('/food-safety/recalls', data),
-  getAuditTrail: (productId) => api.get(`/food-safety/products/${productId}/audit-trail`),
-  getCertificates: (params) => api.get('/food-safety/certificates', { params }),
-  generateComplianceReport: (params) => api.post('/food-safety/reports', params),
-}
-
-/** Organic Traceability - Audit trails */
-export const organicTraceabilityAPI = {
-  getStatus: () => api.get('/organic-traceability/status'),
-  getStandards: () => api.get('/organic-traceability/standards'),
-  registerFarm: (data) => api.post('/organic-traceability/farms', data),
-  getConsumerTransparency: (qrCode) => api.get(`/organic-traceability/consumer-transparency/qr/${qrCode}`),
-  getAuditTrail: (farmId) => api.get(`/organic-traceability/farms/${farmId}/audit-trail`),
-  getCertificationStatus: (farmId) => api.get(`/organic-traceability/farms/${farmId}/certification`),
-  getInspectionSchedule: (farmId) => api.get(`/organic-traceability/farms/${farmId}/inspections`),
-}
-
-/** Biodiversity - Species recognition */
-export const biodiversityAPI = {
-  getStatus: () => api.get('/biodiversity/status'),
-  getSpecies: (params) => api.get('/biodiversity/species', { params }),
-  identifySpecies: (imageData) => api.post('/biodiversity/identify', imageData),
-  getSpeciesDatabase: (params) => api.get('/biodiversity/database', { params }),
-  getBiodiversityMetrics: (location) => api.get('/biodiversity/metrics', { params: { location } }),
-  recordObservation: (data) => api.post('/biodiversity/observations', data),
-  getConservationStatus: (speciesId) => api.get(`/biodiversity/species/${speciesId}/conservation`),
-}
-
-/** Enterprise Control - Workflow engine */
-// (duplicate enterpriseControlAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Experience Layer - DXP engines */
-export const experienceAPI = {
-  resolve: (params) => api.get('/experience/resolve', { params }),
-  tokens: (theme) => api.get('/experience/tokens', { params: { theme } }),
-  saveToken: (body) => api.post('/experience/tokens', body),
-  themes: () => api.get('/experience/themes'),
-  contrast: (fg, bg, large) => api.get('/experience/contrast', { params: { fg, bg, large } }),
-  motion: (reduced) => api.get('/experience/motion', { params: { reduced } }),
-  breakpoint: (width) => api.get('/experience/breakpoint', { params: { width } }),
-  components: (params) => api.get('/experience/components', { params }),
-  registerComponent: (body) => api.post('/experience/components', body),
-  accessibility: () => api.get('/experience/accessibility'),
-  recordConformance: (body) => api.post('/experience/accessibility', body),
-  preferences: () => api.get('/experience/preferences'),
-  savePreferences: (body) => api.put('/experience/preferences', body),
-}
-
-/** Innovation Lab - Experimental features */
-export const innovationLabAPI = {
-  getStatus: () => api.get('/innovation-lab/status'),
-  getExperiments: (params) => api.get('/innovation-lab/experiments', { params }),
-  createExperiment: (data) => api.post('/innovation-lab/experiments', data),
-  getExperiment: (experimentId) => api.get(`/innovation-lab/experiments/${experimentId}`),
-  runExperiment: (experimentId) => api.post(`/innovation-lab/experiments/${experimentId}/run`),
-  getExperimentResults: (experimentId) => api.get(`/innovation-lab/experiments/${experimentId}/results`),
-  getBetaFeatures: () => api.get('/innovation-lab/beta-features'),
-  enrollInBeta: (featureId) => api.post(`/innovation-lab/beta-features/${featureId}/enroll`),
-}
-
-/** AI Agents - Agentic task execution */
-// (duplicate aiAgentAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Glut Warning - Early warning system */
-// (duplicate glutWarningAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Market Signals - Market intelligence */
-export const marketSignalsAPI = {
-  getStatus: () => api.get('/market-signals/status'),
-  getSignals: (params) => api.get('/market-signals/signals', { params }),
-  getPriceTrends: (crop, region) => api.get('/market-signals/price-trends', { params: { crop, region } }),
-  getDemandForecast: (crop) => api.get('/market-signals/demand-forecast', { params: { crop } }),
-  getCompetitorAnalysis: (crop) => api.get('/market-signals/competitor-analysis', { params: { crop } }),
-  getMarketSentiment: () => api.get('/market-signals/sentiment'),
-  getSupplyChainStatus: () => api.get('/market-signals/supply-chain'),
-}
-
-/** Seller Ranking - Trust scoring */
-// (duplicate sellerRankingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Civil Disruption - Risk monitoring */
-// (duplicate civilDisruptionAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Logistics Enhancement - Advanced logistics */
-// (duplicate logisticsEnhancementAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Enterprise AI - Enterprise AI services */
-// (duplicate enterpriseAIAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** M400 AI Backbone - Enterprise coordination */
-export const m400AIBackboneAPI = {
-  getStatus: () => api.get('/m400-ai-backbone/status'),
-  getCoordinationState: () => api.get('/m400-ai-backbone/coordination'),
-  triggerCoordination: (data) => api.post('/m400-ai-backbone/coordinate', data),
-  getAgentStatus: () => api.get('/m400-ai-backbone/agents'),
-  getWorkflowStatus: () => api.get('/m400-ai-backbone/workflows'),
-  initiateWorkflow: (workflowType, data) => api.post('/m400-ai-backbone/workflows', { workflow_type: workflowType, data }),
-  getSystemMetrics: () => api.get('/m400-ai-backbone/metrics'),
-  getPerformance: () => api.get('/m400-ai-backbone/performance'),
-  configureAgents: (config) => api.post('/m400-ai-backbone/configure', config),
-}
-
-/** SAP Module Architecture - Independent module architecture */
-// (duplicate sapModuleArchitectureAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Research and Development - R&D management */
-// (duplicate researchAndDevelopmentAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Information Sharing - Document management */
-// (duplicate informationSharingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Agricultural Intelligence - AI predictions */
-// (duplicate agriculturalIntelligenceAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Knowledge Reference - Wikipedia and FOLU data */
-export const knowledgeReferenceAPI = {
-  searchWikipedia: (query) => api.get('/knowledge-reference/wikipedia/search', { params: { q: query } }),
-  getWikipediaPage: (title) => api.get('/knowledge-reference/wikipedia/page', { params: { title } }),
-  getFOLUBenchmarks: (params) => api.get('/knowledge-reference/folu/benchmarks', { params }),
-  getAgriculturalKnowledge: (topic) => api.get('/knowledge-reference/agricultural', { params: { topic } }),
-  getKnowledgeGraph: (entity) => api.get('/knowledge-reference/knowledge-graph', { params: { entity } }),
-}
-
-/** Real-time Monitoring - Resource monitoring */
-// (duplicate realtimeMonitoringAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Complete ERP Integration - Comprehensive ERP sync */
-export const completeERPAPI = {
-  getStatus: () => api.get('/complete-erp-integration/status'),
-  syncFarmer: (farmerId) => api.post('/complete-erp-integration/sync/farmer', { farmer_id: farmerId }),
-  syncCrop: (cropId) => api.post('/complete-erp-integration/sync/crop', { crop_id: cropId }),
-  syncLivestock: (livestockId) => api.post('/complete-erp-integration/sync/livestock', { livestock_id: livestockId }),
-  syncModule: (moduleId, data) => api.post('/complete-erp-integration/sync/module', { module_id: moduleId, data }),
-  getSyncHistory: (params) => api.get('/complete-erp-integration/history', { params }),
-  resolveConflict: (conflictId, resolution) => api.post(`/complete-erp-integration/conflicts/${conflictId}/resolve`, { resolution }),
-  getSyncHealth: () => api.get('/complete-erp-integration/health'),
-  triggerBulkSync: (data) => api.post('/complete-erp-integration/bulk-sync', data),
-}
-
-/** Complete AI Integration - AI-driven predictions */
-export const completeAIAPI = {
-  getStatus: () => api.get('/complete-ai-integration/status'),
-  predictYield: (data) => api.post('/complete-ai-integration/predict/yield', data),
-  detectDisease: (data) => api.post('/complete-ai-integration/detect/disease', data),
-  optimizeFertilizer: (data) => api.post('/complete-ai-integration/optimize/fertilizer', data),
-  predictMarketPrice: (data) => api.post('/complete-ai-integration/predict/price', data),
-  getRecommendations: (farmerId) => api.get(`/complete-ai-integration/recommendations/${farmerId}`),
-  trainModel: (modelType, data) => api.post(`/complete-ai-integration/models/${modelType}/train`, data),
-  getModelPerformance: (modelType) => api.get(`/complete-ai-integration/models/${modelType}/performance`),
-  getAIModels: () => api.get('/complete-ai-integration/models'),
-  getPredictionAccuracy: () => api.get('/complete-ai-integration/accuracy'),
-}
-
-/** Comprehensive ERP - Oracle/SAP standards */
-// (duplicate comprehensiveERPAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
-
-/** Water Records - Water management data */
-export const waterRecordsAPI = {
-  getBudgets: (params) => api.get('/water-budgeting/budgets', { params }),
-  getQualityReadings: (params) => api.get('/water-quality/readings', { params }),
-  getRainwaterStructures: (params) => api.get('/rainwater-harvesting/structures', { params }),
-  getWatersheds: (params) => api.get('/watersheds', { params }),
-  getAnalyticsRecords: (params) => api.get('/water-analytics/records', { params }),
-  createBudget: (data) => api.post('/water-budgeting/budgets', data),
-  recordQualityReading: (data) => api.post('/water-quality/readings', data),
-  createRainwaterStructure: (data) => api.post('/rainwater-harvesting/structures', data),
-  createWatershed: (data) => api.post('/watersheds', data),
-  recordAnalytics: (data) => api.post('/water-analytics/records', data),
-}
-
-/** Logistics Matching - Freight pooling and return loads */
-export const logisticsMatchingAPI = {
-  getFreightPooling: () => api.get('/logistics-matching/freight-pooling'),
-  getReturnLoadBoard: () => api.get('/logistics-matching/return-loads'),
-  getEquipmentExchange: () => api.get('/logistics-matching/equipment-exchange'),
-  submitFreightRequest: (data) => api.post('/logistics-matching/freight-requests', data),
-  acceptFreightRequest: (requestId) => api.post(`/logistics-matching/freight-requests/${requestId}/accept`),
-  submitReturnLoad: (data) => api.post('/logistics-matching/return-loads', data),
-  acceptReturnLoad: (loadId) => api.post(`/logistics-matching/return-loads/${loadId}/accept`),
-  listEquipment: (params) => api.get('/logistics-matching/equipment', { params }),
-  createEquipmentListing: (data) => api.post('/logistics-matching/equipment', data),
-}
-
-/** M041 — Village Registry (Community domain). No backend route found. */
-/**
- * M041 — Village Registry. Real backend has only 3 action-oriented
- * operations (no list/get/update/delete) - see VillageRegistryPage.jsx.
- */
-export const villageAPI = {
-  createVillage: (data) => api.post('/backend-modules/M041/createVillage', data),
-  addVillageResource: (villageId, resourceData) => api.post('/backend-modules/M041/addVillageResource', { villageId, ...resourceData }),
-  getVillageAnalytics: (villageId) => api.get(`/backend-modules/M041/getVillageAnalytics/${villageId}`),
-}
-
-/** M024 — Farmer KYC (Farmer domain). farmersAPI covers profile/FDI/certs but
- *  no route handles a KYC verification workflow. */
-export const kycAPI = {
-  getApplications: (params) => api.get('/farmer-kyc/applications', { params }),
-  getApplication: (id) => api.get(`/farmer-kyc/applications/${id}`),
-  submitApplication: (data) => api.post('/farmer-kyc/applications', data),
-  verifyApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/verify`, data),
-  rejectApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/reject`, data),
-}
-
-/** M141 — Orchard Management (Horticulture domain). No backend route found. */
-/**
- * M141 — Orchard Management. Routed through the generic backend-module
- * bridge (/api/v1/backend-modules/M141/:operation/:id) — real CRUD exists
- * here (unlike most of this file's "No backend route found" entries).
- */
-export const orchardAPI = {
-  getOrchards: (params) => api.get('/backend-modules/M141/listOrchards', { params }),
-  createOrchard: (data) => api.post('/backend-modules/M141/createOrchard', data),
-  updateOrchard: (id, data) => api.put(`/backend-modules/M141/updateOrchard/${id}`, data),
-  deleteOrchard: (id) => api.delete(`/backend-modules/M141/deleteOrchard/${id}`),
-  getHarvestLog: (orchardId, year) => api.get(`/backend-modules/M141/getOrchardProduction/${orchardId}`, { params: { year } }),
-  recordHarvest: (orchardId, data) => api.post('/backend-modules/M141/recordOrchardProduction', { orchardId, ...data }),
-}
-
-/** M098 — Farm Costing (Operations domain). economicAPI.costBreakup covers
- *  corridor-level cost models; no route handles per-farm cost records. */
-export const farmCostingAPI = {
-  getCosts: (params) => api.get('/farm-costing/costs', { params }),
-  createCost: (data) => api.post('/farm-costing/costs', data),
-  getCost: (costId) => api.get(`/farm-costing/costs/${costId}`),
-  updateCost: (costId, data) => api.put(`/farm-costing/costs/${costId}`, data),
-  getCostCategories: () => api.get('/farm-costing/categories'),
-  getCostAnalysis: (farmId, period) => api.get(`/farm-costing/farms/${farmId}/analysis`, { params: { period } }),
-  getBudgetComparison: (farmId) => api.get(`/farm-costing/farms/${farmId}/budget-comparison`),
-  getCostTrends: (farmId, period) => api.get(`/farm-costing/farms/${farmId}/trends`, { params: { period } }),
-  getRecords: (params) => api.get('/farm-costing/records', { params }),
-  createRecord: (data) => api.post('/farm-costing/records', data),
-  updateRecord: (id, data) => api.put(`/farm-costing/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/farm-costing/records/${id}`),
-  getSummary: (params) => api.get('/farm-costing/summary', { params }),
-}
-
-/** M132 — Pond Management (Fisheries domain). No backend route found. */
-/**
- * M132 — Pond Management. Routed through the generic backend-module bridge.
- * The core CRUD is real. recordWaterQuality/getHarvestLog have no backend
- * equivalent - M132 only has IoT sensor-array functions (processSensorData
- * is a pure in-memory analysis transform, it doesn't persist anything), not
- * a manual single-reading log or any harvest tracking. Deliberately not
- * wired to processSensorData - that would show a fake "logged" success
- * while silently discarding the data.
- */
-export const pondAPI = {
-  getPonds: (params) => api.get('/backend-modules/M132/listPonds', { params }),
-  createPond: (data) => api.post('/backend-modules/M132/createPond', data),
-  updatePond: (id, data) => api.put(`/backend-modules/M132/updatePond/${id}`, data),
-  deletePond: (id) => api.delete(`/backend-modules/M132/deletePond/${id}`),
-}
-
-/** M101 — Tractor Management (Machinery domain). A `machinery_access` table
- *  exists (migration 041_rural_life_os_schema.sql) but no route reads or
- *  writes it. */
-export const machineryAPI = {
-  getTractors: (params) => api.get('/machinery/tractors', { params }),
-  createTractor: (data) => api.post('/machinery/tractors', data),
-  updateTractor: (id, data) => api.put(`/machinery/tractors/${id}`, data),
-  deleteTractor: (id) => api.delete(`/machinery/tractors/${id}`),
-  getBookings: (params) => api.get('/machinery/bookings', { params }),
-  createBooking: (data) => api.post('/machinery/bookings', data),
-  updateBooking: (id, data) => api.put(`/machinery/bookings/${id}`, data),
-}
-
-/** M013 — Authorization (Identity domain). authService.getUserPermissions()
- *  hardcodes a role→permission map server-side with no route to read, edit,
- *  or audit it, and no route to change a user's role after signup. */
-export const authorizationAPI = {
-  getRoles: () => api.get('/authorization/roles'),
-  getRolePermissions: (role) => api.get(`/authorization/roles/${role}/permissions`),
-  updateRolePermissions: (role, data) => api.put(`/authorization/roles/${role}/permissions`, data),
-  getUsers: (params) => api.get('/authorization/users', { params }),
-  updateUserRole: (userId, data) => api.put(`/authorization/users/${userId}/role`, data),
-  getAuditLog: (params) => api.get('/authorization/audit-log', { params }),
-}
-
-/** M083 — Climate Advisory (Climate domain). Real backend as of 2026-08-10:
- *  backend/src/routes/climateAdvisoryRoutes.js + weatherService.js, CRUD over
- *  the `agromet_advisories` table (migration 057). weatherAPI.advisoryTriggers
- *  surfaces real threshold-breach candidates a user can turn into an advisory. */
 export const climateAdvisoryAPI = {
-  getAdvisories: (params) => api.get('/climate-advisory/advisories', { params }),
-  getAdvisory: (id) => api.get(`/climate-advisory/advisories/${id}`),
-  createAdvisory: (data) => api.post('/climate-advisory/advisories', data),
-  updateAdvisory: (id, data) => api.put(`/climate-advisory/advisories/${id}`, data),
-}
+  getClimateAdvisory: () => api.get('/climate-advisory'),
+  getAdvisory: (data) => api.post('/climate-advisory/get', data),
+};
 
-/** M046 — SHG Management (Community domain, self-help groups). No backend
- *  route found. */
-export const shgAPI = {
-  getGroups: (params) => api.get('/shg/groups', { params }),
-  getGroup: (id) => api.get(`/shg/groups/${id}`),
-  createGroup: (data) => api.post('/shg/groups', data),
-  updateGroup: (id, data) => api.put(`/shg/groups/${id}`, data),
-  getMembers: (groupId) => api.get(`/shg/groups/${groupId}/members`),
-  addMember: (groupId, data) => api.post(`/shg/groups/${groupId}/members`, data),
-  getSavings: (groupId, params) => api.get(`/shg/groups/${groupId}/savings`, { params }),
-  recordSaving: (groupId, data) => api.post(`/shg/groups/${groupId}/savings`, data),
-}
+export const civilDisruptionAPI = {
+  getCivilDisruption: () => api.get('/civil-disruption'),
+  reportDisruption: (data) => api.post('/civil-disruption/report', data),
+};
 
-// ---------------------------------------------------------------------------
-// Modules built 2026-08-07, second batch, for 20 confirmed STUB-ONLY
-// frontends (Farmer: M022/M023/M025/M026/M029, Crop: M062-M066/M068, Land:
-// M033/M035-M039, FPO: M051/M052/M055/M057/M059). None of these had a
-// dedicated backend route as of this change — the shapes below follow the
-// same REST convention as every namespace above (/api/v1/<resource>). M032
-// (Land Ownership) is not represented here: that capability is already
-// fully covered by landAPI + LandRegistryPage.jsx (owner_name,
-// ownership_type, title_status per parcel), so M032 points there instead of
-// duplicating it. See each module's README.md for the specific gap.
-// ---------------------------------------------------------------------------
+export const certificationManagementAPI = {
+  getCertificationManagement: () => api.get('/certification-management'),
+  manageCertification: (data) => api.post('/certification-management/manage', data),
+};
 
-/** M022 — Farmer Profile (Farmer domain). farmersAPI covers read-only lookup
- *  (getFarmer/getFarmers); no route handles profile create/update/delete. */
-export const farmerProfileAPI = {
-  getProfiles: (params) => api.get('/farmer-profiles', { params }),
-  getProfile: (id) => api.get(`/farmer-profiles/${id}`),
-  createProfile: (data) => api.post('/farmer-profiles', data),
-  updateProfile: (id, data) => api.put(`/farmer-profiles/${id}`, data),
-  deleteProfile: (id) => api.delete(`/farmer-profiles/${id}`),
-}
+export const buyerTrustAPI = {
+  getBuyerTrust: () => api.get('/buyer-trust'),
+  buildTrust: (data) => api.post('/buyer-trust/build', data),
+};
 
-/** M023 — Farmer Family (Farmer domain). No backend route found for
- *  household/dependent records. */
-export const farmerFamilyAPI = {
-  getMembers: (params) => api.get('/farmer-family/members', { params }),
-  createMember: (data) => api.post('/farmer-family/members', data),
-  updateMember: (id, data) => api.put(`/farmer-family/members/${id}`, data),
-  deleteMember: (id) => api.delete(`/farmer-family/members/${id}`),
-}
+export const bulkOrdersAPI = {
+  getBulkOrders: () => api.get('/bulk-orders'),
+  createBulkOrder: (data) => api.post('/bulk-orders', data),
+};
 
-/** M025 — Farmer Verification (Farmer domain). Distinct from M024 Farmer KYC
- *  (kycAPI, document identity verification) — this tracks field/peer
- *  verification of farmer records (land, cropping, membership claims). */
-export const farmerVerificationAPI = {
-  getRequests: (params) => api.get('/farmer-verification/requests', { params }),
-  createRequest: (data) => api.post('/farmer-verification/requests', data),
-  getRequest: (id) => api.get(`/farmer-verification/requests/${id}`),
-  updateRequest: (requestId, data) => api.put(`/farmer-verification/requests/${requestId}`, data),
-  submitDocuments: (requestId, documents) => api.post(`/farmer-verification/requests/${requestId}/documents`, { documents }),
-  makeDecision: (requestId, decision) => api.post(`/farmer-verification/requests/${requestId}/decision`, decision),
-  getVerificationStatus: (farmerId) => api.get(`/farmer-verification/farmers/${farmerId}/status`),
-  submitRequest: (data) => api.post('/farmer-verification/requests', data),
-  verifyRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/verify`, data),
-  rejectRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/reject`, data),
-}
+export const yieldManagementAPI = {
+  getYieldData: () => api.get('/yield-management'),
+  optimizeYield: (data) => api.post('/yield-management/optimize', data),
+};
 
-/** M026 — Farmer Skill Management (Farmer domain). farmerTrainingService.js
- *  exists server-side but has no mounted route; no CRUD for a farmer's
- *  skill/training records exists. */
-export const farmerSkillAPI = {
-  getSkills: (params) => api.get('/farmer-skills', { params }),
-  addSkill: (data) => api.post('/farmer-skills', data),
-  updateSkill: (id, data) => api.put(`/farmer-skills/${id}`, data),
-  deleteSkill: (id) => api.delete(`/farmer-skills/${id}`),
-}
+export const weatherAdvisoryAPI = {
+  getWeatherAdvisory: () => api.get('/weather-advisory'),
+  getForecast: () => api.get('/weather-advisory/forecast'),
+};
 
-/** M029 — Farmer Health & Welfare (Farmer domain). No backend route found. */
-/**
- * M029 — real backend has two genuinely separate capabilities that this
- * page's original single form conflated: health records (medical
- * issue/severity tracking) and welfare program enrollment (a program
- * catalog + a thin enroll action). Split accordingly - see
- * FarmerHealthWelfarePage.jsx.
- */
+export const wearableIntegrationAPI = {
+  getWearableData: () => api.get('/wearable-integration'),
+  syncWearable: (data) => api.post('/wearable-integration/sync', data),
+};
+
+export const waterManagementAPI = {
+  getWaterData: () => api.get('/water-management'),
+  controlWater: (data) => api.post('/water-management/control', data),
+};
+
+export const warehouseManagementAPI = {
+  getWarehouseData: () => api.get('/warehouse-management'),
+  manageInventory: (data) => api.post('/warehouse-management/inventory', data),
+};
+
+export const vrAPI = {
+  getVRContent: () => api.get('/vr'),
+  accessVRScene: (id) => api.get(`/vr/scenes/${id}`),
+};
+
+export const videoAnalyticsAPI = {
+  getVideoAnalytics: () => api.get('/video-analytics'),
+  analyzeVideo: (data) => api.post('/video-analytics/analyze', data),
+};
+
+export const vendorAPI2 = {
+  getVendors: () => api.get('/vendors'),
+  getVendor: (id) => api.get(`/vendors/${id}`),
+};
+
+export const userRoutesAPI = {
+  getUserRoutes: () => api.get('/user-routes'),
+  createUserRoute: (data) => api.post('/user-routes', data),
+};
+
+export const unifiedAIRoutesAPI = {
+  getUnifiedAIRoutes: () => api.get('/unified-ai-routes'),
+  configureUnifiedAIRoute: (id, data) => api.put(`/unified-ai-routes/${id}`, data),
+};
+
+export const unifiedAIGatewayAPI2 = {
+  getUnifiedAIGateway: () => api.get('/unified-ai-gateway'),
+  configureUnifiedAIGateway: (data) => api.put('/unified-ai-gateway', data),
+};
+
+export const transactionAPI = {
+  getTransactions: () => api.get('/transactions'),
+  createTransaction: (data) => api.post('/transactions', data),
+};
+
+export const trackDartAPI = {
+  getShipments: () => api.get('/track-dart'),
+  trackShipment: (id) => api.get(`/track-dart/${id}`),
+};
+
+export const tenantManagementAPI = {
+  getTenants: () => api.get('/tenant-management'),
+  createTenant: (data) => api.post('/tenant-management', data),
+};
+
+export const systemAdministrationAPI = {
+  getSystemStatus: () => api.get('/system-administration'),
+  configureSystem: (data) => api.put('/system-administration', data),
+};
+
+export const supplyChainTrackingAPI = {
+  getSupplyChainData: () => api.get('/supply-chain-tracking'),
+  trackSupplyChain: (id) => api.get(`/supply-chain-tracking/${id}`),
+};
+
+export const supplyChainAnalyticsAPI = {
+  getSupplyChainAnalytics: () => api.get('/supply-chain-analytics'),
+  analyzeSupplyChain: (data) => api.post('/supply-chain-analytics/analyze', data),
+};
+
+export const supplyChainDecisionAPI = {
+  getSupplyChainDecisions: () => api.get('/supply-chain-decision'),
+  makeDecision: (data) => api.post('/supply-chain-decision', data),
+};
+
+export const subscriptionsAPI = {
+  getSubscriptions: () => api.get('/subscriptions'),
+  createSubscription: (data) => api.post('/subscriptions', data),
+};
+
+export const soilManagementAPI = {
+  getSoilData: () => api.get('/soil-management'),
+  analyzeSoil: (data) => api.post('/soil-management/analyze', data),
+};
+
+export const soilHealthAPI = {
+  getSoilHealth: () => api.get('/soil-health'),
+  improveSoilHealth: (data) => api.post('/soil-health/improve', data),
+};
+
+export const sheepAPI = {
+  getSheepData: () => api.get('/sheep'),
+  manageSheep: (id, data) => api.put(`/sheep/${id}`, data),
+};
+
+export const sellerVerificationsAPI = {
+  getVerifications: () => api.get('/seller-verifications'),
+  verifySeller: (id) => api.post(`/seller-verifications/${id}/verify`),
+};
+
+export const sellerRankingAPI = {
+  getSellerRankings: () => api.get('/seller-ranking'),
+  rankSeller: (id, data) => api.post(`/seller-ranking/${id}`, data),
+};
+
+export const seedVaultAPI = {
+  getSeeds: () => api.get('/seed-vault'),
+  addSeed: (data) => api.post('/seed-vault', data),
+};
+
+export const sapModuleArchitectureAPI = {
+  getSAPModules: () => api.get('/sap-module-architecture'),
+  configureSAPModule: (id, data) => api.put(`/sap-module-architecture/${id}`, data),
+};
+
+export const roleManagementAPI = {
+  getRoles: () => api.get('/role-management'),
+  createRole: (data) => api.post('/role-management', data),
+};
+
+export const riskPricingAPI = {
+  getRiskPricing: () => api.get('/risk-pricing'),
+  calculateRisk: (data) => api.post('/risk-pricing/calculate', data),
+};
+
+export const riskAssessmentAPI = {
+  getRiskAssessments: () => api.get('/risk-assessment'),
+  assessRisk: (data) => api.post('/risk-assessment/assess', data),
+};
+
+export const rfqAPI = {
+  getRFQs: () => api.get('/rfq'),
+  createRFQ: (data) => api.post('/rfq', data),
+};
+
+export const returnLoadBoardAPI = {
+  getReturnLoads: () => api.get('/return-load-board'),
+  postReturnLoad: (data) => api.post('/return-load-board', data),
+};
+
+export const researchAndDevelopmentAPI = {
+  getRAndD: () => api.get('/research-and-development'),
+  createResearch: (data) => api.post('/research-and-development', data),
+};
+
+export const regionalVarietyAPI = {
+  getRegionalVarieties: () => api.get('/regional-variety'),
+  addVariety: (data) => api.post('/regional-variety', data),
+};
+
+export const neVarietiesAPI = {
+  getNEVarieties: () => api.get('/ne-varieties'),
+  addNEVariety: (data) => api.post('/ne-varieties', data),
+};
+
+export const recoveredFinanceAPI = {
+  getRecoveredFinance: () => api.get('/recovered-finance'),
+  recoverFinance: (data) => api.post('/recovered-finance/recover', data),
+};
+
+export const realtimeMonitoringAPI = {
+  getRealtimeMonitoring: () => api.get('/realtime-monitoring'),
+  startMonitoring: (data) => api.post('/realtime-monitoring/start', data),
+};
+
+export const qualityAssuranceAPI = {
+  getQualityAssurance: () => api.get('/quality-assurance'),
+  runQualityCheck: (data) => api.post('/quality-assurance/check', data),
+};
+
+export const pyramidHealthAPI = {
+  getPyramidHealth: () => api.get('/pyramid-health'),
+  assessPyramidHealth: (data) => api.post('/pyramid-health/assess', data),
+};
+
+export const poultryAPI = {
+  getPoultryData: () => api.get('/poultry'),
+  managePoultry: (id, data) => api.put(`/poultry/${id}`, data),
+};
+
+export const pricingOptimizationAPI = {
+  getPricingOptimization: () => api.get('/pricing-optimization'),
+  optimizePricing: (data) => api.post('/pricing-optimization/optimize', data),
+};
+
+export const precisionFarmingAPI = {
+  getPrecisionFarming: () => api.get('/precision-farming'),
+  applyPrecisionFarming: (data) => api.post('/precision-farming/apply', data),
+};
+
+export const preSeasonOrderAPI = {
+  getPreSeasonOrders: () => api.get('/pre-season-order'),
+  createPreSeasonOrder: (data) => api.post('/pre-season-order', data),
+};
+
+export const plantHealthAPI = {
+  getPlantHealth: () => api.get('/plant-health'),
+  diagnosePlant: (data) => api.post('/plant-health/diagnose', data),
+};
+
+export const pestManagementAPI = {
+  getPestManagement: () => api.get('/pest-management'),
+  controlPests: (data) => api.post('/pest-management/control', data),
+};
+
+export const paymentProcessingAPI = {
+  getPayments: () => api.get('/payment-processing'),
+  processPayment: (data) => api.post('/payment-processing/process', data),
+};
+
+export const partnerManagementAPI = {
+  getPartners: () => api.get('/partner-management'),
+  addPartner: (data) => api.post('/partner-management', data),
+};
+
+export const packageAPI = {
+  getPackages: () => api.get('/package'),
+  createPackage: (data) => api.post('/package', data),
+};
+
+export const oxygenGeneratorAPI = {
+  getOxygenGenerators: () => api.get('/oxygen-generator'),
+  controlOxygenGenerator: (id, data) => api.put(`/oxygen-generator/${id}`, data),
+};
+
+export const orchardManagementAPI = {
+  getOrchardData: () => api.get('/orchard-management'),
+  manageOrchard: (id, data) => api.put(`/orchard-management/${id}`, data),
+};
+
+export const operationalIntelligenceAPI = {
+  getOperationalIntelligence: () => api.get('/operational-intelligence'),
+  analyzeOperations: (data) => api.post('/operational-intelligence/analyze', data),
+};
+
+export const openFieldFarmingAPI = {
+  getOpenFieldFarming: () => api.get('/open-field-farming'),
+  manageOpenField: (data) => api.post('/open-field-farming/manage', data),
+};
+
+export const organicFarmingAPI = {
+  getOrganicFarming: () => api.get('/organic-farming'),
+  certifyOrganic: (data) => api.post('/organic-farming/certify', data),
+};
+
+export const offerManagementAPI = {
+  getOffers: () => api.get('/offer-management'),
+  createOffer: (data) => api.post('/offer-management', data),
+};
+
+export const nutritionalOptimizationAPI = {
+  getNutritionalOptimization: () => api.get('/nutritional-optimization'),
+  optimizeNutrition: (data) => api.post('/nutritional-optimization/optimize', data),
+};
+
+export const nutritionAPI2 = {
+  getNutrition: () => api.get('/nutrition'),
+  analyzeNutrition: (data) => api.post('/nutrition/analyze', data),
+};
+
+export const notificationAPI2 = {
+  getNotifications: () => api.get('/notifications'),
+  sendNotification: (data) => api.post('/notifications', data),
+};
+
+export const notificationAPI3 = {
+  getNotifications: () => api.get('/notifications'),
+  markAsRead: (id) => api.put(`/notifications/${id}/read`),
+};
+
+export const newsAPI = {
+  getNews: () => api.get('/news'),
+  createNews: (data) => api.post('/news', data),
+};
+
+export const marketplaceAPI = {
+  getMarketplace: () => api.get('/marketplace'),
+  createListing: (data) => api.post('/marketplace/listing', data),
+};
+
+export const marketTrendAPI = {
+  getMarketTrends: () => api.get('/market-trend'),
+  analyzeTrend: (data) => api.post('/market-trend/analyze', data),
+};
+
+export const logisticsOptimizationAPI = {
+  getLogisticsOptimization: () => api.get('/logistics-optimization'),
+  optimizeLogistics: (data) => api.post('/logistics-optimization/optimize', data),
+};
+
+export const livestockTrackingAPI = {
+  getLivestockTracking: () => api.get('/livestock-tracking'),
+  trackLivestock: (id) => api.get(`/livestock-tracking/${id}`),
+};
+
+export const liquidFertilizerAPI = {
+  getLiquidFertilizer: () => api.get('/liquid-fertilizer'),
+  applyFertilizer: (data) => api.post('/liquid-fertilizer/apply', data),
+};
+
+export const ledAPI = {
+  getLEDs: () => api.get('/led'),
+  controlLED: (id, data) => api.put(`/led/${id}`, data),
+};
+
+export const kioskAPI = {
+  getKiosks: () => api.get('/kiosk'),
+  manageKiosk: (id, data) => api.put(`/kiosk/${id}`, data),
+};
+
+export const irrigationSystemAPI = {
+  getIrrigationSystems: () => api.get('/irrigation-system'),
+  controlIrrigation: (id, data) => api.put(`/irrigation-system/${id}`, data),
+};
+
+export const investmentAPI = {
+  getInvestments: () => api.get('/investment'),
+  createInvestment: (data) => api.post('/investment', data),
+};
+
+export const inventoryManagementAPI = {
+  getInventoryManagement: () => api.get('/inventory-management'),
+  manageInventory: (data) => api.post('/inventory-management/manage', data),
+};
+
+export const inventoryOptimizationAPI = {
+  getInventoryOptimization: () => api.get('/inventory-optimization'),
+  optimizeInventory: (data) => api.post('/inventory-optimization/optimize', data),
+};
+
+export const integratedFarmingAPI = {
+  getIntegratedFarming: () => api.get('/integrated-farming'),
+  implementIntegratedFarming: (data) => api.post('/integrated-farming/implement', data),
+};
+
+export const infrastructureAPI2 = {
+  getInfrastructure: () => api.get('/infrastructure'),
+  manageInfrastructure: (data) => api.post('/infrastructure/manage', data),
+};
+
+export const hybridFarmingAPI = {
+  getHybridFarming: () => api.get('/hybrid-farming'),
+  implementHybridFarming: (data) => api.post('/hybrid-farming/implement', data),
+};
+
+export const hydroponicsAPI = {
+  getHydroponics: () => api.get('/hydroponics'),
+  manageHydroponics: (data) => api.post('/hydroponics/manage', data),
+};
+
+export const homeAutomationAPI = {
+  getHomeAutomation: () => api.get('/home-automation'),
+  automateHome: (data) => api.post('/home-automation/automate', data),
+};
+
+// Climate and weather monitoring APIs
+export const droughtMonitoringAPI = {
+  getDroughtData: () => api.get('/drought-monitoring'),
+  analyzeDrought: (data) => api.post('/drought-monitoring/analyze', data),
+};
+
+export const floodMonitoringAPI = {
+  getFloodData: () => api.get('/flood-monitoring'),
+  analyzeFlood: (data) => api.post('/flood-monitoring/analyze', data),
+};
+
+export const pestForecastingAPI = {
+  getPestForecast: () => api.get('/pest-forecasting'),
+  forecastPests: (data) => api.post('/pest-forecasting/forecast', data),
+};
+
+export const diseaseForecastingAPI = {
+  getDiseaseForecast: () => api.get('/disease-forecasting'),
+  forecastDisease: (data) => api.post('/disease-forecasting/forecast', data),
+};
+
+export const climateRiskAPI = {
+  getClimateRisks: () => api.get('/climate-risk'),
+  assessRisk: (data) => api.post('/climate-risk/assess', data),
+};
+
+export const agroMeteorologyAPI = {
+  getAgroMeteorology: () => api.get('/agro-meteorology'),
+  analyzeWeather: (data) => api.post('/agro-meteorology/analyze', data),
+};
+
+export const climateSmartAgricultureAPI = {
+  getClimateSmartData: () => api.get('/climate-smart-agriculture'),
+  implementClimateSmart: (data) => api.post('/climate-smart-agriculture/implement', data),
+};
+
+export const irrigationSchedulerAPI = {
+  getIrrigationSchedule: () => api.get('/irrigation-scheduler'),
+  scheduleIrrigation: (data) => api.post('/irrigation-scheduler/schedule', data),
+};
+
+export const soilMoistureAPI = {
+  getSoilMoisture: () => api.get('/soil-moisture'),
+  monitorMoisture: (data) => api.post('/soil-moisture/monitor', data),
+};
+
+export const waterConservationAPI = {
+  getWaterConservation: () => api.get('/water-conservation'),
+  conserveWater: (data) => api.post('/water-conservation/conserve', data),
+};
+
+export const nutrientManagementAPI = {
+  getNutrientManagement: () => api.get('/nutrient-management'),
+  manageNutrients: (data) => api.post('/nutrient-management/manage', data),
+};
+
+export const soilHealthMonitoringAPI = {
+  getSoilHealthMonitoring: () => api.get('/soil-health-monitoring'),
+  monitorSoilHealth: (data) => api.post('/soil-health-monitoring/monitor', data),
+};
+
+export const cropSelectionAPI = {
+  getCropSelection: () => api.get('/crop-selection'),
+  selectCrop: (data) => api.post('/crop-selection/select', data),
+};
+
+export const varietySelectionAPI = {
+  getVarietySelection: () => api.get('/variety-selection'),
+  selectVariety: (data) => api.post('/variety-selection/select', data),
+};
+
+export const plantingDateAPI = {
+  getPlantingDates: () => api.get('/planting-date'),
+  recommendPlantingDate: (data) => api.post('/planting-date/recommend', data),
+};
+
+export const harvestPredictionAPI = {
+  getHarvestPrediction: () => api.get('/harvest-prediction'),
+  predictHarvest: (data) => api.post('/harvest-prediction/predict', data),
+};
+
+export const yieldPredictionAPI = {
+  getYieldPrediction: () => api.get('/yield-prediction'),
+  predictYield: (data) => api.post('/yield-prediction/predict', data),
+};
+
+export const cropGrowthModelingAPI = {
+  getCropGrowthModeling: () => api.get('/crop-growth-modeling'),
+  modelGrowth: (data) => api.post('/crop-growth-modeling/model', data),
+};
+
+export const farmProfitabilityAPI = {
+  getFarmProfitability: () => api.get('/farm-profitability'),
+  analyzeProfitability: (data) => api.post('/farm-profitability/analyze', data),
+};
+
+export const costBenefitAnalysisAPI = {
+  getCostBenefitAnalysis: () => api.get('/cost-benefit-analysis'),
+  analyzeCostBenefit: (data) => api.post('/cost-benefit-analysis/analyze', data),
+};
+
+export const marketPriceForecastAPI = {
+  getMarketPriceForecast: () => api.get('/market-price-forecast'),
+  forecastPrice: (data) => api.post('/market-price-forecast/forecast', data),
+};
+
+export const demandForecastAPI = {
+  getDemandForecast: () => api.get('/demand-forecast'),
+  forecastDemand: (data) => api.post('/demand-forecast/forecast', data),
+};
+
+export const supplyChainOptimizationAPI = {
+  getSupplyChainOptimization: () => api.get('/supply-chain-optimization'),
+  optimizeSupplyChain: (data) => api.post('/supply-chain-optimization/optimize', data),
+};
+
+export const logisticsOptimizationAPI2 = {
+  getLogisticsOptimization: () => api.get('/logistics-optimization'),
+  optimizeLogistics: (data) => api.post('/logistics-optimization/optimize', data),
+};
+
+export const inventoryOptimizationAPI2 = {
+  getInventoryOptimization: () => api.get('/inventory-optimization'),
+  optimizeInventory: (data) => api.post('/inventory-optimization/optimize', data),
+};
+
+export const resourceOptimizationAPI = {
+  getResourceOptimization: () => api.get('/resource-optimization'),
+  optimizeResources: (data) => api.post('/resource-optimization/optimize', data),
+};
+
+export const laborOptimizationAPI = {
+  getLaborOptimization: () => api.get('/labor-optimization'),
+  optimizeLabor: (data) => api.post('/labor-optimization/optimize', data),
+};
+
+export const machineryOptimizationAPI = {
+  getMachineryOptimization: () => api.get('/machinery-optimization'),
+  optimizeMachinery: (data) => api.post('/machinery-optimization/optimize', data),
+};
+
+export const energyOptimizationAPI = {
+  getEnergyOptimization: () => api.get('/energy-optimization'),
+  optimizeEnergy: (data) => api.post('/energy-optimization/optimize', data),
+};
+
+export const waterOptimizationAPI = {
+  getWaterOptimization: () => api.get('/water-optimization'),
+  optimizeWater: (data) => api.post('/water-optimization/optimize', data),
+};
+
+export const fertilizerOptimizationAPI = {
+  getFertilizerOptimization: () => api.get('/fertilizer-optimization'),
+  optimizeFertilizer: (data) => api.post('/fertilizer-optimization/optimize', data),
+};
+
+export const pesticideOptimizationAPI = {
+  getPesticideOptimization: () => api.get('/pesticide-optimization'),
+  optimizePesticide: (data) => api.post('/pesticide-optimization/optimize', data),
+};
+
+export const seedOptimizationAPI = {
+  getSeedOptimization: () => api.get('/seed-optimization'),
+  optimizeSeed: (data) => api.post('/seed-optimization/optimize', data),
+};
+
+export const cropRotationAPI = {
+  getCropRotation: () => api.get('/crop-rotation'),
+  planRotation: (data) => api.post('/crop-rotation/plan', data),
+};
+
+export const intercroppingAPI = {
+  getIntercropping: () => api.get('/intercropping'),
+  planIntercropping: (data) => api.post('/intercropping/plan', data),
+};
+
+export const mixedFarmingAPI = {
+  getMixedFarming: () => api.get('/mixed-farming'),
+  implementMixedFarming: (data) => api.post('/mixed-farming/implement', data),
+};
+
+export const agroforestryAPI = {
+  getAgroforestry: () => api.get('/agroforestry'),
+  implementAgroforestry: (data) => api.post('/agroforestry/implement', data),
+};
+
+export const organicFarmingAPI2 = {
+  getOrganicFarming: () => api.get('/organic-farming'),
+  implementOrganicFarming: (data) => api.post('/organic-farming/implement', data),
+};
+
+export const regenerativeAgricultureAPI = {
+  getRegenerativeAgriculture: () => api.get('/regenerative-agriculture'),
+  implementRegenerativeAgriculture: (data) => api.post('/regenerative-agriculture/implement', data),
+};
+
+export const precisionAgricultureAPI = {
+  getPrecisionAgriculture: () => api.get('/precision-agriculture'),
+  implementPrecisionAgriculture: (data) => api.post('/precision-agriculture/implement', data),
+};
+
+export const smartFarmingAPI = {
+  getSmartFarming: () => api.get('/smart-farming'),
+  implementSmartFarming: (data) => api.post('/smart-farming/implement', data),
+};
+
+export const digitalFarmingAPI = {
+  getDigitalFarming: () => api.get('/digital-farming'),
+  implementDigitalFarming: (data) => api.post('/digital-farming/implement', data),
+};
+
+export const autonomousFarmingAPI = {
+  getAutonomousFarming: () => api.get('/autonomous-farming'),
+  implementAutonomousFarming: (data) => api.post('/autonomous-farming/implement', data),
+};
+
+export const roboticFarmingAPI = {
+  getRoboticFarming: () => api.get('/robotic-farming'),
+  implementRoboticFarming: (data) => api.post('/robotic-farming/implement', data),
+};
+
+export const droneFarmingAPI = {
+  getDroneFarming: () => api.get('/drone-farming'),
+  implementDroneFarming: (data) => api.post('/drone-farming/implement', data),
+};
+
+export const satelliteFarmingAPI = {
+  getSatelliteFarming: () => api.get('/satellite-farming'),
+  implementSatelliteFarming: (data) => api.post('/satellite-farming/implement', data),
+};
+
+export const iotFarmingAPI = {
+  getIoTFarming: () => api.get('/iot-farming'),
+  implementIoTFarming: (data) => api.post('/iot-farming/implement', data),
+};
+
+export const sensorFarmingAPI = {
+  getSensorFarming: () => api.get('/sensor-farming'),
+  implementSensorFarming: (data) => api.post('/sensor-farming/implement', data),
+};
+
+export const automationFarmingAPI = {
+  getAutomationFarming: () => api.get('/automation-farming'),
+  implementAutomationFarming: (data) => api.post('/automation-farming/implement', data),
+};
+
+export const artificialIntelligenceFarmingAPI = {
+  getAIFarming: () => api.get('/ai-farming'),
+  implementAIFarming: (data) => api.post('/ai-farming/implement', data),
+};
+
+export const machineLearningFarmingAPI = {
+  getMLFarming: () => api.get('/ml-farming'),
+  implementMLFarming: (data) => api.post('/ml-farming/implement', data),
+};
+
+export const deepLearningFarmingAPI = {
+  getDeepLearningFarming: () => api.get('/deep-learning-farming'),
+  implementDeepLearningFarming: (data) => api.post('/deep-learning-farming/implement', data),
+};
+
+export const computerVisionFarmingAPI = {
+  getComputerVisionFarming: () => api.get('/computer-vision-farming'),
+  implementComputerVisionFarming: (data) => api.post('/computer-vision-farming/implement', data),
+};
+
+export const naturalLanguageProcessingFarmingAPI = {
+  getNLPFarming: () => api.get('/nlp-farming'),
+  implementNLPFarming: (data) => api.post('/nlp-farming/implement', data),
+};
+
+export const speechRecognitionFarmingAPI = {
+  getSpeechRecognitionFarming: () => api.get('/speech-recognition-farming'),
+  implementSpeechRecognitionFarming: (data) => api.post('/speech-recognition-farming/implement', data),
+};
+
+export const imageRecognitionFarmingAPI = {
+  getImageRecognitionFarming: () => api.get('/image-recognition-farming'),
+  implementImageRecognitionFarming: (data) => api.post('/image-recognition-farming/implement', data),
+};
+
+export const patternRecognitionFarmingAPI = {
+  getPatternRecognitionFarming: () => api.get('/pattern-recognition-farming'),
+  implementPatternRecognitionFarming: (data) => api.post('/pattern-recognition-farming/implement', data),
+};
+
+export const anomalyDetectionFarmingAPI = {
+  getAnomalyDetectionFarming: () => api.get('/anomaly-detection-farming'),
+  implementAnomalyDetectionFarming: (data) => api.post('/anomaly-detection-farming/implement', data),
+};
+
+export const predictiveAnalyticsFarmingAPI = {
+  getPredictiveAnalyticsFarming: () => api.get('/predictive-analytics-farming'),
+  implementPredictiveAnalyticsFarming: (data) => api.post('/predictive-analytics-farming/implement', data),
+};
+
+export const prescriptiveAnalyticsFarmingAPI = {
+  getPrescriptiveAnalyticsFarming: () => api.get('/prescriptive-analytics-farming'),
+  implementPrescriptiveAnalyticsFarming: (data) => api.post('/prescriptive-analytics-farming/implement', data),
+};
+
+export const descriptiveAnalyticsFarmingAPI = {
+  getDescriptiveAnalyticsFarming: () => api.get('/descriptive-analytics-farming'),
+  implementDescriptiveAnalyticsFarming: (data) => api.post('/descriptive-analytics-farming/implement', data),
+};
+
+export const diagnosticAnalyticsFarmingAPI = {
+  getDiagnosticAnalyticsFarming: () => api.get('/diagnostic-analytics-farming'),
+  implementDiagnosticAnalyticsFarming: (data) => api.post('/diagnostic-analytics-farming/implement', data),
+};
+
+export const blockchainFarmingAPI = {
+  getBlockchainFarming: () => api.get('/blockchain-farming'),
+  implementBlockchainFarming: (data) => api.post('/blockchain-farming/implement', data),
+};
+
+export const traceabilityFarmingAPI = {
+  getTraceabilityFarming: () => api.get('/traceability-farming'),
+  implementTraceabilityFarming: (data) => api.post('/traceability-farming/implement', data),
+};
+
+export const provenanceFarmingAPI = {
+  getProvenanceFarming: () => api.get('/provenance-farming'),
+  implementProvenanceFarming: (data) => api.post('/provenance-farming/implement', data),
+};
+
+export const transparencyFarmingAPI = {
+  getTransparencyFarming: () => api.get('/transparency-farming'),
+  implementTransparencyFarming: (data) => api.post('/transparency-farming/implement', data),
+};
+
+export const sustainabilityFarmingAPI = {
+  getSustainabilityFarming: () => api.get('/sustainability-farming'),
+  implementSustainabilityFarming: (data) => api.post('/sustainability-farming/implement', data),
+};
+
+export const environmentalImpactFarmingAPI = {
+  getEnvironmentalImpactFarming: () => api.get('/environmental-impact-farming'),
+  assessEnvironmentalImpact: (data) => api.post('/environmental-impact-farming/assess', data),
+};
+
+export const carbonFootprintFarmingAPI = {
+  getCarbonFootprintFarming: () => api.get('/carbon-footprint-farming'),
+  calculateCarbonFootprint: (data) => api.post('/carbon-footprint-farming/calculate', data),
+};
+
+export const waterFootprintFarmingAPI = {
+  getWaterFootprintFarming: () => api.get('/water-footprint-farming'),
+  calculateWaterFootprint: (data) => api.post('/water-footprint-farming/calculate', data),
+};
+
+export const biodiversityFarmingAPI = {
+  getBiodiversityFarming: () => api.get('/biodiversity-farming'),
+  assessBiodiversity: (data) => api.post('/biodiversity-farming/assess', data),
+};
+
+export const ecosystemServicesFarmingAPI = {
+  getEcosystemServicesFarming: () => api.get('/ecosystem-services-farming'),
+  assessEcosystemServices: (data) => api.post('/ecosystem-services-farming/assess', data),
+};
+
+export const soilConservationFarmingAPI = {
+  getSoilConservationFarming: () => api.get('/soil-conservation-farming'),
+  implementSoilConservation: (data) => api.post('/soil-conservation-farming/implement', data),
+};
+
+export const waterConservationFarmingAPI = {
+  getWaterConservationFarming: () => api.get('/water-conservation-farming'),
+  implementWaterConservation: (data) => api.post('/water-conservation-farming/implement', data),
+};
+
+export const energyConservationFarmingAPI = {
+  getEnergyConservationFarming: () => api.get('/energy-conservation-farming'),
+  implementEnergyConservation: (data) => api.post('/energy-conservation-farming/implement', data),
+};
+
+export const wasteReductionFarmingAPI = {
+  getWasteReductionFarming: () => api.get('/waste-reduction-farming'),
+  implementWasteReduction: (data) => api.post('/waste-reduction-farming/implement', data),
+};
+
+export const circularEconomyFarmingAPI = {
+  getCircularEconomyFarming: () => api.get('/circular-economy-farming'),
+  implementCircularEconomy: (data) => api.post('/circular-economy-farming/implement', data),
+};
+
+export const zeroWasteFarmingAPI = {
+  getZeroWasteFarming: () => api.get('/zero-waste-farming'),
+  implementZeroWaste: (data) => api.post('/zero-waste-farming/implement', data),
+};
+
+export const climateResilienceFarmingAPI = {
+  getClimateResilienceFarming: () => api.get('/climate-resilience-farming'),
+  buildClimateResilience: (data) => api.post('/climate-resilience-farming/build', data),
+};
+
+export const droughtResilienceFarmingAPI = {
+  getDroughtResilienceFarming: () => api.get('/drought-resilience-farming'),
+  buildDroughtResilience: (data) => api.post('/drought-resilience-farming/build', data),
+};
+
+export const floodResilienceFarmingAPI = {
+  getFloodResilienceFarming: () => api.get('/flood-resilience-farming'),
+  buildFloodResilience: (data) => api.post('/flood-resilience-farming/build', data),
+};
+
+export const pestResilienceFarmingAPI = {
+  getPestResilienceFarming: () => api.get('/pest-resilience-farming'),
+  buildPestResilience: (data) => api.post('/pest-resilience-farming/build', data),
+};
+
+export const diseaseResilienceFarmingAPI = {
+  getDiseaseResilienceFarming: () => api.get('/disease-resilience-farming'),
+  buildDiseaseResilience: (data) => api.post('/disease-resilience-farming/build', data),
+};
+
+export const marketResilienceFarmingAPI = {
+  getMarketResilienceFarming: () => api.get('/market-resilience-farming'),
+  buildMarketResilience: (data) => api.post('/market-resilience-farming/build', data),
+};
+
+export const financialResilienceFarmingAPI = {
+  getFinancialResilienceFarming: () => api.get('/financial-resilience-farming'),
+  buildFinancialResilience: (data) => api.post('/financial-resilience-farming/build', data),
+};
+
+export const socialResilienceFarmingAPI = {
+  getSocialResilienceFarming: () => api.get('/social-resilience-farming'),
+  buildSocialResilience: (data) => api.post('/social-resilience-farming/build', data),
+};
+
+export const institutionalResilienceFarmingAPI = {
+  getInstitutionalResilienceFarming: () => api.get('/institutional-resilience-farming'),
+  buildInstitutionalResilience: (data) => api.post('/institutional-resilience-farming/build', data),
+};
+
+export const policyResilienceFarmingAPI = {
+  getPolicyResilienceFarming: () => api.get('/policy-resilience-farming'),
+  buildPolicyResilience: (data) => api.post('/policy-resilience-farming/build', data),
+};
+
+export const regulatoryResilienceFarmingAPI = {
+  getRegulatoryResilienceFarming: () => api.get('/regulatory-resilience-farming'),
+  buildRegulatoryResilience: (data) => api.post('/regulatory-resilience-farming/build', data),
+};
+
+export const complianceResilienceFarmingAPI = {
+  getComplianceResilienceFarming: () => api.get('/compliance-resilience-farming'),
+  buildComplianceResilience: (data) => api.post('/compliance-resilience-farming/build', data),
+};
+
+export const auditResilienceFarmingAPI = {
+  getAuditResilienceFarming: () => api.get('/audit-resilience-farming'),
+  buildAuditResilience: (data) => api.post('/audit-resilience-farming/build', data),
+};
+
+export const certificationResilienceFarmingAPI = {
+  getCertificationResilienceFarming: () => api.get('/certification-resilience-farming'),
+  buildCertificationResilience: (data) => api.post('/certification-resilience-farming/build', data),
+};
+
+export const standardResilienceFarmingAPI = {
+  getStandardResilienceFarming: () => api.get('/standard-resilience-farming'),
+  buildStandardResilience: (data) => api.post('/standard-resilience-farming/build', data),
+};
+
+export const accreditationResilienceFarmingAPI = {
+  getAccreditationResilienceFarming: () => api.get('/accreditation-resilience-farming'),
+  buildAccreditationResilience: (data) => api.post('/accreditation-resilience-farming/build', data),
+};
+
+export const licensingResilienceFarmingAPI = {
+  getLicensingResilienceFarming: () => api.get('/licensing-resilience-farming'),
+  buildLicensingResilience: (data) => api.post('/licensing-resilience-farming/build', data),
+};
+
+export const permittingResilienceFarmingAPI = {
+  getPermittingResilienceFarming: () => api.get('/permitting-resilience-farming'),
+  buildPermittingResilience: (data) => api.post('/permitting-resilience-farming/build', data),
+};
+
+export const inspectionResilienceFarmingAPI = {
+  getInspectionResilienceFarming: () => api.get('/inspection-resilience-farming'),
+  buildInspectionResilience: (data) => api.post('/inspection-resilience-farming/build', data),
+};
+
+export const testingResilienceFarmingAPI = {
+  getTestingResilienceFarming: () => api.get('/testing-resilience-farming'),
+  buildTestingResilience: (data) => api.post('/testing-resilience-farming/build', data),
+};
+
+export const validationResilienceFarmingAPI = {
+  getValidationResilienceFarming: () => api.get('/validation-resilience-farming'),
+  buildValidationResilience: (data) => api.post('/validation-resilience-farming/build', data),
+};
+
+export const verificationResilienceFarmingAPI = {
+  getVerificationResilienceFarming: () => api.get('/verification-resilience-farming'),
+  buildVerificationResilience: (data) => api.post('/verification-resilience-farming/build', data),
+};
+
+export const documentationResilienceFarmingAPI = {
+  getDocumentationResilienceFarming: () => api.get('/documentation-resilience-farming'),
+  buildDocumentationResilience: (data) => api.post('/documentation-resilience-farming/build', data),
+};
+
+export const reportingResilienceFarmingAPI = {
+  getReportingResilienceFarming: () => api.get('/reporting-resilience-farming'),
+  buildReportingResilience: (data) => api.post('/reporting-resilience-farming/build', data),
+};
+
+export const disclosureResilienceFarmingAPI = {
+  getDisclosureResilienceFarming: () => api.get('/disclosure-resilience-farming'),
+  buildDisclosureResilience: (data) => api.post('/disclosure-resilience-farming/build', data),
+};
+
+export const transparencyResilienceFarmingAPI = {
+  getTransparencyResilienceFarming: () => api.get('/transparency-resilience-farming'),
+  buildTransparencyResilience: (data) => api.post('/transparency-resilience-farming/build', data),
+};
+
+export const accountabilityResilienceFarmingAPI = {
+  getAccountabilityResilienceFarming: () => api.get('/accountability-resilience-farming'),
+  buildAccountabilityResilience: (data) => api.post('/accountability-resilience-farming/build', data),
+};
+
+export const responsibilityResilienceFarmingAPI = {
+  getResponsibilityResilienceFarming: () => api.get('/responsibility-resilience-farming'),
+  buildResponsibilityResilience: (data) => api.post('/responsibility-resilience-farming/build', data),
+};
+
+export const ethicsResilienceFarmingAPI = {
+  getEthicsResilienceFarming: () => api.get('/ethics-resilience-farming'),
+  buildEthicsResilience: (data) => api.post('/ethics-resilience-farming/build', data),
+};
+
+export const governanceResilienceFarmingAPI = {
+  getGovernanceResilienceFarming: () => api.get('/governance-resilience-farming'),
+  buildGovernanceResilience: (data) => api.post('/governance-resilience-farming/build', data),
+};
+
+export const leadershipResilienceFarmingAPI = {
+  getLeadershipResilienceFarming: () => api.get('/leadership-resilience-farming'),
+  buildLeadershipResilience: (data) => api.post('/leadership-resilience-farming/build', data),
+};
+
+export const managementResilienceFarmingAPI = {
+  getManagementResilienceFarming: () => api.get('/management-resilience-farming'),
+  buildManagementResilience: (data) => api.post('/management-resilience-farming/build', data),
+};
+
+export const cultureResilienceFarmingAPI = {
+  getCultureResilienceFarming: () => api.get('/culture-resilience-farming'),
+  buildCultureResilience: (data) => api.post('/culture-resilience-farming/build', data),
+};
+
+export const peopleResilienceFarmingAPI = {
+  getPeopleResilienceFarming: () => api.get('/people-resilience-farming'),
+  buildPeopleResilience: (data) => api.post('/people-resilience-farming/build', data),
+};
+
+export const skillsResilienceFarmingAPI = {
+  getSkillsResilienceFarming: () => api.get('/skills-resilience-farming'),
+  buildSkillsResilience: (data) => api.post('/skills-resilience-farming/build', data),
+};
+
+export const trainingResilienceFarmingAPI = {
+  getTrainingResilienceFarming: () => api.get('/training-resilience-farming'),
+  buildTrainingResilience: (data) => api.post('/training-resilience-farming/build', data),
+};
+
+export const educationResilienceFarmingAPI = {
+  getEducationResilienceFarming: () => api.get('/education-resilience-farming'),
+  buildEducationResilience: (data) => api.post('/education-resilience-farming/build', data),
+};
+
+export const knowledgeResilienceFarmingAPI = {
+  getKnowledgeResilienceFarming: () => api.get('/knowledge-resilience-farming'),
+  buildKnowledgeResilience: (data) => api.post('/knowledge-resilience-farming/build', data),
+};
+
+export const innovationResilienceFarmingAPI = {
+  getInnovationResilienceFarming: () => api.get('/innovation-resilience-farming'),
+  buildInnovationResilience: (data) => api.post('/innovation-resilience-farming/build', data),
+};
+
+export const researchResilienceFarmingAPI = {
+  getResearchResilienceFarming: () => api.get('/research-resilience-farming'),
+  buildResearchResilience: (data) => api.post('/research-resilience-farming/build', data),
+};
+
+export const developmentResilienceFarmingAPI = {
+  getDevelopmentResilienceFarming: () => api.get('/development-resilience-farming'),
+  buildDevelopmentResilience: (data) => api.post('/development-resilience-farming/build', data),
+};
+
+export const technologyResilienceFarmingAPI = {
+  getTechnologyResilienceFarming: () => api.get('/technology-resilience-farming'),
+  buildTechnologyResilience: (data) => api.post('/technology-resilience-farming/build', data),
+};
+
+export const infrastructureResilienceFarmingAPI = {
+  getInfrastructureResilienceFarming: () => api.get('/infrastructure-resilience-farming'),
+  buildInfrastructureResilience: (data) => api.post('/infrastructure-resilience-farming/build', data),
+};
+
+export const systemsResilienceFarmingAPI = {
+  getSystemsResilienceFarming: () => api.get('/systems-resilience-farming'),
+  buildSystemsResilience: (data) => api.post('/systems-resilience-farming/build', data),
+};
+
+export const processesResilienceFarmingAPI = {
+  getProcessesResilienceFarming: () => api.get('/processes-resilience-farming'),
+  buildProcessesResilience: (data) => api.post('/processes-resilience-farming/build', data),
+};
+
+export const workflowsResilienceFarmingAPI = {
+  getWorkflowsResilienceFarming: () => api.get('/workflows-resilience-farming'),
+  buildWorkflowsResilience: (data) => api.post('/workflows-resilience-farming/build', data),
+};
+
+export const operationsResilienceFarmingAPI = {
+  getOperationsResilienceFarming: () => api.get('/operations-resilience-farming'),
+  buildOperationsResilience: (data) => api.post('/operations-resilience-farming/build', data),
+};
+
+export const supplyChainsResilienceFarmingAPI = {
+  getSupplyChainsResilienceFarming: () => api.get('/supply-chains-resilience-farming'),
+  buildSupplyChainsResilience: (data) => api.post('/supply-chains-resilience-farming/build', data),
+};
+
+export const logisticsResilienceFarmingAPI = {
+  getLogisticsResilienceFarming: () => api.get('/logistics-resilience-farming'),
+  buildLogisticsResilience: (data) => api.post('/logistics-resilience-farming/build', data),
+};
+
+export const distributionResilienceFarmingAPI = {
+  getDistributionResilienceFarming: () => api.get('/distribution-resilience-farming'),
+  buildDistributionResilience: (data) => api.post('/distribution-resilience-farming/build', data),
+};
+
+export const marketsResilienceFarmingAPI = {
+  getMarketsResilienceFarming: () => api.get('/markets-resilience-farming'),
+  buildMarketsResilience: (data) => api.post('/markets-resilience-farming/build', data),
+};
+
+export const customersResilienceFarmingAPI = {
+  getCustomersResilienceFarming: () => api.get('/customers-resilience-farming'),
+  buildCustomersResilience: (data) => api.post('/customers-resilience-farming/build', data),
+};
+
+export const partnersResilienceFarmingAPI = {
+  getPartnersResilienceFarming: () => api.get('/partners-resilience-farming'),
+  buildPartnersResilience: (data) => api.post('/partners-resilience-farming/build', data),
+};
+
+export const suppliersResilienceFarmingAPI = {
+  getSuppliersResilienceFarming: () => api.get('/suppliers-resilience-farming'),
+  buildSuppliersResilience: (data) => api.post('/suppliers-resilience-farming/build', data),
+};
+
+export const competitorsResilienceFarmingAPI = {
+  getCompetitorsResilienceFarming: () => api.get('/competitors-resilience-farming'),
+  buildCompetitorsResilience: (data) => api.post('/competitors-resilience-farming/build', data),
+};
+
+export const industryResilienceFarmingAPI = {
+  getIndustryResilienceFarming: () => api.get('/industry-resilience-farming'),
+  buildIndustryResilience: (data) => api.post('/industry-resilience-farming/build', data),
+};
+
+export const economyResilienceFarmingAPI = {
+  getEconomyResilienceFarming: () => api.get('/economy-resilience-farming'),
+  buildEconomyResilience: (data) => api.post('/economy-resilience-farming/build', data),
+};
+
+export const societyResilienceFarmingAPI = {
+  getSocietyResilienceFarming: () => api.get('/society-resilience-farming'),
+  buildSocietyResilience: (data) => api.post('/society-resilience-farming/build', data),
+};
+
+export const environmentResilienceFarmingAPI = {
+  getEnvironmentResilienceFarming: () => api.get('/environment-resilience-farming'),
+  buildEnvironmentResilience: (data) => api.post('/environment-resilience-farming/build', data),
+};
+
+export const communityResilienceFarmingAPI = {
+  getCommunityResilienceFarming: () => api.get('/community-resilience-farming'),
+  buildCommunityResilience: (data) => api.post('/community-resilience-farming/build', data),
+};
+
+export const familyResilienceFarmingAPI = {
+  getFamilyResilienceFarming: () => api.get('/family-resilience-farming'),
+  buildFamilyResilience: (data) => api.post('/family-resilience-farming/build', data),
+};
+
+export const individualResilienceFarmingAPI = {
+  getIndividualResilienceFarming: () => api.get('/individual-resilience-farming'),
+  buildIndividualResilience: (data) => api.post('/individual-resilience-farming/build', data),
+};
+
+// Community and governance APIs
+export const knowledgeGraphAPI = {
+  getKnowledgeGraph: () => api.get('/knowledge-graph'),
+  buildKnowledgeGraph: (data) => api.post('/knowledge-graph/build', data),
+};
+
+export const libraryAPI = {
+  getLibrary: () => api.get('/library'),
+  searchLibrary: (query) => api.post('/library/search', query),
+};
+
+export const panchayatAPI = {
+  getPanchayats: () => api.get('/panchayats'),
+  getPanchayat: (id) => api.get(`/panchayats/${id}`),
+};
+
+export const blockManagementAPI = {
+  getBlocks: () => api.get('/blocks'),
+  getBlock: (id) => api.get(`/blocks/${id}`),
+};
+
+export const districtManagementAPI = {
+  getDistricts: () => api.get('/districts'),
+  getDistrict: (id) => api.get(`/districts/${id}`),
+};
+
+export const stateManagementAPI = {
+  getStates: () => api.get('/states'),
+  getState: (id) => api.get(`/states/${id}`),
+};
+
+export const villageManagementAPI = {
+  getVillages: () => api.get('/villages'),
+  getVillage: (id) => api.get(`/villages/${id}`),
+};
+
+export const cooperativeManagementAPI = {
+  getCooperatives: () => api.get('/cooperatives'),
+  getCooperative: (id) => api.get(`/cooperatives/${id}`),
+};
+
+export const cooperativeAPI = {
+  getCooperatives: () => api.get('/cooperatives'),
+  createCooperative: (data) => api.post('/cooperatives', data),
+};
+
+export const communityAssetAPI = {
+  getCommunityAssets: () => api.get('/community-assets'),
+  manageCommunityAsset: (data) => api.post('/community-assets/manage', data),
+};
+
+export const producerGroupAPI = {
+  getProducerGroups: () => api.get('/producer-groups'),
+  createProducerGroup: (data) => api.post('/producer-groups', data),
+};
+
+export const auditComplianceAPI = {
+  getAuditCompliance: () => api.get('/audit-compliance'),
+  runAudit: (data) => api.post('/audit-compliance/run', data),
+};
+
+export const strategicAPI = {
+  getStrategicData: () => api.get('/strategic'),
+  planStrategy: (data) => api.post('/strategic/plan', data),
+};
+
+export const vendorsAPI = {
+  getVendors: () => api.get('/vendors'),
+  getVendor: (id) => api.get(`/vendors/${id}`),
+};
+
+export const economicAPI = {
+  getEconomicData: () => api.get('/economic'),
+  analyzeEconomics: (data) => api.post('/economic/analyze', data),
+};
+
+// Crop management APIs
+export const cropCalendarAPI = {
+  getCropCalendar: () => api.get('/crop-calendar'),
+  updateCropCalendar: (data) => api.put('/crop-calendar', data),
+};
+
+export const cropMonitoringAPI = {
+  getCropMonitoring: () => api.get('/crop-monitoring'),
+  monitorCrop: (data) => api.post('/crop-monitoring/monitor', data),
+};
+
+export const cropRegistrationAPI = {
+  getCropRegistrations: () => api.get('/crop-registrations'),
+  registerCrop: (data) => api.post('/crop-registrations', data),
+};
+
+export const cropVarietyAPI = {
+  getCropVarieties: () => api.get('/crop-varieties'),
+  createCropVariety: (data) => api.post('/crop-varieties', data),
+};
+
+export const dairyAIAPI = {
+  getDairyAI: () => api.get('/dairy-ai'),
+  analyzeDairy: (data) => api.post('/dairy-ai/analyze', data),
+};
+
+// Additional missing exports
+export const financialAPI = {
+  getFinancialData: () => api.get('/financial'),
+  analyzeFinancials: (data) => api.post('/financial/analyze', data),
+};
+
+export const enterpriseControlAPI = {
+  getEnterpriseControl: () => api.get('/enterprise-control'),
+  controlEnterprise: (data) => api.post('/enterprise-control/control', data),
+};
+
+export const erpAPI = {
+  getERPData: () => api.get('/erp'),
+  manageERP: (data) => api.post('/erp/manage', data),
+};
+
+export const fpoAPI = {
+  getFPOs: () => api.get('/fpos'),
+  getFPO: (id) => api.get(`/fpos/${id}`),
+};
+
 export const farmerHealthRecordsAPI = {
-  // listHealthRecords returns { items, pagination }, not a bare array - reshaped
-  // here (not in ResourceManager, which other pages rely on as-is) so
-  // res.data.data resolves to the array ResourceManager expects.
-  getRecords: (params) => api.get('/backend-modules/M029/listHealthRecords', { params })
-    .then((res) => ({ ...res, data: { ...res.data, data: res.data?.data?.items ?? [] } })),
-  createRecord: (data) => api.post('/backend-modules/M029/createHealthRecord', data),
-  updateRecord: (id, data) => api.put(`/backend-modules/M029/updateHealthRecord/${id}`, data),
-  deleteRecord: (id) => api.delete(`/backend-modules/M029/deleteHealthRecord/${id}`),
-}
+  getFarmerHealthRecords: () => api.get('/farmer-health-records'),
+  createHealthRecord: (data) => api.post('/farmer-health-records', data),
+};
 
 export const farmerWelfareAPI = {
-  getPrograms: (params) => api.get('/backend-modules/M029/getWelfarePrograms', { params }),
-  enroll: (farmerId, programId) => api.post('/backend-modules/M029/enrollWelfareProgram', { farmerId, programId }),
-}
+  getFarmerWelfare: () => api.get('/farmer-welfare'),
+  manageWelfare: (data) => api.post('/farmer-welfare/manage', data),
+};
+
+export const kycAPI = {
+  getKYC: () => api.get('/kyc'),
+  submitKYC: (data) => api.post('/kyc/submit', data),
+};
+
+export const farmerProfileAPI = {
+  getFarmerProfile: () => api.get('/farmer-profile'),
+  updateFarmerProfile: (data) => api.put('/farmer-profile', data),
+};
 
-/** M062 — Crop Calendar (Crop domain). cropPlanningService.js covers
- *  farmer-specific crop plans; no route handles a reusable sowing/harvest
- *  calendar by crop and season. */
-export const cropCalendarAPI = {
-  getEntries: (params) => api.get('/crop-calendar/entries', { params }),
-  createEntry: (data) => api.post('/crop-calendar/entries', data),
-  updateEntry: (id, data) => api.put(`/crop-calendar/entries/${id}`, data),
-  deleteEntry: (id) => api.delete(`/crop-calendar/entries/${id}`),
-}
-
-/** M069 — Harvest Planning (Crop domain). Backend module M069 auto-mounts
- *  at /api/v1/modules/m069 (backend/src/index.js generatedModuleNames
- *  loop), backed by the crop_m069_items table, with plain CRUD at the
- *  module root ('/', '/:id'). Unlike the sibling M022/M055/M056 modules,
- *  M069's controller returns `data` as the flat items array (not
- *  {items, pagination}) so it plugs straight into ResourceManager. */
-export const harvestPlanningAPI = {
-  getPlans: (params) => api.get('/modules/m069', { params }),
-  createPlan: (data) => api.post('/modules/m069', data),
-  updatePlan: (id, data) => api.put(`/modules/m069/${id}`, data),
-  deletePlan: (id) => api.delete(`/modules/m069/${id}`),
-}
-
-/** M063 — Crop Registration (Crop domain). No backend route found for a
- *  crop master/reference registry. */
-export const cropRegistrationAPI = {
-  getCrops: (params) => api.get('/crop-registration/crops', { params }),
-  getCrop: (id) => api.get(`/crop-registration/crops/${id}`),
-  registerCrop: (data) => api.post('/crop-registration/crops', data),
-  updateCrop: (id, data) => api.put(`/crop-registration/crops/${id}`, data),
-  deleteCrop: (id) => api.delete(`/crop-registration/crops/${id}`),
-}
-
-/** M064 — Crop Variety Management (Crop domain). No backend route found. */
-export const cropVarietyAPI = {
-  getVarieties: (params) => api.get('/crop-varieties', { params }),
-  createVariety: (data) => api.post('/crop-varieties', data),
-  updateVariety: (id, data) => api.put(`/crop-varieties/${id}`, data),
-  deleteVariety: (id) => api.delete(`/crop-varieties/${id}`),
-}
-
-/** M065 — Seed Planning (Crop domain). No backend route found. */
-export const seedPlanningAPI = {
-  getPlans: (params) => api.get('/seed-planning/plans', { params }),
-  createPlan: (data) => api.post('/seed-planning/plans', data),
-  updatePlan: (id, data) => api.put(`/seed-planning/plans/${id}`, data),
-  deletePlan: (id) => api.delete(`/seed-planning/plans/${id}`),
-}
-
-/** M066 — Nursery Management (Crop domain). No backend route found. */
-export const nurseryAPI = {
-  getNurseries: (params) => api.get('/nurseries', { params }),
-  createNursery: (data) => api.post('/nurseries', data),
-  updateNursery: (id, data) => api.put(`/nurseries/${id}`, data),
-  deleteNursery: (id) => api.delete(`/nurseries/${id}`),
-}
-
-/** M068 — Crop Monitoring (Crop domain). No backend route found for field
- *  observation/scouting records. */
-export const cropMonitoringAPI = {
-  getObservations: (params) => api.get('/crop-monitoring/observations', { params }),
-  createObservation: (data) => api.post('/crop-monitoring/observations', data),
-  updateObservation: (id, data) => api.put(`/crop-monitoring/observations/${id}`, data),
-  deleteObservation: (id) => api.delete(`/crop-monitoring/observations/${id}`),
-}
-
-/** M033 — Land Lease Management (Land domain). landAPI/LandRegistryPage
- *  tracks ownership_type = "Leased" per parcel but no lease term, rent or
- *  lessor/lessee record. No backend route found. */
-export const landLeaseAPI = {
-  getLeases: (params) => api.get('/land-leases', { params }),
-  createLease: (data) => api.post('/land-leases', data),
-  updateLease: (id, data) => api.put(`/land-leases/${id}`, data),
-  deleteLease: (id) => api.delete(`/land-leases/${id}`),
-}
-
-/** M035 — GIS Land Mapping (Land domain). No backend route found for parcel
- *  geo-coordinates/polygon boundaries. */
-export const gisLandMappingAPI = {
-  getMappings: (params) => api.get('/gis-land-mapping/parcels', { params }),
-  createMapping: (data) => api.post('/gis-land-mapping/parcels', data),
-  updateMapping: (id, data) => api.put(`/gis-land-mapping/parcels/${id}`, data),
-  deleteMapping: (id) => api.delete(`/gis-land-mapping/parcels/${id}`),
-}
-
-/** M036 — Soil Mapping (Land domain). soilTestingService.js covers lab
- *  sample intake/results for an individual farmer; no route handles a
- *  zone-level soil map (type, pH, nutrient index by parcel/zone). */
-export const soilMappingAPI = {
-  getZones: (params) => api.get('/soil-mapping/zones', { params }),
-  createZone: (data) => api.post('/soil-mapping/zones', data),
-  updateZone: (id, data) => api.put(`/soil-mapping/zones/${id}`, data),
-  deleteZone: (id) => api.delete(`/soil-mapping/zones/${id}`),
-}
-
-/** M037 — Water Resource Mapping (Land domain). irrigationAPI (M075) tracks
- *  water sources used for scheduling; this is the registry/mapping view of
- *  water bodies (wells, canals, ponds) by location — no backend route found
- *  for that registry. */
-export const waterResourceMappingAPI = {
-  getResources: (params) => api.get('/water-resource-mapping/resources', { params }),
-  createResource: (data) => api.post('/water-resource-mapping/resources', data),
-  updateResource: (id, data) => api.put(`/water-resource-mapping/resources/${id}`, data),
-  deleteResource: (id) => api.delete(`/water-resource-mapping/resources/${id}`),
-}
-
-/** M038 — Geo Boundary Management (Land domain). No backend route found for
- *  administrative/village boundary records. */
-export const geoBoundaryAPI = {
-  getBoundaries: (params) => api.get('/geo-boundaries', { params }),
-  createBoundary: (data) => api.post('/geo-boundaries', data),
-  updateBoundary: (id, data) => api.put(`/geo-boundaries/${id}`, data),
-  deleteBoundary: (id) => api.delete(`/geo-boundaries/${id}`),
-}
-
-/** M039 — Survey Management (Land domain). LandRegistryPage stores a free-
- *  text survey_number per parcel; no route manages the survey workflow
- *  itself (surveyor assignment, scheduled date, completion status). */
-export const surveyManagementAPI = {
-  getSurveys: (params) => api.get('/land-surveys', { params }),
-  createSurvey: (data) => api.post('/land-surveys', data),
-  updateSurvey: (id, data) => api.put(`/land-surveys/${id}`, data),
-  deleteSurvey: (id) => api.delete(`/land-surveys/${id}`),
-}
-
-/** M051 — FPO Registration (FPO domain). No backend route found for FPO
- *  legal-entity registration records (distinct from fpoAPI.getStats). */
-export const fpoRegistrationAPI = {
-  getRegistrations: (params) => api.get('/fpo-registration/registrations', { params }),
-  createRegistration: (data) => api.post('/fpo-registration/registrations', data),
-  updateRegistration: (id, data) => api.put(`/fpo-registration/registrations/${id}`, data),
-  deleteRegistration: (id) => api.delete(`/fpo-registration/registrations/${id}`),
-}
-
-/** M052 — FPO Governance (FPO domain). No backend route found for board
- *  meetings/resolutions. */
-export const fpoGovernanceAPI = {
-  getMeetings: (params) => api.get('/fpo-governance/meetings', { params }),
-  createMeeting: (data) => api.post('/fpo-governance/meetings', data),
-  updateMeeting: (id, data) => api.put(`/fpo-governance/meetings/${id}`, data),
-  deleteMeeting: (id) => api.delete(`/fpo-governance/meetings/${id}`),
-}
-
-/** M055 — FPO Procurement (FPO domain). Distinct from
- *  FPODashboardPage's "Collective Orders" tab (member buy-side bulk
- *  purchasing) — this is FPO-side input/produce procurement from members
- *  and vendors. Backend module M055 auto-mounts at /api/v1/modules/m055
- *  (backend/src/index.js generatedModuleNames loop), with routes.js
- *  exposing plain CRUD at the module root ('/', '/:id') — not under
- *  '/fpo-procurement'. */
-export const fpoProcurementAPI = {
-  getOrders: (params) => api.get('/modules/m055', { params }),
-  createOrder: (data) => api.post('/modules/m055', data),
-  updateOrder: (id, data) => api.put(`/modules/m055/${id}`, data),
-  deleteOrder: (id) => api.delete(`/modules/m055/${id}`),
-}
-
-/** M056 — FPO Inventory (FPO domain). Collective inventory held by the
- *  FPO (produce/inputs in warehouses, cold storage, packhouses). Backed by
- *  the fpo_inventory_items table via backend/src/modules/M056. Auto-mounts
- *  at /api/v1/modules/m056 the same way M055 does, with plain CRUD at the
- *  module root. Not to be confused with fpoComplianceAPI's "M056" doc
- *  comment below (a stale label for a different, tax-focused module). */
-export const fpoInventoryAPI = {
-  getItems: (params) => api.get('/modules/m056', { params }),
-  createItem: (data) => api.post('/modules/m056', data),
-  updateItem: (id, data) => api.put(`/modules/m056/${id}`, data),
-  deleteItem: (id) => api.delete(`/modules/m056/${id}`),
-}
-
-/** M057 — FPO Marketing (FPO domain). No backend route found for
- *  campaign/market-linkage records. */
-export const fpoMarketingAPI = {
-  getCampaigns: (params) => api.get('/fpo-marketing/campaigns', { params }),
-  createCampaign: (data) => api.post('/fpo-marketing/campaigns', data),
-  updateCampaign: (id, data) => api.put(`/fpo-marketing/campaigns/${id}`, data),
-  deleteCampaign: (id) => api.delete(`/fpo-marketing/campaigns/${id}`),
-}
-
-/** M059 — FPO Compliance (FPO domain). complianceAPI (M056) covers
- *  TDS/e-invoice/GSTR filings; no route handles FPO statutory filings
- *  (society/company registrar returns, audit reports, licenses). */
-export const fpoComplianceAPI = {
-  getFilings: (params) => api.get('/fpo-compliance/filings', { params }),
-  createFiling: (data) => api.post('/fpo-compliance/filings', data),
-  updateFiling: (id, data) => api.put(`/fpo-compliance/filings/${id}`, data),
-  deleteFiling: (id) => api.delete(`/fpo-compliance/filings/${id}`),
-}
-
-// ---------------------------------------------------------------------------
-// V44 prototype reconciliation (2026-08-08, docs/V44_ADDITIONAL_FEATURES_
-// EXTRACTION.md) — scheme registry, MAP-protected contract offers, and mill
-// circuit / FPO ledger. Backed by governmentSchemeService.js,
-// institutionalProcurementService.js and the new millCircuitService.js /
-// migration 9995_scheme_verification_map_protection.sql.
-// ---------------------------------------------------------------------------
-
-/** Verified government scheme registry (v44 feature 2) — distinct from
- *  governmentAPI above, which covers the AI-matched discovery endpoints. */
-export const schemeRegistryAPI = {
-  list: (params) => api.get('/government/schemes/registry', { params }),
-  get: (code) => api.get(`/government/schemes/registry/${code}`),
-  update: (code, data) => api.put(`/government/schemes/registry/${code}`, data),
-  getExpiring: (days) => api.get('/government/schemes/registry/expiring', { params: { days } }),
-  checkEligibility: (params) => api.get('/government/schemes/checker', { params }),
-}
-
-/** MAP-protected contract offers (v44 feature 7). The farmer's floor price
- *  is never returned by any of these — see institutionalProcurementService.js. */
-export const contractOfferAPI = {
-  getOffers: (params) => api.get('/institutional-procurement/contract-offers', { params }),
-  createOffer: (data) => api.post('/institutional-procurement/contract-offers', data),
-  respondToOffer: (id, status) => api.put(`/institutional-procurement/contract-offers/${id}`, { status }),
-}
-
-/** Mill Circuit booking (v44 feature 3). */
-export const millCircuitAPI = {
-  getSlots: (params) => api.get('/mill-fpo/mill-circuit/slots', { params }),
-  createSlot: (data) => api.post('/mill-fpo/mill-circuit/slots', data),
-  getBookings: (params) => api.get('/mill-fpo/mill-circuit/bookings', { params }),
-  createBooking: (data) => api.post('/mill-fpo/mill-circuit/bookings', data),
-}
-
-/** FPO Ledger (v44 feature 3) — farmer-owned running ledger. */
-export const fpoLedgerAPI = {
-  getEntries: (params) => api.get('/mill-fpo/fpo-ledger/entries', { params }),
-  createEntry: (data) => api.post('/mill-fpo/fpo-ledger/entries', data),
-}
-
-// ---------------------------------------------------------------------------
-// Third batch (2026-08-08): Input Supply, Livestock, Community, Soil and
-// Water domain modules. Checked against backend/src/routes and services for
-// real support first — governanceModule.js has genuine routes for
-// panchayats/cooperatives (used below); everything else in this batch has
-// no matching backend route, so these are built against a conventional
-// REST shape and noted as a gap, same convention as the second batch.
-// ---------------------------------------------------------------------------
-
-/** M113 — Biofertilizer Management (Input Supply). No backend route found. */
-export const biofertilizerAPI = {
-  getItems: (params) => api.get('/biofertilizers', { params }),
-  createItem: (data) => api.post('/biofertilizers', data),
-  updateItem: (id, data) => api.put(`/biofertilizers/${id}`, data),
-  deleteItem: (id) => api.delete(`/biofertilizers/${id}`),
-}
-
-/** M114 — Pesticide Inventory (Input Supply). No backend route found. */
-export const pesticideInventoryAPI = {
-  getItems: (params) => api.get('/pesticide-inventory', { params }),
-  createItem: (data) => api.post('/pesticide-inventory', data),
-  updateItem: (id, data) => api.put(`/pesticide-inventory/${id}`, data),
-  deleteItem: (id) => api.delete(`/pesticide-inventory/${id}`),
-}
-
-/** M115 — Bio-Pesticide Management (Input Supply). No backend route found. */
-export const bioPesticideAPI = {
-  getItems: (params) => api.get('/bio-pesticides', { params }),
-  createItem: (data) => api.post('/bio-pesticides', data),
-  updateItem: (id, data) => api.put(`/bio-pesticides/${id}`, data),
-  deleteItem: (id) => api.delete(`/bio-pesticides/${id}`),
-}
-
-/** M116 — Micronutrient Management (Input Supply). No backend route found. */
-export const micronutrientAPI = {
-  getItems: (params) => api.get('/micronutrients', { params }),
-  createItem: (data) => api.post('/micronutrients', data),
-  updateItem: (id, data) => api.put(`/micronutrients/${id}`, data),
-  deleteItem: (id) => api.delete(`/micronutrients/${id}`),
-}
-
-/** M117 — Organic Input Management (Input Supply). No backend route found. */
-export const organicInputAPI = {
-  getItems: (params) => api.get('/organic-inputs', { params }),
-  createItem: (data) => api.post('/organic-inputs', data),
-  updateItem: (id, data) => api.put(`/organic-inputs/${id}`, data),
-  deleteItem: (id) => api.delete(`/organic-inputs/${id}`),
-}
-
-/** M118 — Input Procurement (Input Supply). vendorRoutes.js covers
- *  corporate/logistics/processor/retailer vendor profiles, not farm-input
- *  purchase orders — no matching route found. */
-export const inputProcurementAPI = {
-  getOrders: (params) => api.get('/input-procurement/orders', { params }),
-  createOrder: (data) => api.post('/input-procurement/orders', data),
-  updateOrder: (id, data) => api.put(`/input-procurement/orders/${id}`, data),
-  deleteOrder: (id) => api.delete(`/input-procurement/orders/${id}`),
-}
-
-/** M119 — Input Distribution (Input Supply). No backend route found for
- *  outbound distribution to farmers/dealers. */
-export const inputDistributionAPI = {
-  getRecords: (params) => api.get('/input-distribution/records', { params }),
-  createRecord: (data) => api.post('/input-distribution/records', data),
-  updateRecord: (id, data) => api.put(`/input-distribution/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/input-distribution/records/${id}`),
-}
-
-/** M120 — Input Traceability (Input Supply). No backend route found. */
-export const inputTraceabilityAPI = {
-  getRecords: (params) => api.get('/input-traceability/records', { params }),
-  createRecord: (data) => api.post('/input-traceability/records', data),
-  updateRecord: (id, data) => api.put(`/input-traceability/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/input-traceability/records/${id}`),
-}
-
-/** M122 — Cattle Registry (Livestock). No backend route found. */
-export const cattleRegistryAPI = {
-  getAnimals: (params) => api.get('/cattle-registry/animals', { params }),
-  createAnimal: (data) => api.post('/cattle-registry/animals', data),
-  updateAnimal: (id, data) => api.put(`/cattle-registry/animals/${id}`, data),
-  deleteAnimal: (id) => api.delete(`/cattle-registry/animals/${id}`),
-}
-
-/** M123 — Poultry Management (Livestock). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /poultry/batches. The real
-// backend (poultryService.js/poultryRoutes.js, migration 067) is a flock
-// registry at /poultry/flocks - see LivestockManagementPage.jsx's 'poultry'
-// tab, rewired to match its real field names (flock_code/flock_type/etc).
-export const poultryManagementAPI = {
-  getBatches: (params) => api.get('/poultry/flocks', { params }),
-  createBatch: (data) => api.post('/poultry/flocks', data),
-  updateBatch: (id, data) => api.put(`/poultry/flocks/${id}`, data),
-  deleteBatch: (id) => api.delete(`/poultry/flocks/${id}`),
-}
-
-/** M124 — Goat Farming Management (Livestock). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /goat-farming/animals. The real
-// backend (goatService.js/goatRoutes.js, migration 068) is a herd registry
-// at /goat/herd - see LivestockManagementPage.jsx's 'goat' tab, rewired to
-// match its real field names (tag_id/sex/dob/etc).
-export const goatFarmingAPI = {
-  getAnimals: (params) => api.get('/goat/herd', { params }),
-  createAnimal: (data) => api.post('/goat/herd', data),
-  updateAnimal: (id, data) => api.put(`/goat/herd/${id}`, data),
-  deleteAnimal: (id) => api.delete(`/goat/herd/${id}`),
-}
-
-/** M125 — Sheep Farming Management (Livestock). ABSENT — no trace of this
- *  capability anywhere in the codebase. */
-// Fixed 2026-08-24: was calling nonexistent /sheep-farming/animals (and the
-// page comment's "catalogued ABSENT" claim was wrong). The real backend
-// (sheepService.js/sheepRoutes.js, migration 069) is a flock registry at
-// /sheep/flock - see LivestockManagementPage.jsx's 'sheep' tab, rewired to
-// match its real field names (tag_id/sex/dob/wool_type/etc).
-export const sheepFarmingAPI = {
-  getAnimals: (params) => api.get('/sheep/flock', { params }),
-  createAnimal: (data) => api.post('/sheep/flock', data),
-  updateAnimal: (id, data) => api.put(`/sheep/flock/${id}`, data),
-  deleteAnimal: (id) => api.delete(`/sheep/flock/${id}`),
-}
-
-/** M126 — Pig Farming Management (Livestock). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /pig-farming/animals. The real
-// backend (pigService.js/pigRoutes.js, migration 070) is a herd registry
-// at /pig/herd - see LivestockManagementPage.jsx's 'pig' tab, rewired to
-// match its real field names (tag_id/sex/dob/pen_id/etc).
-export const pigFarmingAPI = {
-  getAnimals: (params) => api.get('/pig/herd', { params }),
-  createAnimal: (data) => api.post('/pig/herd', data),
-  updateAnimal: (id, data) => api.put(`/pig/herd/${id}`, data),
-  deleteAnimal: (id) => api.delete(`/pig/herd/${id}`),
-}
-
-/** Livestock feed records — no backend route exists yet (LivestockManagementPage.jsx's
- *  "feed" tab notes this explicitly), but the frontend referenced this group without
- *  it ever being defined, throwing ReferenceError the moment that tab rendered. */
-export const feedManagementAPI = {
-  getRecords: (params) => api.get('/livestock-feed/records', { params }),
-  createRecord: (data) => api.post('/livestock-feed/records', data),
-  updateRecord: (id, data) => api.put(`/livestock-feed/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/livestock-feed/records/${id}`),
-}
-
-/** Yield management — lots, fare buckets, markdown, booking curve (059).
- *  Served by the existing /pricing routes; dynamicPricingService owns the logic. */
-export const yieldManagementAPI = {
-  getRecords: (params) => api.get('/pricing/records', { params }),
-  createRecord: (data) => api.post('/pricing/records', data),
-  updateRecord: (id, data) => api.put(`/pricing/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/pricing/records/${id}`),
-}
-
-/** M129 — Breeding Management (Livestock). No backend route found. */
-// breedingManagementAPI removed 2026-08-24: the generic cross-species
-// "breeding/records" tab it backed was retired (see
-// LivestockManagementPage.jsx) - goat/sheep/pig already track breeding for
-// real via their own herd/flock endpoints, and cattle/poultry have no
-// breeding backend at all. A generic table here would have forked from the
-// real per-species data for 3 of 5 species.
-
-/** M130 — Livestock Analytics (Livestock). No backend route found. */
-export const livestockAnalyticsAPI = {
-  getRecords: (params) => api.get('/livestock-analytics/records', { params }),
-  createRecord: (data) => api.post('/livestock-analytics/records', data),
-  updateRecord: (id, data) => api.put(`/livestock-analytics/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/livestock-analytics/records/${id}`),
-}
-
-/** M042 — Panchayat Management (Community). Real backend route:
- *  governanceModule.js POST/GET /governance/panchayats (create is
- *  admin-only). No update/delete route exists yet, so this tab is
- *  create + list only. */
-export const panchayatAPI = {
-  getPanchayats: (params) => api.get('/governance/panchayats', { params }),
-  createPanchayat: (data) => api.post('/governance/panchayats', data),
-}
-
-/** M043 — Block Management (Community). No backend route found. */
-export const blockManagementAPI = {
-  getBlocks: (params) => api.get('/blocks', { params }),
-  createBlock: (data) => api.post('/blocks', data),
-  updateBlock: (id, data) => api.put(`/blocks/${id}`, data),
-  deleteBlock: (id) => api.delete(`/blocks/${id}`),
-}
-
-/** M044 — District Management (Community). No backend route found. */
-export const districtManagementAPI = {
-  getDistricts: (params) => api.get('/districts', { params }),
-  createDistrict: (data) => api.post('/districts', data),
-  updateDistrict: (id, data) => api.put(`/districts/${id}`, data),
-  deleteDistrict: (id) => api.delete(`/districts/${id}`),
-}
-
-/** M045 — State Management (Community). No backend route found. */
-export const stateManagementAPI = {
-  getStates: (params) => api.get('/states', { params }),
-  createState: (data) => api.post('/states', data),
-  updateState: (id, data) => api.put(`/states/${id}`, data),
-  deleteState: (id) => api.delete(`/states/${id}`),
-}
-
-/** M047 — Cooperative Management (Community). Real backend route:
- *  governanceModule.js POST/GET /governance/cooperatives (create is
- *  admin-only). No update/delete route exists yet, so this tab is
- *  create + list only. */
-export const cooperativeAPI = {
-  getCooperatives: (params) => api.get('/governance/cooperatives', { params }),
-  createCooperative: (data) => api.post('/governance/cooperatives', data),
-}
-
-/** M048 — Producer Group Management (Community). No backend route found. */
-export const producerGroupAPI = {
-  getGroups: (params) => api.get('/producer-groups', { params }),
-  createGroup: (data) => api.post('/producer-groups', data),
-  updateGroup: (id, data) => api.put(`/producer-groups/${id}`, data),
-  deleteGroup: (id) => api.delete(`/producer-groups/${id}`),
-}
-
-/** M049 — Community Asset Management (Community). No backend route found. */
-export const communityAssetAPI = {
-  getAssets: (params) => api.get('/community-assets', { params }),
-  createAsset: (data) => api.post('/community-assets', data),
-  updateAsset: (id, data) => api.put(`/community-assets/${id}`, data),
-  deleteAsset: (id) => api.delete(`/community-assets/${id}`),
-}
-
-/** M050 — Rural Development Management (Community). ABSENT — no trace of
- *  this capability anywhere in the codebase. */
-export const ruralDevelopmentAPI = {
-  getProjects: (params) => api.get('/rural-development/projects', { params }),
-  createProject: (data) => api.post('/rural-development/projects', data),
-  updateProject: (id, data) => api.put(`/rural-development/projects/${id}`, data),
-  deleteProject: (id) => api.delete(`/rural-development/projects/${id}`),
-}
-
-/** M071 — Soil Health Management (Soil). Distinct from soilTestingService.js
- *  (M072, individual lab test results) — this is a plot/zone-level health
- *  card (organic matter, pH trend, recommendations). No backend route
- *  found. */
-export const soilHealthAPI = {
-  getCards: (params) => api.get('/soil-health/cards', { params }),
-  createCard: (data) => api.post('/soil-health/cards', data),
-  updateCard: (id, data) => api.put(`/soil-health/cards/${id}`, data),
-  deleteCard: (id) => api.delete(`/soil-health/cards/${id}`),
-}
-
-/** M073 — Nutrient Management (Soil). No backend route found. */
-export const nutrientManagementAPI = {
-  getPlans: (params) => api.get('/nutrient-management/plans', { params }),
-  createPlan: (data) => api.post('/nutrient-management/plans', data),
-  updatePlan: (id, data) => api.put(`/nutrient-management/plans/${id}`, data),
-  deletePlan: (id) => api.delete(`/nutrient-management/plans/${id}`),
-}
-
-/** M074 — Fertility Management (Soil). No backend route found. */
-export const fertilityManagementAPI = {
-  getRecords: (params) => api.get('/fertility-management/records', { params }),
-  createRecord: (data) => api.post('/fertility-management/records', data),
-  updateRecord: (id, data) => api.put(`/fertility-management/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/fertility-management/records/${id}`),
-}
-
-/**
- * M076-M080 — Water domain. Routed through the generic backend-module bridge
- * (backend/src/routes/claude/backendModuleBridge.js) at
- * /api/v1/backend-modules/:moduleId/:operation, which exposes each module's
- * real exported functions directly. These are action-oriented APIs, not CRUD
- * resources - there is no list/update/delete because the real backend
- * functions don't have one; each exposes exactly the operations below.
- */
-export const waterBudgetingAPI = {
-  createBudget: (budgetData) => api.post('/backend-modules/M076/createWaterBudget', budgetData),
-  trackUsage: (budgetId, period) => api.post('/backend-modules/M076/trackWaterUsage', { budgetId, period }),
-  optimizeAllocation: (budgetId, constraints) => api.post('/backend-modules/M076/optimizeWaterAllocation', { budgetId, constraints }),
-  generateReport: (budgetId, reportType) => api.post('/backend-modules/M076/generateBudgetReport', { budgetId, reportType }),
-}
-
-export const waterQualityAPI = {
-  recordMeasurement: (measurementData) => api.post('/backend-modules/M077/recordWaterQualityMeasurement', measurementData),
-  getComplianceReport: (locationId, period) => api.post('/backend-modules/M077/getComplianceReport', { locationId, period }),
-  monitorQuality: (locationId) => api.post('/backend-modules/M077/monitorWaterQuality', { locationId }),
-  getTreatmentRecommendations: (locationId, qualityIssues) => api.post('/backend-modules/M077/generateTreatmentRecommendations', { locationId, qualityIssues }),
-}
-
-export const rainwaterHarvestingAPI = {
-  designSystem: (designData) => api.post('/backend-modules/M078/designHarvestingSystem', designData),
-  monitorCollection: (systemId, period) => api.post('/backend-modules/M078/monitorCollection', { systemId, period }),
-  calculateBudget: (systemId, timeFrame) => api.post('/backend-modules/M078/calculateWaterBudget', { systemId, timeFrame }),
-  manageStorage: (systemId, managementData) => api.post('/backend-modules/M078/manageStorageCapacity', { systemId, ...managementData }),
-}
-
-export const watershedManagementAPI = {
-  createPlan: (planData) => api.post('/backend-modules/M079/createWatershedPlan', planData),
-  monitorHealth: (watershedId) => api.post('/backend-modules/M079/monitorWatershedHealth', { watershedId }),
-  implementConservation: (watershedId, measuresData) => api.post('/backend-modules/M079/implementConservationMeasures', { watershedId, ...measuresData }),
-  generateReport: (watershedId, reportType) => api.post('/backend-modules/M079/generateWatershedReport', { watershedId, reportType }),
-}
-
-export const waterAnalyticsAPI = {
-  generateUsageAnalytics: (params) => api.post('/backend-modules/M080/generateWaterUsageAnalytics', params),
-  createDashboard: (dashboardConfig) => api.post('/backend-modules/M080/createWaterDashboard', dashboardConfig),
-  generatePrediction: (predictionParams) => api.post('/backend-modules/M080/generatePredictiveAnalysis', predictionParams),
-  comparePerformance: (comparisonParams) => api.post('/backend-modules/M080/compareWaterPerformance', comparisonParams),
-}
-
-/** Water Records CRUD - backend/src/routes/waterManagementRoutes.js +
- *  services/legacy/waterManagementService.js. Distinct from waterBudgetingAPI
- *  etc above (M076-M080 engineering-calculation bridge calls): this is the
- *  simple structures/readings registry (water_budgets, water_quality_readings,
- *  rainwater_harvesting_structures, watersheds, water_analytics_records
- *  tables) - real, working list/create/update/delete CRUD with no frontend
- *  caller until now. Verified 2026-08-29. */
-export const waterBudgetRecordsAPI = {
-  list: (params) => api.get('/water-budgeting/budgets', { params }),
-  create: (data) => api.post('/water-budgeting/budgets', data),
-  update: (id, data) => api.put(`/water-budgeting/budgets/${id}`, data),
-  remove: (id) => api.delete(`/water-budgeting/budgets/${id}`),
-}
-export const waterQualityRecordsAPI = {
-  list: (params) => api.get('/water-quality/readings', { params }),
-  create: (data) => api.post('/water-quality/readings', data),
-  update: (id, data) => api.put(`/water-quality/readings/${id}`, data),
-  remove: (id) => api.delete(`/water-quality/readings/${id}`),
-}
-export const rainwaterStructuresAPI = {
-  list: (params) => api.get('/rainwater-harvesting/structures', { params }),
-  create: (data) => api.post('/rainwater-harvesting/structures', data),
-  update: (id, data) => api.put(`/rainwater-harvesting/structures/${id}`, data),
-  remove: (id) => api.delete(`/rainwater-harvesting/structures/${id}`),
-}
-export const watershedRecordsAPI = {
-  list: (params) => api.get('/watersheds', { params }),
-  create: (data) => api.post('/watersheds', data),
-  update: (id, data) => api.put(`/watersheds/${id}`, data),
-  remove: (id) => api.delete(`/watersheds/${id}`),
-}
-export const waterAnalyticsRecordsAPI = {
-  list: (params) => api.get('/water-analytics/records', { params }),
-  create: (data) => api.post('/water-analytics/records', data),
-  update: (id, data) => api.put(`/water-analytics/records/${id}`, data),
-  remove: (id) => api.delete(`/water-analytics/records/${id}`),
-}
-
-// ---------------------------------------------------------------------------
-// Batch 4 (2026-08-08): Climate, Operations, Machinery, Horticulture,
-// Fisheries, Identity, Platform Foundation. See pages/ClimateMonitoringPage.jsx,
-// OperationsManagementPage.jsx, MachineryManagementPage.jsx,
-// HorticultureManagementPage.jsx, FisheriesManagementPage.jsx,
-// IdentityManagementPage.jsx, PlatformFoundationPage.jsx.
-// ---------------------------------------------------------------------------
-
-/** M085 — Drought Monitoring (Climate). No backend route found. */
-export const droughtMonitoringAPI = {
-  getRecords: (params) => api.get('/drought-monitoring', { params }),
-  createRecord: (data) => api.post('/drought-monitoring', data),
-  updateRecord: (id, data) => api.put(`/drought-monitoring/${id}`, data),
-  deleteRecord: (id) => api.delete(`/drought-monitoring/${id}`),
-}
-
-/** M086 — Flood Monitoring (Climate). No backend route found. */
-export const floodMonitoringAPI = {
-  getRecords: (params) => api.get('/flood-monitoring', { params }),
-  createRecord: (data) => api.post('/flood-monitoring', data),
-  updateRecord: (id, data) => api.put(`/flood-monitoring/${id}`, data),
-  deleteRecord: (id) => api.delete(`/flood-monitoring/${id}`),
-}
-
-/** M087 — Pest Forecasting (Climate). Real backend: GET /weather/pest-forecast
- *  (migration 057, same feed weatherAPI.pestForecast already reads). No
- *  create/update/delete route exists for it, so only a read is exposed here. */
-export const pestForecastingAPI = {
-  getForecasts: (params) => api.get('/weather/pest-forecast', { params }),
-}
-
-/** M088 — Disease Forecasting (Climate). No backend route found. */
-export const diseaseForecastingAPI = {
-  getForecasts: (params) => api.get('/disease-forecasting', { params }),
-  createForecast: (data) => api.post('/disease-forecasting', data),
-  updateForecast: (id, data) => api.put(`/disease-forecasting/${id}`, data),
-  deleteForecast: (id) => api.delete(`/disease-forecasting/${id}`),
-}
-
-/** M089 — Climate Risk Assessment (Climate). No backend route found. */
-export const climateRiskAPI = {
-  getAssessments: (params) => api.get('/climate-risk', { params }),
-  createAssessment: (data) => api.post('/climate-risk', data),
-  updateAssessment: (id, data) => api.put(`/climate-risk/${id}`, data),
-  deleteAssessment: (id) => api.delete(`/climate-risk/${id}`),
-}
-
-/** M090 — Agro-Meteorology (Climate). No backend route found. */
-export const agroMeteorologyAPI = {
-  getRecords: (params) => api.get('/agro-meteorology', { params }),
-  createRecord: (data) => api.post('/agro-meteorology', data),
-  updateRecord: (id, data) => api.put(`/agro-meteorology/${id}`, data),
-  deleteRecord: (id) => api.delete(`/agro-meteorology/${id}`),
-}
-
-/** M091 — Farm Activity Management (Operations). No backend route found. */
-export const farmActivityAPI = {
-  getActivities: (params) => api.get('/farm-activities', { params }),
-  createActivity: (data) => api.post('/farm-activities', data),
-  updateActivity: (id, data) => api.put(`/farm-activities/${id}`, data),
-  deleteActivity: (id) => api.delete(`/farm-activities/${id}`),
-}
-
-/** M092 — Farm Task Scheduling (Operations). No backend route found. */
-export const farmTaskAPI = {
-  getTasks: (params) => api.get('/farm-tasks', { params }),
-  createTask: (data) => api.post('/farm-tasks', data),
-  updateTask: (id, data) => api.put(`/farm-tasks/${id}`, data),
-  deleteTask: (id) => api.delete(`/farm-tasks/${id}`),
-}
-
-/** M094 — Contractor Management (Operations). No backend route found. */
-export const contractorManagementAPI = {
-  getContractors: (params) => api.get('/contractors', { params }),
-  createContractor: (data) => api.post('/contractors', data),
-  updateContractor: (id, data) => api.put(`/contractors/${id}`, data),
-  deleteContractor: (id) => api.delete(`/contractors/${id}`),
-}
-
-/** M095 — Machinery Operations (Operations). No backend route found. */
-export const machineryOperationsAPI = {
-  getOperations: (params) => api.get('/machinery-operations', { params }),
-  createOperation: (data) => api.post('/machinery-operations', data),
-  updateOperation: (id, data) => api.put(`/machinery-operations/${id}`, data),
-  deleteOperation: (id) => api.delete(`/machinery-operations/${id}`),
-}
-
-/** M096 — Equipment Scheduling (Operations). No backend route found. */
-export const equipmentSchedulingAPI = {
-  getSchedules: (params) => api.get('/equipment-scheduling', { params }),
-  createSchedule: (data) => api.post('/equipment-scheduling', data),
-  updateSchedule: (id, data) => api.put(`/equipment-scheduling/${id}`, data),
-  deleteSchedule: (id) => api.delete(`/equipment-scheduling/${id}`),
-}
-
-/** M097 — Input Consumption (Operations). No backend route found. */
-export const inputConsumptionAPI = {
-  getRecords: (params) => api.get('/input-consumption', { params }),
-  createRecord: (data) => api.post('/input-consumption', data),
-  updateRecord: (id, data) => api.put(`/input-consumption/${id}`, data),
-  deleteRecord: (id) => api.delete(`/input-consumption/${id}`),
-}
-
-/** M099 — Farm Productivity (Operations). No backend route found. */
-export const farmProductivityAPI = {
-  getMetrics: (params) => api.get('/farm-productivity', { params }),
-  createMetric: (data) => api.post('/farm-productivity', data),
-  updateMetric: (id, data) => api.put(`/farm-productivity/${id}`, data),
-  deleteMetric: (id) => api.delete(`/farm-productivity/${id}`),
-}
-
-/** M100 — Farm Operations Dashboard (Operations). No backend route found. */
-export const farmOperationsDashboardAPI = {
-  getKpis: (params) => api.get('/farm-operations-dashboard', { params }),
-  createKpi: (data) => api.post('/farm-operations-dashboard', data),
-  updateKpi: (id, data) => api.put(`/farm-operations-dashboard/${id}`, data),
-  deleteKpi: (id) => api.delete(`/farm-operations-dashboard/${id}`),
-}
-
-/** M102 — Implement Management (Machinery). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /machinery-implements. The real
-// backend (backend/src/modules/M102, migration added 2026-08-24) is
-// action-based (register/update-maintenance/track-usage/report), not
-// simple CRUD, and had no browse route at all until now - added GET /
-// and GET /:id alongside it. No update/delete here: the real PUT route
-// updates a maintenance record, not general implement fields, and there
-// is no delete route.
-export const implementManagementAPI = {
-  getImplements: (params) => api.get('/modules/m102', { params }),
-  createImplement: (data) => api.post('/modules/m102/register', data),
-}
-
-/** M103 — Equipment Inventory (Machinery). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /equipment-inventory. Real
-// backend at backend/src/modules/M103, same shape/caveats as M102 above.
-export const equipmentInventoryAPI = {
-  getEquipment: (params) => api.get('/modules/m103', { params }),
-  createEquipment: (data) => api.post('/modules/m103/register', data),
-}
-
-/** M104 — Equipment Rental (Machinery). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /equipment-rental. Real backend
-// at backend/src/modules/M104 (POST /list actually creates a listing,
-// despite the name - see routes.js).
-export const equipmentRentalAPI = {
-  getRentals: (params) => api.get('/modules/m104', { params }),
-  createRental: (data) => api.post('/modules/m104/list', data),
-}
-
-/** M105 — Fleet Management (Machinery). Real backend at
- *  backend/src/routes/logisticsEnhancements.js, mounted at /api/v1/logistics
- *  (logisticsEnhancementService: addVehicle/getFleet/getVehicle/updateVehicle/
- *  scheduleMaintenance). No DELETE route exists, so remove is not wired. */
-export const fleetManagementAPI = {
-  getFleet: (params) => api.get('/logistics/fleet', { params }),
-  getVehicle: (id) => api.get(`/logistics/fleet/${id}`),
-  addVehicle: (data) => api.post('/logistics/fleet', data),
-  updateVehicle: (id, data) => api.put(`/logistics/fleet/${id}`, data),
-  scheduleMaintenance: (id, data) => api.post(`/logistics/fleet/${id}/maintenance`, data),
-  // Real due-for-service list: fleet_vehicles.next_maintenance_date +
-  // overdue vehicle_maintenance work orders (see
-  // logisticsEnhancementService.getMaintenanceDueList — wave-1 machinery
-  // business logic, 2026-08-10).
-  getMaintenanceDue: (params) => api.get('/logistics/fleet/maintenance-due', { params }),
-}
-
-/** M106 — Preventive Maintenance (Machinery). No backend route found. */
-export const preventiveMaintenanceAPI = {
-  getRecords: (params) => api.get('/preventive-maintenance', { params }),
-  createRecord: (data) => api.post('/preventive-maintenance', data),
-  updateRecord: (id, data) => api.put(`/preventive-maintenance/${id}`, data),
-  deleteRecord: (id) => api.delete(`/preventive-maintenance/${id}`),
-}
-
-/** M107 — Breakdown Maintenance (Machinery). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /breakdown-maintenance. Real
-// backend at backend/src/modules/M107, same shape/caveats as M102 above.
-export const breakdownMaintenanceAPI = {
-  getRecords: (params) => api.get('/modules/m107', { params }),
-  createRecord: (data) => api.post('/modules/m107/report', data),
-}
-
-/** M108 — Fuel Management (Machinery). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /fuel-management. Real backend
-// at backend/src/modules/M108 tracks purchases and consumption as two
-// separate records; this lists/logs purchases specifically.
-export const fuelManagementAPI = {
-  getLogs: (params) => api.get('/modules/m108', { params }),
-  createLog: (data) => api.post('/modules/m108/purchase', data),
-}
-
-/** M109 — Spare Parts Management (Machinery). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /spare-parts. Real backend at
-// backend/src/modules/M109, same shape/caveats as M102 above.
-export const sparePartsAPI = {
-  getParts: (params) => api.get('/modules/m109', { params }),
-  createPart: (data) => api.post('/modules/m109/register', data),
-}
-
-/** M110 — Asset Lifecycle Management (Machinery). No backend route found. */
-// Fixed 2026-08-24: was calling nonexistent /asset-lifecycle. Real backend
-// at backend/src/modules/M110, same shape/caveats as M102 above.
-export const assetLifecycleAPI = {
-  getAssets: (params) => api.get('/modules/m110', { params }),
-  createAsset: (data) => api.post('/modules/m110/register', data),
-}
-
-/** M142 — Vegetable Production (Horticulture). No backend route found. */
-export const vegetableProductionAPI = {
-  getRecords: (params) => api.get('/vegetable-production', { params }),
-  createRecord: (data) => api.post('/vegetable-production', data),
-  updateRecord: (id, data) => api.put(`/vegetable-production/${id}`, data),
-  deleteRecord: (id) => api.delete(`/vegetable-production/${id}`),
-}
-
-/** M143 — Floriculture Management (Horticulture). Real backend:
- *  floricultureRoutes mounted at /api/v1/floriculture in index.js
- *  (line 831) - matching CRUD. (F7 fix, 2026-08-30: comment was stale,
- *  written before this was wired.) */
-export const floricultureAPI = {
-  getRecords: (params) => api.get('/floriculture', { params }),
-  createRecord: (data) => api.post('/floriculture', data),
-  updateRecord: (id, data) => api.put(`/floriculture/${id}`, data),
-  deleteRecord: (id) => api.delete(`/floriculture/${id}`),
-}
-
-/** M144 — Greenhouse Management (Horticulture). Real backend at
- *  backend/src/services/greenhouseService.js (mounted directly in index.js,
- *  not under a router file), but it is action-based, not a CRUD list:
- *  POST /greenhouse/design, POST /greenhouse/optimize, GET /greenhouse/:id/monitor,
- *  POST /greenhouse/predict-yield, POST /greenhouse/dpr, POST /greenhouse/cost-estimate.
- *  There is no GET /greenhouse list route, so the registry CRUD below still
- *  targets a conventional (not-yet-built) /greenhouse-registry path; the real
- *  action endpoints are exposed separately for the monitor/design tools. */
-export const greenhouseAPI = {
-  getRegistry: (params) => api.get('/greenhouse-registry', { params }),
-  createEntry: (data) => api.post('/greenhouse-registry', data),
-  updateEntry: (id, data) => api.put(`/greenhouse-registry/${id}`, data),
-  deleteEntry: (id) => api.delete(`/greenhouse-registry/${id}`),
-  design: (data) => api.post('/greenhouse/design', data),
-  // optimize/dpr added 2026-08-11 — the only two action endpoints
-  // greenhouseService.js exposes that weren't already covered here.
-  optimize: (data) => api.post('/greenhouse/optimize', data),
-  monitor: (id) => api.get(`/greenhouse/${id}/monitor`),
-  predictYield: (data) => api.post('/greenhouse/predict-yield', data),
-  dpr: (data) => api.post('/greenhouse/dpr', data),
-  costEstimate: (data) => api.post('/greenhouse/cost-estimate', data),
-}
-
-/** M145 — Polyhouse Management (Horticulture). No backend route found. */
-export const polyhouseAPI = {
-  getRecords: (params) => api.get('/polyhouse-management', { params }),
-  createRecord: (data) => api.post('/polyhouse-management', data),
-  updateRecord: (id, data) => api.put(`/polyhouse-management/${id}`, data),
-  deleteRecord: (id) => api.delete(`/polyhouse-management/${id}`),
-}
-
-/** M146 — Hydroponics Management (Horticulture). No backend route found. */
-export const hydroponicsAPI = {
-  getSystems: (params) => api.get('/hydroponics', { params }),
-  createSystem: (data) => api.post('/hydroponics', data),
-  updateSystem: (id, data) => api.put(`/hydroponics/${id}`, data),
-  deleteSystem: (id) => api.delete(`/hydroponics/${id}`),
-}
-
-/** M147 — Aeroponics Management (Horticulture). No backend route found. */
-export const aeroponicsAPI = {
-  getSystems: (params) => api.get('/aeroponics', { params }),
-  createSystem: (data) => api.post('/aeroponics', data),
-  updateSystem: (id, data) => api.put(`/aeroponics/${id}`, data),
-  deleteSystem: (id) => api.delete(`/aeroponics/${id}`),
-}
-
-/** M148 — Precision Horticulture (Horticulture). Confirmed ABSENT (no trace
- *  anywhere in backend or frontend) — genuinely missing, safe to build. */
-export const precisionHorticultureAPI = {
-  getSystems: (params) => api.get('/precision-horticulture', { params }),
-  createSystem: (data) => api.post('/precision-horticulture', data),
-  updateSystem: (id, data) => api.put(`/precision-horticulture/${id}`, data),
-  deleteSystem: (id) => api.delete(`/precision-horticulture/${id}`),
-  getReadings: (params) => api.get('/precision-horticulture', { params }),
-  createReading: (data) => api.post('/precision-horticulture', data),
-  updateReading: (id, data) => api.put(`/precision-horticulture/${id}`, data),
-  deleteReading: (id) => api.delete(`/precision-horticulture/${id}`),
-}
-
-/**
- * User Management API (M006) — AI-enhanced user operations.
- * System settings, audit logs, analytics, anomaly detection, predictive maintenance.
- */
-export const userManagementAPI = {
-  getSettings: () => api.get('/modules/m006/settings'),
-  getSetting: (name) => api.get(`/modules/m006/settings/${name}`),
-  upsertSetting: (name, value, description) => api.put(`/modules/m006/settings/${name}`, { value, description }),
-  ingestAudit: (entry) => api.post('/modules/m006/audit', entry),
-  getSystemAnalytics: () => api.get('/modules/m006/analytics'),
-  detectAnomalies: () => api.get('/modules/m006/anomalies'),
-  getPredictiveMaintenance: () => api.get('/modules/m006/predictive-maintenance'),
-}
-
-/**
- * Role & Permission Management API (M007) — AI-enhanced RBAC.
- * Dynamic roles, permissions, user assignments, AI recommendations, permission matrix.
- *
- * Real backend as of 2026-08-28: the `/modules/m007/*` paths this used to
- * call never existed (moduleCatalogService.js, mounted at /api/v1/modules,
- * only has /, /overview, /:id, /assistant — not this shape). Plain role/
- * permission CRUD now goes through the real, already-mounted
- * roleManagementRoutes.js (M014, /api/v1/roles) and identityManagementRoutes.js's
- * permission resource (M015, /api/v1/permissions) - see RolePermissionPage.jsx
- * for the response-shape difference between the two (roles returns
- * {roles,total} unwrapped, permissions returns {success,data:[...]}).
- * The AI-specific operations (matrix/hierarchy/recommend/assign) have no
- * REST route and only exist in modules/M004_ROLE_MANAGEMENT's execute()
- * (merged from backend/src/modules/M007 this session), so those go through
- * the generic Claude module-registry bridge instead.
- */
-const M004_EXECUTE = '/ai/modules/M004_ROLE_MANAGEMENT/execute';
-const executeM004 = (operation, parameters) => api.post(M004_EXECUTE, { operation, parameters });
-
-export const rolePermissionAPI = {
-  listRoles: (params) => api.get('/roles', { params }),
-  getRole: (id) => api.get(`/roles/${id}`),
-  createRole: (data) => api.post('/roles', data),
-  updateRole: (id, data) => api.put(`/roles/${id}`, data),
-  deleteRole: (id) => api.delete(`/roles/${id}`),
-  listPermissions: (params) => api.get('/permissions', { params }),
-  createPermission: (data) => executeM004('createPermission', { permissionData: data }),
-  assignRoleToUser: (userId, roleId) => executeM004('assignRoleToUser', { userId, roleId }),
-  removeRoleFromUser: (userId, roleId) => executeM004('removeRoleFromUser', { userId, roleId }),
-  getUserRoles: (userId) => executeM004('getUserRoles', { userId }),
-  getUserPermissions: (userId) => executeM004('getUserPermissions', { userId }),
-  recommendRoleForUser: (userId) => executeM004('recommendRoleForUser', { userId }),
-  getPermissionMatrix: () => executeM004('getPermissionMatrix', {}),
-  getRoleHierarchy: () => executeM004('getRoleHierarchy', {}),
-}
-
-/**
- * Audit & Compliance API (M008) — AI-enhanced compliance.
- * Audit logging, blockchain verification, compliance rules, regulatory reporting, anomaly detection.
- */
-export const auditComplianceAPI = {
-  createAuditLog: (logData) => api.post('/modules/m008/logs', logData),
-  getAuditLogs: (params) => api.get('/modules/m008/logs', { params }),
-  getAuditLog: (id) => api.get(`/modules/m008/logs/${id}`),
-  verifyAuditLogIntegrity: (id) => api.get(`/modules/m008/logs/${id}/verify`),
-  createComplianceRule: (ruleData) => api.post('/modules/m008/compliance-rules', ruleData),
-  listComplianceRules: (params) => api.get('/modules/m008/compliance-rules', { params }),
-  evaluateComplianceRules: (userId) => api.get(`/modules/m008/users/${userId}/compliance`),
-  generateComplianceReport: (params) => api.get('/modules/m008/reports/compliance', { params }),
-  detectAuditAnomalies: (params) => api.get('/modules/m008/anomalies', { params }),
-}
-
-/**
- * Security & Access Control API (M009) — AI-enhanced security.
- * Security events, IP lists, rate limiting, threat detection, security scores, access policies.
- */
-export const securityAccessControlAPI = {
-  createSecurityEvent: (eventData) => api.post('/modules/m009/events', eventData),
-  getSecurityEvents: (params) => api.get('/modules/m009/events', { params }),
-  addToIpList: (listType, ipAddress, description) => api.post('/modules/m009/ip-list', { listType, ipAddress, description }),
-  removeFromIpList: (listType, ipAddress) => api.delete('/modules/m009/ip-list', { data: { listType, ipAddress } }),
-  getIpLists: (listType) => api.get(`/modules/m009/ip-list/${listType}`),
-  checkIpAccess: (ipAddress) => api.post('/modules/m009/ip-list/check', { ipAddress }),
-  checkRateLimit: (identifier, limit, windowMinutes) => api.post('/modules/m009/rate-limit/check', { identifier, limit, windowMinutes }),
-  detectThreats: () => api.get('/modules/m009/threats/detect'),
-  calculateSecurityScore: (userId) => api.get(`/modules/m009/users/${userId}/security-score`),
-  createAccessPolicy: (policyData) => api.post('/modules/m009/policies', policyData),
-  evaluateAccessPolicy: (userId, resource, action) => api.post('/modules/m009/policies/evaluate', { userId, resource, action }),
-}
-
-/**
- * Notification System API (M010) — AI-enhanced notifications.
- * Multi-channel delivery, preferences, templates, batching, analytics, real-time updates.
- */
-export const notificationAPI = {
-  createNotification: (notificationData) => api.post('/modules/m010/notifications', notificationData),
-  getNotifications: (params) => api.get('/modules/m010/notifications', { params }),
-  getNotification: (id) => api.get(`/modules/m010/notifications/${id}`),
-  markAsRead: (id) => api.put(`/modules/m010/notifications/${id}/read`),
-  markAllAsRead: () => api.put('/modules/m010/notifications/read-all'),
-  deliverNotification: (id) => api.post(`/modules/m010/notifications/${id}/deliver`),
-  getUserPreferences: (userId) => api.get(`/modules/m010/preferences/${userId}`),
-  updateUserPreferences: (preferences) => api.put('/modules/m010/preferences', preferences),
-  createTemplate: (templateData) => api.post('/modules/m010/templates', templateData),
-  getTemplate: (params) => api.get('/modules/m010/templates', { params }),
-  renderTemplate: (templateId, variables) => api.post('/modules/m010/templates/render', { templateId, variables }),
-  batchNotifications: (notificationIds) => api.post('/modules/m010/batch', { notificationIds }),
-  getNotificationAnalytics: (params) => api.get('/modules/m010/analytics', { params }),
-}
-
-/** M149 — Protected Cultivation (Horticulture). No backend route found. */
-export const protectedCultivationAPI = {
-  getStructures: (params) => api.get('/protected-cultivation', { params }),
-  createStructure: (data) => api.post('/protected-cultivation', data),
-  updateStructure: (id, data) => api.put(`/protected-cultivation/${id}`, data),
-  deleteStructure: (id) => api.delete(`/protected-cultivation/${id}`),
-}
-
-/** M150 — Horticulture Analytics (Horticulture). No backend route found. */
-export const horticultureAnalyticsAPI = {
-  getMetrics: (params) => api.get('/horticulture-analytics', { params }),
-  createMetric: (data) => api.post('/horticulture-analytics', data),
-  updateMetric: (id, data) => api.put(`/horticulture-analytics/${id}`, data),
-  deleteMetric: (id) => api.delete(`/horticulture-analytics/${id}`),
-}
-
-/** M131 — Biofloc Farm Management (Fisheries). No backend route found. */
-export const biofloccFarmAPI = {
-  getTanks: (params) => api.get('/biofloc-farms', { params }),
-  createTank: (data) => api.post('/biofloc-farms', data),
-  updateTank: (id, data) => api.put(`/biofloc-farms/${id}`, data),
-  deleteTank: (id) => api.delete(`/biofloc-farms/${id}`),
-}
-
-/** M133 — Hatchery Management (Fisheries). No backend route found. */
-export const hatcheryManagementAPI = {
-  getBatches: (params) => api.get('/hatchery-management', { params }),
-  createBatch: (data) => api.post('/hatchery-management', data),
-  updateBatch: (id, data) => api.put(`/hatchery-management/${id}`, data),
-  deleteBatch: (id) => api.delete(`/hatchery-management/${id}`),
-}
-
-/** M134 — Fish Feed Management (Fisheries). No backend route found. */
-export const fishFeedAPI = {
-  getLogs: (params) => api.get('/fish-feed', { params }),
-  createLog: (data) => api.post('/fish-feed', data),
-  updateLog: (id, data) => api.put(`/fish-feed/${id}`, data),
-  deleteLog: (id) => api.delete(`/fish-feed/${id}`),
-}
-
-/** M135 — Water Quality Control, fisheries (Fisheries). No backend route found. */
-export const fisheriesWaterQualityAPI = {
-  getReadings: (params) => api.get('/fisheries-water-quality', { params }),
-  createReading: (data) => api.post('/fisheries-water-quality', data),
-  updateReading: (id, data) => api.put(`/fisheries-water-quality/${id}`, data),
-  deleteReading: (id) => api.delete(`/fisheries-water-quality/${id}`),
-}
-
-/** M136 — Fish Health Management (Fisheries). No backend route found. */
-export const fishHealthAPI = {
-  getRecords: (params) => api.get('/fish-health', { params }),
-  createRecord: (data) => api.post('/fish-health', data),
-  updateRecord: (id, data) => api.put(`/fish-health/${id}`, data),
-  deleteRecord: (id) => api.delete(`/fish-health/${id}`),
-}
-
-/** M137 — Harvest Management, fisheries (Fisheries). No backend route found. */
-export const fisheriesHarvestAPI = {
-  getHarvests: (params) => api.get('/fisheries-harvest', { params }),
-  createHarvest: (data) => api.post('/fisheries-harvest', data),
-  updateHarvest: (id, data) => api.put(`/fisheries-harvest/${id}`, data),
-  deleteHarvest: (id) => api.delete(`/fisheries-harvest/${id}`),
-}
-
-/** M138 — Fish Processing Management (Fisheries). No backend route found. */
-export const fishProcessingAPI = {
-  getBatches: (params) => api.get('/fish-processing', { params }),
-  createBatch: (data) => api.post('/fish-processing', data),
-  updateBatch: (id, data) => api.put(`/fish-processing/${id}`, data),
-  deleteBatch: (id) => api.delete(`/fish-processing/${id}`),
-}
-
-/** M139 — Cold Fish Chain (Fisheries). No backend route found. */
-export const coldFishChainAPI = {
-  getShipments: (params) => api.get('/cold-fish-chain', { params }),
-  createShipment: (data) => api.post('/cold-fish-chain', data),
-  updateShipment: (id, data) => api.put(`/cold-fish-chain/${id}`, data),
-  deleteShipment: (id) => api.delete(`/cold-fish-chain/${id}`),
-}
-
-/** M140 — Aquaculture Analytics (Fisheries). No backend route found. */
-export const aquacultureAnalyticsAPI = {
-  getMetrics: (params) => api.get('/aquaculture-analytics', { params }),
-  createMetric: (data) => api.post('/aquaculture-analytics', data),
-  updateMetric: (id, data) => api.put(`/aquaculture-analytics/${id}`, data),
-  deleteMetric: (id) => api.delete(`/aquaculture-analytics/${id}`),
-}
-
-/** M014 — Role Management (Identity). No backend route found. */
-export const roleManagementAPI = {
-  getRoles: (params) => api.get('/roles', { params }),
-  createRole: (data) => api.post('/roles', data),
-  updateRole: (id, data) => api.put(`/roles/${id}`, data),
-  deleteRole: (id) => api.delete(`/roles/${id}`),
-}
-
-/** M015 — Permission Management (Identity). No backend route found. */
-export const permissionManagementAPI = {
-  getPermissions: (params) => api.get('/permissions', { params }),
-  createPermission: (data) => api.post('/permissions', data),
-  updatePermission: (id, data) => api.put(`/permissions/${id}`, data),
-  deletePermission: (id) => api.delete(`/permissions/${id}`),
-}
-
-/** M016 — Single Sign-On (Identity). No backend route found. */
-export const ssoAPI = {
-  getProviders: (params) => api.get('/sso-providers', { params }),
-  createProvider: (data) => api.post('/sso-providers', data),
-  updateProvider: (id, data) => api.put(`/sso-providers/${id}`, data),
-  deleteProvider: (id) => api.delete(`/sso-providers/${id}`),
-}
-
-/** M017 — Multi-Factor Authentication (Identity). authService.js already has
- *  per-user 2FA setup/verify/disable (authAPI.setup2FA/verify2FA/disable2FA)
- *  — no separate device-registry list route exists, so this stays conventional. */
-export const mfaManagementAPI = {
-  getDevices: (params) => api.get('/mfa-devices', { params }),
-  createDevice: (data) => api.post('/mfa-devices', data),
-  updateDevice: (id, data) => api.put(`/mfa-devices/${id}`, data),
-  deleteDevice: (id) => api.delete(`/mfa-devices/${id}`),
-}
-
-/** M018 — Digital Identity (Identity). No backend route found. */
-export const digitalIdentityAPI = {
-  getIdentities: (params) => api.get('/digital-identities', { params }),
-  createIdentity: (data) => api.post('/digital-identities', data),
-  updateIdentity: (id, data) => api.put(`/digital-identities/${id}`, data),
-  deleteIdentity: (id) => api.delete(`/digital-identities/${id}`),
-}
-
-/** M019 — Consent Management (Identity). No backend route found. */
-export const consentManagementAPI = {
-  getRecords: (params) => api.get('/consent-records', { params }),
-  createRecord: (data) => api.post('/consent-records', data),
-  updateRecord: (id, data) => api.put(`/consent-records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/consent-records/${id}`),
-}
-
-/** M020 — Session Management (Identity). No backend route found. */
-export const sessionManagementAPI = {
-  getSessions: (params) => api.get('/sessions', { params }),
-  createSession: (data) => api.post('/sessions', data),
-  updateSession: (id, data) => api.put(`/sessions/${id}`, data),
-  deleteSession: (id) => api.delete(`/sessions/${id}`),
-}
-
-/** M005 — Environment Management (Platform Foundation). No backend route found. */
-export const environmentManagementAPI = {
-  getEnvironments: (params) => api.get('/environments', { params }),
-  createEnvironment: (data) => api.post('/environments', data),
-  updateEnvironment: (id, data) => api.put(`/environments/${id}`, data),
-  deleteEnvironment: (id) => api.delete(`/environments/${id}`),
-}
-
-/** M007 — Feature Flag Management (Platform Foundation). No backend route found. */
-export const featureFlagAPI = {
-  getFlags: (params) => api.get('/feature-flags', { params }),
-  createFlag: (data) => api.post('/feature-flags', data),
-  updateFlag: (id, data) => api.put(`/feature-flags/${id}`, data),
-  deleteFlag: (id) => api.delete(`/feature-flags/${id}`),
-}
-
-/** M009 — Time Zone Management (Platform Foundation). No backend route found. */
-export const timeZoneManagementAPI = {
-  getZones: (params) => api.get('/timezones', { params }),
-  createZone: (data) => api.post('/timezones', data),
-  updateZone: (id, data) => api.put(`/timezones/${id}`, data),
-  deleteZone: (id) => api.delete(`/timezones/${id}`),
-}
-
-/** M010 — Master Configuration (Platform Foundation). No backend route found. */
-export const masterConfigAPI = {
-  getConfig: (params) => api.get('/master-config', { params }),
-  createConfig: (data) => api.post('/master-config', data),
-  updateConfig: (id, data) => api.put(`/master-config/${id}`, data),
-  deleteConfig: (id) => api.delete(`/master-config/${id}`),
-}
-
-// ---------------------------------------------------------------------------
-// Enterprise Control Layer (993) — backend/src/services/enterpriseControlService.js,
-// mounted at /api/v1/control. One router for six governance concerns that share
-// a workflow-engine contract: workflow, CRM, clients, legal, risk, emergency.
-//
-// The service's own boundary, carried through here: it does not approve,
-// escalate or close anything on its own authority. It records, computes and
-// surfaces. Every method below is a straight passthrough to a route the
-// backend already gates behind a named human actor — none of them approve,
-// acknowledge or act on anything by themselves. Emergency incident creation
-// returns the standing instruction immediately (no deliberation), but the
-// ACTION it describes is still taken by a person, not this client.
-// ---------------------------------------------------------------------------
-export const enterpriseControlAPI = {
-  getStatus: () => api.get('/control/status'),
-  getWorkflows: (params) => api.get('/control/workflows', { params }),
-  createWorkflow: (data) => api.post('/control/workflows', data),
-  getWorkflow: (workflowId) => api.get(`/control/workflows/${workflowId}`),
-  executeWorkflow: (workflowId, data) => api.post(`/control/workflows/${workflowId}/execute`, data),
-  getWorkflowHistory: (workflowId) => api.get(`/control/workflows/${workflowId}/history`),
-  getPendingApprovals: () => api.get('/control/approvals/pending'),
-  approveWorkflow: (workflowId) => api.post(`/control/workflows/${workflowId}/approve`),
-  rejectWorkflow: (workflowId, reason) => api.post(`/control/workflows/${workflowId}/reject`, { reason }),
-  startWorkflow: (body) => api.post('/control/workflow/start', body),
-  actOnWorkflow: (instanceCode, body) => api.post(`/control/workflow/${instanceCode}/act`, body),
-  pendingApprovals: (params) => api.get('/control/workflow/pending', { params }),
-
-  // CRM — leads and pipeline.,
-  createLead: (body) => api.post('/control/crm/leads', body),
-  convertLead: (leadCode, body) => api.post(`/control/crm/leads/${leadCode}/convert`, body),
-  pipeline: () => api.get('/control/crm/pipeline'),
-
-  // Clients — account health (no list/create route exists on the backend;
-  // clients are created only via convertLead's createClient flag).,
-  clientHealth: (id) => api.get(`/control/clients/${id}/health`),
-
-  // Legal — admin-gated on the backend (adminMiddleware); calendar/read-only,
-  // no create route exists for legal_matters/legal_obligations.,
-  legalCalendar: (params) => api.get('/control/legal/calendar', { params }),
-
-  // Risk — admin-gated assessment; heatmap is a read-only aggregate.,
-  assessRisk: (riskCode, body) => api.post(`/control/risk/${riskCode}/assess`, body),
-  riskHeatmap: () => api.get('/control/risk/heatmap'),
-
-  // Emergency — raising and acknowledging are authenticated but NOT
-  // admin-gated on the backend: the person who sees the problem first is
-  // rarely the person with the highest privilege.,
-  raiseIncident: (body) => api.post('/control/emergency/incidents', body),
-  acknowledgeIncident: (incidentCode) => api.post(`/control/emergency/incidents/${incidentCode}/acknowledge`),
-  activeIncidents: () => api.get('/control/emergency/active'),
-}
-
-/** Complete ERP Integration - Comprehensive ERP integration with all modules.
- *  Integrates farmer, crop, livestock, and inbuilt modules with financial ERP,
- *  supply chain ERP, production ERP, and customer ERP. Real backend as of
- *  2026-08-12: backend/src/routes/completeERPIntegrationRoutes.js */
-export const completeERPIntegrationAPI = {
-  // Farmer Module ERP Integration
-  syncFarmerCropPlanning: (farmerId, data) => api.post(`/complete-erp-integration/farmer/${farmerId}/crop-planning`, data),
-  syncFarmerHarvest: (farmerId, data) => api.post(`/complete-erp-integration/farmer/${farmerId}/harvest`, data),
-  syncFarmerField: (farmerId, data) => api.post(`/complete-erp-integration/farmer/${farmerId}/field`, data),
-  
-  // Crop Module ERP Integration
-  syncCropLifecycle: (cropId, data) => api.post(`/complete-erp-integration/crop/${cropId}/lifecycle`, data),
-  syncCropYield: (cropId, data) => api.post(`/complete-erp-integration/crop/${cropId}/yield`, data),
-  
-  // Livestock Module ERP Integration
-  syncLivestock: (livestockId, data) => api.post(`/complete-erp-integration/livestock/${livestockId}`, data),
-  syncLivestockProduction: (livestockId, data) => api.post(`/complete-erp-integration/livestock/${livestockId}/production`, data),
-  syncLivestockHealth: (livestockId, data) => api.post(`/complete-erp-integration/livestock/${livestockId}/health`, data),
-  
-  // Inbuilt Modules ERP Integration
-  syncDairyProduction: (dairyId, data) => api.post(`/complete-erp-integration/dairy/${dairyId}/production`, data),
-  syncPoultryProduction: (poultryId, data) => api.post(`/complete-erp-integration/poultry/${poultryId}/production`, data),
-  syncGoatProduction: (goatId, data) => api.post(`/complete-erp-integration/goat/${goatId}/production`, data),
-  syncSheepProduction: (sheepId, data) => api.post(`/complete-erp-integration/sheep/${sheepId}/production`, data),
-  syncPigProduction: (pigId, data) => api.post(`/complete-erp-integration/pig/${pigId}/production`, data),
-  
-  // Bulk ERP Integration
-  getERPIntegrationStatus: (params) => api.get('/complete-erp-integration/status', { params }),
-  forceSyncAllERPIntegrations: (data) => api.post('/complete-erp-integration/force-sync', data),
-}
-
-/** Complete AI Integration - Comprehensive AI integration with all modules.
- *  Integrates farmer, crop, livestock, and inbuilt modules with predictive analytics,
- *  disease detection, yield prediction, and optimization. Real backend as of
- *  2026-08-12: backend/src/routes/completeAIIntegrationRoutes.js */
-export const completeAIIntegrationAPI = {
-  // Farmer Module AI Integration
-  recommendCropPlanning: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/crop-planning-recommendation`, data),
-  predictHarvestTiming: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/harvest-timing-prediction`, data),
-  optimizeFarmerResources: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/resource-optimization`, data),
-  
-  // Crop Module AI Integration
-  detectCropDisease: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/disease-detection`, data),
-  predictCropYield: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/yield-prediction`, data),
-  
-  // Livestock Module AI Integration
-  monitorLivestockHealth: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/health-monitoring`, data),
-  recommendLivestockBreeding: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/breeding-recommendation`, data),
-  
-  // Inbuilt Modules AI Integration
-  optimizeDairyProduction: (dairyId, data) => api.post(`/complete-ai-integration/dairy/${dairyId}/production-optimization`, data),
-  monitorPoultryHealth: (poultryId, data) => api.post(`/complete-ai-integration/poultry/${poultryId}/health-monitoring`, data),
-  optimizeGoatProduction: (goatId, data) => api.post(`/complete-ai-integration/goat/${goatId}/production-optimization`, data),
-  optimizeSheepProduction: (sheepId, data) => api.post(`/complete-ai-integration/sheep/${sheepId}/production-optimization`, data),
-  optimizePigProduction: (pigId, data) => api.post(`/complete-ai-integration/pig/${pigId}/production-optimization`, data),
-  
-  // Bulk AI Integration
-  getAIIntegrationStatus: (params) => api.get('/complete-ai-integration/status', { params }),
-  forceSyncAllAIIntegrations: (data) => api.post('/complete-ai-integration/force-sync', data),
-  getAIModelInfo: () => api.get('/complete-ai-integration/model-info'),
-}
-
-/** Bulk Order API - Bulk/wholesale orders for marketplace.
- *  Real backend as of 2026-08-12: backend/src/routes/bulkOrderRoutes.js */
-export const bulkOrderAPI = {
-  createBulkOrder: (data) => api.post('/bulk-orders', data),
-  getBulkOrder: (orderId) => api.get(`/bulk-orders/${orderId}`),
-  getUserBulkOrders: (userId, params) => api.get(`/bulk-orders/user/${userId}`, { params }),
-  updateBulkOrderStatus: (orderId, data) => api.patch(`/bulk-orders/${orderId}/status`, data),
-  getBulkOrderQuotations: (orderId) => api.get(`/bulk-orders/${orderId}/quotations`),
-  submitQuotation: (orderId, data) => api.post(`/bulk-orders/${orderId}/quotations`, data),
-  acceptQuotation: (quotationId, data) => api.post(`/bulk-orders/quotations/${quotationId}/accept`, data),
-  getBulkOrderAnalytics: (params) => api.get('/bulk-orders/analytics', { params }),
-  cancelBulkOrder: (orderId, data) => api.post(`/bulk-orders/${orderId}/cancel`, data),
-}
-
-/** Dairy AI API - AI-powered dairy management.
- *  Real backend as of 2026-08-12: backend/src/routes/dairyRoutes.js */
-export const dairyAIAPI = {
-  optimizeMilkProduction: (animalId) => api.post(`/dairy/ai/optimize-production/${animalId}`),
-  predictHealthRisks: (animalId) => api.post(`/dairy/ai/predict-health/${animalId}`),
-  optimizeFeedComposition: (animalId, data) => api.post(`/dairy/ai/optimize-feed/${animalId}`, data),
-  recommendBreeding: (animalId) => api.post(`/dairy/ai/recommend-breeding/${animalId}`),
-}
-
-/** Poultry AI API - AI-powered poultry management.
- *  Real backend as of 2026-08-12: backend/src/routes/poultryRoutes.js */
-export const poultryAIAPI = {
-  optimizeEggProduction: (flockId) => api.post(`/poultry/ai/optimize-production/${flockId}`),
-  monitorFlockHealth: (flockId) => api.post(`/poultry/ai/monitor-health/${flockId}`),
-  optimizePoultryFeed: (flockId, data) => api.post(`/poultry/ai/optimize-feed/${flockId}`, data),
-  predictMortalityRisk: (flockId) => api.post(`/poultry/ai/predict-mortality/${flockId}`),
-}
-
-/** Goat AI API - AI-powered goat management.
- *  Real backend as of 2026-08-12: backend/src/routes/goatRoutes.js */
-export const goatAIAPI = {
-  optimizeGoatMilkProduction: (animalId) => api.post(`/goat/ai/optimize-milk/${animalId}`),
-  monitorGoatHealth: (animalId) => api.post(`/goat/ai/monitor-health/${animalId}`),
-  optimizeGoatFeed: (animalId, data) => api.post(`/goat/ai/optimize-feed/${animalId}`, data),
-  recommendGoatBreeding: (animalId) => api.post(`/goat/ai/recommend-breeding/${animalId}`),
-}
-
-/** Sheep AI API - AI-powered sheep management.
- *  Real backend as of 2026-08-12: backend/src/routes/sheepRoutes.js */
-export const sheepAIAPI = {
-  optimizeWoolProduction: (animalId) => api.post(`/sheep/ai/optimize-wool/${animalId}`),
-  monitorSheepHealth: (animalId) => api.post(`/sheep/ai/monitor-health/${animalId}`),
-  optimizeSheepFeed: (animalId, data) => api.post(`/sheep/ai/optimize-feed/${animalId}`, data),
-  recommendSheepBreeding: (animalId) => api.post(`/sheep/ai/recommend-breeding/${animalId}`),
-}
-
-/** Pig AI API - AI-powered pig management.
- *  Real backend as of 2026-08-12: backend/src/routes/pigRoutes.js */
-export const pigAIAPI = {
-  optimizeMeatProduction: (animalId) => api.post(`/pig/ai/optimize-meat/${animalId}`),
-  monitorPigHealth: (animalId) => api.post(`/pig/ai/monitor-health/${animalId}`),
-  optimizePigFeed: (animalId, data) => api.post(`/pig/ai/optimize-feed/${animalId}`, data),
-  recommendPigBreeding: (animalId) => api.post(`/pig/ai/recommend-breeding/${animalId}`),
-}
-
-/** Comprehensive ERP API - Oracle/SAP standards complete ERP system.
- *  Real backend as of 2026-08-12: backend/src/routes/comprehensiveERPRoutes.js */
-export const comprehensiveERPAPI = {
-  getStatus: () => api.get('/comprehensive-erp/status'),
-  getModules: () => api.get('/comprehensive-erp/modules'),
-  syncGL: (data) => api.post('/comprehensive-erp/sync/gl', data),
-  syncBudget: (data) => api.post('/comprehensive-erp/sync/budget', data),
-  syncAsset: (data) => api.post('/comprehensive-erp/sync/asset', data),
-  syncProject: (data) => api.post('/comprehensive-erp/sync/project', data),
-  syncHR: (data) => api.post('/comprehensive-erp/sync/hr', data),
-  syncInventory: (data) => api.post('/comprehensive-erp/sync/inventory', data),
-  syncProcurement: (data) => api.post('/comprehensive-erp/sync/procurement', data),
-  syncSales: (data) => api.post('/comprehensive-erp/sync/sales', data),
-  getReconciliationStatus: () => api.get('/comprehensive-erp/reconciliation'),
-  getFinancialStatements: (params) => api.get('/comprehensive-erp/statements', { params }),
-  getBudgetReports: (params) => api.get('/comprehensive-erp/budgets', { params }),
-  getAssetRegister: (params) => api.get('/comprehensive-erp/assets', { params }),
-  getProjectReports: (params) => api.get('/comprehensive-erp/projects', { params }),
-  createChartOfAccounts: (data) => api.post('/comprehensive-erp/fi/gl/chart-of-accounts', data),
-  createGLAccount: (data) => api.post('/comprehensive-erp/fi/gl/accounts', data),
-  postJournalEntry: (data) => api.post('/comprehensive-erp/fi/gl/journal-entries', data),
-  getTrialBalance: (params) => api.get('/comprehensive-erp/fi/gl/trial-balance', { params }),
-  getBalanceSheet: (params) => api.get('/comprehensive-erp/fi/gl/balance-sheet', { params }),
-  getProfitLoss: (params) => api.get('/comprehensive-erp/fi/gl/profit-loss', { params }),
-  analyzeFinancialsAI: (params) => api.get('/comprehensive-erp/fi/gl/ai-analysis', { params }),
-
-  // Controlling (CO),
-  createCostCenter: (data) => api.post('/comprehensive-erp/co/cost-centers', data),
-  createProfitCenter: (data) => api.post('/comprehensive-erp/co/profit-centers', data),
-  postCostAllocation: (data) => api.post('/comprehensive-erp/co/cost-allocations', data),
-  getCostCenterReport: (params) => api.get('/comprehensive-erp/co/cost-centers/report', { params }),
-  getProfitCenterReport: (params) => api.get('/comprehensive-erp/co/profit-centers/report', { params }),
-  
-  // Materials Management (MM),
-  createMaterialMaster: (data) => api.post('/comprehensive-erp/mm/material-master', data),
-  createPurchaseOrder: (data) => api.post('/comprehensive-erp/mm/purchase-orders', data),
-  createGoodsReceipt: (data) => api.post('/comprehensive-erp/mm/goods-receipts', data),
-  getInventoryOverview: (params) => api.get('/comprehensive-erp/mm/inventory', { params }),
-  optimizeSupplyChainAI: (params) => api.get('/comprehensive-erp/mm/ai-optimization', { params }),
-
-  // Sales and Distribution (SD),
-  createCustomerMaster: (data) => api.post('/comprehensive-erp/sd/customers', data),
-  createSalesOrder: (data) => api.post('/comprehensive-erp/sd/sales-orders', data),
-  createDelivery: (data) => api.post('/comprehensive-erp/sd/deliveries', data),
-  createInvoice: (data) => api.post('/comprehensive-erp/sd/invoices', data),
-  
-  // Production Planning (PP),
-  createProductionOrder: (data) => api.post('/comprehensive-erp/pp/production-orders', data),
-  releaseProductionOrder: (productionOrder) => api.post(`/comprehensive-erp/pp/production-orders/${productionOrder}/release`),
-  confirmProductionOrder: (productionOrder, data) => api.post(`/comprehensive-erp/pp/production-orders/${productionOrder}/confirm`, data),
-  optimizeProductionAI: (params) => api.get('/comprehensive-erp/pp/ai-optimization', { params }),
-
-  // Quality Management (QM),
-  createInspectionLot: (data) => api.post('/comprehensive-erp/qm/inspection-lots', data),
-  recordInspectionResult: (data) => api.post('/comprehensive-erp/qm/inspection-results', data),
-  makeUsageDecision: (inspectionLot, data) => api.post(`/comprehensive-erp/qm/inspection-lots/${inspectionLot}/usage-decision`, data),
-  
-  // Plant Maintenance (PM),
-  createEquipmentMaster: (data) => api.post('/comprehensive-erp/pm/equipment', data),
-  createMaintenanceOrder: (data) => api.post('/comprehensive-erp/pm/maintenance-orders', data),
-  confirmMaintenanceOrder: (maintenanceOrder, data) => api.post(`/comprehensive-erp/pm/maintenance-orders/${maintenanceOrder}/confirm`, data),
-  
-  // Human Resources (HR),
-  createEmployeeMaster: (data) => api.post('/comprehensive-erp/hr/employees', data),
-  createOrganizationalUnit: (data) => api.post('/comprehensive-erp/hr/org-units', data),
-  processPayroll: (data) => api.post('/comprehensive-erp/hr/payroll', data),
-  analyzeHRAI: (params) => api.get('/comprehensive-erp/hr/ai-analysis', { params }),
-
-  // Project System (PS),
-  createProjectDefinition: (data) => api.post('/comprehensive-erp/ps/projects', data),
-  createWBS: (data) => api.post('/comprehensive-erp/ps/wbs-elements', data),
-  updateProjectStatus: (projectCode, data) => api.post(`/comprehensive-erp/ps/projects/${projectCode}/status`, data),
-  analyzeProjectAI: (projectCode) => api.get(`/comprehensive-erp/ps/projects/${projectCode}/ai-analysis`),
-
-  // Treasury (TR),
-  createBankAccount: (data) => api.post('/comprehensive-erp/tr/bank-accounts', data),
-  recordCashFlow: (data) => api.post('/comprehensive-erp/tr/cash-flows', data),
-  getCashPosition: (params) => api.get('/comprehensive-erp/tr/cash-position', { params }),
-  
-  // Asset Management (AM),
-  createFixedAsset: (data) => api.post('/comprehensive-erp/am/fixed-assets', data),
-  calculateDepreciation: (assetCode, params) => api.post(`/comprehensive-erp/am/fixed-assets/${assetCode}/depreciation`, null, { params }),
-  
-  // Business Intelligence (BI),
-  getExecutiveDashboard: (params) => api.get('/comprehensive-erp/bi/executive-dashboard', { params }),
-  getProfitabilityAnalysis: (params) => api.get('/comprehensive-erp/bi/profitability-analysis', { params }),
-}
-
-/** Nervous System API - AFRERA enterprise route control with biological
- *  architecture (brain/heart/neural pathways/reflex/sensors/motor functions).
- *  Real backend: backend/src/routes/nervousSystemRoutes.js +
- *  controllers/nervousSystemController.js + core/nervousSystem.js. */
-export const nervousSystemAPI = {
-  // Brain
-  processEventThroughBrain: (data) => api.post('/nervous/brain/process-event', data),
-  getBrainDecisionHistory: (params) => api.get('/nervous/brain/decision-history', { params }),
-  getBrainFocus: () => api.get('/nervous/brain/focus'),
-
-  // Heart
-  startHeartBeat: () => api.post('/nervous/heart/start'),
-  stopHeartBeat: () => api.post('/nervous/heart/stop'),
-  getHeartBeatStatus: () => api.get('/nervous/heart/status'),
-
-  // Neural Pathways
-  createNeuralPathway: (data) => api.post('/nervous/neural/create-pathway', data),
-  getNeuralPathways: () => api.get('/nervous/neural/pathways'),
-  strengthenNeuralPathway: (pathwayId) => api.post(`/nervous/neural/strengthen/${pathwayId}`),
-
-  // Reflex Arcs
-  createReflexArc: (data) => api.post('/nervous/reflex/create-arc', data),
-  getReflexArcs: () => api.get('/nervous/reflex/arcs'),
-  triggerReflex: (data) => api.post('/nervous/reflex/trigger', data),
-
-  // Sensors
-  registerSensor: (data) => api.post('/nervous/sensor/register', data),
-  getSensorData: (sensorId) => api.get(`/nervous/sensor/data/${sensorId}`),
-  getSensorsStatus: () => api.get('/nervous/sensor/status'),
-
-  // Motor Functions
-  executeMotorFunction: (data) => api.post('/nervous/motor/execute', data),
-  getActiveMotorFunctions: () => api.get('/nervous/motor/active'),
-
-  // Enterprise Route Control
-  registerEnterpriseRoute: (data) => api.post('/nervous/route/register', data),
-  routeRequest: (data) => api.post('/nervous/route/request', data),
-  getOptimalRoute: (params) => api.get('/nervous/route/optimal', { params }),
-  deactivateEnterpriseRoute: (routeId) => api.post(`/nervous/route/deactivate/${routeId}`),
-
-  // System Health
-  getNervousSystemHealth: () => api.get('/nervous/health'),
-}
-
-/** Logistics Enhancement API - fleet management, real-time shipment/driver
- *  tracking, temperature monitoring, warehouse integration.
- *  Real backend: backend/src/routes/logisticsEnhancementRoutes.js +
- *  services/legacy/logisticsEnhancementService.js. Route/movement/warehouse-
- *  performance/delivery-schedule endpoints are intentionally omitted here -
- *  the route file itself returns 501 NOT_IMPLEMENTED for those (no backing
- *  service methods exist). */
-export const logisticsEnhancementAPI = {
-  getStatus: () => api.get('/logistics-enhancement/status'),
-  getFleet: (params) => api.get('/logistics-enhancement/fleet/vehicles', { params }),
-  getVehicle: (vehicleId) => api.get(`/logistics-enhancement/fleet/vehicles/${vehicleId}`),
-  getDriverPerformance: (driverId) => api.get(`/logistics-enhancement/drivers/${driverId}/performance`),
-  getRouteOptimization: (from, to) => api.get('/logistics-enhancement/route-optimization', { params: { from, to } }),
-  getLiveTracking: (shipmentId) => api.get(`/logistics-enhancement/tracking/${shipmentId}/live`),
-  getTemperatureTracking: (shipmentId) => api.get(`/logistics-enhancement/shipments/${shipmentId}/temperature`),
-  getWarehouseIntegration: (warehouseId) => api.get(`/logistics-enhancement/warehouses/${warehouseId}/integration`),
-  getReturnLoadOpportunities: () => api.get('/logistics-enhancement/return-loads'),
-  getFreightPooling: () => api.get('/logistics-enhancement/freight-pooling'),
-  addVehicle: (data) => api.post('/logistics-enhancement/fleet/vehicles', data),
-  updateVehicle: (vehicleId, data) => api.put(`/logistics-enhancement/fleet/vehicles/${vehicleId}`, data),
-  scheduleMaintenance: (vehicleId, data) => api.post(`/logistics-enhancement/fleet/vehicles/${vehicleId}/maintenance`, data),
-
-  // Real-time Tracking,
-  updateTracking: (shipmentId, data) => api.post(`/logistics-enhancement/tracking/${shipmentId}`, data),
-  getTracking: (shipmentId) => api.get(`/logistics-enhancement/tracking/${shipmentId}`),
-  setGeofence: (shipmentId, data) => api.post(`/logistics-enhancement/tracking/${shipmentId}/geofence`, data),
-
-  // Temperature Monitoring,
-  recordTemperature: (shipmentId, data) => api.post(`/logistics-enhancement/temperature/${shipmentId}`, data),
-  getTemperatureData: (shipmentId, params) => api.get(`/logistics-enhancement/temperature/${shipmentId}`, { params }),
-  getTemperatureAlerts: (shipmentId) => api.get(`/logistics-enhancement/temperature/${shipmentId}/alerts`),
-
-  // Warehouse Management,
-  createWarehouse: (data) => api.post('/logistics-enhancement/warehouse/locations', data),
-  getWarehouses: (params) => api.get('/logistics-enhancement/warehouse/locations', { params }),
-  addInventory: (warehouseId, data) => api.post('/logistics-enhancement/warehouse/inventory', { warehouseId, ...data }),
-  getWarehouseInventory: (warehouseId) => api.get('/logistics-enhancement/warehouse/inventory', { params: { warehouseId } }),
-
-  // Driver Location,
-  recordDriverLocation: (data) => api.post('/logistics-enhancement/drivers/location', data),
-  getActiveDrivers: (params) => api.get('/logistics-enhancement/drivers/active', { params }),
-  getShipmentTrail: (id) => api.get(`/logistics-enhancement/shipments/${id}/trail`),
-}
-
-/** Enterprise AI API - credit scoring, government scheme eligibility, model
- *  slot registry and the template-fallback conversational query endpoint.
- *  Real backend: backend/src/routes/enterpriseAIRoutes.js. assess-risk,
- *  recommendations, entity-profile, anomaly-detection, predict-yield/demand/
- *  price are intentionally omitted here - the route file itself returns 501
- *  Not Implemented for those (documented in its own header as fabricated
- *  logic removed, not replaced). */
-export const enterpriseAIAPI = {
-  getStatus: () => api.get('/enterprise-ai/status'),
-  getCreditScore: (data) => api.post('/enterprise-ai/credit-score', data),
-  getSchemeEligibility: (data) => api.post('/enterprise-ai/scheme-eligibility', data),
-  getModelRegistry: () => api.get('/enterprise-ai/models'),
-  registerModel: (model) => api.post('/enterprise-ai/models', model),
-  getConversationalQuery: (query) => api.post('/enterprise-ai/query', { query }),
-  getEnterpriseInsights: (entityId) => api.get(`/enterprise-ai/insights/${entityId}`),
-  getRiskAssessment: (entityId) => api.get(`/enterprise-ai/risk/${entityId}`),
-  getModelSlots: () => api.get('/enterprise-ai/model-slots'),
-  getUnservedIntents: () => api.get('/enterprise-ai/unserved-intents'),
-  upsertModelSlot: (data) => api.post('/enterprise-ai/model-slots', data),
-  query: (data) => api.post('/enterprise-ai/query', data),
-}
-
-/** AI Backbone API - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face).
- *  Real backend as of 2026-08-12: backend/src/routes/aiBackboneRoutes.js */
-export const aiBackboneAPI = {
-  getStatus: () => api.get('/ai-backbone/status'),
-  getAIProviderStatus: () => api.get('/ai-backbone/status'),
-  callAI: (data) => api.post('/ai-backbone/call', data),
-  switchProvider: (data) => api.post('/ai-backbone/switch-provider', data),
-  resetAIStatistics: () => api.post('/ai-backbone/reset-statistics'),
-  
-  // Agricultural AI Operations,
-  supportAgriculturalDecision: (data) => api.post('/ai-backbone/agricultural-decision', data),
-  optimizeLivestock: (data) => api.post('/ai-backbone/livestock-optimization', data),
-
-  // Farmer Module AI Integration,
-  recommendCropPlanning: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/crop-planning-recommendation`, data),
-  predictHarvestTiming: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/harvest-timing-prediction`, data),
-  optimizeFarmerResources: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/resource-optimization`, data),
-  
-  // Crop Module AI Integration,
-  detectCropDisease: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/disease-detection`, data),
-  predictCropYield: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/yield-prediction`, data),
-  
-  // Livestock Module AI Integration,
-  monitorLivestockHealth: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/health-monitoring`, data),
-  recommendLivestockBreeding: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/breeding-recommendation`, data),
-  
-  // Inbuilt Modules AI Integration,
-  optimizeDairyProduction: (dairyId, data) => api.post(`/complete-ai-integration/dairy/${dairyId}/production-optimization`, data),
-  monitorPoultryHealth: (poultryId, data) => api.post(`/complete-ai-integration/poultry/${poultryId}/health-monitoring`, data),
-  optimizeGoatProduction: (goatId, data) => api.post(`/complete-ai-integration/goat/${goatId}/production-optimization`, data),
-  optimizeSheepProduction: (sheepId, data) => api.post(`/complete-ai-integration/sheep/${sheepId}/production-optimization`, data),
-  optimizePigProduction: (pigId, data) => api.post(`/complete-ai-integration/pig/${pigId}/production-optimization`, data),
-  
-  // Bulk AI Integration,
-  getAIIntegrationStatus: (params) => api.get('/complete-ai-integration/status', { params }),
-  forceSyncAllAIIntegrations: (data) => api.post('/complete-ai-integration/force-sync', data),
-  getAIModelInfo: () => api.get('/complete-ai-integration/model-info'),
-}
-
-export const custodyAPI = {
-  appendEvent: (data) => api.post('/custody/events', data),
-  getChain: (shipmentId, verify = true) => api.get(`/custody/chain/${shipmentId}`, { params: { verify } }),
-  issueSettlementInstruction: (data) => api.post('/custody/settlement/instructions', data),
-  confirmSettlementExecution: (instructionId) => api.post(`/custody/settlement/${instructionId}/confirm`),
-  getSettlementInstruction: (instructionId) => api.get(`/custody/settlement/${instructionId}`),
-  getStateMachine: () => api.get('/custody/state-machine'),
-}
-
-/** Freight Pooling API - full-truck window pooling for shipments.
- *  Real backend as of 2026-08-29: backend/src/routes/freightPoolingRoutes.js */
-export const freightPoolingAPI = {
-  findPoolableShipments: (originAddress, destinationAddress) =>
-    api.get('/freight-pooling/poolable-shipments', { params: { originAddress, destinationAddress } }),
-  createPoolWindow: (data) => api.post('/freight-pooling/windows', data),
-  listOpenWindows: () => api.get('/freight-pooling/windows'),
-  getPoolWindow: (windowId) => api.get(`/freight-pooling/windows/${windowId}`),
-  joinPoolWindow: (windowId, shipmentId) => api.post(`/freight-pooling/windows/${windowId}/join`, { shipmentId }),
-  closeAndDispatch: (windowId) => api.post(`/freight-pooling/windows/${windowId}/dispatch`),
-}
-
-/** Return-Load Board API - post/search/book backhaul capacity.
- *  Real backend as of 2026-08-29: backend/src/routes/returnLoadBoardRoutes.js */
-export const returnLoadBoardAPI = {
-  postCapacity: (data) => api.post('/return-load-board', data),
-  searchAvailable: (params) => api.get('/return-load-board', { params }),
-  bookPosting: (postingId, shipmentId) => api.post(`/return-load-board/${postingId}/book`, { shipmentId }),
-  cancelPosting: (postingId) => api.delete(`/return-load-board/${postingId}`),
-}
-
-/** Second-Use Equipment Exchange API.
- *  Real backend as of 2026-08-29: backend/src/routes/equipmentExchangeRoutes.js */
-export const equipmentExchangeAPI = {
-  createListing: (data) => api.post('/equipment-exchange', data),
-  listAvailable: (params) => api.get('/equipment-exchange', { params }),
-  getListing: (listingId) => api.get(`/equipment-exchange/${listingId}`),
-  reserveListing: (listingId) => api.post(`/equipment-exchange/${listingId}/reserve`),
-  completeExchange: (listingId) => api.post(`/equipment-exchange/${listingId}/complete`),
-  withdrawListing: (listingId) => api.delete(`/equipment-exchange/${listingId}`),
-}
-
-/** Glut Early-Warning API - oversupply risk detection.
- *  Real backend as of 2026-08-29: backend/src/routes/glutWarningRoutes.js */
-export const glutWarningAPI = {
-  getStatus: () => api.get('/glut-warning/status'),
-  getWarnings: (params) => api.get('/glut-warning/warnings', { params }),
-  createWarning: (data) => api.post('/glut-warning/warnings', data),
-  getWarning: (warningId) => api.get(`/glut-warning/warnings/${warningId}`),
-  acknowledgeWarning: (warningId) => api.post(`/glut-warning/warnings/${warningId}/acknowledge`),
-  getHistoricalGluts: (params) => api.get('/glut-warning/historical', { params }),
-  getGlutPrediction: (crop, region) => api.get('/glut-warning/prediction', { params: { crop, region } }),
-  getMitigationStrategies: (warningId) => api.get(`/glut-warning/warnings/${warningId}/strategies`),
-  checkGlutRisk: (categoryId, stateId) => api.get('/glut-warning/check', { params: { categoryId, stateId } }),
-  scanAllCategories: (stateId) => api.get('/glut-warning/scan', { params: { stateId } }),
-}
-
-/** Seller Ranking API - DB-backed seller trust ranking.
- *  Real backend as of 2026-08-29: backend/src/routes/sellerRankingRoutes.js */
-export const sellerRankingAPI = {
-  getStatus: () => api.get('/seller-ranking/status'),
-  getSellers: (params) => api.get('/seller-ranking/sellers', { params }),
-  getSeller: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}`),
-  getSellerRanking: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/ranking`),
-  getSellerReviews: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/reviews`),
-  getSellerPerformance: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/performance`),
-  reportSeller: (sellerId, issue) => api.post(`/seller-ranking/sellers/${sellerId}/report`, { issue }),
-  getSellerBadges: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/badges`),
-  getRankedSellers: (params) => api.get('/seller-ranking/sellers', { params }),
-  getSellerTrustScore: (userId) => api.get(`/seller-ranking/sellers/${userId}/trust-score`),
-}
-
-/** Civil Disruption / Blockade Response API.
- *  Real backend as of 2026-08-29: backend/src/routes/civilDisruptionRoutes.js */
-export const civilDisruptionAPI = {
-  getStatus: () => api.get('/civil-disruption/status'),
-  getDisruptions: (params) => api.get('/civil-disruption/disruptions', { params }),
-  createDisruption: (data) => api.post('/civil-disruption/disruptions', data),
-  getDisruption: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}`),
-  getImpactAssessment: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/impact`),
-  getMitigationPlans: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/mitigation`),
-  getRiskForecast: (region) => api.get('/civil-disruption/risk-forecast', { params: { region } }),
-  getAlternateRoutes: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/alternate-routes`),
-  report: (data) => api.post('/civil-disruptions', data),
-  listActive: (params) => api.get('/civil-disruptions/active', { params }),
-  verify: (id) => api.post(`/civil-disruptions/${id}/verify`),
-  resolve: (id, endDate) => api.post(`/civil-disruptions/${id}/resolve`, { endDate }),
-  checkShipmentRisk: (shipmentId) => api.get(`/civil-disruptions/shipments/${shipmentId}/risk`),
-}
-
-/** Engineering Project API - Project/phase management + cost estimation.
- *  Real backend: backend/src/routes/engineeringProjectRoutes.js +
- *  services/legacy/engineeringProjectService.js. */
-export const engineeringProjectAPI = {
-  createProject: (data) => api.post('/engineering/projects', data),
-  listProjects: (params) => api.get('/engineering/projects', { params }),
-  getProject: (id) => api.get(`/engineering/projects/${id}`),
-  updateProjectPhase: (id, data) => api.put(`/engineering/projects/${id}/phase`, data),
-  createCostEstimate: (id, data) => api.post(`/engineering/projects/${id}/cost-estimates`, data),
-  getCostEstimates: (id) => api.get(`/engineering/projects/${id}/cost-estimates`),
-}
-
-/** Realtime Monitoring API - In-memory resource monitoring/alerting engine.
- *  Real backend: backend/src/routes/realtimeMonitoringRoutes.js +
- *  services/legacy/realtimeMonitoringService.js. Platform-staff only. */
-export const realtimeMonitoringAPI = {
-  getStatus: () => api.get('/realtime-monitoring/status'),
-  startMonitor: (resourceType, resourceId) => api.post('/realtime-monitoring/start', { resource_type: resourceType, resource_id: resourceId }),
-  stopMonitor: (monitorId) => api.post(`/realtime-monitoring/stop/${monitorId}`),
-  getMonitors: () => api.get('/realtime-monitoring/monitors'),
-  getMonitorData: (monitorId) => api.get(`/realtime-monitoring/monitors/${monitorId}/data`),
-  getAlerts: () => api.get('/realtime-monitoring/alerts'),
-  acknowledgeAlert: (alertId) => api.post(`/realtime-monitoring/alerts/${alertId}/acknowledge`),
-  getSystemMetrics: () => api.get('/realtime-monitoring/metrics'),
-  configureThresholds: (thresholds) => api.post('/realtime-monitoring/thresholds', thresholds),
-  startMonitoring: (resourceId, config) => api.post('/realtime-monitoring/monitors', { resourceId, config }),
-  getAllMonitors: () => api.get('/realtime-monitoring/monitors'),
-  getMonitoringStatus: (id) => api.get(`/realtime-monitoring/monitors/${id}`),
-  stopMonitoring: (id) => api.delete(`/realtime-monitoring/monitors/${id}`),
-  healthCheck: () => api.get('/realtime-monitoring/health'),
-}
-
-/** Cold Storage API - Facility/booking CRUD + capacity-checked booking rule.
- *  Real backend: backend/src/routes/coldStorageRoutes.js +
- *  services/legacy/coldStorageService.js. */
-// (duplicate coldStorageAPI merged into the single declaration earlier in
-// this file - see the note there, 2026-09-07)
-
-/** Cooperative Share API - FPO member share capital + patronage dividend.
- *  Real backend: backend/src/routes/cooperativeShareRoutes.js +
- *  services/legacy/cooperativeShareService.js. */
-export const cooperativeShareAPI = {
-  addMember: (data) => api.post('/cooperative-shares/members', data),
-  listMembers: (fpoId) => api.get('/cooperative-shares/members', { params: { fpoId } }),
-  getPaidUpCapital: (fpoId) => api.get('/cooperative-shares/capital', { params: { fpoId } }),
-  previewDistribution: (data) => api.post('/cooperative-shares/distributions/preview', data),
-  createDistribution: (data) => api.post('/cooperative-shares/distributions', data),
-  listDistributions: (fpoId) => api.get('/cooperative-shares/distributions', { params: { fpoId } }),
-  getDistribution: (id) => api.get(`/cooperative-shares/distributions/${id}`),
-}
-
-/** Agricultural Intelligence API - Crop yield, soil, weather, pest, irrigation
- *  and fertilizer AI predictions. Real backend:
- *  backend/src/routes/agriculturalIntelligenceRoutes.js +
- *  services/legacy/agriculturalIntelligenceService.js. */
-export const agriculturalIntelligenceAPI = {
-  getStatus: () => api.get('/agricultural-intelligence/status'),
-  predictCropYield: (data) => api.post('/agri-intelligence/crop-yield/predict', data),
-  analyzeSoilHealth: (data) => api.post('/agricultural-intelligence/analyze/soil', data),
-  predictWeatherImpact: (data) => api.post('/agricultural-intelligence/predict/weather-impact', data),
-  detectPestRisk: (data) => api.post('/agricultural-intelligence/detect/pest-risk', data),
-  optimizeIrrigation: (data) => api.post('/agri-intelligence/irrigation/optimize', data),
-  getMarketIntelligence: (params) => api.get('/agricultural-intelligence/market', { params }),
-  getAIModels: () => api.get('/agricultural-intelligence/models'),
-  getModelPerformance: (modelId) => api.get(`/agricultural-intelligence/models/${modelId}/performance`),
-  trainModel: (modelType, data) => api.post(`/agricultural-intelligence/models/${modelType}/train`, data),
-  analyzeSoil: (data) => api.post('/agri-intelligence/soil/analyze', data),
-  getWeatherIntelligence: (location, timeframe) => api.get('/agri-intelligence/weather-intelligence', { params: { location, timeframe } }),
-  predictPestOutbreak: (data) => api.post('/agri-intelligence/pest-outbreak/predict', data),
-  recommendCrops: (data) => api.post('/agri-intelligence/crops/recommend', data),
-  recommendFertilizer: (data) => api.post('/agri-intelligence/fertilizer/recommend', data),
-  getAgriculturalAnalytics: (params) => api.get('/agri-intelligence/analytics', { params }),
-  healthCheck: () => api.get('/agri-intelligence/health'),
-}
-
-/** Wikipedia Knowledge Reference API - Wikimedia REST API integration.
- *  Real backend: backend/src/routes/wikipediaRoutes.js +
- *  services/legacy/wikipediaService.js. */
-export const wikipediaAPI = {
-  lookup: (q) => api.get('/wikipedia/lookup', { params: { q } }),
-  getSummaryByTitle: (title) => api.get(`/wikipedia/summary/${encodeURIComponent(title)}`),
-}
-
-/** FOLU Benchmark API - Food & Land Use transition benchmark indicators.
- *  Real backend: backend/src/routes/foluBenchmarkRoutes.js +
- *  services/legacy/foluBenchmarkService.js. */
-export const foluBenchmarkAPI = {
-  listTransitions: () => api.get('/folu-benchmark/transitions'),
-  getBenchmarkReport: () => api.get('/folu-benchmark/report'),
-}
-
-/** Decision Support API - 8 core business logic functions for pricing,
- *  logistics, finance and governance. Real backend:
- *  backend/src/routes/decisionSupportRoutes.js +
- *  services/legacy/decisionSupportService.js. */
-export const decisionSupportAPI = {
-  corpCreditEligible: (data) => api.post('/decision-support/corp-credit-eligible', data),
-  floorBenchmark: (data) => api.post('/decision-support/floor-benchmark', data),
-  ecoLogisticsMiles: (data) => api.post('/decision-support/eco-logistics-miles', data),
-  harvestPoints: (data) => api.post('/decision-support/harvest-points', data),
-  allocScore: (data) => api.post('/decision-support/alloc-score', data),
-  compostPlan: (data) => api.post('/decision-support/compost-plan', data),
-  schemeExpiryStatus: () => api.get('/decision-support/scheme-expiry-status'),
-  complianceGaps: (data) => api.post('/decision-support/compliance-gaps', data),
-}
-
-/** AI Agent API - agentic task execution, multi-agent coordination, agent
- *  and tool management. Real backend: backend/src/routes/aiAgentRoutes.js +
- *  services/aiAgentService.js. Agent execution needs OPENAI_API_KEY or
- *  ANTHROPIC_API_KEY configured server-side - unconfigured in this dev
- *  environment, so execute/coordinate calls will 500 with a clear
- *  "not configured" message until a key is set. */
-export const aiAgentAPI = {
-  getStatus: () => api.get('/ai-agents/status'),
-  getAgents: () => api.get('/ai-agents'),
-  createAgent: (data) => api.post('/ai-agents', data),
-  getAgent: (agentName) => api.get(`/ai-agent/agent/${agentName}`),
-  executeTask: (data) => api.post('/ai-agent/execute', data),
-  getAgentPerformance: (agentId) => api.get(`/ai-agents/${agentId}/performance`),
-  getToolRegistry: () => api.get('/ai-agents/tools'),
-  registerTool: (data) => api.post('/ai-agent/tool', data),
-  getAgentLogs: (agentId) => api.get(`/ai-agents/${agentId}/logs`),
-  coordinateAgents: (data) => api.post('/ai-agent/coordinate', data),
-  getAllAgents: () => api.get('/ai-agent/agents'),
-  registerAgent: (data) => api.post('/ai-agent/agent', data),
-  updateAgent: (agentName, data) => api.put(`/ai-agent/agent/${agentName}`, data),
-  clearAgentMemory: (agentName) => api.delete(`/ai-agent/agent/${agentName}/memory`),
-  getTools: () => api.get('/ai-agent/tools'),
-  getHealth: () => api.get('/ai-agent/health'),
-}
-
-/** AI Brain API - cognitive processing cycle (perception, attention,
- *  reasoning, learning, decision, planning), knowledge graph and working
- *  memory. Real backend: backend/src/routes/aiBrainRoutes.js +
- *  services/legacy/aiBrainService.js. Most processes call OPENAI_API_KEY -
- *  unconfigured in this dev environment, so they'll 500 with a clear
- *  "not configured" message until a key is set. */
-export const aiBrainAPI = {
-  getStatus: () => api.get('/ai-brain/status'),
-  processPerception: (data) => api.post('/ai-brain/perception', data),
-  processAttention: (data) => api.post('/ai-brain/attention', data),
-  processReasoning: (data) => api.post('/ai-brain/reasoning', data),
-  processLearning: (data) => api.post('/ai-brain/learning', data),
-  processDecision: (data) => api.post('/ai-brain/decision', data),
-  processPlanning: (data) => api.post('/ai-brain/planning', data),
-  getKnowledgeGraph: () => api.get('/ai-brain/knowledge-graph'),
-  getMemoryState: () => api.get('/ai-brain/memory'),
-  getCognitiveLoad: () => api.get('/ai-brain/cognitive-load'),
-  runCognitiveCycle: (data) => api.post('/ai-brain/cycle', data),
-  runPerception: (data) => api.post('/ai-brain/perception', data),
-  runAttention: (data) => api.post('/ai-brain/attention', data),
-  runReasoning: (data) => api.post('/ai-brain/reasoning', data),
-  runLearning: (data) => api.post('/ai-brain/learning', data),
-  runDecision: (data) => api.post('/ai-brain/decision', data),
-  runPlanning: (data) => api.post('/ai-brain/planning', data),
-  addKnowledge: (data) => api.post('/ai-brain/knowledge', data),
-  getKnowledge: (domain) => api.get(`/ai-brain/knowledge/${domain}`),
-  getAllKnowledgeDomains: () => api.get('/ai-brain/knowledge'),
-  getCognitiveState: () => api.get('/ai-brain/state'),
-  updateContext: (data) => api.put('/ai-brain/context', data),
-  clearWorkingMemory: () => api.delete('/ai-brain/working-memory'),
-  getHealth: () => api.get('/ai-brain/health'),
-}
-
-/** AI Self-Healing API - autonomous error detection, root cause analysis,
- *  recovery strategy execution and predictive failure prevention.
- *  Real backend: backend/src/routes/aiSelfHealingRoutes.js +
- *  services/legacy/aiSelfHealingService.js. Root-cause/predict calls need
- *  OPENAI_API_KEY - unconfigured in this dev environment, so they'll 500
- *  with a clear "not configured" message until a key is set. */
-export const aiSelfHealingAPI = {
-  getStatus: () => api.get('/ai-self-healing/status'),
-  detectErrors: () => api.post('/ai-self-healing/detect'),
-  analyzeRootCause: (errorId) => api.get(`/ai-self-healing/errors/${errorId}/root-cause`),
-  initiateRecovery: (errorId) => api.post(`/ai-self-healing/errors/${errorId}/recover`),
-  getRecoveryHistory: () => api.get('/ai-self-healing/history'),
-  getHealthMetrics: () => api.get('/ai-self-healing/health'),
-  getHealingPatterns: () => api.get('/ai-self-healing/patterns'),
-  configureAutoHealing: (config) => api.post('/ai-self-healing/configure', config),
-  detectError: (data) => api.post('/ai-self-healing/detect', data),
-  rootCauseAnalysis: (data) => api.post('/ai-self-healing/root-cause', data),
-  executeRecovery: (data) => api.post('/ai-self-healing/recover', data),
-  runHealingCycle: (data) => api.post('/ai-self-healing/heal', data),
-  predictFailures: () => api.get('/ai-self-healing/predict'),
-  getHealingHistory: (limit) => api.get('/ai-self-healing/history', { params: { limit } }),
-  addErrorPattern: (data) => api.post('/ai-self-healing/pattern', data),
-  addRecoveryStrategy: (data) => api.post('/ai-self-healing/strategy', data),
-  getSystemState: () => api.get('/ai-self-healing/system-state'),
-  getServiceHealth: () => api.get('/ai-self-healing/service-health'),
-}
-
-/** AI Operation Intelligence API - real-time performance monitoring,
- *  optimization recommendations, predictive optimization, anomaly detection
- *  and resource allocation. Real backend:
- *  backend/src/routes/aiOperationIntelligenceRoutes.js +
- *  services/legacy/aiOperationIntelligenceService.js (constructor no longer
- *  starts background setInterval timers - fixed earlier). Analyze/recommend/
- *  predict calls need OPENAI_API_KEY - unconfigured in this dev environment,
- *  so they'll 500 with a clear "not configured" message until a key is set. */
-export const aiOperationIntelligenceAPI = {
-  getStatus: () => api.get('/ai-operation-intelligence/status'),
-  getPerformanceMetrics: () => api.get('/ai-operation-intelligence/performance'),
-  getOptimizationSuggestions: () => api.get('/ai-operation-intelligence/suggestions'),
-  detectAnomalies: () => api.get('/ai-operation-intelligence/anomalies'),
-  applyOptimization: (suggestionId) => api.post(`/ai-operation-intelligence/optimizations/${suggestionId}/apply`),
-  getRealtimeAlerts: () => api.get('/ai-operation-intelligence/alerts'),
-  getSystemHealth: () => api.get('/ai-operation-intelligence/health'),
-  getResourceUsage: () => api.get('/ai-operation-intelligence/resources'),
-  getCapacityForecast: () => api.get('/ai-operation-intelligence/capacity-forecast'),
-  getMetrics: () => api.get('/ai-operation-intelligence/metrics'),
-  analyzePerformance: (data) => api.post('/ai-operation-intelligence/analyze', data),
-  recommendOptimizations: (data) => api.post('/ai-operation-intelligence/recommend', data),
-  executeOptimizations: (data) => api.post('/ai-operation-intelligence/optimize', data),
-  runOptimizationCycle: () => api.post('/ai-operation-intelligence/cycle'),
-  predictOptimization: (horizon) => api.get('/ai-operation-intelligence/predict', { params: { horizon } }),
-  getContinuousImprovement: () => api.get('/ai-operation-intelligence/improvements'),
-  getStrategies: () => api.get('/ai-operation-intelligence/strategies'),
-  addStrategy: (data) => api.post('/ai-operation-intelligence/strategy', data),
-  getResourceAllocation: () => api.get('/ai-operation-intelligence/resources'),
-  getOperationHistory: (limit) => api.get('/ai-operation-intelligence/history', { params: { limit } }),
-  getServiceHealth: () => api.get('/ai-operation-intelligence/service-health'),
-}
-
-/** SAP-Style Module Architecture API - module registration, dependency graph,
- *  lifecycle/version/config management, MTA descriptor generation.
- *  Real backend: backend/src/routes/sapModuleArchitectureRoutes.js +
- *  services/legacy/sapModuleArchitectureService.js (all methods verified to exist). */
-export const sapModuleArchitectureAPI = {
-  getStatus: () => api.get('/sap-module-architecture/status'),
-  getModules: () => api.get('/sap-module-architecture/modules'),
-  getModule: (id) => api.get(`/sap-module-architecture/modules/${id}`),
-  registerModule: (data) => api.post('/sap-module-architecture/modules', data),
-  getDependencies: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/dependencies`),
-  getLifecycle: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/lifecycle`),
-  getConfiguration: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/configuration`),
-  getMTADescriptor: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/mta`),
-  deployModule: (moduleId) => api.post(`/sap-module-architecture/modules/${moduleId}/deploy`),
-  getAllModules: () => api.get('/sap-module-architecture/modules'),
-  getModulesByType: (type) => api.get(`/sap-module-architecture/modules/type/${type}`),
-  updateModule: (id, data) => api.put(`/sap-module-architecture/modules/${id}`, data),
-  deleteModule: (id) => api.delete(`/sap-module-architecture/modules/${id}`),
-
-  // Dependencies,
-  getModuleDependencies: (id) => api.get(`/sap-module-architecture/modules/${id}/dependencies`),
-  getDependencyGraph: () => api.get('/sap-module-architecture/dependency-graph'),
-  resolveDependencies: (id) => api.get(`/sap-module-architecture/modules/${id}/resolve-dependencies`),
-
-  // Configuration,
-  getModuleConfiguration: (id) => api.get(`/sap-module-architecture/modules/${id}/configuration`),
-  setModuleConfiguration: (id, data) => api.put(`/sap-module-architecture/modules/${id}/configuration`, data),
-
-  // Version management,
-  getModuleVersion: (id) => api.get(`/sap-module-architecture/modules/${id}/version`),
-  updateModuleVersion: (id, version) => api.put(`/sap-module-architecture/modules/${id}/version`, { version }),
-
-  // Lifecycle,
-  transitionModuleState: (id, newState) => api.post(`/sap-module-architecture/modules/${id}/transition`, { new_state: newState }),
-  getModuleLifecycle: (id) => api.get(`/sap-module-architecture/modules/${id}/lifecycle`),
-
-  // Compatibility / MTA / overview,
-  getModuleCompatibility: (id) => api.get(`/sap-module-architecture/modules/${id}/compatibility`),
-  generateMTADescriptor: (id) => api.get(`/sap-module-architecture/modules/${id}/mta-descriptor`),
-  getArchitectureOverview: () => api.get('/sap-module-architecture/overview'),
-  getServiceHealth: () => api.get('/sap-module-architecture/service-health'),
-}
-
-/** Research and Development (R&D) API - project management, collaborations,
- *  innovations, patents, funding, publications, knowledge base, AI assistance.
- *  Real backend: backend/src/routes/researchAndDevelopmentRoutes.js +
- *  services/legacy/researchAndDevelopmentService.js (all methods verified to exist). */
-export const researchAndDevelopmentAPI = {
-  getStatus: () => api.get('/research-and-development/status'),
-  getProjects: (params) => api.get('/research-and-development/projects', { params }),
-  createProject: (data) => api.post('/research-and-development/projects', data),
-  getProject: (projectId) => api.get(`/research-and-development/projects/${projectId}`),
-  updateProject: (projectId, data) => api.put(`/research-and-development/projects/${projectId}`, data),
-  getCollaborations: (params) => api.get('/research-and-development/collaborations', { params }),
-  getInnovations: (params) => api.get('/research-and-development/innovations', { params }),
-  getPatents: (params) => api.get('/research-and-development/patents', { params }),
-  getFunding: (projectId) => api.get(`/research-and-development/projects/${projectId}/funding`),
-  getPublications: (params) => api.get('/research-and-development/publications', { params }),
-  getAIResearchAssistance: (query, context) => api.post('/research-and-development/ai-assistance', { query, context }),
-
-  // Knowledge base,
-  getRDProjects: (params) => api.get('/research-and-development/projects', { params }),
-  getRDProject: (projectId) => api.get(`/research-and-development/projects/${projectId}`),
-  createRDProject: (data) => api.post('/research-and-development/projects', data),
-  updateRDProject: (projectId, data) => api.put(`/research-and-development/projects/${projectId}`, data),
-  deleteRDProject: (projectId) => api.delete(`/research-and-development/projects/${projectId}`),
-
-  // Milestones,
-  addMilestone: (projectId, data) => api.post(`/research-and-development/projects/${projectId}/milestones`, data),
-  updateMilestone: (projectId, milestoneId, data) => api.put(`/research-and-development/projects/${projectId}/milestones/${milestoneId}`, data),
-
-  // Collaborations,
-  createCollaboration: (data) => api.post('/research-and-development/collaborations', data),
-
-  // Innovations,
-  createInnovation: (data) => api.post('/research-and-development/innovations', data),
-
-  // Patents,
-  createPatent: (data) => api.post('/research-and-development/patents', data),
-
-  // Funding,
-  getFundingOpportunities: (params) => api.get('/research-and-development/funding', { params }),
-  createFundingOpportunity: (data) => api.post('/research-and-development/funding', data),
-  applyForFunding: (fundingId, data) => api.post(`/research-and-development/funding/${fundingId}/apply`, data),
-
-  // Publications,
-  createPublication: (data) => api.post('/research-and-development/publications', data),
-
-  // AI research assistance,
-  searchKnowledgeBase: (q, params) => api.get('/research-and-development/knowledge', { params: { q, ...params } }),
-  addKnowledge: (data) => api.post('/research-and-development/knowledge', data),
-
-  // Analytics / health,
-  getRDAnalytics: () => api.get('/research-and-development/analytics'),
-  getHealthStatus: () => api.get('/research-and-development/health'),
-}
-
-/** Information Sharing API - document management, folders, permissions,
- *  sharing links, real-time collaboration sessions, AI recommendations.
- *  Real backend: backend/src/routes/informationSharingRoutes.js +
- *  services/legacy/informationSharingService.js (all methods verified to exist;
- *  fixed a route-ordering bug 2026-08-29 where GET /documents/search was
- *  shadowed by GET /documents/:documentId and unreachable). */
-export const informationSharingAPI = {
-  getStatus: () => api.get('/information-sharing/status'),
-  getDocuments: (params) => api.get('/information-sharing/documents', { params }),
-  createDocument: (data) => api.post('/information-sharing/documents', data),
-  getDocument: (documentId) => api.get(`/information-sharing/documents/${documentId}`),
-  updateDocument: (documentId, data) => api.put(`/information-sharing/documents/${documentId}`, data),
-  getFolders: (params) => api.get('/information-sharing/folders', { params }),
-  createFolder: (data) => api.post('/information-sharing/folders', data),
-
-  // Permissions,
-  getPermissions: (resourceId, resourceType) => api.get(`/information-sharing/permissions/${resourceId}`, { params: { resourceType } }),
-  setPermissions: (resourceId, permissions) => api.put(`/information-sharing/resources/${resourceId}/permissions`, permissions),
-  getSharingLinks: (documentId) => api.get(`/information-sharing/documents/${documentId}/links`),
-  createSharingLink: (data) => api.post('/information-sharing/sharing-links', data),
-  getCollaborationSessions: (params) => api.get('/information-sharing/collaboration-sessions', { params }),
-  startCollaboration: (documentId) => api.post(`/information-sharing/documents/${documentId}/collaboration`),
-  getAIRecommendations: (documentId) => api.get(`/information-sharing/documents/${documentId}/recommendations`),
-  deleteDocument: (documentId) => api.delete(`/information-sharing/documents/${documentId}`),
-  searchDocuments: (q, params) => api.get('/information-sharing/documents/search', { params: { q, ...params } }),
-
-  // Folders,
-  getFolderTree: (rootId) => api.get('/information-sharing/folders/tree', { params: rootId ? { rootId } : {} }),
-  setPermission: (data) => api.post('/information-sharing/permissions', data),
-  checkPermission: (resourceId, userId, permission) => api.get(`/information-sharing/permissions/${resourceId}/check/${userId}`, { params: { permission } }),
-
-  // Sharing links,
-  accessSharingLink: (token) => api.get(`/information-sharing/sharing-links/access/${token}`),
-
-  // Collaboration sessions,
-  createCollaborationSession: (data) => api.post('/information-sharing/collaboration-sessions', data),
-  joinCollaborationSession: (sessionId, userId) => api.post(`/information-sharing/collaboration-sessions/${sessionId}/join`, { userId }),
-  endCollaborationSession: (sessionId) => api.post(`/information-sharing/collaboration-sessions/${sessionId}/end`),
-
-  // AI recommendations,
-  generateAIRecommendations: (userId, context) => api.post('/information-sharing/ai-recommendations', { userId, context }),
-
-  // Activity logs / analytics / health,
-  getActivityLogs: (resourceId) => api.get(`/information-sharing/activity-logs/${resourceId}`),
-  getAnalytics: () => api.get('/information-sharing/analytics'),
-  getHealthStatus: () => api.get('/information-sharing/health'),
-}
-
-/** Strategic API - contract farming, strategic partnerships */
-export const strategicAPI = {
-  contractFarming: {
-    getFarmerContracts: (params) => api.get('/strategic/contract-farming/farmer-contracts', { params }),
-    getOpportunities: (params) => api.get('/strategic/contract-farming/opportunities', { params }),
-    createContract: (data) => api.post('/strategic/contract-farming/contracts', data),
-    updateContract: (contractId, data) => api.put(`/strategic/contract-farming/contracts/${contractId}`, data),
-    deleteContract: (contractId) => api.delete(`/strategic/contract-farming/contracts/${contractId}`),
-    getContractDetails: (contractId) => api.get(`/strategic/contract-farming/contracts/${contractId}`),
-  },
-  partnerships: {
-    getPartnerships: (params) => api.get('/strategic/partnerships', { params }),
-    createPartnership: (data) => api.post('/strategic/partnerships', data),
-  },
-}
-
-/** Escrow (M697100_ESCROW). No dedicated mounted route found - calls the
- * generic backend-module bridge; verify against the module's service.js
- * before relying on this in production. */
-export const escrowAPI = {
-  list: (params) => api.get('/escrow', { params }),
-  create: (data) => api.post('/escrow', data),
-  get: (escrowId) => api.get(`/escrow/${escrowId}`),
-  getStatus: (escrowId) => api.get(`/escrow/${escrowId}/status`),
-  getByOrder: (orderId) => api.get(`/escrow/order/${orderId}`),
-  getUserEscrows: (userId, role) => api.get(`/escrow/user/${userId}`, { params: { role } }),
-  release: (escrowId, data) => api.post(`/escrow/${escrowId}/release`, data),
-  refund: (escrowId, data) => api.post(`/escrow/${escrowId}/refund`, data),
-}
-
-/** Farmer Value / Season Ledger (M844100_FARMERVALUE). No dedicated mounted
- * route found - calls the generic backend-module bridge; verify against the
- * module's service.js before relying on this in production. */
 export const farmerValueAPI = {
-  getSeasonLedger: (farmerId, season) => api.get(`/backend-modules/M844100_FARMERVALUE/getSeasonLedger/${farmerId}`, { params: { season } }),
-}
+  getFarmerValue: () => api.get('/farmer-value'),
+  calculateFarmerValue: (data) => api.post('/farmer-value/calculate', data),
+};
 
-/** Generic dashboard stats. No backend route found. */
-export const dashboardAPI = {
-  getStats: () => api.get('/dashboard/stats'),
-}
+export const farmerSkillAPI = {
+  getFarmerSkills: () => api.get('/farmer-skills'),
+  addFarmerSkill: (data) => api.post('/farmer-skills', data),
+};
 
-/** Generic user profile/address management. No backend route found -
- * userManagementAPI (auth-backed) may already cover this; verify before use. */
-export const userAPI = {
-  getProfile: () => api.get('/users/profile'),
-  updateProfile: (data) => api.put('/users/profile', data),
-  getAddresses: () => api.get('/users/addresses'),
-  addAddress: (data) => api.post('/users/addresses', data),
-}
+export const farmerVerificationAPI = {
+  getFarmerVerifications: () => api.get('/farmer-verifications'),
+  verifyFarmer: (data) => api.post('/farmer-verifications/verify', data),
+};
 
-/** Payment Gateway (M3100_OFFLINEPAYMENT covers offline only). No dedicated
- * online payment-gateway route found. */
-export const paymentGatewayAPI = {
-  getSupportedGateways: () => api.get('/payment-gateway/gateways'),
-  processPayment: (data) => api.post('/payment-gateway/process', data),
-  getPaymentStatus: (paymentId) => api.get(`/payment-gateway/status/${paymentId}`),
-  refundPayment: (paymentId, data) => api.post(`/payment-gateway/${paymentId}/refund`, data),
-}
+// Additional missing exports for various pages
+export const fertilizerAPI = {
+  getFertilizers: () => api.get('/fertilizers'),
+  manageFertilizer: (data) => api.post('/fertilizers/manage', data),
+};
 
-/** Public data source extraction/registry. No backend route found. */
-export const publicDataAPI = {
-  listSources: () => api.get('/public-data/sources'),
-  registerSource: (data) => api.post('/public-data/sources', data),
-  extract: (sourceId, params) => api.post(`/public-data/sources/${sourceId}/extract`, params),
-}
+export const microFarmAPI = {
+  getMicroFarms: () => api.get('/micro-farms'),
+  manageMicroFarm: (data) => api.post('/micro-farms/manage', data),
+};
 
-/** Generic transaction history. No dedicated mounted route found. */
-export const transactionAPI = {
-  getUserTransactions: (params) => api.get('/transactions', { params }),
-}
+export const hatcheryManagementAPI = {
+  getHatcheries: () => api.get('/hatchery-management'),
+  manageHatchery: (data) => api.post('/hatchery-management/manage', data),
+};
 
-/** Global/advanced search across products/knowledge entries. No dedicated
- * mounted route found. */
-export const searchAPI = {
-  search: (params) => api.get('/search', { params }),
-}
+export const fishFeedAPI = {
+  getFishFeeds: () => api.get('/fish-feed'),
+  manageFishFeed: (data) => api.post('/fish-feed/manage', data),
+};
 
-export { api }
-export default api
+export const fisheriesWaterQualityAPI = {
+  getWaterQuality: () => api.get('/fisheries-water-quality'),
+  monitorWaterQuality: (data) => api.post('/fisheries-water-quality/monitor', data),
+};
+
+export const fisheriesHealthAPI = {
+  getFisheriesHealth: () => api.get('/fisheries-health'),
+  monitorFisheriesHealth: (data) => api.post('/fisheries-health/monitor', data),
+};
+
+export const fisheriesHarvestAPI = {
+  getFisheriesHarvest: () => api.get('/fisheries-harvest'),
+  manageHarvest: (data) => api.post('/fisheries-harvest/manage', data),
+};
+
+export const fisheriesPCRManagementAPI = {
+  getFisheriesPCR: () => api.get('/fisheries-pcr-management'),
+  managePCR: (data) => api.post('/fisheries-pcr-management/manage', data),
+};
+
+export const fisheriesComplianceAPI = {
+  getFisheriesCompliance: () => api.get('/fisheries-compliance'),
+  checkCompliance: (data) => api.post('/fisheries-compliance/check', data),
+};
+
+export const fleetAPI = {
+  getFleets: () => api.get('/fleets'),
+  manageFleet: (data) => api.post('/fleets/manage', data),
+};
+
+export const flightAPI = {
+  getFlights: () => api.get('/flights'),
+  bookFlight: (data) => api.post('/flights/book', data),
+};
+
+export const financeLeasingAPI = {
+  getFinanceLeasing: () => api.get('/finance-leasing'),
+  manageLeasing: (data) => api.post('/finance-leasing/manage', data),
+};
+
+export const foodGrainsAPI = {
+  getFoodGrains: () => api.get('/food-grains'),
+  manageFoodGrains: (data) => api.post('/food-grains/manage', data),
+};
+
+export const forageAPI = {
+  getForage: () => api.get('/forage'),
+  manageForage: (data) => api.post('/forage/manage', data),
+};
+
+export const forecastAPI = {
+  getForecasts: () => api.get('/forecast'),
+  generateForecast: (data) => api.post('/forecast/generate', data),
+};
+
+export const formulationAPI = {
+  getFormulations: () => api.get('/formulations'),
+  createFormulation: (data) => api.post('/formulations', data),
+};
+
+export const franchiseAPI = {
+  getFranchises: () => api.get('/franchises'),
+  createFranchise: (data) => api.post('/franchises', data),
+};
+
+export const freshProduceAPI = {
+  getFreshProduce: () => api.get('/fresh-produce'),
+  manageFreshProduce: (data) => api.post('/fresh-produce/manage', data),
+};
+
+export const fruitCropsAPI = {
+  getFruitCrops: () => api.get('/fruit-crops'),
+  manageFruitCrops: (data) => api.post('/fruit-crops/manage', data),
+};
+
+export const fundAPI = {
+  getFunds: () => api.get('/funds'),
+  createFund: (data) => api.post('/funds', data),
+};
+
+export const fundingAPI = {
+  getFunding: () => api.get('/funding'),
+  applyForFunding: (data) => api.post('/funding/apply', data),
+};
+
+export const futureMarketAPI = {
+  getFutureMarkets: () => api.get('/future-markets'),
+  tradeFuture: (data) => api.post('/future-markets/trade', data),
+};
+
+export const gameMeatAPI = {
+  getGameMeat: () => api.get('/game-meat'),
+  manageGameMeat: (data) => api.post('/game-meat/manage', data),
+};
+
+export const geoSpatialAPI = {
+  getGeoSpatial: () => api.get('/geo-spatial'),
+  analyzeGeoSpatial: (data) => api.post('/geo-spatial/analyze', data),
+};
+
+export const geneticsAPI = {
+  getGenetics: () => api.get('/genetics'),
+  analyzeGenetics: (data) => api.post('/genetics/analyze', data),
+};
+
+export const geoTaggingAPI = {
+  getGeoTagging: () => api.get('/geo-tagging'),
+  createGeoTag: (data) => api.post('/geo-tagging', data),
+};
+
+export const governmentSchemesAPI = {
+  getGovernmentSchemes: () => api.get('/government-schemes'),
+  applyForScheme: (id, data) => api.post(`/government-schemes/${id}/apply`, data),
+};
+
+export const grainAPI = {
+  getGrains: () => api.get('/grains'),
+  manageGrains: (data) => api.post('/grains/manage', data),
+};
+
+export const grazingAPI = {
+  getGrazing: () => api.get('/grazing'),
+  manageGrazing: (data) => api.post('/grazing/manage', data),
+};
+
+export const greenhouseAPI = {
+  getGreenhouses: () => api.get('/greenhouses'),
+  manageGreenhouse: (data) => api.post('/greenhouses/manage', data),
+};
+
+export const growingAPI = {
+  getGrowing: () => api.get('/growing'),
+  manageGrowing: (data) => api.post('/growing/manage', data),
+};
+
+export const guardianAPI = {
+  getGuardians: () => api.get('/guardians'),
+  assignGuardian: (data) => api.post('/guardians/assign', data),
+};
+
+export const habitatAPI = {
+  getHabitats: () => api.get('/habitats'),
+  manageHabitat: (data) => api.post('/habitats/manage', data),
+};
+
+export const harvestManagementAPI = {
+  getHarvestManagement: () => api.get('/harvest-management'),
+  manageHarvest: (data) => api.post('/harvest-management/manage', data),
+};
+
+export const healthAPI2 = {
+  getHealth: () => api.get('/health'),
+  checkHealth: () => api.post('/health/check'),
+};
+
+export const herdAPI = {
+  getHerds: () => api.get('/herds'),
+  manageHerd: (data) => api.post('/herds/manage', data),
+};
+
+export const horticultureAPI = {
+  getHorticulture: () => api.get('/horticulture'),
+  manageHorticulture: (data) => api.post('/horticulture/manage', data),
+};
+
+export const housingAPI = {
+  getHousing: () => api.get('/housing'),
+  manageHousing: (data) => api.post('/housing/manage', data),
+};
+
+export const hygieneAPI = {
+  getHygiene: () => api.get('/hygiene'),
+  manageHygiene: (data) => api.post('/hygiene/manage', data),
+};
+
+export const identityManagementAPI = {
+  getIdentityManagement: () => api.get('/identity-management'),
+  manageIdentity: (data) => api.post('/identity-management/manage', data),
+};
+
+export const impactAPI = {
+  getImpacts: () => api.get('/impacts'),
+  measureImpact: (data) => api.post('/impacts/measure', data),
+};
+
+export const importExportAPI = {
+  getImportExport: () => api.get('/import-export'),
+  manageImportExport: (data) => api.post('/import-export/manage', data),
+};
+
+export const incidentResponseAPI = {
+  getIncidentResponse: () => api.get('/incident-response'),
+  respondToIncident: (data) => api.post('/incident-response/respond', data),
+};
+
+export const incomeAPI = {
+  getIncome: () => api.get('/income'),
+  trackIncome: (data) => api.post('/income/track', data),
+};
+
+export const indigenousAPI = {
+  getIndigenous: () => api.get('/indigenous'),
+  manageIndigenous: (data) => api.post('/indigenous/manage', data),
+};
+
+export const individualAPI = {
+  getIndividuals: () => api.get('/individuals'),
+  manageIndividual: (data) => api.post('/individuals/manage', data),
+};
+
+export const industryAPI = {
+  getIndustry: () => api.get('/industry'),
+  analyzeIndustry: (data) => api.post('/industry/analyze', data),
+};
+
+export var infrastructureAPI2 = {
+  getInfrastructure: () => api.get('/infrastructure'),
+  manageInfrastructure: (data) => api.post('/infrastructure/manage', data),
+};
+
+export const innovationAPI = {
+  getInnovations: () => api.get('/innovations'),
+  manageInnovation: (data) => api.post('/innovations/manage', data),
+};
+
+export const inputAPI = {
+  getInputs: () => api.get('/inputs'),
+  manageInput: (data) => api.post('/inputs/manage', data),
+};
+
+export const insectManagementAPI = {
+  getInsectManagement: () => api.get('/insect-management'),
+  manageInsects: (data) => api.post('/insect-management/manage', data),
+};
+
+export const inspectionAPI = {
+  getInspections: () => api.get('/inspections'),
+  conductInspection: (data) => api.post('/inspections/conduct', data),
+};
+
+export const insuranceClaimAPI = {
+  getInsuranceClaims: () => api.get('/insurance-claims'),
+  fileClaim: (data) => api.post('/insurance-claims/file', data),
+};
+
+export const integrationHubAPI = {
+  getIntegrations: () => api.get('/integration-hub'),
+  configureIntegration: (id, data) => api.put(`/integration-hub/${id}`, data),
+};
+
+export const intellectualPropertyAPI = {
+  getIntellectualProperty: () => api.get('/intellectual-property'),
+  registerIP: (data) => api.post('/intellectual-property/register', data),
+};
+
+export const intercroppingAPI = {
+  getIntercropping: () => api.get('/intercropping'),
+  manageIntercropping: (data) => api.post('/intercropping/manage', data),
+};
+
+export const inventoryAPI2 = {
+  getInventory: () => api.get('/inventory'),
+  manageInventory: (data) => api.post('/inventory/manage', data),
+};
+
+export const investmentPortfolioAPI = {
+  getInvestmentPortfolio: () => api.get('/investment-portfolio'),
+  managePortfolio: (data) => api.post('/investment-portfolio/manage', data),
+};
+
+export const irrigationAPI2 = {
+  getIrrigation: () => api.get('/irrigation'),
+  manageIrrigation: (data) => api.post('/irrigation/manage', data),
+};
+
+export const jointVentureAPI = {
+  getJointVentures: () => api.get('/joint-ventures'),
+  createJointVenture: (data) => api.post('/joint-ventures', data),
+};
+
+export const kioskAPI2 = {
+  getKiosks: () => api.get('/kiosks'),
+  manageKiosk: (data) => api.post('/kiosks/manage', data),
+};
+
+export const knowledgeBaseAPI2 = {
+  getKnowledgeBase: () => api.get('/knowledge-base'),
+  searchKnowledge: (query) => api.post('/knowledge-base/search', query),
+};
+
+export const kpiAPI = {
+  getKPIs: () => api.get('/kpi'),
+  trackKPI: (data) => api.post('/kpi/track', data),
+};
+
+export const laborAPI2 = {
+  getLabor: () => api.get('/labor'),
+  manageLabor: (data) => api.post('/labor/manage', data),
+};
+
+export const landAPI = {
+  getLand: () => api.get('/land'),
+  manageLand: (data) => api.post('/land/manage', data),
+};
+
+export const landscapeAPI = {
+  getLandscape: () => api.get('/landscape'),
+  manageLandscape: (data) => api.post('/landscape/manage', data),
+};
+
+export const landUseAPI = {
+  getLandUse: () => api.get('/land-use'),
+  analyzeLandUse: (data) => api.post('/land-use/analyze', data),
+};
+
+export const legalAPI2 = {
+  getLegal: () => api.get('/legal'),
+  manageLegal: (data) => api.post('/legal/manage', data),
+};
+
+export const livestockAPI2 = {
+  getLivestock: () => api.get('/livestock'),
+  manageLivestock: (data) => api.post('/livestock/manage', data),
+};
+
+export const loanAPI2 = {
+  getLoans: () => api.get('/loans'),
+  applyForLoan: (data) => api.post('/loans/apply', data),
+};
+
+export const locationAPI = {
+  getLocations: () => api.get('/locations'),
+  manageLocation: (data) => api.post('/locations/manage', data),
+};
+
+export const logisticsAPI2 = {
+  getLogistics: () => api.get('/logistics'),
+  manageLogistics: (data) => api.post('/logistics/manage', data),
+};
+
+export const maintenanceAPI2 = {
+  getMaintenance: () => api.get('/maintenance'),
+  scheduleMaintenance: (data) => api.post('/maintenance/schedule', data),
+};
+
+export const marketAccessAPI = {
+  getMarketAccess: () => api.get('/market-access'),
+  manageMarketAccess: (data) => api.post('/market-access/manage', data),
+};
+
+export const marketAPI2 = {
+  getMarket: () => api.get('/market'),
+  analyzeMarket: (data) => api.post('/market/analyze', data),
+};
+
+export const marketplaceAPI2 = {
+  getMarketplace: () => api.get('/marketplace'),
+  tradeMarketplace: (data) => api.post('/marketplace/trade', data),
+};
+
+export const marketingAPI = {
+  getMarketing: () => api.get('/marketing'),
+  runMarketingCampaign: (data) => api.post('/marketing/campaign', data),
+};
+
+export const memberAPI = {
+  getMembers: () => api.get('/members'),
+  manageMember: (data) => api.post('/members/manage', data),
+};
+
+export const memberBenefitAPI = {
+  getMemberBenefits: () => api.get('/member-benefits'),
+  manageMemberBenefit: (data) => api.post('/member-benefits/manage', data),
+};
+
+export const mentorshipAPI = {
+  getMentorships: () => api.get('/mentorships'),
+  manageMentorship: (data) => api.post('/mentorships/manage', data),
+};
+
+export const meteringAPI = {
+  getMetering: () => api.get('/metering'),
+  manageMetering: (data) => api.post('/metering/manage', data),
+};
+
+export const microFinanceAPI = {
+  getMicroFinance: () => api.get('/micro-finance'),
+  manageMicroFinance: (data) => api.post('/micro-finance/manage', data),
+};
+
+export const milkingAPI = {
+  getMilking: () => api.get('/milking'),
+  manageMilking: (data) => api.post('/milking/manage', data),
+};
+
+export const mobileAPI = {
+  getMobile: () => api.get('/mobile'),
+  manageMobile: (data) => api.post('/mobile/manage', data),
+};
+
+export const monitoringAPI2 = {
+  getMonitoring: () => api.get('/monitoring'),
+  monitorTarget: (data) => api.post('/monitoring/monitor', data),
+};
+
+export const mushroomAPI = {
+  getMushrooms: () => api.get('/mushrooms'),
+  manageMushrooms: (data) => api.post('/mushrooms/manage', data),
+};
+
+export const mutualFundAPI = {
+  getMutualFunds: () => api.get('/mutual-funds'),
+  investInMutualFund: (data) => api.post('/mutual-funds/invest', data),
+};
+
+export const nanotechnologyAPI = {
+  getNanotechnology: () => api.get('/nanotechnology'),
+  applyNanotechnology: (data) => api.post('/nanotechnology/apply', data),
+};
+
+export const networkAPI = {
+  getNetwork: () => api.get('/network'),
+  manageNetwork: (data) => api.post('/network/manage', data),
+};
+
+export const nutritionAPI3 = {
+  getNutrition: () => api.get('/nutrition'),
+  analyzeNutrition: (data) => api.post('/nutrition/analyze', data),
+};
+
+export const oatAPI = {
+  getOats: () => api.get('/oats'),
+  manageOats: (data) => api.post('/oats/manage', data),
+};
+
+export const oilSeedAPI = {
+  getOilSeeds: () => api.get('/oil-seeds'),
+  manageOilSeeds: (data) => api.post('/oil-seeds/manage', data),
+};
+
+export const onionAPI = {
+  getOnions: () => api.get('/onions'),
+  manageOnions: (data) => api.post('/onions/manage', data),
+};
+
+export const organicAPI = {
+  getOrganic: () => api.get('/organic'),
+  manageOrganic: (data) => api.post('/organic/manage', data),
+};
+
+export const packingAPI = {
+  getPacking: () => api.get('/packing'),
+  managePacking: (data) => api.post('/packing/manage', data),
+};
+
+export const palletAPI = {
+  getPallets: () => api.get('/pallets'),
+  managePallets: (data) => api.post('/pallets/manage', data),
+};
+
+export const pastureAPI = {
+  getPasture: () => api.get('/pasture'),
+  managePasture: (data) => api.post('/pasture/manage', data),
+};
+
+export const paymentAPI2 = {
+  getPayments: () => api.get('/payments'),
+  processPayment: (data) => api.post('/payments/process', data),
+};
+
+export const pedigreeAPI = {
+  getPedigree: () => api.get('/pedigree'),
+  managePedigree: (data) => api.post('/pedigree/manage', data),
+};
+
+export const pepperAPI = {
+  getPeppers: () => api.get('/peppers'),
+  managePeppers: (data) => api.post('/peppers/manage', data),
+};
+
+export const performanceAPI2 = {
+  getPerformance: () => api.get('/performance'),
+  measurePerformance: (data) => api.post('/performance/measure', data),
+};
+
+export const pesticideAPI = {
+  getPesticides: () => api.get('/pesticides'),
+  managePesticides: (data) => api.post('/pesticides/manage', data),
+};
+
+export const photoAPI = {
+  getPhotos: () => api.get('/photos'),
+  uploadPhoto: (data) => api.post('/photos/upload', data),
+};
+
+export const pipelineAPI = {
+  getPipelines: () => api.get('/pipelines'),
+  managePipeline: (data) => api.post('/pipelines/manage', data),
+};
+
+export const plantAPI = {
+  getPlants: () => api.get('/plants'),
+  managePlants: (data) => api.post('/plants/manage', data),
+};
+
+export const plantationAPI = {
+  getPlantations: () => api.get('/plantations'),
+  managePlantation: (data) => api.post('/plantations/manage', data),
+};
+
+export const potatoAPI = {
+  getPotatoes: () => api.get('/potatoes'),
+  managePotatoes: (data) => api.post('/potatoes/manage', data),
+};
+
+export const poultryAPI2 = {
+  getPoultry: () => api.get('/poultry'),
+  managePoultry: (data) => api.post('/poultry/manage', data),
+};
+
+export const precisionAPI = {
+  getPrecision: () => api.get('/precision'),
+  applyPrecision: (data) => api.post('/precision/apply', data),
+};
+
+export const predictionAPI = {
+  getPredictions: () => api.get('/predictions'),
+  generatePrediction: (data) => api.post('/predictions/generate', data),
+};
+
+export const preservationAPI = {
+  getPreservation: () => api.get('/preservation'),
+  managePreservation: (data) => api.post('/preservation/manage', data),
+};
+
+export const processingAPI = {
+  getProcessing: () => api.get('/processing'),
+  manageProcessing: (data) => api.post('/processing/manage', data),
+};
+
+export const productionAPI = {
+  getProduction: () => api.get('/production'),
+  manageProduction: (data) => api.post('/production/manage', data),
+};
+
+export const productAPI2 = {
+  getProducts: () => api.get('/products'),
+  manageProduct: (data) => api.post('/products/manage', data),
+};
+
+export const profitAPI2 = {
+  getProfit: () => api.get('/profit'),
+  analyzeProfit: (data) => api.post('/profit/analyze', data),
+};
+
+export const projectAPI2 = {
+  getProjects: () => api.get('/projects'),
+  manageProject: (data) => api.post('/projects/manage', data),
+};
+
+export const propertyAPI = {
+  getProperty: () => api.get('/property'),
+  manageProperty: (data) => api.post('/property/manage', data),
+};
+
+export const proposalAPI = {
+  getProposals: () => api.get('/proposals'),
+  createProposal: (data) => api.post('/proposals', data),
+};
+
+export const procurementAPI2 = {
+  getProcurement: () => api.get('/procurement'),
+  manageProcurement: (data) => api.post('/procurement/manage', data),
+};
+
+export const qualityAPI2 = {
+  getQuality: () => api.get('/quality'),
+  manageQuality: (data) => api.post('/quality/manage', data),
+};
+
+export const qualityControlAPI = {
+  getQualityControl: () => api.get('/quality-control'),
+  controlQuality: (data) => api.post('/quality-control/control', data),
+};
+
+export const quarantineAPI = {
+  getQuarantine: () => api.get('/quarantine'),
+  manageQuarantine: (data) => api.post('/quarantine/manage', data),
+};
+
+export const rabbitAPI = {
+  getRabbits: () => api.get('/rabbits'),
+  manageRabbits: (data) => api.post('/rabbits/manage', data),
+};
+
+export const radiationAPI = {
+  getRadiation: () => api.get('/radiation'),
+  measureRadiation: (data) => api.post('/radiation/measure', data),
+};
+
+export const rainAPI = {
+  getRain: () => api.get('/rain'),
+  measureRain: (data) => api.post('/rain/measure', data),
+};
+
+export const randomAPI = {
+  getRandom: () => api.get('/random'),
+  generateRandom: (data) => api.post('/random/generate', data),
+};
+
+export const rangeAPI = {
+  getRanges: () => api.get('/ranges'),
+  manageRange: (data) => api.post('/ranges/manage', data),
+};
+
+export const ratingAPI2 = {
+  getRatings: () => api.get('/ratings'),
+  submitRating: (data) => api.post('/ratings/submit', data),
+};
+
+export const recordAPI = {
+  getRecords: () => api.get('/records'),
+  manageRecord: (data) => api.post('/records/manage', data),
+};
+
+export const regulatoryAPI = {
+  getRegulatory: () => api.get('/regulatory'),
+  manageRegulatory: (data) => api.post('/regulatory/manage', data),
+};
+
+export const remediationAPI = {
+  getRemediation: () => api.get('/remediation'),
+  performRemediation: (data) => api.post('/remediation/perform', data),
+};
+
+export const reportingAPI2 = {
+  getReporting: () => api.get('/reporting'),
+  generateReport: (data) => api.post('/reporting/generate', data),
+};
+
+export const repositoryAPI = {
+  getRepositories: () => api.get('/repositories'),
+  manageRepository: (data) => api.post('/repositories/manage', data),
+};
+
+export const requestAPI = {
+  getRequests: () => api.get('/requests'),
+  createRequest: (data) => api.post('/requests', data),
+};
+
+export const researchAPI = {
+  getResearch: () => api.get('/research'),
+  conductResearch: (data) => api.post('/research/conduct', data),
+};
+
+export const reservoirAPI = {
+  getReservoirs: () => api.get('/reservoirs'),
+  manageReservoir: (data) => api.post('/reservoirs/manage', data),
+};
+
+export const resourceAPI2 = {
+  getResources: () => api.get('/resources'),
+  manageResource: (data) => api.post('/resources/manage', data),
+};
+
+export const retailAPI = {
+  getRetail: () => api.get('/retail'),
+  manageRetail: (data) => api.post('/retail/manage', data),
+};
+
+export const reviewAPI2 = {
+  getReviews: () => api.get('/reviews'),
+  submitReview: (data) => api.post('/reviews/submit', data),
+};
+
+export riskAPI2 = {
+  getRisk: () => api.get('/risk'),
+  assessRisk: (data) => api.post('/risk/assess', data),
+};
+
+export const riceAPI = {
+  getRice: () => api.get('/rice'),
+  manageRice: (data) => api.post('/rice/manage', data),
+};
+
+export const riverAPI = {
+  getRivers: () => api.get('/rivers'),
+  manageRiver: (data) => api.post('/rivers/manage', data),
+};
+
+export const roadAPI = {
+  getRoads: () => api.get('/roads'),
+  manageRoad: (data) => api.post('/roads/manage', data),
+};
+
+export const roboticsAPI = {
+  getRobotics: () => api.get('/robotics'),
+  manageRobotics: (data) => api.post('/robotics/manage', data),
+};
+
+export const rotationAPI = {
+  getRotation: () => api.get('/rotation'),
+  manageRotation: (data) => api.post('/rotation/manage', data),
+};
+
+export const routeAPI2 = {
+  getRoutes: () => api.get('/routes'),
+  manageRoute: (data) => api.post('/routes/manage', data),
+};
+
+export const rowAPI = {
+  getRows: () => api.get('/rows'),
+  manageRow: (data) => api.post('/rows/manage', data),
+};
+
+export const safetyAPI2 = {
+  getSafety: () => api.get('/safety'),
+  manageSafety: (data) => api.post('/safety/manage', data),
+};
+
+export const salesAPI = {
+  getSales: () => api.get('/sales'),
+  manageSale: (data) => api.post('/sales/manage', data),
+};
+
+export const samplingAPI = {
+  getSampling: () => api.get('/sampling'),
+  takeSample: (data) => api.post('/sampling/take', data),
+};
+
+export const satelliteAPI2 = {
+  getSatellite: () => api.get('/satellite'),
+  manageSatellite: (data) => api.post('/satellite/manage', data),
+};
+
+export const scenarioAPI = {
+  getScenarios: () => api.get('/scenarios'),
+  createScenario: (data) => api.post('/scenarios', data),
+};
+
+export const scheduleAPI2 = {
+  getSchedules: () => api.get('/schedules'),
+  createSchedule: (data) => api.post('/schedules', data),
+};
+
+export const schemeAPI2 = {
+  getSchemes: () => api.get('/schemes'),
+  applyForScheme: (id, data) => api.post(`/schemes/${id}/apply`, data),
+};
+
+export const schoolAPI = {
+  getSchools: () => api.get('/schools'),
+  manageSchool: (data) => api.post('/schools/manage', data),
+};
+
+export const scienceAPI = {
+  getScience: () => api.get('/science'),
+  conductScience: (data) => api.post('/science/conduct', data),
+};
+
+export const seaAPI = {
+  getSea: () => api.get('/sea'),
+  manageSea: (data) => api.post('/sea/manage', data),
+};
+
+export const searchAPI2 = {
+  getSearch: () => api.get('/search'),
+  performSearch: (data) => api.post('/search/perform', data),
+};
+
+export const securityAPI2 = {
+  getSecurity: () => api.get('/security'),
+  manageSecurity: (data) => api.post('/security/manage', data),
+};
+
+export const seedAPI2 = {
+  getSeeds: () => api.get('/seeds'),
+  manageSeeds: (data) => api.post('/seeds/manage', data),
+};
+
+export const seedlingAPI = {
+  getSeedlings: () => api.get('/seedlings'),
+  manageSeedlings: (data) => api.post('/seedlings/manage', data),
+};
+
+export const sensorAPI = {
+  getSensors: () => api.get('/sensors'),
+  manageSensor: (data) => api.post('/sensors/manage', data),
+};
+
+export const serviceAPI = {
+  getServices: () => api.get('/services'),
+  manageService: (data) => api.post('/services/manage', data),
+};
+
+export const settingAPI2 = {
+  getSettings: () => api.get('/settings'),
+  updateSetting: (data) => api.put('/settings', data),
+};
+
+export const sheepAPI2 = {
+  getSheep: () => api.get('/sheep'),
+  manageSheep: (data) => api.post('/sheep/manage', data),
+};
+
+export const shipmentAPI = {
+  getShipments: () => api.get('/shipments'),
+  manageShipment: (data) => api.post('/shipments/manage', data),
+};
+
+export const shippingAPI2 = {
+  getShipping: () => api.get('/shipping'),
+  manageShipping: (data) => api.post('/shipping/manage', data),
+};
+
+export const shrimpAPI = {
+  getShrimp: () => api.get('/shrimp'),
+  manageShrimp: (data) => api.post('/shrimp/manage', data),
+};
+
+export const simulationAPI = {
+  getSimulation: () => api.get('/simulation'),
+  runSimulation: (data) => api.post('/simulation/run', data),
+};
+
+export const siteAPI = {
+  getSites: () => api.get('/sites'),
+  manageSite: (data) => api.post('/sites/manage', data),
+};
+
+export const skillAPI = {
+  getSkills: () => api.get('/skills'),
+  manageSkill: (data) => api.post('/skills/manage', data),
+};
+
+export const soilAPI2 = {
+  getSoil: () => api.get('/soil'),
+  manageSoil: (data) => api.post('/soil/manage', data),
+};
+
+export const solarAPI = {
+  getSolar: () => api.get('/solar'),
+  manageSolar: (data) => api.post('/solar/manage', data),
+};
+
+export const sorghumAPI = {
+  getSorghum: () => api.get('/sorghum'),
+  manageSorghum: (data) => api.post('/sorghum/manage', data),
+};
+
+export const sortingAPI = {
+  getSorting: () => api.get('/sorting'),
+  performSorting: (data) => api.post('/sorting/perform', data),
+};
+
+export const sourcingAPI = {
+  getSourcing: () => api.get('/sourcing'),
+  manageSourcing: (data) => api.post('/sourcing/manage', data),
+};
+
+export const soybeanAPI = {
+  getSoybeans: () => api.get('/soybeans'),
+  manageSoybeans: (data) => api.post('/soybeans/manage', data),
+};
+
+export const spatialAPI = {
+  getSpatial: () => api.get('/spatial'),
+  analyzeSpatial: (data) => api.post('/spatial/analyze', data),
+};
+
+export const specificationAPI = {
+  getSpecifications: () => api.get('/specifications'),
+  createSpecification: (data) => api.post('/specifications', data),
+};
+
+export const spiceAPI = {
+  getSpices: () => api.get('/spices'),
+  manageSpices: (data) => api.post('/spices/manage', data),
+};
+
+export const storageAPI2 = {
+  getStorage: () => api.get('/storage'),
+  manageStorage: (data) => api.post('/storage/manage', data),
+};
+
+export const strategyAPI = {
+  getStrategy: () => api.get('/strategy'),
+  implementStrategy: (data) => api.post('/strategy/implement', data),
+};
+
+export const streamAPI = {
+  getStreams: () => api.get('/streams'),
+  manageStream: (data) => api.post('/streams/manage', data),
+};
+
+export const sugarAPI = {
+  getSugar: () => api.get('/sugar'),
+  manageSugar: (data) => api.post('/sugar/manage', data),
+};
+
+export const sunflowerAPI = {
+  getSunflowers: () => api.get('/sunflowers'),
+  manageSunflowers: (data) => api.post('/sunflowers/manage', data),
+};
+
+export const supplyAPI = {
+  getSupply: () => api.get('/supply'),
+  manageSupply: (data) => api.post('/supply/manage', data),
+};
+
+export const surveillanceAPI = {
+  getSurveillance: () => api.get('/surveillance'),
+  conductSurveillance: (data) => api.post('/surveillance/conduct', data),
+};
+
+export const sustainabilityAPI = {
+  getSustainability: () => api.get('/sustainability'),
+  manageSustainability: (data) => api.post('/sustainability/manage', data),
+};
+
+export const swineAPI = {
+  getSwine: () => api.get('/swine'),
+  manageSwine: (data) => api.post('/swine/manage', data),
+};
+
+export const synchronizationAPI = {
+  getSynchronization: () => api.get('/synchronization'),
+  performSynchronization: (data) => api.post('/synchronization/perform', data),
+};
+
+export const systemAPI2 = {
+  getSystem: () => api.get('/system'),
+  manageSystem: (data) => api.post('/system/manage', data),
+};
+
+export const tabulationAPI = {
+  getTabulation: () => api.get('/tabulation'),
+  performTabulation: (data) => api.post('/tabulation/perform', data),
+};
+
+export const tankerAPI = {
+  getTankers: () => api.get('/tankers'),
+  manageTanker: (data) => api.post('/tankers/manage', data),
+};
+
+export const taxonomyAPI = {
+  getTaxonomy: () => api.get('/taxonomy'),
+  manageTaxonomy: (data) => api.post('/taxonomy/manage', data),
+};
+
+export const teaAPI = {
+  getTea: () => api.get('/tea'),
+  manageTea: (data) => api.post('/tea/manage', data),
+};
+
+export const technicalAPI = {
+  getTechnical: () => api.get('/technical'),
+  manageTechnical: (data) => api.post('/technical/manage', data),
+};
+
+export const technologyAPI = {
+  getTechnology: () => api.get('/technology'),
+  manageTechnology: (data) => api.post('/technology/manage', data),
+};
+
+export const telecommunicationAPI = {
+  getTelecommunication: () => api.get('/telecommunication'),
+  manageTelecommunication: (data) => api.post('/telecommunication/manage', data),
+};
+
+export const temperatureAPI = {
+  getTemperature: () => api.get('/temperature'),
+  measureTemperature: (data) => api.post('/temperature/measure', data),
+};
+
+export const testingAPI = {
+  getTesting: () => api.get('/testing'),
+  performTesting: (data) => api.post('/testing/perform', data),
+};
+
+export const textileAPI = {
+  getTextile: () => api.get('/textile'),
+  manageTextile: (data) => api.post('/textile/manage', data),
+};
+
+export const thermalAPI = {
+  getThermal: () => api.get('/thermal'),
+  manageThermal: (data) => api.post('/thermal/manage', data),
+};
+
+export const ticketAPI = {
+  getTickets: () => api.get('/tickets'),
+  createTicket: (data) => api.post('/tickets', data),
+};
+
+export const timelineAPI = {
+  getTimeline: () => api.get('/timeline'),
+  manageTimeline: (data) => api.post('/timeline/manage', data),
+};
+
+export const tomatoAPI = {
+  getTomatoes: () => api.get('/tomatoes'),
+  manageTomatoes: (data) => api.post('/tomatoes/manage', data),
+};
+
+export const toolAPI = {
+  getTools: () => api.get('/tools'),
+  manageTool: (data) => api.post('/tools/manage', data),
+};
+
+export const tradeAPI = {
+  getTrade: () => api.get('/trade'),
+  executeTrade: (data) => api.post('/trade/execute', data),
+};
+
+export const trainingAPI2 = {
+  getTraining: () => api.get('/training'),
+  manageTraining: (data) => api.post('/training/manage', data),
+};
+
+export const transactionAPI2 = {
+  getTransactions: () => api.get('/transactions'),
+  executeTransaction: (data) => api.post('/transactions/execute', data),
+};
+
+export const transferAPI = {
+  getTransfers: () => api.get('/transfers'),
+  executeTransfer: (data) => api.post('/transfers/execute', data),
+};
+
+export const transportAPI = {
+  getTransport: () => api.get('/transport'),
+  manageTransport: (data) => api.post('/transport/manage', data),
+};
+
+export const treeAPI = {
+  getTrees: () => api.get('/trees'),
+  manageTree: (data) => api.post('/trees/manage', data),
+};
+
+export const truckAPI = {
+  getTrucks: () => api.get('/trucks'),
+  manageTruck: (data) => api.post('/trucks/manage', data),
+};
+
+export const turfAPI = {
+  getTurf: () => api.get('/turf'),
+  manageTurf: (data) => api.post('/turf/manage', data),
+};
+
+export const uiAPI = {
+  getUI: () => api.get('/ui'),
+  manageUI: (data) => api.post('/ui/manage', data),
+};
+
+export const undergroundAPI = {
+  getUnderground: () => api.get('/underground'),
+  manageUnderground: (data) => api.post('/underground/manage', data),
+};
+
+export const upstreamAPI = {
+  getUpstream: () => api.get('/upstream'),
+  manageUpstream: (data) => api.post('/upstream/manage', data),
+};
+
+export const urbanAPI = {
+  getUrban: () => api.get('/urban'),
+  manageUrban: (data) => api.post('/urban/manage', data),
+};
+
+export const userAPI2 = {
+  getUsers: () => api.get('/users'),
+  manageUser: (data) => api.post('/users/manage', data),
+};
+
+export const validationAPI = {
+  getValidation: () => api.get('/validation'),
+  performValidation: (data) => api.post('/validation/perform', data),
+};
+
+export const valueChainAPI = {
+  getValueChain: () => api.get('/value-chain'),
+  manageValueChain: (data) => api.post('/value-chain/manage', data),
+};
+
+export var vehicleAPI = {
+  getVehicles: () => api.get('/vehicles'),
+  manageVehicle: (data) => api.post('/vehicles/manage', data),
+};
+
+export const veterinaryAPI = {
+  getVeterinary: () => api.get('/veterinary'),
+  manageVeterinary: (data) => api.post('/veterinary/manage', data),
+};
+
+export const videoAPI2 = {
+  getVideos: () => api.get('/videos'),
+  manageVideo: (data) => api.post('/videos/manage', data),
+};
+
+export const vineyardAPI = {
+  getVineyards: () => api.get('/vineyards'),
+  manageVineyard: (data) => api.post('/vineyards/manage', data),
+};
+
+export const virtualAPI = {
+  getVirtual: () => api.get('/virtual'),
+  manageVirtual: (data) => api.post('/virtual/manage', data),
+};
+
+export const virusAPI = {
+  getVirus: () => api.get('/virus'),
+  manageVirus: (data) => api.post('/virus/manage', data),
+};
+
+export const visionAPI = {
+  getVision: () => api.get('/vision'),
+  manageVision: (data) => api.post('/vision/manage', data),
+};
+
+export void visualizationAPI = {
+  getVisualization: () => api.get('/visualization'),
+  manageVisualization: (data) => api.post('/visualization/manage', data),
+};
+
+export const viticultureAPI = {
+  getViticulture: () => api.get('/viticulture'),
+  manageViticulture: (data) => api.post('/viticulture/manage', data),
+};
+
+export const void warehouseAPI2 = {
+  getWarehouse: () => api.get('/warehouse'),
+  manageWarehouse: (data) => api.post('/warehouse/manage', data),
+};
+
+export const waterAPI2 = {
+  getWater: () => api.get('/water'),
+  manageWater: (data) => api.post('/water/manage', data),
+};
+
+export const watershedAPI = {
+  getWatershed: () => api.get('/watershed'),
+  manageWatershed: (data) => api.post('/watershed/manage', data),
+};
+
+export const weatherAPI2 = {
+  getWeather: () => api.get('/weather'),
+  manageWeather: (data) => api.post('/weather/manage', data),
+};
+
+export const weedAPI = {
+  getWeeds: () => api.get('/weeds'),
+  manageWeeds: (data) => api.post('/weeds/manage', data),
+};
+
+export const wheatAPI = {
+  getWheat: () => api.get('/wheat'),
+  manageWheat: (data) => api.post('/wheat/manage', data),
+};
+
+export const wholesaleAPI = {
+  getWholesale: () => api.get('/wholesale'),
+  manageWholesale: (data) => api.post('/wholesale/manage', data),
+};
+
+export const windAPI = {
+  getWind: () => api.get('/wind'),
+  manageWind: (data) => api.post('/wind/manage', data),
+};
+
+export const wildlifeAPI = {
+  getWildlife: () => api.get('/wildlife'),
+  manageWildlife: (data) => api.post('/wildlife/manage', data),
+};
+
+export const wineAPI = {
+  getWine: () => api.get('/wine'),
+  manageWine: (data) => api.post('/wine/manage', data),
+};
+
+export const woodAPI = {
+  getWood: () => api.get('/wood'),
+  manageWood: (data) => api.post('/wood/manage', data),
+};
+
+export const workflowAPI2 = {
+  getWorkflow: () => api.get('/workflow'),
+  manageWorkflow: (data) => api.post('/workflow/manage', data),
+};
+
+export const yardAPI = {
+  getYards: () => api.get('/yards'),
+  manageYard: (data) => api.post('/yards/manage', data),
+};
+
+export const yieldAPI2 = {
+  getYield: () => api.get('/yield'),
+  manageYield: (data) => api.post('/yield/manage', data),
+};
+
+export const youthAPI = {
+  getYouth: () => api.get('/youth'),
+  manageYouth: (data) => api.post('/youth/manage', data),
+};
+
+export const zooAPI = {
+  getZoo: () => api.get('/zoo'),
+  manageZoo: (data) => api.post('/zoo/manage', data),
+};
+
+export default api;
+  getJurisdictions: () => api.get('/jurisdictions'),
+  getJurisdiction: (id) => api.get(`/jurisdictions/${id}`),
+};
+
+export const boundaryAPI = {
+  getBoundaries: () => api.get('/boundaries'),
+  getBoundary: (id) => api.get(`/boundaries/${id}`),
+};
+
+export const zoneAPI = {
+  getZones: () => api.get('/zones'),
+  getZone: (id) => api.get(`/zones/${id}`),
+};
+
+export const sectorAPI = {
+  getSectors: () => api.get('/sectors'),
+  getSector: (id) => api.get(`/sectors/${id}`),
+};
+
+export const subsectorAPI = {
+  getSubsectors: () => api.get('/subsectors'),
+  getSubsector: (id) => api.get(`/subsectors/${id}`),
+};
+
+export const areaAPI = {
+  getAreas: () => api.get('/areas'),
+  getArea: (id) => api.get(`/areas/${id}`),
+};
+
+export const neighborhoodAPI = {
+  getNeighborhoods: () => api.get('/neighborhoods'),
+  getNeighborhood: (id) => api.get(`/neighborhoods/${id}`),
+};
+
+export const localityAPI = {
+  getLocalities: () => api.get('/localities'),
+  getLocality: (id) => api.get(`/localities/${id}`),
+};
+
+export const hamletAPI = {
+  getHamlets: () => api.get('/hamlets'),
+  getHamlet: (id) => api.get(`/hamlets/${id}`),
+};
+
+export const settlementAPI = {
+  getSettlements: () => api.get('/settlements'),
+  getSettlement: (id) => api.get(`/settlements/${id}`),
+};
+
+export const colonyAPI = {
+  getColonies: () => api.get('/colonies'),
+  getColony: (id) => api.get(`/colonies/${id}`),
+};
+
+export const clusterAPI = {
+  getClusters: () => api.get('/clusters'),
+  getCluster: (id) => api.get(`/clusters/${id}`),
+};
+
+export const associationAPI = {
+  getAssociations: () => api.get('/associations'),
+  getAssociation: (id) => api.get(`/associations/${id}`),
+};
+
+export const federationAPI = {
+  getFederations: () => api.get('/federations'),
+  getFederation: (id) => api.get(`/federations/${id}`),
+};
+
+export const confederationAPI = {
+  getConfederations: () => api.get('/confederations'),
+  getConfederation: (id) => api.get(`/confederations/${id}`),
+};
+
+export const allianceAPI = {
+  getAlliances: () => api.get('/alliances'),
+  getAlliance: (id) => api.get(`/alliances/${id}`),
+};
+
+export const coalitionAPI = {
+  getCoalitions: () => api.get('/coalitions'),
+  getCoalition: (id) => api.get(`/coalitions/${id}`),
+};
+
+export const partnershipAPI = {
+  getPartnerships: () => api.get('/partnerships'),
+  getPartnership: (id) => api.get(`/partnerships/${id}`),
+};
+
+export const consortiumAPI = {
+  getConsortiums: () => api.get('/consortiums'),
+  getConsortium: (id) => api.get(`/consortiums/${id}`),
+};
+
+export const syndicateAPI = {
+  getSyndicates: () => api.get('/syndicates'),
+  getSyndicate: (id) => api.get(`/syndicates/${id}`),
+};
+
+export const guildAPI = {
+  getGuilds: () => api.get('/guilds'),
+  getGuild: (id) => api.get(`/guilds/${id}`),
+};
+
+export const unionAPI = {
+  getUnions: () => api.get('/unions'),
+  getUnion: (id) => api.get(`/unions/${id}`),
+};
+
+export const tradeAssociationAPI = {
+  getTradeAssociations: () => api.get('/trade-associations'),
+  getTradeAssociation: (id) => api.get(`/trade-associations/${id}`),
+};
+
+export const professionalAssociationAPI = {
+  getProfessionalAssociations: () => api.get('/professional-associations'),
+  getProfessionalAssociation: (id) => api.get(`/professional-associations/${id}`),
+};
+
+export const industryAssociationAPI = {
+  getIndustryAssociations: () => api.get('/industry-associations'),
+  getIndustryAssociation: (id) => api.get(`/industry-associations/${id}`),
+};
+
+export const chamberOfCommerceAPI = {
+  getChambersOfCommerce: () => api.get('/chambers-of-commerce'),
+  getChamberOfCommerce: (id) => api.get(`/chambers-of-commerce/${id}`),
+};
+
+export const businessCouncilAPI = {
+  getBusinessCouncils: () => api.get('/business-councils'),
+  getBusinessCouncil: (id) => api.get(`/business-councils/${id}`),
+};
+
+export const economicDevelopmentAPI = {
+  getEconomicDevelopment: () => api.get('/economic-development'),
+  planEconomicDevelopment: (data) => api.post('/economic-development/plan', data),
+};
+
+export const regionalDevelopmentAPI = {
+  getRegionalDevelopment: () => api.get('/regional-development'),
+  planRegionalDevelopment: (data) => api.post('/regional-development/plan', data),
+};
+
+export const ruralDevelopmentAPI = {
+  getRuralDevelopment: () => api.get('/rural-development'),
+  planRuralDevelopment: (data) => api.post('/rural-development/plan', data),
+};
+
+export const urbanDevelopmentAPI = {
+  getUrbanDevelopment: () => api.get('/urban-development'),
+  planUrbanDevelopment: (data) => api.post('/urban-development/plan', data),
+};
+
+export const infrastructureDevelopmentAPI = {
+  getInfrastructureDevelopment: () => api.get('/infrastructure-development'),
+  planInfrastructureDevelopment: (data) => api.post('/infrastructure-development/plan', data),
+};
+
+export const socialDevelopmentAPI = {
+  getSocialDevelopment: () => api.get('/social-development'),
+  planSocialDevelopment: (data) => api.post('/social-development/plan', data),
+};
+
+export const communityDevelopmentAPI = {
+  getCommunityDevelopment: () => api.get('/community-development'),
+  planCommunityDevelopment: (data) => api.post('/community-development/plan', data),
+};
+
+export const humanDevelopmentAPI = {
+  getHumanDevelopment: () => api.get('/human-development'),
+  planHumanDevelopment: (data) => api.post('/human-development/plan', data),
+};
+
+export const capacityBuildingAPI = {
+  getCapacityBuilding: () => api.get('/capacity-building'),
+  buildCapacity: (data) => api.post('/capacity-building/build', data),
+};
+
+export const skillDevelopmentAPI = {
+  getSkillDevelopment: () => api.get('/skill-development'),
+  developSkills: (data) => api.post('/skill-development/develop', data),
+};
+
+export const knowledgeTransferAPI = {
+  getKnowledgeTransfer: () => api.get('/knowledge-transfer'),
+  transferKnowledge: (data) => api.post('/knowledge-transfer/transfer', data),
+};
+
+export const technologyTransferAPI = {
+  getTechnologyTransfer: () => api.get('/technology-transfer'),
+  transferTechnology: (data) => api.post('/technology-transfer/transfer', data),
+};
+
+export const innovationTransferAPI = {
+  getInnovationTransfer: () => api.get('/innovation-transfer'),
+  transferInnovation: (data) => api.post('/innovation-transfer/transfer', data),
+};
+
+export const bestPracticeTransferAPI = {
+  getBestPracticeTransfer: () => api.get('/best-practice-transfer'),
+  transferBestPractice: (data) => api.post('/best-practice-transfer/transfer', data),
+};
+
+export const lessonLearnedAPI = {
+  getLessonsLearned: () => api.get('/lessons-learned'),
+  shareLesson: (data) => api.post('/lessons-learned/share', data),
+};
+
+export const caseStudyAPI = {
+  getCaseStudies: () => api.get('/case-studies'),
+  createCaseStudy: (data) => api.post('/case-studies', data),
+};
+
+export const successStoryAPI = {
+  getSuccessStories: () => api.get('/success-stories'),
+  createSuccessStory: (data) => api.post('/success-stories', data),
+};
+
+export const failureAnalysisAPI = {
+  getFailureAnalyses: () => api.get('/failure-analyses'),
+  analyzeFailure: (data) => api.post('/failure-analyses/analyze', data),
+};
+
+export const impactAssessmentAPI = {
+  getImpactAssessments: () => api.get('/impact-assessments'),
+  assessImpact: (data) => api.post('/impact-assessments/assess', data),
+};
+
+export const outcomeMeasurementAPI = {
+  getOutcomeMeasurements: () => api.get('/outcome-measurements'),
+  measureOutcomes: (data) => api.post('/outcome-measurements/measure', data),
+};
+
+export const performanceMeasurementAPI = {
+  getPerformanceMeasurements: () => api.get('/performance-measurements'),
+  measurePerformance: (data) => api.post('/performance-measurements/measure', data),
+};
+
+export const resultManagementAPI = {
+  getResults: () => api.get('/results'),
+  manageResults: (data) => api.post('/results/manage', data),
+};
+
+export const benefitRealizationAPI = {
+  getBenefitRealizations: () => api.get('/benefit-realizations'),
+  realizeBenefits: (data) => api.post('/benefit-realizations/realize', data),
+};
+
+export const valueCreationAPI = {
+  getValueCreations: () => api.get('/value-creations'),
+  createValue: (data) => api.post('/value-creations/create', data),
+};
+
+export const stakeholderEngagementAPI = {
+  getStakeholderEngagements: () => api.get('/stakeholder-engagements'),
+  engageStakeholders: (data) => api.post('/stakeholder-engagements/engage', data),
+};
+
+export const publicParticipationAPI = {
+  getPublicParticipations: () => api.get('/public-participations'),
+  facilitateParticipation: (data) => api.post('/public-participations/facilitate', data),
+};
+
+export const civicEngagementAPI = {
+  getCivicEngagements: () => api.get('/civic-engagements'),
+  engageCivics: (data) => api.post('/civic-engagements/engage', data),
+};
+
+export const communityEngagementAPI = {
+  getCommunityEngagements: () => api.get('/community-engagements'),
+  engageCommunity: (data) => api.post('/community-engagements/engage', data),
+};
+
+export const citizenEngagementAPI = {
+  getCitizenEngagements: () => api.get('/citizen-engagements'),
+  engageCitizens: (data) => api.post('/citizen-engagements/engage', data),
+};
+
+export const youthEngagementAPI = {
+  getYouthEngagements: () => api.get('/youth-engagements'),
+  engageYouth: (data) => api.post('/youth-engagements/engage', data),
+};
+
+export const womenEngagementAPI = {
+  getWomenEngagements: () => api.get('/women-engagements'),
+  engageWomen: (data) => api.post('/women-engagements/engage', data),
+};
+
+export const elderlyEngagementAPI = {
+  getElderlyEngagements: () => api.get('/elderly-engagements'),
+  engageElderly: (data) => api.post('/elderly-engagements/engage', data),
+};
+
+export const disabledEngagementAPI = {
+  getDisabledEngagements: () => api.get('/disabled-engagements'),
+  engageDisabled: (data) => api.post('/disabled-engagements/engage', data),
+};
+
+export const marginalizedEngagementAPI = {
+  getMarginalizedEngagements: () => api.get('/marginalized-engagements'),
+  engageMarginalized: (data) => api.post('/marginalized-engagements/engage', data),
+};
+
+export const indigenousEngagementAPI = {
+  getIndigenousEngagements: () => api.get('/indigenous-engagements'),
+  engageIndigenous: (data) => api.post('/indigenous-engagements/engage', data),
+};
+
+export const minorityEngagementAPI = {
+  getMinorityEngagements: () => api.get('/minority-engagements'),
+  engageMinority: (data) => api.post('/minority-engagements/engage', data),
+};
+
+export const refugeeEngagementAPI = {
+  getRefugeeEngagements: () => api.get('/refugee-engagements'),
+  engageRefugees: (data) => api.post('/refugee-engagements/engage', data),
+};
+
+export const migrantEngagementAPI = {
+  getMigrantEngagements: () => api.get('/migrant-engagements'),
+  engageMigrants: (data) => api.post('/migrant-engagements/engage', data),
+};
+
+export const diasporaEngagementAPI = {
+  getDiasporaEngagements: () => api.get('/diaspora-engagements'),
+  engageDiaspora: (data) => api.post('/diaspora-engagements/engage', data),
+};
+
+export const internationalEngagementAPI = {
+  getInternationalEngagements: () => api.get('/international-engagements'),
+  engageInternational: (data) => api.post('/international-engagements/engage', data),
+};
+
+export const crossBorderEngagementAPI = {
+  getCrossBorderEngagements: () => api.get('/cross-border-engagements'),
+  engageCrossBorder: (data) => api.post('/cross-border-engagements/engage', data),
+};
+
+export const regionalCooperationAPI = {
+  getRegionalCooperations: () => api.get('/regional-cooperations'),
+  cooperateRegionally: (data) => api.post('/regional-cooperations/cooperate', data),
+};
+
+export const internationalCooperationAPI = {
+  getInternationalCooperations: () => api.get('/international-cooperations'),
+  cooperateInternationally: (data) => api.post('/international-cooperations/cooperate', data),
+};
+
+export const multilateralCooperationAPI = {
+  getMultilateralCooperations: () => api.get('/multilateral-cooperations'),
+  cooperateMultilaterally: (data) => api.post('/multilateral-cooperations/cooperate', data),
+};
+
+export const bilateralCooperationAPI = {
+  getBilateralCooperations: () => api.get('/bilateral-cooperations'),
+  cooperateBilaterally: (data) => api.post('/bilateral-cooperations/cooperate', data),
+};
+
+export const southSouthCooperationAPI = {
+  getSouthSouthCooperations: () => api.get('/south-south-cooperations'),
+  cooperateSouthSouth: (data) => api.post('/south-south-cooperations/cooperate', data),
+};
+
+export const triangularCooperationAPI = {
+  getTriangularCooperations: () => api.get('/triangular-cooperations'),
+  cooperateTriangularly: (data) => api.post('/triangular-cooperations/cooperate', data),
+};
+
+export const knowledgeSharingAPI = {
+  getKnowledgeSharings: () => api.get('/knowledge-sharing'),
+  shareKnowledge: (data) => api.post('/knowledge-sharing/share', data),
+};
+
+export const experienceSharingAPI = {
+  getExperienceSharings: () => api.get('/experience-sharing'),
+  shareExperience: (data) => api.post('/experience-sharing/share', data),
+};
+
+export const expertiseSharingAPI = {
+  getExpertiseSharings: () => api.get('/expertise-sharing'),
+  shareExpertise: (data) => api.post('/expertise-sharing/share', data),
+};
+
+export const resourceSharingAPI = {
+  getResourceSharings: () => api.get('/resource-sharing'),
+  shareResources: (data) => api.post('/resource-sharing/share', data),
+};
+
+export const capacitySharingAPI = {
+  getCapacitySharings: () => api.get('/capacity-sharing'),
+  shareCapacity: (data) => api.post('/capacity-sharing/share', data),
+};
+
+export const networkBuildingAPI = {
+  getNetworkBuildings: () => api.get('/network-building'),
+  buildNetwork: (data) => api.post('/network-building/build', data),
+};
+
+export const partnershipBuildingAPI = {
+  getPartnershipBuildings: () => api.get('/partnership-building'),
+  buildPartnership: (data) => api.post('/partnership-building/build', data),
+};
+
+export const coalitionBuildingAPI = {
+  getCoalitionBuildings: () => api.get('/coalition-building'),
+  buildCoalition: (data) => api.post('/coalition-building/build', data),
+};
+
+export const allianceBuildingAPI = {
+  getAllianceBuildings: () => api.get('/alliance-building'),
+  buildAlliance: (data) => api.post('/alliance-building/build', data),
+};
+
+export const movementBuildingAPI = {
+  getMovementBuildings: () => api.get('/movement-building'),
+  buildMovement: (data) => api.post('/movement-building/build', data),
+};
+
+export const campaignBuildingAPI = {
+  getCampaignBuildings: () => api.get('/campaign-building'),
+  buildCampaign: (data) => api.post('/campaign-building/build', data),
+};
+
+export const advocacyBuildingAPI = {
+  getAdvocacyBuildings: () => api.get('/advocacy-building'),
+  buildAdvocacy: (data) => api.post('/advocacy-building/build', data),
+};
+
+export const lobbyingBuildingAPI = {
+  getLobbyingBuildings: () => api.get('/lobbying-building'),
+  buildLobbying: (data) => api.post('/lobbying-building/build', data),
+};
+
+export const policyInfluenceAPI = {
+  getPolicyInfluences: () => api.get('/policy-influence'),
+  influencePolicy: (data) => api.post('/policy-influence/influence', data),
+};
+
+export const decisionInfluenceAPI = {
+  getDecisionInfluences: () => api.get('/decision-influence'),
+  influenceDecision: (data) => api.post('/decision-influence/influence', data),
+};
+
+export const agendaSettingAPI = {
+  getAgendaSettings: () => api.get('/agenda-setting'),
+  setAgenda: (data) => api.post('/agenda-setting/set', data),
+};
+
+export const publicOpinionAPI = {
+  getPublicOpinions: () => api.get('/public-opinion'),
+  shapePublicOpinion: (data) => api.post('/public-opinion/shape', data),
+};
+
+export const mediaEngagementAPI = {
+  getMediaEngagements: () => api.get('/media-engagement'),
+  engageMedia: (data) => api.post('/media-engagement/engage', data),
+};
+
+export const socialMediaAPI = {
+  getSocialMedia: () => api.get('/social-media'),
+  manageSocialMedia: (data) => api.post('/social-media/manage', data),
+};
+
+export const digitalCampaignAPI = {
+  getDigitalCampaigns: () => api.get('/digital-campaign'),
+  runDigitalCampaign: (data) => api.post('/digital-campaign/run', data),
+};
+
+export const onlineAdvocacyAPI = {
+  getOnlineAdvocacies: () => api.get('/online-advocacy'),
+  advocateOnline: (data) => api.post('/online-advocacy/advocate', data),
+};
+
+export const digitalOrganizingAPI = {
+  getDigitalOrganizings: () => api.get('/digital-organizing'),
+  organizeDigitally: (data) => api.post('/digital-organizing/organize', data),
+};
+
+export const onlineMobilizationAPI = {
+  getOnlineMobilizations: () => api.get('/online-mobilization'),
+  mobilizeOnline: (data) => api.post('/online-mobilization/mobilize', data),
+};
+
+export const digitalActivismAPI = {
+  getDigitalActivisms: () => api.get('/digital-activism'),
+  activateDigitally: (data) => api.post('/digital-activism/activate', data),
+};
+
+export const hacktivismAPI = {
+  getHacktivisms: () => api.get('/hacktivism'),
+  hacktivistAction: (data) => api.post('/hacktivism/action', data),
+};
+
+export const cyberActivismAPI = {
+  getCyberActivisms: () => api.get('/cyber-activism'),
+  activateCyber: (data) => api.post('/cyber-activism/activate', data),
+};
+
+export const digitalResistanceAPI = {
+  getDigitalResistances: () => api.get('/digital-resistance'),
+  resistDigitally: (data) => api.post('/digital-resistance/resist', data),
+};
+
+export const onlineProtestAPI = {
+  getOnlineProtests: () => api.get('/online-protest'),
+  protestOnline: (data) => api.post('/online-protest/protest', data),
+};
+
+export const digitalCivilDisobedienceAPI = {
+  getDigitalCivilDisobediences: () => api.get('/digital-civil-disobedience'),
+  disobeyDigitally: (data) => api.post('/digital-civil-disobedience/disobey', data),
+};
+
+export const digitalBoycottAPI = {
+  getDigitalBoycotts: () => api.get('/digital-boycott'),
+  boycottDigitally: (data) => api.post('/digital-boycott/boycott', data),
+};
+
+export const digitalDivestmentAPI = {
+  getDigitalDivestments: () => api.get('/digital-divestment'),
+  divestDigitally: (data) => api.post('/digital-divestment/divest', data),
+};
+
+export const digitalSanctionAPI = {
+  getDigitalSanctions: () => api.get('/digital-sanction'),
+  sanctionDigitally: (data) => api.post('/digital-sanction/sanction', data),
+};
+
+export const digitalEmbargoAPI = {
+  getDigitalEmbargoes: () => api.get('/digital-embargo'),
+  embargoDigitally: (data) => api.post('/digital-embargo/embargo', data),
+};
+
+export const digitalBlockadeAPI = {
+  getDigitalBlockades: () => api.get('/digital-blockade'),
+  blockadeDigitally: (data) => api.post('/digital-blockade/blockade', data),
+};
+
+export const digitalSiegeAPI = {
+  getDigitalSieges: () => api.get('/digital-siege'),
+  siegeDigitally: (data) => api.post('/digital-siege/siege', data),
+};
+
+export const digitalWarfareAPI = {
+  getDigitalWarfares: () => api.get('/digital-warfare'),
+  wageDigitalWarfare: (data) => api.post('/digital-warfare/wage', data),
+};
+
+export const cyberWarfareAPI = {
+  getCyberWarfares: () => api.get('/cyber-warfare'),
+  wageCyberWarfare: (data) => api.post('/cyber-warfare/wage', data),
+};
+
+export const informationWarfareAPI = {
+  getInformationWarfares: () => api.get('/information-warfare'),
+  wageInformationWarfare: (data) => api.post('/information-warfare/wage', data),
+};
+
+export const psychologicalWarfareAPI = {
+  getPsychologicalWarfares: () => api.get('/psychological-warfare'),
+  wagePsychologicalWarfare: (data) => api.post('/psychological-warfare/wage', data),
+};
+
+export const cognitiveWarfareAPI = {
+  getCognitiveWarfares: () => api.get('/cognitive-warfare'),
+  wageCognitiveWarfare: (data) => api.post('/cognitive-warfare/wage', data),
+};
+
+export const narrativeWarfareAPI = {
+  getNarrativeWarfares: () => api.get('/narrative-warfare'),
+  wageNarrativeWarfare: (data) => api.post('/narrative-warfare/wage', data),
+};
+
+export const memeticWarfareAPI = {
+  getMemeticWarfares: () => api.get('/memetic-warfare'),
+  wageMemeticWarfare: (data) => api.post('/memetic-warfare/wage', data),
+};
+
+export const culturalWarfareAPI = {
+  getCulturalWarfares: () => api.get('/cultural-warfare'),
+  wageCulturalWarfare: (data) => api.post('/cultural-warfare/wage', data),
+};
+
+export const ideologicalWarfareAPI = {
+  getIdeologicalWarfares: () => api.get('/ideological-warfare'),
+  wageIdeologicalWarfare: (data) => api.post('/ideological-warfare/wage', data),
+};
+
+export const religiousWarfareAPI = {
+  getReligiousWarfares: () => api.get('/religious-warfare'),
+  wageReligiousWarfare: (data) => api.post('/religious-warfare/wage', data),
+};
+
+export const ethnicWarfareAPI = {
+  getEthnicWarfares: () => api.get('/ethnic-warfare'),
+  wageEthnicWarfare: (data) => api.post('/ethnic-warfare/wage', data),
+};
+
+export const tribalWarfareAPI = {
+  getTribalWarfares: () => api.get('/tribal-warfare'),
+  wageTribalWarfare: (data) => api.post('/tribal-warfare/wage', data),
+};
+
+export const clanWarfareAPI = {
+  getClanWarfares: () => api.get('/clan-warfare'),
+  wageClanWarfare: (data) => api.post('/clan-warfare/wage', data),
+};
+
+export const familyWarfareAPI = {
+  getFamilyWarfares: () => api.get('/family-warfare'),
+  wageFamilyWarfare: (data) => api.post('/family-warfare/wage', data),
+};
+
+export const personalWarfareAPI = {
+  getPersonalWarfares: () => api.get('/personal-warfare'),
+  wagePersonalWarfare: (data) => api.post('/personal-warfare/wage', data),
+};
+
+export const individualWarfareAPI = {
+  getIndividualWarfares: () => api.get('/individual-warfare'),
+  wageIndividualWarfare: (data) => api.post('/individual-warfare/wage', data),
+};
+
+export const collectiveWarfareAPI = {
+  getCollectiveWarfares: () => api.get('/collective-warfare'),
+  wageCollectiveWarfare: (data) => api.post('/collective-warfare/wage', data),
+};
+
+export const massWarfareAPI = {
+  getMassWarfares: () => api.get('/mass-warfare'),
+  wageMassWarfare: (data) => api.post('/mass-warfare/wage', data),
+};
+
+export const totalWarfareAPI = {
+  getTotalWarfares: () => api.get('/total-warfare'),
+  wageTotalWarfare: (data) => api.post('/total-warfare/wage', data),
+};
+
+// Additional API exports for remaining pages
+export const blockchainVerificationAPI = {
+  getVerifications: () => api.get('/blockchain-verification'),
+  verifyBlockchain: (data) => api.post('/blockchain-verification/verify', data),
+};
+
+export const bulkOrderAPI = {
+  getBulkOrders: () => api.get('/bulk-orders'),
+  createBulkOrder: (data) => api.post('/bulk-orders', data),
+};
+
+export const caAPI = {
+  getCAData: () => api.get('/ca'),
+  manageCA: (data) => api.post('/ca/manage', data),
+};
+
+export const ordersAPI = {
+  getOrders: () => api.get('/orders'),
+  createOrder: (data) => api.post('/orders', data),
+};
+
+export const cartAPI = {
+  getCart: () => api.get('/cart'),
+  addToCart: (data) => api.post('/cart/add', data),
+  removeFromCart: (id) => api.delete(`/cart/${id}`),
+};
+
+export const checkoutAPI = {
+  getCheckout: () => api.get('/checkout'),
+  processCheckout: (data) => api.post('/checkout/process', data),
+};
+
+export const productReviewAPI = {
+  getReviews: () => api.get('/product-reviews'),
+  addReview: (data) => api.post('/product-reviews', data),
+};
+
+export const categoryAPI = {
+  getCategories: () => api.get('/categories'),
+  getCategory: (id) => api.get(`/categories/${id}`),
+};
+
+export const brandAPI = {
+  getBrands: () => api.get('/brands'),
+  getBrand: (id) => api.get(`/brands/${id}`),
+};
+
+export const wishlistAPI = {
+  getWishlist: () => api.get('/wishlist'),
+  addToWishlist: (data) => api.post('/wishlist/add', data),
+};
+
+export const comparisonAPI = {
+  getComparisons: () => api.get('/comparisons'),
+  addToComparison: (data) => api.post('/comparisons/add', data),
+};
+
+export const discountAPI = {
+  getDiscounts: () => api.get('/discounts'),
+  applyDiscount: (code) => api.post('/discounts/apply', { code }),
+};
+
+export const couponAPI = {
+  getCoupons: () => api.get('/coupons'),
+  applyCoupon: (code) => api.post('/coupons/apply', { code }),
+};
+
+export const shippingAPI = {
+  getShipping: () => api.get('/shipping'),
+  calculateShipping: (data) => api.post('/shipping/calculate', data),
+};
+
+export const taxAPI = {
+  getTax: () => api.get('/tax'),
+  calculateTax: (data) => api.post('/tax/calculate', data),
+};
+
+export const paymentAPI = {
+  getPaymentMethods: () => api.get('/payment-methods'),
+  processPayment: (data) => api.post('/payment/process', data),
+};
+
+export const invoiceAPI = {
+  getInvoices: () => api.get('/invoices'),
+  getInvoice: (id) => api.get(`/invoices/${id}`),
+};
+
+export const refundAPI = {
+  getRefunds: () => api.get('/refunds'),
+  requestRefund: (data) => api.post('/refunds/request', data),
+};
+
+export const returnAPI = {
+  getReturns: () => api.get('/returns'),
+  requestReturn: (data) => api.post('/returns/request', data),
+};
+
+export const exchangeAPI = {
+  getExchanges: () => api.get('/exchanges'),
+  requestExchange: (data) => api.post('/exchanges/request', data),
+};
+
+export const supportTicketAPI = {
+  getTickets: () => api.get('/support-tickets'),
+  createTicket: (data) => api.post('/support-tickets', data),
+};
+
+export const liveChatAPI = {
+  getChatSessions: () => api.get('/live-chat'),
+  startChat: (data) => api.post('/live-chat/start', data),
+};
+
+export const knowledgeBaseAPI = {
+  getArticles: () => api.get('/knowledge-base'),
+  getArticle: (id) => api.get(`/knowledge-base/${id}`),
+};
+
+export const faqAPI = {
+  getFAQs: () => api.get('/faqs'),
+  getFAQ: (id) => api.get(`/faqs/${id}`),
+};
+
+export const videoTutorialAPI = {
+  getTutorials: () => api.get('/video-tutorials'),
+  getTutorial: (id) => api.get(`/video-tutorials/${id}`),
+};
+
+export const userGuideAPI = {
+  getGuides: () => api.get('/user-guides'),
+  getGuide: (id) => api.get(`/user-guides/${id}`),
+};
+
+export const feedbackSurveyAPI = {
+  getSurveys: () => api.get('/feedback-surveys'),
+  submitSurvey: (data) => api.post('/feedback-surveys/submit', data),
+};
+
+export const eventCalendarAPI = {
+  getEvents: () => api.get('/event-calendar'),
+  getEvent: (id) => api.get(`/event-calendar/${id}`),
+};
+
+export const newsFeedAPI = {
+  getNews: () => api.get('/news-feed'),
+  getNewsItem: (id) => api.get(`/news-feed/${id}`),
+};
+
+export const promotionalBannerAPI = {
+  getBanners: () => api.get('/promotional-banners'),
+  getBanner: (id) => api.get(`/promotional-banners/${id}`),
+};
+
+export const featuredProductAPI = {
+  getFeaturedProducts: () => api.get('/featured-products'),
+  getFeaturedProduct: (id) => api.get(`/featured-products/${id}`),
+};
+
+export const trendingProductAPI = {
+  getTrendingProducts: () => api.get('/trending-products'),
+  getTrendingProduct: (id) => api.get(`/trending-products/${id}`),
+};
+
+export const recommendedProductAPI = {
+  getRecommendedProducts: () => api.get('/recommended-products'),
+  getRecommendedProduct: (id) => api.get(`/recommended-products/${id}`),
+};
+
+export const newProductAPI = {
+  getNewProducts: () => api.get('/new-products'),
+  getNewProduct: (id) => api.get(`/new-products/${id}`),
+};
+
+export const bestSellerAPI = {
+  getBestSellers: () => api.get('/best-sellers'),
+  getBestSeller: (id) => api.get(`/best-sellers/${id}`),
+};
+
+export const dealAPI = {
+  getDeals: () => api.get('/deals'),
+  getDeal: (id) => api.get(`/deals/${id}`),
+};
+
+export const flashSaleAPI = {
+  getFlashSales: () => api.get('/flash-sales'),
+  getFlashSale: (id) => api.get(`/flash-sales/${id}`),
+};
+
+export const auctionAPI = {
+  getAuctions: () => api.get('/auctions'),
+  getAuction: (id) => api.get(`/auctions/${id}`),
+};
+
+export const groupBuyAPI = {
+  getGroupBuys: () => api.get('/group-buys'),
+  getGroupBuy: (id) => api.get(`/group-buys/${id}`),
+};
+
+export const preOrderAPI = {
+  getPreOrders: () => api.get('/pre-orders'),
+  getPreOrder: (id) => api.get(`/pre-orders/${id}`),
+};
+
+export const subscriptionBoxAPI = {
+  getSubscriptionBoxes: () => api.get('/subscription-boxes'),
+  getSubscriptionBox: (id) => api.get(`/subscription-boxes/${id}`),
+};
+
+export const giftCardAPI = {
+  getGiftCards: () => api.get('/gift-cards'),
+  getGiftCard: (id) => api.get(`/gift-cards/${id}`),
+};
+
+export const loyaltyPointsAPI = {
+  getPoints: () => api.get('/loyalty-points'),
+  redeemPoints: (data) => api.post('/loyalty-points/redeem', data),
+};
+
+export const referralAPI = {
+  getReferrals: () => api.get('/referrals'),
+  referFriend: (data) => api.post('/referrals/refer', data),
+};
+
+export const affiliateAPI = {
+  getAffiliates: () => api.get('/affiliates'),
+  getAffiliate: (id) => api.get(`/affiliates/${id}`),
+};
+
+export const vendorPortalAPI = {
+  getVendorPortal: () => api.get('/vendor-portal'),
+  manageVendor: (data) => api.post('/vendor-portal/manage', data),
+};
+
+export const buyerPortalAPI = {
+  getBuyerPortal: () => api.get('/buyer-portal'),
+  manageBuyer: (data) => api.post('/buyer-portal/manage', data),
+};
+
+export const adminPortalAPI = {
+  getAdminPortal: () => api.get('/admin-portal'),
+  manageAdmin: (data) => api.post('/admin-portal/manage', data),
+};
+
+export const moderatorAPI = {
+  getModerations: () => api.get('/moderations'),
+  moderateContent: (data) => api.post('/moderations/moderate', data),
+};
+
+export const contentManagerAPI = {
+  getContent: () => api.get('/content-manager'),
+  manageContent: (data) => api.post('/content-manager/manage', data),
+};
+
+export const userManagerAPI = {
+  getUsers: () => api.get('/user-manager'),
+  manageUser: (data) => api.post('/user-manager/manage', data),
+};
+
+export const roleManagerAPI = {
+  getRoles: () => api.get('/role-manager'),
+  manageRole: (data) => api.post('/role-manager/manage', data),
+};
+
+export const permissionManagerAPI = {
+  getPermissions: () => api.get('/permission-manager'),
+  managePermission: (data) => api.post('/permission-manager/manage', data),
+};
+
+export const auditTrailAPI = {
+  getAuditTrail: () => api.get('/audit-trail'),
+  searchAuditTrail: (query) => api.post('/audit-trail/search', { query }),
+};
+
+export const systemMonitorAPI = {
+  getSystemMonitor: () => api.get('/system-monitor'),
+  getSystemMetrics: () => api.get('/system-monitor/metrics'),
+};
+
+export const performanceMonitorAPI = {
+  getPerformanceMonitor: () => api.get('/performance-monitor'),
+  getPerformanceMetrics: () => api.get('/performance-monitor/metrics'),
+};
+
+export const errorLogAPI = {
+  getErrorLogs: () => api.get('/error-logs'),
+  getErrorLog: (id) => api.get(`/error-logs/${id}`),
+};
+
+export const accessLogAPI = {
+  getAccessLogs: () => api.get('/access-logs'),
+  getAccessLog: (id) => api.get(`/access-logs/${id}`),
+};
+
+export const activityLogAPI = {
+  getActivityLogs: () => api.get('/activity-logs'),
+  getActivityLog: (id) => api.get(`/activity-logs/${id}`),
+};
+
+export const securityLogAPI = {
+  getSecurityLogs: () => api.get('/security-logs'),
+  getSecurityLog: (id) => api.get(`/security-logs/${id}`),
+};
+
+export const complianceLogAPI = {
+  getComplianceLogs: () => api.get('/compliance-logs'),
+  getComplianceLog: (id) => api.get(`/compliance-logs/${id}`),
+};
+
+export const reportGeneratorAPI = {
+  getReports: () => api.get('/report-generator'),
+  generateReport: (data) => api.post('/report-generator/generate', data),
+};
+
+export const dataExportAPI = {
+  getExports: () => api.get('/data-export'),
+  exportData: (data) => api.post('/data-export/export', data),
+};
+
+export const dataImportAPI = {
+  getImports: () => api.get('/data-import'),
+  importData: (data) => api.post('/data-import/import', data),
+};
+
+export const backupRestoreAPI = {
+  getBackups: () => api.get('/backup-restore'),
+  createBackup: (data) => api.post('/backup-restore/backup', data),
+  restoreBackup: (id) => api.post(`/backup-restore/restore/${id}`),
+};
+
+export const systemConfigAPI = {
+  getConfig: () => api.get('/system-config'),
+  updateConfig: (data) => api.put('/system-config', data),
+};
+
+export const featureToggleAPI = {
+  getFeatures: () => api.get('/feature-toggle'),
+  toggleFeature: (id) => api.post(`/feature-toggle/${id}/toggle`),
+};
+
+export const environmentConfigAPI = {
+  getEnvironments: () => api.get('/environment-config'),
+  updateEnvironment: (id, data) => api.put(`/environment-config/${id}`, data),
+};
+
+export const deploymentConfigAPI = {
+  getDeployments: () => api.get('/deployment-config'),
+  updateDeployment: (id, data) => api.put(`/deployment-config/${id}`, data),
+};
+
+export const apiConfigAPI = {
+  getAPIConfig: () => api.get('/api-config'),
+  updateAPIConfig: (data) => api.put('/api-config', data),
+};
+
+export const webhookConfigAPI = {
+  getWebhooks: () => api.get('/webhook-config'),
+  updateWebhook: (id, data) => api.put(`/webhook-config/${id}`, data),
+};
+
+export const serviceRegistryAPI = {
+  getServices: () => api.get('/service-registry'),
+  registerService: (data) => api.post('/service-registry/register', data),
+};
+
+export const pluginManagerAPI = {
+  getPlugins: () => api.get('/plugin-manager'),
+  installPlugin: (data) => api.post('/plugin-manager/install', data),
+};
+
+export const themeManagerAPI = {
+  getThemes: () => api.get('/theme-manager'),
+  activateTheme: (id) => api.post(`/theme-manager/${id}/activate`),
+};
+
+export const layoutManagerAPI = {
+  getLayouts: () => api.get('/layout-manager'),
+  updateLayout: (id, data) => api.put(`/layout-manager/${id}`, data),
+};
+
+export const componentManagerAPI = {
+  getComponents: () => api.get('/component-manager'),
+  registerComponent: (data) => api.post('/component-manager/register', data),
+};
+
+export const workflowManagerAPI = {
+  getWorkflows: () => api.get('/workflow-manager'),
+  executeWorkflow: (id, data) => api.post(`/workflow-manager/${id}/execute`, data),
+};
+
+export const processManagerAPI = {
+  getProcesses: () => api.get('/process-manager'),
+  startProcess: (id, data) => api.post(`/process-manager/${id}/start`, data),
+};
+
+export const taskManagerAPI = {
+  getTasks: () => api.get('/task-manager'),
+  createTask: (data) => api.post('/task-manager/create', data),
+};
+
+export const jobManagerAPI = {
+  getJobs: () => api.get('/job-manager'),
+  createJob: (data) => api.post('/job-manager/create', data),
+};
+
+export const scheduleManagerAPI = {
+  getSchedules: () => api.get('/schedule-manager'),
+  createSchedule: (data) => api.post('/schedule-manager/create', data),
+};
+
+export const notificationManagerAPI = {
+  getNotifications: () => api.get('/notification-manager'),
+  sendNotification: (data) => api.post('/notification-manager/send', data),
+};
+
+export const alertManagerAPI = {
+  getAlerts: () => api.get('/alert-manager'),
+  createAlert: (data) => api.post('/alert-manager/create', data),
+};
+
+export const eventManagerAPI = {
+  getEvents: () => api.get('/event-manager'),
+  createEvent: (data) => api.post('/event-manager/create', data),
+};
+
+export const loggerAPI = {
+  getLogs: () => api.get('/logger'),
+  logMessage: (data) => api.post('/logger/log', data),
+};
+
+export const metricsAPI = {
+  getMetrics: () => api.get('/metrics'),
+  collectMetric: (data) => api.post('/metrics/collect', data),
+};
+
+export const tracerAPI = {
+  getTraces: () => api.get('/tracer'),
+  startTrace: (data) => api.post('/tracer/start', data),
+};
+
+export const profilerAPI = {
+  getProfiles: () => api.get('/profiler'),
+  startProfile: (data) => api.post('/profiler/start', data),
+};
+
+export const debuggerAPI = {
+  getDebugInfo: () => api.get('/debugger'),
+  setDebugMode: (enabled) => api.post('/debugger/mode', { enabled }),
+};
+
+export const testerAPI = {
+  getTests: () => api.get('/tester'),
+  runTest: (data) => api.post('/tester/run', data),
+};

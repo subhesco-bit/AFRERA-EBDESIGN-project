@@ -31,21 +31,21 @@ async function upsertSetting(name, value, description) {
        description = COALESCE(EXCLUDED.description, admin_settings.description),
        updated_at = NOW()
      RETURNING name, value, description, created_at, updated_at`,
-    [name, value === undefined ? null : JSON.stringify(value), description || null]
+    [name, value === undefined ? null : JSON.stringify(value), description || null],
   );
-  
+
   // Emit signal for configuration change
   signalBus.emitSignal(SIGNAL.CONFIGURATION_CHANGED, {
     settingName: name,
     oldValue: res.rows[0]?.value,
     newValue: value,
-    changedBy: 'admin'
+    changedBy: 'admin',
   }, {
     severity: SEVERITY.INFO,
     source: 'system_administration_service',
-    entityId: name
+    entityId: name,
   });
-  
+
   return res.rows[0];
 }
 
@@ -61,22 +61,22 @@ async function ingestAuditLog(entry = {}) {
     `INSERT INTO audit_logs (user_id, action, entity, entity_id, details, ip_address, created_at)
      VALUES ($1, $2, $3, $4, $5, $6, NOW())
      RETURNING id, user_id, action, entity, entity_id, details, ip_address, created_at`,
-    [userId, action, entity, entityId, details ? JSON.stringify(details) : null, ipAddress]
+    [userId, action, entity, entityId, details ? JSON.stringify(details) : null, ipAddress],
   );
-  
+
   // Emit signal for audit log entry
   signalBus.emitSignal(SIGNAL.WORKFLOW_STARTED, {
     auditId: res.rows[0].id,
     userId,
     action,
     entity,
-    entityId
+    entityId,
   }, {
     severity: SEVERITY.INFO,
     source: 'system_administration_service',
-    entityId: userId
+    entityId: userId,
   });
-  
+
   return { success: true, data: res.rows[0] };
 }
 
@@ -84,7 +84,7 @@ async function ingestAuditLog(entry = {}) {
 async function getSystemAnalytics() {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   // Get audit log statistics
   const auditStats = await pg.query(`
     SELECT 
@@ -96,7 +96,7 @@ async function getSystemAnalytics() {
     GROUP BY action, DATE(created_at)
     ORDER BY date DESC, count DESC
   `);
-  
+
   // Get system settings summary
   const settingsSummary = await pg.query(`
     SELECT 
@@ -104,11 +104,11 @@ async function getSystemAnalytics() {
       COUNT(CASE WHEN updated_at > NOW() - INTERVAL '7 days' THEN 1 END) as recently_updated
     FROM admin_settings
   `);
-  
+
   return {
     auditPatterns: auditStats.rows,
     settingsHealth: settingsSummary.rows[0],
-    recommendations: generateAIRecommendations(auditStats.rows)
+    recommendations: generateAIRecommendations(auditStats.rows),
   };
 }
 
@@ -116,7 +116,7 @@ async function getSystemAnalytics() {
 async function detectAnomalies() {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   // Detect unusual activity patterns
   const unusualActivity = await pg.query(`
     SELECT 
@@ -129,26 +129,26 @@ async function detectAnomalies() {
     GROUP BY user_id, action, ip_address
     HAVING COUNT(*) > 50
   `);
-  
+
   const anomalies = unusualActivity.rows.map(row => ({
     type: 'high_frequency_activity',
     userId: row.user_id,
     action: row.action,
     count: row.action_count,
     ipAddress: row.ip_address,
-    severity: row.action_count > 100 ? 'critical' : 'warning'
+    severity: row.action_count > 100 ? 'critical' : 'warning',
   }));
-  
+
   if (anomalies.length > 0) {
     signalBus.emitSignal(SIGNAL.SECURITY_THREAT_DETECTED, {
       anomalies,
-      detectionTime: new Date().toISOString()
+      detectionTime: new Date().toISOString(),
     }, {
       severity: SEVERITY.WARNING,
-      source: 'system_administration_service'
+      source: 'system_administration_service',
     });
   }
-  
+
   return anomalies;
 }
 
@@ -156,7 +156,7 @@ async function detectAnomalies() {
 async function getPredictiveMaintenance() {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   // Analyze system performance patterns
   const performanceData = await pg.query(`
     SELECT 
@@ -167,35 +167,35 @@ async function getPredictiveMaintenance() {
     GROUP BY DATE(created_at)
     ORDER BY date ASC
   `);
-  
+
   // Simple trend analysis
   const recent = performanceData.rows.slice(-7);
   const avgActions = recent.reduce((sum, row) => sum + parseInt(row.total_actions), 0) / recent.length;
-  
+
   return {
     currentLoad: avgActions,
     trend: avgActions > 1000 ? 'high' : avgActions > 500 ? 'medium' : 'normal',
     recommendations: avgActions > 1000 ? [
       'Consider scaling database resources',
       'Review audit log retention policy',
-      'Implement log aggregation service'
-    ] : []
+      'Implement log aggregation service',
+    ] : [],
   };
 }
 
 function generateAIRecommendations(auditStats) {
   const recommendations = [];
-  
+
   // Analyze action patterns
   const highFrequencyActions = auditStats.filter(row => parseInt(row.count) > 100);
   if (highFrequencyActions.length > 0) {
     recommendations.push({
       type: 'optimization',
       message: 'High-frequency actions detected. Consider implementing caching for frequently accessed resources.',
-      actions: highFrequencyActions.map(a => a.action)
+      actions: highFrequencyActions.map(a => a.action),
     });
   }
-  
+
   return recommendations;
 }
 

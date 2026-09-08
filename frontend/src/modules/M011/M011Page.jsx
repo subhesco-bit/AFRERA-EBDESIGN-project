@@ -1,9 +1,8 @@
 ﻿import React, { useEffect, useState } from 'react';
 import './styles.css';
-import { useAuthStore } from '../../store/authStore';
+import { userAdministrationAPI } from '../../services/api';
 
 export default function M011Page() {
-  const { token } = useAuthStore();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'farmer' });
@@ -12,8 +11,7 @@ export default function M011Page() {
   async function load() {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/users');
-      const body = await res.json();
+      const { data: body } = await userAdministrationAPI.listUsers();
       if (body && body.success) setUsers(body.data.users || []);
       else setError(body.error || 'Failed to load');
     } catch (e) {
@@ -27,12 +25,7 @@ export default function M011Page() {
     e.preventDefault();
     setError(null);
     try {
-      const res = await fetch('/api/v1/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify(form)
-      });
-      const body = await res.json();
+      const { data: body } = await userAdministrationAPI.createUser(form);
       if (body && body.success) {
         setForm({ name: '', email: '', password: '', role: 'farmer' });
         load();

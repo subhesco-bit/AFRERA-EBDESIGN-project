@@ -1,6 +1,6 @@
 // Enterprise Input Validation - Production Grade
 const { ValidationError } = require('./errorHandler');
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class Validator {
   static string(value, options = {}) {

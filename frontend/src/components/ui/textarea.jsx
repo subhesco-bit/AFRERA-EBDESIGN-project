@@ -1,5 +1,5 @@
-import React from 'react'
-import { cn } from '../../lib/utils'
+import React from 'react';
+import { cn } from '../../lib/utils';
 
 export const Textarea = React.forwardRef(({ className, ...props }, ref) => (
   <textarea
@@ -9,9 +9,9 @@ export const Textarea = React.forwardRef(({ className, ...props }, ref) => (
       'ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none ' +
       'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ' +
       'disabled:cursor-not-allowed disabled:opacity-50',
-      className
+      className,
     )}
     {...props}
   />
-))
-Textarea.displayName = 'Textarea'
+));
+Textarea.displayName = 'Textarea';

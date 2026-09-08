@@ -45,5 +45,5 @@ module.exports = {
   generateWaterUsageAnalytics,
   createWaterDashboard,
   generatePredictiveAnalysis,
-  compareWaterPerformance
+  compareWaterPerformance,
 };

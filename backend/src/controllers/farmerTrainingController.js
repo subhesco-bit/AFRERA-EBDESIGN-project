@@ -95,7 +95,7 @@ const farmerTrainingController = {
       logger.error('Error generating compliance report', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 module.exports = farmerTrainingController;

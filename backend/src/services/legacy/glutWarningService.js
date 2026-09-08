@@ -36,7 +36,7 @@ class GlutWarningService {
           AND ($2::integer IS NULL OR state_id = $2)
           AND is_active = TRUE
           AND created_at >= NOW() - ($3 || ' days')::interval`,
-      [categoryId, stateId || null, WINDOW_DAYS]
+      [categoryId, stateId || null, WINDOW_DAYS],
     );
     const row = result.rows[0];
     const sellerCount = Number(row.seller_count);
@@ -80,10 +80,11 @@ class GlutWarningService {
         GROUP BY category_id
         HAVING COUNT(DISTINCT created_by) >= $3
         ORDER BY seller_count DESC`,
-      [stateId || null, WINDOW_DAYS, GLUT_SELLER_THRESHOLD]
+      [stateId || null, WINDOW_DAYS, GLUT_SELLER_THRESHOLD],
     );
     return result.rows.map((r) => ({ categoryId: r.category_id, sellerCount: Number(r.seller_count), atRisk: true }));
   }
 }
 
 module.exports = new GlutWarningService();
+

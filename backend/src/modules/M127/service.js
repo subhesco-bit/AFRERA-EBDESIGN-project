@@ -39,7 +39,7 @@ async function createHealthRecord(healthData) {
       veterinarian_id,
       location,
       state,
-      district
+      district,
     } = healthData;
 
     const record = {
@@ -58,7 +58,7 @@ async function createHealthRecord(healthData) {
       state,
       district,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered health analysis
@@ -69,8 +69,8 @@ async function createHealthRecord(healthData) {
         disease_patterns: await getDiseasePatterns(animal_type, state, district),
         treatment_recommendations: await getTreatmentRecommendations(diagnosis, animal_type),
         vaccination_status: await getVaccinationStatus(animal_id),
-        herd_health_impact: await assessHerdHealthImpact(animal_id, farmer_id)
-      }
+        herd_health_impact: await assessHerdHealthImpact(animal_id, farmer_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -100,8 +100,8 @@ async function createHealthRecord(healthData) {
         record.district,
         record.status,
         JSON.stringify(record.ai_analysis),
-        record.created_at
-      ]
+        record.created_at,
+      ],
     );
 
     logger.info(`Health record created: ${record.health_record_id}`);
@@ -127,7 +127,7 @@ async function scheduleVaccination(vaccinationData) {
       veterinarian_id,
       location,
       state,
-      district
+      district,
     } = vaccinationData;
 
     const vaccination = {
@@ -143,7 +143,7 @@ async function scheduleVaccination(vaccinationData) {
       state,
       district,
       status: 'scheduled',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered vaccination optimization
@@ -153,8 +153,8 @@ async function scheduleVaccination(vaccinationData) {
         vaccination_data: vaccinationData,
         vaccination_schedule: await getVaccinationSchedule(animal_type),
         herd_immunity: await assessHerdImmunity(farmer_id, animal_type),
-        disease_risk: await assessDiseaseRisk(animal_type, state, district)
-      }
+        disease_risk: await assessDiseaseRisk(animal_type, state, district),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -181,8 +181,8 @@ async function scheduleVaccination(vaccinationData) {
         vaccination.district,
         vaccination.status,
         JSON.stringify(vaccination.ai_optimization),
-        vaccination.created_at
-      ]
+        vaccination.created_at,
+      ],
     );
 
     logger.info(`Vaccination scheduled: ${vaccination.vaccination_id}`);
@@ -205,9 +205,9 @@ async function monitorHerdHealth(farmerId, animalType) {
       timestamp: new Date().toISOString(),
       overall_health_score: await calculateHerdHealthScore(farmerId, animalType),
       disease_outbreaks: await detectDiseaseOutbreaks(farmerId, animalType),
-    vaccination_coverage: await calculateVaccinationCoverage(farmerId, animalType),
-    treatment_compliance: await calculateTreatmentCompliance(farmerId, animalType),
-    recommendations: await generateHerdHealthRecommendations(farmerId, animalType)
+      vaccination_coverage: await calculateVaccinationCoverage(farmerId, animalType),
+      treatment_compliance: await calculateTreatmentCompliance(farmerId, animalType),
+      recommendations: await generateHerdHealthRecommendations(farmerId, animalType),
     };
 
     return monitoring;
@@ -232,7 +232,7 @@ async function generateHealthReport(farmerId, reportType) {
       disease_statistics: await getDiseaseStatistics(farmerId),
       vaccination_status: await getVaccinationStatus(farmerId),
       treatment_history: await getTreatmentHistory(farmerId),
-      recommendations: await generateHealthRecommendations(farmerId)
+      recommendations: await generateHealthRecommendations(farmerId),
     };
 
     return report;
@@ -250,7 +250,7 @@ async function getDiseasePatterns(animalType, state, district) {
   try {
     const result = await pool.query(
       'SELECT * FROM regional_disease_patterns WHERE animal_type = $1 AND state = $2 AND district = $3',
-      [animalType, state, district]
+      [animalType, state, district],
     );
     return result.rows;
   } catch (error) {
@@ -261,7 +261,7 @@ async function getDiseasePatterns(animalType, state, district) {
 async function getTreatmentRecommendations(diagnosis, animalType) {
   return [
     { treatment: 'antibiotics', duration: '7 days', dosage: 'recommended' },
-    { treatment: 'supportive_care', duration: '14 days', dosage: 'as_needed' }
+    { treatment: 'supportive_care', duration: '14 days', dosage: 'as_needed' },
   ];
 }
 
@@ -269,7 +269,7 @@ async function getVaccinationStatus(animalId) {
   try {
     const result = await pool.query(
       'SELECT * FROM vaccination_records WHERE animal_id = $1 ORDER BY vaccination_date DESC LIMIT 5',
-      [animalId]
+      [animalId],
     );
     return result.rows;
   } catch (error) {
@@ -281,14 +281,14 @@ async function assessHerdHealthImpact(animalId, farmerId) {
   return {
     transmission_risk: 'medium',
     quarantine_needed: false,
-    herd_monitoring_required: true
+    herd_monitoring_required: true,
   };
 }
 
 async function getVaccinationSchedule(animalType) {
   return [
     { vaccine: 'core_vaccine', age_weeks: 4, booster: '6_months' },
-    { vaccine: 'disease_specific', age_weeks: 8, booster: '12_months' }
+    { vaccine: 'disease_specific', age_weeks: 8, booster: '12_months' },
   ];
 }
 
@@ -296,7 +296,7 @@ async function assessHerdImmunity(farmerId, animalType) {
   return {
     coverage_percentage: 75,
     immunity_level: 'moderate',
-    vulnerability_risk: 'medium'
+    vulnerability_risk: 'medium',
   };
 }
 
@@ -304,7 +304,7 @@ async function assessDiseaseRisk(animalType, state, district) {
   return {
     current_risk: 'low',
     seasonal_risk: 'moderate',
-    endemic_diseases: ['common_disease_1', 'common_disease_2']
+    endemic_diseases: ['common_disease_1', 'common_disease_2'],
   };
 }
 
@@ -312,7 +312,7 @@ async function calculateHerdHealthScore(farmerId, animalType) {
   return {
     overall_score: 80,
     health_distribution: { excellent: 60, good: 25, fair: 10, poor: 5 },
-    trend: 'improving'
+    trend: 'improving',
   };
 }
 
@@ -321,7 +321,7 @@ async function detectDiseaseOutbreaks(farmerId, animalType) {
     active_outbreaks: 0,
     recent_outbreaks: 1,
     outbreak_types: ['respiratory'],
-    affected_animals: 5
+    affected_animals: 5,
   };
 }
 
@@ -330,7 +330,7 @@ async function calculateVaccinationCoverage(farmerId, animalType) {
     fully_vaccinated: 70,
     partially_vaccinated: 20,
     not_vaccinated: 10,
-    coverage_percentage: 75
+    coverage_percentage: 75,
   };
 }
 
@@ -338,7 +338,7 @@ async function calculateTreatmentCompliance(farmerId, animalType) {
   return {
     compliance_rate: 85,
     treatment_completion: 90,
-    follow_up_rate: 75
+    follow_up_rate: 75,
   };
 }
 
@@ -346,7 +346,7 @@ async function generateHerdHealthRecommendations(farmerId, animalType) {
   return [
     'Increase vaccination coverage',
     'Implement regular health screenings',
-    'Improve biosecurity measures'
+    'Improve biosecurity measures',
   ];
 }
 
@@ -354,7 +354,7 @@ async function getTotalAnimals(farmerId) {
   try {
     const result = await pool.query(
       'SELECT COUNT(*) as count FROM animal_registry WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -367,7 +367,7 @@ async function getHealthSummary(farmerId) {
     healthy: 75,
     under_treatment: 15,
     critical: 5,
-    quarantined: 5
+    quarantined: 5,
   };
 }
 
@@ -376,7 +376,7 @@ async function getDiseaseStatistics(farmerId) {
     total_cases: 50,
     active_cases: 10,
     recovered: 35,
-    mortality: 5
+    mortality: 5,
   };
 }
 
@@ -385,7 +385,7 @@ async function getTreatmentHistory(farmerId) {
     total_treatments: 100,
     successful: 85,
     ongoing: 10,
-    failed: 5
+    failed: 5,
   };
 }
 
@@ -393,7 +393,7 @@ async function generateHealthRecommendations(farmerId) {
   return [
     'Implement preventive health measures',
     'Schedule regular veterinary check-ups',
-    'Maintain proper nutrition and housing'
+    'Maintain proper nutrition and housing',
   ];
 }
 
@@ -401,6 +401,6 @@ module.exports = {
   createHealthRecord,
   scheduleVaccination,
   monitorHerdHealth,
-  generateHealthReport
+  generateHealthReport,
 };
 

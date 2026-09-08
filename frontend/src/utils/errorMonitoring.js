@@ -1,16 +1,26 @@
 /**
  * Error Monitoring and Logging Utility
- * 
+ *
  * Provides comprehensive error tracking, logging, and monitoring
  * for production-ready error handling and debugging
  */
+
+import { errorMonitoringAPI } from '../services/api';
 
 class ErrorMonitoring {
   constructor() {
     this.errorQueue = [];
     this.maxQueueSize = 50;
     this.isOnline = navigator.onLine;
-    
+    this.activeUser = null;
+    this.handleOnline = () => {
+      this.isOnline = true;
+      this.flushErrorQueue();
+    };
+    this.handleOffline = () => {
+      this.isOnline = false;
+    };
+
     // Initialize event listeners
     this.initializeErrorHandlers();
     this.initializeNetworkListeners();
@@ -18,7 +28,7 @@ class ErrorMonitoring {
 
   initializeErrorHandlers() {
     // Global error handler
-    window.onerror = (message, source, lineno, colno, error) => {
+    this.handleWindowError = (message, source, lineno, colno, error) => {
       this.logError({
         type: 'javascript',
         message,
@@ -28,24 +38,24 @@ class ErrorMonitoring {
         stack: error?.stack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     };
 
     // Unhandled promise rejection handler
-    window.onunhandledrejection = (event) => {
+    this.handleUnhandledRejection = (event) => {
       this.logError({
         type: 'promise',
         message: event.reason?.message || 'Unhandled Promise Rejection',
         stack: event.reason?.stack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     };
 
     // React error boundary will call this method
-    window.logReactError = (error, errorInfo) => {
+    this.handleReactError = (error, errorInfo) => {
       this.logError({
         type: 'react',
         message: error.message,
@@ -53,26 +63,23 @@ class ErrorMonitoring {
         componentStack: errorInfo.componentStack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     };
+    window.onerror = this.handleWindowError;
+    window.onunhandledrejection = this.handleUnhandledRejection;
+    window.logReactError = this.handleReactError;
   }
 
   initializeNetworkListeners() {
-    window.addEventListener('online', () => {
-      this.isOnline = true;
-      this.flushErrorQueue();
-    });
-
-    window.addEventListener('offline', () => {
-      this.isOnline = false;
-    });
+    window.addEventListener('online', this.handleOnline);
+    window.addEventListener('offline', this.handleOffline);
   }
 
   logError(errorData) {
     // Add to queue
     this.errorQueue.push(errorData);
-    
+
     // Trim queue if too large
     if (this.errorQueue.length > this.maxQueueSize) {
       this.errorQueue = this.errorQueue.slice(-this.maxQueueSize);
@@ -90,16 +97,10 @@ class ErrorMonitoring {
   }
 
   async sendErrorToServer(errorData) {
+    if (import.meta.env.DEV) return;
+
     try {
-      // In production, send to your error monitoring service
-      // For now, we'll use a local endpoint
-      await fetch('/api/v1/errors/log', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(errorData),
-      });
+      await errorMonitoringAPI.log(errorData);
     } catch (error) {
       console.warn('Failed to send error to server:', error);
     }
@@ -120,12 +121,25 @@ class ErrorMonitoring {
     return {
       totalErrors: this.errorQueue.length,
       isOnline: this.isOnline,
-      recentErrors: this.errorQueue.slice(-10)
+      activeUser: this.activeUser,
+      recentErrors: this.errorQueue.slice(-10),
     };
+  }
+
+  trackActiveUser(userId, sessionId) {
+    this.activeUser = { userId, sessionId };
   }
 
   clearErrors() {
     this.errorQueue = [];
+  }
+
+  destroy() {
+    window.removeEventListener('online', this.handleOnline);
+    window.removeEventListener('offline', this.handleOffline);
+    if (window.onerror === this.handleWindowError) window.onerror = null;
+    if (window.onunhandledrejection === this.handleUnhandledRejection) window.onunhandledrejection = null;
+    if (window.logReactError === this.handleReactError) delete window.logReactError;
   }
 }
 

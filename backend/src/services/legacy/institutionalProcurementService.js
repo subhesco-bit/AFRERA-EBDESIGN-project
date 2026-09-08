@@ -9,7 +9,7 @@ const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
 const { PROCUREMENT_ROLES } = require('../../middleware/roleGroups');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
@@ -24,7 +24,7 @@ const pool = require('../../database/pool');
 /**
  * Create tender
  */
-router.post('/tenders', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/tenders', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       tender_number,
@@ -48,7 +48,7 @@ router.post('/tenders', authRateLimit, authMiddleware, async (req, res) => {
       evaluation_criteria,
       documents_required,
       status,
-      created_by
+      created_by,
     } = req.body;
 
     const result = await pool.query(
@@ -68,8 +68,8 @@ router.post('/tenders', authRateLimit, authMiddleware, async (req, res) => {
         financial_evaluation_date, award_date, contract_duration,
         JSON.stringify(delivery_schedule), JSON.stringify(payment_terms),
         JSON.stringify(eligibility_criteria), JSON.stringify(evaluation_criteria),
-        JSON.stringify(documents_required), status, created_by
-      ]
+        JSON.stringify(documents_required), status, created_by,
+      ],
     );
 
     logger.info(`Tender created: ${result.rows[0].id}`);
@@ -86,7 +86,7 @@ router.post('/tenders', authRateLimit, authMiddleware, async (req, res) => {
 router.get('/tenders', authMiddleware, async (req, res) => {
   try {
     const { institution_id, tender_type, status, procurement_category } = req.query;
-    
+
     let query = 'SELECT * FROM procurement_tenders WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -126,7 +126,7 @@ router.get('/tenders', authMiddleware, async (req, res) => {
 /**
  * Submit bid for tender
  */
-router.post('/tenders/:id/bids', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/tenders/:id/bids', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       supplier_id,
@@ -136,7 +136,7 @@ router.post('/tenders/:id/bids', authRateLimit, authMiddleware, async (req, res)
       documents_submitted,
       bid_security_provided,
       proposed_delivery_schedule,
-      proposed_payment_terms
+      proposed_payment_terms,
     } = req.body;
 
     const result = await pool.query(
@@ -150,8 +150,8 @@ router.post('/tenders/:id/bids', authRateLimit, authMiddleware, async (req, res)
         req.params.id, req.user.id, bid_amount, JSON.stringify(technical_proposal),
         JSON.stringify(financial_proposal), JSON.stringify(documents_submitted),
         bid_security_provided, JSON.stringify(proposed_delivery_schedule),
-        JSON.stringify(proposed_payment_terms)
-      ]
+        JSON.stringify(proposed_payment_terms),
+      ],
     );
 
     logger.info(`Bid submitted for tender ${req.params.id}`);
@@ -169,7 +169,7 @@ router.post('/tenders/:id/bids', authRateLimit, authMiddleware, async (req, res)
 /**
  * Create demand forecast
  */
-router.post('/demand-forecast', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/demand-forecast', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       institution_id,
@@ -184,7 +184,7 @@ router.post('/demand-forecast', authRateLimit, authMiddleware, async (req, res) 
       budget_constraints,
       forecast_method,
       confidence_level,
-      generated_by
+      generated_by,
     } = req.body;
 
     const result = await pool.query(
@@ -200,8 +200,8 @@ router.post('/demand-forecast', authRateLimit, authMiddleware, async (req, res) 
         JSON.stringify(historical_data), JSON.stringify(seasonal_factors),
         JSON.stringify(special_events), JSON.stringify(enrollment_data),
         JSON.stringify(menu_requirements), JSON.stringify(budget_constraints),
-        forecast_method, confidence_level, generated_by
-      ]
+        forecast_method, confidence_level, generated_by,
+      ],
     );
 
     logger.info(`Demand forecast created: ${result.rows[0].id}`);
@@ -218,7 +218,7 @@ router.post('/demand-forecast', authRateLimit, authMiddleware, async (req, res) 
 router.get('/demand-forecast', authMiddleware, async (req, res) => {
   try {
     const { institution_id, forecast_type, product_category } = req.query;
-    
+
     let query = 'SELECT * FROM demand_forecasts WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -256,7 +256,7 @@ router.get('/demand-forecast', authMiddleware, async (req, res) => {
 /**
  * Create menu plan
  */
-router.post('/menu-plans', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/menu-plans', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       institution_id,
@@ -277,7 +277,7 @@ router.post('/menu-plans', authRateLimit, authMiddleware, async (req, res) => {
       preparation_instructions,
       allergen_information,
       approved_by,
-      status
+      status,
     } = req.body;
 
     const result = await pool.query(
@@ -297,8 +297,8 @@ router.post('/menu-plans', authRateLimit, authMiddleware, async (req, res) => {
         JSON.stringify(local_sourcing_requirements), JSON.stringify(menu_items),
         JSON.stringify(ingredients_list), JSON.stringify(portion_sizes),
         JSON.stringify(preparation_instructions), JSON.stringify(allergen_information),
-        approved_by, status
-      ]
+        approved_by, status,
+      ],
     );
 
     logger.info(`Menu plan created: ${result.rows[0].id}`);
@@ -315,7 +315,7 @@ router.post('/menu-plans', authRateLimit, authMiddleware, async (req, res) => {
 router.get('/menu-plans', authMiddleware, async (req, res) => {
   try {
     const { institution_id, plan_type, status, start_date, end_date } = req.query;
-    
+
     let query = 'SELECT * FROM menu_plans WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -365,7 +365,7 @@ router.get('/menu-plans', authMiddleware, async (req, res) => {
 /**
  * Create nutrition compliance record
  */
-router.post('/nutrition-compliance', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/nutrition-compliance', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       institution_id,
@@ -378,7 +378,7 @@ router.post('/nutrition-compliance', authRateLimit, authMiddleware, async (req, 
       compliance_score,
       assessed_by,
       assessment_date,
-      next_assessment_date
+      next_assessment_date,
     } = req.body;
 
     const result = await pool.query(
@@ -392,8 +392,8 @@ router.post('/nutrition-compliance', authRateLimit, authMiddleware, async (req, 
         institution_id, compliance_type, compliance_period,
         JSON.stringify(nutritional_standards), JSON.stringify(actual_achievement),
         JSON.stringify(deficiencies), JSON.stringify(corrective_actions),
-        compliance_score, assessed_by, assessment_date, next_assessment_date
-      ]
+        compliance_score, assessed_by, assessment_date, next_assessment_date,
+      ],
     );
 
     logger.info(`Nutrition compliance record created: ${result.rows[0].id}`);
@@ -410,7 +410,7 @@ router.post('/nutrition-compliance', authRateLimit, authMiddleware, async (req, 
 router.get('/nutrition-compliance', authMiddleware, async (req, res) => {
   try {
     const { institution_id, compliance_type, assessment_date } = req.query;
-    
+
     let query = 'SELECT * FROM nutrition_compliance WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -448,7 +448,7 @@ router.get('/nutrition-compliance', authMiddleware, async (req, res) => {
 /**
  * Create supply contract
  */
-router.post('/contracts', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/contracts', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       contract_number,
@@ -469,7 +469,7 @@ router.post('/contracts', authRateLimit, authMiddleware, async (req, res) => {
       termination_conditions,
       special_conditions,
       status,
-      signed_by
+      signed_by,
     } = req.body;
 
     const result = await pool.query(
@@ -487,8 +487,8 @@ router.post('/contracts', authRateLimit, authMiddleware, async (req, res) => {
         JSON.stringify(delivery_schedule), JSON.stringify(quality_standards),
         JSON.stringify(payment_terms), JSON.stringify(penalty_clauses),
         force_majeure, JSON.stringify(renewal_terms), JSON.stringify(termination_conditions),
-        JSON.stringify(special_conditions), status, signed_by
-      ]
+        JSON.stringify(special_conditions), status, signed_by,
+      ],
     );
 
     logger.info(`Supply contract created: ${result.rows[0].id}`);
@@ -505,7 +505,7 @@ router.post('/contracts', authRateLimit, authMiddleware, async (req, res) => {
 router.get('/contracts', authMiddleware, async (req, res) => {
   try {
     const { institution_id, supplier_id, contract_type, status } = req.query;
-    
+
     let query = 'SELECT * FROM supply_contracts WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -549,7 +549,7 @@ router.get('/contracts', authMiddleware, async (req, res) => {
 /**
  * Create quality inspection
  */
-router.post('/quality-inspections', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/quality-inspections', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       inspection_number,
@@ -568,7 +568,7 @@ router.post('/quality-inspections', authRateLimit, authMiddleware, async (req, r
       non_conformities,
       corrective_actions_required,
       approval_status,
-      notes
+      notes,
     } = req.body;
 
     const result = await pool.query(
@@ -584,8 +584,8 @@ router.post('/quality-inspections', authRateLimit, authMiddleware, async (req, r
         inspector_id, inspection_location, sample_size, JSON.stringify(inspection_criteria),
         JSON.stringify(test_results), quality_score, pass_fail, JSON.stringify(defects_found),
         JSON.stringify(non_conformities), JSON.stringify(corrective_actions_required),
-        approval_status, notes
-      ]
+        approval_status, notes,
+      ],
     );
 
     logger.info(`Quality inspection created: ${result.rows[0].id}`);
@@ -602,7 +602,7 @@ router.post('/quality-inspections', authRateLimit, authMiddleware, async (req, r
 router.get('/quality-inspections', authMiddleware, async (req, res) => {
   try {
     const { contract_id, shipment_id, inspection_type, approval_status } = req.query;
-    
+
     let query = 'SELECT * FROM quality_inspections WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -646,7 +646,7 @@ router.get('/quality-inspections', authMiddleware, async (req, res) => {
 /**
  * Create settlement record
  */
-router.post('/settlements', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/settlements', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       settlement_number,
@@ -663,7 +663,7 @@ router.post('/settlements', authRateLimit, authMiddleware, async (req, res) => {
       payment_reference,
       settled_by,
       approved_by,
-      notes
+      notes,
     } = req.body;
 
     const result = await pool.query(
@@ -676,8 +676,8 @@ router.post('/settlements', authRateLimit, authMiddleware, async (req, res) => {
       [
         settlement_number, contract_id, invoice_id, settlement_type, settlement_date,
         amount_due, amount_paid, JSON.stringify(deductions), JSON.stringify(penalties),
-        JSON.stringify(bonuses), payment_method, payment_reference, settled_by, approved_by, notes
-      ]
+        JSON.stringify(bonuses), payment_method, payment_reference, settled_by, approved_by, notes,
+      ],
     );
 
     logger.info(`Settlement record created: ${result.rows[0].id}`);
@@ -694,7 +694,7 @@ router.post('/settlements', authRateLimit, authMiddleware, async (req, res) => {
 router.get('/settlements', authMiddleware, async (req, res) => {
   try {
     const { contract_id, invoice_id, settlement_type, status } = req.query;
-    
+
     let query = 'SELECT * FROM settlement_records WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -798,11 +798,11 @@ function generateOfferNumber() {
  * Submit a contract offer. Institution-side: authenticated, but the caller
  * never learns the farmer's floor — only whether the offer cleared it.
  */
-router.post('/contract-offers', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/contract-offers', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       farmer_id, crop, institution_id, offered_price_inr_per_kg, quantity_kg,
-      delivery_schedule, payment_terms, special_conditions
+      delivery_schedule, payment_terms, special_conditions,
     } = req.body;
 
     if (!farmer_id || !crop || !offered_price_inr_per_kg || !quantity_kg) {
@@ -812,7 +812,7 @@ router.post('/contract-offers', authRateLimit, authMiddleware, async (req, res) 
     const readiness = await pool.query(
       `SELECT map_price_inr_per_kg FROM farmer_contract_readiness
        WHERE farmer_id = $1 AND crop = $2`,
-      [farmer_id, crop]
+      [farmer_id, crop],
     );
 
     const mapPrice = readiness.rows[0] ? readiness.rows[0].map_price_inr_per_kg : null;
@@ -824,7 +824,7 @@ router.post('/contract-offers', authRateLimit, authMiddleware, async (req, res) 
       logger.info(`Contract offer below MAP rejected for farmer ${farmer_id}/${crop}`);
       return res.status(422).json({
         error: 'Offer rejected: below the farmer\'s protected floor price. It was not delivered to the farmer.',
-        status: 'rejected_below_map'
+        status: 'rejected_below_map',
       });
     }
 
@@ -839,8 +839,8 @@ router.post('/contract-offers', authRateLimit, authMiddleware, async (req, res) 
         generateOfferNumber(), farmer_id, crop, institution_id || null,
         offered_price_inr_per_kg, quantity_kg,
         JSON.stringify(delivery_schedule || null), JSON.stringify(payment_terms || null),
-        JSON.stringify(special_conditions || null)
-      ]
+        JSON.stringify(special_conditions || null),
+      ],
     );
 
     logger.info(`Contract offer created: ${result.rows[0].offer_number}`);
@@ -872,7 +872,7 @@ router.get('/contract-offers', authMiddleware, async (req, res) => {
               created_at, updated_at
        FROM contract_offers ${where}
        ORDER BY created_at DESC`,
-      params
+      params,
     );
     res.json(result.rows);
   } catch (error) {
@@ -895,7 +895,7 @@ router.put('/contract-offers/:id', authMiddleware, requireRole(...PROCUREMENT_RO
       `UPDATE contract_offers SET status = $1, updated_at = NOW()
        WHERE id = $2
        RETURNING id, offer_number, farmer_id, crop, status, updated_at`,
-      [status, req.params.id]
+      [status, req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -916,5 +916,6 @@ function isHealthy() {
 
 module.exports = {
   router,
-  isHealthy
+  isHealthy,
 };
+

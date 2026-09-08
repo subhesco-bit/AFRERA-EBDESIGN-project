@@ -8,7 +8,7 @@
  * 3. District-level overrides
  * 4. Cluster-level overrides
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class ConfigService {
   constructor() {

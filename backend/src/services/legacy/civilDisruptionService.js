@@ -34,7 +34,7 @@ class CivilDisruptionService {
          (disruption_type, title, description, affected_state, affected_district, affected_route_names, start_date, reported_by, source_note, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'unverified')
        RETURNING *`,
-      [disruptionType, title, description || null, affectedState, affectedDistrict || null, affectedRouteNames || null, startDate, reportedBy || null, sourceNote || null]
+      [disruptionType, title, description || null, affectedState, affectedDistrict || null, affectedRouteNames || null, startDate, reportedBy || null, sourceNote || null],
     );
     const event = result.rows[0];
 
@@ -57,7 +57,7 @@ class CivilDisruptionService {
     const result = await pool.query(
       `UPDATE civil_disruption_events SET status = 'active', verified_by = $1, verified_at = NOW(), updated_at = NOW()
        WHERE id = $2 AND status = 'unverified' RETURNING *`,
-      [verifiedBy, disruptionId]
+      [verifiedBy, disruptionId],
     );
     if (result.rows.length === 0) throw new Error('Disruption not found or not in unverified status');
     return result.rows[0];
@@ -67,7 +67,7 @@ class CivilDisruptionService {
     const result = await pool.query(
       `UPDATE civil_disruption_events SET status = 'resolved', end_date = $1, updated_at = NOW()
        WHERE id = $2 RETURNING *`,
-      [endDate || new Date().toISOString().slice(0, 10), disruptionId]
+      [endDate || new Date().toISOString().slice(0, 10), disruptionId],
     );
     if (result.rows.length === 0) throw new Error('Disruption not found');
     const event = result.rows[0];
@@ -76,13 +76,13 @@ class CivilDisruptionService {
   }
 
   async listActive({ state, district } = {}) {
-    const conditions = [`status IN ('active', 'unverified')`, `(end_date IS NULL OR end_date >= CURRENT_DATE)`];
+    const conditions = ['status IN (\'active\', \'unverified\')', '(end_date IS NULL OR end_date >= CURRENT_DATE)'];
     const params = [];
     if (state) { params.push(state); conditions.push(`affected_state ILIKE $${params.length}`); }
     if (district) { params.push(district); conditions.push(`affected_district ILIKE $${params.length}`); }
     const result = await pool.query(
       `SELECT * FROM civil_disruption_events WHERE ${conditions.join(' AND ')} ORDER BY start_date DESC`,
-      params
+      params,
     );
     return result.rows;
   }
@@ -106,7 +106,7 @@ class CivilDisruptionService {
          FROM shipments
         WHERE status NOT IN ('delivered', 'cancelled')
           AND (${conditions.join(' OR ')})`,
-      params
+      params,
     );
     return result.rows;
   }
@@ -131,3 +131,4 @@ class CivilDisruptionService {
 }
 
 module.exports = new CivilDisruptionService();
+

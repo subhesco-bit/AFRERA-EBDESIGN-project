@@ -58,7 +58,7 @@ class InsuranceFraudDetectionService {
         riskLevel,
         indicators: fraudIndicators,
         recommendedAction: this.getRecommendedAction(riskLevel),
-        analyzedAt: new Date()
+        analyzedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error analyzing claim for fraud', { error: error.message, stack: error.stack });
@@ -144,7 +144,7 @@ class InsuranceFraudDetectionService {
         threshold: 3,
         isSuspicious,
         riskScore,
-        details: `${claimCount} claims in 12 months (threshold: 3)`
+        details: `${claimCount} claims in 12 months (threshold: 3)`,
       };
     } catch (error) {
       logger.error('Error checking claim frequency', { error: error.message, stack: error.stack });
@@ -191,7 +191,7 @@ class InsuranceFraudDetectionService {
         percentile95: p95,
         isSuspicious,
         riskScore,
-        details: `Amount ${claim.amount} vs avg ${avgAmount.toFixed(2)} (z-score: ${zScore.toFixed(2)})`
+        details: `Amount ${claim.amount} vs avg ${avgAmount.toFixed(2)} (z-score: ${zScore.toFixed(2)})`,
       };
     } catch (error) {
       logger.error('Error checking claim amount anomaly', { error: error.message, stack: error.stack });
@@ -229,7 +229,7 @@ class InsuranceFraudDetectionService {
         isWeekend,
         isSuspicious,
         riskScore,
-        details: `Claim filed ${daysToReport} days after incident`
+        details: `Claim filed ${daysToReport} days after incident`,
       };
     } catch (error) {
       logger.error('Error checking timing patterns', { error: error.message, stack: error.stack });
@@ -269,7 +269,7 @@ class InsuranceFraudDetectionService {
         hasRequiredDocs,
         isSuspicious,
         riskScore,
-        details: `${documentCount} documents uploaded, required docs: ${hasRequiredDocs ? 'yes' : 'no'}`
+        details: `${documentCount} documents uploaded, required docs: ${hasRequiredDocs ? 'yes' : 'no'}`,
       };
     } catch (error) {
       logger.error('Error checking document consistency', { error: error.message, stack: error.stack });
@@ -313,7 +313,7 @@ class InsuranceFraudDetectionService {
         locationMatch,
         isSuspicious,
         riskScore,
-        details: `Claim location: ${claimLocation}, Registered: ${userLocation}`
+        details: `Claim location: ${claimLocation}, Registered: ${userLocation}`,
       };
     } catch (error) {
       logger.error('Error checking location consistency', { error: error.message, stack: error.stack });
@@ -345,7 +345,7 @@ class InsuranceFraudDetectionService {
         unverifiedKYC,
         isSuspicious,
         riskScore,
-        details: `FDI: ${fdiScore}, KYC: ${kycVerified ? 'verified' : 'unverified'}`
+        details: `FDI: ${fdiScore}, KYC: ${kycVerified ? 'verified' : 'unverified'}`,
       };
     } catch (error) {
       logger.error('Error checking policyholder behavior', { error: error.message, stack: error.stack });
@@ -382,7 +382,7 @@ class InsuranceFraudDetectionService {
         relatedCount,
         isSuspicious,
         riskScore,
-        details: `${relatedCount} related policyholders found`
+        details: `${relatedCount} related policyholders found`,
       };
     } catch (error) {
       logger.error('Error checking network analysis', { error: error.message, stack: error.stack });
@@ -423,7 +423,7 @@ class InsuranceFraudDetectionService {
         investigatedClaims,
         isSuspicious,
         riskScore,
-        details: `${previousClaims} previous claims, ${rejectedClaims} rejected, ${investigatedClaims} investigated`
+        details: `${previousClaims} previous claims, ${rejectedClaims} rejected, ${investigatedClaims} investigated`,
       };
     } catch (error) {
       logger.error('Error checking historical patterns', { error: error.message, stack: error.stack });
@@ -452,7 +452,7 @@ class InsuranceFraudDetectionService {
       totalScore: normalizedScore,
       suspiciousIndicators: suspiciousCount,
       totalIndicators: indicators.length,
-      breakdown: indicators
+      breakdown: indicators,
     };
   }
 
@@ -472,11 +472,11 @@ class InsuranceFraudDetectionService {
    */
   getRecommendedAction(riskLevel) {
     const actions = {
-      'critical': 'Immediate investigation, claim suspension, potential fraud report',
-      'high': 'Detailed investigation, additional documentation required',
-      'medium': 'Standard investigation, verification of key details',
-      'low': ' expedited processing with minor verification',
-      'minimal': 'Standard processing'
+      critical: 'Immediate investigation, claim suspension, potential fraud report',
+      high: 'Detailed investigation, additional documentation required',
+      medium: 'Standard investigation, verification of key details',
+      low: ' expedited processing with minor verification',
+      minimal: 'Standard processing',
     };
 
     return actions[riskLevel] || 'Standard processing';
@@ -504,7 +504,7 @@ class InsuranceFraudDetectionService {
         claimId,
         JSON.stringify(indicators),
         JSON.stringify(fraudScore),
-        riskLevel
+        riskLevel,
       ]);
 
       return result.rows[0];
@@ -591,3 +591,4 @@ class InsuranceFraudDetectionService {
 }
 
 module.exports = new InsuranceFraudDetectionService();
+

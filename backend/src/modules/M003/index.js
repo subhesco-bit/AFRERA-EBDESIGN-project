@@ -9,8 +9,8 @@ router.put('/tenants/:id', controller.updateTenant);
 router.get('/tenants/:id/usage', controller.getTenantUsageMetrics);
 router.get('/tenants', controller.listTenants);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

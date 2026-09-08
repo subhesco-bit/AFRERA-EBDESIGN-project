@@ -154,26 +154,26 @@ module.exports = {
   createDataAccessPolicy,
   getDataAccessPolicies,
   checkDataAccess,
-  
+
   // Data masking
   applyDataMasking,
   createMaskingRule,
   getMaskingRules,
-  
+
   // Privacy policy management
   createPrivacyPolicy,
   getPrivacyPolicies,
   acceptPrivacyPolicy,
-  
+
   // AI-powered risk assessment
   assessPrivacyRisk,
-  
+
   // Privacy impact analysis
   performPrivacyImpactAnalysis,
-  
+
   // Compliance monitoring
   getPrivacyComplianceStatus,
-  
+
   // Data retention
   enforceDataRetention,
 };

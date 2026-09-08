@@ -36,7 +36,7 @@ function buildAdvisoryActions(source) {
       area: 'irrigation',
       priority: 'high',
       action: 'Schedule irrigation and verify water-source availability',
-      evidence: 'low_soil_moisture signal'
+      evidence: 'low_soil_moisture signal',
     });
   }
   if (signals.includes('price_drop')) {
@@ -44,7 +44,7 @@ function buildAdvisoryActions(source) {
       area: 'market',
       priority: 'high',
       action: 'Review sell timing and evaluate storage or forward contract options',
-      evidence: 'price_drop signal'
+      evidence: 'price_drop signal',
     });
   }
   if (signals.includes('pest_pressure')) {
@@ -52,7 +52,7 @@ function buildAdvisoryActions(source) {
       area: 'crop_health',
       priority: 'critical',
       action: 'Create field scouting task and record observed pest evidence',
-      evidence: 'pest_pressure signal'
+      evidence: 'pest_pressure signal',
     });
   }
   if (signals.includes('certification_renewal_due')) {
@@ -60,7 +60,7 @@ function buildAdvisoryActions(source) {
       area: 'compliance',
       priority: 'high',
       action: 'Prepare renewal documents and schedule inspection',
-      evidence: 'certification_renewal_due signal'
+      evidence: 'certification_renewal_due signal',
     });
   }
 
@@ -69,7 +69,7 @@ function buildAdvisoryActions(source) {
       area: source.advisoryType ?? 'general',
       priority: normalizePriority(source.priority),
       action: source.recommendedAction ?? 'Review farmer context and create a local follow-up task',
-      evidence: 'manual_or_contextual_advisory'
+      evidence: 'manual_or_contextual_advisory',
     });
   }
 
@@ -103,9 +103,9 @@ function normalizeAdvisory(payload = {}, existing = {}) {
     aiCompatibility: {
       canEnrichWithClaude: true,
       requiresExternalData: false,
-      inputContract: ['farmerId', 'advisoryType', 'context', 'signals']
+      inputContract: ['farmerId', 'advisoryType', 'context', 'signals'],
     },
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 }
 
@@ -139,12 +139,12 @@ async function listItems({ page = 1, limit = 20, farmerId, advisoryType, status,
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await client.query(
     `SELECT * FROM ${tableName} ${where} ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
-    [...params, safeLimit, offset]
+    [...params, safeLimit, offset],
   );
 
   return {
     items: res.rows.map(row => ({ ...row, data: normalizeAdvisory(row.data || {}, row) })),
-    pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) }
+    pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
   };
 }
 
@@ -158,7 +158,7 @@ async function createItem(payload) {
   const data = normalizeAdvisory(payload);
   const res = await pg().query(
     `INSERT INTO ${tableName} (data, created_at, updated_at) VALUES ($1, NOW(), NOW()) RETURNING *`,
-    [data]
+    [data],
   );
   return res.rows[0];
 }
@@ -169,14 +169,14 @@ async function updateItem(id, payload) {
   const data = normalizeAdvisory(payload, current);
   const res = await pg().query(
     `UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-    [data, id]
+    [data, id],
   );
   return res.rows[0] || null;
 }
 
 async function deleteItem(id) {
   const res = await pg().query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 async function generateAdvisoryPlan(parameters = {}) {
@@ -192,8 +192,8 @@ async function generateAdvisoryPlan(parameters = {}) {
       title: advisory.title,
       context: advisory.context,
       signals: advisory.signals,
-      actions: advisory.actions
-    }
+      actions: advisory.actions,
+    },
   };
 }
 
@@ -209,8 +209,8 @@ async function getOpenActionSummary(farmerId) {
     actions: advisories.flatMap(item => item.actions.map(action => ({
       advisoryType: item.advisoryType,
       dueDate: item.dueDate,
-      ...action
-    })))
+      ...action,
+    }))),
   };
 }
 
@@ -250,5 +250,5 @@ module.exports = {
   generateAdvisoryPlan,
   getOpenActionSummary,
   healthCheck,
-  execute
+  execute,
 };

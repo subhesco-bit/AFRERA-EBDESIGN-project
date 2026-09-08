@@ -26,7 +26,7 @@ class RegionalVarietyService {
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const result = await pool.query(
       `SELECT * FROM regional_variety_directory ${where} ORDER BY category, product_name`,
-      params
+      params,
     );
     return result.rows;
   }
@@ -39,7 +39,7 @@ class RegionalVarietyService {
 
   async listCategories() {
     const result = await pool.query(
-      `SELECT category, COUNT(*) AS variety_count FROM regional_variety_directory GROUP BY category ORDER BY category`
+      'SELECT category, COUNT(*) AS variety_count FROM regional_variety_directory GROUP BY category ORDER BY category',
     );
     return result.rows;
   }
@@ -53,9 +53,9 @@ class RegionalVarietyService {
    */
   async requestVarietyImage(id) {
     const variety = await this.getById(id);
-    const prompt = `Professional product photography of ${variety.product_name}` +
-      (variety.scientific_name ? ` (${variety.scientific_name})` : '') +
-      `, a regional variety from ${variety.primary_states}, Northeast India. Natural lighting, clean background, realistic.`;
+    const prompt = `Professional product photography of ${variety.product_name}${
+      variety.scientific_name ? ` (${variety.scientific_name})` : ''
+    }, a regional variety from ${variety.primary_states}, Northeast India. Natural lighting, clean background, realistic.`;
 
     const result = await productMediaAIService.callImageProvider('openai_images', prompt);
     const status = result.ok ? 'completed' : (result.status === 'not_configured' ? 'not_configured' : 'failed');
@@ -63,7 +63,7 @@ class RegionalVarietyService {
       `UPDATE regional_variety_directory
          SET image_generation_status = $1, image_url = $2, updated_at = CURRENT_TIMESTAMP
        WHERE id = $3`,
-      [status, result.imageUrl || null, id]
+      [status, result.imageUrl || null, id],
     );
     return { varietyId: id, status, provider: 'openai_images', ...result };
   }

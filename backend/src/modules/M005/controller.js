@@ -45,5 +45,5 @@ module.exports = {
   createEnvironment,
   getEnvironment,
   updateEnvironment,
-  listEnvironments
+  listEnvironments,
 };

@@ -26,27 +26,27 @@ async function createPreSeasonOrder(orderData) {
       price_offered,
       payment_terms,
       contract_duration,
-      escrow_required
+      escrow_required,
     } = orderData;
 
     const order = {
       order_id: generateId(),
       order_number: generateOrderNumber(),
-      buyer_id: buyer_id,
-      buyer_type: buyer_type,
-      product_id: product_id,
-      product_category: product_category,
-      quantity_required: quantity_required,
-      quality_specifications: quality_specifications,
-      delivery_location: delivery_location,
-      delivery_date: delivery_date,
-      price_offered: price_offered,
-      payment_terms: payment_terms,
-      contract_duration: contract_duration,
-      escrow_required: escrow_required,
+      buyer_id,
+      buyer_type,
+      product_id,
+      product_category,
+      quantity_required,
+      quality_specifications,
+      delivery_location,
+      delivery_date,
+      price_offered,
+      payment_terms,
+      contract_duration,
+      escrow_required,
       status: 'open',
       created_at: new Date().toISOString(),
-      expires_at: calculateExpiryDate(contract_duration)
+      expires_at: calculateExpiryDate(contract_duration),
     };
 
     // AI-powered order validation and pricing
@@ -59,8 +59,8 @@ async function createPreSeasonOrder(orderData) {
         price_trends: await getPriceTrends(product_category),
         farmer_availability: await getFarmerAvailability(product_category, delivery_location),
         logistics_costs: await getLogisticsCosts(delivery_location),
-        seasonality_factors: await getSeasonalityFactors(product_category)
-      }
+        seasonality_factors: await getSeasonalityFactors(product_category),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -94,23 +94,23 @@ async function submitBid(bidData) {
       harvest_date,
       location,
       certifications,
-      payment_terms_preference
+      payment_terms_preference,
     } = bidData;
 
     const bid = {
       bid_id: generateId(),
-      order_id: order_id,
-      farmer_id: farmer_id,
-      farmer_name: farmer_name,
-      offered_quantity: offered_quantity,
-      offered_price: offered_price,
-      expected_quality: expected_quality,
-      harvest_date: harvest_date,
-      location: location,
-      certifications: certifications,
-      payment_terms_preference: payment_terms_preference,
+      order_id,
+      farmer_id,
+      farmer_name,
+      offered_quantity,
+      offered_price,
+      expected_quality,
+      harvest_date,
+      location,
+      certifications,
+      payment_terms_preference,
       status: 'submitted',
-      submitted_at: new Date().toISOString()
+      submitted_at: new Date().toISOString(),
     };
 
     // AI-powered bid evaluation
@@ -123,8 +123,8 @@ async function submitBid(bidData) {
         farmer_history: await getFarmerPerformanceHistory(farmer_id),
         quality_assessment: await assessQualityPotential(expected_quality, certifications),
         logistics_feasibility: await assessLogisticsFeasibility(location, bidData.order_id),
-        risk_assessment: await assessFarmerRisk(farmer_id)
-      }
+        risk_assessment: await assessFarmerRisk(farmer_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -135,11 +135,11 @@ async function submitBid(bidData) {
     const order = await getPreSeasonOrder(order_id);
     socketServer.sendNotification(order.buyer_id, {
       type: 'new_bid_received',
-      order_id: order_id,
+      order_id,
       bid_id: bid.bid_id,
-      farmer_name: farmer_name,
-      offered_price: offered_price,
-      quantity: offered_quantity
+      farmer_name,
+      offered_price,
+      quantity: offered_quantity,
     });
 
     logger.info(`Bid submitted for order ${order_id}: ${bid.bid_id}`);
@@ -167,8 +167,8 @@ async function selectWinningBid(orderId, selectionCriteria) {
         selection_criteria: selectionCriteria,
         optimization_objectives: await getOptimizationObjectives(order.buyer_id),
         risk_tolerance: await getRiskTolerance(order.buyer_id),
-        quality_requirements: order.quality_specifications
-      }
+        quality_requirements: order.quality_specifications,
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -184,7 +184,7 @@ async function selectWinningBid(orderId, selectionCriteria) {
       risk_factors: aiResponse.risk_factors,
       recommendations: aiResponse.recommendations,
       confidence: aiResponse.confidence,
-      selected_at: new Date().toISOString()
+      selected_at: new Date().toISOString(),
     };
 
     // Update order status
@@ -197,7 +197,7 @@ async function selectWinningBid(orderId, selectionCriteria) {
         type: 'bid_selected',
         order_id: orderId,
         bid_id: selectedBid.bid_id,
-        message: 'Your bid has been selected'
+        message: 'Your bid has been selected',
       });
     }
 
@@ -225,26 +225,26 @@ async function createContractAgreement(agreementData) {
       delivery_schedule,
       payment_terms,
       penalties,
-      dispute_resolution
+      dispute_resolution,
     } = agreementData;
 
     const agreement = {
       agreement_id: generateId(),
       contract_number: generateContractNumber(),
-      order_id: order_id,
-      buyer_id: buyer_id,
-      farmers: farmers,
-      product_details: product_details,
-      quantity: quantity,
-      quality_standards: quality_standards,
-      pricing_structure: pricing_structure,
-      delivery_schedule: delivery_schedule,
-      payment_terms: payment_terms,
-      penalties: penalties,
-      dispute_resolution: dispute_resolution,
+      order_id,
+      buyer_id,
+      farmers,
+      product_details,
+      quantity,
+      quality_standards,
+      pricing_structure,
+      delivery_schedule,
+      payment_terms,
+      penalties,
+      dispute_resolution,
       status: 'draft',
       created_at: new Date().toISOString(),
-      escrow_setup: await setupContractEscrow(agreementData)
+      escrow_setup: await setupContractEscrow(agreementData),
     };
 
     // AI-powered contract optimization
@@ -255,8 +255,8 @@ async function createContractAgreement(agreementData) {
         legal_compliance: await getLegalRequirements(),
         industry_standards: await getIndustryStandards(product_details.category),
         risk_mitigation: await assessContractRisks(agreementData),
-        market_conditions: await getMarketConditions(product_details.category)
-      }
+        market_conditions: await getMarketConditions(product_details.category),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -281,18 +281,18 @@ async function updateContractMilestone(contractId, milestoneData) {
       status,
       completion_date,
       evidence,
-      comments
+      comments,
     } = milestoneData;
 
     const milestone = {
-      milestone_id: milestone_id,
+      milestone_id,
       contract_id: contractId,
-      milestone_type: milestone_type, // planting, growth_monitoring, harvest, quality_check, delivery
-      status: status,
-      completion_date: completion_date,
-      evidence: evidence,
-      comments: comments,
-      updated_at: new Date().toISOString()
+      milestone_type, // planting, growth_monitoring, harvest, quality_check, delivery
+      status,
+      completion_date,
+      evidence,
+      comments,
+      updated_at: new Date().toISOString(),
     };
 
     // AI-powered milestone validation
@@ -303,8 +303,8 @@ async function updateContractMilestone(contractId, milestoneData) {
         contract_details: await getContractDetails(contractId),
         quality_standards: await getQualityStandards(contractId),
         satellite_imagery: await getSatelliteImagery(contractId, milestone_type),
-        weather_data: await getWeatherData(contractId, completion_date)
-      }
+        weather_data: await getWeatherData(contractId, completion_date),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -337,7 +337,7 @@ async function getPreSeasonAnalytics(params) {
       product_category,
       state,
       period_from,
-      period_to
+      period_to,
     } = params;
 
     const analytics = {
@@ -349,25 +349,25 @@ async function getPreSeasonAnalytics(params) {
         total_volume: await getTotalVolume(params),
         average_price: await getAveragePrice(params),
         fulfillment_rate: await getFulfillmentRate(params),
-        farmer_participation: await getFarmerParticipation(params)
+        farmer_participation: await getFarmerParticipation(params),
       },
       trends: {
         price_trends: await getPriceTrendsAnalytics(params),
         volume_trends: await getVolumeTrendsAnalytics(params),
-        quality_trends: await getQualityTrendsAnalytics(params)
+        quality_trends: await getQualityTrendsAnalytics(params),
       },
       farmer_insights: {
         top_performers: await getTopPerformers(params),
         new_farmers: await getNewFarmers(params),
-      farmer_retention: await getFarmerRetention(params)
+        farmer_retention: await getFarmerRetention(params),
       },
       risk_analysis: {
         supply_risk: await assessSupplyRisk(params),
         price_risk: await assessPriceRisk(params),
         quality_risk: await assessQualityRisk(params),
-        logistics_risk: await assessLogisticsRisk(params)
+        logistics_risk: await assessLogisticsRisk(params),
       },
-      recommendations: await getAnalyticsRecommendations(params)
+      recommendations: await getAnalyticsRecommendations(params),
     };
 
     return analytics;
@@ -390,11 +390,11 @@ async function getContractDashboard(userId, userType) {
         active_contracts: await getActiveContracts(userId, userType),
         pending_milestones: await getPendingMilestones(userId, userType),
         total_value: await getTotalContractValue(userId, userType),
-        upcoming_deliveries: await getUpcomingDeliveries(userId, userType)
+        upcoming_deliveries: await getUpcomingDeliveries(userId, userType),
       },
       alerts: await getContractAlerts(userId, userType),
       performance: await getContractPerformance(userId, userType),
-      opportunities: await getContractOpportunities(userId, userType)
+      opportunities: await getContractOpportunities(userId, userType),
     };
 
     return dashboard;
@@ -465,18 +465,18 @@ async function setupEscrow(order) {
       payment_reference: `PRESEASON-${order.order_id}`,
       release_conditions: [
         { type: 'delivery_confirmed' },
-        { type: 'quality_verified' }
-      ]
+        { type: 'quality_verified' },
+      ],
     };
 
     const escrow = await createEscrowTransaction(escrowData);
     logger.info(`Escrow setup successful for order ${order.order_id}`, { escrow_id: escrow.escrow_id });
-    
+
     return {
       escrow_id: escrow.escrow_id,
       amount: escrow.amount,
       status: escrow.status,
-      created_at: escrow.created_at
+      created_at: escrow.created_at,
     };
   } catch (error) {
     logger.error('Failed to setup escrow for order', { error: error.message, order_id: order.order_id });
@@ -594,7 +594,7 @@ async function notifyStakeholders(contract, milestone) {
       type: 'milestone_updated',
       contract_id: contract.contract_id,
       milestone: milestone.milestone_type,
-      status: milestone.status
+      status: milestone.status,
     });
   }
 }
@@ -788,6 +788,6 @@ module.exports = {
   updateContractMilestone,
   getPreSeasonAnalytics,
   getContractDashboard,
-  setupRoutes
+  setupRoutes,
 };
 

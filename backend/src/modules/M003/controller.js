@@ -55,5 +55,5 @@ module.exports = {
   getTenant,
   updateTenant,
   getTenantUsageMetrics,
-  listTenants
+  listTenants,
 };

@@ -8,7 +8,7 @@
  * - Real-time updates (Socket.IO)
  * - Analytics data pipeline
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class EventBus {
   constructor() {

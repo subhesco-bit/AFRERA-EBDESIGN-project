@@ -19,7 +19,7 @@ async function listCompanies() {
             fiscal_year_start_month, is_active, created_at
        FROM companies 
        WHERE is_active = TRUE 
-       ORDER BY code ASC`
+       ORDER BY code ASC`,
   );
   return rows;
 }
@@ -30,8 +30,8 @@ async function listCompanies() {
 async function getCompanyById(id) {
   const db = getPostgreSQL();
   const { rows } = await db.query(
-    `SELECT * FROM companies WHERE id = $1`,
-    [Number(id)]
+    'SELECT * FROM companies WHERE id = $1',
+    [Number(id)],
   );
   if (rows.length === 0) throw new Error(`Company ${id} not found`);
   return rows[0];
@@ -47,7 +47,7 @@ async function getFiscalYears(companyId) {
        FROM fiscal_years 
        WHERE company_id = $1 
        ORDER BY start_date DESC`,
-    [Number(companyId)]
+    [Number(companyId)],
   );
   return rows;
 }
@@ -62,7 +62,7 @@ async function getChartOfAccounts(companyId) {
        FROM chart_of_accounts 
        WHERE company_id = $1 AND is_active = TRUE AND is_postable = TRUE
        ORDER BY account_code ASC`,
-    [Number(companyId)]
+    [Number(companyId)],
   );
   return rows;
 }
@@ -73,3 +73,4 @@ module.exports = {
   getFiscalYears,
   getChartOfAccounts,
 };
+

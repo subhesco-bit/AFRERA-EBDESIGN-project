@@ -1,9 +1,9 @@
-import { Sprout } from 'lucide-react'
-import { cropRegistrationAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { Sprout } from 'lucide-react';
+import { cropRegistrationAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const CROP_TYPES = ['Cereal', 'Pulse', 'Oilseed', 'Vegetable', 'Fruit', 'Spice', 'Fibre', 'Plantation']
-const STATUS = ['Active', 'Under Review', 'Retired']
+const CROP_TYPES = ['Cereal', 'Pulse', 'Oilseed', 'Vegetable', 'Fruit', 'Spice', 'Fibre', 'Plantation'];
+const STATUS = ['Active', 'Under Review', 'Retired'];
 
 const initialForm = {
   crop_name: '',
@@ -13,7 +13,7 @@ const initialForm = {
   duration_days: '',
   status: 'Active',
   notes: '',
-}
+};
 
 function CropRegistrationPage() {
   return (
@@ -57,7 +57,7 @@ function CropRegistrationPage() {
         { label: 'Crop types', value: new Set(items.map((i) => i.crop_type).filter(Boolean)).size },
       ]}
     />
-  )
+  );
 }
 
-export default CropRegistrationPage
+export default CropRegistrationPage;

@@ -54,5 +54,5 @@ module.exports = {
   addGroupMember,
   recordGroupMeeting,
   recordGroupTransaction,
-  getGroupAnalytics
+  getGroupAnalytics,
 };

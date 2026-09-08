@@ -28,7 +28,7 @@ async function registerTractor(tractorData) {
       state,
       district,
       insurance_expiry,
-      status
+      status,
     } = tractorData;
 
     const tractor = {
@@ -49,7 +49,7 @@ async function registerTractor(tractorData) {
       district,
       insurance_expiry,
       status: status || 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered tractor condition assessment
@@ -60,8 +60,8 @@ async function registerTractor(tractorData) {
         make_model_specs: await getMakeModelSpecs(make, model, year),
         regional_usage_patterns: await getRegionalUsagePatterns(state, district),
         maintenance_recommendations: await getMaintenanceRecommendations(year, hp),
-        optimal_usage: await getOptimalUsagePatterns(hp, fuel_type)
-      }
+        optimal_usage: await getOptimalUsagePatterns(hp, fuel_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -94,8 +94,8 @@ async function registerTractor(tractorData) {
         tractor.insurance_expiry,
         tractor.status,
         JSON.stringify(tractor.ai_assessment),
-        tractor.created_at
-      ]
+        tractor.created_at,
+      ],
     );
 
     logger.info(`Tractor registered: ${tractor.tractor_registry_id}`);
@@ -121,7 +121,7 @@ async function updateTractorMaintenance(registryId, maintenanceData) {
       parts_cost,
       service_center,
       next_service_date,
-      notes
+      notes,
     } = maintenanceData;
 
     const maintenanceRecord = {
@@ -137,7 +137,7 @@ async function updateTractorMaintenance(registryId, maintenanceData) {
       service_center,
       next_service_date,
       notes,
-      recorded_at: new Date().toISOString()
+      recorded_at: new Date().toISOString(),
     };
 
     // AI-powered maintenance analysis
@@ -148,8 +148,8 @@ async function updateTractorMaintenance(registryId, maintenanceData) {
         maintenance_data: maintenanceData,
         maintenance_history: await getMaintenanceHistory(registryId),
         manufacturer_guidelines: await getManufacturerGuidelines(await getTractorMakeModel(registryId)),
-        usage_patterns: await getUsagePatterns(registryId)
-      }
+        usage_patterns: await getUsagePatterns(registryId),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -175,8 +175,8 @@ async function updateTractorMaintenance(registryId, maintenanceData) {
         next_service_date,
         notes,
         JSON.stringify(maintenanceRecord.ai_analysis),
-        maintenanceRecord.recorded_at
-      ]
+        maintenanceRecord.recorded_at,
+      ],
     );
 
     logger.info(`Tractor maintenance updated: ${registryId}`);
@@ -202,7 +202,7 @@ async function trackTractorPerformance(registryId, period) {
       field_coverage: await getFieldCoverage(registryId, period),
       operational_cost: await calculateOperationalCost(registryId, period),
       maintenance_frequency: await getMaintenanceFrequency(registryId, period),
-      recommendations: await generatePerformanceRecommendations(registryId, period)
+      recommendations: await generatePerformanceRecommendations(registryId, period),
     };
 
     return performance;
@@ -227,7 +227,7 @@ async function generateTractorReport(farmerId, reportType) {
       maintenance_summary: await getMaintenanceSummary(farmerId),
       operational_metrics: await getOperationalMetrics(farmerId),
       cost_analysis: await getCostAnalysis(farmerId),
-      recommendations: await generateFarmerRecommendations(farmerId)
+      recommendations: await generateFarmerRecommendations(farmerId),
     };
 
     return report;
@@ -247,7 +247,7 @@ async function getMakeModelSpecs(make, model, year) {
     dimensions: { length: 4.5, width: 2.0, height: 2.5 },
     fuel_capacity: 60,
     hydraulic_capacity: 40,
-    pto_hp: 45
+    pto_hp: 45,
   };
 }
 
@@ -256,7 +256,7 @@ async function getRegionalUsagePatterns(state, district) {
     common_crops: ['wheat', 'rice', 'maize'],
     soil_type: 'loamy',
     terrain: 'flat',
-    seasonal_demand: ['kharif', 'rabi']
+    seasonal_demand: ['kharif', 'rabi'],
   };
 }
 
@@ -264,7 +264,7 @@ async function getMaintenanceRecommendations(year, hp) {
   return [
     { service: 'oil_change', interval: '100_hours', due: '50_hours' },
     { service: 'filter_replacement', interval: '200_hours', due: '100_hours' },
-    { service: 'greasing', interval: '50_hours', due: '25_hours' }
+    { service: 'greasing', interval: '50_hours', due: '25_hours' },
   ];
 }
 
@@ -272,7 +272,7 @@ async function getOptimalUsagePatterns(hp, fuelType) {
   return {
     max_field_size: hp * 0.5,
     optimal_implements: ['plow', 'harrow', 'cultivator'],
-    fuel_consumption: fuelType === 'diesel' ? 8 : 10
+    fuel_consumption: fuelType === 'diesel' ? 8 : 10,
   };
 }
 
@@ -280,7 +280,7 @@ async function getMaintenanceHistory(registryId) {
   try {
     const result = await pool.query(
       'SELECT * FROM tractor_maintenance_records WHERE registry_id = $1 ORDER BY service_date DESC LIMIT 10',
-      [registryId]
+      [registryId],
     );
     return result.rows;
   } catch (error) {
@@ -292,7 +292,7 @@ async function getManufacturerGuidelines(makeModel) {
   return {
     service_interval: 100,
     oil_type: '15W40',
-    recommended_parts: ['oil_filter', 'air_filter', 'fuel_filter']
+    recommended_parts: ['oil_filter', 'air_filter', 'fuel_filter'],
   };
 }
 
@@ -300,7 +300,7 @@ async function getUsagePatterns(registryId) {
   return {
     average_daily_hours: 8,
     peak_season_hours: 12,
-    typical_operations: ['tilling', 'plowing', 'hauling']
+    typical_operations: ['tilling', 'plowing', 'hauling'],
   };
 }
 
@@ -308,7 +308,7 @@ async function getTractorMakeModel(registryId) {
   try {
     const result = await pool.query(
       'SELECT make, model FROM tractor_registry WHERE tractor_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -321,7 +321,7 @@ async function calculateFuelEfficiency(registryId, period) {
     liters_per_hour: 8.5,
     cost_per_hour: 85,
     efficiency_rating: 'good',
-    benchmark_comparison: '+5%'
+    benchmark_comparison: '+5%',
   };
 }
 
@@ -330,7 +330,7 @@ async function getWorkHours(registryId, period) {
     total_hours: 240,
     average_daily: 8,
     peak_hours: 12,
-    utilization_rate: 75
+    utilization_rate: 75,
   };
 }
 
@@ -338,7 +338,7 @@ async function getFieldCoverage(registryId, period) {
   return {
     total_acres: 120,
     acres_per_hour: 0.5,
-    efficiency_rating: 'excellent'
+    efficiency_rating: 'excellent',
   };
 }
 
@@ -348,7 +348,7 @@ async function calculateOperationalCost(registryId, period) {
     maintenance_cost: 15000,
     labor_cost: 36000,
     total_cost: 71400,
-    cost_per_hour: 297.5
+    cost_per_hour: 297.5,
   };
 }
 
@@ -357,7 +357,7 @@ async function getMaintenanceFrequency(registryId, period) {
     total_services: 4,
     preventive: 3,
     corrective: 1,
-    compliance_rate: 85
+    compliance_rate: 85,
   };
 }
 
@@ -365,7 +365,7 @@ async function generatePerformanceRecommendations(registryId, period) {
   return [
     'Schedule preventive maintenance during off-season',
     'Monitor fuel consumption patterns',
-    'Optimize implement selection for field conditions'
+    'Optimize implement selection for field conditions',
   ];
 }
 
@@ -373,7 +373,7 @@ async function getTractorCount(farmerId) {
   try {
     const result = await pool.query(
       'SELECT COUNT(*) as count FROM tractor_registry WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -385,7 +385,7 @@ async function getMakeDistribution(farmerId) {
   try {
     const result = await pool.query(
       'SELECT make, COUNT(*) as count FROM tractor_registry WHERE farmer_id = $1 GROUP BY make',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -397,7 +397,7 @@ async function getMaintenanceSummary(farmerId) {
   return {
     preventive_maintenance: 75,
     corrective_maintenance: 20,
-    overdue: 5
+    overdue: 5,
   };
 }
 
@@ -405,7 +405,7 @@ async function getOperationalMetrics(farmerId) {
   return {
     total_work_hours: 960,
     total_field_coverage: 480,
-    average_utilization: 80
+    average_utilization: 80,
   };
 }
 
@@ -415,7 +415,7 @@ async function getCostAnalysis(farmerId) {
     fuel_cost: 81600,
     maintenance_cost: 60000,
     labor_cost: 144000,
-    cost_per_acre: 595
+    cost_per_acre: 595,
   };
 }
 
@@ -423,7 +423,7 @@ async function generateFarmerRecommendations(farmerId) {
   return [
     'Implement preventive maintenance schedule',
     'Monitor fuel efficiency trends',
-    'Consider equipment sharing during peak season'
+    'Consider equipment sharing during peak season',
   ];
 }
 
@@ -431,6 +431,6 @@ module.exports = {
   registerTractor,
   updateTractorMaintenance,
   trackTractorPerformance,
-  generateTractorReport
+  generateTractorReport,
 };
 

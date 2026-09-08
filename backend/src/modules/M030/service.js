@@ -8,16 +8,16 @@ const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 async function generateAdvisory(farmerId, advisoryType) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const farmer = await pg.query('SELECT * FROM farmers WHERE id = $1', [farmerId]);
   if (!farmer.rows.length) {
     return { success: false, error: 'Farmer not found' };
   }
-  
+
   const farmerData = farmer.rows[0];
-  
+
   let advisory = {};
-  
+
   switch (advisoryType) {
     case 'crop_recommendation':
       advisory = await generateCropRecommendation(farmerData);
@@ -37,33 +37,33 @@ async function generateAdvisory(farmerId, advisoryType) {
     default:
       advisory = await generateGeneralAdvisory(farmerData);
   }
-  
+
   // Store advisory
   const res = await pg.query(
     `INSERT INTO farmer_advisories (farmer_id, advisory_type, content, priority, created_at)
      VALUES ($1, $2, $3, $4, NOW())
      RETURNING *`,
-    [farmerId, advisoryType, JSON.stringify(advisory), advisory.priority || 'medium']
+    [farmerId, advisoryType, JSON.stringify(advisory), advisory.priority || 'medium'],
   );
-  
+
   // Emit signal for advisory generation
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'farmer_advisory',
     farmerId,
     advisoryType,
-    priority: advisory.priority
+    priority: advisory.priority,
   }, {
     severity: advisory.priority === 'critical' ? SEVERITY.CRITICAL : SEVERITY.INFO,
     source: 'farmer_advisory_service',
-    entityId: farmerId
+    entityId: farmerId,
   });
-  
+
   return { success: true, data: advisory, advisoryId: res.rows[0].id };
 }
 
 async function generateCropRecommendation(farmerData) {
   const recommendations = [];
-  
+
   // Based on land size
   if (farmerData.land_size < 2) {
     recommendations.push({
@@ -71,14 +71,14 @@ async function generateCropRecommendation(farmerData) {
       name: 'Vegetable Farming',
       reason: 'Suitable for small land holdings with high value per area',
       expectedYield: 'High value, low volume',
-      priority: 'high'
+      priority: 'high',
     });
     recommendations.push({
       type: 'crop',
       name: 'Poultry',
       reason: 'Requires minimal land, high profitability',
       expectedYield: 'Medium volume, high profit',
-      priority: 'medium'
+      priority: 'medium',
     });
   } else if (farmerData.land_size < 5) {
     recommendations.push({
@@ -86,14 +86,14 @@ async function generateCropRecommendation(farmerData) {
       name: 'Cereal Cultivation',
       reason: 'Medium land suitable for staple crop production',
       expectedYield: 'Medium volume, stable profit',
-      priority: 'high'
+      priority: 'high',
     });
     recommendations.push({
       type: 'crop',
       name: 'Fruit Orchards',
       reason: 'Long-term investment with high returns',
       expectedYield: 'Medium volume, high value',
-      priority: 'medium'
+      priority: 'medium',
     });
   } else {
     recommendations.push({
@@ -101,17 +101,17 @@ async function generateCropRecommendation(farmerData) {
       name: 'Cash Crops',
       reason: 'Large land suitable for commercial cash crop farming',
       expectedYield: 'High volume, market-dependent profit',
-      priority: 'high'
+      priority: 'high',
     });
     recommendations.push({
       type: 'crop',
       name: 'Dairy Operations',
       reason: 'Large land suitable for integrated dairy farming',
       expectedYield: 'High volume, consistent profit',
-      priority: 'medium'
+      priority: 'medium',
     });
   }
-  
+
   // Based on existing primary crop
   if (farmerData.primary_crop) {
     recommendations.push({
@@ -119,15 +119,15 @@ async function generateCropRecommendation(farmerData) {
       name: `Crop Rotation with ${farmerData.primary_crop}`,
       reason: 'Improve soil health and reduce pest pressure',
       expectedYield: 'Sustainable long-term yield',
-      priority: 'medium'
+      priority: 'medium',
     });
   }
-  
+
   return {
     type: 'crop_recommendation',
     recommendations,
     confidence: 0.85,
-    urgency: 'normal'
+    urgency: 'normal',
   };
 }
 
@@ -138,21 +138,21 @@ async function generateWeatherAdvisory(farmerData) {
       type: 'weather',
       message: 'Monitor upcoming weather patterns for optimal planting time',
       action: 'Check weather forecasts weekly',
-      priority: 'medium'
+      priority: 'medium',
     },
     {
       type: 'weather',
       message: 'Prepare irrigation systems for expected rainfall variations',
       action: 'Ensure water storage capacity',
-      priority: 'high'
-    }
+      priority: 'high',
+    },
   ];
-  
+
   return {
     type: 'weather_advisory',
     advisories,
     confidence: 0.75,
-    urgency: 'seasonal'
+    urgency: 'seasonal',
   };
 }
 
@@ -162,21 +162,21 @@ async function generateMarketAdvisory(farmerData) {
       type: 'market',
       message: 'Monitor market prices for primary crops before harvest',
       action: 'Set up price alerts for key commodities',
-      priority: 'high'
+      priority: 'high',
     },
     {
       type: 'market',
       message: 'Consider forward contracts to lock in prices',
       action: 'Contact agricultural commodity exchanges',
-      priority: 'medium'
-    }
+      priority: 'medium',
+    },
   ];
-  
+
   return {
     type: 'market_advisory',
     advisories,
     confidence: 0.8,
-    urgency: 'continuous'
+    urgency: 'continuous',
   };
 }
 
@@ -187,21 +187,21 @@ async function generatePestAlert(farmerData) {
       type: 'pest',
       message: 'Seasonal pest activity expected in region',
       action: 'Prepare pest control measures',
-      priority: 'high'
+      priority: 'high',
     },
     {
       type: 'pest',
       message: 'Monitor for early signs of disease in primary crop',
       action: 'Regular field inspections recommended',
-      priority: 'medium'
-    }
+      priority: 'medium',
+    },
   ];
-  
+
   return {
     type: 'pest_alert',
     alerts,
     confidence: 0.7,
-    urgency: 'immediate'
+    urgency: 'immediate',
   };
 }
 
@@ -213,7 +213,7 @@ async function generateGovernmentSchemeAdvisory(farmerData) {
       description: 'Pradhan Mantri Krishi Sinchai Yojana - Irrigation subsidy',
       eligibility: 'Small and marginal farmers',
       action: 'Apply through local agriculture office',
-      priority: 'high'
+      priority: 'high',
     },
     {
       type: 'scheme',
@@ -221,15 +221,15 @@ async function generateGovernmentSchemeAdvisory(farmerData) {
       description: 'Soil health card and fertilizer subsidy',
       eligibility: 'All farmers with registered land',
       action: 'Register for soil health card',
-      priority: 'high'
-    }
+      priority: 'high',
+    },
   ];
-  
+
   return {
     type: 'government_scheme',
     schemes,
     confidence: 0.9,
-    urgency: 'limited_time'
+    urgency: 'limited_time',
   };
 }
 
@@ -240,16 +240,16 @@ async function generateGeneralAdvisory(farmerData) {
       {
         type: 'practice',
         message: 'Follow sustainable farming practices for long-term soil health',
-        priority: 'medium'
+        priority: 'medium',
       },
       {
         type: 'practice',
         message: 'Maintain farm records for better financial planning',
-        priority: 'high'
-      }
+        priority: 'high',
+      },
     ],
     confidence: 0.8,
-    urgency: 'continuous'
+    urgency: 'continuous',
   };
 }
 
@@ -257,19 +257,19 @@ async function generateGeneralAdvisory(farmerData) {
 async function getFarmerAdvisories(farmerId, { limit = 20, advisoryType } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = 'SELECT * FROM farmer_advisories WHERE farmer_id = $1';
   const params = [farmerId];
   let paramIndex = 2;
-  
+
   if (advisoryType) {
     query += ` AND advisory_type = $${paramIndex++}`;
     params.push(advisoryType);
   }
-  
+
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++}`;
   params.push(limit);
-  
+
   const res = await pg.query(query, params);
   return res.rows;
 }
@@ -277,7 +277,7 @@ async function getFarmerAdvisories(farmerId, { limit = 20, advisoryType } = {}) 
 async function getAdvisory(advisoryId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const res = await pg.query('SELECT * FROM farmer_advisories WHERE id = $1', [advisoryId]);
   return res.rows[0] || null;
 }
@@ -286,9 +286,9 @@ async function getAdvisory(advisoryId) {
 async function registerIoTDevice(farmerId, deviceData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { deviceId, deviceType, location, capabilities } = deviceData;
-  
+
   const res = await pg.query(
     `INSERT INTO iot_devices (farmer_id, device_id, device_type, location, capabilities, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, 'active', NOW(), NOW())
@@ -298,31 +298,31 @@ async function registerIoTDevice(farmerId, deviceData) {
        capabilities = EXCLUDED.capabilities,
        updated_at = NOW()
      RETURNING *`,
-    [farmerId, deviceId, deviceType, JSON.stringify(location), JSON.stringify(capabilities || [])]
+    [farmerId, deviceId, deviceType, JSON.stringify(location), JSON.stringify(capabilities || [])],
   );
-  
+
   // Emit signal for IoT device registration
   signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
     entityType: 'iot_device',
     farmerId,
     deviceId,
-    deviceType
+    deviceType,
   }, {
     severity: SEVERITY.INFO,
     source: 'farmer_advisory_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
-  
+
   return res.rows[0];
 }
 
 async function getIoTDeviceData(farmerId, deviceId, { timeframe = '24h' } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const device = await pg.query(
     'SELECT * FROM iot_devices WHERE farmer_id = $1 AND device_id = $2',
-    [farmerId, deviceId]
+    [farmerId, deviceId],
   );
 
   if (!device.rows.length) {
@@ -330,7 +330,7 @@ async function getIoTDeviceData(farmerId, deviceId, { timeframe = '24h' } = {}) 
       deviceId,
       timeframe,
       implemented: false,
-      reason: 'No registered IoT device exists for this farmer/device pair.'
+      reason: 'No registered IoT device exists for this farmer/device pair.',
     };
   }
 
@@ -340,7 +340,7 @@ async function getIoTDeviceData(farmerId, deviceId, { timeframe = '24h' } = {}) 
     device: device.rows[0],
     data: [],
     implemented: false,
-    reason: 'Device registry is connected, but no real IoT telemetry table/provider is wired to this module yet.'
+    reason: 'Device registry is connected, but no real IoT telemetry table/provider is wired to this module yet.',
   };
 }
 
@@ -348,48 +348,48 @@ async function getIoTDeviceData(farmerId, deviceId, { timeframe = '24h' } = {}) 
 async function createAlert(alertData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { farmerId, alertType, severity, message, actionRequired } = alertData;
-  
+
   const res = await pg.query(
     `INSERT INTO farmer_alerts (farmer_id, alert_type, severity, message, action_required, is_read, created_at)
      VALUES ($1, $2, $3, $4, $5, false, NOW())
      RETURNING *`,
-    [farmerId, alertType, severity, message, actionRequired]
+    [farmerId, alertType, severity, message, actionRequired],
   );
-  
+
   // Emit signal for critical alerts
   if (severity === 'critical') {
     signalBus.emitSignal(SIGNAL.EMERGENCY_RAISED, {
       farmerId,
       alertType,
       message,
-      actionRequired
+      actionRequired,
     }, {
       severity: SEVERITY.CRITICAL,
       source: 'farmer_advisory_service',
-      entityId: farmerId
+      entityId: farmerId,
     });
   }
-  
+
   return res.rows[0];
 }
 
 async function getFarmerAlerts(farmerId, { unreadOnly = false, limit = 20 } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = 'SELECT * FROM farmer_alerts WHERE farmer_id = $1';
   const params = [farmerId];
   let paramIndex = 2;
-  
+
   if (unreadOnly) {
-    query += ` AND is_read = false`;
+    query += ' AND is_read = false';
   }
-  
+
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++}`;
   params.push(limit);
-  
+
   const res = await pg.query(query, params);
   return res.rows;
 }
@@ -397,7 +397,7 @@ async function getFarmerAlerts(farmerId, { unreadOnly = false, limit = 20 } = {}
 async function markAlertAsRead(alertId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   await pg.query('UPDATE farmer_alerts SET is_read = true, read_at = NOW() WHERE id = $1', [alertId]);
   return { success: true };
 }
@@ -406,7 +406,7 @@ async function markAlertAsRead(alertId) {
 async function getAdvisoryAnalytics({ startDate, endDate, advisoryType } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = `
     SELECT 
       advisory_type,
@@ -418,7 +418,7 @@ async function getAdvisoryAnalytics({ startDate, endDate, advisoryType } = {}) {
   `;
   const params = [];
   let paramIndex = 1;
-  
+
   if (startDate) {
     query += ` AND created_at >= $${paramIndex++}`;
     params.push(startDate);
@@ -431,16 +431,16 @@ async function getAdvisoryAnalytics({ startDate, endDate, advisoryType } = {}) {
     query += ` AND advisory_type = $${paramIndex++}`;
     params.push(advisoryType);
   }
-  
-  query += ` GROUP BY advisory_type, priority, DATE(created_at) ORDER BY date DESC`;
-  
+
+  query += ' GROUP BY advisory_type, priority, DATE(created_at) ORDER BY date DESC';
+
   const res = await pg.query(query, params);
-  
+
   return {
     data: res.rows,
     totalAdvisories: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
     byType: groupBy(res.rows, 'advisory_type'),
-    byPriority: groupBy(res.rows, 'priority')
+    byPriority: groupBy(res.rows, 'priority'),
   };
 }
 
@@ -499,7 +499,7 @@ function normalizePerformanceSnapshot(payload = {}) {
     band: performanceScore >= 80 ? 'leader' : performanceScore >= 60 ? 'stable' : 'needs_support',
     improvementActions,
     sourceSignals: payload.sourceSignals ?? {},
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 }
 
@@ -512,7 +512,7 @@ async function createPerformanceSnapshot(payload) {
     `INSERT INTO farmer_m030_items (data, created_at, updated_at)
      VALUES ($1, NOW(), NOW())
      RETURNING *`,
-    [snapshot]
+    [snapshot],
   );
 
   return res.rows[0];
@@ -528,7 +528,7 @@ async function getFarmerPerformance(farmerId, { limit = 12 } = {}) {
      WHERE data->>'farmerId' = $1
      ORDER BY created_at DESC
      LIMIT $2`,
-    [farmerId, safeLimit]
+    [farmerId, safeLimit],
   );
   const snapshots = res.rows.map(row => ({ ...row, data: normalizePerformanceSnapshot(row.data || {}) }));
 
@@ -536,9 +536,9 @@ async function getFarmerPerformance(farmerId, { limit = 12 } = {}) {
     farmerId,
     latest: snapshots[0] || null,
     history: snapshots,
-    trend: snapshots.length >= 2
-      ? snapshots[0].data.performanceScore - snapshots[snapshots.length - 1].data.performanceScore
-      : 0
+    trend: snapshots.length >= 2 ?
+      snapshots[0].data.performanceScore - snapshots[snapshots.length - 1].data.performanceScore :
+      0,
   };
 }
 
@@ -551,7 +551,7 @@ async function healthCheck() {
     moduleId: 'M030',
     moduleName: 'Farmer Performance',
     advisoryRoutes: true,
-    performanceSnapshots: true
+    performanceSnapshots: true,
   };
 }
 
@@ -575,20 +575,20 @@ async function execute(operation, parameters = {}) {
 module.exports = {
   // Advisory generation
   generateAdvisory,
-  
+
   // Advisory management
   getFarmerAdvisories,
   getAdvisory,
-  
+
   // IoT integration
   registerIoTDevice,
   getIoTDeviceData,
-  
+
   // Alerts
   createAlert,
   getFarmerAlerts,
   markAlertAsRead,
-  
+
   // Analytics
   getAdvisoryAnalytics,
 
@@ -596,5 +596,5 @@ module.exports = {
   createPerformanceSnapshot,
   getFarmerPerformance,
   healthCheck,
-  execute
+  execute,
 };

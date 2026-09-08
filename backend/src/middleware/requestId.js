@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Request ID Middleware
- * 
+ *
  * Production-ready distributed tracing with:
  * - Unique request ID generation (UUID v4)
  * - Correlation ID propagation across services
@@ -43,9 +43,9 @@ function extractCorrelationId(req) {
     'x-trace-id',
     'traceparent',
     'uber-trace-id',
-    'x-transaction-id'
+    'x-transaction-id',
   ];
-  
+
   for (const header of headers) {
     const value = req.get(header);
     if (value) {
@@ -59,7 +59,7 @@ function extractCorrelationId(req) {
       return value;
     }
   }
-  
+
   return null;
 }
 
@@ -69,7 +69,7 @@ function extractCorrelationId(req) {
 function generateTraceParent(traceId, parentId = null) {
   const spanId = crypto.randomBytes(8).toString('hex');
   const traceFlags = '01'; // sampled
-  
+
   if (parentId) {
     return `00-${traceId}-${parentId}-${traceFlags}`;
   }
@@ -84,14 +84,14 @@ function requestId(req, res, next) {
   const correlationId = extractCorrelationId(req) || generateUUID();
   const requestId = generateUUID();
   const shortId = generateShortId();
-  
+
   // Attach IDs to request object
   req.id = requestId;
   req.shortId = shortId;
   req.correlationId = correlationId;
   req.traceId = correlationId; // Alias for compatibility
   req.parentSpanId = extractCorrelationId(req) ? crypto.randomBytes(8).toString('hex') : null;
-  
+
   // Add request context
   req.context = {
     requestId,
@@ -100,44 +100,44 @@ function requestId(req, res, next) {
     traceId: correlationId,
     parentSpanId: req.parentSpanId,
     spanId: crypto.randomBytes(8).toString('hex'),
-    sampled: true
+    sampled: true,
   };
-  
+
   // Set response headers for tracing
   res.setHeader('X-Request-ID', requestId);
   res.setHeader('X-Correlation-ID', correlationId);
   res.setHeader('X-Trace-ID', correlationId);
-  
+
   // Generate and set traceparent header
   const traceParent = generateTraceParent(correlationId, req.parentSpanId);
   res.setHeader('traceparent', traceParent);
-  
+
   // Add additional tracing metadata
   res.setHeader('X-Span-ID', req.context.spanId);
   res.setHeader('X-Parent-Span-ID', req.parentSpanId || 'root');
-  
+
   // Add request timing start
   req.startTime = Date.now();
   req.traceStartTime = Date.now();
-  
+
   // Add request chain tracking
   req.chain = {
     depth: req.get('X-Chain-Depth') ? parseInt(req.get('X-Chain-Depth')) + 1 : 1,
-    services: req.get('X-Chain-Services') ? req.get('X-Chain-Services').split(',') : []
+    services: req.get('X-Chain-Services') ? req.get('X-Chain-Services').split(',') : [],
   };
-  
+
   // Add current service to chain
   const serviceName = process.env.SERVICE_NAME || 'api';
   if (!req.chain.services.includes(serviceName)) {
     req.chain.services.push(serviceName);
   }
-  
+
   res.setHeader('X-Chain-Depth', req.chain.depth);
   res.setHeader('X-Chain-Services', req.chain.services.join(','));
-  
+
   // Add request fingerprint for anomaly detection
   req.fingerprint = generateRequestFingerprint(req);
-  
+
   next();
 }
 
@@ -151,7 +151,7 @@ function generateRequestFingerprint(req) {
     ip: req.ip,
     userAgent: req.get('user-agent'),
     contentType: req.get('content-type'),
-    correlationId: req.correlationId
+    correlationId: req.correlationId,
   };
   return crypto.createHash('md5').update(JSON.stringify(fingerprintData)).digest('hex');
 }
@@ -161,19 +161,19 @@ function generateRequestFingerprint(req) {
  */
 function addChildSpan(req, operationName) {
   if (!req.context) return null;
-  
+
   const childSpanId = crypto.randomBytes(8).toString('hex');
   const childSpan = {
     id: childSpanId,
     parentId: req.context.spanId,
     traceId: req.context.traceId,
     operationName,
-    startTime: Date.now()
+    startTime: Date.now(),
   };
-  
+
   req.childSpans = req.childSpans || [];
   req.childSpans.push(childSpan);
-  
+
   return childSpan;
 }
 
@@ -182,7 +182,7 @@ function addChildSpan(req, operationName) {
  */
 function completeChildSpan(req, spanId) {
   if (!req.childSpans) return;
-  
+
   const span = req.childSpans.find(s => s.id === spanId);
   if (span) {
     span.duration = Date.now() - span.startTime;
@@ -202,7 +202,7 @@ function getTraceContext(req) {
     spanId: req.context?.spanId,
     parentSpanId: req.parentSpanId,
     fingerprint: req.fingerprint,
-    chain: req.chain
+    chain: req.chain,
   };
 }
 
@@ -211,8 +211,8 @@ function getTraceContext(req) {
  */
 function spanTiming(req, res, next) {
   const originalEnd = res.end;
-  
-  res.end = function(chunk, encoding) {
+
+  res.end = function (chunk, encoding) {
     // Complete all child spans
     if (req.childSpans) {
       req.childSpans.forEach(span => {
@@ -222,17 +222,17 @@ function spanTiming(req, res, next) {
         }
       });
     }
-    
+
     // Add span timing to response headers
     if (req.childSpans && req.childSpans.length > 0) {
       const totalSpanTime = req.childSpans.reduce((sum, span) => sum + (span.duration || 0), 0);
       res.setHeader('X-Span-Time', `${totalSpanTime}ms`);
       res.setHeader('X-Span-Count', req.childSpans.length);
     }
-    
+
     originalEnd.call(this, chunk, encoding);
   };
-  
+
   next();
 }
 
@@ -246,5 +246,5 @@ module.exports = {
   completeChildSpan,
   getTraceContext,
   spanTiming,
-  generateRequestFingerprint
+  generateRequestFingerprint,
 };

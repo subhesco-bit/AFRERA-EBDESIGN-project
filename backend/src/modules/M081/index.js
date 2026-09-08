@@ -25,8 +25,8 @@ router.post('/dashboards/:id/share', controller.shareDashboard);
 
 router.get('/dashboards/:id/analytics', controller.getDashboardAnalytics);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

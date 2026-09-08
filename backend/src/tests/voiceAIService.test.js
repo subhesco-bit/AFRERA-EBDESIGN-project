@@ -13,7 +13,7 @@ describe('Voice AI Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('Voice AI Service', () => {
       .send({
         email: 'voice-test@example.com',
         password: 'Test123!@#',
-        role: 'consumer'
+        role: 'consumer',
       });
 
     authToken = registerResponse.body.token;
@@ -37,7 +37,7 @@ describe('Voice AI Service', () => {
         .post('/api/v1/voice-ai/voice-sessions')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          language: 'en'
+          language: 'en',
         })
         .expect(201);
 
@@ -51,7 +51,7 @@ describe('Voice AI Service', () => {
       const response = await request(app)
         .post('/api/v1/voice-ai/voice-sessions')
         .send({
-          language: 'en'
+          language: 'en',
         })
         .expect(401);
     });
@@ -86,7 +86,7 @@ describe('Voice AI Service', () => {
           session_id: testSessionId,
           transcript: 'Search for organic rice',
           command_type: 'product_search',
-          parameters: { query: 'organic rice' }
+          parameters: { query: 'organic rice' },
         })
         .expect(201);
 
@@ -99,7 +99,7 @@ describe('Voice AI Service', () => {
       const response = await request(app)
         .post('/api/v1/voice-ai/voice-commands')
         .send({
-          transcript: 'Test command'
+          transcript: 'Test command',
         })
         .expect(401);
     });
@@ -128,7 +128,7 @@ describe('Voice AI Service', () => {
           confidence_score: 0.95,
           language_detected: 'en',
           recognition_provider: 'google',
-          processing_time_ms: 300
+          processing_time_ms: 300,
         })
         .expect(201);
 
@@ -147,7 +147,7 @@ describe('Voice AI Service', () => {
           response_type: 'text',
           content: 'Here are the search results for organic rice',
           audio_url: null,
-          language: 'en'
+          language: 'en',
         })
         .expect(201);
 
@@ -167,7 +167,7 @@ describe('Voice AI Service', () => {
           speech_rate: 1.0,
           voice_volume: 1.0,
           auto_response_enabled: true,
-          confirmation_required: true
+          confirmation_required: true,
         })
         .expect(200);
 
@@ -200,8 +200,8 @@ describe('Voice AI Service', () => {
             failed: 2,
             avg_confidence: 0.92,
             avg_duration: 45,
-            most_used_commands: { product_search: 8, order: 5 }
-          }
+            most_used_commands: { product_search: 8, order: 5 },
+          },
         })
         .expect(200);
 

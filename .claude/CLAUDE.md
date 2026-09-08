@@ -1,5 +1,7 @@
 # Claude Code Agents — Orchestrator
 
+**Project:** Subhesco/EBDESIGN (changed from Subhesco/EBDESIGN)
+
 You are the **orchestrator**. You manage subagents via `Task()`.
 
 ## Available Agents
@@ -88,3 +90,4 @@ After EVERY response where you consulted or referenced any truthpack file, you M
 
 
 **Violation of truthpack data = hallucination. The truthpack is ALWAYS right.**
+

@@ -44,7 +44,7 @@ class ApicultureService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting apiculture:', error);
@@ -59,11 +59,11 @@ class ApicultureService {
     try {
       const query = 'SELECT * FROM apiculture WHERE id = $1';
       const result = await this.pool.query(query, [apicultureId]);
-      
+
       if (result.rows.length === 0) {
         throw new Error('Apiculture not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting apiculture by ID:', error);
@@ -83,7 +83,7 @@ class ApicultureService {
         honey_type,
         hive_count,
         colony_strength,
-        expected_honey_kg
+        expected_honey_kg,
       } = apicultureData;
 
       const query = `
@@ -93,7 +93,7 @@ class ApicultureService {
       `;
 
       const result = await this.pool.query(query, [
-        farmer_id, name, location, honey_type, hive_count, colony_strength, expected_honey_kg
+        farmer_id, name, location, honey_type, hive_count, colony_strength, expected_honey_kg,
       ]);
 
       return result.rows[0];
@@ -143,3 +143,4 @@ class ApicultureService {
 }
 
 module.exports = new ApicultureService();
+

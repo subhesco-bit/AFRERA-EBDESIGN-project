@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { Package, Plus, X, ArrowLeft, CheckCircle, XCircle, Clock, FileText } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { bulkOrderAPI } from '../services/api'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { Package, Plus, X, ArrowLeft, CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { bulkOrderAPI } from '../services/api';
+import Modal from '../components/common/Modal';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -12,12 +12,12 @@ const STATUS_COLORS = {
   confirmed: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800',
   cancelled: 'bg-gray-100 text-gray-700',
-}
+};
 
 const emptyForm = {
   productId: '', quantity: '', expectedDeliveryDate: '', deliveryLocation: '',
   specialRequirements: '', budgetPerUnit: '', contactPerson: '', contactPhone: '', contactEmail: '',
-}
+};
 
 // This user's own id. The real backend accepts req.body.userId as a
 // fallback when there's no authenticated req.user - see
@@ -25,63 +25,63 @@ const emptyForm = {
 // dedicated "current user" store exists in this codebase's frontend yet
 // (checked), so this is entered manually until real auth wiring exists.
 function BulkOrderPage() {
-  const queryClient = useQueryClient()
-  const [userId, setUserId] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(emptyForm)
-  const [selectedOrderId, setSelectedOrderId] = useState(null)
+  const queryClient = useQueryClient();
+  const [userId, setUserId] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   const { data: ordersData, isLoading, error, refetch } = useQuery({
     queryKey: ['bulk-orders', userId],
     // getUserBulkOrders returns {orders, pagination}, not a bare array.
     queryFn: async () => (await bulkOrderAPI.getUserBulkOrders(userId)).data?.data?.orders ?? [],
-    enabled: !!userId,
-  })
+    enabled: Boolean(userId),
+  });
 
   const { data: selectedOrder } = useQuery({
     queryKey: ['bulk-order', selectedOrderId],
     queryFn: async () => (await bulkOrderAPI.getBulkOrder(selectedOrderId)).data?.data ?? null,
-    enabled: !!selectedOrderId,
-  })
+    enabled: Boolean(selectedOrderId),
+  });
 
   const { data: quotations } = useQuery({
     queryKey: ['bulk-order-quotations', selectedOrderId],
     queryFn: async () => (await bulkOrderAPI.getBulkOrderQuotations(selectedOrderId)).data?.data ?? [],
-    enabled: !!selectedOrderId,
-  })
+    enabled: Boolean(selectedOrderId),
+  });
 
   const createMutation = useMutation({
     mutationFn: (payload) => bulkOrderAPI.createBulkOrder({ ...payload, userId }),
     onSuccess: () => {
-      toast.success('Bulk order request created')
-      queryClient.invalidateQueries({ queryKey: ['bulk-orders', userId] })
-      setShowForm(false)
-      setForm(emptyForm)
+      toast.success('Bulk order request created');
+      queryClient.invalidateQueries({ queryKey: ['bulk-orders', userId] });
+      setShowForm(false);
+      setForm(emptyForm);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to create bulk order'),
-  })
+  });
 
   const acceptMutation = useMutation({
     mutationFn: (quotationId) => bulkOrderAPI.acceptQuotation(quotationId, { userId }),
     onSuccess: () => {
-      toast.success('Quotation accepted')
-      queryClient.invalidateQueries({ queryKey: ['bulk-order-quotations', selectedOrderId] })
-      queryClient.invalidateQueries({ queryKey: ['bulk-order', selectedOrderId] })
+      toast.success('Quotation accepted');
+      queryClient.invalidateQueries({ queryKey: ['bulk-order-quotations', selectedOrderId] });
+      queryClient.invalidateQueries({ queryKey: ['bulk-order', selectedOrderId] });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to accept quotation'),
-  })
+  });
 
   const cancelMutation = useMutation({
     mutationFn: ({ orderId, reason }) => bulkOrderAPI.cancelBulkOrder(orderId, { reason }),
     onSuccess: () => {
-      toast.success('Bulk order cancelled')
-      queryClient.invalidateQueries({ queryKey: ['bulk-orders', userId] })
-      setSelectedOrderId(null)
+      toast.success('Bulk order cancelled');
+      queryClient.invalidateQueries({ queryKey: ['bulk-orders', userId] });
+      setSelectedOrderId(null);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to cancel order'),
-  })
+  });
 
-  const orders = Array.isArray(ordersData) ? ordersData : []
+  const orders = Array.isArray(ordersData) ? ordersData : [];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -188,7 +188,7 @@ function BulkOrderPage() {
               </div>
               {selectedOrder.status !== 'cancelled' && selectedOrder.status !== 'confirmed' && (
                 <button
-                  onClick={() => { if (confirm('Cancel this bulk order?')) cancelMutation.mutate({ orderId: selectedOrder.id, reason: 'Cancelled by buyer' }) }}
+                  onClick={() => { if (confirm('Cancel this bulk order?')) cancelMutation.mutate({ orderId: selectedOrder.id, reason: 'Cancelled by buyer' }); }}
                   className="text-sm text-red-600 hover:underline flex items-center"
                 >
                   <XCircle className="w-4 h-4 mr-1" />Cancel this order
@@ -241,9 +241,9 @@ function BulkOrderPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.productId || !form.quantity) { toast.error('Product ID and quantity are required'); return }
-                  createMutation.mutate({ ...form, quantity: Number(form.quantity), budgetPerUnit: form.budgetPerUnit ? Number(form.budgetPerUnit) : undefined })
+                  e.preventDefault();
+                  if (!form.productId || !form.quantity) { toast.error('Product ID and quantity are required'); return; }
+                  createMutation.mutate({ ...form, quantity: Number(form.quantity), budgetPerUnit: form.budgetPerUnit ? Number(form.budgetPerUnit) : undefined });
                 }}
                 className="space-y-4"
               >
@@ -308,7 +308,7 @@ function BulkOrderPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default BulkOrderPage
+export default BulkOrderPage;

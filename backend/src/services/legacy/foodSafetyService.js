@@ -9,7 +9,7 @@ const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
 const { PLATFORM_STAFF_ROLES } = require('../../middleware/roleGroups');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 
 const router = express.Router();
@@ -25,7 +25,7 @@ const pool = require('../../database/pool');
 /**
  * Create HACCP plan
  */
-router.post('/haccp', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/haccp', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       plan_name,
@@ -40,7 +40,7 @@ router.post('/haccp', authRateLimit, authMiddleware, async (req, res) => {
       record_keeping,
       review_frequency,
       approved_by,
-      effective_date
+      effective_date,
     } = req.body;
 
     const result = await pool.query(
@@ -56,8 +56,8 @@ router.post('/haccp', authRateLimit, authMiddleware, async (req, res) => {
         JSON.stringify(critical_control_points), JSON.stringify(monitoring_procedures),
         JSON.stringify(critical_limits), JSON.stringify(corrective_actions),
         JSON.stringify(verification_procedures), JSON.stringify(record_keeping),
-        review_frequency, approved_by, effective_date
-      ]
+        review_frequency, approved_by, effective_date,
+      ],
     );
 
     logger.info(`HACCP plan created: ${result.rows[0].id}`);
@@ -74,7 +74,7 @@ router.post('/haccp', authRateLimit, authMiddleware, async (req, res) => {
 router.get('/haccp', authMiddleware, async (req, res) => {
   try {
     const { facility_id, product_category, status } = req.query;
-    
+
     let query = 'SELECT * FROM haccp_plans WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -108,7 +108,7 @@ router.get('/haccp', authMiddleware, async (req, res) => {
 /**
  * Record HACCP monitoring data
  */
-router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/haccp/:id/monitoring', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       ccp_id,
@@ -117,7 +117,7 @@ router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, 
       within_limits,
       monitoring_by,
       comments,
-      corrective_action_taken
+      corrective_action_taken,
     } = req.body;
 
     const result = await pool.query(
@@ -128,8 +128,8 @@ router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, 
        RETURNING *`,
       [
         req.params.id, ccp_id, monitoring_value, critical_limit,
-        within_limits, monitoring_by, comments, corrective_action_taken
-      ]
+        within_limits, monitoring_by, comments, corrective_action_taken,
+      ],
     );
 
     logger.info(`HACCP monitoring recorded: ${result.rows[0].id}`);
@@ -147,7 +147,7 @@ router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, 
 /**
  * Create FSSAI compliance record
  */
-router.post('/fssai', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/fssai', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       license_number,
@@ -163,7 +163,7 @@ router.post('/fssai', authRateLimit, authMiddleware, async (req, res) => {
       inspection_date,
       next_inspection_date,
       violations,
-      corrective_actions
+      corrective_actions,
     } = req.body;
 
     const result = await pool.query(
@@ -179,8 +179,8 @@ router.post('/fssai', authRateLimit, authMiddleware, async (req, res) => {
         valid_from, valid_to, annual_turnover,
         JSON.stringify(manufacturing_activities), JSON.stringify(products_covered),
         compliance_status, inspection_date, next_inspection_date,
-        JSON.stringify(violations), JSON.stringify(corrective_actions)
-      ]
+        JSON.stringify(violations), JSON.stringify(corrective_actions),
+      ],
     );
 
     logger.info(`FSSAI compliance record created: ${result.rows[0].id}`);
@@ -197,7 +197,7 @@ router.post('/fssai', authRateLimit, authMiddleware, async (req, res) => {
 router.get('/fssai', authMiddleware, async (req, res) => {
   try {
     const { facility_id, license_number, compliance_status } = req.query;
-    
+
     let query = 'SELECT * FROM fssai_compliance WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -235,7 +235,7 @@ router.get('/fssai', authMiddleware, async (req, res) => {
 /**
  * Create ISO 22000 compliance record
  */
-router.post('/iso22000', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/iso22000', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       certificate_number,
@@ -251,7 +251,7 @@ router.post('/iso22000', authRateLimit, authMiddleware, async (req, res) => {
       food_safety_policy,
       objectives,
       performance_indicators,
-      nonconformities
+      nonconformities,
     } = req.body;
 
     const result = await pool.query(
@@ -268,8 +268,8 @@ router.post('/iso22000', authRateLimit, authMiddleware, async (req, res) => {
         management_review, JSON.stringify(internal_audits),
         JSON.stringify(prerequisite_programs), food_safety_policy,
         JSON.stringify(objectives), JSON.stringify(performance_indicators),
-        JSON.stringify(nonconformities)
-      ]
+        JSON.stringify(nonconformities),
+      ],
     );
 
     logger.info(`ISO 22000 compliance record created: ${result.rows[0].id}`);
@@ -286,7 +286,7 @@ router.post('/iso22000', authRateLimit, authMiddleware, async (req, res) => {
 router.get('/iso22000', authMiddleware, async (req, res) => {
   try {
     const { facility_id, certificate_number, status } = req.query;
-    
+
     let query = 'SELECT * FROM iso22000_compliance WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -324,7 +324,7 @@ router.get('/iso22000', authMiddleware, async (req, res) => {
 /**
  * Create recall record
  */
-router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/recalls', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -339,7 +339,7 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
       recall_date,
       response_deadline,
       corrective_action_plan,
-      communication_plan
+      communication_plan,
     } = req.body;
 
     const result = await pool.query(
@@ -355,8 +355,8 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
         affected_quantity, JSON.stringify(distribution_scope),
         JSON.stringify(notification_method), recall_initiator, recall_date,
         response_deadline, JSON.stringify(corrective_action_plan),
-        JSON.stringify(communication_plan)
-      ]
+        JSON.stringify(communication_plan),
+      ],
     );
 
     logger.info(`Food safety recall created: ${result.rows[0].id}`);
@@ -375,9 +375,9 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
         productId: result.rows[0].product_id ?? null,
         recallType: result.rows[0].recall_type ?? null,
         recallReason: result.rows[0].recall_reason ?? null,
-        riskLevel: result.rows[0].risk_level ?? null
+        riskLevel: result.rows[0].risk_level ?? null,
       },
-      { severity: SEVERITY.EMERGENCY, source: 'foodSafetyService.createRecall' }
+      { severity: SEVERITY.EMERGENCY, source: 'foodSafetyService.createRecall' },
     );
 
     res.status(201).json(result.rows[0]);
@@ -390,7 +390,7 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
 /**
  * Update recall status
  */
-router.put('/recalls/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/recalls/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, recovery_rate, closure_notes, closed_by } = req.body;
 
@@ -404,7 +404,7 @@ router.put('/recalls/:id/status', authRateLimit, authMiddleware, requireRole(...
            updated_at = NOW()
        WHERE id = $5
        RETURNING *`,
-      [status, recovery_rate, closure_notes, closed_by, req.params.id]
+      [status, recovery_rate, closure_notes, closed_by, req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -425,7 +425,7 @@ router.put('/recalls/:id/status', authRateLimit, authMiddleware, requireRole(...
 router.get('/recalls', authMiddleware, async (req, res) => {
   try {
     const { product_id, status, risk_level, start_date, end_date } = req.query;
-    
+
     let query = 'SELECT * FROM food_safety_recalls WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -475,7 +475,7 @@ router.get('/recalls', authMiddleware, async (req, res) => {
 /**
  * Create CAPA record
  */
-router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/capa', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       source_type,
@@ -488,7 +488,7 @@ router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
       responsibility,
       target_date,
       effectiveness_check,
-      verification_method
+      verification_method,
     } = req.body;
 
     const result = await pool.query(
@@ -502,8 +502,8 @@ router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
         source_type, source_id, issue_description, root_cause,
         JSON.stringify(impact_assessment), JSON.stringify(preventive_action),
         JSON.stringify(corrective_action), responsibility, target_date,
-        effectiveness_check, verification_method
-      ]
+        effectiveness_check, verification_method,
+      ],
     );
 
     logger.info(`CAPA record created: ${result.rows[0].id}`);
@@ -517,7 +517,7 @@ router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
 /**
  * Update CAPA status
  */
-router.put('/capa/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/capa/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
@@ -531,7 +531,7 @@ router.put('/capa/:id/status', authRateLimit, authMiddleware, requireRole(...PLA
            updated_at = NOW()
        WHERE id = $5
        RETURNING *`,
-      [status, completion_notes, completed_by, effectiveness_result, req.params.id]
+      [status, completion_notes, completed_by, effectiveness_result, req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -552,7 +552,7 @@ router.put('/capa/:id/status', authRateLimit, authMiddleware, requireRole(...PLA
 router.get('/capa', authMiddleware, async (req, res) => {
   try {
     const { source_type, source_id, status, responsibility } = req.query;
-    
+
     let query = 'SELECT * FROM capa_records WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -596,7 +596,7 @@ router.get('/capa', authMiddleware, async (req, res) => {
 /**
  * Create food safety audit
  */
-router.post('/audits', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/audits', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       audit_type,
@@ -613,7 +613,7 @@ router.post('/audits', authRateLimit, authMiddleware, async (req, res) => {
       grade,
       recommendations,
       follow_up_required,
-      next_audit_date
+      next_audit_date,
     } = req.body;
 
     const result = await pool.query(
@@ -630,8 +630,8 @@ router.post('/audits', authRateLimit, authMiddleware, async (req, res) => {
         scheduled_date, actual_date, JSON.stringify(findings),
         JSON.stringify(nonconformities), JSON.stringify(observations),
         score, grade, JSON.stringify(recommendations), follow_up_required,
-        next_audit_date
-      ]
+        next_audit_date,
+      ],
     );
 
     logger.info(`Food safety audit created: ${result.rows[0].id}`);
@@ -648,7 +648,7 @@ router.post('/audits', authRateLimit, authMiddleware, async (req, res) => {
 router.get('/audits', authMiddleware, async (req, res) => {
   try {
     const { facility_id, audit_type, status, start_date, end_date } = req.query;
-    
+
     let query = 'SELECT * FROM food_safety_audits WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -698,7 +698,7 @@ router.get('/audits', authMiddleware, async (req, res) => {
 /**
  * Create risk assessment
  */
-router.post('/risk-assessment', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/risk-assessment', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       assessment_type,
@@ -714,7 +714,7 @@ router.post('/risk-assessment', authRateLimit, authMiddleware, async (req, res) 
       residual_risk,
       assessment_date,
       assessed_by,
-      review_date
+      review_date,
     } = req.body;
 
     const result = await pool.query(
@@ -730,8 +730,8 @@ router.post('/risk-assessment', authRateLimit, authMiddleware, async (req, res) 
         JSON.stringify(hazard_identification), JSON.stringify(risk_characterization),
         JSON.stringify(exposure_assessment), risk_level, likelihood, severity,
         JSON.stringify(mitigation_measures), residual_risk, assessment_date,
-        assessed_by, review_date
-      ]
+        assessed_by, review_date,
+      ],
     );
 
     logger.info(`Risk assessment created: ${result.rows[0].id}`);
@@ -748,7 +748,7 @@ router.post('/risk-assessment', authRateLimit, authMiddleware, async (req, res) 
 router.get('/risk-assessment', authMiddleware, async (req, res) => {
   try {
     const { facility_id, product_id, assessment_type, risk_level } = req.query;
-    
+
     let query = 'SELECT * FROM food_safety_risk_assessments WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -792,7 +792,7 @@ router.get('/risk-assessment', authMiddleware, async (req, res) => {
 /**
  * Create corrective action
  */
-router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/corrective-actions', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       source_type,
@@ -805,7 +805,7 @@ router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, re
       due_date,
       effectiveness_verification,
       completion_date,
-      completed_by
+      completed_by,
     } = req.body;
 
     const result = await pool.query(
@@ -818,8 +818,8 @@ router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, re
       [
         source_type, source_id, issue_description, immediate_action,
         root_cause, long_term_correction, responsibility, due_date,
-        effectiveness_verification, completion_date, completed_by
-      ]
+        effectiveness_verification, completion_date, completed_by,
+      ],
     );
 
     logger.info(`Corrective action created: ${result.rows[0].id}`);
@@ -833,7 +833,7 @@ router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, re
 /**
  * Update corrective action status
  */
-router.put('/corrective-actions/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/corrective-actions/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
@@ -847,7 +847,7 @@ router.put('/corrective-actions/:id/status', authRateLimit, authMiddleware, requ
            updated_at = NOW()
        WHERE id = $5
        RETURNING *`,
-      [status, completion_notes, completed_by, effectiveness_result, req.params.id]
+      [status, completion_notes, completed_by, effectiveness_result, req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -868,7 +868,7 @@ router.put('/corrective-actions/:id/status', authRateLimit, authMiddleware, requ
 router.get('/corrective-actions', authMiddleware, async (req, res) => {
   try {
     const { source_type, source_id, status, responsibility } = req.query;
-    
+
     let query = 'SELECT * FROM corrective_actions WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -953,5 +953,6 @@ function isHealthy() {
 
 module.exports = {
   router,
-  isHealthy
+  isHealthy,
 };
+

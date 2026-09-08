@@ -17,31 +17,31 @@ const AI_MODELS = {
     type: 'regression',
     features: ['season', 'region', 'historical_demand', 'price', 'competitor_pricing'],
     target: 'demand_quantity',
-    accuracy: 0.87
+    accuracy: 0.87,
   },
   price_optimization: {
     type: 'optimization',
     factors: ['supply', 'demand', 'competitor_prices', 'seasonality', 'quality_grade'],
     constraints: ['min_price', 'max_price', 'market_conditions'],
-    accuracy: 0.82
+    accuracy: 0.82,
   },
   credit_scoring: {
     type: 'classification',
     features: ['fdi_score', 'repayment_history', 'farm_size', 'crop_diversity', 'certifications'],
     target: 'credit_risk_level',
-    accuracy: 0.89
+    accuracy: 0.89,
   },
   fraud_detection: {
     type: 'anomaly_detection',
     features: ['transaction_patterns', 'user_behavior', 'location_data', 'timing_patterns'],
     threshold: 0.95,
-    accuracy: 0.91
+    accuracy: 0.91,
   },
   recommendation: {
     type: 'collaborative_filtering',
     features: ['user_history', 'similar_users', 'item_attributes', 'context'],
-    accuracy: 0.78
-  }
+    accuracy: 0.78,
+  },
 };
 
 /**
@@ -50,7 +50,7 @@ const AI_MODELS = {
 async function predictDemand(productId, timeHorizon = 30) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Get historical data
     const historicalQuery = `
       SELECT 
@@ -64,9 +64,9 @@ async function predictDemand(productId, timeHorizon = 30) {
       GROUP BY DATE_TRUNC('month', order_date)
       ORDER BY month DESC
     `;
-    
+
     const historicalData = await pg.query(historicalQuery, [productId]);
-    
+
     // Get product details
     const productQuery = `
       SELECT p.*, c.name as category_name, s.name as state_name
@@ -75,34 +75,34 @@ async function predictDemand(productId, timeHorizon = 30) {
       LEFT JOIN states s ON p.state_id = s.id
       WHERE p.id = $1
     `;
-    
+
     const productResult = await pg.query(productQuery, [productId]);
     const product = productResult.rows[0];
-    
+
     // Simple demand forecasting model (in production, use ML models)
     const seasonalFactor = getSeasonalFactor(product.category_name);
     const trendFactor = calculateTrend(historicalData.rows);
-    const baseDemand = historicalData.rows.length > 0 
-      ? historicalData.rows.reduce((sum, row) => sum + parseFloat(row.demand), 0) / historicalData.rows.length
-      : 100;
-    
+    const baseDemand = historicalData.rows.length > 0 ?
+      historicalData.rows.reduce((sum, row) => sum + parseFloat(row.demand), 0) / historicalData.rows.length :
+      100;
+
     const predictedDemand = Math.round(baseDemand * seasonalFactor * trendFactor);
-    
+
     const confidence = calculateConfidence(historicalData.rows.length, product.gi_status);
-    
+
     logger.info(`Demand prediction for product ${productId}: ${predictedDemand} (confidence: ${confidence}%)`);
-    
+
     return {
       product_id: productId,
       predicted_demand: predictedDemand,
       time_horizon_days: timeHorizon,
-      confidence: confidence,
+      confidence,
       factors: {
         seasonal: seasonalFactor,
         trend: trendFactor,
-        base_demand: baseDemand
+        base_demand: baseDemand,
       },
-      recommendations: generateDemandRecommendations(predictedDemand, confidence)
+      recommendations: generateDemandRecommendations(predictedDemand, confidence),
     };
   } catch (error) {
     logger.error('Error predicting demand', { error: error.message, stack: error.stack });
@@ -116,7 +116,7 @@ async function predictDemand(productId, timeHorizon = 30) {
 async function optimizePrice(productId, currentPrice) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Get market data
     const marketQuery = `
       SELECT 
@@ -128,21 +128,21 @@ async function optimizePrice(productId, currentPrice) {
       WHERE oi.product_id = $1
         AND oi.order_date >= NOW() - INTERVAL '3 months'
     `;
-    
+
     const marketData = await pg.query(marketQuery, [productId]);
     const market = marketData.rows[0];
-    
+
     // Get competitor pricing (simulated)
     const competitorPrices = await getCompetitorPrices(productId);
-    
+
     // Calculate optimal price using multi-objective optimization
     const optimalPrice = calculateOptimalPrice(currentPrice, market, competitorPrices);
-    
+
     const priceElasticity = calculatePriceElasticity(productId);
     const revenueImpact = calculateRevenueImpact(currentPrice, optimalPrice, priceElasticity);
-    
+
     logger.info(`Price optimization for product ${productId}: â‚¹${optimalPrice} (current: â‚¹${currentPrice})`);
-    
+
     return {
       product_id: productId,
       current_price: currentPrice,
@@ -153,16 +153,16 @@ async function optimizePrice(productId, currentPrice) {
         average_price: market.avg_market_price,
         price_range: {
           min: market.min_market_price,
-          max: market.max_market_price
+          max: market.max_market_price,
         },
-        competitor_prices: competitorPrices
+        competitor_prices: competitorPrices,
       },
       impact: {
         expected_demand_change: priceElasticity * ((optimalPrice - currentPrice) / currentPrice * 100),
         revenue_impact: revenueImpact,
-        margin_impact: calculateMarginImpact(currentPrice, optimalPrice)
+        margin_impact: calculateMarginImpact(currentPrice, optimalPrice),
       },
-      recommendations: generatePricingRecommendations(optimalPrice, market)
+      recommendations: generatePricingRecommendations(optimalPrice, market),
     };
   } catch (error) {
     logger.error('Error optimizing price', { error: error.message, stack: error.stack });
@@ -176,7 +176,7 @@ async function optimizePrice(productId, currentPrice) {
 async function assessCreditRisk(farmerId) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Get farmer data
     const farmerQuery = `
       SELECT f.*, u.name, u.phone
@@ -184,13 +184,13 @@ async function assessCreditRisk(farmerId) {
       JOIN users u ON f.user_id = u.id
       WHERE f.id = $1
     `;
-    
+
     const farmerResult = await pg.query(farmerQuery, [farmerId]);
     const farmer = farmerResult.rows[0];
-    
+
     // Get FDI score
     const fdiScore = await calculateFDI(farmerId);
-    
+
     // Get repayment history
     const repaymentQuery = `
       SELECT 
@@ -201,13 +201,13 @@ async function assessCreditRisk(farmerId) {
       FROM loans
       WHERE farmer_id = $1
     `;
-    
+
     const repaymentData = await pg.query(repaymentQuery, [farmerId]);
     const repayment = repaymentData.rows[0];
-    
+
     // Calculate credit score (0-100)
     const creditScore = calculateCreditScore(fdiScore, repayment, farmer);
-    
+
     // Determine risk level
     let riskLevel, maxAdvancePercentage, interestRate;
     if (creditScore >= 80) {
@@ -227,9 +227,9 @@ async function assessCreditRisk(farmerId) {
       maxAdvancePercentage = 10;
       interestRate = 18.0;
     }
-    
+
     logger.info(`Credit risk assessment for farmer ${farmerId}: ${riskLevel} (score: ${creditScore})`);
-    
+
     return {
       farmer_id: farmerId,
       credit_score: creditScore,
@@ -238,28 +238,28 @@ async function assessCreditRisk(farmerId) {
       fdi_score: fdiScore.score,
       repayment_history: {
         total_loans: repayment.total_loans,
-        repayment_rate: repayment.total_loans > 0 
-          ? (repayment.paid_loans / repayment.total_loans * 100).toFixed(1) 
-          : 0,
-        default_rate: repayment.total_loans > 0 
-          ? (repayment.defaulted_loans / repayment.total_loans * 100).toFixed(1) 
-          : 0,
-        avg_days_late: repayment.avg_days_late || 0
+        repayment_rate: repayment.total_loans > 0 ?
+          (repayment.paid_loans / repayment.total_loans * 100).toFixed(1) :
+          0,
+        default_rate: repayment.total_loans > 0 ?
+          (repayment.defaulted_loans / repayment.total_loans * 100).toFixed(1) :
+          0,
+        avg_days_late: repayment.avg_days_late || 0,
       },
       credit_parameters: {
         max_advance_percentage: maxAdvancePercentage,
         interest_rate: interestRate,
-        loan_limit: calculateLoanLimit(creditScore, farmer.farm_size || 1)
+        loan_limit: calculateLoanLimit(creditScore, farmer.farm_size || 1),
       },
       factors: {
         fdi_contribution: fdiScore.score * 0.4,
-        repayment_contribution: (repayment.total_loans > 0 
-          ? (repayment.paid_loans / repayment.total_loans) * 100 * 0.35 
-          : 50) * 0.35,
+        repayment_contribution: (repayment.total_loans > 0 ?
+          (repayment.paid_loans / repayment.total_loans) * 100 * 0.35 :
+          50) * 0.35,
         certification_contribution: (farmer.certification_count || 0) * 5 * 0.15,
-        experience_contribution: Math.min((farmer.years_active || 0) * 2, 10) * 0.1
+        experience_contribution: Math.min((farmer.years_active || 0) * 2, 10) * 0.1,
       },
-      recommendations: generateCreditRecommendations(riskLevel, creditScore)
+      recommendations: generateCreditRecommendations(riskLevel, creditScore),
     };
   } catch (error) {
     logger.error('Error assessing credit risk', { error: error.message, stack: error.stack });
@@ -274,31 +274,31 @@ async function detectFraud(transactionData) {
   try {
     const mongo = getMongoDatabase();
     const fraudCollection = mongo.collection('fraud_patterns');
-    
+
     // Get historical fraud patterns
     const patterns = await fraudCollection.find({ active: true }).toArray();
-    
+
     const riskFactors = [];
     let totalRiskScore = 0;
-    
+
     // Check for suspicious patterns
     if (transactionData.amount > 100000) {
       riskFactors.push({ factor: 'high_amount', risk: 0.3 });
       totalRiskScore += 30;
     }
-    
+
     if (transactionData.velocity > 10) { // More than 10 transactions in short time
       riskFactors.push({ factor: 'high_velocity', risk: 0.4 });
       totalRiskScore += 40;
     }
-    
+
     // Check location anomalies
     const locationRisk = await checkLocationAnomaly(transactionData);
     if (locationRisk > 0.5) {
       riskFactors.push({ factor: 'location_anomaly', risk: locationRisk });
       totalRiskScore += locationRisk * 50;
     }
-    
+
     // Check against known fraud patterns
     for (const pattern of patterns) {
       if (matchesPattern(transactionData, pattern)) {
@@ -306,10 +306,10 @@ async function detectFraud(transactionData) {
         totalRiskScore += pattern.risk_score * 100;
       }
     }
-    
+
     // Normalize risk score
     const normalizedRisk = Math.min(totalRiskScore, 100);
-    
+
     let decision, action;
     if (normalizedRisk >= 80) {
       decision = 'block';
@@ -321,26 +321,26 @@ async function detectFraud(transactionData) {
       decision = 'approve';
       action = 'Transaction approved';
     }
-    
+
     logger.info(`Fraud detection for transaction ${transactionData.id}: ${decision} (risk: ${normalizedRisk}%)`);
-    
+
     // Store analysis for audit
     await mongo.collection('fraud_analyses').insertOne({
       transaction_id: transactionData.id,
       risk_score: normalizedRisk,
       risk_factors: riskFactors,
-      decision: decision,
-      timestamp: new Date()
+      decision,
+      timestamp: new Date(),
     });
-    
+
     return {
       transaction_id: transactionData.id,
       risk_score: normalizedRisk,
-      decision: decision,
-      action: action,
+      decision,
+      action,
       confidence: 0.91,
       risk_factors: riskFactors,
-      recommendations: generateFraudRecommendations(decision, riskFactors)
+      recommendations: generateFraudRecommendations(decision, riskFactors),
     };
   } catch (error) {
     logger.error('Error detecting fraud', { error: error.message, stack: error.stack });
@@ -355,7 +355,7 @@ async function generateRecommendations(userId, context = {}) {
   try {
     const pg = getPostgreSQL();
     const mongo = getMongoDatabase();
-    
+
     // Get user's purchase history
     const historyQuery = `
       SELECT 
@@ -371,27 +371,27 @@ async function generateRecommendations(userId, context = {}) {
       ORDER BY purchase_count DESC
       LIMIT 10
     `;
-    
+
     const historyData = await pg.query(historyQuery, [userId]);
-    
+
     // Get collaborative filtering recommendations
     const collaborativeRecs = await getCollaborativeRecommendations(userId, historyData.rows);
-    
+
     // Get content-based recommendations
     const contentRecs = await getContentBasedRecommendations(historyData.rows);
-    
+
     // Get context-aware recommendations
     const contextRecs = await getContextualRecommendations(context);
-    
+
     // Combine and rank recommendations
     const recommendations = combineRecommendations(
       collaborativeRecs,
       contentRecs,
-      contextRecs
+      contextRecs,
     );
-    
+
     logger.info(`Generated ${recommendations.length} recommendations for user ${userId}`);
-    
+
     return {
       user_id: userId,
       recommendations: recommendations.slice(0, 20), // Top 20
@@ -399,9 +399,9 @@ async function generateRecommendations(userId, context = {}) {
       categories: {
         collaborative: collaborativeRecs.length,
         content_based: contentRecs.length,
-        contextual: contextRecs.length
+        contextual: contextRecs.length,
       },
-      explanation: generateRecommendationExplanation(recommendations)
+      explanation: generateRecommendationExplanation(recommendations),
     };
   } catch (error) {
     logger.error('Error generating recommendations', { error: error.message, stack: error.stack });
@@ -415,21 +415,21 @@ async function generateRecommendations(userId, context = {}) {
 function getSeasonalFactor(category) {
   const seasonalFactors = {
     'Grains & Millets': 1.2,
-    'Spices': 1.4,
-    'Fruits': 1.3,
+    Spices: 1.4,
+    Fruits: 1.3,
     'Vegetables & Greens': 1.1,
     'Tea & Beverages': 0.9,
-    'Honey & Sweeteners': 1.0
+    'Honey & Sweeteners': 1.0,
   };
   return seasonalFactors[category] || 1.0;
 }
 
 function calculateTrend(historicalData) {
   if (historicalData.length < 2) return 1.0;
-  
+
   const recent = historicalData.slice(0, 3).reduce((sum, row) => sum + parseFloat(row.demand), 0) / 3;
   const older = historicalData.slice(3, 6).reduce((sum, row) => sum + parseFloat(row.demand), 0) / 3;
-  
+
   return older > 0 ? recent / older : 1.0;
 }
 
@@ -441,19 +441,19 @@ function calculateConfidence(dataPoints, giStatus) {
 
 function calculateOptimalPrice(currentPrice, market, competitorPrices) {
   const avgMarketPrice = market.avg_market_price || currentPrice;
-  const avgCompetitorPrice = competitorPrices.length > 0
-    ? competitorPrices.reduce((sum, p) => sum + p, 0) / competitorPrices.length
-    : currentPrice;
-  
+  const avgCompetitorPrice = competitorPrices.length > 0 ?
+    competitorPrices.reduce((sum, p) => sum + p, 0) / competitorPrices.length :
+    currentPrice;
+
   // Weighted average of market and competitor prices
   const marketWeight = 0.4;
   const competitorWeight = 0.3;
   const currentWeight = 0.3;
-  
+
   return Math.round(
     avgMarketPrice * marketWeight +
     avgCompetitorPrice * competitorWeight +
-    currentPrice * currentWeight
+    currentPrice * currentWeight,
   );
 }
 
@@ -487,18 +487,18 @@ function calculateFDI(farmerId) {
   return {
     score: 72,
     grade: 'B+',
-    advance_percentage: 30
+    advance_percentage: 30,
   };
 }
 
 function calculateCreditScore(fdiScore, repayment, farmer) {
   const fdiContribution = fdiScore.score * 0.4;
-  const repaymentContribution = repayment.total_loans > 0 
-    ? (repayment.paid_loans / repayment.total_loans) * 100 * 0.35 
-    : 50 * 0.35;
+  const repaymentContribution = repayment.total_loans > 0 ?
+    (repayment.paid_loans / repayment.total_loans) * 100 * 0.35 :
+    50 * 0.35;
   const certificationContribution = (farmer.certification_count || 0) * 5 * 0.15;
   const experienceContribution = Math.min((farmer.years_active || 0) * 2, 10) * 0.1;
-  
+
   return Math.round(fdiContribution + repaymentContribution + certificationContribution + experienceContribution);
 }
 
@@ -506,7 +506,7 @@ function calculateLoanLimit(creditScore, farmSize) {
   const baseLimit = 100000;
   const scoreMultiplier = creditScore / 100;
   const sizeMultiplier = Math.min(farmSize, 10);
-  
+
   return Math.round(baseLimit * scoreMultiplier * sizeMultiplier);
 }
 
@@ -658,7 +658,6 @@ function isHealthy() {
   return true; // AI service health check
 }
 
-
 // ============================================================
 // CANONICAL AI COMPATIBILITY API
 // Provides the contract expected by platform services.
@@ -685,8 +684,8 @@ async function generateRecommendation(request = {}) {
     {
       ...context,
       ...payload,
-      task
-    }
+      task,
+    },
   );
 
   return {
@@ -694,14 +693,14 @@ async function generateRecommendation(request = {}) {
     task,
     confidence: typeof result?.confidence === 'number' ? result.confidence : 0,
     explanation: result?.explanation || null,
-    recommendations: Array.isArray(result?.recommendations)
-      ? result.recommendations
-      : []
+    recommendations: Array.isArray(result?.recommendations) ?
+      result.recommendations :
+      [],
   };
 }
 
 const aiAPI = {
-  generateRecommendation
+  generateRecommendation,
 };
 module.exports = {
   aiAPI,
@@ -711,6 +710,6 @@ module.exports = {
   assessCreditRisk,
   detectFraud,
   generateRecommendations,
-  isHealthy
+  isHealthy,
 };
 

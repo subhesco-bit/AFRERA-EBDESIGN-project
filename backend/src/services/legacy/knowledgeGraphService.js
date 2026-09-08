@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === 'test') {
     query_id: queryId,
     query_name: `query-${queryId}`,
     execution_time_ms: 1,
-    result: []
+    result: [],
   });
   recordKnowledgeAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
   /* eslint-enable no-func-assign */
@@ -50,7 +50,7 @@ async function createKnowledgeNode(data) {
     description,
     properties,
     source_system,
-    confidence_score
+    confidence_score,
   } = data;
 
   try {
@@ -66,8 +66,8 @@ async function createKnowledgeNode(data) {
         description,
         JSON.stringify(properties),
         source_system,
-        confidence_score
-      ]
+        confidence_score,
+      ],
     );
 
     return result.rows[0];
@@ -147,7 +147,7 @@ async function createRelationship(data) {
     relationship_type,
     relationship_properties,
     confidence_score,
-    source
+    source,
   } = data;
 
   try {
@@ -162,8 +162,8 @@ async function createRelationship(data) {
         relationship_type,
         JSON.stringify(relationship_properties),
         confidence_score,
-        source
-      ]
+        source,
+      ],
     );
 
     return result.rows[0];
@@ -193,7 +193,7 @@ async function findRelatedNodes(nodeId, relationshipType = null) {
   try {
     const result = await pool.query(
       'SELECT find_related_nodes($1, $2, 2) as related_nodes',
-      [nodeId, relationshipType]
+      [nodeId, relationshipType],
     );
 
     return result.rows[0].related_nodes;
@@ -230,7 +230,7 @@ async function createGraphQuery(data) {
     query_type,
     query_definition,
     parameters,
-    description
+    description,
   } = data;
 
   try {
@@ -244,8 +244,8 @@ async function createGraphQuery(data) {
         query_type,
         JSON.stringify(query_definition),
         JSON.stringify(parameters),
-        description
-      ]
+        description,
+      ],
     );
 
     return result.rows[0];
@@ -274,11 +274,11 @@ router.post('/graph-queries', authMiddleware, async (req, res) => {
 async function executeGraphQuery(queryId, parameters) {
   try {
     const startTime = Date.now();
-    
+
     // Get query definition
     const queryResult = await pool.query(
       'SELECT * FROM graph_queries WHERE id = $1',
-      [queryId]
+      [queryId],
     );
 
     if (queryResult.rows.length === 0) {
@@ -286,7 +286,7 @@ async function executeGraphQuery(queryId, parameters) {
     }
 
     const query = queryResult.rows[0];
-    
+
     // Execute query based on type (simplified)
     let resultData;
     switch (query.query_type) {
@@ -307,14 +307,14 @@ async function executeGraphQuery(queryId, parameters) {
       `INSERT INTO query_results 
        (query_id, executed_by, execution_time_ms, result_data, result_count)
        VALUES ($1, $2, $3, $4, $5)`,
-      [queryId, parameters.executed_by, executionTime, JSON.stringify(resultData), Array.isArray(resultData) ? resultData.length : 1]
+      [queryId, parameters.executed_by, executionTime, JSON.stringify(resultData), Array.isArray(resultData) ? resultData.length : 1],
     );
 
     return {
       query_id: queryId,
       query_name: query.query_name,
       execution_time_ms: executionTime,
-      result: resultData
+      result: resultData,
     };
   } catch (error) {
     logger.error('Execute graph query error', { error: error.message, stack: error.stack });
@@ -329,7 +329,7 @@ router.post('/graph-queries/:queryId/execute', authMiddleware, async (req, res) 
   try {
     const result = await executeGraphQuery(req.params.queryId, {
       ...req.body,
-      executed_by: req.user.id
+      executed_by: req.user.id,
     });
     res.json(result);
   } catch (error) {
@@ -365,8 +365,8 @@ async function recordKnowledgeAnalytics(metrics) {
         metrics.total_queries || 0,
         metrics.avg_query_time || 0,
         metrics.unique_users || 0,
-        JSON.stringify(metrics.most_queried_types || {})
-      ]
+        JSON.stringify(metrics.most_queried_types || {}),
+      ],
     );
 
     return result.rows[0];
@@ -407,5 +407,6 @@ module.exports = {
   createGraphQuery,
   executeGraphQuery,
   recordKnowledgeAnalytics,
-  isHealthy
+  isHealthy,
 };
+

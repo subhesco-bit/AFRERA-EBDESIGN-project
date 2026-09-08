@@ -20,5 +20,5 @@ const NUTRITION_WELLNESS_DISCLAIMER =
   'or taking medication.';
 
 module.exports = {
-  NUTRITION_WELLNESS_DISCLAIMER
+  NUTRITION_WELLNESS_DISCLAIMER,
 };

@@ -50,7 +50,7 @@ class FoluBenchmarkService {
     const result = await pool.query(
       `SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE organic = TRUE) AS organic_count,
               COUNT(*) FILTER (WHERE gi_status = TRUE) AS gi_certified_count
-         FROM products WHERE is_active = TRUE`
+         FROM products WHERE is_active = TRUE`,
     );
     const row = result.rows[0];
     const total = Number(row.total);
@@ -69,7 +69,7 @@ class FoluBenchmarkService {
     const result = await pool.query(
       `SELECT COUNT(*) AS booking_count, COALESCE(SUM(quantity_units), 0) AS total_quantity_units,
               COUNT(DISTINCT farmer_id) AS farmers_using_cold_storage
-         FROM cold_storage_bookings WHERE status IN ('checked_in', 'checked_out')`
+         FROM cold_storage_bookings WHERE status IN ('checked_in', 'checked_out')`,
     );
     const row = result.rows[0];
     return {
@@ -87,7 +87,7 @@ class FoluBenchmarkService {
   async localLoopsIndicator() {
     const result = await pool.query(
       `SELECT COUNT(*) AS order_count, COALESCE(SUM(total_amount), 0) AS total_gmv_inr
-         FROM orders WHERE status NOT IN ('cancelled', 'refunded')`
+         FROM orders WHERE status NOT IN ('cancelled', 'refunded')`,
     );
     const row = result.rows[0];
     return {
@@ -103,7 +103,7 @@ class FoluBenchmarkService {
   async digitalAdoptionIndicator() {
     const result = await pool.query(
       `SELECT COUNT(*) AS total_farmers, COUNT(*) FILTER (WHERE training_completed = TRUE) AS trained_count
-         FROM farmers WHERE status = 'active'`
+         FROM farmers WHERE status = 'active'`,
     );
     const row = result.rows[0];
     const total = Number(row.total_farmers);
@@ -120,17 +120,17 @@ class FoluBenchmarkService {
   async ruralLivelihoodsIndicator() {
     const fdiResult = await pool.query(
       `SELECT AVG(fdi_score) AS avg_fdi_score, COUNT(*) AS total_farmers
-         FROM farmers WHERE status = 'active' AND fdi_score > 0`
+         FROM farmers WHERE status = 'active' AND fdi_score > 0`,
     );
     const dprResult = await pool.query(
       `SELECT COUNT(*) AS dpr_count, COALESCE(SUM(financing_ask_inr), 0) AS total_financing_ask_inr
-         FROM dpr_documents`
+         FROM dpr_documents`,
     );
     let dividendResult = { rows: [{ distribution_count: 0, total_dividends_inr: 0 }] };
     try {
       dividendResult = await pool.query(
         `SELECT COUNT(*) AS distribution_count, COALESCE(SUM(total_surplus_inr), 0) AS total_dividends_inr
-           FROM fpo_profit_distributions`
+           FROM fpo_profit_distributions`,
       );
     } catch (error) {
       // Table exists via migration 3106 — if it hasn't been applied yet in
@@ -187,3 +187,4 @@ class FoluBenchmarkService {
 }
 
 module.exports = new FoluBenchmarkService();
+

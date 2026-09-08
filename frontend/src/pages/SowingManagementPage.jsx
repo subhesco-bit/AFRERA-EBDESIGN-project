@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { sowingAPI } from '../services/api'
-import { Sprout, Plus, Trash2, Edit, X, CalendarDays } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { sowingAPI } from '../services/api';
+import { Sprout, Plus, Trash2, Edit, X, CalendarDays } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const SEASONS = ['Kharif', 'Rabi', 'Zaid']
-const METHODS = ['Broadcasting', 'Line Sowing', 'Dibbling', 'Transplanting', 'Drilling']
+const SEASONS = ['Kharif', 'Rabi', 'Zaid'];
+const METHODS = ['Broadcasting', 'Line Sowing', 'Dibbling', 'Transplanting', 'Drilling'];
 
 const emptyForm = {
   crop: '',
@@ -19,48 +19,48 @@ const emptyForm = {
   expected_germination_date: '',
   seed_rate_kg: '',
   notes: '',
-}
+};
 
 function SowingManagementPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyForm)
-  const [seasonFilter, setSeasonFilter] = useState('')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [seasonFilter, setSeasonFilter] = useState('');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['sowing-records', seasonFilter],
     queryFn: async () => {
-      const res = await sowingAPI.getRecords(seasonFilter ? { season: seasonFilter } : {})
-      return res.data?.data ?? []
+      const res = await sowingAPI.getRecords(seasonFilter ? { season: seasonFilter } : {});
+      return res.data?.data ?? [];
     },
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? sowingAPI.updateRecord(editingId, payload) : sowingAPI.createRecord(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Sowing record updated' : 'Sowing record added')
-      queryClient.invalidateQueries({ queryKey: ['sowing-records'] })
-      closeForm()
+      toast.success(editingId ? 'Sowing record updated' : 'Sowing record added');
+      queryClient.invalidateQueries({ queryKey: ['sowing-records'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save sowing record'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => sowingAPI.deleteRecord(id),
     onSuccess: () => {
-      toast.success('Sowing record deleted')
-      queryClient.invalidateQueries({ queryKey: ['sowing-records'] })
+      toast.success('Sowing record deleted');
+      queryClient.invalidateQueries({ queryKey: ['sowing-records'] });
     },
     onError: () => toast.error('Failed to delete record'),
-  })
+  });
 
   const closeForm = () => {
-    setShowForm(false)
-    setEditingId(null)
-    setForm(emptyForm)
-  }
+    setShowForm(false);
+    setEditingId(null);
+    setForm(emptyForm);
+  };
 
   const openEdit = (record) => {
     setForm({
@@ -74,27 +74,27 @@ function SowingManagementPage() {
       expected_germination_date: record.expected_germination_date ? record.expected_germination_date.slice(0, 10) : '',
       seed_rate_kg: record.seed_rate_kg ?? '',
       notes: record.notes || '',
-    })
-    setEditingId(record.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(record.id);
+    setShowForm(true);
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!form.crop || !form.field_name || !form.sowing_date) {
-      toast.error('Crop, field and sowing date are required')
-      return
+      toast.error('Crop, field and sowing date are required');
+      return;
     }
     saveMutation.mutate({
       ...form,
       area_hectares: form.area_hectares === '' ? null : Number(form.area_hectares),
       seed_rate_kg: form.seed_rate_kg === '' ? null : Number(form.seed_rate_kg),
-    })
-  }
+    });
+  };
 
-  const records = data || []
-  const totalArea = records.reduce((sum, r) => sum + (Number(r.area_hectares) || 0), 0)
-  const activeSeason = records.filter((r) => r.season === 'Kharif').length
+  const records = data || [];
+  const totalArea = records.reduce((sum, r) => sum + (Number(r.area_hectares) || 0), 0);
+  const activeSeason = records.filter((r) => r.season === 'Kharif').length;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -107,7 +107,7 @@ function SowingManagementPage() {
           <p className="text-gray-600">Log sowing operations by field, crop, season and method</p>
         </div>
         <button
-          onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true) }}
+          onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }}
           className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition flex items-center"
         >
           <Plus className="w-5 h-5 mr-2" />
@@ -193,7 +193,7 @@ function SowingManagementPage() {
                   <td className="px-4 py-3 text-right space-x-2">
                     <button onClick={() => openEdit(r)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
                     <button
-                      onClick={() => { if (confirm('Delete this sowing record?')) deleteMutation.mutate(r.id) }}
+                      onClick={() => { if (confirm('Delete this sowing record?')) deleteMutation.mutate(r.id); }}
                       className="p-2 text-red-600 hover:bg-red-50 rounded"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -290,7 +290,7 @@ function SowingManagementPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default SowingManagementPage
+export default SowingManagementPage;

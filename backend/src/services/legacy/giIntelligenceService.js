@@ -36,7 +36,7 @@ async function registerGIProduct(data) {
     historical_significance,
     unique_characteristics,
     production_methods,
-    quality_standards
+    quality_standards,
   } = data;
 
   try {
@@ -60,8 +60,8 @@ async function registerGIProduct(data) {
         historical_significance,
         JSON.stringify(unique_characteristics),
         JSON.stringify(production_methods),
-        JSON.stringify(quality_standards)
-      ]
+        JSON.stringify(quality_standards),
+      ],
     );
 
     // Defensive fallback for test-mode mocks that may return an empty result
@@ -82,7 +82,7 @@ async function registerGIProduct(data) {
         unique_characteristics: unique_characteristics || [],
         production_methods: production_methods || [],
         quality_standards: quality_standards || [],
-        status: 'registered'
+        status: 'registered',
       };
       // Persist into test store when available
       persistTestFallback('gi_products', fallback.product_id, fallback);
@@ -161,7 +161,7 @@ async function registerGIProducer(data) {
     fpo_id,
     production_location_id,
     certified_area_hectares,
-    annual_production_tonnes
+    annual_production_tonnes,
   } = data;
 
   try {
@@ -179,14 +179,14 @@ async function registerGIProducer(data) {
         `GI-PROD-${Date.now()}`,
         production_location_id,
         certified_area_hectares,
-        annual_production_tonnes
-      ]
+        annual_production_tonnes,
+      ],
     );
 
     if (!result || !result.rows || !result.rows[0]) {
       const fallback = {
         id: `gip-${Date.now()}`,
-        gi_product_id: gi_product_id,
+        gi_product_id,
         producer_id: producer_id || `producer-${Date.now()}`,
         farmer_id: farmer_id || null,
         fpo_id: fpo_id || null,
@@ -195,7 +195,7 @@ async function registerGIProducer(data) {
         certified_area_hectares: certified_area_hectares || null,
         annual_production_tonnes: annual_production_tonnes || null,
         certification_status: 'active',
-        registration_date: new Date().toISOString()
+        registration_date: new Date().toISOString(),
       };
       persistTestFallback('gi_producers', gi_product_id, fallback, true);
       return fallback;
@@ -233,7 +233,7 @@ async function getGIProducers(giProductId) {
        LEFT JOIN addresses a ON gp.production_location_id = a.id
        WHERE gp.gi_product_id = $1 AND gp.certification_status = 'active'
        ORDER BY gp.registration_date DESC`,
-      [giProductId]
+      [giProductId],
     );
 
     return result.rows;
@@ -267,7 +267,7 @@ async function calculateGIPricing(productId, basePrice, giProductId) {
   try {
     const result = await pool.query(
       'SELECT calculate_gi_pricing($1, $2, $3) as pricing',
-      [productId, basePrice, giProductId]
+      [productId, basePrice, giProductId],
     );
 
     let pricing = result && result.rows && result.rows[0] ? result.rows[0].pricing : null;
@@ -283,7 +283,7 @@ async function calculateGIPricing(productId, basePrice, giProductId) {
         gi_premium: giPremium,
         final_price: finalPrice,
         premium_percentage: 20,
-        pricing_factors: { region_bonus: 0.1 }
+        pricing_factors: { region_bonus: 0.1 },
       };
     }
 
@@ -300,8 +300,8 @@ async function calculateGIPricing(productId, basePrice, giProductId) {
           pricing.gi_premium,
           pricing.final_price,
           pricing.premium_percentage,
-          JSON.stringify(pricing.pricing_factors)
-        ]
+          JSON.stringify(pricing.pricing_factors),
+        ],
       );
     } catch (e) {
       // ignore — this is best-effort persistence in test-mode
@@ -345,7 +345,7 @@ async function authenticateGIProduct(productId, batchNumber, producerId) {
        (product_id, batch_number, authentication_code, producer_id, production_date, authentication_status)
        VALUES ($1, $2, $3, $4, CURRENT_DATE, 'verified')
        RETURNING *`,
-      [productId, batchNumber, authCode, producerId]
+      [productId, batchNumber, authCode, producerId],
     );
 
     if (!result || !result.rows || !result.rows[0]) {
@@ -356,7 +356,7 @@ async function authenticateGIProduct(productId, batchNumber, producerId) {
         authentication_code: authCode,
         producer_id: producerId || null,
         production_date: new Date().toISOString(),
-        authentication_status: 'verified'
+        authentication_status: 'verified',
       };
       persistTestFallback('gi_authentication', authCode, fallback);
       return fallback;
@@ -393,7 +393,7 @@ async function verifyGIAuthCode(authCode) {
        FROM gi_authentication ga
        LEFT JOIN gi_products gp ON ga.product_id = gp.id
        WHERE ga.authentication_code = $1`,
-      [authCode]
+      [authCode],
     );
 
     if (result.rows.length === 0) {
@@ -439,7 +439,7 @@ async function createGIListing(data) {
     price_per_unit,
     quality_tier,
     harvest_date,
-    location_id
+    location_id,
   } = data;
 
   try {
@@ -465,8 +465,8 @@ async function createGIListing(data) {
         pricing.premium_percentage,
         quality_tier,
         harvest_date,
-        location_id
-      ]
+        location_id,
+      ],
     );
 
     const row = result.rows[0];
@@ -507,7 +507,7 @@ router.post('/gi-marketplace', authMiddleware, async (req, res) => {
       harvest_date: req.body.harvest_date || null,
       location_id: req.body.location_id || null,
       listing_status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // Persist into test store when available
@@ -535,12 +535,12 @@ async function getGIListings(giProductId = null, state = null) {
     const params = [];
 
     if (giProductId) {
-      query += ' AND gml.gi_product_id = $' + (params.length + 1);
+      query += ` AND gml.gi_product_id = $${ params.length + 1}`;
       params.push(giProductId);
     }
 
     if (state) {
-      query += ' AND gp.state = $' + (params.length + 1);
+      query += ` AND gp.state = $${ params.length + 1}`;
       params.push(state);
     }
 
@@ -599,8 +599,8 @@ async function recordGIAnalytics(giProductId, metrics) {
         metrics.sales || 0,
         metrics.quantity_sold || 0,
         metrics.avg_premium || 0,
-        metrics.unique_consumers || 0
-      ]
+        metrics.unique_consumers || 0,
+      ],
     );
 
     return result.rows[0];
@@ -621,7 +621,7 @@ router.post('/gi-analytics', authMiddleware, async (req, res) => {
       const fallback = Object.assign({
         id: `gian-${Date.now()}`,
         gi_product_id,
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
       }, {
         total_views: metrics.views || 0,
         total_searches: metrics.searches || 0,
@@ -629,7 +629,7 @@ router.post('/gi-analytics', authMiddleware, async (req, res) => {
         total_sales: metrics.sales || 0,
         total_quantity_sold: metrics.quantity_sold || 0,
         average_premium_percentage: metrics.avg_premium || 0,
-        unique_consumers: metrics.unique_consumers || 0
+        unique_consumers: metrics.unique_consumers || 0,
       });
       return res.json(fallback);
     }
@@ -649,12 +649,12 @@ async function getGIAnalytics(giProductId, startDate = null, endDate = null) {
     const params = [giProductId];
 
     if (startDate) {
-      query += ' AND date >= $' + (params.length + 1);
+      query += ` AND date >= $${ params.length + 1}`;
       params.push(startDate);
     }
 
     if (endDate) {
-      query += ' AND date <= $' + (params.length + 1);
+      query += ` AND date <= $${ params.length + 1}`;
       params.push(endDate);
     }
 
@@ -703,5 +703,6 @@ module.exports = {
   getGIListings,
   recordGIAnalytics,
   getGIAnalytics,
-  isHealthy
+  isHealthy,
 };
+

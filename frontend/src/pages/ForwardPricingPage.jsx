@@ -14,59 +14,59 @@
  * removes the one safeguard the model has.
  */
 
-import React, { useState, useCallback } from 'react'
-import { pricingAPI, weatherAPI } from '../services/api'
+import React, { useState, useCallback } from 'react';
+import { pricingAPI, weatherAPI } from '../services/api';
 import {
   ModulePage, Section, Field, Band, Rupees, Value, ProvenanceBadge,
   ConfidenceMeter, RefusalNotice, AsyncState, DataTable,
-} from '../components/common/DataPrimitives'
+} from '../components/common/DataPrimitives';
 
 const CROPS = [
   { key: 'lakadong_turmeric', name: 'Lakadong Turmeric' },
   { key: 'chakhao_rice', name: 'Chak-Hao Black Rice' },
   { key: 'naga_mircha', name: 'Naga Mircha' },
   { key: 'kaji_nemu', name: 'Kaji Nemu' },
-]
+];
 
 export default function ForwardPricingPage() {
   const [form, setForm] = useState({
     crop: 'lakadong_turmeric', months: 6, spot: 180,
     state: 'Meghalaya', district: 'East Khasi Hills',
     qtyKg: 5000, floorPerKg: 150, participationShare: 0.6, cashUrgency: 0.5,
-  })
-  const [rate, setRate] = useState(null)
-  const [advice, setAdvice] = useState(null)
-  const [weather, setWeather] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  });
+  const [rate, setRate] = useState(null);
+  const [advice, setAdvice] = useState(null);
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const run = useCallback(async () => {
-    setLoading(true); setError(null); setRate(null); setAdvice(null)
+    setLoading(true); setError(null); setRate(null); setAdvice(null);
     try {
       // Pull real weather for the district first. The engine falls back to a
       // hard-coded constant when this is missing, and the farmer should be able
       // to see which of the two produced their number.
-      let w = null
+      let w = null;
       try {
         const wr = await weatherAPI.forArp({
           state: form.state, district: form.district, days: 120,
-        })
-        w = wr.data?.data ?? null
+        });
+        w = wr.data?.data ?? null;
       } catch {
-        w = null
+        w = null;
       }
-      setWeather(w)
+      setWeather(w);
 
       const r = await pricingAPI.forward({
         crop: form.crop, months: form.months, spot: form.spot,
         state: form.state, district: form.district,
-        ...(w && w.calibrated
-          ? { rainfall: w.rainfallMm, temp: w.meanTempC, heatDays: w.heatDaysAboveThresh }
-          : {}),
-      })
-      setRate(r.data?.data ?? null)
+        ...(w && w.calibrated ?
+          { rainfall: w.rainfallMm, temp: w.meanTempC, heatDays: w.heatDaysAboveThresh } :
+          {}),
+      });
+      setRate(r.data?.data ?? null);
 
       const a = await pricingAPI.advise({
         cropKey: form.crop, state: form.state, district: form.district,
@@ -74,16 +74,16 @@ export default function ForwardPricingPage() {
         participationShare: Number(form.participationShare),
         spotPerKg: Number(form.spot), monthsAhead: Number(form.months),
         cashUrgency: Number(form.cashUrgency),
-      })
-      setAdvice(a.data?.data ?? null)
+      });
+      setAdvice(a.data?.data ?? null);
     } catch (e) {
-      setError(e.response?.data?.error || e.message)
+      setError(e.response?.data?.error || e.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [form])
+  }, [form]);
 
-  const declined = advice && advice.advice === 'NO RECOMMENDATION'
+  const declined = advice && advice.advice === 'NO RECOMMENDATION';
 
   return (
     <ModulePage
@@ -93,7 +93,7 @@ export default function ForwardPricingPage() {
     >
       <Section title="Inputs">
         <form
-          onSubmit={(e) => { e.preventDefault(); run() }}
+          onSubmit={(e) => { e.preventDefault(); run(); }}
           style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'flex-end' }}
         >
           <Field label="Crop" id="fp-crop">
@@ -149,7 +149,7 @@ export default function ForwardPricingPage() {
                   {' · '}<Value value={weather.heatDaysAboveThresh} decimals={0} /> heat-stress days
                 </p>
               ) : (
-                <div role="note" style={{ background: '#fff8c5', border: '1px solid #d4a72c66',
+                <div role="note" style={{ background: 'color-mix(in srgb, hsl(var(--sev-warning)) 16%, transparent)', border: '1px solid hsl(var(--sev-warning))',
                   borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>
                   <strong>No usable weather for this district.</strong>
                   <p style={{ margin: '4px 0 0' }}>{weather.note}</p>
@@ -164,15 +164,15 @@ export default function ForwardPricingPage() {
 
           {rate && (
             <Section title="Forward curve"
-              description={`Delivery ${rate.deliveryMonth || rate.monthsAhead + ' months ahead'} · method ${rate.method}`}>
+              description={`Delivery ${rate.deliveryMonth || `${rate.monthsAhead } months ahead`} · method ${rate.method}`}>
               <Band low={rate.low} central={rate.central} high={rate.high} bandPct={rate.band} />
               <p style={{ marginTop: 12, fontSize: 14 }}>
                 Spot today <Rupees value={rate.spot} perKg />
                 {' · '}yield index <Value value={rate.yieldIndex} decimals={2} />
                 {' · '}<ProvenanceBadge provenance={rate.parameterProvenance} />
               </p>
-              <div style={{ marginTop: 12, padding: '10px 12px', background: '#f6f8fa',
-                border: '1px solid #d0d7de', borderRadius: 6 }}>
+              <div style={{ marginTop: 12, padding: '10px 12px', background: 'hsl(var(--muted))',
+                border: '1px solid hsl(var(--border))', borderRadius: 6 }}>
                 <p style={{ margin: 0, fontSize: 14 }}>
                   <strong>Safe advance ceiling: <Rupees value={rate.advanceCeiling} perKg /></strong>
                 </p>
@@ -183,7 +183,7 @@ export default function ForwardPricingPage() {
                 </p>
               </div>
               {rate.warning && (
-                <p role="note" style={{ marginTop: 10, color: '#9a6700', fontSize: 13 }}>
+                <p role="note" style={{ marginTop: 10, color: 'hsl(var(--sev-warning))', fontSize: 13 }}>
                   <strong>Note:</strong> {rate.warning}
                 </p>
               )}
@@ -251,5 +251,5 @@ export default function ForwardPricingPage() {
         </>
       </AsyncState>
     </ModulePage>
-  )
+  );
 }

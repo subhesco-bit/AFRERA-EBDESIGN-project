@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Equipment Inventory (backend/src/modules/M103). Generic operation panel -
@@ -12,5 +12,5 @@ export default function EquipmentInventoryPage() {
       title="Equipment Inventory"
       description="Equipment inventory tracking and optimization."
     />
-  )
+  );
 }

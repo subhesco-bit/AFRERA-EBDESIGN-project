@@ -6,7 +6,7 @@
 
 # AGENT PROTOCOL
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Version:** 1.0  
 **Created:** 24 August 2026
 
@@ -210,3 +210,4 @@
 ---
 
 *This protocol ensures Claude and Devin work as coordinated agents on ONE continuous project. Both agents must follow this protocol for all work.*
+

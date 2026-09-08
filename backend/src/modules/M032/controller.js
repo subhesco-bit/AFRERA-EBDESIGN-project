@@ -24,5 +24,5 @@ const getSoilRecommendations = async (req, res) => {
 
 module.exports = {
   createSoilSample,
-  getSoilRecommendations
+  getSoilRecommendations,
 };

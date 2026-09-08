@@ -24,8 +24,8 @@ router.get('/kpi-definitions/:id/benchmarks', controller.getBenchmarks);
 router.post('/dimensions', controller.addDimension);
 router.get('/kpi-definitions/:id/dimensions', controller.getDimensions);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

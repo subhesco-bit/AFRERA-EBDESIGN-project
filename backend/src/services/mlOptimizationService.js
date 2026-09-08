@@ -1,5 +1,5 @@
 const db = require('../database/dbConnection');
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 class MLOptimizationService {
   async trainModel(modelId, trainingData) {
   // Validate inputs

@@ -44,7 +44,7 @@ class MushroomService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting mushroom cultivation:', error);
@@ -59,11 +59,11 @@ class MushroomService {
     try {
       const query = 'SELECT * FROM mushroom_cultivation WHERE id = $1';
       const result = await this.pool.query(query, [mushroomId]);
-      
+
       if (result.rows.length === 0) {
         throw new Error('Mushroom cultivation not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting mushroom cultivation by ID:', error);
@@ -84,7 +84,7 @@ class MushroomService {
         cultivation_area_sqft,
         substrate_type,
         spawn_quantity_kg,
-        expected_yield_kg
+        expected_yield_kg,
       } = mushroomData;
 
       const query = `
@@ -94,7 +94,7 @@ class MushroomService {
       `;
 
       const result = await this.pool.query(query, [
-        farmer_id, name, location, variety, cultivation_area_sqft, substrate_type, spawn_quantity_kg, expected_yield_kg
+        farmer_id, name, location, variety, cultivation_area_sqft, substrate_type, spawn_quantity_kg, expected_yield_kg,
       ]);
 
       return result.rows[0];
@@ -144,3 +144,4 @@ class MushroomService {
 }
 
 module.exports = new MushroomService();
+

@@ -17,7 +17,7 @@ const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
 });
 const { seedEconomic } = require('./seed_economic');
 
@@ -27,7 +27,7 @@ async function seedRoles() {
     { name: 'farmer', description: 'Farmer / producer account' },
     { name: 'buyer', description: 'Marketplace buyer account' },
     { name: 'fpo_manager', description: 'Farmer Producer Organization manager' },
-    { name: 'superadmin', description: 'Super administrator' }
+    { name: 'superadmin', description: 'Super administrator' },
   ];
 
   for (const role of roles) {
@@ -35,7 +35,7 @@ async function seedRoles() {
       `INSERT INTO roles (name, description)
        VALUES ($1, $2)
        ON CONFLICT (name) DO NOTHING`,
-      [role.name, role.description]
+      [role.name, role.description],
     );
   }
 
@@ -47,7 +47,7 @@ async function seedGSTRates() {
     { category: 'fresh_produce', rate: 0, hsn: '0701' },
     { category: 'processed_food', rate: 5, hsn: '2001' },
     { category: 'packaged_food', rate: 12, hsn: '2106' },
-    { category: 'agri_equipment', rate: 18, hsn: '8432' }
+    { category: 'agri_equipment', rate: 18, hsn: '8432' },
   ];
 
   for (const rate of rates) {
@@ -55,7 +55,7 @@ async function seedGSTRates() {
       `INSERT INTO gst_rates (product_category, gst_rate, hsn_code, effective_date, is_active)
        VALUES ($1, $2, $3, CURRENT_DATE, true)
        ON CONFLICT (product_category) DO NOTHING`,
-      [rate.category, rate.rate, rate.hsn]
+      [rate.category, rate.rate, rate.hsn],
     );
   }
 

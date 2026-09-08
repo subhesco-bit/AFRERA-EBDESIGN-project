@@ -1,9 +1,9 @@
-import { Flower2 } from 'lucide-react'
-import { nurseryAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { Flower2 } from 'lucide-react';
+import { nurseryAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const NURSERY_TYPES = ['Seedling', 'Sapling', 'Tissue Culture', 'Poly-house']
-const STATUS = ['Active', 'Seasonal Closure', 'Closed']
+const NURSERY_TYPES = ['Seedling', 'Sapling', 'Tissue Culture', 'Poly-house'];
+const STATUS = ['Active', 'Seasonal Closure', 'Closed'];
 
 const initialForm = {
   nursery_name: '',
@@ -14,7 +14,7 @@ const initialForm = {
   crops_raised: '',
   status: 'Active',
   notes: '',
-}
+};
 
 function NurseryManagementPage() {
   return (
@@ -59,7 +59,7 @@ function NurseryManagementPage() {
         { label: 'Total capacity', value: items.reduce((s, i) => s + (Number(i.capacity) || 0), 0) },
       ]}
     />
-  )
+  );
 }
 
-export default NurseryManagementPage
+export default NurseryManagementPage;

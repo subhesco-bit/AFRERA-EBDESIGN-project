@@ -28,7 +28,7 @@ class EnterpriseIntegrationService {
         endpointUrl,
         apiKey,
         config,
-        organizationId
+        organizationId,
       } = integrationData;
 
       // Validate integration type
@@ -37,7 +37,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Unsupported integration type',
-          supportedTypes
+          supportedTypes,
         };
       }
 
@@ -47,7 +47,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Connection test failed',
-          details: connectionTest.error
+          details: connectionTest.error,
         };
       }
 
@@ -65,7 +65,7 @@ class EnterpriseIntegrationService {
       const result = await db.query(query, [
         integrationId, integrationType, integrationName,
         endpointUrl, this.encryptApiKey(apiKey),
-        JSON.stringify(config), organizationId
+        JSON.stringify(config), organizationId,
       ]);
 
       // Add to active integrations
@@ -75,7 +75,7 @@ class EnterpriseIntegrationService {
         endpointUrl,
         config,
         organizationId,
-        lastUsed: new Date()
+        lastUsed: new Date(),
       });
 
       return {
@@ -85,15 +85,15 @@ class EnterpriseIntegrationService {
           integrationType: result.rows[0].integration_type,
           status: result.rows[0].status,
           connectionStatus: 'connected',
-          registeredAt: new Date().toISOString()
-        }
+          registeredAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - registerIntegration error:`, error);
       return {
         success: false,
         error: 'Failed to register integration',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -108,7 +108,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Invalid ERP integration',
-          integrationId
+          integrationId,
         };
       }
 
@@ -134,15 +134,15 @@ class EnterpriseIntegrationService {
           dataType,
           recordsProcessed: syncResult.recordsProcessed,
           syncStatus: syncResult.status,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - syncWithERP error:`, error);
       return {
         success: false,
         error: 'Failed to sync with ERP',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -157,7 +157,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Invalid payment gateway integration',
-          integrationId
+          integrationId,
         };
       }
 
@@ -169,14 +169,14 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Invalid payment data',
-          validationErrors: validation.errors
+          validationErrors: validation.errors,
         };
       }
 
       // Process payment
       const paymentResult = await this.sendPaymentRequest(
         integration,
-        paymentData
+        paymentData,
       );
 
       // Store payment record
@@ -190,7 +190,7 @@ class EnterpriseIntegrationService {
       return {
         success: false,
         error: 'Failed to process payment',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -205,7 +205,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Invalid logistics integration',
-          integrationId
+          integrationId,
         };
       }
 
@@ -226,7 +226,7 @@ class EnterpriseIntegrationService {
           result = {
             success: false,
             error: 'Invalid logistics operation',
-            operation
+            operation,
           };
       }
 
@@ -236,7 +236,7 @@ class EnterpriseIntegrationService {
       return {
         success: false,
         error: 'Failed to sync logistics',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -251,7 +251,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Invalid analytics integration',
-          integrationId
+          integrationId,
         };
       }
 
@@ -263,7 +263,7 @@ class EnterpriseIntegrationService {
         eventType,
         eventData,
         userId,
-        sessionId
+        sessionId,
       );
 
       return {
@@ -271,15 +271,15 @@ class EnterpriseIntegrationService {
         data: {
           eventId: result.eventId,
           eventType,
-          processedAt: new Date().toISOString()
-        }
+          processedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - sendAnalytics error:`, error);
       return {
         success: false,
         error: 'Failed to send analytics',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -294,7 +294,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Invalid communication integration',
-          integrationId
+          integrationId,
         };
       }
 
@@ -305,7 +305,7 @@ class EnterpriseIntegrationService {
         channel,
         recipients,
         message,
-        templateId
+        templateId,
       );
 
       return {
@@ -314,15 +314,15 @@ class EnterpriseIntegrationService {
           messageId: result.messageId,
           channel,
           recipientsCount: recipients.length,
-          sentAt: new Date().toISOString()
-        }
+          sentAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - sendCommunication error:`, error);
       return {
         success: false,
         error: 'Failed to send communication',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -355,23 +355,23 @@ class EnterpriseIntegrationService {
       const options = {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
         },
-        timeout: 10000
+        timeout: 10000,
       };
 
-      const response = await this.makeHttpRequest(endpointUrl + '/health', options);
-      
+      const response = await this.makeHttpRequest(`${endpointUrl }/health`, options);
+
       return {
         success: response.statusCode === 200,
         statusCode: response.statusCode,
-        responseTime: response.responseTime
+        responseTime: response.responseTime,
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -384,18 +384,18 @@ class EnterpriseIntegrationService {
     const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ records })
+      body: JSON.stringify({ records }),
     };
 
     const response = await this.makeHttpRequest(endpoint, options);
-    
+
     return {
       status: response.statusCode === 200 ? 'success' : 'failed',
       recordsProcessed: records.length,
-      response: response.body
+      response: response.body,
     };
   }
 
@@ -407,26 +407,26 @@ class EnterpriseIntegrationService {
     const options = {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
+      },
     };
 
     const response = await this.makeHttpRequest(endpoint, options);
-    
+
     if (response.statusCode === 200) {
       const records = JSON.parse(response.body);
       return {
         status: 'success',
         recordsProcessed: records.length,
-        records
+        records,
       };
     }
-    
+
     return {
       status: 'failed',
       recordsProcessed: 0,
-      error: response.body
+      error: response.body,
     };
   }
 
@@ -436,12 +436,12 @@ class EnterpriseIntegrationService {
   async bidirectionalSync(integration, dataType, records) {
     const pushResult = await this.pushToERP(integration, dataType, records);
     const pullResult = await this.pullFromERP(integration, dataType);
-    
+
     return {
       status: pushResult.status === 'success' && pullResult.status === 'success' ? 'success' : 'partial',
       pushResult,
       pullResult,
-      recordsProcessed: pushResult.recordsProcessed + pullResult.recordsProcessed
+      recordsProcessed: pushResult.recordsProcessed + pullResult.recordsProcessed,
     };
   }
 
@@ -453,14 +453,14 @@ class EnterpriseIntegrationService {
     const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(paymentData)
+      body: JSON.stringify(paymentData),
     };
 
     const response = await this.makeHttpRequest(endpoint, options);
-    
+
     if (response.statusCode === 200) {
       const result = JSON.parse(response.body);
       return {
@@ -468,15 +468,15 @@ class EnterpriseIntegrationService {
         data: {
           paymentId: result.payment_id,
           status: result.status,
-          transactionId: result.transaction_id
-        }
+          transactionId: result.transaction_id,
+        },
       };
     }
-    
+
     return {
       success: false,
       error: 'Payment processing failed',
-      details: response.body
+      details: response.body,
     };
   }
 
@@ -488,14 +488,14 @@ class EnterpriseIntegrationService {
     const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(shipmentData)
+      body: JSON.stringify(shipmentData),
     };
 
     const response = await this.makeHttpRequest(endpoint, options);
-    
+
     if (response.statusCode === 200) {
       const result = JSON.parse(response.body);
       return {
@@ -503,15 +503,15 @@ class EnterpriseIntegrationService {
         data: {
           shipmentId: result.shipment_id,
           trackingNumber: result.tracking_number,
-          estimatedDelivery: result.estimated_delivery
-        }
+          estimatedDelivery: result.estimated_delivery,
+        },
       };
     }
-    
+
     return {
       success: false,
       error: 'Failed to create shipment',
-      details: response.body
+      details: response.body,
     };
   }
 
@@ -523,13 +523,13 @@ class EnterpriseIntegrationService {
     const options = {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
+      },
     };
 
     const response = await this.makeHttpRequest(endpoint, options);
-    
+
     if (response.statusCode === 200) {
       const result = JSON.parse(response.body);
       return {
@@ -539,15 +539,15 @@ class EnterpriseIntegrationService {
           currentStatus: result.status,
           location: result.current_location,
           estimatedDelivery: result.estimated_delivery,
-          trackingHistory: result.tracking_history
-        }
+          trackingHistory: result.tracking_history,
+        },
       };
     }
-    
+
     return {
       success: false,
       error: 'Failed to track shipment',
-      details: response.body
+      details: response.body,
     };
   }
 
@@ -559,28 +559,28 @@ class EnterpriseIntegrationService {
     const options = {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(shipmentData)
+      body: JSON.stringify(shipmentData),
     };
 
     const response = await this.makeHttpRequest(endpoint, options);
-    
+
     if (response.statusCode === 200) {
       return {
         success: true,
         data: {
           shipmentId: shipmentData.shipmentId,
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     }
-    
+
     return {
       success: false,
       error: 'Failed to update shipment',
-      details: response.body
+      details: response.body,
     };
   }
 
@@ -592,23 +592,23 @@ class EnterpriseIntegrationService {
     const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         event_type: eventType,
         event_data: eventData,
         user_id: userId,
         session_id: sessionId,
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     };
 
     const response = await this.makeHttpRequest(endpoint, options);
-    
+
     return {
       eventId: `evt-${Date.now()}`,
-      status: response.statusCode === 200 ? 'delivered' : 'failed'
+      status: response.statusCode === 200 ? 'delivered' : 'failed',
     };
   }
 
@@ -620,22 +620,22 @@ class EnterpriseIntegrationService {
     const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         channel,
         recipients,
         message,
-        template_id: templateId
-      })
+        template_id: templateId,
+      }),
     };
 
     const response = await this.makeHttpRequest(endpoint, options);
-    
+
     return {
       messageId: `msg-${Date.now()}`,
-      status: response.statusCode === 200 ? 'sent' : 'failed'
+      status: response.statusCode === 200 ? 'sent' : 'failed',
     };
   }
 
@@ -655,17 +655,17 @@ class EnterpriseIntegrationService {
           resolve({
             statusCode: res.statusCode,
             body: data,
-            responseTime: Date.now() - startTime
+            responseTime: Date.now() - startTime,
           });
         });
       });
 
       req.on('error', reject);
-      
+
       if (options.body) {
         req.write(options.body);
       }
-      
+
       req.end();
     });
   }
@@ -675,26 +675,26 @@ class EnterpriseIntegrationService {
    */
   validatePaymentData(paymentData) {
     const errors = [];
-    
+
     if (!paymentData.amount || paymentData.amount <= 0) {
       errors.push('Invalid amount');
     }
-    
+
     if (!paymentData.currency || paymentData.currency.length !== 3) {
       errors.push('Invalid currency code');
     }
-    
+
     if (!paymentData.orderId) {
       errors.push('Order ID is required');
     }
-    
+
     if (!paymentData.customerDetails || !paymentData.customerDetails.email) {
       errors.push('Customer email is required');
     }
-    
+
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -716,7 +716,7 @@ class EnterpriseIntegrationService {
       paymentResult.data.amount,
       paymentResult.data.currency,
       paymentResult.data.status,
-      paymentResult.data.transactionId
+      paymentResult.data.transactionId,
     ]);
   }
 
@@ -738,7 +738,7 @@ class EnterpriseIntegrationService {
       syncConfig.syncDirection,
       syncResult.recordsProcessed,
       syncResult.status,
-      syncResult.error || null
+      syncResult.error || null,
     ]);
   }
 
@@ -778,14 +778,14 @@ class EnterpriseIntegrationService {
     `;
 
     const result = await db.query(query, [organizationId]);
-    
+
     return {
       success: true,
       data: {
         organizationId,
         integrationCount: result.rows.length,
-        integrations: result.rows
-      }
+        integrations: result.rows,
+      },
     };
   }
 
@@ -801,7 +801,7 @@ class EnterpriseIntegrationService {
     `;
 
     const result = await db.query(query, [integrationId]);
-    
+
     // Remove from active integrations
     this.activeIntegrations.delete(integrationId);
 
@@ -810,8 +810,8 @@ class EnterpriseIntegrationService {
       data: {
         integrationId: result.rows[0].integration_id,
         status: result.rows[0].status,
-        deactivatedAt: new Date().toISOString()
-      }
+        deactivatedAt: new Date().toISOString(),
+      },
     };
   }
 
@@ -824,13 +824,13 @@ class EnterpriseIntegrationService {
       return {
         success: false,
         error: 'Integration not found',
-        integrationId
+        integrationId,
       };
     }
 
     const healthCheck = await this.testConnection(
       integration.endpoint_url,
-      this.decryptApiKey(integration.api_key)
+      this.decryptApiKey(integration.api_key),
     );
 
     // Get recent sync activity
@@ -844,8 +844,8 @@ class EnterpriseIntegrationService {
         connectionStatus: healthCheck.success ? 'healthy' : 'unhealthy',
         lastTested: integration.last_tested,
         recentSyncActivity: syncActivity,
-        activeSince: integration.created_at
-      }
+        activeSince: integration.created_at,
+      },
     };
   }
 

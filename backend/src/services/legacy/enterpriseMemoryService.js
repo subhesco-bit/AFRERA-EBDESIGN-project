@@ -113,7 +113,7 @@ async function recordMemory(entry = {}) {
         severity == null ? null : String(severity),
         sourcePredictionId == null ? null : Number(sourcePredictionId),
         sourceOutcomeId == null ? null : Number(sourceOutcomeId),
-      ]
+      ],
     );
     return rows[0];
   } catch (error) {
@@ -131,7 +131,7 @@ async function linkOutcome(memoryId, signalType, subjectId, sinceIso) {
     `SELECT id FROM ai_outcomes
       WHERE signal_type = $1 AND subject_id = $2 AND reacted_at >= $3
       ORDER BY reacted_at ASC LIMIT 1`,
-    [signalType, subjectId, sinceIso]
+    [signalType, subjectId, sinceIso],
   );
   if (!rows.length) return null;
 
@@ -139,7 +139,7 @@ async function linkOutcome(memoryId, signalType, subjectId, sinceIso) {
     `UPDATE enterprise_memory_entries
         SET source_outcome_id = $2
       WHERE id = $1 AND source_outcome_id IS NULL`,
-    [memoryId, rows[0].id]
+    [memoryId, rows[0].id],
   );
   return rows[0].id;
 }
@@ -160,24 +160,24 @@ const SIGNAL_MEMORY_RULES = {
     entityType: () => 'shipment_or_lot',
     // Mirrors core/effectors.js REACTIONS['coldchain.breach_response'].handle()
     subject: (p) => p.shipmentId ?? p.batchId ?? p.lotId ?? p.deviceId ?? p.sensorId ?? null,
-    describe: (signal, subject) => `Temperature breach reported${subject ? ` on ${subject}` : ''} `
-      + `(source: ${signal.source}, severity: ${severityLabel(signal.severity)}).`,
+    describe: (signal, subject) => `Temperature breach reported${subject ? ` on ${subject}` : ''} ` +
+      `(source: ${signal.source}, severity: ${severityLabel(signal.severity)}).`,
   },
   [SIGNAL.RECALL_ISSUED]: {
     category: 'recall',
     entityType: () => 'batch',
     // Mirrors core/effectors.js REACTIONS['recall.notification'].handle()
     subject: (p) => p.batchId ?? null,
-    describe: (signal, subject) => `Recall issued${subject ? ` for batch ${subject}` : ''} `
-      + `(source: ${signal.source}).`,
+    describe: (signal, subject) => `Recall issued${subject ? ` for batch ${subject}` : ''} ` +
+      `(source: ${signal.source}).`,
   },
   [SIGNAL.FRAUD_SUSPECTED]: {
     category: 'fraud',
     entityType: (p) => (p.transactionId ? 'transaction' : 'user'),
     // Mirrors core/effectors.js REACTIONS['fraud.hold_review'].handle()
     subject: (p) => p.transactionId ?? p.userId ?? null,
-    describe: (signal, subject) => `Fraud suspected${subject ? ` involving ${subject}` : ''} `
-      + `(source: ${signal.source}, severity: ${severityLabel(signal.severity)}).`,
+    describe: (signal, subject) => `Fraud suspected${subject ? ` involving ${subject}` : ''} ` +
+      `(source: ${signal.source}, severity: ${severityLabel(signal.severity)}).`,
   },
 };
 
@@ -312,7 +312,7 @@ async function recallByEntity(entityType, entityId, { limit = 50 } = {}) {
       `${MEMORY_WITH_CONTEXT_SELECT}
         WHERE m.entity_type = $1 AND m.entity_id = $2
         ORDER BY m.occurred_at DESC LIMIT $3`,
-      [String(entityType), String(entityId), Math.min(Number(limit) || 50, 200)]
+      [String(entityType), String(entityId), Math.min(Number(limit) || 50, 200)],
     );
     return rows;
   } catch (error) {
@@ -379,3 +379,4 @@ module.exports = {
   installSignalHooks,
   isHealthy,
 };
+
