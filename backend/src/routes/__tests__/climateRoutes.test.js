@@ -36,7 +36,7 @@ jest.mock('../../services/legacy/weatherService', () => ({
 }));
 
 const app = express();
-app.use(expresson());
+app.use(express.json());
 app.use('/drought', require('../climateMonitoringRoutes').droughtMonitoringRoutes);
 app.use('/weather', require('../weatherRoutes'));
 app.use('/advisory', require('../climateAdvisoryRoutes'));

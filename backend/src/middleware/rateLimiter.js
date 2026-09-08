@@ -160,6 +160,7 @@ const conditionalLimiter = (limiter) => {
 
 module.exports = {
   apiLimiter,
+  rateLimiter: apiLimiter,
   strictLimiter,
   authLimiter,
   apiKeyLimiter,

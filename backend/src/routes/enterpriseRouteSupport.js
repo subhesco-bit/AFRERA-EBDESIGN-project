@@ -1,7 +1,8 @@
 const express = require('express');
 'use strict';
 
-const { apiLimiter } = require('../middleware/rateLimiter');
+const rateLimiters = require('../middleware/rateLimiter');
+const apiLimiter = rateLimiters.apiLimiter || rateLimiters.rateLimiter || ((req, res, next) => next());
 const { sanitizeObject } = require('../middleware/inputValidation');
 const { logger } = require('../utils/logger');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');

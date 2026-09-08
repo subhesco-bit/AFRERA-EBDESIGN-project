@@ -191,6 +191,7 @@ const agriculturalIntelligenceRoutes = require('./routes/agriculturalIntelligenc
 const advancedSearchRoutes = require('./routes/advancedSearchRoutes.js');
 const advancedFeatures = require('./routes/advancedFeatures.js');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
+const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
 /**
  * EBDESIGN Platform Backend - Main Entry Point
  * Auto-Discovery Architecture: Supports 200K+ services & routes
@@ -222,6 +223,14 @@ const { securityHeaders, rateLimit } = require('./middleware/securityMiddleware'
 const { requestId } = require('./middleware/requestId');
 const { responseFormatter } = require('./middleware/responseFormatter');
 const { routeMonitoring } = require('./middleware/routeMonitoring');
+const { 
+  standardizeResponse, 
+  standardizeErrorResponse, 
+  addStandardHeaders, 
+  trackResponseTime,
+  correlationId,
+  contentNegotiation
+} = require('./middleware/apiResponseStandardizer');
 const mfaMiddleware = require('./middleware/dual-use/mfaMiddleware');
 const loggingService = require('./services/loggingService');
 const libraryKnowledgeService = require('./services/libraryKnowledgeService');
@@ -263,6 +272,10 @@ app.use(compression());
 
 // Logging middleware
 app.use(morgan('combined'));
+app.use(correlationId());
+app.use(contentNegotiation());
+app.use(addStandardHeaders());
+app.use(trackResponseTime());
 app.use(requestId);
 app.use(responseFormatter);
 app.use(routeMonitoring);
@@ -672,6 +685,7 @@ async function startup() {
     app.use('/api/advancedsearch', advancedSearchRoutes);
     app.use('/api/advancedfeatures', advancedFeatures);
     app.use('/api/advancedanalytics', advancedAnalyticsRoutes);
+    app.use('/api/v1/warnings', apiWarningRoutes);
 
     // Routes index is a module exporter, not a router - don't mount it
     // app.use('/api/index', index);
@@ -679,7 +693,8 @@ async function startup() {
     app.use('/health', healthRoutes);
     logger.info('✅ Health check routes mounted at /health');
 
-    // Error handling must follow every route registration.
+    // Standardized error handling must follow every route registration.
+    app.use(standardizeErrorResponse);
     app.use(errorHandler);
 
     // ========================================================================
