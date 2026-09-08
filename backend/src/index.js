@@ -194,6 +194,8 @@ const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
 const aiModelsRoutes = require('./routes/aiModelsRoutes.js');
 const aiTrainingEvaluationRoutes = require('./routes/aiTrainingEvaluationRoutes.js');
+const infrastructureMonitoringRoutes = require('./routes/infrastructureMonitoringRoutes.js');
+const gdprComplianceRoutes = require('./routes/gdprComplianceRoutes.js');
 
 /**
  * EBDESIGN Platform Backend - Main Entry Point
@@ -513,6 +515,10 @@ async function startup() {
     app.use('/api/ai/training', aiTrainingEvaluationRoutes);
     app.use('/api/v1/ai/models', aiModelsRoutes);
     app.use('/api/v1/ai/training', aiTrainingEvaluationRoutes);
+    app.use('/api/monitoring', infrastructureMonitoringRoutes);
+    app.use('/api/v1/monitoring', infrastructureMonitoringRoutes);
+    app.use('/api/gdpr', gdprComplianceRoutes);
+    app.use('/api/v1/gdpr', gdprComplianceRoutes);
     app.use('/api/unifiedaigateway', unifiedAIGateway);
     app.use('/api/transaction', transactionRoutes);
     app.use('/api/trackdart', trackDartRoutes);
