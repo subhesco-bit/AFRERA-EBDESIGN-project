@@ -2,7 +2,7 @@
  * Audit Service (Section 21: Audit Trail)
  * Logs all user actions for compliance
  */
-const logger = require('../../utils/logger');
+const { logger } = require('../../utils/logger');
 
 class AuditService {
   constructor() {

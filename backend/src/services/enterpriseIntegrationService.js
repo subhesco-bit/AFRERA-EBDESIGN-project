@@ -5,7 +5,7 @@
  */
 
 const db = require('../database/connection');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 const https = require('https');
 const http = require('http');
 

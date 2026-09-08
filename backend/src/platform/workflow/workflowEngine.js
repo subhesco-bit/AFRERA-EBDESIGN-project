@@ -4,7 +4,7 @@
  * - Approvals, Rejections, Escalations
  * - Used by: Subsidy applications, Credit approvals, etc.
  */
-const logger = require('../../utils/logger');
+const { logger } = require('../../utils/logger');
 
 class WorkflowEngine {
   constructor() {

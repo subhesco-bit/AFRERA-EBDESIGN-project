@@ -4,7 +4,7 @@
 const ProductionService = require('./productionService');
 const { ValidationError, ServerError, NotFoundError } = require('./errorHandler');
 const { Validator } = require('./validation');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 class EnhancedServiceFramework extends ProductionService {
   constructor(name, db) {

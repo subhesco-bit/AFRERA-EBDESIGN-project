@@ -5,7 +5,7 @@
  */
 
 const db = require('../database/connection');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 // Whitelisted analytics_data columns a custom report is allowed to select/group/filter by.
 // buildCustomQuery/buildWhereClause take metrics/filters/groupBy straight from req.body, so

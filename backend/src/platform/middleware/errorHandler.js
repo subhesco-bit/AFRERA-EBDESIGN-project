@@ -2,7 +2,7 @@
  * Global Error Handler (Section 23: Middleware)
  * Catches and formats all errors consistently
  */
-const logger = require('../../utils/logger');
+const { logger } = require('../../utils/logger');
 
 function errorHandler(err, req, res, next) {
   // TODO: Implement error categorization and formatting

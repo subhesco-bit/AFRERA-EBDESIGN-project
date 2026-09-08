@@ -3,7 +3,7 @@
  * Comprehensive audit trail and reporting system
  */
 
-const logger = require('../../utils/logger');
+const { logger } = require('../../utils/logger');
 
 class AuditService {
   constructor() {

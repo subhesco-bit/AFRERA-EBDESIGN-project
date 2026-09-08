@@ -11,7 +11,7 @@ const express = require('express');
 const router = express.Router();
 const waterIrrigationService = require('../services/waterIrrigationService');
 const { authMiddleware } = require('../middleware/auth');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 /**
  * POST /api/v1/water-irrigation/water-budgets

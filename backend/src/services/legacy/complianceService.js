@@ -68,10 +68,15 @@ async function deductTds({ deducteeId, deducteeName, deducteePan, deducteeType, 
       paymentAmountInr, rate, noPan, quarterOf(when), financialYearOf(when)]
   );
   const row = rows[0];
+  // tds_amount_inr is a Postgres GENERATED ALWAYS AS (...) STORED column
+  // (migration 056) - real Postgres computes and returns it via RETURNING *,
+  // but computing it here too (same formula) keeps this function correct
+  // even against a mock/test double that doesn't emulate generated columns.
+  const tdsAmountInr = row.tds_amount_inr != null ? Number(row.tds_amount_inr) : r2(paymentAmountInr * rate / 100);
   return {
     ...row,
-    tds_amount_inr: Number(row.tds_amount_inr),
-    netPayableInr: r2(paymentAmountInr - Number(row.tds_amount_inr)),
+    tds_amount_inr: tdsAmountInr,
+    netPayableInr: r2(paymentAmountInr - tdsAmountInr),
     explanation: noPan
       ? `No PAN on record, so s.206AA applies a flat ${NO_PAN_RATE}% instead of the `
       + `usual ${cfg.rate}% under ${cfg.section}. Furnishing a PAN reduces this.`

@@ -2,7 +2,7 @@
  * Session Service (Section 21: Authentication & Session Management)
  * Manages user sessions and device information
  */
-const logger = require('../../utils/logger');
+const { logger } = require('../../utils/logger');
 
 class SessionService {
   constructor() {

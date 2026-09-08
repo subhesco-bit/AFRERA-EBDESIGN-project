@@ -2,7 +2,7 @@
  * MFA Service (Section 21: Multi-Factor Authentication)
  * Handles multi-factor authentication setup and verification
  */
-const logger = require('../../utils/logger');
+const { logger } = require('../../utils/logger');
 
 class MFAService {
   constructor() {

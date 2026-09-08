@@ -121,10 +121,13 @@ describe('governanceService villages + CSR round-trip', () => {
   });
 
   it('creates a CSR project and reads it back', async () => {
+    // csr_projects (migration 012): name and organization are NOT NULL;
+    // the field is `name`, not `title` - matches governanceModule.js's
+    // req.body passthrough into createCSRProject().
     const project = await governanceService.createCSRProject({
-      title: 'Well Rehabilitation', budget_inr: 250000,
+      name: 'Well Rehabilitation', organization: 'Test Org', budget: 250000,
     });
-    expect(project.title).toBe('Well Rehabilitation');
+    expect(project.name).toBe('Well Rehabilitation');
 
     const fetched = await governanceService.getCSRProject(project.id);
     expect(fetched).toBeTruthy();

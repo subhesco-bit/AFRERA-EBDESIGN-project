@@ -11,7 +11,7 @@ const express = require('express');
 const router = express.Router();
 const machineryVillageOpsService = require('../services/machineryVillageOpsService');
 const { authMiddleware } = require('../middleware/auth');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 /**
  * POST /api/v1/machinery-village-ops/machinery-assets

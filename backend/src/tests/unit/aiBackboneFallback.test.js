@@ -24,7 +24,9 @@ jest.mock('../../middleware/auth', () => ({
 describe('aiBackboneService.router export (regression: no-router-export landmine)', () => {
   it('exports a mountable express router alongside the AI gateway functions', () => {
     const aiBackboneService = require('../../services/legacy/aiBackboneService');
-    expect(typeof aiBackboneService.router).toBe('object');
+    // An Express Router is itself a callable function (see index.js's
+    // mountRoute() comment) - typeof reports 'function', not 'object'.
+    expect(typeof aiBackboneService.router).toBe('function');
     expect(typeof aiBackboneService.router.use).toBe('function');
     expect(typeof aiBackboneService.analyze).toBe('function');
     expect(typeof aiBackboneService.optimize).toBe('function');
@@ -53,7 +55,12 @@ describe('conversationalAIService.generateResponse fallback path', () => {
   const pool = require('../../database/pool');
 
   beforeEach(() => {
-    jest.resetModules();
+    // NOTE: deliberately not calling jest.resetModules() here - it would
+    // clear the module registry entry for '../../database/pool', so the
+    // conversationalAIService required below would pick up a *new* mock
+    // instance of pool.query that was never configured with
+    // mockResolvedValueOnce, silently returning undefined instead of the
+    // queued rows.
     pool.query.mockReset();
   });
 

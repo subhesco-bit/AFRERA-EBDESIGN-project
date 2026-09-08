@@ -2,7 +2,7 @@
  * User Service Stub
  * Placeholder for user management functionality
  */
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 class UserService {
   constructor() {

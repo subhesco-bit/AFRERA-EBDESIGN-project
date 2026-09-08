@@ -1,6 +1,6 @@
 // Phase 8: Rural Services (consolidated)
 const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 class Phase8Services {
   async villageServices(villageId) {
   // Validate inputs
