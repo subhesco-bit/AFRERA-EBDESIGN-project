@@ -4,24 +4,11 @@ const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 
-// Production-readiness audit (2026-08-28): committed 'your-secret-key'
-// fallback - a real, separate JWT_SECRET resolution from the one already
-// fixed in services/dual-use/authService.js. This module is only reachable
-// via the generic Claude module-registry bridge (not a dedicated route),
-// but it does sign real access/refresh tokens (see initiateOAuthFlow /
-// handleOAuthCallback below), so the same fail-fast-in-production fix
-// applies.
-function resolveJwtSecret() {
-  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('JWT_SECRET environment variable is required in production');
-  }
-  logger.warn('JWT_SECRET not set - using a random per-process secret for this dev/test run.');
-  return crypto.randomBytes(32).toString('hex');
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required and must not be empty');
 }
-const JWT_SECRET = resolveJwtSecret();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // OAuth2/OIDC Integration
 async function initiateOAuthFlow(provider, redirectUri) {
