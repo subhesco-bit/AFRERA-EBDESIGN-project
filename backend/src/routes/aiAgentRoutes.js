@@ -12,6 +12,7 @@
 const express = require('express');
 const router = express.Router();
 const aiAgentService = require('../services/aiAgentService');
+const { authMiddleware, requireRole } = require('../middleware/auth');
 
 /**
  * Execute an agent task
@@ -121,7 +122,7 @@ router.get('/agents', (req, res) => {
  * Register a new agent
  * POST /api/ai-agent/agent
  */
-router.post('/agent', (req, res) => {
+router.post('/agent', authMiddleware, requireRole('admin'), (req, res) => {
   try {
     const { name, description, capabilities, model, system_prompt } = req.body;
     
@@ -158,7 +159,7 @@ router.post('/agent', (req, res) => {
  * Update agent configuration
  * PUT /api/ai-agent/agent/:agent_name
  */
-router.put('/agent/:agent_name', (req, res) => {
+router.put('/agent/:agent_name', authMiddleware, requireRole('admin'), (req, res) => {
   try {
     const { agent_name } = req.params;
     const updates = req.body;
@@ -179,7 +180,7 @@ router.put('/agent/:agent_name', (req, res) => {
  * Clear agent memory
  * DELETE /api/ai-agent/agent/:agent_name/memory
  */
-router.delete('/agent/:agent_name/memory', (req, res) => {
+router.delete('/agent/:agent_name/memory', authMiddleware, requireRole('admin'), (req, res) => {
   try {
     const { agent_name } = req.params;
     const result = aiAgentService.clearAgentMemory(agent_name);
@@ -198,7 +199,7 @@ router.delete('/agent/:agent_name/memory', (req, res) => {
  * Register a new tool
  * POST /api/ai-agent/tool
  */
-router.post('/tool', (req, res) => {
+router.post('/tool', authMiddleware, requireRole('admin'), (req, res) => {
   try {
     const { name, description, parameters, handler } = req.body;
     

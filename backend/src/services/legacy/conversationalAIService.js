@@ -13,6 +13,12 @@ const router = express.Router();
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../../database/pool');
+// AI backbone gateway (2026-09-07): generateResponse() previously always
+// returned a static per-intent template with no indication it wasn't a real
+// AI response. Now attempts a real LLM call through the shared gateway and
+// only falls back to the template - explicitly labeled source: 'fallback' -
+// when no provider is configured or the call fails.
+const { callAI } = require('./aiBackboneService');
 
 // ============================================================================
 // CONVERSATION SESSIONS
@@ -263,17 +269,40 @@ async function generateResponse(sessionId, userMessage, context = {}) {
   try {
     // Get session info
     const session = await getConversationSession(sessionId);
-    
+
     // Detect intent
     const intentResult = await detectIntent(userMessage);
-    
-    // Get response template based on intent
-    const response = await getResponseForIntent(intentResult.intent, session.domain_id, context);
-    
-    // In production, this would call an AI model (OpenAI, Anthropic, etc.)
-    // For now, return template-based response
+
+    let content;
+    let source;
+    try {
+      // Real AI call through the shared gateway (throws if no provider is
+      // configured, e.g. no API key set - caught below).
+      const recentMessages = await getConversationMessages(sessionId, 10);
+      const history = recentMessages
+        .map(m => `${m.role}: ${m.content}`)
+        .join('\n');
+      const prompt = `You are the AFRERA agricultural platform assistant. ` +
+        `Detected intent: ${intentResult.intent}. ` +
+        `Conversation so far:\n${history}\n\n` +
+        `Respond helpfully and concisely to the user's latest message: "${userMessage}"`;
+      const aiResult = await callAI(prompt, { maxTokens: 400 });
+      content = aiResult.content;
+      source = 'ai';
+    } catch (aiError) {
+      // No AI provider configured, or the call failed - fall back to the
+      // template response and say so honestly rather than pretending it's
+      // an AI-generated answer.
+      logger.warn('AI provider unavailable for conversational response, using template fallback', {
+        error: aiError.message
+      });
+      content = await getResponseForIntent(intentResult.intent, session.domain_id, context);
+      source = 'fallback';
+    }
+
     return {
-      content: response,
+      content,
+      source,
       intent: intentResult.intent,
       confidence: intentResult.confidence,
       requires_action: determineIfActionRequired(intentResult.intent)

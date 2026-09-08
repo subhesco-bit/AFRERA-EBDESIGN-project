@@ -6,6 +6,15 @@
 
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
+// AI backbone gateway (2026-09-07): generateFarmInsights() previously
+// returned an empty placeholder structure with a comment admitting it wasn't
+// implemented. Now pulls real farm/crop-planting rows and asks the shared
+// AI gateway's LLM call (callAI - the gateway's own recommend()/predict()
+// helpers for this domain are honestly implemented:false, see
+// aiBackboneService.js) to summarize them; falls back to a plain data
+// summary (source: 'fallback') when no AI provider is configured or the DB
+// has no data for this farm, rather than faking an insight.
+const { callAI } = require('./aiBackboneService');
 
 class AIAgenticCompanionService {
   constructor() {
@@ -624,18 +633,80 @@ class AIAgenticCompanionService {
   }
 
   async generateFarmInsights(farmId) {
-    // Generate comprehensive insights for a specific farm
-    const insights = {
-      crop_recommendations: [],
-      irrigation_suggestions: [],
-      pest_alerts: [],
-      financial_overview: {},
-      weather_impact: {}
+    // Pull the farm's real crop-planting history/state instead of returning
+    // an empty placeholder structure.
+    let farm = null;
+    let plantings = [];
+    try {
+      const farmResult = await getPostgreSQL().query(
+        'SELECT id, name, area, soil_type, current_status FROM farms WHERE id = $1',
+        [farmId]
+      );
+      farm = farmResult.rows[0] || null;
+
+      const plantingResult = await getPostgreSQL().query(
+        `SELECT cp.growth_stage, cp.current_health, cp.planting_date,
+                cp.expected_harvest_date, cp.expected_yield_kg, cp.actual_yield_kg,
+                c.name as crop_name
+         FROM crop_plantings cp
+         JOIN crops c ON c.id = cp.crop_id
+         WHERE cp.farm_id = $1 AND cp.status = 'active'
+         ORDER BY cp.planting_date DESC`,
+        [farmId]
+      );
+      plantings = plantingResult.rows;
+    } catch (error) {
+      logger.warn('Failed to load farm data for insights', { farmId, error: error.message });
+    }
+
+    if (!farm) {
+      return {
+        farm_id: farmId,
+        found: false,
+        source: 'fallback',
+        message: 'No farm record found for this farmId.'
+      };
+    }
+
+    const dataSummary = {
+      farm: { name: farm.name, area: farm.area, soil_type: farm.soil_type, status: farm.current_status },
+      active_plantings: plantings.map(p => ({
+        crop: p.crop_name,
+        growth_stage: p.growth_stage,
+        health: p.current_health,
+        planting_date: p.planting_date,
+        expected_harvest_date: p.expected_harvest_date,
+        expected_yield_kg: p.expected_yield_kg,
+        actual_yield_kg: p.actual_yield_kg
+      }))
     };
 
-    // This would typically query farm-specific data and generate insights
-    // For now, returning a placeholder structure
-    return insights;
+    try {
+      const prompt = `You are an agricultural advisor. Given this farm data, produce concise, ` +
+        `actionable insights (crop recommendations, irrigation suggestions, pest alerts, ` +
+        `financial overview, weather impact) as JSON with those five keys:\n` +
+        `${JSON.stringify(dataSummary)}`;
+      const aiResult = await callAI(prompt, { maxTokens: 600 });
+      let parsed;
+      try {
+        parsed = JSON.parse(aiResult.content);
+      } catch {
+        parsed = { summary: aiResult.content };
+      }
+      return { farm_id: farmId, found: true, source: 'ai', data: dataSummary, insights: parsed };
+    } catch (aiError) {
+      logger.warn('AI provider unavailable for farm insights, returning raw data summary', {
+        farmId,
+        error: aiError.message
+      });
+      return {
+        farm_id: farmId,
+        found: true,
+        source: 'fallback',
+        data: dataSummary,
+        message: 'No AI provider configured - showing raw farm/crop data instead of AI-generated insights.'
+      };
+    }
   }
 
   // Additional helper methods (simplified for brevity)

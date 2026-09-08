@@ -1,75 +1,22 @@
 /**
- * Company Service — lookup endpoint for ERP accounting modules.
+ * companyService (thin wrapper)
  *
- * Provides read access to the companies table (migration 996) so that
- * accounting UI pages (AF-AA, AF-CO, AF-PS) can offer a company picker
- * instead of requiring manual ID entry.
+ * (2026-09-08) Duplicate-file remediation pass: this top-level copy has ZERO
+ * live callers - verified via a repo-wide require() grep cross-referenced
+ * against the actual mounted-route reachability graph rooted at
+ * backend/src/index.js (not just "a route file requires it" - confirmed
+ * that route file is itself require()'d and app.use()'d/mountRoute()'d
+ * live). It was reachable only through the dead
+ * backend/src/services/index.js barrel (itself never required by
+ * index.js) and/or other top-level sibling services that are themselves
+ * unreachable from any mounted route. backend/src/services/legacy/companyService.js
+ * is the confirmed-live copy. Collapsed to a re-export per the
+ * productReviewService.js precedent rather than kept as a second,
+ * independently-drifting copy - see .ai/tasks/ACTIVE.md for the full
+ * duplicate-file remediation and the (small) set of pairs that were left
+ * unmerged as genuinely different features instead.
  */
 
-const { getPostgreSQL } = require('../database/connection');
-const { logger } = require('../utils/logger');
+'use strict';
 
-/**
- * List all active companies.
- */
-async function listCompanies() {
-  const db = getPostgreSQL();
-  const { rows } = await db.query(
-    `SELECT id, code, name, legal_name, base_currency, country, 
-            fiscal_year_start_month, is_active, created_at
-       FROM companies 
-       WHERE is_active = TRUE 
-       ORDER BY code ASC`
-  );
-  return rows;
-}
-
-/**
- * Get a single company by ID.
- */
-async function getCompanyById(id) {
-  const db = getPostgreSQL();
-  const { rows } = await db.query(
-    `SELECT * FROM companies WHERE id = $1`,
-    [Number(id)]
-  );
-  if (rows.length === 0) throw new Error(`Company ${id} not found`);
-  return rows[0];
-}
-
-/**
- * Get fiscal years for a company.
- */
-async function getFiscalYears(companyId) {
-  const db = getPostgreSQL();
-  const { rows } = await db.query(
-    `SELECT id, code, start_date, end_date, status 
-       FROM fiscal_years 
-       WHERE company_id = $1 
-       ORDER BY start_date DESC`,
-    [Number(companyId)]
-  );
-  return rows;
-}
-
-/**
- * Get chart of accounts for a company (postable accounts only).
- */
-async function getChartOfAccounts(companyId) {
-  const db = getPostgreSQL();
-  const { rows } = await db.query(
-    `SELECT id, account_code, account_name, account_type, normal_balance, is_postable
-       FROM chart_of_accounts 
-       WHERE company_id = $1 AND is_active = TRUE AND is_postable = TRUE
-       ORDER BY account_code ASC`,
-    [Number(companyId)]
-  );
-  return rows;
-}
-
-module.exports = {
-  listCompanies,
-  getCompanyById,
-  getFiscalYears,
-  getChartOfAccounts,
-};
+module.exports = require('./legacy/companyService.js');

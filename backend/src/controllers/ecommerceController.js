@@ -54,8 +54,8 @@ async function getListings(req, res) {
     const filters = {
       category_id: req.query.category_id,
       state_id: req.query.state_id,
-      gi_tagged: req.query.gi_tagged === 'true',
-      organic: req.query.organic === 'true',
+      gi_tagged: req.query.gi_tagged === undefined ? undefined : req.query.gi_tagged === 'true',
+      organic: req.query.organic === undefined ? undefined : req.query.organic === 'true',
       search: req.query.search,
       min_price: req.query.min_price ? parseFloat(req.query.min_price) : null,
       max_price: req.query.max_price ? parseFloat(req.query.max_price) : null,

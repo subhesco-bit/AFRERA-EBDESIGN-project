@@ -24,8 +24,25 @@ const lazyAuth = (req, res, next) =>
   require('../middleware/auth').authMiddleware(req, res, next);
 
 // JWT Configuration
+// A committed, guessable fallback secret used to ship here — any deploy that
+// forgot to set JWT_SECRET would silently sign/verify tokens with a public
+// string, letting anyone forge an admin token. Fail fast in production
+// instead; in dev/test, generate a random per-process secret so nothing is
+// ever knowable, at the cost of invalidating tokens across restarts.
+// (This file is what Node actually resolves for `require('../services/authService')`
+// per module resolution order — services/dual-use/authService.js is a separate
+// module and does not shadow it — so this copy needs the same fix.)
+function resolveJwtSecret() {
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production');
+  }
+  logger.warn('JWT_SECRET not set - using a random per-process secret for this dev/test run. Set JWT_SECRET to persist sessions across restarts.');
+  return crypto.randomBytes(32).toString('hex');
+}
+
 const JWT_CONFIG = {
-  secret: process.env.JWT_SECRET || 'your-super-secret-key-change-in-production',
+  secret: resolveJwtSecret(),
   accessTokenExpiry: process.env.JWT_ACCESS_EXPIRY || '15m',
   refreshTokenExpiry: process.env.JWT_REFRESH_EXPIRY || '7d',
   issuer: process.env.JWT_ISSUER || 'afrera-platform',

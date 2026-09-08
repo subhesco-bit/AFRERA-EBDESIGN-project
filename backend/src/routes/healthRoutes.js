@@ -26,6 +26,11 @@ const { logger } = require('../utils/logger');
 const pool = require('../database/pool');
 const fs = require('fs');
 const os = require('os');
+const { authMiddleware } = require('../middleware/auth');
+
+const protectDiagnostics = process.env.NODE_ENV === 'production'
+  ? authMiddleware
+  : (req, res, next) => next();
 
 /**
  * Health check registry for custom checks
@@ -70,8 +75,8 @@ class HealthCheckRegistry {
     const results = {};
     
     for (const [name, config] of this.checks.entries()) {
+      const startTime = Date.now();
       try {
-        const startTime = Date.now();
         const result = await Promise.race([
           config.fn(),
           new Promise((_, reject) => 
@@ -89,7 +94,7 @@ class HealthCheckRegistry {
         results[name] = {
           status: 'unhealthy',
           message: error.message,
-          duration: Date.now() - Date.now()
+          duration: Date.now() - startTime
         };
       }
     }
@@ -291,7 +296,7 @@ router.get('/', async (req, res) => {
  * GET /health/detailed
  * Detailed health check with all service dependencies
  */
-router.get('/detailed', async (req, res) => {
+router.get('/detailed', protectDiagnostics, async (req, res) => {
   const startTime = Date.now();
   const healthStatus = {
     status: 'healthy',
@@ -393,7 +398,7 @@ router.get('/live', (req, res) => {
  * GET /health/checks
  * List all registered health checks
  */
-router.get('/checks', (req, res) => {
+router.get('/checks', protectDiagnostics, (req, res) => {
   const checks = healthRegistry.getAll();
   
   res.json({
@@ -410,7 +415,7 @@ router.get('/checks', (req, res) => {
  * POST /health/checks/:name
  * Manually trigger a specific health check
  */
-router.post('/checks/:name', async (req, res) => {
+router.post('/checks/:name', protectDiagnostics, async (req, res) => {
   const { name } = req.params;
   const config = healthRegistry.checks.get(name);
   

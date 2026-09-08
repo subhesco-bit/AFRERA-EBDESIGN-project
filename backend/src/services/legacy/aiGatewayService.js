@@ -2,6 +2,21 @@
  * AI Gateway Service
  * Central AI/ML integration hub for all platform modules
  * Provides standardized AI capabilities: prediction, optimization, analysis, recommendations
+ *
+ * FILENAME COLLISION NOTE (2026-09-08, do not merge): this shares a basename
+ * with backend/src/services/aiGatewayService.js but is a GENUINELY DIFFERENT
+ * feature, not a stale duplicate - this file is a class-based AI/ML hub
+ * (predictions/models/caching), while the top-level file is a small,
+ * separately-tested "governed AI gateway" wrapper (run/buildGovernedPrompt/
+ * loadLibraryContext) that layers library-context governance on top of
+ * legacy/aiBackboneService.js and is exercised by
+ * backend/src/tests/aiGatewayService.test.js and
+ * backend/src/tests/aiDomainAdapterService.test.js. Neither copy is
+ * currently required from a mounted route (verified via repo-wide require()
+ * grep against backend/src/index.js's live route set), so this is not the
+ * "two live implementations disagreeing" case - it's two unrelated features
+ * that happen to share a filename. Per the merge-not-delete / do-not-force-
+ * a-merge policy, both are left as-is; see .ai/tasks/ACTIVE.md.
  */
 
 const { logger } = require('../../utils/logger');

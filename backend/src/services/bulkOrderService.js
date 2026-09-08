@@ -1,25 +1,22 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+/**
+ * bulkOrderService (thin wrapper)
+ *
+ * (2026-09-08) Duplicate-file remediation pass: this top-level copy has ZERO
+ * live callers - verified via a repo-wide require() grep cross-referenced
+ * against the actual mounted-route reachability graph rooted at
+ * backend/src/index.js (not just "a route file requires it" - confirmed
+ * that route file is itself require()'d and app.use()'d/mountRoute()'d
+ * live). It was reachable only through the dead
+ * backend/src/services/index.js barrel (itself never required by
+ * index.js) and/or other top-level sibling services that are themselves
+ * unreachable from any mounted route. backend/src/services/legacy/bulkOrderService.js
+ * is the confirmed-live copy. Collapsed to a re-export per the
+ * productReviewService.js precedent rather than kept as a second,
+ * independently-drifting copy - see .ai/tasks/ACTIVE.md for the full
+ * duplicate-file remediation and the (small) set of pairs that were left
+ * unmerged as genuinely different features instead.
+ */
 
-class BulkOrderService {
-  async createBulkOrder(data) {
-    try {
-      const id = require('uuid').v4();
-      await db('bulk_orders').insert({
-        id, buyer_id: data.buyer_id, quantity: data.quantity, total_amount: data.total_amount,
-        status: 'requested', created_at: new Date(),
-      });
-      logger.info(`Bulk order created: ${id}`);
-      return { order_id: id, status: 'requested' };
-    } catch (error) { logger.error(`Create order failed: ${error.message}`); throw error; }
-  }
+'use strict';
 
-  async getQuotations(orderId) {
-    try {
-      const quotations = await db('bulk_quotations').where('bulk_order_id', orderId);
-      return { order_id: orderId, quotations };
-    } catch (error) { logger.error(`Get quotations failed: ${error.message}`); throw error; }
-  }
-}
-
-module.exports = new BulkOrderService();
+module.exports = require('./legacy/bulkOrderService.js');

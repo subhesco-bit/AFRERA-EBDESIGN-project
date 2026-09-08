@@ -506,7 +506,11 @@ class PlatformCoreService {
     const configId = `PC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     let aiRecommendations = null;
     try {
-      const { aiAPI } = require('../../../backend/src/services/legacy/aiService');
+      // 2026-09-08: this used to require('../../../backend/src/services/legacy/aiService'),
+      // which does not exist anywhere in the repo - always threw MODULE_NOT_FOUND,
+      // silently swallowed by the surrounding catch as a fake "unavailable" reason.
+      // The real aiAPI.generateRecommendation lives in services/aiService/.
+      const { aiAPI } = require('../../../services/aiService');
       aiRecommendations = await aiAPI.generateRecommendation({
         task: 'platform_configuration_optimization',
         parameters: { config_data: parameters }
@@ -567,7 +571,11 @@ class PlatformCoreService {
     const { configId, feature_flags, security_config } = parameters;
     let impactAnalysis = null;
     try {
-      const { aiAPI } = require('../../../backend/src/services/legacy/aiService');
+      // 2026-09-08: this used to require('../../../backend/src/services/legacy/aiService'),
+      // which does not exist anywhere in the repo - always threw MODULE_NOT_FOUND,
+      // silently swallowed by the surrounding catch as a fake "unavailable" reason.
+      // The real aiAPI.generateRecommendation lives in services/aiService/.
+      const { aiAPI } = require('../../../services/aiService');
       impactAnalysis = await aiAPI.generateRecommendation({
         task: 'configuration_update_impact_analysis',
         parameters: { config_id: configId, updates: parameters }

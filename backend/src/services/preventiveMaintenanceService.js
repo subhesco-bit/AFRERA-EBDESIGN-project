@@ -1,35 +1,22 @@
 /**
- * Backend for M106 Preventive Maintenance -
- * MachineryManagementPage.jsx's "preventive" tab.
+ * preventiveMaintenanceService (thin wrapper)
  *
- * The other 7 tabs on that page (implements, inventory, rental, breakdown,
- * fuel, parts, lifecycle) are deliberately NOT built here: they correspond
- * to backend/src/modules/M102/M103/M104/M107/M108/M109/M110, which already
- * have real, substantial (450+ line), differently-shaped action-based
- * backends (register/report/list-for-rental/book, not simple CRUD) for the
- * same real-world equipment/assets. Building new simple-CRUD tables for
- * those would create a second, disconnected write path for the same
- * equipment - the same "dangerous duplicate" class of bug removed
- * elsewhere this session (and the same situation as Poultry/Goat/Sheep/Pig
- * in the Livestock domain). They need their own rewiring/redesign pass,
- * not a new backend.
- *
- * M106 itself was confirmed genuinely generic (backend/src/modules/M106's
- * old content was the auto-generated `data JSONB` blob template, zero
- * domain columns) - safe to give a real schema, matching how M090/M149
- * were handled earlier this session.
- *
- * Field list taken directly from the "preventive" tab's `fields`/
- * `requiredFields` in MachineryManagementPage.jsx, not invented.
+ * (2026-09-08) Duplicate-file remediation pass: this top-level copy has ZERO
+ * live callers - verified via a repo-wide require() grep cross-referenced
+ * against the actual mounted-route reachability graph rooted at
+ * backend/src/index.js (not just "a route file requires it" - confirmed
+ * that route file is itself require()'d and app.use()'d/mountRoute()'d
+ * live). It was reachable only through the dead
+ * backend/src/services/index.js barrel (itself never required by
+ * index.js) and/or other top-level sibling services that are themselves
+ * unreachable from any mounted route. backend/src/services/legacy/preventiveMaintenanceService.js
+ * is the confirmed-live copy. Collapsed to a re-export per the
+ * productReviewService.js precedent rather than kept as a second,
+ * independently-drifting copy - see .ai/tasks/ACTIVE.md for the full
+ * duplicate-file remediation and the (small) set of pairs that were left
+ * unmerged as genuinely different features instead.
  */
 
 'use strict';
 
-const { createCrudService } = require('./resourceCrudFactory');
-
-const preventiveMaintenance = createCrudService('preventive_maintenance_records', {
-  fields: ['equipment_name', 'maintenance_type', 'scheduled_date', 'completed_date', 'technician', 'cost', 'status'],
-  requiredFields: ['equipment_name'],
-});
-
-module.exports = { preventiveMaintenance };
+module.exports = require('./legacy/preventiveMaintenanceService.js');

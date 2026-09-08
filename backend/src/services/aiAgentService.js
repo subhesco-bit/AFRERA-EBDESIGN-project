@@ -11,6 +11,69 @@
  */
 
 const axios = require('axios');
+const { URL } = require('url');
+
+function evaluateArithmetic(expression) {
+  if (typeof expression !== 'string' || expression.length > 200 || !/^[\d\s()+\-*/%.]+$/.test(expression)) {
+    throw new Error('Only bounded arithmetic expressions are supported');
+  }
+
+  const rawTokens = expression.match(/\d+(?:\.\d+)?|[()+\-*/%]/g) || [];
+  if (rawTokens.join('') !== expression.replace(/\s+/g, '')) {
+    throw new Error('Invalid arithmetic expression');
+  }
+
+  // Rewrite unary +/- (at the start, or right after '(' or another operator)
+  // into a binary form by inserting an implicit leading 0, e.g. "-5+3" ->
+  // "0 - 5 + 3". The shunting-yard loop below only understands binary
+  // operators, so without this "-5+3" fails to parse as an operand ever
+  // being pushed before the first apply().
+  const tokens = [];
+  let expectOperand = true;
+  for (const token of rawTokens) {
+    if ((token === '-' || token === '+') && expectOperand) {
+      tokens.push('0', token);
+    } else {
+      tokens.push(token);
+      expectOperand = token === '(' || (isNaN(Number(token)) && token !== ')');
+    }
+  }
+
+  const values = [];
+  const operators = [];
+  const precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '%': 2 };
+  const apply = () => {
+    const operator = operators.pop();
+    const right = values.pop();
+    const left = values.pop();
+    if (left === undefined || right === undefined || (operator === '/' && right === 0)) {
+      throw new Error('Invalid arithmetic expression');
+    }
+    values.push(operator === '+' ? left + right : operator === '-' ? left - right
+      : operator === '*' ? left * right : operator === '/' ? left / right : left % right);
+  };
+
+  for (const token of tokens) {
+    if (!Number.isNaN(Number(token))) {
+      values.push(Number(token));
+    } else if (token === '(') {
+      operators.push(token);
+    } else if (token === ')') {
+      while (operators.length && operators[operators.length - 1] !== '(') apply();
+      if (operators.pop() !== '(') throw new Error('Invalid arithmetic expression');
+    } else {
+      while (operators.length && operators[operators.length - 1] !== '('
+        && precedence[operators[operators.length - 1]] >= precedence[token]) apply();
+      operators.push(token);
+    }
+  }
+  while (operators.length) {
+    if (operators[operators.length - 1] === '(') throw new Error('Invalid arithmetic expression');
+    apply();
+  }
+  if (values.length !== 1 || !Number.isFinite(values[0])) throw new Error('Invalid arithmetic expression');
+  return values[0];
+}
 
 // These three SDKs are not in package.json (no live LLM credentials exist in this
 // environment, by design — see core/aiOrchestrator.js's PROVIDER_ENV/callProvider()
@@ -103,6 +166,13 @@ class AIAgentService {
         required: ['url', 'method']
       },
       handler: async (params) => {
+        const target = new URL(params.url);
+        const allowedHosts = (process.env.AI_AGENT_ALLOWED_API_HOSTS || '')
+          .split(',').map(host => host.trim()).filter(Boolean);
+        if (!['http:', 'https:'].includes(target.protocol)
+          || !allowedHosts.includes(target.hostname)) {
+          throw new Error('API destination is not allowlisted');
+        }
         const response = await axios({
           method: params.method,
           url: params.url,
@@ -111,7 +181,7 @@ class AIAgentService {
         return { success: true, data: response.data };
       }
     });
-    
+
     // Calculation tools
     this.registerTool('calculate', {
       description: 'Perform mathematical calculations',
@@ -124,7 +194,7 @@ class AIAgentService {
       },
       handler: async (params) => {
         try {
-          const result = eval(params.expression);
+          const result = evaluateArithmetic(params.expression);
           return { success: true, result };
         } catch (error) {
           return { success: false, error: error.message };

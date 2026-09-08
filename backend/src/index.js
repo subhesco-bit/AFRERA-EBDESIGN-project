@@ -4,6 +4,8 @@
  */
 
 require('dotenv').config();
+const { assertProductionConfiguration } = require('./config/productionConfig');
+assertProductionConfiguration();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -119,6 +121,8 @@ const gstRoutes = require('./routes/gstRoutes');
 // REMOVED: logisticsOpsRoutes - was imported from logisticsEnhancementRoutes but route removed to prevent crash
 const farmerRoutes = require('./routes/farmerRoutes');
 const auditRoutes = require('./routes/auditRoutes');
+const auditTrailRoutes = require('./routes/auditTrail');
+const complianceTrackingRoutes = require('./routes/complianceTracking');
 // M121 Dairy Management + M112 Fertilizer Inventory (Livestock / Input
 // Supply, wave 1) — real backends for two pages that were UI-only until now.
 const dairyRoutes = require('./routes/dairyRoutes');
@@ -194,6 +198,8 @@ const aiOperationIntelligenceService = require('./services/legacy/aiOperationInt
 const { validateAPIContracts, generateContractReport } = require('./utils/apiContractValidator');
 // Advanced Medical Coding Service - MS-Level Knowledge Integration
 const advancedMedicalCodingService = require('./services/advancedMedicalCodingService');
+const clinicalNutritionDecisionSupportService = require('./services/clinicalNutritionDecisionSupportService');
+const medicalCodingReferenceService = require('./services/medicalCodingReferenceService');
 // MFA Service - Multi-Factor Authentication
 const mfaService = require('./services/dual-use/mfaService');
 const mfaRoutes = require('./routes/dual-use/mfaRoutes');
@@ -598,7 +604,11 @@ const mountRoute = (pathPrefix, serviceModule) => {
       return false;
     }
 
-    if (typeof serviceModule.router !== 'object' || typeof serviceModule.router.use !== 'function') {
+    // An Express Router is itself a callable function (with .use/.get/etc.
+    // attached), so `typeof` reports 'function', not 'object' — checking for
+    // 'object' here rejected every genuine router. The correct signal that
+    // this is a usable router is that `.use` is a function on it.
+    if (!serviceModule.router || typeof serviceModule.router.use !== 'function') {
       const error = `Router property is not a valid Express router for ${pathPrefix}`;
       logger.error(`Route mount failed for ${pathPrefix}: ${error}`);
       failedMounts.set(pathPrefix, { error: 'invalid_router', timestamp: new Date() });
@@ -800,6 +810,12 @@ app.use('/api/v1/gst', gstRoutes);
 // Newly created routes covering previously-orphaned services
 app.use('/api/v1/farmers', farmerRoutes);
 app.use('/api/v1/admin/audit', auditRoutes);
+// auditTrail.js / complianceTracking.js: real, DB-backed (services/auditTrailService.js,
+// services/complianceTrackingService.js via database/dbConnection.js's query builder on
+// top of the shared pool), but their route files were never require()'d/mounted anywhere.
+// Distinct endpoint shapes from auditRoutes/complianceRoutes above, so no collision.
+app.use('/api/v1', auditTrailRoutes);
+app.use('/api/v1', complianceTrackingRoutes);
 // M121 Dairy Management + M112 Fertilizer Inventory — see dairyRoutes.js /
 // fertilizerRoutes.js. Frontend already calls these exact paths
 // (dairyAPI / fertilizerAPI in frontend/src/services/api.js); this is the
@@ -1018,6 +1034,8 @@ mountRoute('/api/v1/ai-self-healing', aiSelfHealingService);
 // AI Operation Intelligence - Real-Time Optimization Layer (using service router for health checks)
 mountRoute('/api/v1/ai-operation-intelligence', aiOperationIntelligenceService);
 mountRoute('/api/v1/advanced-medical-coding', advancedMedicalCodingService);
+mountRoute('/api/v1/clinical-nutrition', clinicalNutritionDecisionSupportService);
+mountRoute('/api/v1/medical-coding-reference', medicalCodingReferenceService);
 app.use('/api/v1/m400-ai-backbone', m400AiBackboneRoutes);
 // SAP Module Architecture - Independent Module Architecture
 app.use('/api/v1/sap-module-architecture', sapModuleArchitectureRoutes);
@@ -1104,7 +1122,6 @@ app.get('/health/comprehensive', async (req, res) => {
       },
       services: {
         ai: { status: 'unknown', message: 'AI services not verified' },
-        erp: { status: 'unknown', message: 'ERP services not verified' },
         ai_brain: { status: mountedRoutes.has('/api/v1/ai-brain') ? 'mounted' : 'not_mounted' },
         ai_gateway: { status: mountedRoutes.has('/api/v1/ai-gateway') ? 'mounted' : 'not_mounted' },
         ai_self_healing: { status: mountedRoutes.has('/api/v1/ai-self-healing') ? 'mounted' : 'not_mounted' },

@@ -868,37 +868,12 @@ function resetAIStatistics() {
 // EXPORT ALL FUNCTIONS
 // ============================================================================
 
-module.exports = {
-  // AI Provider Functions
-  callClaudeAI,
-  callOpenAI,
-  callGeminiAI,
-  callAzureOpenAI,
-  callHuggingFace,
-  callOllamaAI,
-
-  // Unified AI Interface
-  callAI,
-  getPreferredProvider,
-  
-  // ERP-Specific AI Functions
-  analyzeFinancialData,
-  optimizeSupplyChain,
-  optimizeProduction,
-  analyzeHR,
-  analyzeProject,
-  supportAgriculturalDecision,
-  optimizeLivestock,
-  
-  // AI Backbone Management
-  getAIProviderStatus,
-  switchProvider,
-  resetAIStatistics,
-  
-  // Configuration
-  AI_PROVIDERS,
-  aiRequestTracker
-};
+// NOTE: this section's exports (AI provider functions, ERP-specific AI
+// functions, AI backbone management) are folded into the single consolidated
+// `module.exports` block at the end of this file - see the note there
+// (2026-09-07 dedup fix). Keeping a `module.exports = {...}` here as well
+// would silently discard every export assigned before it, since only the
+// last `module.exports` assignment in a CommonJS module survives.
 
 // ============================================================================
 // CONSOLIDATED FEATURES (merged from 7 services)
@@ -1613,16 +1588,9 @@ async function generateRecommendation(request = {}) {
 const aiAPI = {
   generateRecommendation
 };
-module.exports = {
-  aiAPI,
-  router,
-  predictDemand,
-  optimizePrice,
-  assessCreditRisk,
-  detectFraud,
-  generateRecommendations,
-  isHealthy
-};
+// (aiAPI/router/predictDemand/optimizePrice/assessCreditRisk/detectFraud/
+// generateRecommendations/isHealthy all folded into the final consolidated
+// module.exports block - see note there.)
 
 
 // From aiBackboneService.js
@@ -1963,28 +1931,24 @@ class aiBackboneService {
     return { recommended_crops: [], confidence: null, reasoning: null, implemented: false, reason: 'No real crop-recommendation model is connected to this gateway.' };
   }
 
+  // recommendFertilizer/recommendIrrigation/recommendPestControl previously
+  // returned the exact same hardcoded advice (NPK_10_26_26, drip/daily/2h,
+  // generic IPM) for every farm/crop/context regardless of input, presented
+  // as if it were a real recommendation. Fixed 2026-09-07 to match the
+  // honest `implemented: false` pattern already used by
+  // recommendCropSelection/genericRecommendation/predict* in this class,
+  // rather than one caller silently getting real-looking but fabricated
+  // agronomic advice.
   recommendFertilizer(context, options) {
-    return {
-      fertilizer_type: 'NPK_10_26_26',
-      application_rate: '50kg/acre',
-      timing: 'before_sowing'
-    };
+    return { fertilizer_type: null, application_rate: null, timing: null, implemented: false, reason: 'No real fertilizer-recommendation model is connected to this gateway.' };
   }
 
   recommendIrrigation(context, options) {
-    return {
-      irrigation_method: 'drip',
-      frequency: 'daily',
-      duration: '2_hours'
-    };
+    return { irrigation_method: null, frequency: null, duration: null, implemented: false, reason: 'No real irrigation-recommendation model is connected to this gateway.' };
   }
 
   recommendPestControl(context, options) {
-    return {
-      pest_control_method: 'integrated_pest_management',
-      action: 'monitor_and_treat_as_needed',
-      products: ['bio_pesticide', 'trap_crops']
-    };
+    return { pest_control_method: null, action: null, products: [], implemented: false, reason: 'No real pest-control-recommendation model is connected to this gateway.' };
   }
 
   genericRecommendation(context, options) {
@@ -2130,11 +2094,9 @@ router.post('/recommend', authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = {
-  router,
-  aiBackboneService,
-  ...new aiBackboneService()
-};
+// (router/aiGateway/analyze/optimize/predict/recommend folded into the final
+// consolidated module.exports block, bound explicitly instead of spread -
+// see note there for why the spread pattern didn't work.)
 // From aiBackboneService.js
 /**
  * AI Brain Service - Cognitive Processing Layer
@@ -2701,11 +2663,7 @@ router.post('/memory/long-term', authMiddleware, (req, res) => {
   }
 });
 
-module.exports = {
-  router,
-  aiBrainServiceInstance,
-  ...aiBrainServiceInstance
-};
+// (router/aiBrain folded into the final consolidated module.exports block.)
 
 // From aiBackboneService.js
 /**
@@ -4045,27 +4003,11 @@ async function optimizePigProductionAlgorithm(productionRows) {
 // EXPORTS
 // ============================================================================
 
-module.exports = {
-  // Farmer Module AI Integration
-  recommendCropPlanning,
-  predictHarvestTiming,
-  optimizeFarmerResources,
-  
-  // Crop Module AI Integration
-  detectCropDisease,
-  predictCropYield,
-  
-  // Livestock Module AI Integration
-  monitorLivestockHealth,
-  recommendLivestockBreeding,
-  
-  // Inbuilt Modules AI Integration
-  optimizeDairyProduction,
-  monitorPoultryHealth,
-  optimizeGoatProduction,
-  optimizeSheepProduction,
-  optimizePigProduction
-};
+// (recommendCropPlanning/predictHarvestTiming/optimizeFarmerResources/
+// detectCropDisease/predictCropYield/monitorLivestockHealth/
+// recommendLivestockBreeding/optimizeDairyProduction/monitorPoultryHealth/
+// optimizeGoatProduction/optimizeSheepProduction/optimizePigProduction all
+// folded into the final consolidated module.exports block.)
 
 // From advancedaiBackboneService.js
 /**
@@ -5669,15 +5611,9 @@ router.get('/health', (req, res) => {
   });
 });
 
-module.exports = {
-  router,
-  advancedPredictDemand,
-  advancedOptimizePrice,
-  advancedAssessCreditRisk,
-  advancedDetectFraud,
-  advancedGenerateRecommendations,
-  detectCropDisease
-};
+// (router/advancedPredictDemand/advancedOptimizePrice/advancedAssessCreditRisk/
+// advancedDetectFraud/advancedGenerateRecommendations/detectCropDisease all
+// folded into the final consolidated module.exports block.)
 // From aiCopilotService.js
 /**
  * AI Copilot Framework Service
@@ -6342,14 +6278,11 @@ function isCopilotHealthy() {
   return true;
 }
 
-module.exports = {
-  router,
-  isHealthy: isCopilotHealthy,
-  // Exported (additive only, no logic changed) so services/whatsappService.js
-  // can reuse the existing generic-copilot template response for default
-  // farmer queries instead of duplicating it.
-  generateCopilotResponse
-};
+// (router/isCopilotHealthy/generateCopilotResponse all folded into the final
+// consolidated module.exports block - generateCopilotResponse is exported
+// there too, additive only, so services/whatsappService.js can reuse the
+// existing generic-copilot template response for default farmer queries
+// instead of duplicating it.)
 
 // From aiOperationIntelligenceService.js
 /**
@@ -7019,11 +6952,8 @@ router.post('/detect-anomaly', authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = {
-  router,
-  aiOperationIntelligenceService,
-  ...aiOperationIntelligenceService
-};
+// (router/aiOperationIntelligenceService folded into the final consolidated
+// module.exports block.)
 
 // Export consolidated service.
 //
@@ -7053,6 +6983,15 @@ module.exports = {
 const aiGatewayInstance = new aiBackboneService();
 
 module.exports = {
+  // Express router carrying every route registered via `router.get/post(...)`
+  // throughout this file (single `const router = express.Router()` at line
+  // ~1509). `backend/src/index.js`'s `mountRoute()` requires `.router` to
+  // mount '/api/v1/ai', '/api/v1/ai-brain' and '/api/v1/ai-gateway' - it was
+  // silently dropped from this export block during the 2026-09-07 dedup fix
+  // (mountRoute() no-ops rather than crashing, so the omission was silent).
+  // Restored 2026-09-07.
+  router,
+
   // Core AI provider interface (section: "AI Backbone Service - Real AI
   // Integration", top of file).
   callClaudeAI, callOpenAI, callGeminiAI, callAzureOpenAI, callHuggingFace,
@@ -7083,11 +7022,15 @@ module.exports = {
   aiBrain: aiBrainServiceInstance,
 
   // Farmer/crop/livestock module AI integration functions ("Complete AI
-  // Integration" section).
+  // Integration" section). optimizeSheepProduction/optimizePigProduction
+  // were also dropped by the 2026-09-07 dedup fix, silently breaking
+  // completeAIIntegrationController.js's optimizeSheepProduction/
+  // optimizePigProduction handlers (`aiBackboneService.optimizeSheepProduction
+  // is not a function`) - restored 2026-09-07.
   recommendCropPlanning, predictHarvestTiming, optimizeFarmerResources,
   detectCropDisease, predictCropYield, monitorLivestockHealth,
   recommendLivestockBreeding, optimizeDairyProduction, monitorPoultryHealth,
-  optimizeGoatProduction,
+  optimizeGoatProduction, optimizeSheepProduction, optimizePigProduction,
 
   // Advanced AI Decision-Making Engine.
   advancedPredictDemand, advancedOptimizePrice, advancedAssessCreditRisk,

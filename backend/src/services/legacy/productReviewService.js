@@ -124,13 +124,17 @@ class ProductReviewService {
       const result = await this.pool.query(query, params);
 
       // Get total count
-      const countQuery = `
+      const countParams = [productId];
+      let countQuery = `
         SELECT COUNT(*) as total
         FROM product_reviews
         WHERE product_id = $1
-        ${status ? `AND status = '${status}'` : ''}
       `;
-      const countResult = await this.pool.query(countQuery, [productId]);
+      if (status) {
+        countParams.push(status);
+        countQuery += ` AND status = $${countParams.length}`;
+      }
+      const countResult = await this.pool.query(countQuery, countParams);
 
       return {
         reviews: result.rows,
@@ -197,7 +201,7 @@ class ProductReviewService {
         UPDATE products
         SET 
           average_rating = (
-            SELECT COALESCE(AG(rating), 0)
+            SELECT COALESCE(AVG(rating), 0)
             FROM product_reviews
             WHERE product_id = $1 AND status = 'approved'
           ),

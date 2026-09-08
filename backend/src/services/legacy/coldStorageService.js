@@ -90,6 +90,57 @@ class ColdStorageService {
     }
   }
 
+  /**
+   * Same listing as getFacilities(), enriched with real per-facility
+   * occupancy/utilization/latest-temperature so the frontend dashboard
+   * (ColdStorageDashboardPage) can render capacity + cold-chain status
+   * without a second round trip per facility. Every added field is a live
+   * aggregate, not a stored/cached counter.
+   */
+  async getFacilitiesWithStatus(filters = {}) {
+    try {
+      const facilities = await this.getFacilities(filters);
+      const today = new Date().toISOString().slice(0, 10);
+
+      return Promise.all(facilities.map(async (f) => {
+        const occResult = await this.pool.query(
+          `SELECT
+             COALESCE(SUM(quantity_units) FILTER (WHERE status = 'checked_in'), 0) AS checked_in_units,
+             COALESCE(SUM(quantity_units) FILTER (WHERE status = 'booked'), 0) AS reserved_units
+           FROM cold_storage_bookings
+           WHERE facility_id = $1 AND status IN ('booked', 'checked_in')
+             AND check_in_date <= $2 AND check_out_date >= $2`,
+          [f.id, today]
+        );
+        const occ = occResult.rows[0];
+        const checkedIn = Number(occ.checked_in_units);
+        const reserved = Number(occ.reserved_units);
+        const capacity = Number(f.capacity_units);
+        const currentLoad = checkedIn + reserved;
+        const utilizationPct = capacity > 0 ? Number(((currentLoad / capacity) * 100).toFixed(1)) : 0;
+
+        const tempResult = await this.pool.query(
+          `SELECT recorded_temperature_c FROM cold_storage_temperature_readings
+            WHERE facility_id = $1 ORDER BY recorded_at DESC LIMIT 1`,
+          [f.id]
+        );
+        const currentTemp = tempResult.rows[0] ? Number(tempResult.rows[0].recorded_temperature_c) : null;
+
+        return {
+          ...f,
+          capacity,
+          currentLoad,
+          reserved,
+          utilization: utilizationPct,
+          currentTemp,
+        };
+      }));
+    } catch (error) {
+      logger.error('Error listing cold storage facilities with status', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
   async getFacility(facilityId) {
     try {
       const result = await this.pool.query('SELECT * FROM cold_storage_facilities WHERE id = $1', [facilityId]);
@@ -289,6 +340,294 @@ class ColdStorageService {
       return facilityId ? (rows[0] || null) : rows;
     } catch (error) {
       logger.error('Error computing cold storage utilization', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
+  // -------------------------------------------------------------------
+  // Temperature compliance — facility-level probe log.
+  // Merged in from the previously-unmounted
+  // backend/src/routes/logistics/coldStorageRoutes.js (2026-09-07 Logistics
+  // domain batch): that file talked to `pool` directly rather than going
+  // through this service. Same schema
+  // (cold_storage_temperature_readings, migration
+  // 9998_cold_storage_temperature_compliance.sql), same compliance math,
+  // now exposed as service methods so the mounted route file
+  // (coldStorageRoutes.js) stays consistent with every other endpoint here.
+  // -------------------------------------------------------------------
+
+  /** Real threshold check against the facility's own declared temperature range. */
+  checkTemperatureCompliance(temperatureC, minC, maxC) {
+    const min = minC === null || minC === undefined ? null : Number(minC);
+    const max = maxC === null || maxC === undefined ? null : Number(maxC);
+    if (min === null && max === null) {
+      return { isCompliant: true, deviationC: 0, note: 'Facility has no declared temperature range; nothing to check against.' };
+    }
+    let deviationC = 0;
+    let isCompliant = true;
+    if (min !== null && temperatureC < min) {
+      isCompliant = false;
+      deviationC = Number((min - temperatureC).toFixed(2));
+    } else if (max !== null && temperatureC > max) {
+      isCompliant = false;
+      deviationC = Number((temperatureC - max).toFixed(2));
+    }
+    return { isCompliant, deviationC };
+  }
+
+  async recordTemperatureReading(facilityId, data = {}) {
+    try {
+      const { temperatureC, humidityPct, sensorId } = data;
+      if (temperatureC === undefined || temperatureC === null || Number.isNaN(Number(temperatureC))) {
+        throw new Error('temperatureC is required and must be numeric');
+      }
+
+      const facility = await this.getFacility(facilityId);
+      const compliance = this.checkTemperatureCompliance(
+        Number(temperatureC), facility.temperature_range_min_c, facility.temperature_range_max_c
+      );
+
+      const result = await this.pool.query(
+        `INSERT INTO cold_storage_temperature_readings
+           (facility_id, recorded_temperature_c, recorded_humidity_pct, sensor_id, is_compliant, deviation_c)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING *`,
+        [facilityId, temperatureC, humidityPct ?? null, sensorId || null, compliance.isCompliant, compliance.deviationC]
+      );
+
+      if (!compliance.isCompliant) {
+        logger.warn(`Cold storage facility ${facilityId} out of range: ${temperatureC}C, deviation ${compliance.deviationC}C`);
+      }
+      return { reading: result.rows[0], reasoning: compliance };
+    } catch (error) {
+      logger.error('Error recording cold storage temperature', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
+  async getTemperatureReadings(facilityId, { page = 1, limit = 500 } = {}) {
+    try {
+      const p = Math.max(parseInt(page, 10) || 1, 1);
+      const l = Math.min(Math.max(parseInt(limit, 10) || 500, 1), 1000);
+      const offset = (p - 1) * l;
+      const result = await this.pool.query(
+        `SELECT * FROM cold_storage_temperature_readings
+          WHERE facility_id = $1
+          ORDER BY recorded_at DESC
+          LIMIT $2 OFFSET $3`,
+        [facilityId, l, offset]
+      );
+      return { page: p, limit: l, rows: result.rows };
+    } catch (error) {
+      logger.error('Error listing cold storage temperature readings', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
+  async getTemperatureAlerts(facilityId, { hours = 72, limit = 100 } = {}) {
+    try {
+      const h = Math.min(Math.max(parseInt(hours, 10) || 72, 1), 24 * 90);
+      const result = await this.pool.query(
+        `SELECT * FROM cold_storage_temperature_readings
+          WHERE facility_id = $1 AND is_compliant = FALSE
+            AND recorded_at >= NOW() - ($2 || ' hours')::INTERVAL
+          ORDER BY recorded_at DESC
+          LIMIT $3`,
+        [facilityId, h, Math.min(Math.max(parseInt(limit, 10) || 100, 1), 500)]
+      );
+      return result.rows;
+    } catch (error) {
+      logger.error('Error listing cold storage temperature alerts', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
+  async getComplianceStats(facilityId, hours = 24) {
+    try {
+      const h = Math.min(Math.max(parseInt(hours, 10) || 24, 1), 24 * 90);
+      const facility = await this.getFacility(facilityId);
+
+      const result = await this.pool.query(
+        `SELECT
+           COUNT(*) AS total,
+           COUNT(*) FILTER (WHERE is_compliant) AS compliant_count,
+           MIN(recorded_temperature_c) AS min_temp,
+           MAX(recorded_temperature_c) AS max_temp,
+           AVG(recorded_temperature_c) AS avg_temp,
+           MAX(recorded_at) AS latest_reading_at
+         FROM cold_storage_temperature_readings
+        WHERE facility_id = $1 AND recorded_at >= NOW() - ($2 || ' hours')::INTERVAL`,
+        [facilityId, h]
+      );
+
+      const stats = result.rows[0];
+      const total = Number(stats.total);
+      const compliantCount = Number(stats.compliant_count);
+      const compliancePct = total > 0 ? Number(((compliantCount / total) * 100).toFixed(1)) : null;
+
+      return {
+        facilityId: facility.id,
+        windowHours: h,
+        totalReadings: total,
+        compliantReadings: compliantCount,
+        nonCompliantReadings: total - compliantCount,
+        compliancePct,
+        status: total === 0 ? 'no_data' : (compliancePct === 100 ? 'fully_compliant' : compliancePct >= 90 ? 'mostly_compliant' : 'at_risk'),
+        minTempC: stats.min_temp === null ? null : Number(stats.min_temp),
+        maxTempC: stats.max_temp === null ? null : Number(stats.max_temp),
+        avgTempC: stats.avg_temp === null ? null : Number(Number(stats.avg_temp).toFixed(2)),
+        latestReadingAt: stats.latest_reading_at,
+        declaredRangeC: { min: facility.temperature_range_min_c, max: facility.temperature_range_max_c },
+      };
+    } catch (error) {
+      logger.error('Error computing cold storage compliance', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
+  /**
+   * Facility-scoped booking convenience wrapper for the REST-style
+   * POST /facilities/:facilityId/book path the frontend calls
+   * (coldStorageAPI.bookFacility) — delegates to the same real
+   * capacity-checked createBooking() above.
+   */
+  async bookFacility(facilityId, data = {}) {
+    return this.createBooking({ ...data, facilityId });
+  }
+
+  /**
+   * Real capacity-planning projection: for each of the next `days` days,
+   * sum quantity_units of active bookings whose window covers that date
+   * and compare to declared capacity. Not canned — driven entirely by the
+   * same overlap query the booking capacity check uses.
+   */
+  async getCapacityPlanning(facilityId, days = 30) {
+    try {
+      const d = Math.min(Math.max(parseInt(days, 10) || 30, 1), 180);
+      const facility = await this.getFacility(facilityId);
+      const capacity = Number(facility.capacity_units);
+
+      const result = await this.pool.query(
+        `SELECT gs::date AS day,
+                COALESCE(SUM(b.quantity_units) FILTER (
+                  WHERE b.status IN ('booked', 'checked_in')
+                    AND b.check_in_date <= gs::date AND b.check_out_date >= gs::date
+                ), 0) AS booked_units
+         FROM generate_series(CURRENT_DATE, CURRENT_DATE + ($1 || ' days')::INTERVAL, '1 day') gs
+         LEFT JOIN cold_storage_bookings b ON b.facility_id = $2
+         GROUP BY gs
+         ORDER BY gs`,
+        [d - 1, facilityId]
+      );
+
+      const projection = result.rows.map((r) => {
+        const booked = Number(r.booked_units);
+        return {
+          date: r.day,
+          bookedUnits: booked,
+          availableUnits: Number(Math.max(capacity - booked, 0).toFixed(2)),
+          utilizationPct: capacity > 0 ? Number(((booked / capacity) * 100).toFixed(1)) : null,
+        };
+      });
+
+      const daysAtOrOverCapacity = projection.filter((p) => p.utilizationPct !== null && p.utilizationPct >= 100).length;
+
+      return {
+        facilityId: facility.id,
+        capacityUnits: capacity,
+        capacityUnitLabel: facility.capacity_unit_label,
+        horizonDays: d,
+        daysAtOrOverCapacity,
+        projection,
+      };
+    } catch (error) {
+      logger.error('Error computing cold storage capacity planning', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
+  /**
+   * System-wide status rollup for the dashboard overview cards
+   * (frontend coldStorageAPI.getStatus()). Every figure is a real
+   * aggregate over cold_storage_facilities / cold_storage_bookings /
+   * cold_storage_temperature_readings — nothing canned.
+   */
+  async getSystemStatus() {
+    try {
+      const facilities = await this.getFacilities();
+
+      const readingResult = await this.pool.query(
+        `SELECT
+           COUNT(*) FILTER (WHERE NOT is_compliant) AS active_alerts,
+           COUNT(*) FILTER (WHERE is_compliant) AS compliant_count,
+           COUNT(*) AS total_count,
+           MIN(recorded_temperature_c) AS min_temp,
+           MAX(recorded_temperature_c) AS max_temp,
+           AVG(recorded_temperature_c) AS avg_temp,
+           COUNT(DISTINCT sensor_id) FILTER (WHERE sensor_id IS NOT NULL) AS active_sensors,
+           MAX(recorded_at) AS last_sync
+         FROM cold_storage_temperature_readings
+         WHERE recorded_at >= NOW() - INTERVAL '24 hours'`
+      );
+      const r = readingResult.rows[0];
+      const totalReadings = Number(r.total_count);
+      const compliancePct = totalReadings > 0 ? Number(((Number(r.compliant_count) / totalReadings) * 100).toFixed(1)) : null;
+
+      const today = new Date().toISOString().slice(0, 10);
+      let sumUtilization = 0;
+      let utilizationCount = 0;
+      let inRange = 0;
+      for (const f of facilities) {
+        const util = await this.getUtilization(f.id, today);
+        if (util && util.utilizationPct !== null) {
+          sumUtilization += util.utilizationPct;
+          utilizationCount += 1;
+        }
+      }
+
+      const alertsResult = await this.pool.query(
+        `SELECT t.recorded_temperature_c, t.deviation_c, t.recorded_at, f.name AS facility, f.id AS facility_id
+         FROM cold_storage_temperature_readings t
+         JOIN cold_storage_facilities f ON f.id = t.facility_id
+         WHERE t.is_compliant = FALSE
+         ORDER BY t.recorded_at DESC
+         LIMIT 10`
+      );
+      const recentAlerts = alertsResult.rows.map((a) => ({
+        facility: a.facility,
+        facilityId: a.facility_id,
+        message: `Recorded ${Number(a.recorded_temperature_c).toFixed(1)}C — ${Number(a.deviation_c).toFixed(1)}C out of range`,
+        severity: Math.abs(Number(a.deviation_c)) >= 5 ? 'critical' : 'warning',
+        timestamp: a.recorded_at,
+      }));
+
+      const inRangeResult = await this.pool.query(
+        `SELECT COUNT(DISTINCT facility_id) AS n FROM cold_storage_facilities f
+         WHERE NOT EXISTS (
+           SELECT 1 FROM cold_storage_temperature_readings t
+           WHERE t.facility_id = f.id AND t.is_compliant = FALSE
+             AND t.recorded_at >= NOW() - INTERVAL '24 hours'
+         )`
+      );
+      inRange = Number(inRangeResult.rows[0]?.n || 0);
+
+      return {
+        status: Number(r.active_alerts) > 0 ? 'degraded' : 'healthy',
+        activeAlerts: Number(r.active_alerts),
+        avgUtilization: utilizationCount > 0 ? Number((sumUtilization / utilizationCount).toFixed(1)) : 0,
+        complianceRate: compliancePct,
+        avgTemperature: r.avg_temp === null ? null : Number(Number(r.avg_temp).toFixed(1)),
+        minTemp: r.min_temp === null ? null : Number(r.min_temp),
+        maxTemp: r.max_temp === null ? null : Number(r.max_temp),
+        activeSensors: Number(r.active_sensors),
+        lastSync: r.last_sync,
+        alertThreshold: null,
+        inRange,
+        totalFacilities: facilities.length,
+        recentAlerts,
+      };
+    } catch (error) {
+      logger.error('Error computing cold storage system status', { error: error.message, stack: error.stack });
       throw error;
     }
   }

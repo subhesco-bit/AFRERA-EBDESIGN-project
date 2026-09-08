@@ -1,93 +1,22 @@
 /**
- * Second-Use Equipment Exchange — marketplace for retired farm machinery
- * with condition grade, donor attribution, and free/priced listings.
- * Confirmed genuinely absent (2026-08-15 concept-document gap analysis).
- * Reduces farmer capital cost by giving working-but-retired equipment a
- * second life instead of it sitting idle or being scrapped.
+ * equipmentExchangeService (thin wrapper)
+ *
+ * (2026-09-08) Duplicate-file remediation pass: this top-level copy has ZERO
+ * live callers - verified via a repo-wide require() grep cross-referenced
+ * against the actual mounted-route reachability graph rooted at
+ * backend/src/index.js (not just "a route file requires it" - confirmed
+ * that route file is itself require()'d and app.use()'d/mountRoute()'d
+ * live). It was reachable only through the dead
+ * backend/src/services/index.js barrel (itself never required by
+ * index.js) and/or other top-level sibling services that are themselves
+ * unreachable from any mounted route. backend/src/services/legacy/equipmentExchangeService.js
+ * is the confirmed-live copy. Collapsed to a re-export per the
+ * productReviewService.js precedent rather than kept as a second,
+ * independently-drifting copy - see .ai/tasks/ACTIVE.md for the full
+ * duplicate-file remediation and the (small) set of pairs that were left
+ * unmerged as genuinely different features instead.
  */
 
 'use strict';
 
-const pool = require('../database/pool');
-
-class EquipmentExchangeService {
-  async createListing(listedBy, data) {
-    const { equipmentName, equipmentType, conditionGrade, description, images, pricingType, priceInr, locationAddress, stateId } = data || {};
-    if (!equipmentName) throw new Error('equipmentName is required');
-    if (!conditionGrade) throw new Error('conditionGrade is required');
-    const resolvedPricingType = pricingType || 'priced';
-    if (resolvedPricingType === 'priced' && !(Number(priceInr) >= 0)) throw new Error('priceInr is required and must be >= 0 for a priced listing');
-
-    const result = await pool.query(
-      `INSERT INTO equipment_exchange_listings
-        (listed_by, equipment_name, equipment_type, condition_grade, description, images, pricing_type, price_inr, location_address, state_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
-      [listedBy, equipmentName, equipmentType || null, conditionGrade, description || null,
-        JSON.stringify(images || []), resolvedPricingType, resolvedPricingType === 'priced' ? priceInr : null,
-        locationAddress || null, stateId || null]
-    );
-    return result.rows[0];
-  }
-
-  async listAvailable({ equipmentType, stateId, pricingType } = {}) {
-    const conditions = [`status = 'available'`];
-    const params = [];
-    if (equipmentType) { params.push(equipmentType); conditions.push(`equipment_type = $${params.length}`); }
-    if (stateId) { params.push(stateId); conditions.push(`state_id = $${params.length}`); }
-    if (pricingType) { params.push(pricingType); conditions.push(`pricing_type = $${params.length}`); }
-
-    const result = await pool.query(
-      `SELECT eel.*, u.name AS listed_by_name
-         FROM equipment_exchange_listings eel
-         JOIN users u ON u.id = eel.listed_by
-        WHERE ${conditions.join(' AND ')}
-        ORDER BY eel.created_at DESC`,
-      params
-    );
-    return result.rows;
-  }
-
-  async getListing(listingId) {
-    const result = await pool.query(
-      `SELECT eel.*, u.name AS listed_by_name
-         FROM equipment_exchange_listings eel
-         JOIN users u ON u.id = eel.listed_by
-        WHERE eel.id = $1`,
-      [listingId]
-    );
-    if (result.rows.length === 0) throw new Error('Listing not found');
-    return result.rows[0];
-  }
-
-  async reserveListing(listingId, reservedBy) {
-    const result = await pool.query(
-      `UPDATE equipment_exchange_listings SET status = 'reserved', reserved_by = $1, updated_at = NOW()
-       WHERE id = $2 AND status = 'available' RETURNING *`,
-      [reservedBy, listingId]
-    );
-    if (result.rows.length === 0) throw new Error('Listing not found or not available');
-    return result.rows[0];
-  }
-
-  async completeExchange(listingId, listedBy) {
-    const result = await pool.query(
-      `UPDATE equipment_exchange_listings SET status = 'exchanged', updated_at = NOW()
-       WHERE id = $1 AND listed_by = $2 AND status = 'reserved' RETURNING *`,
-      [listingId, listedBy]
-    );
-    if (result.rows.length === 0) throw new Error('Listing not found, not yours, or not reserved');
-    return result.rows[0];
-  }
-
-  async withdrawListing(listingId, listedBy) {
-    const result = await pool.query(
-      `UPDATE equipment_exchange_listings SET status = 'withdrawn', updated_at = NOW()
-       WHERE id = $1 AND listed_by = $2 AND status IN ('available', 'reserved') RETURNING *`,
-      [listingId, listedBy]
-    );
-    if (result.rows.length === 0) throw new Error('Listing not found, not yours, or already exchanged/withdrawn');
-    return result.rows[0];
-  }
-}
-
-module.exports = new EquipmentExchangeService();
+module.exports = require('./legacy/equipmentExchangeService.js');
