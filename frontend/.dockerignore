@@ -1,0 +1,33 @@
+# Keep the Docker build context small and secret-free.
+
+# Dependencies (npm ci reinstalls these fresh inside the image)
+node_modules/
+
+# VCS
+.git/
+.gitignore
+
+# Env files / secrets - never send these to the Docker daemon
+.env
+.env.*
+!.env.example
+
+# Build output (regenerated inside the image)
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test artifacts
+coverage/
+
+# Misc dev-only config not needed inside the image
+.github/
+
+# Editor/OS cruft
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
