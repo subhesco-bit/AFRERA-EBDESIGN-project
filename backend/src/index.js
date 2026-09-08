@@ -192,6 +192,9 @@ const advancedSearchRoutes = require('./routes/advancedSearchRoutes.js');
 const advancedFeatures = require('./routes/advancedFeatures.js');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
+const aiModelsRoutes = require('./routes/aiModelsRoutes.js');
+const aiTrainingEvaluationRoutes = require('./routes/aiTrainingEvaluationRoutes.js');
+
 /**
  * EBDESIGN Platform Backend - Main Entry Point
  * Auto-Discovery Architecture: Supports 200K+ services & routes
@@ -506,6 +509,10 @@ async function startup() {
     app.use('/api/unifiedai', unifiedAIRoutes);
     app.use('/api/ai', unifiedAIRoutes);
     app.use('/api/v1/ai', unifiedAIRoutes);
+    app.use('/api/ai/models', aiModelsRoutes);
+    app.use('/api/ai/training', aiTrainingEvaluationRoutes);
+    app.use('/api/v1/ai/models', aiModelsRoutes);
+    app.use('/api/v1/ai/training', aiTrainingEvaluationRoutes);
     app.use('/api/unifiedaigateway', unifiedAIGateway);
     app.use('/api/transaction', transactionRoutes);
     app.use('/api/trackdart', trackDartRoutes);
