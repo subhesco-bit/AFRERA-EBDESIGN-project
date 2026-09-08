@@ -44,7 +44,7 @@ const bulkOrderRoutes = require('../bulkOrderRoutes');
 
 function appFor(router, path) {
   const app = express();
-  app.use(expresson());
+  app.use(express.json());
   app.use(path, router);
   return app;
 }

@@ -3251,11 +3251,6 @@ export const industryAPI = {
   analyzeIndustry: (data) => api.post('/industry/analyze', data),
 };
 
-export var infrastructureAPI2 = {
-  getInfrastructure: () => api.get('/infrastructure'),
-  manageInfrastructure: (data) => api.post('/infrastructure/manage', data),
-};
-
 export const innovationAPI = {
   getInnovations: () => api.get('/innovations'),
   manageInnovation: (data) => api.post('/innovations/manage', data),
@@ -3289,11 +3284,6 @@ export const integrationHubAPI = {
 export const intellectualPropertyAPI = {
   getIntellectualProperty: () => api.get('/intellectual-property'),
   registerIP: (data) => api.post('/intellectual-property/register', data),
-};
-
-export const intercroppingAPI = {
-  getIntercropping: () => api.get('/intercropping'),
-  manageIntercropping: (data) => api.post('/intercropping/manage', data),
 };
 
 export const inventoryAPI2 = {
@@ -3681,11 +3671,6 @@ export const repositoryAPI = {
   manageRepository: (data) => api.post('/repositories/manage', data),
 };
 
-export const requestAPI = {
-  getRequests: () => api.get('/requests'),
-  createRequest: (data) => api.post('/requests', data),
-};
-
 export const researchAPI = {
   getResearch: () => api.get('/research'),
   conductResearch: (data) => api.post('/research/conduct', data),
@@ -3711,7 +3696,7 @@ export const reviewAPI2 = {
   submitReview: (data) => api.post('/reviews/submit', data),
 };
 
-export riskAPI2 = {
+export const riskAPI2 = {
   getRisk: () => api.get('/risk'),
   assessRisk: (data) => api.post('/risk/assess', data),
 };
@@ -4011,11 +3996,6 @@ export const temperatureAPI = {
   measureTemperature: (data) => api.post('/temperature/measure', data),
 };
 
-export const testingAPI = {
-  getTesting: () => api.get('/testing'),
-  performTesting: (data) => api.post('/testing/perform', data),
-};
-
 export const textileAPI = {
   getTextile: () => api.get('/textile'),
   manageTextile: (data) => api.post('/textile/manage', data),
@@ -4024,16 +4004,6 @@ export const textileAPI = {
 export const thermalAPI = {
   getThermal: () => api.get('/thermal'),
   manageThermal: (data) => api.post('/thermal/manage', data),
-};
-
-export const ticketAPI = {
-  getTickets: () => api.get('/tickets'),
-  createTicket: (data) => api.post('/tickets', data),
-};
-
-export const timelineAPI = {
-  getTimeline: () => api.get('/timeline'),
-  manageTimeline: (data) => api.post('/timeline/manage', data),
 };
 
 export const tomatoAPI = {
@@ -4109,11 +4079,6 @@ export const urbanAPI = {
 export const userAPI2 = {
   getUsers: () => api.get('/users'),
   manageUser: (data) => api.post('/users/manage', data),
-};
-
-export const validationAPI = {
-  getValidation: () => api.get('/validation'),
-  performValidation: (data) => api.post('/validation/perform', data),
 };
 
 export const valueChainAPI = {
@@ -5337,4 +5302,17 @@ export const debuggerAPI = {
 export const testerAPI = {
   getTests: () => api.get('/tester'),
   runTest: (data) => api.post('/tester/run', data),
+};
+
+// API Warning System - Production-Grade Warning Management
+export const warningAPI = {
+  generateWarning: (data) => api.post('/warnings/generate', data),
+  getUserWarnings: (filters) => api.get('/warnings/user', { params: filters }),
+  getSystemWarnings: (filters) => api.get('/warnings/system', { params: filters }),
+  getWarningStats: (timeRange) => api.get('/warnings/stats', { params: { timeRange } }),
+  acknowledgeWarning: (warningId) => api.post('/warnings/' + warningId + '/acknowledge'),
+  cleanupWarnings: () => api.post('/warnings/cleanup'),
+  getWarningMetrics: () => api.get('/warnings/metrics'),
+  resetWarningMetrics: () => api.post('/warnings/metrics/reset'),
+  getWarningHealth: () => api.get('/warnings/health'),
 };
