@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { productsAPI } from '../services/api'
 import { ShoppingCart, Star, Leaf, Award, Truck } from 'lucide-react'
 import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel'
+import { updateMetaDescription, updateCanonicalUrl, updateOpenGraphTags, updateTwitterCardTags } from '../components/RouteAnalytics'
 
 function ProductDetailPage() {
   const { id } = useParams()
@@ -12,6 +14,49 @@ function ProductDetailPage() {
     queryKey: ['product', id],
     queryFn: async () => (await productsAPI.getProduct(id)).data,
   })
+
+  // RouteMetadata only matches by path pattern (/products/:id), so it can only
+  // ever set the generic static title — it has no way to know which product
+  // is loaded. Set the real per-product title/OG/Twitter/JSON-LD here once the
+  // product data actually arrives.
+  useEffect(() => {
+    if (!product) return
+
+    const title = `${product.name} - AFRERA`
+    const description = product.description || product.usp || `Buy ${product.name} on AFRERA marketplace.`
+    const image = product.images?.[0]
+    const url = window.location.href
+
+    document.title = title
+    updateMetaDescription(description)
+    updateCanonicalUrl(url)
+    updateOpenGraphTags(title, description, image || '/icons/icon-512.png', url)
+    updateTwitterCardTags(title, description, image || '/icons/icon-512.png')
+
+    const scriptId = 'product-jsonld'
+    let script = document.getElementById(scriptId)
+    if (!script) {
+      script = document.createElement('script')
+      script.id = scriptId
+      script.type = 'application/ld+json'
+      document.head.appendChild(script)
+    }
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.name,
+      description,
+      image: image ? [image] : undefined,
+      offers: {
+        '@type': 'Offer',
+        price: product.base_price,
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock'
+      }
+    })
+
+    return () => { script?.remove() }
+  }, [product])
 
   if (isLoading) {
     return (

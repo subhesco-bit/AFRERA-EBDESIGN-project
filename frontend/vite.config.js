@@ -133,16 +133,13 @@ export default defineConfig(async () => {
               return 'vendor';
             }
 
-            // App chunks
-            if (id.includes('/pages/')) {
-              return 'pages';
-            }
-            if (id.includes('/components/')) {
-              return 'components';
-            }
-            if (id.includes('/modules/')) {
-              return 'modules';
-            }
+            // App code is intentionally left un-bucketed here: routes.js
+            // already lazy()-loads every page, and grouping all pages into
+            // one 'pages' chunk (or all modules into one 'modules' chunk)
+            // defeats that route-level code splitting by pulling every
+            // page's code into a single ~1.6MB chunk regardless of which
+            // route is visited. Letting Rollup split each dynamic import
+            // into its own chunk is what the lazy() calls are for.
           },
           // Optimize chunk file names for caching
           chunkFileNames: 'assets/js/[name]-[hash].js',

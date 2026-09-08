@@ -77,7 +77,7 @@ export function RouteAnalytics({ routeConfig }) {
 /**
  * Update meta description tag
  */
-function updateMetaDescription(description) {
+export function updateMetaDescription(description) {
   let metaTag = document.querySelector('meta[name="description"]')
   if (!metaTag) {
     metaTag = document.createElement('meta')
@@ -103,7 +103,7 @@ function updateMetaKeywords(keywords) {
 /**
  * Update canonical URL
  */
-function updateCanonicalUrl(url) {
+export function updateCanonicalUrl(url) {
   let linkTag = document.querySelector('link[rel="canonical"]')
   if (!linkTag) {
     linkTag = document.createElement('link')
@@ -116,7 +116,7 @@ function updateCanonicalUrl(url) {
 /**
  * Update Open Graph tags
  */
-function updateOpenGraphTags(title, description, image, url) {
+export function updateOpenGraphTags(title, description, image, url) {
   const ogTags = [
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
@@ -139,7 +139,7 @@ function updateOpenGraphTags(title, description, image, url) {
 /**
  * Update Twitter Card tags
  */
-function updateTwitterCardTags(title, description, image) {
+export function updateTwitterCardTags(title, description, image) {
   const twitterTags = [
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: title },
@@ -189,7 +189,7 @@ export function RouteMetadata({ route }) {
       updateOpenGraphTags(
         route.title,
         route.description,
-        route.image || '/og-image.png',
+        route.image || '/icons/icon-512.png',
         url
       )
     }
@@ -199,7 +199,7 @@ export function RouteMetadata({ route }) {
       updateTwitterCardTags(
         route.title,
         route.description,
-        route.image || '/twitter-image.png'
+        route.image || '/icons/icon-512.png'
       )
     }
 

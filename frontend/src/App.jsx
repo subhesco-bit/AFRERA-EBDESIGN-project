@@ -22,6 +22,16 @@ import { AccessibilityProvider } from './components/Accessibility/AccessibilityP
 // Lazy load EconomicDashboard (not in centralized routes yet)
 const EconomicDashboard = lazy(() => import('./pages/economic/EconomicDashboard'))
 
+// Module page components (M001-M150), created once at module scope. Creating
+// these inside the render body (previously done via Array.from(...).map in
+// the JSX below) would call lazy() fresh on every App re-render, producing a
+// new component identity each time and forcing React to unmount/remount the
+// active module page instead of reusing it.
+const MODULE_PAGES = Array.from({ length: 150 }, (_, i) => {
+  const moduleId = `M${String(i + 1).padStart(3, '0')}`
+  return { moduleId, Component: lazy(() => import(`./modules/${moduleId}/${moduleId}Page.jsx`)) }
+})
+
 function App() {
   const { user, checkAuth } = useAuthStore()
   const location = useLocation()
@@ -207,25 +217,21 @@ function App() {
                 />
 
                 {/* Module Routes (M001-M150) */}
-                {Array.from({ length: 150 }, (_, i) => {
-                  const moduleNum = i + 1
-                  const ModulePage = lazy(() => import(`./modules/M${String(moduleNum).padStart(3, '0')}/M${String(moduleNum).padStart(3, '0')}Page.jsx`))
-                  return (
-                    <Route
-                      key={`/module/M${String(moduleNum).padStart(3, '0')}`}
-                      path={`/module/M${String(moduleNum).padStart(3, '0')}`}
-                      element={
-                        <ProtectedRoute>
-                          <PageTransition transition="fade">
-                            <RouteSuspense>
-                              <ModulePage />
-                            </RouteSuspense>
-                          </PageTransition>
-                        </ProtectedRoute>
-                      }
-                    />
-                  )
-                })}
+                {MODULE_PAGES.map(({ moduleId, Component: ModulePage }) => (
+                  <Route
+                    key={`/module/${moduleId}`}
+                    path={`/module/${moduleId}`}
+                    element={
+                      <ProtectedRoute>
+                        <PageTransition transition="fade">
+                          <RouteSuspense>
+                            <ModulePage />
+                          </RouteSuspense>
+                        </PageTransition>
+                      </ProtectedRoute>
+                    }
+                  />
+                ))}
 
                 {/* Error Pages */}
                 <Route path="/error" element={<ErrorPage />} />
