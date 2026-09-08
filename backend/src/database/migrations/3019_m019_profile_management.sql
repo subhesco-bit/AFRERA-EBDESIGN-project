@@ -6,7 +6,7 @@
 -- User Profiles Table
 CREATE TABLE IF NOT EXISTS user_profiles (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE UNIQUE,
   first_name VARCHAR(100),
   last_name VARCHAR(100),
   display_name VARCHAR(255),
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
 -- Profile Views Table (shared with M018)
 CREATE TABLE IF NOT EXISTS profile_views (
   id SERIAL PRIMARY KEY,
-  profile_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  profile_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   viewer_user_id INTEGER,
   ip_address INET,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS profile_views (
 -- Profile Activity Table (shared with M018)
 CREATE TABLE IF NOT EXISTS profile_activity (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   activity_type VARCHAR(50) NOT NULL,
   details JSONB,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

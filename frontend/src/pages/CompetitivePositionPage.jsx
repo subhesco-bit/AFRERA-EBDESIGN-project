@@ -19,11 +19,11 @@
  *   confirming the source's terms were reviewed. That is a prompt to have the
  *   conversation, not a legal opinion.
  */
-import React, { useState } from 'react'
-import { competitorAPI } from '../services/api'
+import React, { useState } from 'react';
+import { competitorAPI } from '../services/api';
 import {
   ModulePage, Section, Field, Rupees, Value, AsyncState, DataTable,
-} from '../components/common/DataPrimitives'
+} from '../components/common/DataPrimitives';
 
 const METHODS = [
   ['manual_observation', 'Manual observation (someone read a price)'],
@@ -32,52 +32,52 @@ const METHODS = [
   ['licensed_feed', 'Licensed data feed'],
   ['partner_share', 'Shared by a partner'],
   ['automated_collection', 'Automated collection'],
-]
+];
 
 export default function CompetitivePositionPage() {
   const [obs, setObs] = useState({
     productName: '', competitor: '', channel: 'online', observedPriceInr: '',
     packSizeG: '', unit: 'pack', collectionMethod: 'manual_observation',
     sourceUrl: '', termsReviewed: false, matchConfidence: '',
-  })
-  const [saved, setSaved] = useState(null)
-  const [saveErr, setSaveErr] = useState(null)
-  const [query, setQuery] = useState({ productName: '', ourPricePerKg: '' })
-  const [position, setPosition] = useState(null)
-  const [loading, setLoading] = useState(false)
+  });
+  const [saved, setSaved] = useState(null);
+  const [saveErr, setSaveErr] = useState(null);
+  const [query, setQuery] = useState({ productName: '', ourPricePerKg: '' });
+  const [position, setPosition] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const set = (k) => (e) => setObs((o) => ({
     ...o, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
-  }))
+  }));
 
-  const needsTerms = obs.collectionMethod === 'automated_collection'
-  const canSubmit = obs.productName && obs.competitor && obs.observedPriceInr
-    && (!needsTerms || (obs.termsReviewed && obs.sourceUrl))
+  const needsTerms = obs.collectionMethod === 'automated_collection';
+  const canSubmit = obs.productName && obs.competitor && obs.observedPriceInr &&
+    (!needsTerms || (obs.termsReviewed && obs.sourceUrl));
 
   const submit = async (e) => {
-    e.preventDefault(); setSaveErr(null); setSaved(null)
+    e.preventDefault(); setSaveErr(null); setSaved(null);
     try {
       const r = await competitorAPI.observe({
         ...obs,
         observedPriceInr: Number(obs.observedPriceInr),
         packSizeG: obs.packSizeG ? Number(obs.packSizeG) : null,
         matchConfidence: obs.matchConfidence ? Number(obs.matchConfidence) : null,
-      })
-      setSaved(r.data?.data)
-    } catch (err) { setSaveErr(err.response?.data?.error || err.message) }
-  }
+      });
+      setSaved(r.data?.data);
+    } catch (err) { setSaveErr(err.response?.data?.error || err.message); }
+  };
 
   const check = async (e) => {
-    e.preventDefault(); setLoading(true)
+    e.preventDefault(); setLoading(true);
     try {
-      const r = await competitorAPI.position({
+      let r = await competitorAPI.position({
         productName: query.productName,
         ourPricePerKg: query.ourPricePerKg,
-      })
-      setPosition(r.data?.data)
-    } catch (err) { setPosition({ error: err.response?.data?.error || err.message }) }
-    finally { setLoading(false) }
-  }
+      });
+      setPosition(r.data?.data);
+    } catch (err) { setPosition({ error: err.response?.data?.error || err.message }); }
+    finally { setLoading(false); }
+  };
 
   return (
     <ModulePage
@@ -119,7 +119,7 @@ export default function CompetitivePositionPage() {
           </Field>
 
           {needsTerms && (
-            <div style={{ width: '100%', border: '1px solid #d4a72c66', background: '#fff8c5',
+            <div style={{ width: '100%', border: '1px solid hsl(var(--sev-warning))', background: 'color-mix(in srgb, hsl(var(--sev-warning)) 16%, transparent)',
               borderRadius: 6, padding: '12px 14px' }}>
               <p style={{ margin: '0 0 8px', fontSize: 14 }}>
                 <strong>Automated collection.</strong> Many retailers prohibit this in their
@@ -147,7 +147,7 @@ export default function CompetitivePositionPage() {
           </button>
         </form>
 
-        {saveErr && <p role="alert" style={{ color: '#cf222e', marginTop: 10 }}>{saveErr}</p>}
+        {saveErr && <p role="alert" style={{ color: 'hsl(var(--destructive))', marginTop: 10 }}>{saveErr}</p>}
         {saved && (
           <p role="status" style={{ marginTop: 10, fontSize: 14 }}>
             Recorded. {saved.note || ''}
@@ -177,15 +177,15 @@ export default function CompetitivePositionPage() {
           {position && !position.error && position.observations > 0 && (
             <div style={{ marginTop: 16 }}>
               {position.stale && (
-                <div role="alert" style={{ border: '1px solid #bc4c00', borderLeft: '4px solid #bc4c00',
-                  background: '#ffece5', borderRadius: 6, padding: '10px 12px', marginBottom: 12 }}>
+                <div role="alert" style={{ border: '1px solid hsl(var(--sev-critical))', borderLeft: '4px solid hsl(var(--sev-critical))',
+                  background: 'color-mix(in srgb, hsl(var(--sev-critical)) 12%, transparent)', borderRadius: 6, padding: '10px 12px', marginBottom: 12 }}>
                   <strong>No recommendation — data is stale.</strong>
                   <p style={{ margin: '4px 0 0', fontSize: 14 }}>{position.note}</p>
                 </div>
               )}
               {!position.stale && !position.recommendation && position.note && (
-                <div role="note" style={{ border: '1px solid #0969da', borderLeft: '4px solid #0969da',
-                  background: '#ddf4ff', borderRadius: 6, padding: '10px 12px', marginBottom: 12 }}>
+                <div role="note" style={{ border: '1px solid hsl(var(--sev-info))', borderLeft: '4px solid hsl(var(--sev-info))',
+                  background: 'color-mix(in srgb, hsl(var(--sev-info)) 12%, transparent)', borderRadius: 6, padding: '10px 12px', marginBottom: 12 }}>
                   <strong>No recommendation.</strong>
                   <p style={{ margin: '4px 0 0', fontSize: 14 }}>{position.note}</p>
                 </div>
@@ -227,5 +227,5 @@ export default function CompetitivePositionPage() {
         </AsyncState>
       </Section>
     </ModulePage>
-  )
+  );
 }

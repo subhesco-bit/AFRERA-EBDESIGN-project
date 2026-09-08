@@ -8,28 +8,28 @@ const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 async function registerPoultryFlock(flockData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { flockName, birdType, birdCount, location, farmId, averageEggProduction, healthStatus } = flockData;
-  
+
   const res = await pg.query(
     `INSERT INTO poultry_flocks (flock_name, bird_type, bird_count, location, farm_id, average_egg_production, health_status, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW(), NOW())
      RETURNING *`,
-    [flockName, birdType, birdCount, JSON.stringify(location), farmId, averageEggProduction, healthStatus]
+    [flockName, birdType, birdCount, JSON.stringify(location), farmId, averageEggProduction, healthStatus],
   );
-  
+
   signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
     entityType: 'poultry_flock',
     flockId: res.rows[0].id,
     flockName,
     birdType,
-    birdCount
+    birdCount,
   }, {
     severity: SEVERITY.INFO,
     source: 'poultry_management_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
-  
+
   return res.rows[0];
 }
 
@@ -43,12 +43,12 @@ async function getPoultryFlock(flockId) {
 async function listPoultryFlocks({ page = 1, limit = 20, farmId, birdType, status } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const offset = (page - 1) * limit;
   let query = 'SELECT * FROM poultry_flocks WHERE 1=1';
   const params = [];
   let paramIndex = 1;
-  
+
   if (farmId) {
     query += ` AND farm_id = $${paramIndex++}`;
     params.push(farmId);
@@ -61,23 +61,23 @@ async function listPoultryFlocks({ page = 1, limit = 20, farmId, birdType, statu
     query += ` AND status = $${paramIndex++}`;
     params.push(status);
   }
-  
+
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
-  
+
   const res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace(`SELECT * FROM poultry_flocks`, 'SELECT COUNT(*) FROM poultry_flocks').split('LIMIT')[0], params.slice(0, -2));
+  const totalRes = await pg.query(query.replace('SELECT * FROM poultry_flocks', 'SELECT COUNT(*) FROM poultry_flocks').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
-  
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function updatePoultryFlock(flockId, updates) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { flockName, birdType, birdCount, location, averageEggProduction, healthStatus, status } = updates;
-  
+
   const res = await pg.query(
     `UPDATE poultry_flocks 
      SET flock_name = COALESCE($1, flock_name),
@@ -90,19 +90,19 @@ async function updatePoultryFlock(flockId, updates) {
          updated_at = NOW()
      WHERE id = $8
      RETURNING *`,
-    [flockName, birdType, birdCount, location ? JSON.stringify(location) : null, averageEggProduction, healthStatus, status, flockId]
+    [flockName, birdType, birdCount, location ? JSON.stringify(location) : null, averageEggProduction, healthStatus, status, flockId],
   );
-  
+
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'poultry_flock',
     flockId,
-    action: 'updated'
+    action: 'updated',
   }, {
     severity: SEVERITY.INFO,
     source: 'poultry_management_service',
-    entityId: flockId
+    entityId: flockId,
   });
-  
+
   return res.rows[0] || null;
 }
 
@@ -110,12 +110,12 @@ async function updatePoultryFlock(flockId, updates) {
 async function analyzeEggProduction(flockId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const flock = await getPoultryFlock(flockId);
   if (!flock) {
     return { success: false, error: 'Flock not found' };
   }
-  
+
   const analysis = {
     flockId,
     flockName: flock.flock_name,
@@ -124,9 +124,9 @@ async function analyzeEggProduction(flockId) {
     projectedDailyYield: calculateProjectedYield(flock),
     feedOptimization: generateFeedOptimization(flock),
     healthRecommendations: generateHealthRecommendations(flock),
-    environmentalAlerts: generateEnvironmentalAlerts(flock)
+    environmentalAlerts: generateEnvironmentalAlerts(flock),
   };
-  
+
   return { success: true, data: analysis };
 }
 
@@ -151,7 +151,7 @@ function calculateProjectedYield(flock) {
   return {
     daily: dailyProduction,
     weekly: dailyProduction * 7,
-    monthly: dailyProduction * 30
+    monthly: dailyProduction * 30,
   };
 }
 
@@ -161,7 +161,7 @@ function generateFeedOptimization(flock) {
     recommendations.push({
       type: 'feed',
       message: 'Increase calcium and protein in feed to boost egg production',
-      priority: 'high'
+      priority: 'high',
     });
   }
   return recommendations;
@@ -173,7 +173,7 @@ function generateHealthRecommendations(flock) {
     recommendations.push({
       type: 'health',
       message: 'Review health protocols and consult veterinarian',
-      priority: 'high'
+      priority: 'high',
     });
   }
   return recommendations;
@@ -185,7 +185,7 @@ function generateEnvironmentalAlerts(flock) {
     alerts.push({
       type: 'environment',
       message: 'Large flock requires enhanced ventilation monitoring',
-      priority: 'medium'
+      priority: 'medium',
     });
   }
   return alerts;
@@ -195,7 +195,7 @@ function generateEnvironmentalAlerts(flock) {
 async function getPoultryAnalytics({ startDate, endDate, farmId } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = `
     SELECT 
       bird_type,
@@ -207,7 +207,7 @@ async function getPoultryAnalytics({ startDate, endDate, farmId } = {}) {
   `;
   const params = [];
   let paramIndex = 1;
-  
+
   if (startDate) {
     query += ` AND created_at >= $${paramIndex++}`;
     params.push(startDate);
@@ -220,16 +220,16 @@ async function getPoultryAnalytics({ startDate, endDate, farmId } = {}) {
     query += ` AND farm_id = $${paramIndex++}`;
     params.push(farmId);
   }
-  
-  query += ` GROUP BY bird_type ORDER BY total_birds DESC`;
-  
+
+  query += ' GROUP BY bird_type ORDER BY total_birds DESC';
+
   const res = await pg.query(query, params);
-  
+
   return {
     byBirdType: res.rows,
     totalFlocks: res.rows.reduce((sum, row) => sum + parseInt(row.flock_count), 0),
     totalBirds: res.rows.reduce((sum, row) => sum + parseInt(row.total_birds), 0),
-    recommendations: generatePoultryAnalyticsRecommendations(res.rows)
+    recommendations: generatePoultryAnalyticsRecommendations(res.rows),
   };
 }
 
@@ -240,7 +240,7 @@ function generatePoultryAnalyticsRecommendations(birdData) {
     recommendations.push({
       type: 'resource_allocation',
       message: `Highest concentration of ${topBirdType.bird_type}. Allocate specialized resources.`,
-      priority: 'high'
+      priority: 'high',
     });
   }
   return recommendations;

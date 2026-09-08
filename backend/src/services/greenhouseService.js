@@ -1,22 +1,20 @@
-/**
- * greenhouseService (thin wrapper)
- *
- * (2026-09-08) Duplicate-file remediation pass: this top-level copy has ZERO
- * live callers - verified via a repo-wide require() grep cross-referenced
- * against the actual mounted-route reachability graph rooted at
- * backend/src/index.js (not just "a route file requires it" - confirmed
- * that route file is itself require()'d and app.use()'d/mountRoute()'d
- * live). It was reachable only through the dead
- * backend/src/services/index.js barrel (itself never required by
- * index.js) and/or other top-level sibling services that are themselves
- * unreachable from any mounted route. backend/src/services/legacy/greenhouseService.js
- * is the confirmed-live copy. Collapsed to a re-export per the
- * productReviewService.js precedent rather than kept as a second,
- * independently-drifting copy - see .ai/tasks/ACTIVE.md for the full
- * duplicate-file remediation and the (small) set of pairs that were left
- * unmerged as genuinely different features instead.
- */
+const db = require('../database/dbConnection');
+const logger = require('../utils/logger');
 
-'use strict';
+class GreenhouseService {
+  async createGreenhouse(data) {
+  // Validate inputs
+    if (!data) throw new Error('Missing required parameter');
 
-module.exports = require('./legacy/greenhouseService.js');
+    try {
+      const id = require('uuid').v4();
+      await db('greenhouses').insert({
+        id, farmer_id: data.farmer_id, area: data.area, crops: data.crops, created_at: new Date(),
+      });
+      logger.info(`Greenhouse created: ${id}`);
+      return { greenhouse_id: id, status: 'active' };
+    } catch (error) { logger.error(`Create greenhouse failed: ${error.message}`); throw error; }
+  }
+}
+
+module.exports = new GreenhouseService();

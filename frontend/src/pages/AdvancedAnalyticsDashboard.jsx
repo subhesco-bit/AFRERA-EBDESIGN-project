@@ -9,6 +9,7 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
 import { EnhancedErrorBoundary } from '../components/ErrorBoundary/EnhancedErrorBoundary';
+import { analyticsAPI } from '../services/api';
 
 const AdvancedAnalyticsDashboard = () => {
   const [timeRange, setTimeRange] = useState('30d');
@@ -17,33 +18,35 @@ const AdvancedAnalyticsDashboard = () => {
   // Fetch platform analytics
   const { data: platformData, isLoading: platformLoading, error: platformError } = useQuery({
     queryKey: ['platformAnalytics', timeRange],
-    queryFn: () => fetch(`/api/analytics/platform?timeRange=${timeRange}`)
-      .then(res => res.json())
-      .then(res => res.data),
-    refetchInterval: 300000 // 5 minutes
+    queryFn: async () => {
+      const response = await analyticsAPI.getPlatformStats({ timeRange });
+      return response.data?.data || response.data;
+    },
+    refetchInterval: 300000, // 5 minutes
   });
 
   // Fetch market trends
   const { data: marketData, isLoading: marketLoading } = useQuery({
     queryKey: ['marketTrends', 'rice', timeRange],
-    queryFn: () => fetch(`/api/analytics/market/trends?cropType=rice&timeRange=${timeRange}`)
-      .then(res => res.json())
-      .then(res => res.data),
-    enabled: !!platformData
+    queryFn: async () => {
+      let response = await analyticsAPI.getInsights({ cropType: 'rice', timeRange });
+      return response.data?.data || response.data;
+    },
+    enabled: Boolean(platformData),
   });
 
   const timeRanges = [
     { value: '7d', label: '7 Days' },
     { value: '30d', label: '30 Days' },
     { value: '90d', label: '90 Days' },
-    { value: '1y', label: '1 Year' }
+    { value: '1y', label: '1 Year' },
   ];
 
   const metrics = [
     { value: 'revenue', label: 'Revenue' },
     { value: 'orders', label: 'Orders' },
     { value: 'farmers', label: 'Active Farmers' },
-    { value: 'crops', label: 'Active Crops' }
+    { value: 'crops', label: 'Active Crops' },
   ];
 
   if (platformLoading) {
@@ -137,8 +140,8 @@ const AdvancedAnalyticsDashboard = () => {
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Trend Direction</span>
               <span className={`font-semibold ${
-                marketData?.trends?.trend === 'increasing' ? 'text-green-600' : 
-                marketData?.trends?.trend === 'decreasing' ? 'text-red-600' : 'text-gray-600'
+                marketData?.trends?.trend === 'increasing' ? 'text-green-600' :
+                  marketData?.trends?.trend === 'decreasing' ? 'text-red-600' : 'text-gray-600'
               }`}>
                 {marketData?.trends?.trend || 'stable'}
               </span>

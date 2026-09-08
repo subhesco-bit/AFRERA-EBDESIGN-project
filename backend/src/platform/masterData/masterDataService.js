@@ -4,7 +4,7 @@
  * - Farmers, Farms, Crops, Products, Buyers
  * Prevents duplicates, manages deduplication
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class MasterDataService {
   constructor() {

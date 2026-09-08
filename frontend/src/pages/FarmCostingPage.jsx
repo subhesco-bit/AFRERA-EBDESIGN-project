@@ -1,50 +1,50 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { farmCostingAPI } from '../services/api'
-import { Calculator, Plus, X, Trash2, IndianRupee } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { farmCostingAPI } from '../services/api';
+import { Calculator, Plus, X, Trash2, IndianRupee } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const CATEGORIES = ['Seeds', 'Fertilizer', 'Labour', 'Irrigation', 'Machinery', 'Pesticides', 'Transport', 'Other']
+const CATEGORIES = ['Seeds', 'Fertilizer', 'Labour', 'Irrigation', 'Machinery', 'Pesticides', 'Transport', 'Other'];
 
-const emptyForm = { crop: '', field_name: '', season: '', category: 'Seeds', amount: '', expected_revenue: '', notes: '' }
+const emptyForm = { crop: '', field_name: '', season: '', category: 'Seeds', amount: '', expected_revenue: '', notes: '' };
 
 function FarmCostingPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(emptyForm)
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyForm);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['farm-costing-records'],
     queryFn: async () => (await farmCostingAPI.getRecords()).data?.data ?? [],
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => farmCostingAPI.createRecord(payload),
     onSuccess: () => {
-      toast.success('Cost record added')
-      queryClient.invalidateQueries({ queryKey: ['farm-costing-records'] })
-      setShowForm(false)
-      setForm(emptyForm)
+      toast.success('Cost record added');
+      queryClient.invalidateQueries({ queryKey: ['farm-costing-records'] });
+      setShowForm(false);
+      setForm(emptyForm);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save cost record'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => farmCostingAPI.deleteRecord(id),
-    onSuccess: () => { toast.success('Record removed'); queryClient.invalidateQueries({ queryKey: ['farm-costing-records'] }) },
+    onSuccess: () => { toast.success('Record removed'); queryClient.invalidateQueries({ queryKey: ['farm-costing-records'] }); },
     onError: () => toast.error('Failed to remove record'),
-  })
+  });
 
-  const records = data || []
-  const totalCost = records.reduce((s, r) => s + (Number(r.amount) || 0), 0)
-  const totalRevenue = records.reduce((s, r) => s + (Number(r.expected_revenue) || 0), 0)
-  const margin = totalRevenue - totalCost
+  const records = data || [];
+  const totalCost = records.reduce((s, r) => s + (Number(r.amount) || 0), 0);
+  const totalRevenue = records.reduce((s, r) => s + (Number(r.expected_revenue) || 0), 0);
+  const margin = totalRevenue - totalCost;
   const byCategory = CATEGORIES.map((c) => ({
     category: c,
     total: records.filter((r) => r.category === c).reduce((s, r) => s + (Number(r.amount) || 0), 0),
-  })).filter((c) => c.total > 0)
+  })).filter((c) => c.total > 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -125,7 +125,7 @@ function FarmCostingPage() {
                   <td className="px-4 py-3"><span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-800">{r.category}</span></td>
                   <td className="px-4 py-3 text-gray-700">₹{r.amount}</td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => { if (confirm('Remove this entry?')) deleteMutation.mutate(r.id) }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => { if (confirm('Remove this entry?')) deleteMutation.mutate(r.id); }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
@@ -144,13 +144,13 @@ function FarmCostingPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.crop || !form.amount) { toast.error('Crop and amount are required'); return }
+                  e.preventDefault();
+                  if (!form.crop || !form.amount) { toast.error('Crop and amount are required'); return; }
                   saveMutation.mutate({
                     ...form,
                     amount: Number(form.amount),
                     expected_revenue: form.expected_revenue === '' ? null : Number(form.expected_revenue),
-                  })
+                  });
                 }}
                 className="space-y-4"
               >
@@ -209,7 +209,7 @@ function FarmCostingPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default FarmCostingPage
+export default FarmCostingPage;

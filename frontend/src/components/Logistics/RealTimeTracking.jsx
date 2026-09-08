@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { MapPin, Truck, Clock, Navigation, AlertTriangle } from 'lucide-react';
-import { logisticsAPI } from '../../services/api';
+import { logisticsAPI } from '../../services/componentApi';
 
 // FE-02 note: not resolved here. This component polls on a 5-second interval
 // for live position/temperature data tied to a specific shipmentId — a
@@ -42,7 +42,7 @@ const RealTimeTracking = ({ shipmentId }) => {
 
   const loadTemperatureData = async () => {
     try {
-      const response = await logisticsAPI.getTemperatureData(shipmentId);
+      let response = await logisticsAPI.getTemperatureData(shipmentId);
       if (response.data.data.length > 0) {
         setTemperature(response.data.data[0]);
       }
@@ -53,7 +53,7 @@ const RealTimeTracking = ({ shipmentId }) => {
 
   const loadAlerts = async () => {
     try {
-      const response = await logisticsAPI.getTemperatureAlerts(shipmentId);
+      let response = await logisticsAPI.getTemperatureAlerts(shipmentId);
       setAlerts(response.data.data);
     } catch (error) {
       console.error('Error loading alerts:', error);

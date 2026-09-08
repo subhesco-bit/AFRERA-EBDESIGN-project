@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { TrendingUp, FileText, Users, Database, Activity, BookOpen, FlaskConical, BarChart3, Lightbulb, Award } from 'lucide-react'
-import { researchAndDevelopmentAPI } from '../services/api'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { TrendingUp, FileText, Users, Database, Activity, BookOpen, FlaskConical, BarChart3, Lightbulb, Award } from 'lucide-react';
+import { researchAndDevelopmentAPI } from '../services/api';
 
 // This dashboard previously showed entirely invented data - hardcoded named
 // field trials ("Chak-Hao Black Rice Variety" in Imphal), fabricated AI
@@ -17,36 +17,36 @@ import { researchAndDevelopmentAPI } from '../services/api'
 // fresh backend - that's shown honestly as an empty state rather than
 // papered over with invented rows.
 function ResearchDashboardPage() {
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('overview');
 
   const { data: analytics } = useQuery({
     queryKey: ['rd-analytics'],
     queryFn: () => researchAndDevelopmentAPI.getRDAnalytics().then(r => r.data?.data),
-  })
+  });
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
     queryKey: ['rd-projects'],
     queryFn: () => researchAndDevelopmentAPI.getRDProjects({}).then(r => r.data?.data),
     enabled: activeTab === 'overview' || activeTab === 'trials',
-  })
+  });
 
   const { data: innovations, isLoading: innovationsLoading } = useQuery({
     queryKey: ['rd-innovations'],
     queryFn: () => researchAndDevelopmentAPI.getInnovations({}).then(r => r.data?.data),
     enabled: activeTab === 'data',
-  })
+  });
 
   const { data: knowledge, isLoading: knowledgeLoading } = useQuery({
     queryKey: ['rd-knowledge'],
     queryFn: () => researchAndDevelopmentAPI.searchKnowledgeBase('').then(r => r.data?.data),
     enabled: activeTab === 'knowledge',
-  })
+  });
 
   const { data: collaborations, isLoading: collaborationsLoading } = useQuery({
     queryKey: ['rd-collaborations'],
     queryFn: () => researchAndDevelopmentAPI.getCollaborations({}).then(r => r.data?.data),
     enabled: activeTab === 'collaboration',
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -63,15 +63,15 @@ function ResearchDashboardPage() {
           { id: 'data', label: 'Innovations & Patents', icon: Lightbulb },
           { id: 'knowledge', label: 'Knowledge Base', icon: BookOpen },
           { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-          { id: 'collaboration', label: 'Collaboration', icon: Users }
+          { id: 'collaboration', label: 'Collaboration', icon: Users },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-teal-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              activeTab === tab.id ?
+                'bg-teal-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             <tab.icon className="w-5 h-5 mr-2" />
@@ -175,7 +175,7 @@ function ResearchDashboardPage() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       trial.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      'bg-blue-100 text-blue-800'
+                        'bg-blue-100 text-blue-800'
                     }`}>
                       {trial.status}
                     </span>
@@ -218,8 +218,8 @@ function ResearchDashboardPage() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       project.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      project.status === 'active' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
+                        project.status === 'active' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
                     }`}>
                       {project.status}
                     </span>
@@ -251,8 +251,8 @@ function ResearchDashboardPage() {
                             <span className="text-gray-600">{m.name}</span>
                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                               m.status === 'completed' ? 'bg-green-100 text-green-800' :
-                              m.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                              'bg-gray-100 text-gray-600'
+                                m.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-gray-100 text-gray-600'
                             }`}>
                               {m.status}
                             </span>
@@ -395,7 +395,7 @@ function ResearchDashboardPage() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       collab.status === 'active' ? 'bg-green-100 text-green-800' :
-                      'bg-yellow-100 text-yellow-800'
+                        'bg-yellow-100 text-yellow-800'
                     }`}>
                       {collab.status}
                     </span>
@@ -407,7 +407,7 @@ function ResearchDashboardPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default ResearchDashboardPage
+export default ResearchDashboardPage;

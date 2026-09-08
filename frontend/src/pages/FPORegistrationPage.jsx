@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * FPO Registration (backend/src/modules/M051). Generic operation panel -
@@ -12,5 +12,5 @@ export default function FPORegistrationPage() {
       title="FPO Registration"
       description="Farmer Producer Organization registration and management."
     />
-  )
+  );
 }

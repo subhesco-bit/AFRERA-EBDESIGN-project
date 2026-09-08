@@ -19,7 +19,7 @@ async function createPricingRule(ruleData) {
       base_price,
       conditions,
       adjustments,
-      metadata
+      metadata,
     } = ruleData;
 
     const rule = {
@@ -31,7 +31,7 @@ async function createPricingRule(ruleData) {
       conditions,
       adjustments,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered pricing optimization
@@ -42,8 +42,8 @@ async function createPricingRule(ruleData) {
         market_data: await getMarketData(product_id),
         demand_forecast: await getDemandForecast(product_id),
         competitor_pricing: await getCompetitorPricing(product_id),
-        elasticity_analysis: await analyzePriceElasticity(product_id)
-      }
+        elasticity_analysis: await analyzePriceElasticity(product_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -66,8 +66,8 @@ async function createPricingRule(ruleData) {
         rule.status,
         JSON.stringify(rule.ai_recommendations),
         JSON.stringify(metadata || {}),
-        rule.created_at
-      ]
+        rule.created_at,
+      ],
     );
 
     logger.info(`Pricing rule created: ${rule.rule_id}`);
@@ -101,11 +101,11 @@ async function calculateDynamicPrice(productId, context = {}) {
       parameters: {
         product_id: productId,
         base_price: basePrice,
-        context: context,
+        context,
         demand: await getCurrentDemand(productId),
         inventory: await getInventoryLevel(productId),
-        time_factors: await getTimeFactors()
-      }
+        time_factors: await getTimeFactors(),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -117,7 +117,7 @@ async function calculateDynamicPrice(productId, context = {}) {
       applied_rules: applicableRules,
       adjustments: appliedAdjustments,
       ai_optimization: aiResponse,
-      calculated_at: new Date().toISOString()
+      calculated_at: new Date().toISOString(),
     };
   } catch (error) {
     logger.error('Error calculating dynamic price', { error: error.message });
@@ -131,39 +131,39 @@ async function calculateDynamicPrice(productId, context = {}) {
 async function listPricingRules({ page = 1, limit = 20, productId = null, status = null } = {}) {
   try {
     const offset = (page - 1) * limit;
-    
+
     let countQuery = 'SELECT COUNT(*) FROM pricing_rules';
-    let countParams = [];
-    let conditions = [];
-    
+    const countParams = [];
+    const conditions = [];
+
     if (productId) {
-      conditions.push('product_id = $' + (conditions.length + 1));
+      conditions.push(`product_id = $${ conditions.length + 1}`);
       countParams.push(productId);
     }
     if (status) {
-      conditions.push('status = $' + (conditions.length + 1));
+      conditions.push(`status = $${ conditions.length + 1}`);
       countParams.push(status);
     }
-    
+
     if (conditions.length > 0) {
-      countQuery += ' WHERE ' + conditions.join(' AND ');
+      countQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
+
     const totalRes = await pool.query(countQuery, countParams);
     const total = parseInt(totalRes.rows[0].count || '0');
-    
+
     let dataQuery = 'SELECT * FROM pricing_rules';
-    let dataParams = [...countParams];
-    
+    const dataParams = [...countParams];
+
     if (conditions.length > 0) {
-      dataQuery += ' WHERE ' + conditions.join(' AND ');
+      dataQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
-    dataQuery += ' ORDER BY created_at DESC LIMIT $' + (dataParams.length + 1) + ' OFFSET $' + (dataParams.length + 2);
+
+    dataQuery += ` ORDER BY created_at DESC LIMIT $${ dataParams.length + 1 } OFFSET $${ dataParams.length + 2}`;
     dataParams.push(limit, offset);
-    
+
     const res = await pool.query(dataQuery, dataParams);
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   } catch (error) {
     logger.error('Error listing pricing rules', { error: error.message });
     throw new Error('Failed to list pricing rules');
@@ -195,8 +195,8 @@ async function updatePricingRule(ruleId, updates) {
         adjustments ? JSON.stringify(adjustments) : null,
         status,
         metadata ? JSON.stringify(metadata) : null,
-        ruleId
-      ]
+        ruleId,
+      ],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -211,7 +211,7 @@ async function updatePricingRule(ruleId, updates) {
 async function deletePricingRule(ruleId) {
   try {
     const res = await pool.query('DELETE FROM pricing_rules WHERE rule_id = $1 RETURNING rule_id', [ruleId]);
-    return !!res.rows[0];
+    return Boolean(res.rows[0]);
   } catch (error) {
     logger.error('Error deleting pricing rule', { error: error.message });
     throw new Error('Failed to delete pricing rule');
@@ -227,7 +227,7 @@ async function getMarketData(productId) {
   return {
     average_price: 100,
     price_range: { min: 80, max: 120 },
-    demand_level: 'high'
+    demand_level: 'high',
   };
 }
 
@@ -235,7 +235,7 @@ async function getDemandForecast(productId) {
   return {
     forecast: 'increasing',
     confidence: 0.8,
-    time_horizon: '30_days'
+    time_horizon: '30_days',
   };
 }
 
@@ -243,7 +243,7 @@ async function getCompetitorPricing(productId) {
   return [
     { competitor: 'A', price: 95 },
     { competitor: 'B', price: 105 },
-    { competitor: 'C', price: 110 }
+    { competitor: 'C', price: 110 },
   ];
 }
 
@@ -251,7 +251,7 @@ async function analyzePriceElasticity(productId) {
   return {
     elasticity: -1.5,
     sensitivity: 'high',
-    optimal_price_point: 102
+    optimal_price_point: 102,
   };
 }
 
@@ -263,7 +263,7 @@ async function getBasePrice(productId) {
 async function getApplicableRules(productId, context) {
   const res = await pool.query(
     'SELECT * FROM pricing_rules WHERE product_id = $1 AND status = $2',
-    [productId, 'active']
+    [productId, 'active'],
   );
   return res.rows;
 }
@@ -273,7 +273,7 @@ function applyRule(rule, basePrice, context) {
     rule_id: rule.rule_id,
     rule_name: rule.rule_name,
     amount: basePrice * 0.1,
-    type: 'percentage'
+    type: 'percentage',
   };
 }
 
@@ -290,7 +290,7 @@ async function getTimeFactors() {
   return {
     hour: new Date().getHours(),
     day_of_week: new Date().getDay(),
-    season: 'monsoon'
+    season: 'monsoon',
   };
 }
 
@@ -299,6 +299,6 @@ module.exports = {
   calculateDynamicPrice,
   listPricingRules,
   updatePricingRule,
-  deletePricingRule
+  deletePricingRule,
 };
 

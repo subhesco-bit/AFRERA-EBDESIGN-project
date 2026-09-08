@@ -7,8 +7,8 @@ router.post('/villages', controller.createVillage);
 router.post('/villages/:villageId/resources', controller.addVillageResource);
 router.get('/villages/:villageId/analytics', controller.getVillageAnalytics);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

@@ -1,55 +1,55 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { vendorsAPI } from '../services/api'
-import { Truck, Package, CheckCircle, Navigation, Thermometer, Clock, TrendingUp, DollarSign, Route } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
-import { useAuthStore } from '../store/authStore'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { vendorsAPI } from '../services/api';
+import { Truck, Package, CheckCircle, Navigation, Thermometer, Clock, TrendingUp, DollarSign, Route } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
+import { useAuthStore } from '../store/authStore';
 
 function LogisticsProviderPage() {
-  const [activeTab, setActiveTab] = useState('dashboard')
-  const [showBookingModal, setShowBookingModal] = useState(false)
-  const queryClient = useQueryClient()
-  const { user } = useAuthStore()
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   // Was hardcoded to the literal string 'current-provider-id' for every
   // visitor. Use the logged-in user's real id instead.
-  const providerId = user?.id
+  const providerId = user?.id;
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: providerProfile } = useQuery({
     queryKey: ['logistics-profile', providerId],
     queryFn: () => vendorsAPI.getLogisticsProfile(providerId).then(r => r.data),
-    enabled: !!providerId,
-  })
+    enabled: Boolean(providerId),
+  });
 
   const { data: activeShipments } = useQuery({
     queryKey: ['active-shipments', providerId],
     queryFn: () => vendorsAPI.getActiveShipments(providerId).then(r => r.data),
-    enabled: !!providerId,
-  })
+    enabled: Boolean(providerId),
+  });
 
   const { data: coldChainNodes } = useQuery({
     queryKey: ['coldchain-nodes'],
     queryFn: () => vendorsAPI.getColdChainNodes().then(r => r.data),
-  })
+  });
 
   const { data: returnTrucks } = useQuery({
     queryKey: ['return-trucks'],
     queryFn: () => vendorsAPI.getReturnTruckOpportunities().then(r => r.data),
-  })
+  });
 
   const createBookingMutation = useMutation({
     mutationFn: (data) => vendorsAPI.createLogisticsBooking(data),
     onSuccess: () => {
-      toast.success('Booking created successfully')
-      queryClient.invalidateQueries({ queryKey: ['active-shipments'] })
-      setShowBookingModal(false)
+      toast.success('Booking created successfully');
+      queryClient.invalidateQueries({ queryKey: ['active-shipments'] });
+      setShowBookingModal(false);
     },
     onError: () => {
-      toast.error('Failed to create booking')
+      toast.error('Failed to create booking');
     },
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -65,15 +65,15 @@ function LogisticsProviderPage() {
           { id: 'shipments', label: 'Active Shipments', icon: Package },
           { id: 'coldchain', label: 'Cold-Chain Nodes', icon: Thermometer },
           { id: 'return', label: 'Return Trucks', icon: Route },
-          { id: 'analytics', label: 'Analytics', icon: TrendingUp }
+          { id: 'analytics', label: 'Analytics', icon: TrendingUp },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              activeTab === tab.id ?
+                'bg-green-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             <tab.icon className="w-5 h-5 mr-2" />
@@ -177,7 +177,7 @@ function LogisticsProviderPage() {
                 { type: 'Reefer Trucks', total: 45, active: 38, status: 'operational' },
                 { type: 'Cold Storage Units', total: 12, active: 11, status: 'operational' },
                 { type: 'Pre-cooling Centers', total: 22, active: 20, status: 'operational' },
-                { type: 'Mobile Cold Rooms', total: 8, active: 6, status: 'maintenance' }
+                { type: 'Mobile Cold Rooms', total: 8, active: 6, status: 'maintenance' },
               ].map((equip) => (
                 <div key={equip.type} className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
@@ -188,7 +188,7 @@ function LogisticsProviderPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     equip.status === 'operational' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
+                      'bg-yellow-100 text-yellow-800'
                   }`}>
                     {equip.status}
                   </span>
@@ -222,9 +222,9 @@ function LogisticsProviderPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     shipment.status === 'in_transit' ? 'bg-blue-100 text-blue-800' :
-                    shipment.status === 'loading' ? 'bg-yellow-100 text-yellow-800' :
-                    shipment.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                    'bg-gray-100 text-gray-800'
+                      shipment.status === 'loading' ? 'bg-yellow-100 text-yellow-800' :
+                        shipment.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                          'bg-gray-100 text-gray-800'
                   }`}>
                     {shipment.status}
                   </span>
@@ -280,7 +280,7 @@ function LogisticsProviderPage() {
       {activeTab === 'coldchain' && (
         <div className="space-y-6">
           <h2 className="text-lg font-semibold text-gray-800">Cold-Chain Network</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {coldChainNodes?.map((node) => (
               <div key={node.id} className="bg-white rounded-lg shadow p-6">
@@ -288,8 +288,8 @@ function LogisticsProviderPage() {
                   <Thermometer className="w-8 h-8 text-blue-600" />
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
                     node.type === 'production' ? 'bg-green-100 text-green-800' :
-                    node.type === 'transit' ? 'bg-blue-100 text-blue-800' :
-                    'bg-purple-100 text-purple-800'
+                      node.type === 'transit' ? 'bg-blue-100 text-blue-800' :
+                        'bg-purple-100 text-purple-800'
                   }`}>
                     {node.type}
                   </span>
@@ -332,7 +332,7 @@ function LogisticsProviderPage() {
           </div>
 
           <h2 className="text-lg font-semibold text-gray-800">Available Return Lanes</h2>
-          
+
           <div className="space-y-4">
             {returnTrucks?.map((lane) => (
               <div key={lane.id} className="bg-white rounded-lg shadow p-6">
@@ -343,7 +343,7 @@ function LogisticsProviderPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     lane.status === 'available' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
+                      'bg-yellow-100 text-yellow-800'
                   }`}>
                     {lane.status}
                   </span>
@@ -472,7 +472,7 @@ function LogisticsProviderPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default LogisticsProviderPage
+export default LogisticsProviderPage;

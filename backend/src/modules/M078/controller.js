@@ -45,5 +45,5 @@ module.exports = {
   designHarvestingSystem,
   monitorCollection,
   calculateWaterBudget,
-  manageStorageCapacity
+  manageStorageCapacity,
 };

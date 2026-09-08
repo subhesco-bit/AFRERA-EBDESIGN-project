@@ -8,10 +8,10 @@
  * now just explains that and points to the real ledger, rather than calling
  * an endpoint that no longer exists.
  */
-import { Link } from 'react-router-dom'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
 export default function UnifiedLedgerPage() {
   return (
@@ -46,5 +46,5 @@ export default function UnifiedLedgerPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

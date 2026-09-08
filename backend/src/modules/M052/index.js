@@ -12,8 +12,8 @@ router.delete('/products/:id', controller.deleteProduct);
 router.patch('/products/:id/inventory', controller.updateInventory);
 router.get('/products/:id/recommendations', controller.getProductRecommendations);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

@@ -66,5 +66,5 @@ module.exports = {
   registerEquipment,
   updateEquipmentStatus,
   trackEquipmentUtilization,
-  generateInventoryReport
+  generateInventoryReport,
 };

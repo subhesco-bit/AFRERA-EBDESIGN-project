@@ -27,12 +27,12 @@ async function createEquipment(equipmentData) {
       specifications,
       fuel_type,
       power_rating,
-      maintenance_interval_days
+      maintenance_interval_days,
     } = equipmentData;
 
-    const current_age_years = purchase_date 
-      ? Math.floor((new Date() - new Date(purchase_date)) / (365.25 * 24 * 60 * 60 * 1000))
-      : 0;
+    const current_age_years = purchase_date ?
+      Math.floor((new Date() - new Date(purchase_date)) / (365.25 * 24 * 60 * 60 * 1000)) :
+      0;
 
     const equipment = {
       equipment_id: generateId(),
@@ -60,7 +60,7 @@ async function createEquipment(equipmentData) {
       last_maintenance_date: null,
       next_maintenance_date: calculateNextMaintenanceDate(purchase_date, maintenance_interval_days),
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered health assessment
@@ -70,8 +70,8 @@ async function createEquipment(equipmentData) {
         equipment_data: equipmentData,
         manufacturer_reliability: await getManufacturerReliability(manufacturer),
         category_benchmarks: await getCategoryBenchmarks(category),
-        usage_patterns: await getUsagePatterns(category)
-      }
+        usage_patterns: await getUsagePatterns(category),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -96,8 +96,8 @@ async function createEquipment(equipmentData) {
         JSON.stringify(equipment.specifications), equipment.operating_hours, equipment.fuel_type,
         equipment.power_rating, equipment.maintenance_interval_days, equipment.last_maintenance_date,
         equipment.next_maintenance_date, equipment.ai_health_score,
-        JSON.stringify(equipment.ai_maintenance_prediction), equipment.status, equipment.created_at
-      ]
+        JSON.stringify(equipment.ai_maintenance_prediction), equipment.status, equipment.created_at,
+      ],
     );
 
     logger.info(`Equipment created: ${equipment.equipment_id}`);
@@ -126,7 +126,7 @@ async function recordEquipmentUsage(equipmentId, usageData) {
       location,
       fuel_consumed,
       notes,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const result = await pool.query(
@@ -138,14 +138,14 @@ async function recordEquipmentUsage(equipmentId, usageData) {
       [
         usage.usage_id, usage.equipment_id, usage.user_id, usage.usage_date,
         usage.start_time, usage.end_time, usage.hours_used, usage.task_performed,
-        usage.location, usage.fuel_consumed, usage.notes, usage.created_at
-      ]
+        usage.location, usage.fuel_consumed, usage.notes, usage.created_at,
+      ],
     );
 
     // Update equipment operating hours
     await pool.query(
       'UPDATE equipment_inventory SET operating_hours = operating_hours + $1 WHERE equipment_id = $2',
-      [hours_used, equipmentId]
+      [hours_used, equipmentId],
     );
 
     logger.info(`Equipment usage recorded: ${usage.usage_id}`);
@@ -160,7 +160,7 @@ async function getEquipmentByOwner(ownerId) {
   try {
     const result = await pool.query(
       'SELECT * FROM equipment_inventory WHERE owner_id = $1 ORDER BY created_at DESC',
-      [ownerId]
+      [ownerId],
     );
 
     return {
@@ -168,7 +168,7 @@ async function getEquipmentByOwner(ownerId) {
       total_equipment: result.rows.length,
       total_value: result.rows.reduce((sum, eq) => sum + parseFloat(eq.current_value || 0), 0),
       by_category: getCategorySummary(result.rows),
-      equipment: result.rows
+      equipment: result.rows,
     };
   } catch (error) {
     logger.error('Error getting equipment by owner', { error: error.message });
@@ -180,7 +180,7 @@ async function getMaintenancePredictions(category) {
   try {
     const result = await pool.query(
       'SELECT * FROM equipment_inventory WHERE category = $1 AND status = $2',
-      [category, 'active']
+      [category, 'active'],
     );
 
     const predictions = result.rows.map(equipment => ({
@@ -189,13 +189,13 @@ async function getMaintenancePredictions(category) {
       health_score: equipment.ai_health_score,
       next_maintenance: equipment.next_maintenance_date,
       maintenance_prediction: equipment.ai_maintenance_prediction,
-      urgency: determineMaintenanceUrgency(equipment)
+      urgency: determineMaintenanceUrgency(equipment),
     }));
 
     return {
       category,
       total_equipment: predictions.length,
-      predictions
+      predictions,
     };
   } catch (error) {
     logger.error('Error getting maintenance predictions', { error: error.message, stack: error.stack });
@@ -225,7 +225,7 @@ async function getManufacturerReliability(manufacturer) {
   return {
     reliability_score: 0.85,
     common_issues: ['wear', 'tear'],
-    average_lifespan: 10
+    average_lifespan: 10,
   };
 }
 
@@ -233,7 +233,7 @@ async function getCategoryBenchmarks(category) {
   return {
     average_operating_hours: 1000,
     maintenance_frequency: 'quarterly',
-    failure_rate: 0.05
+    failure_rate: 0.05,
   };
 }
 
@@ -241,7 +241,7 @@ async function getUsagePatterns(category) {
   return {
     peak_usage_season: 'harvest',
     average_daily_hours: 8,
-    utilization_rate: 0.7
+    utilization_rate: 0.7,
   };
 }
 
@@ -254,9 +254,9 @@ function getCategorySummary(equipmentList) {
 }
 
 function determineMaintenanceUrgency(equipment) {
-  const daysUntilMaintenance = equipment.next_maintenance_date
-    ? Math.floor((new Date(equipment.next_maintenance_date) - new Date()) / (1000 * 60 * 60 * 24))
-    : 999;
+  const daysUntilMaintenance = equipment.next_maintenance_date ?
+    Math.floor((new Date(equipment.next_maintenance_date) - new Date()) / (1000 * 60 * 60 * 24)) :
+    999;
 
   if (daysUntilMaintenance < 0) return 'overdue';
   if (daysUntilMaintenance < 7) return 'urgent';
@@ -268,6 +268,6 @@ module.exports = {
   createEquipment,
   recordEquipmentUsage,
   getEquipmentByOwner,
-  getMaintenancePredictions
+  getMaintenancePredictions,
 };
 

@@ -22,7 +22,7 @@ class InsurancePremiumService {
       sumInsuredPerHectare,
       location,
       farmerId,
-      season
+      season,
     } = cropData;
 
     try {
@@ -52,14 +52,14 @@ class InsurancePremiumService {
         cropType,
         areaInHectares,
         sumInsured,
-        baseRate: (baseRate * 100).toFixed(2) + '%',
+        baseRate: `${(baseRate * 100).toFixed(2) }%`,
         riskMultiplier: riskMultiplier.toFixed(2),
         grossPremium: grossPremium.toFixed(2),
-        subsidyRate: (subsidyRate * 100).toFixed(2) + '%',
+        subsidyRate: `${(subsidyRate * 100).toFixed(2) }%`,
         subsidyAmount: subsidyAmount.toFixed(2),
         netPremium: netPremium.toFixed(2),
         riskFactors,
-        calculatedAt: new Date()
+        calculatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error calculating crop premium', { error: error.message, stack: error.stack });
@@ -78,17 +78,17 @@ class InsurancePremiumService {
       transportMode,
       distance,
       goodsType,
-      duration
+      duration,
     } = transitData;
 
     try {
       // Base rates by transport mode
       const transportRates = {
-        'road': 0.008,    // 0.8% of value
-        'rail': 0.006,    // 0.6% of value
-        'air': 0.015,     // 1.5% of value
-        'sea': 0.004,     // 0.4% of value
-        'multimodal': 0.01 // 1.0% of value
+        road: 0.008, // 0.8% of value
+        rail: 0.006, // 0.6% of value
+        air: 0.015, // 1.5% of value
+        sea: 0.004, // 0.4% of value
+        multimodal: 0.01, // 1.0% of value
       };
 
       const baseRate = transportRates[transportMode] || 0.01;
@@ -101,11 +101,11 @@ class InsurancePremiumService {
 
       // Goods type risk
       const goodsRiskFactors = {
-        'perishable': 1.5,
-        'fragile': 1.3,
-        'hazardous': 2.0,
-        'high_value': 1.8,
-        'general': 1.0
+        perishable: 1.5,
+        fragile: 1.3,
+        hazardous: 2.0,
+        high_value: 1.8,
+        general: 1.0,
       };
       const goodsRisk = goodsRiskFactors[goodsType] || 1.0;
 
@@ -116,12 +116,12 @@ class InsurancePremiumService {
         transportMode,
         distance,
         duration,
-        baseRate: (baseRate * 100).toFixed(2) + '%',
+        baseRate: `${(baseRate * 100).toFixed(2) }%`,
         routeRisk: routeRisk.toFixed(2),
         durationRisk: durationRisk.toFixed(2),
         goodsRisk: goodsRisk.toFixed(2),
         grossPremium: grossPremium.toFixed(2),
-        calculatedAt: new Date()
+        calculatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error calculating transit premium', { error: error.message, stack: error.stack });
@@ -139,16 +139,16 @@ class InsurancePremiumService {
       buildingType,
       contentsValue,
       fireProtection,
-      securityLevel
+      securityLevel,
     } = warehouseData;
 
     try {
       // Base rate for building
       const buildingRates = {
-        'concrete': 0.003,  // 0.3%
-        'brick': 0.004,     // 0.4%
-        'mixed': 0.005,    // 0.5%
-        'temporary': 0.008 // 0.8%
+        concrete: 0.003, // 0.3%
+        brick: 0.004, // 0.4%
+        mixed: 0.005, // 0.5%
+        temporary: 0.008, // 0.8%
       };
 
       const buildingRate = buildingRates[buildingType] || 0.005;
@@ -161,7 +161,7 @@ class InsurancePremiumService {
 
       // Security discount
       const securityDiscount = securityLevel === 'high' ? 0.9 :
-                              securityLevel === 'medium' ? 0.95 : 1.0;
+        securityLevel === 'medium' ? 0.95 : 1.0;
 
       const buildingPremium = warehouseValue * buildingRate * locationRisk * fireDiscount * securityDiscount;
       const contentsPremium = contentsValue * 0.006 * locationRisk; // 0.6% for contents
@@ -172,14 +172,14 @@ class InsurancePremiumService {
         warehouseValue,
         contentsValue,
         buildingType,
-        buildingRate: (buildingRate * 100).toFixed(2) + '%',
+        buildingRate: `${(buildingRate * 100).toFixed(2) }%`,
         locationRisk: locationRisk.toFixed(2),
-        fireDiscount: (fireDiscount * 100).toFixed(0) + '%',
-        securityDiscount: (securityDiscount * 100).toFixed(0) + '%',
+        fireDiscount: `${(fireDiscount * 100).toFixed(0) }%`,
+        securityDiscount: `${(securityDiscount * 100).toFixed(0) }%`,
         buildingPremium: buildingPremium.toFixed(2),
         contentsPremium: contentsPremium.toFixed(2),
         totalPremium: totalPremium.toFixed(2),
-        calculatedAt: new Date()
+        calculatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error calculating warehouse premium', { error: error.message, stack: error.stack });
@@ -197,18 +197,18 @@ class InsurancePremiumService {
       valuePerAnimal,
       age,
       healthStatus,
-      location
+      location,
     } = livestockData;
 
     try {
       // Base rates by animal type
       const animalRates = {
-        'cattle': 0.04,     // 4%
-        'buffalo': 0.045,   // 4.5%
-        'goat': 0.05,      // 5%
-        'sheep': 0.055,    // 5.5%
-        'poultry': 0.08,   // 8%
-        'pig': 0.06        // 6%
+        cattle: 0.04, // 4%
+        buffalo: 0.045, // 4.5%
+        goat: 0.05, // 5%
+        sheep: 0.055, // 5.5%
+        poultry: 0.08, // 8%
+        pig: 0.06, // 6%
       };
 
       const baseRate = animalRates[animalType] || 0.05;
@@ -218,8 +218,8 @@ class InsurancePremiumService {
 
       // Health status
       const healthFactor = healthStatus === 'excellent' ? 0.9 :
-                          healthStatus === 'good' ? 1.0 :
-                          healthStatus === 'fair' ? 1.2 : 1.5;
+        healthStatus === 'good' ? 1.0 :
+          healthStatus === 'fair' ? 1.2 : 1.5;
 
       // Location risk
       const locationRisk = await this.getLocationRisk(location);
@@ -234,12 +234,12 @@ class InsurancePremiumService {
         totalValue,
         age,
         healthStatus,
-        baseRate: (baseRate * 100).toFixed(2) + '%',
+        baseRate: `${(baseRate * 100).toFixed(2) }%`,
         ageFactor: ageFactor.toFixed(2),
         healthFactor: healthFactor.toFixed(2),
         locationRisk: locationRisk.toFixed(2),
         grossPremium: grossPremium.toFixed(2),
-        calculatedAt: new Date()
+        calculatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error calculating livestock premium', { error: error.message, stack: error.stack });
@@ -255,38 +255,38 @@ class InsurancePremiumService {
       // In production, this would query a risk database
       // For now, return simulated risk factors
       const riskDatabase = {
-        'assam': {
+        assam: {
           floodRisk: 0.8,
           droughtRisk: 0.3,
-          pestRisk: 0.6
+          pestRisk: 0.6,
         },
-        'meghalaya': {
+        meghalaya: {
           floodRisk: 0.6,
           droughtRisk: 0.2,
-          pestRisk: 0.5
+          pestRisk: 0.5,
         },
-        'manipur': {
+        manipur: {
           floodRisk: 0.5,
           droughtRisk: 0.4,
-          pestRisk: 0.4
+          pestRisk: 0.4,
         },
-        'nagaland': {
+        nagaland: {
           floodRisk: 0.4,
           droughtRisk: 0.3,
-          pestRisk: 0.3
+          pestRisk: 0.3,
         },
-        'tripura': {
+        tripura: {
           floodRisk: 0.7,
           droughtRisk: 0.2,
-          pestRisk: 0.5
-        }
+          pestRisk: 0.5,
+        },
       };
 
       const state = location.toLowerCase().split(' ')[0];
       return riskDatabase[state] || {
         floodRisk: 0.5,
         droughtRisk: 0.3,
-        pestRisk: 0.4
+        pestRisk: 0.4,
       };
     } catch (error) {
       logger.error('Error getting location risk factors', { error: error.message, stack: error.stack });
@@ -303,7 +303,7 @@ class InsurancePremiumService {
       // In production, use actual route data and historical incident rates
       const highRiskRoutes = [
         { from: 'assam', to: 'meghalaya', risk: 1.3 },
-        { from: 'manipur', to: 'nagaland', risk: 1.4 }
+        { from: 'manipur', to: 'nagaland', risk: 1.4 },
       ];
 
       const routeKey = `${origin.toLowerCase()}-${destination.toLowerCase()}`;
@@ -368,7 +368,7 @@ class InsurancePremiumService {
       const result = await this.pool.query(quoteQuery, [
         policyholderId,
         insuranceType,
-        JSON.stringify(premiumCalculation)
+        JSON.stringify(premiumCalculation),
       ]);
 
       return {
@@ -377,7 +377,7 @@ class InsurancePremiumService {
         policyholderId,
         premiumCalculation,
         validUntil: result.rows[0].valid_until,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error generating quote', { error: error.message, stack: error.stack });
@@ -414,3 +414,4 @@ class InsurancePremiumService {
 }
 
 module.exports = new InsurancePremiumService();
+

@@ -1,42 +1,42 @@
-import { useState } from 'react'
-import { useAuthStore } from '../store/authStore'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { strategicAPI } from '../services/api'
-import { Home, ShoppingCart, Calendar, DollarSign, Users, Package } from 'lucide-react'
+import { useState } from 'react';
+import { useAuthStore } from '../store/authStore';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { strategicAPI } from '../services/api';
+import { Home, ShoppingCart, Calendar, DollarSign, Users, Package } from 'lucide-react';
 
 function HouseholdProcurementPage() {
-  const { user } = useAuthStore()
-  const queryClient = useQueryClient()
-  const [selectedTab, setSelectedTab] = useState('plans')
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  const [selectedTab, setSelectedTab] = useState('plans');
 
   const { data: plans, isLoading: plansLoading } = useQuery({
     queryKey: ['household-plans', user?.id],
     queryFn: () => strategicAPI.household.getProcurementPlans({ userId: user?.id }).then(r => r.data),
-    enabled: !!user?.id,
-  })
+    enabled: Boolean(user?.id),
+  });
 
   const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
     queryKey: ['household-subscriptions', user?.id],
     queryFn: () => strategicAPI.household.getSubscriptions({ userId: user?.id }).then(r => r.data),
-    enabled: !!user?.id,
-  })
+    enabled: Boolean(user?.id),
+  });
 
   const { data: dashboard, isLoading: dashboardLoading } = useQuery({
     queryKey: ['household-dashboard', user?.id],
     queryFn: () => strategicAPI.household.getDashboard({ userId: user?.id }).then(r => r.data),
-    enabled: !!user?.id,
-  })
+    enabled: Boolean(user?.id),
+  });
 
   const createPlanMutation = useMutation({
     mutationFn: (data) => strategicAPI.household.createProcurementPlan(data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['household-plans'])
-      alert('Procurement plan created successfully!')
+      queryClient.invalidateQueries(['household-plans']);
+      alert('Procurement plan created successfully!');
     },
     onError: (error) => {
-      alert(`Failed to create plan: ${error.message}`)
+      alert(`Failed to create plan: ${error.message}`);
     },
-  })
+  });
 
   const handleCreatePlan = () => {
     const planData = {
@@ -49,9 +49,9 @@ function HouseholdProcurementPage() {
       budget_limit: 15000,
       delivery_frequency: 'weekly',
       delivery_day_of_week: 1,
-    }
-    createPlanMutation.mutate(planData)
-  }
+    };
+    createPlanMutation.mutate(planData);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -231,7 +231,7 @@ function HouseholdProcurementPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default HouseholdProcurementPage
+export default HouseholdProcurementPage;

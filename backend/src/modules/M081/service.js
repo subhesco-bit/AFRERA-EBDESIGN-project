@@ -19,7 +19,7 @@ async function createDashboard(dashboardData) {
       description,
       layout_config,
       is_default,
-      is_public
+      is_public,
     } = dashboardData;
 
     const dashboard = {
@@ -32,18 +32,18 @@ async function createDashboard(dashboardData) {
       is_default: is_default || false,
       is_public: is_public || false,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered dashboard layout optimization
     const aiRequest = {
       task: 'dashboard_layout_optimization',
       parameters: {
-        dashboard_type: dashboard_type,
+        dashboard_type,
         user_preferences: await getUserPreferences(user_id),
         similar_dashboards: await getSimilarDashboards(dashboard_type),
-        best_practices: await getDashboardBestPractices(dashboard_type)
-      }
+        best_practices: await getDashboardBestPractices(dashboard_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -66,8 +66,8 @@ async function createDashboard(dashboardData) {
         dashboard.is_default,
         dashboard.is_public,
         dashboard.status,
-        dashboard.created_at
-      ]
+        dashboard.created_at,
+      ],
     );
 
     logger.info(`Dashboard created: ${dashboard.dashboard_id}`);
@@ -85,7 +85,7 @@ async function getDashboard(dashboardId) {
   try {
     const result = await pool.query(
       'SELECT * FROM dashboards WHERE dashboard_id = $1',
-      [dashboardId]
+      [dashboardId],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -171,7 +171,7 @@ async function deleteDashboard(dashboardId) {
   try {
     const result = await pool.query(
       'DELETE FROM dashboards WHERE dashboard_id = $1 RETURNING dashboard_id',
-      [dashboardId]
+      [dashboardId],
     );
 
     logger.info(`Dashboard deleted: ${dashboardId}`);
@@ -197,7 +197,7 @@ async function addWidget(dashboardId, widgetData) {
       data_source,
       query_config,
       visualization_config,
-      refresh_interval
+      refresh_interval,
     } = widgetData;
 
     const widget = {
@@ -214,18 +214,18 @@ async function addWidget(dashboardId, widgetData) {
       visualization_config: visualization_config || {},
       refresh_interval: refresh_interval || 300,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered widget configuration
     const aiRequest = {
       task: 'widget_configuration_optimization',
       parameters: {
-        widget_type: widget_type,
-        data_source: data_source,
+        widget_type,
+        data_source,
         visualization_best_practices: await getVisualizationBestPractices(widget_type),
-        data_characteristics: await analyzeDataCharacteristics(data_source)
-      }
+        data_characteristics: await analyzeDataCharacteristics(data_source),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -252,8 +252,8 @@ async function addWidget(dashboardId, widgetData) {
         JSON.stringify(widget.visualization_config),
         widget.refresh_interval,
         widget.status,
-        widget.created_at
-      ]
+        widget.created_at,
+      ],
     );
 
     logger.info(`Widget added: ${widget.widget_id}`);
@@ -271,7 +271,7 @@ async function getDashboardWidgets(dashboardId) {
   try {
     const result = await pool.query(
       'SELECT * FROM dashboard_widgets WHERE dashboard_id = $1 AND status = $2 ORDER BY position_y, position_x',
-      [dashboardId, 'active']
+      [dashboardId, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -325,7 +325,7 @@ async function deleteWidget(widgetId) {
   try {
     const result = await pool.query(
       'DELETE FROM dashboard_widgets WHERE widget_id = $1 RETURNING widget_id',
-      [widgetId]
+      [widgetId],
     );
 
     logger.info(`Widget deleted: ${widgetId}`);
@@ -346,7 +346,7 @@ async function addDataSource(dashboardId, sourceData) {
       source_type,
       connection_config,
       query_template,
-      refresh_schedule
+      refresh_schedule,
     } = sourceData;
 
     const result = await pool.query(
@@ -364,8 +364,8 @@ async function addDataSource(dashboardId, sourceData) {
         query_template,
         refresh_schedule,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Data source added: ${result.rows[0].source_id}`);
@@ -383,7 +383,7 @@ async function getDataSources(dashboardId) {
   try {
     const result = await pool.query(
       'SELECT * FROM dashboard_data_sources WHERE dashboard_id = $1 AND status = $2',
-      [dashboardId, 'active']
+      [dashboardId, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -403,7 +403,7 @@ async function addFilter(dashboardId, filterData) {
       field_name,
       default_value,
       filter_config,
-      applies_to_widgets
+      applies_to_widgets,
     } = filterData;
 
     const result = await pool.query(
@@ -422,8 +422,8 @@ async function addFilter(dashboardId, filterData) {
         JSON.stringify(filter_config),
         applies_to_widgets,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Filter added: ${result.rows[0].filter_id}`);
@@ -441,7 +441,7 @@ async function getDashboardFilters(dashboardId) {
   try {
     const result = await pool.query(
       'SELECT * FROM dashboard_filters WHERE dashboard_id = $1 AND status = $2',
-      [dashboardId, 'active']
+      [dashboardId, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -465,12 +465,12 @@ async function createSnapshot(dashboardId, snapshotData) {
       dashboard_id: dashboardId,
       snapshot_name,
       snapshot_data: {
-        dashboard: dashboard,
-        widgets: widgets
+        dashboard,
+        widgets,
       },
       filters_applied: filters_applied || {},
       created_by,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const result = await pool.query(
@@ -485,8 +485,8 @@ async function createSnapshot(dashboardId, snapshotData) {
         JSON.stringify(snapshot.snapshot_data),
         JSON.stringify(snapshot.filters_applied),
         snapshot.created_by,
-        snapshot.created_at
-      ]
+        snapshot.created_at,
+      ],
     );
 
     logger.info(`Snapshot created: ${snapshot.snapshot_id}`);
@@ -517,8 +517,8 @@ async function shareDashboard(dashboardId, shareData) {
         permission_level || 'view',
         expires_at,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Dashboard shared: ${result.rows[0].share_id}`);
@@ -538,7 +538,7 @@ async function logUsage(dashboardId, userId, action, metadata = {}) {
       `INSERT INTO dashboard_usage_logs 
        (dashboard_id, user_id, action, metadata, accessed_at)
        VALUES ($1, $2, $3, $4, $5)`,
-      [dashboardId, userId, action, JSON.stringify(metadata)]
+      [dashboardId, userId, action, JSON.stringify(metadata)],
     );
   } catch (error) {
     logger.error('Error logging usage', { error: error.message });
@@ -557,7 +557,7 @@ async function getDashboardAnalytics(dashboardId) {
        FROM dashboard_usage_logs 
        WHERE dashboard_id = $1 
        GROUP BY action`,
-      [dashboardId]
+      [dashboardId],
     );
 
     const userResult = await pool.query(
@@ -567,12 +567,12 @@ async function getDashboardAnalytics(dashboardId) {
        GROUP BY user_id
        ORDER BY access_count DESC
        LIMIT 10`,
-      [dashboardId]
+      [dashboardId],
     );
 
     return {
       usage_stats: usageResult.rows,
-      top_users: userResult.rows
+      top_users: userResult.rows,
     };
   } catch (error) {
     logger.error('Error getting dashboard analytics', { error: error.message });
@@ -589,7 +589,7 @@ async function getUserPreferences(userId) {
   try {
     const result = await pool.query(
       'SELECT preferences FROM user_preferences WHERE user_id = $1',
-      [userId]
+      [userId],
     );
     return result.rows[0]?.preferences || {};
   } catch (error) {
@@ -601,7 +601,7 @@ async function getSimilarDashboards(dashboardType) {
   try {
     const result = await pool.query(
       'SELECT * FROM dashboards WHERE dashboard_type = $1 AND status = $2 LIMIT 5',
-      [dashboardType, 'active']
+      [dashboardType, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -614,7 +614,7 @@ async function getDashboardBestPractices(dashboardType) {
     layout: 'grid',
     widget_density: 'medium',
     color_scheme: 'professional',
-    recommended_widgets: ['chart', 'kpi', 'table', 'filter']
+    recommended_widgets: ['chart', 'kpi', 'table', 'filter'],
   };
 }
 
@@ -623,7 +623,7 @@ async function getVisualizationBestPractices(widgetType) {
     chart: { max_data_points: 1000, color_palette: 'categorical' },
     kpi: { format: 'number', show_trend: true },
     table: { pagination: true, sortable: true },
-    map: { clustering: true, zoom_level: 5 }
+    map: { clustering: true, zoom_level: 5 },
   };
   return practices[widgetType] || {};
 }
@@ -633,7 +633,7 @@ async function analyzeDataCharacteristics(dataSource) {
     data_type: 'time_series',
     volume: 'medium',
     update_frequency: 'real-time',
-    cardinality: 'high'
+    cardinality: 'high',
   };
 }
 
@@ -641,7 +641,7 @@ async function getWidget(widgetId) {
   try {
     const result = await pool.query(
       'SELECT * FROM dashboard_widgets WHERE widget_id = $1',
-      [widgetId]
+      [widgetId],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -666,6 +666,6 @@ module.exports = {
   createSnapshot,
   shareDashboard,
   logUsage,
-  getDashboardAnalytics
+  getDashboardAnalytics,
 };
 

@@ -1,6 +1,6 @@
 // Phase 10: Integration Services (10 services - consolidated)
 const db = require('../database/dbConnection');
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class Phase10Services {
   async erp(erpId) {

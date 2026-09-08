@@ -19,7 +19,7 @@ const { logger } = require('../../utils/logger');
 async function getStandardCategories() {
   const pg = getPostgreSQL();
   const { rows } = await pg.query(
-    `SELECT DISTINCT category, force_name FROM defense_fitness_standards ORDER BY force_name`
+    'SELECT DISTINCT category, force_name FROM defense_fitness_standards ORDER BY force_name',
   );
   return rows;
 }
@@ -31,7 +31,7 @@ async function getStandardsForCategory(category, gender) {
      FROM defense_fitness_standards
      WHERE category = $1 AND (gender = $2 OR gender = 'any')
      ORDER BY test_component`,
-    [category, gender]
+    [category, gender],
   );
   return rows;
 }
@@ -43,7 +43,7 @@ async function recordAttempt(userId, category, testComponent, recordedValue, sou
     `INSERT INTO defense_fitness_prep_attempts (user_id, category, test_component, recorded_value, source)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING id, recorded_at`,
-    [userId, category, testComponent, recordedValue, source]
+    [userId, category, testComponent, recordedValue, source],
   );
   return rows[0];
 }
@@ -62,7 +62,7 @@ async function getReadinessComparison(userId, category, gender) {
      FROM defense_fitness_prep_attempts
      WHERE user_id = $1 AND category = $2
      ORDER BY test_component, recorded_at DESC`,
-    [userId, category]
+    [userId, category],
   );
   const latestByComponent = Object.fromEntries(attempts.map((a) => [a.test_component, a]));
 
@@ -71,9 +71,9 @@ async function getReadinessComparison(userId, category, gender) {
     if (!attempt) {
       return { ...s, your_value: null, meets_standard: null, latest_attempt_at: null };
     }
-    const meets = s.threshold_type === 'max_time_seconds'
-      ? Number(attempt.recorded_value) <= Number(s.threshold_value)
-      : Number(attempt.recorded_value) >= Number(s.threshold_value);
+    const meets = s.threshold_type === 'max_time_seconds' ?
+      Number(attempt.recorded_value) <= Number(s.threshold_value) :
+      Number(attempt.recorded_value) >= Number(s.threshold_value);
     return {
       ...s,
       your_value: Number(attempt.recorded_value),
@@ -90,3 +90,4 @@ module.exports = {
   recordAttempt,
   getReadinessComparison,
 };
+

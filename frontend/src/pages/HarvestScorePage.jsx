@@ -1,33 +1,33 @@
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { 
-  Award, 
-  TrendingUp, 
-  Star, 
-  Target, 
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import {
+  Award,
+  TrendingUp,
+  Star,
+  Target,
   BarChart3,
   Leaf,
   Droplets,
   Truck,
-  DollarSign
-} from 'lucide-react'
+  DollarSign,
+} from 'lucide-react';
 
 function HarvestScorePage() {
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: harvestScore } = useQuery({
     queryKey: ['harvest-score'],
     queryFn: () => farmersAPI.getHarvestScore('current-farmer-id').then(r => r.data),
-  })
+  });
 
   const { data: scoreHistory } = useQuery({
     queryKey: ['score-history'],
     queryFn: () => farmersAPI.getScoreHistory('current-farmer-id').then(r => r.data),
-  })
+  });
 
   const { data: benchmarks } = useQuery({
     queryKey: ['benchmarks'],
     queryFn: () => farmersAPI.getBenchmarks('current-farmer-id').then(r => r.data),
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -161,8 +161,8 @@ function HarvestScorePage() {
             <div key={index} className="flex items-start p-4 border rounded-lg">
               <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-4 ${
                 rec.priority === 'high' ? 'bg-red-100 text-red-600' :
-                rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-600' :
-                'bg-green-100 text-green-600'
+                  rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-600' :
+                    'bg-green-100 text-green-600'
               }`}>
                 <Star className="w-4 h-4" />
               </div>
@@ -171,8 +171,8 @@ function HarvestScorePage() {
                   <h3 className="font-semibold text-gray-800">{rec.title}</h3>
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     rec.priority === 'high' ? 'bg-red-100 text-red-800' :
-                    rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
+                      rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-green-100 text-green-800'
                   }`}>
                     {rec.priority} priority
                   </span>
@@ -204,9 +204,9 @@ function HarvestScorePage() {
             <div
               key={achievement.id}
               className={`p-4 rounded-lg text-center ${
-                achievement.unlocked
-                  ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200'
-                  : 'bg-gray-50 border border-gray-200 opacity-60'
+                achievement.unlocked ?
+                  'bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200' :
+                  'bg-gray-50 border border-gray-200 opacity-60'
               }`}
             >
               <div className="text-4xl mb-2">{achievement.icon}</div>
@@ -223,7 +223,7 @@ function HarvestScorePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default HarvestScorePage
+export default HarvestScorePage;

@@ -11,11 +11,11 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * POST /api/enterprise/integrations
@@ -34,7 +34,7 @@ router.post('/integrations',
       }
 
       const result = await enterpriseService.registerIntegration(integrationData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Integration registered successfully');
       } else {
@@ -43,7 +43,7 @@ router.post('/integrations',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to register integration', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -58,7 +58,7 @@ router.post('/integrations/:integrationId/sync',
       const syncConfig = req.body;
 
       const result = await enterpriseService.syncWithERP(integrationId, syncConfig);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'ERP sync completed successfully');
       } else {
@@ -67,7 +67,7 @@ router.post('/integrations/:integrationId/sync',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to sync with ERP', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -82,7 +82,7 @@ router.post('/integrations/:integrationId/payments',
       const paymentData = req.body;
 
       const result = await enterpriseService.processPayment(integrationId, paymentData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Payment processed successfully');
       } else {
@@ -91,7 +91,7 @@ router.post('/integrations/:integrationId/payments',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to process payment', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -106,7 +106,7 @@ router.post('/integrations/:integrationId/logistics',
       const logisticsData = req.body;
 
       const result = await enterpriseService.syncLogistics(integrationId, logisticsData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Logistics sync completed successfully');
       } else {
@@ -115,7 +115,7 @@ router.post('/integrations/:integrationId/logistics',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to sync logistics', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -130,7 +130,7 @@ router.post('/integrations/:integrationId/analytics',
       const analyticsData = req.body;
 
       const result = await enterpriseService.sendAnalytics(integrationId, analyticsData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Analytics data sent successfully');
       } else {
@@ -139,7 +139,7 @@ router.post('/integrations/:integrationId/analytics',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to send analytics', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -154,7 +154,7 @@ router.post('/integrations/:integrationId/communications',
       const messageData = req.body;
 
       const result = await enterpriseService.sendCommunication(integrationId, messageData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Communication sent successfully');
       } else {
@@ -163,7 +163,7 @@ router.post('/integrations/:integrationId/communications',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to send communication', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -177,7 +177,7 @@ router.get('/integrations/:integrationId',
       const { integrationId } = req.params;
 
       const integration = await enterpriseService.getIntegration(integrationId);
-      
+
       if (!integration) {
         return apiResponseHandler.sendError(res, 'Integration not found', 404, 'INTEGRATION_NOT_FOUND', integrationId);
       }
@@ -189,7 +189,7 @@ router.get('/integrations/:integrationId',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get integration details', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -208,7 +208,7 @@ router.get('/organizations/:organizationId/integrations',
       }
 
       const result = await enterpriseService.getOrganizationIntegrations(organizationId);
-      
+
       if (result.success) {
         // Remove sensitive data from each integration
         const safeIntegrations = result.data.integrations.map(integration => {
@@ -218,7 +218,7 @@ router.get('/organizations/:organizationId/integrations',
 
         return apiResponseHandler.sendSuccess(res, {
           ...result.data,
-          integrations: safeIntegrations
+          integrations: safeIntegrations,
         }, 'Organization integrations retrieved');
       } else {
         return apiResponseHandler.sendError(res, result.error, 500, 'RETRIEVAL_ERROR', result.details);
@@ -226,7 +226,7 @@ router.get('/organizations/:organizationId/integrations',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get organization integrations', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -240,7 +240,7 @@ router.get('/integrations/:integrationId/health',
       const { integrationId } = req.params;
 
       const result = await enterpriseService.getIntegrationHealth(integrationId);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Integration health status retrieved');
       } else {
@@ -249,7 +249,7 @@ router.get('/integrations/:integrationId/health',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get integration health', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -263,7 +263,7 @@ router.delete('/integrations/:integrationId',
       const { integrationId } = req.params;
 
       const result = await enterpriseService.deactivateIntegration(integrationId);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Integration deactivated successfully');
       } else {
@@ -272,7 +272,7 @@ router.delete('/integrations/:integrationId',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to deactivate integration', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -288,7 +288,7 @@ router.delete('/cache',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to clear cache', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -303,14 +303,14 @@ router.get('/system/status',
         activeIntegrations: enterpriseService.getActiveIntegrationsCount(),
         systemHealth: 'operational',
         supportedIntegrationTypes: ['erp', 'payment_gateway', 'logistics', 'analytics', 'communication'],
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       return apiResponseHandler.sendSuccess(res, systemStatus, 'Enterprise integration system status retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get system status', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 module.exports = router;

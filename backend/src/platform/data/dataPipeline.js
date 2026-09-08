@@ -5,7 +5,7 @@
  * Flow:
  * Operational DB → Events → Pipeline → Analytics Storage → Analytics
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class DataPipeline {
   constructor() {

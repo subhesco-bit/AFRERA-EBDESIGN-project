@@ -1,6 +1,6 @@
 /**
  * Comprehensive ERP Controller - Oracle/SAP Standards
- * 
+ *
  * REST API controller for all ERP modules
  * Handles HTTP requests and responses for ERP operations
  */
@@ -85,7 +85,7 @@ const generalLedgerController = {
       logger.error('Error in AI financial analysis', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -143,7 +143,7 @@ const controllingController = {
       logger.error('Error generating profit center report', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -201,7 +201,7 @@ const materialsManagementController = {
       logger.error('Error in AI supply chain optimization', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -247,7 +247,7 @@ const salesDistributionController = {
       logger.error('Error creating invoice', { error: error.message });
       res.status(400).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -296,7 +296,7 @@ const productionPlanningController = {
       logger.error('Error in AI production optimization', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -333,7 +333,7 @@ const qualityManagementController = {
       logger.error('Error making usage decision', { error: error.message });
       res.status(400).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -370,7 +370,7 @@ const plantMaintenanceController = {
       logger.error('Error confirming maintenance order', { error: error.message });
       res.status(400).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -417,7 +417,7 @@ const humanResourcesController = {
       logger.error('Error in AI HR analysis', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -465,7 +465,7 @@ const projectSystemController = {
       logger.error('Error in AI project analysis', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -502,7 +502,7 @@ const treasuryController = {
       logger.error('Error getting cash position', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -530,7 +530,7 @@ const assetManagementController = {
       logger.error('Error calculating depreciation', { error: error.message });
       res.status(400).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -558,7 +558,7 @@ const businessIntelligenceController = {
       logger.error('Error generating profitability analysis', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 // ============================================================================
@@ -568,38 +568,38 @@ const businessIntelligenceController = {
 module.exports = {
   // Financial Accounting (FI)
   generalLedgerController,
-  
+
   // Controlling (CO)
   controllingController,
-  
+
   // Materials Management (MM)
   materialsManagementController,
-  
+
   // Sales and Distribution (SD)
   salesDistributionController,
-  
+
   // Production Planning (PP)
   productionPlanningController,
-  
+
   // Quality Management (QM)
   qualityManagementController,
-  
+
   // Plant Maintenance (PM)
   plantMaintenanceController,
-  
+
   // Human Resources (HR)
   humanResourcesController,
-  
+
   // Project System (PS)
   projectSystemController,
-  
+
   // Treasury (TR)
   treasuryController,
-  
+
   // Asset Management (AM)
   assetManagementController,
-  
+
   // Business Intelligence (BI)
-  businessIntelligenceController
+  businessIntelligenceController,
 };
 

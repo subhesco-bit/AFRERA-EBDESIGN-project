@@ -27,7 +27,7 @@ async function createFPO(fpoData) {
       membership_count,
       share_capital,
       business_activities,
-      metadata
+      metadata,
     } = fpoData;
 
     const fpo = {
@@ -47,7 +47,7 @@ async function createFPO(fpoData) {
       share_capital,
       business_activities,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered FPO optimization recommendations
@@ -58,8 +58,8 @@ async function createFPO(fpoData) {
         regional_analysis: await getRegionalAnalysis(district_id, state_id),
         market_opportunities: await getMarketOpportunities(fpo_type),
         best_practices: await getFPOBestPractices(fpo_type),
-        governance_recommendations: await getGovernanceRecommendations(membership_count)
-      }
+        governance_recommendations: await getGovernanceRecommendations(membership_count),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -93,8 +93,8 @@ async function createFPO(fpoData) {
         fpo.status,
         JSON.stringify(fpo.ai_recommendations),
         JSON.stringify(metadata || {}),
-        fpo.created_at
-      ]
+        fpo.created_at,
+      ],
     );
 
     logger.info(`FPO created: ${fpo.fpo_id}`);
@@ -111,43 +111,43 @@ async function createFPO(fpoData) {
 async function listFPOs({ page = 1, limit = 20, status = null, districtId = null, stateId = null } = {}) {
   try {
     const offset = (page - 1) * limit;
-    
+
     let countQuery = 'SELECT COUNT(*) FROM fpos';
-    let countParams = [];
-    let conditions = [];
-    
+    const countParams = [];
+    const conditions = [];
+
     if (status) {
-      conditions.push('status = $' + (conditions.length + 1));
+      conditions.push(`status = $${ conditions.length + 1}`);
       countParams.push(status);
     }
     if (districtId) {
-      conditions.push('district_id = $' + (conditions.length + 1));
+      conditions.push(`district_id = $${ conditions.length + 1}`);
       countParams.push(districtId);
     }
     if (stateId) {
-      conditions.push('state_id = $' + (conditions.length + 1));
+      conditions.push(`state_id = $${ conditions.length + 1}`);
       countParams.push(stateId);
     }
-    
+
     if (conditions.length > 0) {
-      countQuery += ' WHERE ' + conditions.join(' AND ');
+      countQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
+
     const totalRes = await pool.query(countQuery, countParams);
     const total = parseInt(totalRes.rows[0].count || '0');
-    
+
     let dataQuery = 'SELECT * FROM fpos';
-    let dataParams = [...countParams];
-    
+    const dataParams = [...countParams];
+
     if (conditions.length > 0) {
-      dataQuery += ' WHERE ' + conditions.join(' AND ');
+      dataQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
-    dataQuery += ' ORDER BY created_at DESC LIMIT $' + (dataParams.length + 1) + ' OFFSET $' + (dataParams.length + 2);
+
+    dataQuery += ` ORDER BY created_at DESC LIMIT $${ dataParams.length + 1 } OFFSET $${ dataParams.length + 2}`;
     dataParams.push(limit, offset);
-    
+
     const res = await pool.query(dataQuery, dataParams);
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   } catch (error) {
     logger.error('Error listing FPOs', { error: error.message });
     throw new Error('Failed to list FPOs');
@@ -188,7 +188,7 @@ async function updateFPO(fpoId, updates) {
       share_capital,
       business_activities,
       status,
-      metadata
+      metadata,
     } = updates;
 
     const result = await pool.query(
@@ -219,8 +219,8 @@ async function updateFPO(fpoId, updates) {
         business_activities ? JSON.stringify(business_activities) : null,
         status,
         metadata ? JSON.stringify(metadata) : null,
-        fpoId
-      ]
+        fpoId,
+      ],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -235,7 +235,7 @@ async function updateFPO(fpoId, updates) {
 async function deleteFPO(fpoId) {
   try {
     const res = await pool.query('DELETE FROM fpos WHERE fpo_id = $1 RETURNING fpo_id', [fpoId]);
-    return !!res.rows[0];
+    return Boolean(res.rows[0]);
   } catch (error) {
     logger.error('Error deleting FPO', { error: error.message });
     throw new Error('Failed to delete FPO');
@@ -250,12 +250,12 @@ async function addFPOMember(fpoId, farmerId, memberDetails) {
     const res = await pool.query(
       `INSERT INTO fpo_memberships (membership_id, fpo_id, farmer_id, membership_date, shareholding, role, metadata) 
        VALUES ($1, $2, $3, NOW(), $4, $5, $6) RETURNING *`,
-      [generateId(), fpoId, farmerId, memberDetails.shareholding || 0, memberDetails.role || 'MEMBER', JSON.stringify(memberDetails.metadata || {})]
+      [generateId(), fpoId, farmerId, memberDetails.shareholding || 0, memberDetails.role || 'MEMBER', JSON.stringify(memberDetails.metadata || {})],
     );
-    
+
     // Update FPO membership count
     await pool.query('UPDATE fpos SET membership_count = membership_count + 1 WHERE fpo_id = $1', [fpoId]);
-    
+
     return res.rows[0];
   } catch (error) {
     logger.error('Error adding FPO member', { error: error.message });
@@ -273,14 +273,14 @@ async function getFPOMembers(fpoId) {
        FROM fpo_memberships fm 
        JOIN farmers f ON fm.farmer_id = f.id 
        WHERE fm.fpo_id = $1 ORDER BY fm.membership_date DESC`,
-      [fpoId]
+      [fpoId],
     );
-    
+
     return {
       fpoId,
       members: res.rows,
       totalMembers: res.rows.length,
-      totalShareholding: res.rows.reduce((sum, member) => sum + parseFloat(member.shareholding || 0), 0)
+      totalShareholding: res.rows.reduce((sum, member) => sum + parseFloat(member.shareholding || 0), 0),
     };
   } catch (error) {
     logger.error('Error getting FPO members', { error: error.message });
@@ -302,15 +302,15 @@ async function getFPOFinancialSummary(fpoId) {
        FROM fpo_financial_transactions 
        WHERE fpo_id = $1 
        GROUP BY fpo_id`,
-      [fpoId]
+      [fpoId],
     );
-    
+
     const financialData = res.rows[0] || { total_credits: 0, total_debits: 0, total_transactions: 0 };
-    
+
     return {
       fpoId,
       ...financialData,
-      netBalance: parseFloat(financialData.total_credits || 0) - parseFloat(financialData.total_debits || 0)
+      netBalance: parseFloat(financialData.total_credits || 0) - parseFloat(financialData.total_debits || 0),
     };
   } catch (error) {
     logger.error('Error getting FPO financial summary', { error: error.message });
@@ -324,13 +324,13 @@ async function getFPOFinancialSummary(fpoId) {
 async function recordFPOTransaction(fpoId, transactionDetails) {
   try {
     const { transactionType, amount, description, category, referenceId, metadata } = transactionDetails;
-    
+
     const res = await pool.query(
       `INSERT INTO fpo_financial_transactions (transaction_id, fpo_id, transaction_type, amount, description, category, reference_id, metadata, transaction_date) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *`,
-      [generateId(), fpoId, transactionType, amount, description, category, referenceId, JSON.stringify(metadata || {})]
+      [generateId(), fpoId, transactionType, amount, description, category, referenceId, JSON.stringify(metadata || {})],
     );
-    
+
     return res.rows[0];
   } catch (error) {
     logger.error('Error recording FPO transaction', { error: error.message });
@@ -354,8 +354,8 @@ async function generateFPOPerformanceReport(fpoId) {
         financial_data: financialSummary,
         membership_data: members,
         regional_benchmarks: await getRegionalBenchmarks(fpo.district_id, fpo.state_id),
-        industry_standards: await getIndustryStandards(fpo.fpo_type)
-      }
+        industry_standards: await getIndustryStandards(fpo.fpo_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -370,7 +370,7 @@ async function generateFPOPerformanceReport(fpoId) {
       performance_metrics: aiResponse.performance_metrics,
       recommendations: aiResponse.recommendations,
       benchmark_comparison: aiResponse.benchmark_comparison,
-      growth_opportunities: aiResponse.growth_opportunities
+      growth_opportunities: aiResponse.growth_opportunities,
     };
 
     return report;
@@ -390,7 +390,7 @@ async function getRegionalAnalysis(districtId, stateId) {
     crop_suitability: ['wheat', 'rice', 'vegetables'],
     market_access: 'moderate',
     infrastructure_quality: 'good',
-    labor_availability: 'high'
+    labor_availability: 'high',
   };
 }
 
@@ -399,7 +399,7 @@ async function getMarketOpportunities(fpoType) {
     'Direct to consumer sales',
     'Value-added processing',
     'Contract farming',
-    'Export markets'
+    'Export markets',
   ];
 }
 
@@ -408,7 +408,7 @@ async function getFPOBestPractices(fpoType) {
     'Implement democratic governance',
     'Maintain transparent financial records',
     'Regular member training programs',
-    'Quality standard certification'
+    'Quality standard certification',
   ];
 }
 
@@ -417,13 +417,13 @@ async function getGovernanceRecommendations(membershipCount) {
     return {
       board_size: 5,
       committee_structure: ['executive', 'finance', 'operations'],
-      meeting_frequency: 'monthly'
+      meeting_frequency: 'monthly',
     };
   } else {
     return {
       board_size: 7,
       committee_structure: ['executive', 'finance', 'operations', 'audit', 'grievance'],
-      meeting_frequency: 'bi-weekly'
+      meeting_frequency: 'bi-weekly',
     };
   }
 }
@@ -433,7 +433,7 @@ async function getRegionalBenchmarks(districtId, stateId) {
     average_membership: 150,
     average_share_capital: 500000,
     average_revenue: 2000000,
-    success_rate: 0.75
+    success_rate: 0.75,
   };
 }
 
@@ -442,7 +442,7 @@ async function getIndustryStandards(fpoType) {
     governance_score: 80,
     financial_health_score: 75,
     operational_efficiency_score: 70,
-    market_penetration_score: 65
+    market_penetration_score: 65,
   };
 }
 
@@ -456,6 +456,6 @@ module.exports = {
   getFPOMembers,
   getFPOFinancialSummary,
   recordFPOTransaction,
-  generateFPOPerformanceReport
+  generateFPOPerformanceReport,
 };
 

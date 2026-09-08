@@ -44,7 +44,7 @@ class SericultureService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting sericulture:', error);
@@ -59,11 +59,11 @@ class SericultureService {
     try {
       const query = 'SELECT * FROM sericulture WHERE id = $1';
       const result = await this.pool.query(query, [sericultureId]);
-      
+
       if (result.rows.length === 0) {
         throw new Error('Sericulture not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting sericulture by ID:', error);
@@ -83,7 +83,7 @@ class SericultureService {
         variety,
         mulberry_area_acres,
         rearing_capacity,
-        current_rearing_count
+        current_rearing_count,
       } = sericultureData;
 
       const query = `
@@ -93,7 +93,7 @@ class SericultureService {
       `;
 
       const result = await this.pool.query(query, [
-        farmer_id, name, location, variety, mulberry_area_acres, rearing_capacity, current_rearing_count
+        farmer_id, name, location, variety, mulberry_area_acres, rearing_capacity, current_rearing_count,
       ]);
 
       return result.rows[0];
@@ -143,3 +143,4 @@ class SericultureService {
 }
 
 module.exports = new SericultureService();
+

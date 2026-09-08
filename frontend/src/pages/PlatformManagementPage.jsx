@@ -29,7 +29,7 @@ const PlatformManagementPage = () => {
       // Mock API calls - replace with actual API calls
       const status = await fetchPlatformStatus();
       const analytics = await fetchPlatformAnalytics();
-      
+
       setPlatformStatus(status);
       setAnalyticsData(analytics);
     } catch (error) {
@@ -48,7 +48,7 @@ const PlatformManagementPage = () => {
     // no `confidence` field unless it is one this session actually computed.
     try {
       const res = await aiBackboneAPI.getAIProviderStatus();
-      const status = res.data?.data;
+      let status = res.data?.data;
       const insights = [];
       const now = new Date().toISOString();
 
@@ -107,12 +107,12 @@ const PlatformManagementPage = () => {
   // anywhere in this codebase, so total_requests/error_rate/growth trends and
   // per-service latency are honestly absent below rather than invented.
   const fetchPlatformStatus = async () => {
-    const res = await platformTelemetryAPI.getStatus();
+    let res = await platformTelemetryAPI.getStatus();
     return res.data?.data;
   };
 
   const fetchPlatformAnalytics = async () => {
-    const res = await platformTelemetryAPI.getAnalytics();
+    let res = await platformTelemetryAPI.getAnalytics();
     return res.data?.data;
   };
 
@@ -142,21 +142,21 @@ const PlatformManagementPage = () => {
       title: 'Total Users',
       type: 'metric',
       value: analyticsData?.total_users ?? 0,
-      description: 'Real count from the users table'
+      description: 'Real count from the users table',
     },
     {
       id: 'active-users',
       title: 'Active Users (30d)',
       type: 'metric',
       value: analyticsData?.active_users_30d ?? 0,
-      description: 'Logged in within the last 30 days'
+      description: 'Logged in within the last 30 days',
     },
     {
       id: 'orders',
       title: 'Total Orders',
       type: 'metric',
       value: analyticsData?.total_orders ?? 0,
-      description: 'Real count from the orders table'
+      description: 'Real count from the orders table',
     },
     {
       id: 'memory',
@@ -164,25 +164,25 @@ const PlatformManagementPage = () => {
       type: 'gauge',
       value: platformStatus?.system_metrics?.system?.memory_used_pct ?? 0,
       unit: '%',
-      description: `${platformStatus?.system_metrics?.system?.memory_total_mb ?? '—'} MB total (real OS reading)`
+      description: `${platformStatus?.system_metrics?.system?.memory_total_mb ?? '—'} MB total (real OS reading)`,
     },
     {
       id: 'services',
       title: 'Service Health',
       type: 'metric',
       value: serviceHealthEntries.length > 0 ? `${healthyServiceCount}/${serviceHealthEntries.length}` : '—',
-      description: 'Real DB/provider-connectivity checks, not simulated latency'
+      description: 'Real DB/provider-connectivity checks, not simulated latency',
     },
     {
       id: 'uptime',
       title: 'Process Uptime',
       type: 'metric',
-      value: platformStatus?.system_metrics?.process?.uptime_seconds
-        ? Math.floor(platformStatus.system_metrics.process.uptime_seconds / 3600)
-        : 0,
+      value: platformStatus?.system_metrics?.process?.uptime_seconds ?
+        Math.floor(platformStatus.system_metrics.process.uptime_seconds / 3600) :
+        0,
       suffix: 'h',
-      description: 'Real backend process uptime'
-    }
+      description: 'Real backend process uptime',
+    },
   ];
 
   const tabs = [
@@ -190,7 +190,7 @@ const PlatformManagementPage = () => {
     { id: 'configuration', label: 'Configuration', icon: '⚙️' },
     { id: 'monitoring', label: 'Monitoring', icon: '📈' },
     { id: 'analytics', label: 'Analytics', icon: '📉' },
-    { id: 'optimization', label: 'Optimization', icon: '🚀' }
+    { id: 'optimization', label: 'Optimization', icon: '🚀' },
   ];
 
   return (

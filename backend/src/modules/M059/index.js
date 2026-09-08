@@ -8,8 +8,8 @@ router.get('/discounts/:id', controller.get);
 router.put('/discounts/:id', controller.update);
 router.delete('/discounts/:id', controller.remove);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

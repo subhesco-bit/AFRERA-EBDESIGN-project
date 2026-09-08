@@ -8,10 +8,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
+import { NativeSelect as Select } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
 import { useAuthStore } from '../store/authStore';
+import api from '../services/api';
 
 const DigitalTwinPage = () => {
   const { user } = useAuthStore();
@@ -20,31 +21,25 @@ const DigitalTwinPage = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Get farmer's digital twins
-  const { data: twinsData, isLoading: twinsLoading } = useQuery({
+  const { data: twinsData, isLoading: twinsLoading, error: twinsError } = useQuery({
     queryKey: ['farmerTwins', user?.id],
-    queryFn: () => fetch(`/api/digital-twin/farmers/${user.id}`)
-      .then(res => res.json())
-      .then(res => res.data),
-    enabled: !!user?.id,
-    refetchInterval: 120000 // 2 minutes
+    queryFn: () => api.get(`/digital-twin/farmers/${user.id}`).then(res => res.data.data),
+    enabled: Boolean(user?.id),
+    refetchInterval: 120000, // 2 minutes
   });
 
   // Get system status
   const { data: systemStatus } = useQuery({
     queryKey: ['digitalTwinSystemStatus'],
-    queryFn: () => fetch('/api/digital-twin/system/status')
-      .then(res => res.json())
-      .then(res => res.data),
-    refetchInterval: 300000 // 5 minutes
+    queryFn: () => api.get('/digital-twin/system/status').then(res => res.data.data),
+    refetchInterval: 300000, // 5 minutes
   });
 
   // Get twin details when selected
   const { data: twinDetails } = useQuery({
     queryKey: ['twinDetails', selectedTwin],
-    queryFn: () => fetch(`/api/digital-twin/${selectedTwin}`)
-      .then(res => res.json())
-      .then(res => res.data),
-    enabled: !!selectedTwin
+    queryFn: () => api.get(`/digital-twin/${selectedTwin}`).then(res => res.data.data),
+    enabled: Boolean(selectedTwin),
   });
 
   const twins = twinsData?.twins || [];
@@ -115,6 +110,8 @@ const DigitalTwinPage = () => {
           <div className="space-y-3">
             {twinsLoading ? (
               <LoadingSkeleton variant="rectangular" lines={3} />
+            ) : twinsError ? (
+              <p className="text-red-600 text-sm">Unable to load digital twins: {twinsError.message}</p>
             ) : twins.length === 0 ? (
               <p className="text-gray-500 text-sm">No digital twins created</p>
             ) : (
@@ -203,7 +200,7 @@ const DigitalTwinPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-2">Simulation Type</label>
-                      <Select 
+                      <Select
                         value={simulationType}
                         onChange={(e) => setSimulationType(e.target.value)}
                       >

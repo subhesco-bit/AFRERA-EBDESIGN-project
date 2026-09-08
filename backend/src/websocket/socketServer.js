@@ -25,10 +25,10 @@ class SocketServer {
    * Initialize WebSocket server
    */
   initialize(server) {
-    this.wss = new WebSocket.Server({ 
+    this.wss = new WebSocket.Server({
       server,
       path: '/ws',
-      clientTracking: true
+      clientTracking: true,
     });
 
     this.wss.on('connection', (ws, req) => {
@@ -77,7 +77,7 @@ class SocketServer {
       this.sendToUser(userId, {
         type: 'connected',
         timestamp: new Date().toISOString(),
-        message: 'Successfully connected to AFRERA real-time service'
+        message: 'Successfully connected to AFRERA real-time service',
       });
 
       // Handle messages from client
@@ -245,7 +245,7 @@ class SocketServer {
     return this.sendToUser(userId, {
       type: 'notification',
       timestamp: new Date().toISOString(),
-      data: notification
+      data: notification,
     });
   }
 
@@ -258,7 +258,7 @@ class SocketServer {
       type: 'tracking_update',
       timestamp: new Date().toISOString(),
       shipment_id: shipmentId,
-      data: update
+      data: update,
     });
   }
 
@@ -271,7 +271,7 @@ class SocketServer {
       type: 'order_update',
       timestamp: new Date().toISOString(),
       order_id: orderId,
-      data: update
+      data: update,
     });
   }
 
@@ -284,7 +284,7 @@ class SocketServer {
       type: 'price_alert',
       timestamp: new Date().toISOString(),
       product_id: productId,
-      data: priceData
+      data: priceData,
     });
   }
 
@@ -297,7 +297,7 @@ class SocketServer {
       type: 'weather_alert',
       timestamp: new Date().toISOString(),
       location,
-      data: weatherData
+      data: weatherData,
     });
   }
 
@@ -308,7 +308,7 @@ class SocketServer {
     return this.broadcast({
       type: 'government_announcement',
       timestamp: new Date().toISOString(),
-      data: announcement
+      data: announcement,
     });
   }
 

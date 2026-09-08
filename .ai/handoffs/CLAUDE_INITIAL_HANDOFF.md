@@ -7,7 +7,7 @@
 
 ## PROJECT
 
-**Project Name:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project Name:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Purpose:** Multi-vertical agricultural platform empowering Northeast India farmers through technology, fair trade, financial services, logistics, insurance, and AI decision-making  
 **Current State:** Substantial implementation complete, awaiting Claude integration and database setup
 
@@ -540,3 +540,4 @@ _EBDESIGN_LIBRARY/        # Module documentation
 *This handoff provides Claude with complete context to understand the existing Devin implementation and make informed architectural decisions.*
 
 *verified by vibecheck*
+

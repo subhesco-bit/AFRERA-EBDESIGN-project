@@ -1,9 +1,9 @@
 /**
  * Pre-Season Purchase Service
  * Strategic implementation for advance agricultural purchase agreements
- * 
- * Business Concept: Pre-season purchase agreements allow buyers to commit to 
- * agricultural output before planting, providing farmers with guaranteed income 
+ *
+ * Business Concept: Pre-season purchase agreements allow buyers to commit to
+ * agricultural output before planting, providing farmers with guaranteed income
  * and buyers with supply security.
  */
 
@@ -13,7 +13,7 @@ const { logger } = require('../../utils/logger');
 class PreSeasonPurchaseService {
   constructor() {
     this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL
+      connectionString: process.env.DATABASE_URL,
     });
   }
 
@@ -24,28 +24,28 @@ class PreSeasonPurchaseService {
    */
   async createAgreement(agreementData) {
     const client = await this.pool.connect();
-    
+
     try {
       await client.query('BEGIN');
-      
+
       // Validate farmer eligibility
       const farmerEligibility = await this.validateFarmerEligibility(
-        client, 
-        agreementData.farmer_id
+        client,
+        agreementData.farmer_id,
       );
-      
+
       if (!farmerEligibility.eligible) {
         throw new Error(`Farmer not eligible: ${farmerEligibility.reason}`);
       }
-      
+
       // Calculate fair price based on historical data + risk premium
       const fairPrice = await this.calculateFairPrice(
         client,
         agreementData.crop_id,
         agreementData.variety_id,
-        agreementData.quantity
+        agreementData.quantity,
       );
-      
+
       // Generate agreement ID and create record
       const agreementResult = await client.query(
         `INSERT INTO pre_season_agreements 
@@ -67,32 +67,32 @@ class PreSeasonPurchaseService {
           fairPrice.priceFloor,
           agreementData.revenue_share_percentage || null,
           agreementData.input_financing_included || false,
-          agreementData.input_financing_amount || null
-        ]
+          agreementData.input_financing_amount || null,
+        ],
       );
-      
+
       const agreementId = agreementResult.rows[0].id;
-      
+
       // Create initial milestones
       await this.createInitialMilestones(client, agreementId, agreementData);
-      
+
       // Generate smart contract reference (placeholder for blockchain integration)
       const smartContractRef = await this.generateSmartContractReference(
         agreementId,
-        agreementData
+        agreementData,
       );
-      
+
       await client.query(
         `UPDATE pre_season_agreements 
          SET smart_contract_address = $1, blockchain_tx_hash = $2
          WHERE id = $3`,
-        [smartContractRef.address, smartContractRef.txHash, agreementId]
+        [smartContractRef.address, smartContractRef.txHash, agreementId],
       );
-      
+
       await client.query('COMMIT');
-      
+
       logger.info(`Pre-season agreement created: ${agreementId}`);
-      
+
       return {
         success: true,
         agreement: {
@@ -102,11 +102,11 @@ class PreSeasonPurchaseService {
           agreed_price: fairPrice.finalPrice,
           price_floor: fairPrice.priceFloor,
           smart_contract: smartContractRef,
-          created_at: agreementResult.rows[0].created_at
+          created_at: agreementResult.rows[0].created_at,
         },
-        price_breakdown: fairPrice
+        price_breakdown: fairPrice,
       };
-      
+
     } catch (error) {
       await client.query('ROLLBACK');
       logger.error(`Error creating pre-season agreement: ${error.message}`);
@@ -129,32 +129,32 @@ class PreSeasonPurchaseService {
         `SELECT credit_score, land_verification_status, active_disputes
          FROM farmers 
          WHERE id = $1`,
-        [farmerId]
+        [farmerId],
       );
-      
+
       if (creditResult.rows.length === 0) {
         return { eligible: false, reason: 'Farmer not found' };
       }
-      
+
       const farmer = creditResult.rows[0];
-      
+
       // Check credit score threshold
       if (farmer.credit_score < 600) {
         return { eligible: false, reason: 'Credit score below threshold (600)' };
       }
-      
+
       // Check land verification
       if (farmer.land_verification_status !== 'verified') {
         return { eligible: false, reason: 'Land ownership not verified' };
       }
-      
+
       // Check for active disputes
       if (farmer.active_disputes > 0) {
         return { eligible: false, reason: 'Active disputes exist' };
       }
-      
+
       return { eligible: true, credit_score: farmer.credit_score };
-      
+
     } catch (error) {
       logger.error(`Error validating farmer eligibility: ${error.message}`);
       return { eligible: false, reason: 'Validation error' };
@@ -181,36 +181,36 @@ class PreSeasonPurchaseService {
          WHERE crop_id = $1 AND variety_id = $2 
          AND price_date >= NOW() - INTERVAL '12 months'
          GROUP BY crop_id, variety_id`,
-        [cropId, varietyId]
+        [cropId, varietyId],
       );
-      
+
       if (historicalPriceResult.rows.length === 0) {
         // Fallback to regional variety directory if no market data
         const varietyResult = await client.query(
           `SELECT indicative_price_min, indicative_price_max
            FROM regional_variety_directory 
            WHERE id = $1`,
-          [varietyId]
+          [varietyId],
         );
-        
+
         if (varietyResult.rows.length > 0) {
           const variety = varietyResult.rows[0];
           const avgPrice = (variety.indicative_price_min + variety.indicative_price_max) / 2;
           const priceVolatility = (variety.indicative_price_max - variety.indicative_price_min) / 2;
-          
+
           return this.calculateRiskAdjustedPrice(avgPrice, priceVolatility, quantity);
         }
-        
+
         throw new Error('No price data available for this crop/variety');
       }
-      
+
       const priceData = historicalPriceResult.rows[0];
       return this.calculateRiskAdjustedPrice(
         priceData.avg_price,
         priceData.price_volatility,
-        quantity
+        quantity,
       );
-      
+
     } catch (error) {
       logger.error(`Error calculating fair price: ${error.message}`);
       throw error;
@@ -228,16 +228,16 @@ class PreSeasonPurchaseService {
     // Risk premium based on volatility (typically 5-15% of base price)
     const riskPremiumRate = Math.min(volatility / basePrice * 100, 15) / 100;
     const riskPremium = basePrice * riskPremiumRate;
-    
+
     // Volume discount for larger orders (2-5% discount for orders > 10 tons)
     let volumeDiscount = 0;
     if (quantity > 10) {
       volumeDiscount = Math.min((quantity - 10) * 0.001, 0.05);
     }
-    
+
     const finalPrice = basePrice + riskPremium - (basePrice * volumeDiscount);
     const priceFloor = basePrice * 0.85; // 15% below base price as safety floor
-    
+
     return {
       basePrice: Math.round(basePrice * 100) / 100,
       riskPremium: Math.round(riskPremium * 100) / 100,
@@ -246,8 +246,8 @@ class PreSeasonPurchaseService {
       priceFloor: Math.round(priceFloor * 100) / 100,
       calculation: {
         risk_premium_rate: riskPremiumRate,
-        volume_discount_rate: volumeDiscount
-      }
+        volume_discount_rate: volumeDiscount,
+      },
     };
   }
 
@@ -262,31 +262,31 @@ class PreSeasonPurchaseService {
       {
         type: 'planting',
         target_date: this.adjustDate(agreementData.delivery_date, -120), // ~4 months before delivery
-        status: 'pending'
+        status: 'pending',
       },
       {
         type: 'input_application',
         target_date: this.adjustDate(agreementData.delivery_date, -90), // ~3 months before delivery
-        status: 'pending'
+        status: 'pending',
       },
       {
         type: 'growth_stage',
         target_date: this.adjustDate(agreementData.delivery_date, -60), // ~2 months before delivery
-        status: 'pending'
+        status: 'pending',
       },
       {
         type: 'harvest',
         target_date: this.adjustDate(agreementData.delivery_date, -30), // ~1 month before delivery
-        status: 'pending'
-      }
+        status: 'pending',
+      },
     ];
-    
+
     for (const milestone of milestones) {
       await client.query(
         `INSERT INTO pre_season_milestones 
          (agreement_id, milestone_type, target_date, status)
          VALUES ($1, $2, $3, $4)`,
-        [agreementId, milestone.type, milestone.target_date, milestone.status]
+        [agreementId, milestone.type, milestone.target_date, milestone.status],
       );
     }
   }
@@ -304,7 +304,7 @@ class PreSeasonPurchaseService {
       address: `0x${agreementId.replace(/-/g, '').substring(0, 40)}`,
       txHash: null, // Will be populated after actual blockchain deployment
       network: 'ethereum',
-      status: 'pending_deployment'
+      status: 'pending_deployment',
     };
   }
 
@@ -316,7 +316,7 @@ class PreSeasonPurchaseService {
   async trackProgress(agreementId) {
     try {
       const client = await this.pool.connect();
-      
+
       try {
         // Get agreement details
         const agreementResult = await client.query(
@@ -328,31 +328,31 @@ class PreSeasonPurchaseService {
            JOIN crops c ON a.crop_id = c.id
            JOIN regional_variety_directory v ON a.variety_id = v.id
            WHERE a.id = $1`,
-          [agreementId]
+          [agreementId],
         );
-        
+
         if (agreementResult.rows.length === 0) {
           throw new Error('Agreement not found');
         }
-        
+
         const agreement = agreementResult.rows[0];
-        
+
         // Get milestones
         const milestonesResult = await client.query(
           `SELECT * FROM pre_season_milestones 
            WHERE agreement_id = $1 
            ORDER BY target_date ASC`,
-          [agreementId]
+          [agreementId],
         );
-        
+
         // Calculate progress percentage
         const completedMilestones = milestonesResult.rows.filter(
-          m => m.status === 'completed'
+          m => m.status === 'completed',
         ).length;
         const progressPercentage = (completedMilestones / milestonesResult.rows.length) * 100;
-        
+
         client.release();
-        
+
         return {
           agreement: {
             id: agreement.id,
@@ -363,20 +363,20 @@ class PreSeasonPurchaseService {
             quantity: agreement.agreed_quantity,
             price: agreement.agreed_price,
             delivery_date: agreement.delivery_date,
-            status: agreement.settlement_status || 'active'
+            status: agreement.settlement_status || 'active',
           },
           milestones: milestonesResult.rows,
           progress: {
             percentage: Math.round(progressPercentage),
             completed: completedMilestones,
             total: milestonesResult.rows.length,
-            next_milestone: milestonesResult.rows.find(m => m.status === 'pending') || null
-          }
+            next_milestone: milestonesResult.rows.find(m => m.status === 'pending') || null,
+          },
         };
-        
+
       } finally {
         client.release();
-    }
+      }
     } catch (error) {
       logger.error(`Error tracking agreement progress: ${error.message}`);
       throw error;
@@ -401,13 +401,13 @@ class PreSeasonPurchaseService {
           updateData.actual_date || new Date(),
           updateData.notes || null,
           JSON.stringify(updateData.verification_data || {}),
-          milestoneId
-        ]
+          milestoneId,
+        ],
       );
-      
+
       logger.info(`Milestone updated: ${milestoneId}`);
       return result.rows[0];
-      
+
     } catch (error) {
       logger.error(`Error updating milestone: ${error.message}`);
       throw error;
@@ -422,37 +422,37 @@ class PreSeasonPurchaseService {
    */
   async settleAgreement(agreementId, settlementData) {
     const client = await this.pool.connect();
-    
+
     try {
       await client.query('BEGIN');
-      
+
       // Get agreement details
       const agreementResult = await client.query(
-        `SELECT * FROM pre_season_agreements WHERE id = $1`,
-        [agreementId]
+        'SELECT * FROM pre_season_agreements WHERE id = $1',
+        [agreementId],
       );
-      
+
       if (agreementResult.rows.length === 0) {
         throw new Error('Agreement not found');
       }
-      
+
       const agreement = agreementResult.rows[0];
-      
+
       // Verify quality
       const qualityVerification = await this.verifyQuality(
         client,
         agreementId,
-        settlementData.quality_data
+        settlementData.quality_data,
       );
-      
+
       // Calculate final price based on quality and market conditions
       const finalPrice = await this.calculateFinalPrice(
         client,
         agreement,
         qualityVerification,
-        settlementData.actual_quantity
+        settlementData.actual_quantity,
       );
-      
+
       // Update agreement with settlement details
       await client.query(
         `UPDATE pre_season_agreements 
@@ -467,22 +467,22 @@ class PreSeasonPurchaseService {
           qualityVerification.score,
           finalPrice.final_amount,
           new Date(),
-          agreementId
-        ]
+          agreementId,
+        ],
       );
-      
+
       // Process payment (integrate with payment service)
       const paymentResult = await this.processPayment(
         client,
         agreement.farmer_id,
         finalPrice.final_amount,
-        agreementId
+        agreementId,
       );
-      
+
       await client.query('COMMIT');
-      
+
       logger.info(`Agreement settled: ${agreementId}`);
-      
+
       return {
         success: true,
         settlement: {
@@ -491,10 +491,10 @@ class PreSeasonPurchaseService {
           quality_score: qualityVerification.score,
           actual_quantity: settlementData.actual_quantity,
           price_adjustment: finalPrice.adjustment,
-          payment_reference: paymentResult.reference
-        }
+          payment_reference: paymentResult.reference,
+        },
       };
-      
+
     } catch (error) {
       await client.query('ROLLBACK');
       logger.error(`Error settling agreement: ${error.message}`);
@@ -515,40 +515,40 @@ class PreSeasonPurchaseService {
     try {
       // Get agreement quality standards
       const agreementResult = await client.query(
-        `SELECT quality_standards FROM pre_season_agreements WHERE id = $1`,
-        [agreementId]
+        'SELECT quality_standards FROM pre_season_agreements WHERE id = $1',
+        [agreementId],
       );
-      
+
       const standards = agreementResult.rows[0].quality_standards;
-      
+
       // Compare actual quality against standards
       let score = 100;
       const deviations = [];
-      
+
       for (const [parameter, standard] of Object.entries(standards)) {
         if (qualityData[parameter]) {
           const actual = qualityData[parameter];
           const deviation = Math.abs((actual - standard) / standard);
-          
+
           if (deviation > 0.1) { // 10% tolerance
             score -= (deviation * 50); // Penalize significantly
             deviations.push({
               parameter,
               standard,
               actual,
-              deviation: (deviation * 100).toFixed(2) + '%'
+              deviation: `${(deviation * 100).toFixed(2) }%`,
             });
           }
         }
       }
-      
+
       return {
         score: Math.max(0, Math.round(score)),
         passed: score >= 70, // 70% threshold
         deviations,
-        verified_at: new Date()
+        verified_at: new Date(),
       };
-      
+
     } catch (error) {
       logger.error(`Error verifying quality: ${error.message}`);
       throw error;
@@ -567,7 +567,7 @@ class PreSeasonPurchaseService {
     try {
       let finalAmount = agreement.agreed_price * actualQuantity;
       const adjustments = [];
-      
+
       // Quality adjustment
       if (qualityVerification.score < 90) {
         const qualityPenalty = (90 - qualityVerification.score) / 100;
@@ -576,7 +576,7 @@ class PreSeasonPurchaseService {
         adjustments.push({
           type: 'quality_penalty',
           amount: -qualityAdjustment,
-          reason: `Quality score ${qualityVerification.score}% below 90% threshold`
+          reason: `Quality score ${qualityVerification.score}% below 90% threshold`,
         });
       } else if (qualityVerification.score > 95) {
         const qualityBonus = (qualityVerification.score - 95) / 100;
@@ -585,35 +585,35 @@ class PreSeasonPurchaseService {
         adjustments.push({
           type: 'quality_bonus',
           amount: qualityAdjustment,
-          reason: `Quality score ${qualityVerification.score}% exceeded 95% threshold`
+          reason: `Quality score ${qualityVerification.score}% exceeded 95% threshold`,
         });
       }
-      
+
       // Market price adjustment (if price floor is triggered)
       const currentMarketPrice = await this.getCurrentMarketPrice(
         client,
         agreement.crop_id,
-        agreement.variety_id
+        agreement.variety_id,
       );
-      
+
       if (currentMarketPrice < agreement.price_floor) {
         const marketAdjustment = (agreement.price_floor - currentMarketPrice) * actualQuantity;
         finalAmount += marketAdjustment;
         adjustments.push({
           type: 'price_floor_protection',
           amount: marketAdjustment,
-          reason: `Market price ₹${currentMarketPrice} below floor ₹${agreement.price_floor}`
+          reason: `Market price ₹${currentMarketPrice} below floor ₹${agreement.price_floor}`,
         });
       }
-      
+
       return {
         base_amount: agreement.agreed_price * actualQuantity,
         final_amount: Math.round(finalAmount * 100) / 100,
         adjustment: Math.round((finalAmount - (agreement.agreed_price * actualQuantity)) * 100) / 100,
         adjustments,
-        per_unit_price: Math.round((finalAmount / actualQuantity) * 100) / 100
+        per_unit_price: Math.round((finalAmount / actualQuantity) * 100) / 100,
       };
-      
+
     } catch (error) {
       logger.error(`Error calculating final price: ${error.message}`);
       throw error;
@@ -635,16 +635,16 @@ class PreSeasonPurchaseService {
          WHERE crop_id = $1 AND variety_id = $2 
          AND price_date >= NOW() - INTERVAL '7 days'
          GROUP BY crop_id, variety_id`,
-        [cropId, varietyId]
+        [cropId, varietyId],
       );
-      
+
       if (result.rows.length > 0) {
         return result.rows[0].current_price;
       }
-      
+
       // Fallback to agreed price if no current market data
       return null;
-      
+
     } catch (error) {
       logger.error(`Error getting current market price: ${error.message}`);
       return null;
@@ -663,36 +663,36 @@ class PreSeasonPurchaseService {
     try {
       // Get farmer bank details
       const farmerResult = await client.query(
-        `SELECT bank_account_number, bank_ifsc_code FROM farmers WHERE id = $1`,
-        [farmerId]
+        'SELECT bank_account_number, bank_ifsc_code FROM farmers WHERE id = $1',
+        [farmerId],
       );
-      
+
       if (farmerResult.rows.length === 0) {
         throw new Error('Farmer bank details not found');
       }
-      
+
       const farmer = farmerResult.rows[0];
-      
+
       // Integrate with payment service (placeholder)
       // In production, this would call actual payment gateway API
       const paymentReference = `PAY-${Date.now()}-${agreementId.substring(0, 8)}`;
-      
+
       // Record payment transaction
       await client.query(
         `INSERT INTO payment_transactions 
          (farmer_id, amount, payment_reference, transaction_type, status, related_agreement_id)
          VALUES ($1, $2, $3, 'settlement', 'completed', $4)`,
-        [farmerId, amount, paymentReference, agreementId]
+        [farmerId, amount, paymentReference, agreementId],
       );
-      
+
       return {
         success: true,
         reference: paymentReference,
-        amount: amount,
+        amount,
         bank_account: farmer.bank_account_number,
-        processed_at: new Date()
+        processed_at: new Date(),
       };
-      
+
     } catch (error) {
       logger.error(`Error processing payment: ${error.message}`);
       throw error;
@@ -730,11 +730,11 @@ class PreSeasonPurchaseService {
          WHERE o.status = 'open' 
          AND o.deadline > NOW()
          ORDER BY o.deadline ASC
-         LIMIT 20`
+         LIMIT 20`,
       );
-      
+
       return result.rows;
-      
+
     } catch (error) {
       logger.error(`Error getting available opportunities: ${error.message}`);
       throw error;
@@ -749,7 +749,7 @@ class PreSeasonPurchaseService {
   async getBuyerPortfolio(buyerId) {
     try {
       const client = await this.pool.connect();
-      
+
       try {
         // Get portfolio summary
         const summaryResult = await client.query(
@@ -759,9 +759,9 @@ class PreSeasonPurchaseService {
                   AVG(CASE WHEN settlement_status = 'completed' THEN quality_score END) as avg_quality_score
            FROM pre_season_agreements 
            WHERE buyer_id = $1`,
-          [buyerId]
+          [buyerId],
         );
-        
+
         // Get status breakdown
         const statusResult = await client.query(
           `SELECT settlement_status, COUNT(*) as count, 
@@ -769,9 +769,9 @@ class PreSeasonPurchaseService {
                   SUM(agreed_price * agreed_quantity) as value
            FROM pre_season_agreements 
            WHERE buyer_id = $1
-           GROUP BY settlement_status`
+           GROUP BY settlement_status`,
         );
-        
+
         // Get regional distribution
         const regionResult = await client.query(
           `SELECT f.district, f.state, 
@@ -781,21 +781,21 @@ class PreSeasonPurchaseService {
            JOIN farmers f ON a.farmer_id = f.id
            WHERE a.buyer_id = $1
            GROUP BY f.district, f.state
-           ORDER BY total_quantity DESC`
+           ORDER BY total_quantity DESC`,
         );
-        
+
         client.release();
-        
+
         return {
           summary: summaryResult.rows[0],
           status_breakdown: statusResult.rows,
-          regional_distribution: regionResult.rows
+          regional_distribution: regionResult.rows,
         };
-        
+
       } finally {
         client.release();
       }
-      
+
     } catch (error) {
       logger.error(`Error getting buyer portfolio: ${error.message}`);
       throw error;

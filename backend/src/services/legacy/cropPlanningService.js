@@ -27,7 +27,7 @@ class CropPlanningService {
       seedSource,
       fertilizerPlan,
       irrigationSchedule,
-      marketStrategy
+      marketStrategy,
     } = planData;
 
     try {
@@ -48,7 +48,7 @@ class CropPlanningService {
       const resourceRequirements = this.calculateResourceRequirements(
         cropType,
         land.area_in_hectares,
-        estimatedYield
+        estimatedYield,
       );
 
       const query = `
@@ -73,7 +73,7 @@ class CropPlanningService {
         JSON.stringify(fertilizerPlan),
         JSON.stringify(irrigationSchedule),
         JSON.stringify(marketStrategy),
-        JSON.stringify(resourceRequirements)
+        JSON.stringify(resourceRequirements),
       ]);
 
       logger.info(`Crop plan created for farmer ${farmerId}`);
@@ -139,7 +139,7 @@ class CropPlanningService {
 
       return {
         plans: result.rows,
-        pagination: { page, limit }
+        pagination: { page, limit },
       };
     } catch (error) {
       logger.error('Error getting farmer crop plans', { error: error.message, stack: error.stack });
@@ -172,7 +172,7 @@ class CropPlanningService {
         land.soil_type,
         land.state,
         land.district,
-        currentSeason
+        currentSeason,
       );
 
       // Get market demand data
@@ -181,7 +181,7 @@ class CropPlanningService {
       // Get weather forecast
       const weatherForecast = await this.getWeatherForecast(
         land.district,
-        currentSeason
+        currentSeason,
       );
 
       // Rank crops by suitability and market demand
@@ -195,7 +195,7 @@ class CropPlanningService {
         marketPrice: crop.marketPrice,
         profitability: crop.profitability,
         riskLevel: crop.riskLevel,
-        recommendationScore: crop.score
+        recommendationScore: crop.score,
       }));
 
       return {
@@ -204,12 +204,12 @@ class CropPlanningService {
         landDetails: {
           area: land.area_in_hectares,
           soilType: land.soilType,
-          irrigationType: land.irrigationType
+          irrigationType: land.irrigationType,
         },
         recommendations,
         weatherForecast,
         marketInsights: marketDemand,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error getting recommended crop plan', { error: error.message, stack: error.stack });
@@ -226,17 +226,17 @@ class CropPlanningService {
       // For now, return predefined suitability data
 
       const cropDatabase = {
-        'alluvial': ['rice', 'wheat', 'maize', 'sugarcane', 'mustard', 'vegetables'],
-        'red_loamy': ['rice', 'millets', 'pulses', 'oilseeds', 'vegetables'],
+        alluvial: ['rice', 'wheat', 'maize', 'sugarcane', 'mustard', 'vegetables'],
+        red_loamy: ['rice', 'millets', 'pulses', 'oilseeds', 'vegetables'],
         'black-soil': ['cotton', 'sugarcane', 'soybean', 'wheat', 'gram'],
-        'laterite': ['rice', 'coconut', 'arecanut', 'cashew', 'spices'],
-        'sandy': ['groundnut', 'millets', 'vegetables', 'fruits']
+        laterite: ['rice', 'coconut', 'arecanut', 'cashew', 'spices'],
+        sandy: ['groundnut', 'millets', 'vegetables', 'fruits'],
       };
 
       const seasonalCrops = {
-        'kharif': ['rice', 'maize', 'cotton', 'soybean', 'groundnut', 'sugarcane'],
-        'rabi': ['wheat', 'barley', 'gram', 'mustard', 'vegetables'],
-        'zaid': ['cucumber', 'watermelon', 'muskmelon', 'vegetables']
+        kharif: ['rice', 'maize', 'cotton', 'soybean', 'groundnut', 'sugarcane'],
+        rabi: ['wheat', 'barley', 'gram', 'mustard', 'vegetables'],
+        zaid: ['cucumber', 'watermelon', 'muskmelon', 'vegetables'],
       };
 
       const soilSuitable = cropDatabase[soilType] || cropDatabase['alluvial'];
@@ -248,7 +248,7 @@ class CropPlanningService {
       return suitableCrops.map(crop => ({
         cropType: crop,
         soilSuitability: soilSuitable.includes(crop) ? 'high' : 'medium',
-        seasonSuitability: seasonalSuitable.includes(crop) ? 'high' : 'medium'
+        seasonSuitability: seasonalSuitable.includes(crop) ? 'high' : 'medium',
       }));
     } catch (error) {
       logger.error('Error getting suitable crops', { error: error.message, stack: error.stack });
@@ -265,14 +265,14 @@ class CropPlanningService {
       // For now, return simulated market data
 
       const marketData = {
-        'rice': { demand: 'high', price: 2500, trend: 'stable' },
-        'wheat': { demand: 'high', price: 2200, trend: 'increasing' },
-        'maize': { demand: 'medium', price: 1800, trend: 'stable' },
-        'cotton': { demand: 'high', price: 6000, trend: 'increasing' },
-        'soybean': { demand: 'medium', price: 4000, trend: 'stable' },
-        'groundnut': { demand: 'medium', price: 5500, trend: 'increasing' },
-        'sugarcane': { demand: 'high', price: 3000, trend: 'stable' },
-        'vegetables': { demand: 'high', price: 3500, trend: 'increasing' }
+        rice: { demand: 'high', price: 2500, trend: 'stable' },
+        wheat: { demand: 'high', price: 2200, trend: 'increasing' },
+        maize: { demand: 'medium', price: 1800, trend: 'stable' },
+        cotton: { demand: 'high', price: 6000, trend: 'increasing' },
+        soybean: { demand: 'medium', price: 4000, trend: 'stable' },
+        groundnut: { demand: 'medium', price: 5500, trend: 'increasing' },
+        sugarcane: { demand: 'high', price: 3000, trend: 'stable' },
+        vegetables: { demand: 'high', price: 3500, trend: 'increasing' },
       };
 
       return marketData;
@@ -297,7 +297,7 @@ class CropPlanningService {
         temperature: 'moderate',
         humidity: 'high',
         riskFactors: ['pests', 'diseases'],
-        favorableConditions: ['good soil moisture', 'adequate sunlight']
+        favorableConditions: ['good soil moisture', 'adequate sunlight'],
       };
     } catch (error) {
       logger.error('Error getting weather forecast', { error: error.message, stack: error.stack });
@@ -326,7 +326,7 @@ class CropPlanningService {
         expectedYield: this.getExpectedYield(crop.cropType),
         profitability: this.calculateProfitability(crop.cropType, marketData.price),
         riskLevel: this.assessRiskLevel(crop.cropType, weatherForecast),
-        score
+        score,
       };
     }).sort((a, b) => b.score - a.score);
   }
@@ -336,14 +336,14 @@ class CropPlanningService {
    */
   getExpectedYield(cropType) {
     const yields = {
-      'rice': 4.5,
-      'wheat': 3.5,
-      'maize': 5.0,
-      'cotton': 1.5,
-      'soybean': 2.0,
-      'groundnut': 1.8,
-      'sugarcane': 70,
-      'vegetables': 25
+      rice: 4.5,
+      wheat: 3.5,
+      maize: 5.0,
+      cotton: 1.5,
+      soybean: 2.0,
+      groundnut: 1.8,
+      sugarcane: 70,
+      vegetables: 25,
     };
 
     return yields[cropType] || 3.0; // tons per hectare
@@ -355,14 +355,14 @@ class CropPlanningService {
   calculateProfitability(cropType, marketPrice) {
     const yields = this.getExpectedYield(cropType);
     const costs = {
-      'rice': 15000,
-      'wheat': 12000,
-      'maize': 10000,
-      'cotton': 25000,
-      'soybean': 18000,
-      'groundnut': 20000,
-      'sugarcane': 50000,
-      'vegetables': 30000
+      rice: 15000,
+      wheat: 12000,
+      maize: 10000,
+      cotton: 25000,
+      soybean: 18000,
+      groundnut: 20000,
+      sugarcane: 50000,
+      vegetables: 30000,
     };
 
     const cost = costs[cropType] || 15000;
@@ -374,7 +374,7 @@ class CropPlanningService {
       expectedRevenue: revenue,
       expectedCost: cost,
       expectedProfit: profit,
-      roi: roi.toFixed(2) + '%'
+      roi: `${roi.toFixed(2) }%`,
     };
   }
 
@@ -383,14 +383,14 @@ class CropPlanningService {
    */
   assessRiskLevel(cropType, weatherForecast) {
     const riskFactors = {
-      'rice': 'medium',
-      'wheat': 'low',
-      'maize': 'low',
-      'cotton': 'high',
-      'soybean': 'medium',
-      'groundnut': 'medium',
-      'sugarcane': 'low',
-      'vegetables': 'high'
+      rice: 'medium',
+      wheat: 'low',
+      maize: 'low',
+      cotton: 'high',
+      soybean: 'medium',
+      groundnut: 'medium',
+      sugarcane: 'low',
+      vegetables: 'high',
     };
 
     return riskFactors[cropType] || 'medium';
@@ -401,39 +401,39 @@ class CropPlanningService {
    */
   calculateResourceRequirements(cropType, areaInHectares, estimatedYield) {
     const baseRequirements = {
-      'rice': {
+      rice: {
         seeds: 20, // kg per hectare
         fertilizer: 100, // kg per hectare
         water: 5000, // cubic meters per hectare
-        labor: 150 // man-days per hectare
+        labor: 150, // man-days per hectare
       },
-      'wheat': {
+      wheat: {
         seeds: 100,
         fertilizer: 120,
         water: 4000,
-        labor: 120
+        labor: 120,
       },
-      'maize': {
+      maize: {
         seeds: 25,
         fertilizer: 80,
         water: 3500,
-        labor: 100
-      }
+        labor: 100,
+      },
     };
 
     const base = baseRequirements[cropType] || {
       seeds: 50,
       fertilizer: 100,
       water: 4000,
-      labor: 120
+      labor: 120,
     };
 
     return {
-      seeds: (base.seeds * areaInHectares).toFixed(2) + ' kg',
-      fertilizer: (base.fertilizer * areaInHectares).toFixed(2) + ' kg',
-      water: (base.water * areaInHectares).toFixed(2) + ' cubic meters',
-      labor: (base.labor * areaInHectares).toFixed(0) + ' man-days',
-      areaInHectares
+      seeds: `${(base.seeds * areaInHectares).toFixed(2) } kg`,
+      fertilizer: `${(base.fertilizer * areaInHectares).toFixed(2) } kg`,
+      water: `${(base.water * areaInHectares).toFixed(2) } cubic meters`,
+      labor: `${(base.labor * areaInHectares).toFixed(0) } man-days`,
+      areaInHectares,
     };
   }
 
@@ -471,7 +471,7 @@ class CropPlanningService {
         updateData.harvestDate,
         updateData.notes,
         planId,
-        farmerId
+        farmerId,
       ]);
 
       if (result.rows.length === 0) {
@@ -520,14 +520,15 @@ module.exports = new CropPlanningService();
 
 // Merged from backend/src/modules/M069
 {
-  const m069 = require("../../modules/M069/service");
+  const m069 = require('../../modules/M069/service');
   const { ...rest } = m069;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M079
 {
-  const m079 = require("../../modules/M079/service");
+  const m079 = require('../../modules/M079/service');
   const { ...rest } = m079;
   Object.assign(module.exports, rest);
 }
+

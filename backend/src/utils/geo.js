@@ -103,7 +103,7 @@ function boundingBox(lat, lng, radiusKm) {
     minLat: Math.max(-90, a - latDelta),
     maxLat: Math.min(90, a + latDelta),
     minLng: Math.max(-180, o - Math.abs(lngDelta)),
-    maxLng: Math.min(180, o + Math.abs(lngDelta))
+    maxLng: Math.min(180, o + Math.abs(lngDelta)),
   };
 }
 
@@ -127,7 +127,7 @@ function radiusQueryFragment({ lat, lng, radiusKm, table = 't', latCol = 'latitu
     sql,
     params: [box.minLat, box.maxLat, box.minLng, box.maxLng],
     nextIndex: i + 4,
-    box
+    box,
   };
 }
 
@@ -165,7 +165,7 @@ function sortByProximity(originLat, originLng, items, latKey = 'latitude', lngKe
   return (items || [])
     .map((item) => ({
       ...item,
-      distanceKm: distanceKm(originLat, originLng, item?.[latKey], item?.[lngKey])
+      distanceKm: distanceKm(originLat, originLng, item?.[latKey], item?.[lngKey]),
     }))
     .filter((item) => item.distanceKm !== null)
     .sort((a, b) => a.distanceKm - b.distanceKm);
@@ -178,7 +178,7 @@ function routeLengthKm(points, latKey = 'latitude', lngKey = 'longitude') {
   for (let i = 1; i < points.length; i++) {
     const d = distanceKm(
       points[i - 1]?.[latKey], points[i - 1]?.[lngKey],
-      points[i]?.[latKey], points[i]?.[lngKey]
+      points[i]?.[latKey], points[i]?.[lngKey],
     );
     if (d !== null) total += d;
   }
@@ -195,5 +195,5 @@ module.exports = {
   isWithinRadius,
   isWithinPolygon,
   sortByProximity,
-  routeLengthKm
+  routeLengthKm,
 };

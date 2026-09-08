@@ -2,7 +2,7 @@
  * Authentication Service (Section 21: Identity & Access Management)
  * Handles user login, token generation, session management
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class AuthService {
   constructor() {

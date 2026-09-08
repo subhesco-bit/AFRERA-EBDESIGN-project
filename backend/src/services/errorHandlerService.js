@@ -2,7 +2,7 @@
  * Error Handler Service Stub
  * Placeholder for error handling functionality
  */
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class ErrorHandlerService {
   constructor() {

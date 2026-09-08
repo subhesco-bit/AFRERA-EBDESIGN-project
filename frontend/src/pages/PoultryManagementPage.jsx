@@ -1,109 +1,109 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { poultryAPI, poultryAIAPI } from '../services/api'
-import { Egg, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Activity } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { poultryAPI, poultryAIAPI } from '../services/api';
+import { Egg, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Activity } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
+import ActionCard from '../components/common/ActionCard';
 
-const BREEDS = ['Broiler', 'Layer', 'Dual Purpose', 'Native / Desi', 'Crossbred']
-const FLOCK_TYPES = ['Broiler', 'Layer', 'Breeder']
-const STATUSES = ['Active', 'Sold', 'Deceased', 'Quarantine']
+const BREEDS = ['Broiler', 'Layer', 'Dual Purpose', 'Native / Desi', 'Crossbred'];
+const FLOCK_TYPES = ['Broiler', 'Layer', 'Breeder'];
+const STATUSES = ['Active', 'Sold', 'Deceased', 'Quarantine'];
 
 // Real backend fields (poultryService.js createFlock): flock_code, flock_type,
 // breed, placement_date, initial_bird_count, house_id, notes - flock_type is
 // required and was missing entirely; flock_id/initial_count were renamed.
 const emptyFlock = {
   flock_code: '', flock_type: 'Layer', breed: 'Native / Desi', placement_date: '', house_id: '', initial_bird_count: '', status: 'Active', notes: '',
-}
+};
 
 function PoultryManagementPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyFlock)
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyFlock);
   // Real fields (recordEggProduction): flock_id, record_date, total_eggs,
   // good_eggs, damaged_eggs, average_weight_grams, notes - "session" has no
   // backend equivalent (removed rather than silently dropped on submit).
-  const [eggForm, setEggForm] = useState({ flock_id: '', record_date: '', total_eggs: '', damaged_eggs: '' })
-  const [feedForm, setFeedForm] = useState({ flock_id: '', record_date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
-  const [tab, setTab] = useState('flocks')
-  const [aiFlockId, setAiFlockId] = useState('')
+  const [eggForm, setEggForm] = useState({ flock_id: '', record_date: '', total_eggs: '', damaged_eggs: '' });
+  const [feedForm, setFeedForm] = useState({ flock_id: '', record_date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' });
+  const [tab, setTab] = useState('flocks');
+  const [aiFlockId, setAiFlockId] = useState('');
 
   const { data: flocksData, isLoading, error } = useQuery({
     queryKey: ['poultry-flocks'],
     // listFlocks returns { items, pagination }, not a bare array
     queryFn: async () => (await poultryAPI.listFlocks()).data?.data?.items ?? [],
-  })
+  });
 
   const { data: eggData, isLoading: eggLoading, error: eggError } = useQuery({
     queryKey: ['poultry-egg-production'],
     queryFn: async () => (await poultryAPI.listEggProduction()).data?.data?.items ?? [],
-  })
+  });
 
   const { data: performanceData, isLoading: performanceLoading, error: performanceError } = useQuery({
     queryKey: ['poultry-performance'],
     queryFn: async () => (await poultryAPI.getFlockPerformance()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: vaccinationAlertsData, isLoading: vaccinationAlertsLoading, error: vaccinationAlertsError } = useQuery({
     queryKey: ['poultry-vaccination-alerts'],
     queryFn: async () => (await poultryAPI.getVaccinationAlerts()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? poultryAPI.updateFlock(editingId, payload) : poultryAPI.createFlock(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Flock updated' : 'Flock registered')
-      queryClient.invalidateQueries({ queryKey: ['poultry-flocks'] })
-      closeForm()
+      toast.success(editingId ? 'Flock updated' : 'Flock registered');
+      queryClient.invalidateQueries({ queryKey: ['poultry-flocks'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save flock'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => poultryAPI.deleteFlock(id),
-    onSuccess: () => { toast.success('Flock removed'); queryClient.invalidateQueries({ queryKey: ['poultry-flocks'] }) },
+    onSuccess: () => { toast.success('Flock removed'); queryClient.invalidateQueries({ queryKey: ['poultry-flocks'] }); },
     onError: () => toast.error('Failed to remove flock'),
-  })
+  });
 
   const recordEggMutation = useMutation({
     mutationFn: (payload) => poultryAPI.recordEggProduction(payload),
     onSuccess: () => {
-      toast.success('Egg production recorded')
-      queryClient.invalidateQueries({ queryKey: ['poultry-egg-production'] })
-      setEggForm({ flock_id: '', record_date: '', total_eggs: '', damaged_eggs: '' })
+      toast.success('Egg production recorded');
+      queryClient.invalidateQueries({ queryKey: ['poultry-egg-production'] });
+      setEggForm({ flock_id: '', record_date: '', total_eggs: '', damaged_eggs: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record egg production'),
-  })
+  });
 
   const recordFeedMutation = useMutation({
     mutationFn: (payload) => poultryAPI.recordFeedConsumption(payload),
     onSuccess: () => {
-      toast.success('Feed consumption recorded')
-      queryClient.invalidateQueries({ queryKey: ['poultry-feed-consumption'] })
-      setFeedForm({ flock_id: '', record_date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
+      toast.success('Feed consumption recorded');
+      queryClient.invalidateQueries({ queryKey: ['poultry-feed-consumption'] });
+      setFeedForm({ flock_id: '', record_date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record feed consumption'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyFlock) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyFlock); };
 
   const openEdit = (f) => {
     setForm({
       flock_code: f.flock_code || '', flock_type: f.flock_type || 'Layer', breed: f.breed || 'Native / Desi', placement_date: f.placement_date ? f.placement_date.slice(0, 10) : '',
       house_id: f.house_id || '', initial_bird_count: f.initial_bird_count || '', status: f.status || 'Active', notes: f.notes || '',
-    })
-    setEditingId(f.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(f.id);
+    setShowForm(true);
+  };
 
-  const flocks = flocksData || []
-  const eggRecords = eggData || []
-  const activeFlocks = flocks.filter((f) => f.status === 'Active').length
-  const totalEggsToday = eggRecords.reduce((s, e) => s + (Number(e.total_eggs) || 0), 0)
+  const flocks = flocksData || [];
+  const eggRecords = eggData || [];
+  const activeFlocks = flocks.filter((f) => f.status === 'Active').length;
+  const totalEggsToday = eggRecords.reduce((s, e) => s + (Number(e.total_eggs) || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -116,7 +116,7 @@ function PoultryManagementPage() {
           <p className="text-gray-600">Track flock health, egg production, and feed consumption</p>
         </div>
         {tab === 'flocks' && (
-          <button onClick={() => { setForm(emptyFlock); setEditingId(null); setShowForm(true) }}
+          <button onClick={() => { setForm(emptyFlock); setEditingId(null); setShowForm(true); }}
             className="px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition flex items-center">
             <Plus className="w-4 h-4 mr-2" /> Add Flock
           </button>
@@ -283,7 +283,7 @@ function PoultryManagementPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default PoultryManagementPage
+export default PoultryManagementPage;

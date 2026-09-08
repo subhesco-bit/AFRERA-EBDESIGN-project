@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { ArrowLeft, Search, Plus, Package, Battery, Sun } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { sharedInfraAPI } from '../services/api'
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Search, Plus, Package, Battery, Sun } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { sharedInfraAPI } from '../services/api';
 
 // Built 2026-08-11 to wire the real, previously-orphaned sharedInfraService.js
 // (backend/src/index.js calls sharedInfraService.setupRoutes(app) but nothing
@@ -13,49 +13,49 @@ import { sharedInfraAPI } from '../services/api'
 // second-life equipment listings, community battery listings, renewable
 // support lookup.
 function SharedInfraPage() {
-  const [tab, setTab] = useState('assets')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [assetForm, setAssetForm] = useState({ asset_type: '', location: '', description: '' })
+  const [tab, setTab] = useState('assets');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [assetForm, setAssetForm] = useState({ asset_type: '', location: '', description: '' });
 
   const { data: assets, isLoading: assetsLoading, error: assetsError, refetch: refetchAssets } = useQuery({
     queryKey: ['shared-infra-assets', searchQuery],
     queryFn: () => sharedInfraAPI.searchAssets({ q: searchQuery }).then((r) => r.data?.data ?? r.data),
     enabled: tab === 'assets',
-  })
+  });
 
   const { data: secondLife, isLoading: secondLifeLoading, error: secondLifeError } = useQuery({
     queryKey: ['shared-infra-second-life', searchQuery],
     queryFn: () => sharedInfraAPI.searchSecondLife({ q: searchQuery }).then((r) => r.data?.data ?? r.data),
     enabled: tab === 'second-life',
-  })
+  });
 
   const { data: renewableSupport, isLoading: renewableLoading, error: renewableError } = useQuery({
     queryKey: ['shared-infra-renewable-support'],
     queryFn: () => sharedInfraAPI.getRenewableSupport({}).then((r) => r.data?.data ?? r.data),
     enabled: tab === 'renewable',
-  })
+  });
 
   const registerMutation = useMutation({
     mutationFn: (data) => sharedInfraAPI.registerAsset(data),
     onSuccess: () => {
-      toast.success('Asset registered')
-      setAssetForm({ asset_type: '', location: '', description: '' })
-      refetchAssets()
+      toast.success('Asset registered');
+      setAssetForm({ asset_type: '', location: '', description: '' });
+      refetchAssets();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to register asset'),
-  })
+  });
 
   const bookMutation = useMutation({
     mutationFn: (data) => sharedInfraAPI.bookAsset(data),
     onSuccess: () => toast.success('Booking request submitted'),
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to book asset'),
-  })
+  });
 
   const TABS = [
     { id: 'assets', label: 'Shared Assets', icon: Package },
     { id: 'second-life', label: 'Second-Life Equipment', icon: Battery },
     { id: 'renewable', label: 'Renewable Support', icon: Sun },
-  ]
+  ];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -89,12 +89,12 @@ function SharedInfraPage() {
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Register a Shared Asset</h3>
             <form
               onSubmit={(e) => {
-                e.preventDefault()
+                e.preventDefault();
                 if (!assetForm.asset_type) {
-                  toast.error('Asset type is required')
-                  return
+                  toast.error('Asset type is required');
+                  return;
                 }
-                registerMutation.mutate(assetForm)
+                registerMutation.mutate(assetForm);
               }}
               className="grid grid-cols-1 md:grid-cols-3 gap-4"
             >
@@ -221,7 +221,7 @@ function SharedInfraPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default SharedInfraPage
+export default SharedInfraPage;

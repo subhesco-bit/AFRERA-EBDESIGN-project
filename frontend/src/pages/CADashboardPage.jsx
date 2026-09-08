@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Calculator, FileText, Shield, Users, CheckCircle, BarChart3, Activity, Building2, AlertTriangle } from 'lucide-react'
-import { caAPI, complianceAPI } from '../services/api'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Calculator, FileText, Shield, Users, CheckCircle, BarChart3, Activity, Building2, AlertTriangle } from 'lucide-react';
+import { caAPI, complianceAPI } from '../services/api';
 
 function CADashboardPage() {
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('overview');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: auditStats } = useQuery({
     queryKey: ['ca-audit'],
     queryFn: () => caAPI.getAuditStats().then(r => r.data),
-  })
+  });
 
   // Real, working backend endpoints (backend/src/routes/complianceRoutes.js +
   // services/legacy/complianceService.js) - unlike caAPI.getAuditStats() above
@@ -21,13 +21,13 @@ function CADashboardPage() {
     queryFn: () => complianceAPI.tdsSummary({}).then(r => r.data?.data),
     enabled: activeTab === 'tax',
     retry: false,
-  })
+  });
 
   const { data: tdsRates } = useQuery({
     queryKey: ['tds-rates'],
     queryFn: () => complianceAPI.tdsRates().then(r => r.data?.data),
     enabled: activeTab === 'tax',
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -43,15 +43,15 @@ function CADashboardPage() {
           { id: 'auditing', label: 'Auditing', icon: Shield },
           { id: 'tax', label: 'Tax Compliance', icon: Calculator },
           { id: 'fpo', label: 'FPO Accounting', icon: Building2 },
-          { id: 'reports', label: 'Reports', icon: FileText }
+          { id: 'reports', label: 'Reports', icon: FileText },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              activeTab === tab.id ?
+                'bg-indigo-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             <tab.icon className="w-5 h-5 mr-2" />
@@ -152,7 +152,7 @@ function CADashboardPage() {
               {[
                 { id: 'AUD-001', client: 'Brahmaputra FPC', type: 'Financial Audit', status: 'completed', date: '2026-08-01' },
                 { id: 'AUD-002', client: 'Ri-Bhoi Honey Cluster', type: 'GST Compliance', status: 'in_progress', date: '2026-08-02' },
-                { id: 'AUD-003', client: 'Ukhrul Farmers Group', type: 'Tax Audit', status: 'pending', date: '2026-08-03' }
+                { id: 'AUD-003', client: 'Ukhrul Farmers Group', type: 'Tax Audit', status: 'pending', date: '2026-08-03' },
               ].map((audit) => (
                 <div key={audit.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
@@ -163,8 +163,8 @@ function CADashboardPage() {
                     <span className="text-sm text-gray-500">{audit.date}</span>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       audit.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      audit.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                      'bg-yellow-100 text-yellow-800'
+                        audit.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                          'bg-yellow-100 text-yellow-800'
                     }`}>
                       {audit.status}
                     </span>
@@ -296,7 +296,7 @@ function CADashboardPage() {
             {[
               { name: 'Brahmaputra FPC', members: 450, turnover: 12, profit: 2.3, status: 'compliant' },
               { name: 'Ri-Bhoi Honey Cluster', members: 120, turnover: 8, profit: 1.8, status: 'review' },
-              { name: 'Ukhrul Farmers Group', members: 85, turnover: 5, profit: 0.9, status: 'compliant' }
+              { name: 'Ukhrul Farmers Group', members: 85, turnover: 5, profit: 0.9, status: 'compliant' },
             ].map((fpo) => (
               <div key={fpo.name} className="border rounded-lg p-4">
                 <div className="flex items-start justify-between mb-3">
@@ -306,7 +306,7 @@ function CADashboardPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     fpo.status === 'compliant' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
+                      'bg-yellow-100 text-yellow-800'
                   }`}>
                     {fpo.status}
                   </span>
@@ -345,7 +345,7 @@ function CADashboardPage() {
               { name: 'Balance Sheet', type: 'Financial', frequency: 'Quarterly' },
               { name: 'Cash Flow Statement', type: 'Financial', frequency: 'Monthly' },
               { name: 'GST Compliance Report', type: 'Tax', frequency: 'Monthly' },
-              { name: 'TDS Reconciliation', type: 'Tax', frequency: 'Quarterly' }
+              { name: 'TDS Reconciliation', type: 'Tax', frequency: 'Quarterly' },
             ].map((report) => (
               <div key={report.name} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
@@ -361,7 +361,7 @@ function CADashboardPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default CADashboardPage
+export default CADashboardPage;

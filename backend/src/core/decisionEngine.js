@@ -39,7 +39,7 @@ const ACTION = Object.freeze({
   TRIGGER_INSPECTION: 'trigger_inspection',
   FREEZE_PAYOUT: 'freeze_payout',
   RECOMMEND_RESTOCK: 'recommend_restock',
-  OPEN_CLAIM: 'open_claim'
+  OPEN_CLAIM: 'open_claim',
 });
 
 /** Correlation window: how far back a rule may look for corroborating signals. */
@@ -98,7 +98,7 @@ class DecisionEngine {
     if (this._depth >= this._maxDepth) {
       logger.warn(
         `DecisionEngine reentrancy depth ${this._depth} reached on ${signal.type}; ` +
-        'skipping to prevent a cascade.'
+        'skipping to prevent a cascade.',
       );
       return [];
     }
@@ -132,7 +132,7 @@ class DecisionEngine {
       ofType: (type) => window.filter((s) => s.type === type),
       countOfType: (type) => window.filter((s) => s.type === type).length,
       severityPeak: window.length ? Math.max(...window.map((s) => s.severity)) : 0,
-      now: Date.now()
+      now: Date.now(),
     };
   }
 
@@ -148,7 +148,7 @@ class DecisionEngine {
       entityId: signal.entityId ?? null,
       severity: decision.severity ?? signal.severity,
       requiresHuman: decision.requiresHuman ?? false,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.decisions.push(record);
@@ -161,7 +161,7 @@ class DecisionEngine {
       severity: record.severity,
       source: 'decisionEngine',
       entityId: record.entityId,
-      correlationId: record.id
+      correlationId: record.id,
     });
 
     return record;
@@ -188,9 +188,9 @@ class DecisionEngine {
           actions: [ACTION.ESCALATE_HUMAN, ACTION.NOTIFY_STAKEHOLDER],
           confidence: 1,
           requiresHuman: true,
-          rationale: `Emergency signal ${signal.type} from ${signal.source} requires immediate human attention.`
+          rationale: `Emergency signal ${signal.type} from ${signal.source} requires immediate human attention.`,
         };
-      }
+      },
     });
 
     // Cold chain + value + perishability -> hold, inspect, pre-open a claim.
@@ -222,9 +222,9 @@ class DecisionEngine {
           severity: SEVERITY.CRITICAL,
           requiresHuman: perishing && delayed,
           causedBy: related.map((s) => s.correlationId),
-          rationale: `Cold-chain integrity compromised on shipment ${signal.entityId}: ${reasons.join('; ')}.`
+          rationale: `Cold-chain integrity compromised on shipment ${signal.entityId}: ${reasons.join('; ')}.`,
         };
-      }
+      },
     });
 
     // Fraud signal + an in-flight payment on the same actor -> freeze, don't just flag.
@@ -251,12 +251,12 @@ class DecisionEngine {
           requiresHuman: probability >= 0.8,
           causedBy: [signal.correlationId, ...payments.map((p) => p.correlationId)],
           rationale:
-            `Fraud probability ${(probability * 100).toFixed(0)}% for ${signal.entityId}` +
-            (payments.length
-              ? ` with ${payments.length} payment(s) in flight — freezing payout pending review.`
-              : ' — blocking transaction.')
+            `Fraud probability ${(probability * 100).toFixed(0)}% for ${signal.entityId}${
+              payments.length ?
+                ` with ${payments.length} payment(s) in flight — freezing payout pending review.` :
+                ' — blocking transaction.'}`,
         };
-      }
+      },
     });
 
     // Quality failure + shipped stock -> recall consideration, not just a log line.
@@ -267,7 +267,7 @@ class DecisionEngine {
       evaluate: (signal, ctx) => {
         const related = signal.entityId ? ctx.forEntity(signal.entityId) : [];
         const shipped = related.some(
-          (s) => s.type === SIGNAL.ORDER_PLACED || s.type === SIGNAL.SHIPMENT_DELAYED
+          (s) => s.type === SIGNAL.ORDER_PLACED || s.type === SIGNAL.SHIPMENT_DELAYED,
         );
         if (!shipped) return null;
 
@@ -280,9 +280,9 @@ class DecisionEngine {
           causedBy: related.map((s) => s.correlationId),
           rationale:
             `Batch ${signal.entityId} failed quality testing after distribution began — ` +
-            'recall assessment required before further movement.'
+            'recall assessment required before further movement.',
         };
-      }
+      },
     });
 
     // Demand forecast shift -> restock/pricing, but only when the forecast is
@@ -304,8 +304,8 @@ class DecisionEngine {
         // (a clean +2/period series scored 0.011 and was discarded).
         // Also measure across the whole horizon: 5% PER PERIOD compounds to
         // roughly 4x over 30 periods and would essentially never fire.
-        const currentLevel = Number(signal.payload?.currentLevel)
-          || (forecast.length ? forecast[0] - trend : 0);
+        const currentLevel = Number(signal.payload?.currentLevel) ||
+          (forecast.length ? forecast[0] - trend : 0);
         if (!currentLevel) return null;
 
         const horizon = forecast.length || 1;
@@ -315,18 +315,18 @@ class DecisionEngine {
         const rising = projectedChange > 0;
         return {
           mode: 'reasoned',
-          actions: rising
-            ? [ACTION.RECOMMEND_RESTOCK, ACTION.ADJUST_PRICE]
-            : [ACTION.ADJUST_PRICE],
+          actions: rising ?
+            [ACTION.RECOMMEND_RESTOCK, ACTION.ADJUST_PRICE] :
+            [ACTION.ADJUST_PRICE],
           confidence: accuracy,
           severity: SEVERITY.NOTICE,
           rationale:
             `Demand for ${signal.entityId} is ${rising ? 'rising' : 'falling'} ` +
             `(projected ${(projectedChange * 100).toFixed(0)}% change over ${horizon} periods, ` +
             `forecast accuracy ${(accuracy * 100).toFixed(0)}%) — ` +
-            `${rising ? 'restock and review pricing' : 'review pricing to defend volume'}.`
+            `${rising ? 'restock and review pricing' : 'review pricing to defend volume'}.`,
         };
-      }
+      },
     });
 
     // Repeated sensor loss on one asset is an integrity problem, not N alerts.
@@ -335,9 +335,9 @@ class DecisionEngine {
       description: 'Repeated sensor dropouts indicate an unreliable monitoring asset.',
       triggers: [SIGNAL.SENSOR_OFFLINE],
       evaluate: (signal, ctx) => {
-        const dropouts = signal.entityId
-          ? ctx.forEntity(signal.entityId).filter((s) => s.type === SIGNAL.SENSOR_OFFLINE).length
-          : 0;
+        const dropouts = signal.entityId ?
+          ctx.forEntity(signal.entityId).filter((s) => s.type === SIGNAL.SENSOR_OFFLINE).length :
+          0;
         if (dropouts < 3) return null;
 
         return {
@@ -347,9 +347,9 @@ class DecisionEngine {
           severity: SEVERITY.WARNING,
           rationale:
             `Sensor ${signal.entityId} dropped out ${dropouts} times in 15 minutes — ` +
-            'cold-chain telemetry for this asset should not be trusted until inspected.'
+            'cold-chain telemetry for this asset should not be trusted until inspected.',
         };
-      }
+      },
     });
   }
 }

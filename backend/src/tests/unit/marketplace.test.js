@@ -9,7 +9,7 @@ describe('Marketplace Service', () => {
         unit: 'kg',
         farmerId: '123',
         isOrganic: true,
-        giCertified: false
+        giCertified: false,
       };
 
       const response = {
@@ -17,8 +17,8 @@ describe('Marketplace Service', () => {
         data: {
           id: 'prod-123',
           ...productData,
-          createdAt: new Date()
-        }
+          createdAt: new Date(),
+        },
       };
 
       expect(response.status).toBe(201);
@@ -33,12 +33,12 @@ describe('Marketplace Service', () => {
         price: -10,
         quantity: 100,
         unit: 'kg',
-        farmerId: '123'
+        farmerId: '123',
       };
 
       const error = {
         status: 400,
-        message: 'Price must be positive'
+        message: 'Price must be positive',
       };
 
       expect(error.status).toBe(400);
@@ -52,12 +52,12 @@ describe('Marketplace Service', () => {
         price: 50,
         quantity: 0,
         unit: 'kg',
-        farmerId: '123'
+        farmerId: '123',
       };
 
       const error = {
         status: 400,
-        message: 'Quantity must be greater than 0'
+        message: 'Quantity must be greater than 0',
       };
 
       expect(error.status).toBe(400);
@@ -70,7 +70,7 @@ describe('Marketplace Service', () => {
       const category = 'Vegetables';
       const results = [
         { id: '1', name: 'Tomato', category: 'Vegetables', price: 30 },
-        { id: '2', name: 'Potato', category: 'Vegetables', price: 25 }
+        { id: '2', name: 'Potato', category: 'Vegetables', price: 25 },
       ];
 
       expect(results).toHaveLength(2);
@@ -81,7 +81,7 @@ describe('Marketplace Service', () => {
       const searchTerm = 'Rice';
       const results = [
         { id: '1', name: 'Organic Rice', category: 'Cereals', price: 50 },
-        { id: '2', name: 'Basmati Rice', category: 'Cereals', price: 80 }
+        { id: '2', name: 'Basmati Rice', category: 'Cereals', price: 80 },
       ];
 
       expect(results).toHaveLength(2);
@@ -94,7 +94,7 @@ describe('Marketplace Service', () => {
       const results = [
         { id: '1', name: 'Tomato', price: 30 },
         { id: '2', name: 'Potato', price: 25 },
-        { id: '3', name: 'Onion', price: 40 }
+        { id: '3', name: 'Onion', price: 40 },
       ];
 
       expect(results.every(p => p.price >= minPrice && p.price <= maxPrice)).toBe(true);
@@ -106,7 +106,7 @@ describe('Marketplace Service', () => {
       const cartItem = {
         productId: 'prod-123',
         quantity: 5,
-        userId: 'user-123'
+        userId: 'user-123',
       };
 
       const response = {
@@ -114,8 +114,8 @@ describe('Marketplace Service', () => {
         data: {
           id: 'cart-123',
           ...cartItem,
-          totalPrice: 250
-        }
+          totalPrice: 250,
+        },
       };
 
       expect(response.status).toBe(200);
@@ -126,7 +126,7 @@ describe('Marketplace Service', () => {
       const cartItem = {
         productId: 'prod-123',
         quantity: 10,
-        userId: 'user-123'
+        userId: 'user-123',
       };
 
       const response = {
@@ -134,8 +134,8 @@ describe('Marketplace Service', () => {
         data: {
           id: 'cart-123',
           ...cartItem,
-          totalPrice: 500
-        }
+          totalPrice: 500,
+        },
       };
 
       expect(response.status).toBe(200);
@@ -146,8 +146,8 @@ describe('Marketplace Service', () => {
       const response = {
         status: 200,
         data: {
-          message: 'Item removed from cart successfully'
-        }
+          message: 'Item removed from cart successfully',
+        },
       };
 
       expect(response.status).toBe(200);
@@ -161,15 +161,15 @@ describe('Marketplace Service', () => {
         userId: 'user-123',
         items: [
           { productId: 'prod-1', quantity: 5, price: 30 },
-          { productId: 'prod-2', quantity: 3, price: 50 }
+          { productId: 'prod-2', quantity: 3, price: 50 },
         ],
         shippingAddress: {
           street: '123 Main St',
           city: 'Guwahati',
           state: 'Assam',
-          zip: '781001'
+          zip: '781001',
         },
-        paymentMethod: 'UPI'
+        paymentMethod: 'UPI',
       };
 
       const response = {
@@ -179,8 +179,8 @@ describe('Marketplace Service', () => {
           ...orderData,
           totalAmount: 300,
           status: 'pending',
-          createdAt: new Date()
-        }
+          createdAt: new Date(),
+        },
       };
 
       expect(response.status).toBe(201);
@@ -192,19 +192,19 @@ describe('Marketplace Service', () => {
       const orderData = {
         userId: 'user-123',
         items: [
-          { productId: 'prod-1', quantity: 1000, price: 30 }
+          { productId: 'prod-1', quantity: 1000, price: 30 },
         ],
         shippingAddress: {
           street: '123 Main St',
           city: 'Guwahati',
           state: 'Assam',
-          zip: '781001'
-        }
+          zip: '781001',
+        },
       };
 
       const error = {
         status: 400,
-        message: 'Insufficient stock for product prod-1'
+        message: 'Insufficient stock for product prod-1',
       };
 
       expect(error.status).toBe(400);

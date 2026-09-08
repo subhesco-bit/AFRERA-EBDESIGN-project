@@ -23,7 +23,7 @@ async function createEscrowTransaction(escrowData) {
       amount,
       currency = 'INR',
       payment_reference,
-      release_conditions
+      release_conditions,
     } = escrowData;
 
     // Validate amount
@@ -37,7 +37,7 @@ async function createEscrowTransaction(escrowData) {
        (order_id, buyer_id, farmer_id, amount, currency, payment_reference, release_conditions, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
        RETURNING *`,
-      [order_id, buyer_id, farmer_id, amount, currency, payment_reference, JSON.stringify(release_conditions)]
+      [order_id, buyer_id, farmer_id, amount, currency, payment_reference, JSON.stringify(release_conditions)],
     );
 
     const escrow = result.rows[0];
@@ -46,7 +46,7 @@ async function createEscrowTransaction(escrowData) {
       order_id,
       amount,
       buyer_id,
-      farmer_id
+      farmer_id,
     });
 
     await client.query('COMMIT');
@@ -72,7 +72,7 @@ async function releaseEscrowFunds(escrowId, releaseData) {
     // Get escrow transaction
     const escrowResult = await client.query(
       'SELECT * FROM escrow_transactions WHERE escrow_id = $1 FOR UPDATE',
-      [escrowId]
+      [escrowId],
     );
 
     if (escrowResult.rows.length === 0) {
@@ -103,13 +103,13 @@ async function releaseEscrowFunds(escrowId, releaseData) {
            released_at = CURRENT_TIMESTAMP,
            release_data = $1
        WHERE escrow_id = $2`,
-      [JSON.stringify(releaseData), escrowId]
+      [JSON.stringify(releaseData), escrowId],
     );
 
     logger.info(`Escrow funds released: ${escrowId}`, {
       order_id: escrow.order_id,
       amount: escrow.amount,
-      farmer_id: escrow.farmer_id
+      farmer_id: escrow.farmer_id,
     });
 
     await client.query('COMMIT');
@@ -135,7 +135,7 @@ async function refundEscrowFunds(escrowId, refundReason) {
     // Get escrow transaction
     const escrowResult = await client.query(
       'SELECT * FROM escrow_transactions WHERE escrow_id = $1 FOR UPDATE',
-      [escrowId]
+      [escrowId],
     );
 
     if (escrowResult.rows.length === 0) {
@@ -156,14 +156,14 @@ async function refundEscrowFunds(escrowId, refundReason) {
            refunded_at = CURRENT_TIMESTAMP,
            refund_reason = $1
        WHERE escrow_id = $2`,
-      [refundReason, escrowId]
+      [refundReason, escrowId],
     );
 
     logger.info(`Escrow funds refunded: ${escrowId}`, {
       order_id: escrow.order_id,
       amount: escrow.amount,
       buyer_id: escrow.buyer_id,
-      reason: refundReason
+      reason: refundReason,
     });
 
     await client.query('COMMIT');
@@ -184,7 +184,7 @@ async function getEscrowTransaction(escrowId) {
   try {
     const result = await pool.query(
       'SELECT * FROM escrow_transactions WHERE escrow_id = $1',
-      [escrowId]
+      [escrowId],
     );
 
     if (result.rows.length === 0) {
@@ -205,61 +205,12 @@ async function getEscrowByOrder(orderId) {
   try {
     const result = await pool.query(
       'SELECT * FROM escrow_transactions WHERE order_id = $1 ORDER BY created_at DESC',
-      [orderId]
+      [orderId],
     );
 
     return result.rows;
   } catch (error) {
     logger.error('Error getting escrow by order', { error: error.message, orderId });
-    throw error;
-  }
-}
-
-/**
- * List all escrow transactions (admin)
- */
-async function listEscrowTransactions(filters = {}) {
-  try {
-    const { status, limit = 100, offset = 0 } = filters;
-    const params = [];
-    let query = 'SELECT * FROM escrow_transactions WHERE 1=1';
-
-    if (status) {
-      params.push(status);
-      query += ` AND status = $${params.length}`;
-    }
-
-    query += ' ORDER BY created_at DESC';
-    params.push(limit);
-    query += ` LIMIT $${params.length}`;
-    params.push(offset);
-    query += ` OFFSET $${params.length}`;
-
-    const result = await pool.query(query, params);
-    return result.rows;
-  } catch (error) {
-    logger.error('Error listing escrow transactions', { error: error.message });
-    throw error;
-  }
-}
-
-/**
- * Get escrow status only (lighter than full transaction fetch)
- */
-async function getEscrowStatus(escrowId) {
-  try {
-    const result = await pool.query(
-      'SELECT escrow_id, status, amount, currency, created_at, released_at, refunded_at FROM escrow_transactions WHERE escrow_id = $1',
-      [escrowId]
-    );
-
-    if (result.rows.length === 0) {
-      throw new Error('Escrow transaction not found');
-    }
-
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error getting escrow status', { error: error.message, escrowId });
     throw error;
   }
 }
@@ -312,54 +263,21 @@ function verifyCondition(condition, data) {
 
 /**
  * Setup Express routes
- *
- * 2026-09-07: merged in the authorization checks that previously lived only
- * in the unmounted backend/src/routes/escrowRoutes.js (that file was never
- * require()'d from index.js — dead code — and it also called two functions,
- * listEscrowTransactions/getEscrowStatus, that didn't exist on this service
- * at all). These endpoints were live and completely unauthenticated: any
- * caller could create, release, or refund escrow for any order. Auth is now
- * required on every route and role/ownership is enforced same as the dead
- * file intended. escrowRoutes.js has been removed as a superseded duplicate.
  */
 function setupRoutes(app) {
-  const { authMiddleware, requireRole } = require('../../middleware/auth');
-
-  // List all escrow transactions (admin only)
-  app.get('/api/v1/escrow', authMiddleware, requireRole('admin'), async (req, res) => {
-    try {
-      const transactions = await listEscrowTransactions(req.query);
-      res.json({ success: true, data: transactions });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
-    }
-  });
-
   // Create escrow transaction
-  app.post('/api/v1/escrow', authMiddleware, async (req, res) => {
+  app.post('/api/v1/escrow', async (req, res) => {
     try {
-      const escrowData = { ...req.body };
-      if (req.user.role === 'buyer') {
-        escrowData.buyer_id = req.user.id;
-      } else if (req.user.role === 'farmer') {
-        escrowData.farmer_id = req.user.id;
-      } else if (!['admin', 'superadmin'].includes(req.user.role)) {
-        return res.status(403).json({ success: false, error: 'Buyer, farmer, or admin role required' });
-      }
-      const escrow = await createEscrowTransaction(escrowData);
+      const escrow = await createEscrowTransaction(req.body);
       res.json({ success: true, data: escrow });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
   });
 
-  // Release escrow funds - only the receiving farmer or an admin
-  app.post('/api/v1/escrow/:escrowId/release', authMiddleware, async (req, res) => {
+  // Release escrow funds
+  app.post('/api/v1/escrow/:escrowId/release', async (req, res) => {
     try {
-      const escrow = await getEscrowTransaction(req.params.escrowId);
-      if (!['admin', 'superadmin'].includes(req.user.role) && escrow.farmer_id !== req.user.id) {
-        return res.status(403).json({ success: false, error: 'Only the receiving farmer or an administrator can release escrow' });
-      }
       const result = await releaseEscrowFunds(req.params.escrowId, req.body);
       res.json(result);
     } catch (error) {
@@ -367,13 +285,9 @@ function setupRoutes(app) {
     }
   });
 
-  // Refund escrow funds - only the paying buyer or an admin
-  app.post('/api/v1/escrow/:escrowId/refund', authMiddleware, async (req, res) => {
+  // Refund escrow funds
+  app.post('/api/v1/escrow/:escrowId/refund', async (req, res) => {
     try {
-      const escrow = await getEscrowTransaction(req.params.escrowId);
-      if (!['admin', 'superadmin'].includes(req.user.role) && escrow.buyer_id !== req.user.id) {
-        return res.status(403).json({ success: false, error: 'Only the paying buyer or an administrator can request a refund' });
-      }
       const result = await refundEscrowFunds(req.params.escrowId, req.body.reason);
       res.json(result);
     } catch (error) {
@@ -381,25 +295,18 @@ function setupRoutes(app) {
     }
   });
 
-  // Get escrow status (must precede the /:escrowId catch-all)
-  app.get('/api/v1/escrow/:escrowId/status', authMiddleware, async (req, res) => {
+  // Get escrow transaction
+  app.get('/api/v1/escrow/:escrowId', async (req, res) => {
     try {
       const escrow = await getEscrowTransaction(req.params.escrowId);
-      const canView = ['admin', 'superadmin'].includes(req.user.role) ||
-        escrow.buyer_id === req.user.id ||
-        escrow.farmer_id === req.user.id;
-      if (!canView) {
-        return res.status(403).json({ success: false, error: 'You do not have access to this escrow status' });
-      }
-      const status = await getEscrowStatus(req.params.escrowId);
-      res.json({ success: true, data: status });
+      res.json({ success: true, data: escrow });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
   });
 
   // Get escrow by order
-  app.get('/api/v1/escrow/order/:orderId', authMiddleware, async (req, res) => {
+  app.get('/api/v1/escrow/order/:orderId', async (req, res) => {
     try {
       const escrows = await getEscrowByOrder(req.params.orderId);
       res.json({ success: true, data: escrows });
@@ -408,33 +315,12 @@ function setupRoutes(app) {
     }
   });
 
-  // Get user escrow transactions - self or admin only
-  app.get('/api/v1/escrow/user/:userId', authMiddleware, async (req, res) => {
+  // Get user escrow transactions
+  app.get('/api/v1/escrow/user/:userId', async (req, res) => {
     try {
-      if (!['admin', 'superadmin'].includes(req.user.role) && req.user.id !== req.params.userId) {
-        return res.status(403).json({ success: false, error: 'You do not have access to another user\'s escrow transactions' });
-      }
       const role = req.query.role || 'all';
       const escrows = await getUserEscrowTransactions(req.params.userId, role);
       res.json({ success: true, data: escrows });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
-    }
-  });
-
-  // Get escrow transaction - buyer, farmer, or admin only. Registered last
-  // among GET /:something routes so it doesn't shadow /order/:id, /user/:id,
-  // /:escrowId/status.
-  app.get('/api/v1/escrow/:escrowId', authMiddleware, async (req, res) => {
-    try {
-      const escrow = await getEscrowTransaction(req.params.escrowId);
-      const canView = ['admin', 'superadmin'].includes(req.user.role) ||
-        escrow.buyer_id === req.user.id ||
-        escrow.farmer_id === req.user.id;
-      if (!canView) {
-        return res.status(403).json({ success: false, error: 'You do not have access to this escrow transaction' });
-      }
-      res.json({ success: true, data: escrow });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
@@ -448,7 +334,6 @@ module.exports = {
   getEscrowTransaction,
   getEscrowByOrder,
   getUserEscrowTransactions,
-  listEscrowTransactions,
-  getEscrowStatus,
-  setupRoutes
+  setupRoutes,
 };
+

@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Security Headers Middleware
- * 
+ *
  * Production-ready security with:
  * - Comprehensive security headers
  * - Content Security Policy (CSP) with nonce support
@@ -44,30 +44,30 @@ function buildCSP(options = {}) {
   const {
     directives = {},
     reportUri = null,
-    nonce = null
+    nonce = null,
   } = options;
-  
+
   const defaultDirectives = {
-    'default-src': ["'self'"],
-    'script-src': ["'self'"],
-    'style-src': ["'self'", "'unsafe-inline'"],
-    'img-src': ["'self'", 'data:', 'https:'],
-    'font-src': ["'self'"],
-    'connect-src': ["'self'"],
-    'frame-src': ["'none'"],
-    'object-src': ["'none'"],
-    'base-uri': ["'self'"],
-    'form-action': ["'self'"],
-    'frame-ancestors': ["'none'"],
-    'upgrade-insecure-requests': []
+    'default-src': ['\'self\''],
+    'script-src': ['\'self\''],
+    'style-src': ['\'self\'', '\'unsafe-inline\''],
+    'img-src': ['\'self\'', 'data:', 'https:'],
+    'font-src': ['\'self\''],
+    'connect-src': ['\'self\''],
+    'frame-src': ['\'none\''],
+    'object-src': ['\'none\''],
+    'base-uri': ['\'self\''],
+    'form-action': ['\'self\''],
+    'frame-ancestors': ['\'none\''],
+    'upgrade-insecure-requests': [],
   };
-  
+
   // Merge with custom directives
   const mergedDirectives = { ...defaultDirectives, ...directives };
-  
+
   // Build CSP string
   const cspParts = [];
-  
+
   for (const [directive, sources] of Object.entries(mergedDirectives)) {
     if (sources.length === 0) {
       cspParts.push(directive);
@@ -80,12 +80,12 @@ function buildCSP(options = {}) {
       cspParts.push(`${directive} ${directiveSources.join(' ')}`);
     }
   }
-  
+
   // Add report-uri if provided
   if (reportUri) {
     cspParts.push(`report-uri ${reportUri}`);
   }
-  
+
   return cspParts.join('; ');
 }
 
@@ -97,7 +97,7 @@ function securityHeaders(options = {}) {
     hsts = {
       maxAge: 31536000, // 1 year
       includeSubDomains: true,
-      preload: true
+      preload: true,
     },
     csp = {},
     cspReportOnly = false,
@@ -111,43 +111,43 @@ function securityHeaders(options = {}) {
     crossOriginEmbedderPolicy = 'require-corp',
     crossOriginResourcePolicy = 'same-origin',
     cacheControl = 'no-store, no-cache, must-revalidate, private',
-    customHeaders = {}
+    customHeaders = {},
   } = options;
-  
+
   return (req, res, next) => {
     // Generate nonce for this request
     const nonce = generateNonce();
     req.cspNonce = nonce;
-    
+
     // Content Security Policy
     const cspValue = buildCSP({
       directives: csp,
       reportOnly: cspReportOnly,
       reportUri: cspReportUri,
-      nonce
+      nonce,
     });
-    
+
     const cspHeaderName = cspReportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy';
     res.setHeader(cspHeaderName, cspValue);
-    
+
     // HTTP Strict Transport Security (HSTS)
     if (process.env.NODE_ENV === 'production' && req.protocol === 'https') {
       const hstsValue = `max-age=${hsts.maxAge}${hsts.includeSubDomains ? '; includeSubDomains' : ''}${hsts.preload ? '; preload' : ''}`;
       res.setHeader('Strict-Transport-Security', hstsValue);
     }
-    
+
     // X-Frame-Options (clickjacking protection)
     res.setHeader('X-Frame-Options', frameOptions);
-    
+
     // X-Content-Type-Options (MIME sniffing protection)
     res.setHeader('X-Content-Type-Options', contentTypeOptions);
-    
+
     // X-XSS-Protection
     res.setHeader('X-XSS-Protection', xssProtection);
-    
+
     // Referrer-Policy
     res.setHeader('Referrer-Policy', referrerPolicy);
-    
+
     // Permissions-Policy (formerly Feature-Policy)
     if (Object.keys(permissionsPolicy).length > 0) {
       const permissionsParts = [];
@@ -165,50 +165,50 @@ function securityHeaders(options = {}) {
         'usb=()',
         'magnetometer=()',
         'gyroscope=()',
-        'accelerometer=()'
+        'accelerometer=()',
       ];
       res.setHeader('Permissions-Policy', defaultPermissions.join(', '));
     }
-    
+
     // Cross-Origin-Opener-Policy
     if (crossOriginOpenerPolicy) {
       res.setHeader('Cross-Origin-Opener-Policy', crossOriginOpenerPolicy);
     }
-    
+
     // Cross-Origin-Embedder-Policy
     if (crossOriginEmbedderPolicy) {
       res.setHeader('Cross-Origin-Embedder-Policy', crossOriginEmbedderPolicy);
     }
-    
+
     // Cross-Origin-Resource-Policy
     if (crossOriginResourcePolicy) {
       res.setHeader('Cross-Origin-Resource-Policy', crossOriginResourcePolicy);
     }
-    
+
     // Cache-Control for sensitive endpoints
     if (req.path.includes('/auth') || req.path.includes('/api/v1/auth')) {
       res.setHeader('Cache-Control', cacheControl);
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
     }
-    
+
     // X-Permitted-Cross-Domain-Policies (for Flash)
     res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
-    
+
     // Clear-Site-Data (for logout endpoints)
     if (req.path.includes('/logout') || req.path.includes('/signout')) {
       res.setHeader('Clear-Site-Data', '"cache", "cookies", "storage", "executionContexts"');
     }
-    
+
     // Custom headers
     for (const [header, value] of Object.entries(customHeaders)) {
       res.setHeader(header, value);
     }
-    
+
     // Remove server information
     res.removeHeader('Server');
     res.removeHeader('X-Powered-By');
-    
+
     next();
   };
 }
@@ -221,16 +221,16 @@ function developmentSecurityHeaders() {
     hsts: {
       maxAge: 0,
       includeSubDomains: false,
-      preload: false
+      preload: false,
     },
     csp: {
-      'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      'style-src': ["'self'", "'unsafe-inline'"],
-      'img-src': ["'self'", 'data:', 'https:', 'http:'],
-      'connect-src': ["'self'", 'http:', 'https:', 'ws:', 'wss:']
+      'script-src': ['\'self\'', '\'unsafe-inline\'', '\'unsafe-eval\''],
+      'style-src': ['\'self\'', '\'unsafe-inline\''],
+      'img-src': ['\'self\'', 'data:', 'https:', 'http:'],
+      'connect-src': ['\'self\'', 'http:', 'https:', 'ws:', 'wss:'],
     },
     frameOptions: 'SAMEORIGIN',
-    permissionsPolicy: {}
+    permissionsPolicy: {},
   });
 }
 
@@ -242,20 +242,20 @@ function productionSecurityHeaders() {
     hsts: {
       maxAge: 63072000, // 2 years
       includeSubDomains: true,
-      preload: true
+      preload: true,
     },
     csp: {
-      'script-src': ["'self'"],
-      'style-src': ["'self'"],
-      'img-src': ["'self'", 'data:', 'https:'],
-      'font-src': ["'self'"],
-      'connect-src': ["'self'"],
-      'frame-src': ["'none'"],
-      'object-src': ["'none'"],
-      'base-uri': ["'self'"],
-      'form-action': ["'self'"],
-      'frame-ancestors': ["'none'"],
-      'upgrade-insecure-requests': []
+      'script-src': ['\'self\''],
+      'style-src': ['\'self\''],
+      'img-src': ['\'self\'', 'data:', 'https:'],
+      'font-src': ['\'self\''],
+      'connect-src': ['\'self\''],
+      'frame-src': ['\'none\''],
+      'object-src': ['\'none\''],
+      'base-uri': ['\'self\''],
+      'form-action': ['\'self\''],
+      'frame-ancestors': ['\'none\''],
+      'upgrade-insecure-requests': [],
     },
     frameOptions: 'DENY',
     contentTypeOptions: 'nosniff',
@@ -271,11 +271,11 @@ function productionSecurityHeaders() {
       gyroscope: '()',
       accelerometer: '()',
       'interest-cohort': '()',
-      'browsing-topics': '()'
+      'browsing-topics': '()',
     },
     crossOriginOpenerPolicy: 'same-origin',
     crossOriginEmbedderPolicy: 'require-corp',
-    crossOriginResourcePolicy: 'same-origin'
+    crossOriginResourcePolicy: 'same-origin',
   });
 }
 
@@ -287,14 +287,14 @@ function apiSecurityHeaders() {
     hsts: {
       maxAge: 31536000,
       includeSubDomains: true,
-      preload: true
+      preload: true,
     },
     csp: {
-      'default-src': ["'self'"],
-      'script-src': ["'none'"],
-      'style-src': ["'none'"],
-      'img-src': ["'none'"],
-      'connect-src': ["'self'"]
+      'default-src': ['\'self\''],
+      'script-src': ['\'none\''],
+      'style-src': ['\'none\''],
+      'img-src': ['\'none\''],
+      'connect-src': ['\'self\''],
     },
     frameOptions: 'DENY',
     contentTypeOptions: 'nosniff',
@@ -307,8 +307,8 @@ function apiSecurityHeaders() {
     cacheControl: 'no-store, no-cache, must-revalidate, private',
     customHeaders: {
       'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY'
-    }
+      'X-Frame-Options': 'DENY',
+    },
   });
 }
 
@@ -317,14 +317,14 @@ function apiSecurityHeaders() {
  */
 function handleCSPViolation(req, res) {
   const violation = req.body;
-  
+
   // Log CSP violation for monitoring
   console.warn('CSP violation reported', {
     violation,
     ip: req.ip,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
-  
+
   // Return 204 No Content as per spec
   res.status(204).end();
 }
@@ -336,5 +336,5 @@ module.exports = {
   apiSecurityHeaders,
   buildCSP,
   generateNonce,
-  handleCSPViolation
+  handleCSPViolation,
 };

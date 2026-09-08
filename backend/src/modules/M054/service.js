@@ -19,7 +19,7 @@ async function createCustomer(customerData) {
       address,
       customer_type,
       business_type,
-      metadata
+      metadata,
     } = customerData;
 
     const customer = {
@@ -31,7 +31,7 @@ async function createCustomer(customerData) {
       customer_type,
       business_type,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered customer segmentation
@@ -41,8 +41,8 @@ async function createCustomer(customerData) {
         customer_data: customerData,
         demographics: await getDemographics(address),
         market_potential: await assessMarketPotential(customer_type, business_type),
-        personalization_opportunities: await getPersonalizationOpportunities(customerData)
-      }
+        personalization_opportunities: await getPersonalizationOpportunities(customerData),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -65,8 +65,8 @@ async function createCustomer(customerData) {
         customer.status,
         JSON.stringify(customer.ai_recommendations),
         JSON.stringify(metadata || {}),
-        customer.created_at
-      ]
+        customer.created_at,
+      ],
     );
 
     logger.info(`Customer created: ${customer.customer_id}`);
@@ -83,39 +83,39 @@ async function createCustomer(customerData) {
 async function listCustomers({ page = 1, limit = 20, status = null, customerType = null } = {}) {
   try {
     const offset = (page - 1) * limit;
-    
+
     let countQuery = 'SELECT COUNT(*) FROM customers';
-    let countParams = [];
-    let conditions = [];
-    
+    const countParams = [];
+    const conditions = [];
+
     if (status) {
-      conditions.push('status = $' + (conditions.length + 1));
+      conditions.push(`status = $${ conditions.length + 1}`);
       countParams.push(status);
     }
     if (customerType) {
-      conditions.push('customer_type = $' + (conditions.length + 1));
+      conditions.push(`customer_type = $${ conditions.length + 1}`);
       countParams.push(customerType);
     }
-    
+
     if (conditions.length > 0) {
-      countQuery += ' WHERE ' + conditions.join(' AND ');
+      countQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
+
     const totalRes = await pool.query(countQuery, countParams);
     const total = parseInt(totalRes.rows[0].count || '0');
-    
+
     let dataQuery = 'SELECT * FROM customers';
-    let dataParams = [...countParams];
-    
+    const dataParams = [...countParams];
+
     if (conditions.length > 0) {
-      dataQuery += ' WHERE ' + conditions.join(' AND ');
+      dataQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
-    dataQuery += ' ORDER BY created_at DESC LIMIT $' + (dataParams.length + 1) + ' OFFSET $' + (dataParams.length + 2);
+
+    dataQuery += ` ORDER BY created_at DESC LIMIT $${ dataParams.length + 1 } OFFSET $${ dataParams.length + 2}`;
     dataParams.push(limit, offset);
-    
+
     const res = await pool.query(dataQuery, dataParams);
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   } catch (error) {
     logger.error('Error listing customers', { error: error.message });
     throw new Error('Failed to list customers');
@@ -160,8 +160,8 @@ async function updateCustomer(customerId, updates) {
         address ? JSON.stringify(address) : null,
         customer_type, business_type, status,
         metadata ? JSON.stringify(metadata) : null,
-        customerId
-      ]
+        customerId,
+      ],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -176,7 +176,7 @@ async function updateCustomer(customerId, updates) {
 async function deleteCustomer(customerId) {
   try {
     const res = await pool.query('DELETE FROM customers WHERE customer_id = $1 RETURNING customer_id', [customerId]);
-    return !!res.rows[0];
+    return Boolean(res.rows[0]);
   } catch (error) {
     logger.error('Error deleting customer', { error: error.message });
     throw new Error('Failed to delete customer');
@@ -197,10 +197,10 @@ async function getCustomerInsights(customerId) {
       parameters: {
         customer_data: customer,
         purchase_history: purchaseHistory,
-        preferences: preferences,
+        preferences,
         behavior_patterns: await analyzeBehaviorPatterns(customerId),
-        churn_risk: await assessChurnRisk(customerId)
-      }
+        churn_risk: await assessChurnRisk(customerId),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -210,11 +210,11 @@ async function getCustomerInsights(customerId) {
       generated_at: new Date().toISOString(),
       customer_profile: customer,
       purchase_summary: purchaseHistory,
-      preferences: preferences,
+      preferences,
       insights: aiResponse.insights,
       recommendations: aiResponse.recommendations,
       churn_risk: aiResponse.churn_risk,
-      lifetime_value: aiResponse.lifetime_value
+      lifetime_value: aiResponse.lifetime_value,
     };
   } catch (error) {
     logger.error('Error getting customer insights', { error: error.message });
@@ -231,7 +231,7 @@ async function getDemographics(address) {
   return {
     region: address?.state || 'unknown',
     urban_rural: 'rural',
-    income_level: 'medium'
+    income_level: 'medium',
   };
 }
 
@@ -239,7 +239,7 @@ async function assessMarketPotential(customerType, businessType) {
   return {
     potential: 'high',
     estimated_value: 100000,
-    growth_potential: 0.3
+    growth_potential: 0.3,
   };
 }
 
@@ -247,14 +247,14 @@ async function getPersonalizationOpportunities(customerData) {
   return [
     'personalized_product_recommendations',
     'targeted_promotions',
-    'custom_pricing_tiers'
+    'custom_pricing_tiers',
   ];
 }
 
 async function getCustomerPurchaseHistory(customerId) {
   const res = await pool.query(
-    `SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 50`,
-    [customerId]
+    'SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 50',
+    [customerId],
   );
   return res.rows;
 }
@@ -262,7 +262,7 @@ async function getCustomerPurchaseHistory(customerId) {
 async function getCustomerPreferences(customerId) {
   const res = await pool.query(
     'SELECT * FROM customer_preferences WHERE customer_id = $1',
-    [customerId]
+    [customerId],
   );
   return res.rows[0] || {};
 }
@@ -272,7 +272,7 @@ async function analyzeBehaviorPatterns(customerId) {
     purchase_frequency: 'monthly',
     average_order_value: 5000,
     preferred_categories: ['grains', 'vegetables'],
-    peak_purchase_times: ['morning', 'weekend']
+    peak_purchase_times: ['morning', 'weekend'],
   };
 }
 
@@ -280,7 +280,7 @@ async function assessChurnRisk(customerId) {
   return {
     risk_level: 'low',
     probability: 0.15,
-    factors: ['recent_activity', 'positive_feedback']
+    factors: ['recent_activity', 'positive_feedback'],
   };
 }
 
@@ -290,6 +290,6 @@ module.exports = {
   getCustomer,
   updateCustomer,
   deleteCustomer,
-  getCustomerInsights
+  getCustomerInsights,
 };
 

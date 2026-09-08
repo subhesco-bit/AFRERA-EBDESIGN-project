@@ -36,17 +36,17 @@ async function listFlocks({ page = 1, limit = 50, status = null } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const offset = (Number(page) - 1) * Number(limit);
-  
+
   let query = 'SELECT COUNT(*) FROM poultry_flocks';
-  let countParams = [];
+  const countParams = [];
   if (status) {
     query += ' WHERE status = $1';
     countParams.push(status);
   }
-  
+
   const totalRes = await pg.query(query, countParams);
   const total = parseInt(totalRes.rows[0].count || '0', 10);
-  
+
   query = 'SELECT * FROM poultry_flocks';
   const params = [limit, offset];
   if (status) {
@@ -54,7 +54,7 @@ async function listFlocks({ page = 1, limit = 50, status = null } = {}) {
     params.push(status);
   }
   query += ' ORDER BY placement_date DESC LIMIT $1 OFFSET $2';
-  
+
   const res = await pg.query(query, params);
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
@@ -70,7 +70,7 @@ async function createFlock(payload) {
     `INSERT INTO poultry_flocks (flock_code, flock_type, breed, placement_date, initial_bird_count, current_bird_count, house_id, status, notes)
      VALUES ($1, $2, $3, $4, $5, $5, $6, 'active', $7)
      RETURNING *`,
-    [flock_code, flock_type, breed || null, placement_date, initial_bird_count, house_id || null, notes || null]
+    [flock_code, flock_type, breed || null, placement_date, initial_bird_count, house_id || null, notes || null],
   );
   return res.rows[0];
 }
@@ -94,7 +94,7 @@ async function updateFlock(id, payload) {
        updated_at = NOW()
      WHERE id = $11
      RETURNING *`,
-    [flock_code, flock_type, breed, placement_date, initial_bird_count, current_bird_count, house_id, status, notes, last_vaccination_date, id]
+    [flock_code, flock_type, breed, placement_date, initial_bird_count, current_bird_count, house_id, status, notes, last_vaccination_date, id],
   );
   return res.rows[0] || null;
 }
@@ -103,7 +103,7 @@ async function deleteFlock(id) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const res = await pg.query('DELETE FROM poultry_flocks WHERE id = $1 RETURNING id', [id]);
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 // ---------------------------------------------------------------------
@@ -117,8 +117,8 @@ async function listEggProduction(flockId, { page = 1, limit = 100 } = {}) {
   const totalRes = await pg.query('SELECT COUNT(*) FROM poultry_egg_production WHERE flock_id = $1', [flockId]);
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await pg.query(
-    `SELECT * FROM poultry_egg_production WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3`,
-    [flockId, limit, offset]
+    'SELECT * FROM poultry_egg_production WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3',
+    [flockId, limit, offset],
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
@@ -136,7 +136,7 @@ async function recordEggProduction(payload) {
      ON CONFLICT (flock_id, record_date)
        DO UPDATE SET total_eggs = EXCLUDED.total_eggs, good_eggs = EXCLUDED.good_eggs, damaged_eggs = EXCLUDED.damaged_eggs, average_weight_grams = EXCLUDED.average_weight_grams
      RETURNING *`,
-    [flock_id, record_date, total_eggs, good_eggs, damaged_eggs, average_weight_grams || null, notes || null]
+    [flock_id, record_date, total_eggs, good_eggs, damaged_eggs, average_weight_grams || null, notes || null],
   );
   return res.rows[0];
 }
@@ -152,8 +152,8 @@ async function listFeedConsumption(flockId, { page = 1, limit = 100 } = {}) {
   const totalRes = await pg.query('SELECT COUNT(*) FROM poultry_feed_consumption WHERE flock_id = $1', [flockId]);
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await pg.query(
-    `SELECT * FROM poultry_feed_consumption WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3`,
-    [flockId, limit, offset]
+    'SELECT * FROM poultry_feed_consumption WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3',
+    [flockId, limit, offset],
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
@@ -171,7 +171,7 @@ async function recordFeedConsumption(payload) {
      ON CONFLICT (flock_id, record_date, feed_type)
        DO UPDATE SET quantity_kg = EXCLUDED.quantity_kg, cost_per_kg = EXCLUDED.cost_per_kg
      RETURNING *`,
-    [flock_id, record_date, feed_type, quantity_kg, cost_per_kg || null, notes || null]
+    [flock_id, record_date, feed_type, quantity_kg, cost_per_kg || null, notes || null],
   );
   return res.rows[0];
 }
@@ -187,8 +187,8 @@ async function listMortality(flockId, { page = 1, limit = 100 } = {}) {
   const totalRes = await pg.query('SELECT COUNT(*) FROM poultry_mortality WHERE flock_id = $1', [flockId]);
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await pg.query(
-    `SELECT * FROM poultry_mortality WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3`,
-    [flockId, limit, offset]
+    'SELECT * FROM poultry_mortality WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3',
+    [flockId, limit, offset],
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
@@ -206,7 +206,7 @@ async function recordMortality(payload) {
      ON CONFLICT (flock_id, record_date)
        DO UPDATE SET bird_count = EXCLUDED.bird_count, cause = EXCLUDED.cause
      RETURNING *`,
-    [flock_id, record_date, bird_count, cause || null, notes || null]
+    [flock_id, record_date, bird_count, cause || null, notes || null],
   );
   return res.rows[0];
 }
@@ -222,8 +222,8 @@ async function listVaccinationRecords(flockId, { page = 1, limit = 50 } = {}) {
   const totalRes = await pg.query('SELECT COUNT(*) FROM poultry_vaccination_records WHERE flock_id = $1', [flockId]);
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await pg.query(
-    `SELECT * FROM poultry_vaccination_records WHERE flock_id = $1 ORDER BY vaccination_date DESC LIMIT $2 OFFSET $3`,
-    [flockId, limit, offset]
+    'SELECT * FROM poultry_vaccination_records WHERE flock_id = $1 ORDER BY vaccination_date DESC LIMIT $2 OFFSET $3',
+    [flockId, limit, offset],
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
@@ -239,7 +239,7 @@ async function recordVaccination(payload) {
     `INSERT INTO poultry_vaccination_records (flock_id, vaccine_name, vaccination_date, next_due_date, administered_by, notes)
      VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING *`,
-    [flock_id, vaccine_name, vaccination_date, next_due_date || null, administered_by || null, notes || null]
+    [flock_id, vaccine_name, vaccination_date, next_due_date || null, administered_by || null, notes || null],
   );
   return res.rows[0];
 }
@@ -264,7 +264,7 @@ async function getFlockPerformance(flockId) {
          COUNT(*) as record_count
        FROM poultry_egg_production
        WHERE flock_id = $1 AND record_date >= CURRENT_DATE - INTERVAL '7 days'`,
-      [flockId]
+      [flockId],
     );
     const eggData = eggRes.rows[0];
     const dailyEggAvg = eggData.record_count > 0 ? Number(eggData.total_eggs) / eggData.record_count : 0;
@@ -277,7 +277,7 @@ async function getFlockPerformance(flockId) {
          COALESCE(SUM(quantity_kg * COALESCE(cost_per_kg, 0)), 0) as total_cost
        FROM poultry_feed_consumption
        WHERE flock_id = $1 AND record_date >= CURRENT_DATE - INTERVAL '7 days'`,
-      [flockId]
+      [flockId],
     );
     const feedData = feedRes.rows[0];
     const dailyFeedAvg = eggData.record_count > 0 ? Number(feedData.total_feed_kg) / eggData.record_count : 0;
@@ -287,7 +287,7 @@ async function getFlockPerformance(flockId) {
       `SELECT COALESCE(SUM(bird_count), 0) as total_deaths
        FROM poultry_mortality
        WHERE flock_id = $1 AND record_date >= CURRENT_DATE - INTERVAL '7 days'`,
-      [flockId]
+      [flockId],
     );
     const mortalityData = mortalityRes.rows[0];
     const mortalityRate = flock.current_bird_count > 0 ? (Number(mortalityData.total_deaths) / flock.current_bird_count) * 100 : 0;
@@ -339,7 +339,7 @@ async function getVaccinationAlerts() {
       `SELECT f.id, f.flock_code, f.flock_type, f.last_vaccination_date
          FROM poultry_flocks f
         WHERE f.status = 'active'
-        ORDER BY f.flock_code`
+        ORDER BY f.flock_code`,
     );
 
     const today = new Date();
@@ -406,7 +406,7 @@ async function getVaccinationAlerts() {
 async function optimizeEggProduction(flockId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get historical egg production data
     const { rows } = await pg.query(
@@ -416,51 +416,51 @@ async function optimizeEggProduction(flockId) {
        WHERE ep.flock_id = $1
        ORDER BY ep.record_date DESC
        LIMIT 30`,
-      [flockId]
+      [flockId],
     );
-    
+
     if (rows.length < 7) {
       return {
         success: false,
         message: 'Insufficient data for AI analysis (minimum 7 records required)',
-        data: null
+        data: null,
       };
     }
-    
+
     // AI analysis calculations
     const recentProduction = rows.slice(0, 7);
     const avgRecentEggs = recentProduction.reduce((sum, r) => sum + r.eggs_produced, 0) / 7;
-    
+
     const olderProduction = rows.slice(7, 14);
     const avgOlderEggs = olderProduction.reduce((sum, r) => sum + r.eggs_produced, 0) / 7;
-    
+
     const productionTrend = ((avgRecentEggs - avgOlderEggs) / avgOlderEggs) * 100;
-    
+
     // AI recommendations based on trend analysis
     const recommendations = [];
-    
+
     if (productionTrend < -5) {
       recommendations.push({
         type: 'production_decline',
         severity: 'high',
         action: 'Review feed quality and nutrition',
-        reason: `Production declined by ${productionTrend.toFixed(1)}%`
+        reason: `Production declined by ${productionTrend.toFixed(1)}%`,
       });
       recommendations.push({
         type: 'health_check',
         severity: 'medium',
         action: 'Check for disease outbreaks',
-        reason: 'Declining production may indicate health issues'
+        reason: 'Declining production may indicate health issues',
       });
     } else if (productionTrend > 5) {
       recommendations.push({
         type: 'production_increase',
         severity: 'low',
         action: 'Continue current management practices',
-        reason: `Production increased by ${productionTrend.toFixed(1)}%`
+        reason: `Production increased by ${productionTrend.toFixed(1)}%`,
       });
     }
-    
+
     // Egg quality analysis
     const avgEggWeight = recentProduction.reduce((sum, r) => sum + (r.avg_egg_weight || 60), 0) / 7;
     if (avgEggWeight < 55) {
@@ -468,10 +468,10 @@ async function optimizeEggProduction(flockId) {
         type: 'egg_quality',
         severity: 'medium',
         action: 'Review nutrition for egg size improvement',
-        reason: `Average egg weight ${avgEggWeight.toFixed(1)}g below optimal`
+        reason: `Average egg weight ${avgEggWeight.toFixed(1)}g below optimal`,
       });
     }
-    
+
     const optimization = {
       flockId,
       analysisDate: new Date().toISOString(),
@@ -481,21 +481,21 @@ async function optimizeEggProduction(flockId) {
       avgEggWeight: avgEggWeight.toFixed(1),
       recommendations,
       confidence: 'high',
-      dataSource: 'real_historical_records'
+      dataSource: 'real_historical_records',
     };
-    
+
     // Emit signal bus event for AI decision
     await signalBus.emit('ai.poultry.production.optimized', {
       flock_id: flockId,
       optimization,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('AI egg production optimization completed', { flockId, productionTrend });
-    
+
     return {
       success: true,
-      data: optimization
+      data: optimization,
     };
   } catch (error) {
     logger.error('Error optimizing egg production with AI', { error: error.message, flockId });
@@ -510,7 +510,7 @@ async function optimizeEggProduction(flockId) {
 async function monitorFlockHealth(flockId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get flock data and production history
     const { rows } = await pg.query(
@@ -521,35 +521,35 @@ async function monitorFlockHealth(flockId) {
        WHERE f.id = $1
        ORDER BY ep.record_date DESC, m.record_date DESC
        LIMIT 30`,
-      [flockId]
+      [flockId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Flock not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const flock = rows[0];
     const riskFactors = [];
     let overallRisk = 'low';
-    
+
     // Analyze production patterns for health indicators
     const productionRecords = rows.filter(r => r.eggs_produced !== null);
     if (productionRecords.length >= 7) {
       const recentProduction = productionRecords.slice(0, 7).reduce((sum, r) => sum + r.eggs_produced, 0) / 7;
       const olderProduction = productionRecords.slice(7, 14).reduce((sum, r) => sum + r.eggs_produced, 0) / 7;
-      
+
       const productionDecline = ((olderProduction - recentProduction) / olderProduction) * 100;
-      
+
       if (productionDecline > 15) {
         riskFactors.push({
           factor: 'significant_production_decline',
           severity: 'high',
           value: productionDecline.toFixed(1),
-          description: `Production declined by ${productionDecline.toFixed(1)}%`
+          description: `Production declined by ${productionDecline.toFixed(1)}%`,
         });
         overallRisk = 'high';
       } else if (productionDecline > 5) {
@@ -557,26 +557,26 @@ async function monitorFlockHealth(flockId) {
           factor: 'moderate_production_decline',
           severity: 'medium',
           value: productionDecline.toFixed(1),
-          description: `Production declined by ${productionDecline.toFixed(1)}%`
+          description: `Production declined by ${productionDecline.toFixed(1)}%`,
         });
         overallRisk = 'medium';
       }
     }
-    
+
     // Analyze mortality patterns
     const mortalityRecords = rows.filter(r => r.mortality_count !== null);
     if (mortalityRecords.length >= 4) {
       const recentMortality = mortalityRecords.slice(0, 4).reduce((sum, r) => sum + r.mortality_count, 0) / 4;
       const olderMortality = mortalityRecords.slice(4, 8).reduce((sum, r) => sum + r.mortality_count, 0) / 4;
-      
+
       const mortalityIncrease = ((recentMortality - olderMortality) / olderMortality) * 100;
-      
+
       if (mortalityIncrease > 20) {
         riskFactors.push({
           factor: 'increased_mortality',
           severity: 'high',
           value: mortalityIncrease.toFixed(1),
-          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`
+          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`,
         });
         overallRisk = 'high';
       } else if (mortalityIncrease > 10) {
@@ -584,12 +584,12 @@ async function monitorFlockHealth(flockId) {
           factor: 'moderate_mortality_increase',
           severity: 'medium',
           value: mortalityIncrease.toFixed(1),
-          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`
+          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`,
         });
         if (overallRisk === 'low') overallRisk = 'medium';
       }
     }
-    
+
     // Check flock age
     if (flock.stocking_date) {
       const flockAge = (new Date() - new Date(flock.stocking_date)) / (30 * 24 * 60 * 60 * 1000); // months
@@ -598,7 +598,7 @@ async function monitorFlockHealth(flockId) {
           factor: 'advanced_flock_age',
           severity: 'medium',
           value: flockAge.toFixed(1),
-          description: `Layer flock is ${flockAge.toFixed(1)} months old`
+          description: `Layer flock is ${flockAge.toFixed(1)} months old`,
         });
         if (overallRisk === 'low') overallRisk = 'medium';
       } else if (flockAge > 12 && flock.flock_type === 'broiler') {
@@ -606,12 +606,12 @@ async function monitorFlockHealth(flockId) {
           factor: 'extended_flock_age',
           severity: 'high',
           value: flockAge.toFixed(1),
-          description: `Broiler flock is ${flockAge.toFixed(1)} months old`
+          description: `Broiler flock is ${flockAge.toFixed(1)} months old`,
         });
         overallRisk = 'high';
       }
     }
-    
+
     const monitoring = {
       flockId,
       flockName: flock.flock_name,
@@ -621,21 +621,21 @@ async function monitorFlockHealth(flockId) {
       riskFactors,
       recommendations: generateHealthRecommendations(riskFactors),
       confidence: productionRecords.length >= 7 ? 'high' : 'medium',
-      dataSource: 'real_flock_and_production_records'
+      dataSource: 'real_flock_and_production_records',
     };
-    
+
     // Emit signal bus event for AI monitoring
     await signalBus.emit('ai.poultry.health.monitored', {
       flock_id: flockId,
       monitoring,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('AI flock health monitoring completed', { flockId, overallRisk });
-    
+
     return {
       success: true,
-      data: monitoring
+      data: monitoring,
     };
   } catch (error) {
     logger.error('Error monitoring flock health with AI', { error: error.message, flockId });
@@ -650,33 +650,33 @@ async function monitorFlockHealth(flockId) {
 async function optimizePoultryFeed(flockId, productionGoal) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get flock data
     const { rows } = await pg.query(
-      `SELECT * FROM poultry_flocks WHERE id = $1`,
-      [flockId]
+      'SELECT * FROM poultry_flocks WHERE id = $1',
+      [flockId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Flock not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const flock = rows[0];
-    
+
     // AI feed optimization logic
     const baseFeed = {
       protein_percentage: 18,
       energy_mj_kg: 12,
       calcium_percentage: 3.5,
       phosphorus_percentage: 0.6,
-      methionine_percentage: 0.4
+      methionine_percentage: 0.4,
     };
-    
+
     // Adjust based on production goal
     if (productionGoal === 'maximize_production') {
       baseFeed.protein_percentage = 20;
@@ -687,7 +687,7 @@ async function optimizePoultryFeed(flockId, productionGoal) {
       baseFeed.energy_mj_kg = 11;
       baseFeed.methionine_percentage = 0.35;
     }
-    
+
     // Adjust based on flock type
     if (flock.flock_type === 'layer') {
       baseFeed.calcium_percentage = 4.0;
@@ -696,7 +696,7 @@ async function optimizePoultryFeed(flockId, productionGoal) {
       baseFeed.protein_percentage += 2;
       baseFeed.energy_mj_kg += 1;
     }
-    
+
     // Adjust based on flock age
     if (flock.stocking_date) {
       const flockAge = (new Date() - new Date(flock.stocking_date)) / (30 * 24 * 60 * 60 * 1000);
@@ -705,7 +705,7 @@ async function optimizePoultryFeed(flockId, productionGoal) {
         baseFeed.energy_mj_kg -= 0.5;
       }
     }
-    
+
     const optimization = {
       flockId,
       flockName: flock.flock_name,
@@ -718,24 +718,24 @@ async function optimizePoultryFeed(flockId, productionGoal) {
       recommendations: [
         'Monitor flock response for 1 week',
         'Adjust feed composition based on actual production response',
-        'Consider seasonal variations in feed availability'
+        'Consider seasonal variations in feed availability',
       ],
       confidence: 'medium',
-      dataSource: 'ai_algorithm_based_on_flock_characteristics'
+      dataSource: 'ai_algorithm_based_on_flock_characteristics',
     };
-    
+
     // Emit signal bus event for AI optimization
     await signalBus.emit('ai.poultry.feed.optimized', {
       flock_id: flockId,
       optimization,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('AI poultry feed optimization completed', { flockId, productionGoal });
-    
+
     return {
       success: true,
-      data: optimization
+      data: optimization,
     };
   } catch (error) {
     logger.error('Error optimizing poultry feed with AI', { error: error.message, flockId });
@@ -750,7 +750,7 @@ async function optimizePoultryFeed(flockId, productionGoal) {
 async function predictMortalityRisk(flockId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get flock data and mortality history
     const { rows } = await pg.query(
@@ -760,36 +760,36 @@ async function predictMortalityRisk(flockId) {
        WHERE f.id = $1
        ORDER BY m.record_date DESC
        LIMIT 20`,
-      [flockId]
+      [flockId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Flock not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const flock = rows[0];
     const mortalityRecords = rows.filter(r => r.mortality_count !== null);
-    
+
     const riskFactors = [];
     let overallRisk = 'low';
-    
+
     // Analyze mortality patterns
     if (mortalityRecords.length >= 4) {
       const recentMortality = mortalityRecords.slice(0, 4).reduce((sum, r) => sum + r.mortality_count, 0) / 4;
       const olderMortality = mortalityRecords.slice(4, 8).reduce((sum, r) => sum + r.mortality_count, 0) / 4;
-      
+
       const mortalityIncrease = ((recentMortality - olderMortality) / olderMortality) * 100;
-      
+
       if (mortalityIncrease > 25) {
         riskFactors.push({
           factor: 'rapid_mortality_increase',
           severity: 'critical',
           value: mortalityIncrease.toFixed(1),
-          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`
+          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`,
         });
         overallRisk = 'critical';
       } else if (mortalityIncrease > 15) {
@@ -797,7 +797,7 @@ async function predictMortalityRisk(flockId) {
           factor: 'significant_mortality_increase',
           severity: 'high',
           value: mortalityIncrease.toFixed(1),
-          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`
+          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`,
         });
         overallRisk = 'high';
       } else if (mortalityIncrease > 5) {
@@ -805,12 +805,12 @@ async function predictMortalityRisk(flockId) {
           factor: 'moderate_mortality_increase',
           severity: 'medium',
           value: mortalityIncrease.toFixed(1),
-          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`
+          description: `Mortality increased by ${mortalityIncrease.toFixed(1)}%`,
         });
         if (overallRisk === 'low') overallRisk = 'medium';
       }
     }
-    
+
     // Check flock density
     if (flock.current_stock && flock.house_capacity) {
       const density = flock.current_stock / flock.house_capacity;
@@ -819,23 +819,23 @@ async function predictMortalityRisk(flockId) {
           factor: 'high_stocking_density',
           severity: 'medium',
           value: density.toFixed(2),
-          description: `Stocking density ${(density * 100).toFixed(0)}% of capacity`
+          description: `Stocking density ${(density * 100).toFixed(0)}% of capacity`,
         });
         if (overallRisk === 'low') overallRisk = 'medium';
       }
     }
-    
+
     // Check environmental conditions
     if (flock.temperature && flock.temperature > 30) {
       riskFactors.push({
         factor: 'high_temperature',
         severity: 'high',
         value: flock.temperature,
-        description: `Temperature ${flock.temperature}°C above optimal`
+        description: `Temperature ${flock.temperature}°C above optimal`,
       });
       if (overallRisk === 'low') overallRisk = 'high';
     }
-    
+
     const prediction = {
       flockId,
       flockName: flock.flock_name,
@@ -846,21 +846,21 @@ async function predictMortalityRisk(flockId) {
       predictedMortalityRate: overallRisk === 'critical' ? '>5%' : overallRisk === 'high' ? '3-5%' : overallRisk === 'medium' ? '1-3%' : '<1%',
       recommendations: generateMortalityRecommendations(riskFactors),
       confidence: mortalityRecords.length >= 4 ? 'high' : 'medium',
-      dataSource: 'real_flock_and_mortality_records'
+      dataSource: 'real_flock_and_mortality_records',
     };
-    
+
     // Emit signal bus event for AI prediction
     await signalBus.emit('ai.poultry.mortality.predicted', {
       flock_id: flockId,
       prediction,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('AI mortality prediction completed', { flockId, overallRisk });
-    
+
     return {
       success: true,
-      data: prediction
+      data: prediction,
     };
   } catch (error) {
     logger.error('Error predicting mortality risk with AI', { error: error.message, flockId });
@@ -871,7 +871,7 @@ async function predictMortalityRisk(flockId) {
 // Helper function to generate health recommendations
 function generateHealthRecommendations(riskFactors) {
   const recommendations = [];
-  
+
   riskFactors.forEach(factor => {
     if (factor.factor === 'significant_production_decline' || factor.factor === 'moderate_production_decline') {
       recommendations.push('Monitor flock health closely for next 7 days');
@@ -886,14 +886,14 @@ function generateHealthRecommendations(riskFactors) {
       recommendations.push('Monitor for age-related health issues');
     }
   });
-  
+
   return recommendations;
 }
 
 // Helper function to generate mortality recommendations
 function generateMortalityRecommendations(riskFactors) {
   const recommendations = [];
-  
+
   riskFactors.forEach(factor => {
     if (factor.factor === 'rapid_mortality_increase' || factor.factor === 'significant_mortality_increase') {
       recommendations.push('Immediate veterinary intervention required');
@@ -909,7 +909,7 @@ function generateMortalityRecommendations(riskFactors) {
       recommendations.push('Ensure adequate water supply');
     }
   });
-  
+
   return recommendations;
 }
 
@@ -937,14 +937,15 @@ module.exports = {
 
 // Merged from backend/src/modules/M072
 {
-  const m072 = require("../../modules/M072/service");
+  const m072 = require('../../modules/M072/service');
   const { ...rest } = m072;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M123 - 1 name(s) collided and were aliased
 {
-  const m123 = require("../../modules/M123/service");
+  const m123 = require('../../modules/M123/service');
   const { registerPoultryFlock: registerPoultryFlockFromBE123, ...rest } = m123;
   Object.assign(module.exports, rest, { registerPoultryFlockFromBE123 });
 }
+

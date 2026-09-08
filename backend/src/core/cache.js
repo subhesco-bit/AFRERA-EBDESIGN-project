@@ -1,6 +1,6 @@
 // Enterprise Caching Layer - Redis Integration
 const redis = require('redis');
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class CacheManager {
   constructor() {

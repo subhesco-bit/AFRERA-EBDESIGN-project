@@ -6,13 +6,13 @@
 const express = require('express');
 const farmerTrainingController = require('../controllers/farmerTrainingController');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 // Training Program Management
 router.post('/programs', farmerTrainingController.createTrainingProgram);

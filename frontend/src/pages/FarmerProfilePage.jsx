@@ -1,9 +1,9 @@
-import { UserCircle2 } from 'lucide-react'
-import { farmerProfileAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { UserCircle2 } from 'lucide-react';
+import { farmerProfileAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const GENDERS = ['Male', 'Female', 'Other']
-const EDUCATION = ['None', 'Primary', 'Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate']
+const GENDERS = ['Male', 'Female', 'Other'];
+const EDUCATION = ['None', 'Primary', 'Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate'];
 
 const initialForm = {
   full_name: '',
@@ -17,7 +17,7 @@ const initialForm = {
   primary_occupation: '',
   years_farming: '',
   notes: '',
-}
+};
 
 function FarmerProfilePage() {
   return (
@@ -65,7 +65,7 @@ function FarmerProfilePage() {
         { label: 'Avg. years farming', value: items.length ? (items.reduce((s, i) => s + (Number(i.years_farming) || 0), 0) / items.length).toFixed(1) : '0' },
       ]}
     />
-  )
+  );
 }
 
-export default FarmerProfilePage
+export default FarmerProfilePage;

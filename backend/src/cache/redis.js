@@ -35,7 +35,7 @@ async function initializeRedis() {
 
     // Test connection
     await redisClient.ping();
-    
+
     return redisClient;
   } catch (error) {
     logger.error('Failed to initialize Redis', { error: error.message, stack: error.stack });
@@ -75,11 +75,11 @@ async function get(key) {
   try {
     const client = getClient();
     const value = await client.get(key);
-    
+
     if (value === null) {
       return null;
     }
-    
+
     return JSON.parse(value);
   } catch (error) {
     logger.error('Error getting cache', { error: error.message, stack: error.stack });
@@ -108,12 +108,12 @@ async function delPattern(pattern) {
   try {
     const client = getClient();
     const keys = await client.keys(pattern);
-    
+
     if (keys.length > 0) {
       await client.del(...keys);
       logger.debug(`Deleted ${keys.length} keys matching pattern: ${pattern}`);
     }
-    
+
     return keys.length;
   } catch (error) {
     logger.error('Error deleting cache pattern', { error: error.message, stack: error.stack });
@@ -194,9 +194,9 @@ function cache(ttl = 3600, keyGenerator = null) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args) {
-      const cacheKey = keyGenerator 
-        ? keyGenerator(...args) 
-        : `${target.constructor.name}:${propertyKey}:${JSON.stringify(args)}`;
+      const cacheKey = keyGenerator ?
+        keyGenerator(...args) :
+        `${target.constructor.name}:${propertyKey}:${JSON.stringify(args)}`;
 
       // Try to get from cache
       const cachedValue = await get(cacheKey);
@@ -265,5 +265,5 @@ module.exports = {
   cache,
   invalidateEntity,
   isHealthy,
-  close
+  close,
 };

@@ -1,6 +1,6 @@
 /**
  * Machinery Access Service
- * 
+ *
  * Wires the existing `machinery_access` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for machinery/equipment sharing
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getMachineryAccess(accessId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM machinery_access WHERE access_id = $1`,
-      [accessId]
+      'SELECT * FROM machinery_access WHERE access_id = $1',
+      [accessId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Machinery access not found: ${accessId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get machinery access: ${error.message}`);
@@ -43,10 +43,10 @@ async function getMachineryAccess(accessId) {
 async function getMachineryAccessByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM machinery_access WHERE village_id = $1 ORDER BY machinery_type`,
-      [villageId]
+      'SELECT * FROM machinery_access WHERE village_id = $1 ORDER BY machinery_type',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get machinery access by village: ${error.message}`);
@@ -62,10 +62,10 @@ async function getMachineryAccessByVillage(villageId) {
 async function getMachineryAccessByType(machineryType) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM machinery_access WHERE machinery_type = $1 ORDER BY village_id`,
-      [machineryType]
+      'SELECT * FROM machinery_access WHERE machinery_type = $1 ORDER BY village_id',
+      [machineryType],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get machinery access by type: ${error.message}`);
@@ -92,7 +92,7 @@ async function upsertMachineryAccess(access) {
       availability_schedule,
       booking_lead_time_days,
       maintenance_status,
-      last_updated
+      last_updated,
     } = access;
 
     const { rows } = await pool.query(
@@ -116,8 +116,8 @@ async function upsertMachineryAccess(access) {
          last_updated = NOW()
        RETURNING *`,
       [access_id, village_id, district, machinery_type, machinery_id,
-       owner_id, access_model, hourly_rate, availability_schedule,
-       booking_lead_time_days, maintenance_status]
+        owner_id, access_model, hourly_rate, availability_schedule,
+        booking_lead_time_days, maintenance_status],
     );
 
     logger.info(`Machinery access upserted: ${access_id}`);
@@ -148,7 +148,7 @@ async function getVillageMachinerySummary(villageId) {
        FROM machinery_access
        WHERE village_id = $1
        GROUP BY machinery_type`,
-      [villageId]
+      [villageId],
     );
 
     return {
@@ -161,8 +161,8 @@ async function getVillageMachinerySummary(villageId) {
         cooperativeCount: parseInt(row.cooperative_count),
         avgHourlyRate: row.avg_hourly_rate ? r2(row.avg_hourly_rate) : 0,
         operationalCount: parseInt(row.operational_count),
-        maintenanceCount: parseInt(row.maintenance_count)
-      }))
+        maintenanceCount: parseInt(row.maintenance_count),
+      })),
     };
   } catch (error) {
     logger.error(`Failed to get village machinery summary: ${error.message}`);
@@ -232,12 +232,13 @@ module.exports = {
   getMachineryAccessByType,
   upsertMachineryAccess,
   getVillageMachinerySummary,
-  setupRoutes
+  setupRoutes,
 };
 
 // Merged from backend/src/modules/M009
 {
-  const m009 = require("../../modules/M009/service");
+  const m009 = require('../../modules/M009/service');
   const { ...rest } = m009;
   Object.assign(module.exports, rest);
 }
+

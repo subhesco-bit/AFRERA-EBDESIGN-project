@@ -44,5 +44,5 @@ module.exports = {
   createEquipment,
   recordEquipmentUsage,
   getEquipmentByOwner,
-  getMaintenancePredictions
+  getMaintenancePredictions,
 };

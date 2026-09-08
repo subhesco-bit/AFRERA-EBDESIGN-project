@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { Tractor, ArrowLeft, ArrowRight, LogIn } from 'lucide-react'
+import { Link } from 'react-router-dom';
+import { Tractor, ArrowLeft, ArrowRight, LogIn } from 'lucide-react';
 
 // Public door #4 of 4 — "Shared infra & rental". See FarmerEntranceHubPage.jsx
 // for background on why this exists. This page is intentionally NOT wrapped
@@ -27,7 +27,7 @@ const ACTIONS = [
     to: '/shared-infra',
     note: 'Requires signing in to this section',
   },
-]
+];
 
 function FarmerSharedDoorPage() {
   return (
@@ -95,7 +95,7 @@ function FarmerSharedDoorPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmerSharedDoorPage
+export default FarmerSharedDoorPage;

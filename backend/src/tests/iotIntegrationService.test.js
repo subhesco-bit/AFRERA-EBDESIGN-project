@@ -13,7 +13,7 @@ describe('IoT Integration Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('IoT Integration Service', () => {
       .send({
         email: 'iot-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
 
     authToken = registerResponse.body.token;
@@ -45,7 +45,7 @@ describe('IoT Integration Service', () => {
           model: 'TempSense-X1',
           firmware_version: '2.1.0',
           device_config: { sampling_rate: 60 },
-          metadata: {}
+          metadata: {},
         })
         .expect(201);
 
@@ -60,7 +60,7 @@ describe('IoT Integration Service', () => {
         .post('/api/v1/iot-integration/iot-devices')
         .send({
           device_id: 'IOT-002',
-          device_name: 'Test Device'
+          device_name: 'Test Device',
         })
         .expect(401);
     });
@@ -94,7 +94,7 @@ describe('IoT Integration Service', () => {
         .send({
           status: 'active',
           battery_level: 85,
-          signal_strength: 90
+          signal_strength: 90,
         })
         .expect(200);
 
@@ -114,7 +114,7 @@ describe('IoT Integration Service', () => {
           sensor_value: 25.5,
           unit: 'C',
           quality_score: 0.95,
-          metadata: {}
+          metadata: {},
         })
         .expect(201);
 
@@ -141,7 +141,7 @@ describe('IoT Integration Service', () => {
         .send({
           device_id: testDeviceId,
           command_type: 'configure',
-          command_payload: { sampling_rate: 30 }
+          command_payload: { sampling_rate: 30 },
         })
         .expect(201);
 
@@ -171,7 +171,7 @@ describe('IoT Integration Service', () => {
           alert_type: 'low_battery',
           alert_severity: 'medium',
           alert_message: 'Battery level below 20%',
-          alert_data: { battery_level: 15 }
+          alert_data: { battery_level: 15 },
         })
         .expect(201);
 
@@ -216,8 +216,8 @@ describe('IoT Integration Service', () => {
             anomaly_count: 5,
             alert_count: 3,
             avg_signal: 85,
-            avg_battery: 75
-          }
+            avg_battery: 75,
+          },
         })
         .expect(200);
 

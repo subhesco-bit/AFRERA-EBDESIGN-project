@@ -114,5 +114,5 @@ module.exports = {
   getFPOMembers,
   getFPOFinancialSummary,
   recordFPOTransaction,
-  generateFPOPerformanceReport
+  generateFPOPerformanceReport,
 };

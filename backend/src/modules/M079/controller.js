@@ -45,5 +45,5 @@ module.exports = {
   createWatershedPlan,
   monitorWatershedHealth,
   implementConservationMeasures,
-  generateWatershedReport
+  generateWatershedReport,
 };

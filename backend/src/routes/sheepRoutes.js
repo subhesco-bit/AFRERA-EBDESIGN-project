@@ -31,13 +31,15 @@ const {
   recommendSheepBreeding,
 } = require('../services/legacy/sheepService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
+protectLivestockRouter(router);
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/v1/sheep/flock

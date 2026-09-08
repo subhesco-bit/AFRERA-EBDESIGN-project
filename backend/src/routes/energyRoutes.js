@@ -15,8 +15,8 @@ const router = express.Router();
 router.post('/calculator/lifetime-cost', async (req, res) => {
   try {
     const { village_id, grid_tariff_per_unit, grid_hours_per_day, outage_hours_per_year,
-            diesel_cost_per_liter, diesel_liters_per_year, solar_irradiation,
-            battery_replacement_cost_per_year, solar_panel_degradation_rate, projection_years } = req.body;
+      diesel_cost_per_liter, diesel_liters_per_year, solar_irradiation,
+      battery_replacement_cost_per_year, solar_panel_degradation_rate, projection_years } = req.body;
 
     if (!village_id) {
       return res.status(400).json({ error: 'village_id is required' });
@@ -55,35 +55,35 @@ router.get('/database/grid-tariffs/:region', async (req, res) => {
 
     // Simplified grid tariff database
     const tariffs = {
-      'MAHARASHTRA': {
+      MAHARASHTRA: {
         agricultural: 3.2,
         domestic: 6.5,
         commercial: 8.5,
         industrial: 7.2,
         lastUpdated: '2026-08-01',
       },
-      'KARNATAKA': {
+      KARNATAKA: {
         agricultural: 3.0,
         domestic: 6.2,
         commercial: 8.2,
         industrial: 7.0,
         lastUpdated: '2026-08-01',
       },
-      'TAMIL_NADU': {
+      TAMIL_NADU: {
         agricultural: 2.8,
         domestic: 5.8,
         commercial: 7.8,
         industrial: 6.8,
         lastUpdated: '2026-08-01',
       },
-      'RAJASTHAN': {
+      RAJASTHAN: {
         agricultural: 3.5,
         domestic: 6.8,
         commercial: 8.8,
         industrial: 7.5,
         lastUpdated: '2026-08-01',
       },
-      'UTTAR_PRADESH': {
+      UTTAR_PRADESH: {
         agricultural: 3.3,
         domestic: 6.3,
         commercial: 8.3,
@@ -236,8 +236,8 @@ router.post('/stack/compare', async (req, res) => {
     const { village_id, stacks } = req.body;
 
     if (!village_id || !stacks || stacks.length < 2) {
-      return res.status(400).json({ 
-        error: 'village_id and at least 2 stacks are required' 
+      return res.status(400).json({
+        error: 'village_id and at least 2 stacks are required',
       });
     }
 

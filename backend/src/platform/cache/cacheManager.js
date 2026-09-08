@@ -2,7 +2,7 @@
  * Cache Manager (Section 23: Caching Layer)
  * Manages caching operations across multiple backends
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class CacheManager {
   constructor() {

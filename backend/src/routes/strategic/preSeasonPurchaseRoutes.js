@@ -5,10 +5,10 @@
 
 const express = require('express');
 const router = express.Router();
-const preSeasonPurchaseService = require('../../services/strategic/preSeasonPurchaseService');
-const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth');
+const preSeasonPurchaseService = require('../../services/strategic/preSeasonPurchaseService.js');
+const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth.js');
 const authorize = (roles) => requireRole(...roles);
-const apiResponseHandler = require('../../middleware/apiResponseHandler');
+const apiResponseHandler = require('../../middleware/apiResponseHandler.js');
 
 const service = new preSeasonPurchaseService();
 

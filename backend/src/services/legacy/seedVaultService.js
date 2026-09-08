@@ -13,7 +13,7 @@ class SeedVaultService {
   async listSeeds(farmerId) {
     const result = await pool.query(
       'SELECT * FROM seed_vault_items WHERE farmer_id = $1 ORDER BY name ASC',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   }
@@ -22,7 +22,7 @@ class SeedVaultService {
   async listCategories(farmerId) {
     const result = await pool.query(
       'SELECT DISTINCT category AS id, category AS name FROM seed_vault_items WHERE farmer_id = $1 ORDER BY category ASC',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   }
@@ -39,7 +39,7 @@ class SeedVaultService {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [farmerId, name, variety || null, category, quantity, unit || 'kg', purchaseDate || null,
-        minStock || 0, supplier || null, storageConditions ? JSON.stringify(storageConditions) : null]
+        minStock || 0, supplier || null, storageConditions ? JSON.stringify(storageConditions) : null],
     );
     return result.rows[0];
   }
@@ -64,7 +64,7 @@ class SeedVaultService {
        WHERE id = $10 AND farmer_id = $11
        RETURNING *`,
       [name, variety, category, quantity, unit, purchaseDate, minStock, supplier,
-        storageConditions ? JSON.stringify(storageConditions) : null, seedId, farmerId]
+        storageConditions ? JSON.stringify(storageConditions) : null, seedId, farmerId],
     );
     return result.rows[0];
   }
@@ -72,7 +72,7 @@ class SeedVaultService {
   async deleteSeed(seedId, farmerId) {
     const result = await pool.query(
       'DELETE FROM seed_vault_items WHERE id = $1 AND farmer_id = $2 RETURNING id',
-      [seedId, farmerId]
+      [seedId, farmerId],
     );
     if (result.rows.length === 0) throw new Error('Seed not found');
     return { deleted: true, id: seedId };
@@ -87,7 +87,7 @@ class SeedVaultService {
     const newQuantity = Math.max(0, Number(existing.rows[0].quantity) - Number(amountUsed));
     const result = await pool.query(
       'UPDATE seed_vault_items SET quantity = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
-      [newQuantity, seedId]
+      [newQuantity, seedId],
     );
     return result.rows[0];
   }
@@ -97,7 +97,8 @@ module.exports = new SeedVaultService();
 
 // Merged from backend/src/modules/M045
 {
-  const m045 = require("../../modules/M045/service");
+  const m045 = require('../../modules/M045/service');
   const { ...rest } = m045;
   Object.assign(module.exports, rest);
 }
+

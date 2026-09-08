@@ -208,55 +208,55 @@ async function detectLoginAnomaly(userId, ipAddress, userAgent) {
 async function createSession(userId, deviceInfo) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const sessionToken = require('crypto').randomBytes(32).toString('hex');
-  
+
   const res = await pg.query(
     `INSERT INTO sessions (user_id, session_token, device_info, ip_address, user_agent, created_at, expires_at)
      VALUES ($1, $2, $3, $4, $5, NOW(), NOW() + INTERVAL '7 days')
      RETURNING *`,
-    [userId, sessionToken, JSON.stringify(deviceInfo), deviceInfo.ipAddress, deviceInfo.userAgent]
+    [userId, sessionToken, JSON.stringify(deviceInfo), deviceInfo.ipAddress, deviceInfo.userAgent],
   );
-  
+
   return res.rows[0];
 }
 
 async function validateSession(sessionToken) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const res = await pg.query(
     `SELECT * FROM sessions 
      WHERE session_token = $1 
      AND expires_at > NOW()
      AND is_active = true`,
-    [sessionToken]
+    [sessionToken],
   );
-  
+
   return res.rows[0] || null;
 }
 
 async function invalidateSession(sessionToken) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   await pg.query(
     'UPDATE sessions SET is_active = false, invalidated_at = NOW() WHERE session_token = $1',
-    [sessionToken]
+    [sessionToken],
   );
-  
+
   return { success: true };
 }
 
 async function invalidateAllUserSessions(userId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database non initialized');
-  
+
   await pg.query(
     'UPDATE sessions SET is_active = false, invalidated_at = NOW() WHERE user_id = $1',
-    [userId]
+    [userId],
   );
-  
+
   return { success: true };
 }
 
@@ -264,28 +264,28 @@ async function invalidateAllUserSessions(userId) {
 async function recordDeviceFingerprint(userId, fingerprint) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const res = await pg.query(
     `INSERT INTO device_fingerprints (user_id, fingerprint, user_agent, ip_address, first_seen, last_seen, created_at)
      VALUES ($1, $2, $3, $4, NOW(), NOW(), NOW())
      ON CONFLICT (user_id, fingerprint) DO UPDATE SET
        last_seen = NOW(), seen_count = seen_count + 1
      RETURNING *`,
-    [userId, fingerprint, fingerprint.userAgent, fingerprint.ipAddress]
+    [userId, fingerprint, fingerprint.userAgent, fingerprint.ipAddress],
   );
-  
+
   return res.rows[0];
 }
 
 async function getUserDevices(userId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const res = await pg.query(
-    `SELECT * FROM device_fingerprints WHERE user_id = $1 ORDER BY last_seen DESC`,
-    [userId]
+    'SELECT * FROM device_fingerprints WHERE user_id = $1 ORDER BY last_seen DESC',
+    [userId],
   );
-  
+
   return res.rows;
 }
 
@@ -293,11 +293,11 @@ async function getUserDevices(userId) {
 async function logSecurityEvent(userId, ipAddress, eventType, reason) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   await pg.query(
     `INSERT INTO security_events (user_id, event_type, ip_address, details, created_at)
      VALUES ($1, $2, $3, $4, NOW())`,
-    [userId, eventType, ipAddress, JSON.stringify({ reason })]
+    [userId, eventType, ipAddress, JSON.stringify({ reason })],
   );
 }
 
@@ -305,15 +305,15 @@ async function logSecurityEvent(userId, ipAddress, eventType, reason) {
 async function getUserSecurityEvents(userId, { limit = 20 } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const res = await pg.query(
     `SELECT * FROM security_events 
      WHERE user_id = $1 
      ORDER BY created_at DESC 
      LIMIT $2`,
-    [userId, limit]
+    [userId, limit],
   );
-  
+
   return res.rows;
 }
 
@@ -321,39 +321,39 @@ async function getUserSecurityEvents(userId, { limit = 20 } = {}) {
 async function changePassword(userId, currentPassword, newPassword) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   // Verify current password
   const userRes = await pg.query('SELECT password_hash FROM users WHERE id = $1', [userId]);
   const user = userRes.rows[0];
-  
+
   if (!user) {
     return { success: false, error: 'User not found' };
   }
-  
+
   const validPassword = await bcrypt.compare(currentPassword, user.password_hash);
   if (!validPassword) {
     return { success: false, error: 'Current password is incorrect' };
   }
-  
+
   // Hash new password
   const newPasswordHash = await bcrypt.hash(newPassword, 12);
-  
+
   await pg.query(
     'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2',
-    [newPasswordHash, userId]
+    [newPasswordHash, userId],
   );
-  
+
   // Emit signal for password change
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'user_security',
     userId,
-    action: 'password_changed'
+    action: 'password_changed',
   }, {
     severity: SEVERITY.INFO,
     source: 'authentication_service',
-    entityId: userId
+    entityId: userId,
   });
-  
+
   return { success: true };
 }
 

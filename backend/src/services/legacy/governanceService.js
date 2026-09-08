@@ -26,7 +26,7 @@ class GovernanceService {
 
       const result = await this.pool.query(query, [
         name, district, state, population, households,
-        JSON.stringify(coordinates), JSON.stringify(demographics)
+        JSON.stringify(coordinates), JSON.stringify(demographics),
       ]);
 
       logger.info(`Village created: ${result.rows[0].id}`);
@@ -106,7 +106,7 @@ class GovernanceService {
         updateData.households,
         updateData.coordinates ? JSON.stringify(updateData.coordinates) : null,
         updateData.demographics ? JSON.stringify(updateData.demographics) : null,
-        villageId
+        villageId,
       ]);
 
       if (result.rows.length === 0) {
@@ -136,7 +136,7 @@ class GovernanceService {
         name, district, state, block,
         JSON.stringify(villages),
         JSON.stringify(contactInfo),
-        chairman
+        chairman,
       ]);
 
       logger.info(`Panchayat created: ${result.rows[0].id}`);
@@ -204,7 +204,7 @@ class GovernanceService {
 
       const result = await this.pool.query(query, [
         panchayatId, name, description, budget, startDate, endDate,
-        JSON.stringify(targetBeneficiaries)
+        JSON.stringify(targetBeneficiaries),
       ]);
 
       logger.info(`Scheme added to panchayat ${panchayatId}`);
@@ -229,7 +229,7 @@ class GovernanceService {
 
       const result = await this.pool.query(query, [
         name, description, organization, budget, startDate, endDate, location,
-        JSON.stringify(impactAreas)
+        JSON.stringify(impactAreas),
       ]);
 
       logger.info(`CSR project created: ${result.rows[0].id}`);
@@ -305,7 +305,7 @@ class GovernanceService {
         updateData.budget,
         updateData.status,
         updateData.progress,
-        projectId
+        projectId,
       ]);
 
       if (result.rows.length === 0) {
@@ -378,7 +378,7 @@ class GovernanceService {
         type, entity, entity_id, period,
         JSON.stringify(findings),
         JSON.stringify(recommendations),
-        submittedBy
+        submittedBy,
       ]);
 
       logger.info(`Compliance report created: ${result.rows[0].id}`);
@@ -454,7 +454,7 @@ class GovernanceService {
         reviewerId,
         comments,
         JSON.stringify(actionItems),
-        reportId
+        reportId,
       ]);
 
       if (result.rows.length === 0) {
@@ -506,7 +506,7 @@ class GovernanceService {
   async complianceGaps() {
     try {
       const { rows } = await this.pool.query(
-        'SELECT * FROM platform_compliance_record WHERE id = 1'
+        'SELECT * FROM platform_compliance_record WHERE id = 1',
       );
       const record = rows[0] || {};
 
@@ -516,7 +516,7 @@ class GovernanceService {
         ['grievance_email', 'Grievance Officer e-mail'],
         ['grievance_phone', 'Grievance Officer phone'],
         ['nodal_officer', 'Nodal Officer (IT Rules 2021)'],
-        ['gstin', 'GSTIN']
+        ['gstin', 'GSTIN'],
       ];
 
       const missing = need
@@ -528,7 +528,7 @@ class GovernanceService {
         totalRequired: need.length,
         completed: need.length - missing.length,
         isReady: missing.length === 0,
-        checkedAt: new Date().toISOString()
+        checkedAt: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error checking compliance gaps', { error: error.message, stack: error.stack });
@@ -555,7 +555,7 @@ class GovernanceService {
 
       const result = await this.pool.query(query, [
         name, type, district, state, registrationNumber,
-        JSON.stringify(members), JSON.stringify(bylaws)
+        JSON.stringify(members), JSON.stringify(bylaws),
       ]);
 
       logger.info(`Cooperative created: ${result.rows[0].id}`);
@@ -606,7 +606,7 @@ class GovernanceService {
       `;
 
       const result = await this.pool.query(query, [
-        cooperativeId, userId, role, shareHolding, joiningDate
+        cooperativeId, userId, role, shareHolding, joiningDate,
       ]);
 
       logger.info(`Member added to cooperative ${cooperativeId}`);
@@ -619,3 +619,4 @@ class GovernanceService {
 }
 
 module.exports = new GovernanceService();
+

@@ -7,7 +7,7 @@ async function initiateOAuthFlow(req, res) {
   try {
     const { provider, redirectUri } = req.body;
     const result = await service.initiateOAuthFlow(provider, redirectUri);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -23,7 +23,7 @@ async function handleOAuthCallback(req, res) {
   try {
     const { provider, code, state } = req.body;
     const result = await service.handleOAuthCallback(provider, code, state);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -40,7 +40,7 @@ async function initiateSAMLFlow(req, res) {
   try {
     const { provider, redirectUri } = req.body;
     const result = await service.initiateSAMLFlow(provider, redirectUri);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -56,7 +56,7 @@ async function handleSAMLResponse(req, res) {
   try {
     const { provider, samlResponse } = req.body;
     const result = await service.handleSAMLResponse(provider, samlResponse);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -115,15 +115,15 @@ module.exports = {
   // OAuth2/OIDC
   initiateOAuthFlow,
   handleOAuthCallback,
-  
+
   // SAML
   initiateSAMLFlow,
   handleSAMLResponse,
-  
+
   // Provider management
   createProviderConfig,
   listProviders,
-  
+
   // AI-powered analytics
   getSSOAnalytics,
   detectSSOAnomalies,

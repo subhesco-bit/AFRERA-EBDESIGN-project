@@ -1,9 +1,9 @@
 /**
  * Contract Farming Service
  * Strategic implementation for contract farming agreements with technical guidance
- * 
+ *
  * Business Concept: Contract farming involves agreements between farmers and buyers
- * for agricultural production with specified technical guidance, input supply, and 
+ * for agricultural production with specified technical guidance, input supply, and
  * output purchase guarantees.
  */
 
@@ -13,7 +13,7 @@ const { logger } = require('../../utils/logger');
 class ContractFarmingService {
   constructor() {
     this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL
+      connectionString: process.env.DATABASE_URL,
     });
   }
 
@@ -24,30 +24,30 @@ class ContractFarmingService {
    */
   async createContract(contractData) {
     const client = await this.pool.connect();
-    
+
     try {
       await client.query('BEGIN');
-      
+
       // Validate farmer eligibility for contract farming
       const farmerEligibility = await this.validateContractEligibility(
-        client, 
-        contractData.farmer_id
+        client,
+        contractData.farmer_id,
       );
-      
+
       if (!farmerEligibility.eligible) {
         throw new Error(`Farmer not eligible for contract farming: ${farmerEligibility.reason}`);
       }
-      
+
       // Create technical package if not provided
-      const technicalPackage = contractData.technical_package_id 
-        ? await this.getTechnicalPackage(client, contractData.technical_package_id)
-        : await this.generateDefaultTechnicalPackage(client, contractData);
-      
+      const technicalPackage = contractData.technical_package_id ?
+        await this.getTechnicalPackage(client, contractData.technical_package_id) :
+        await this.generateDefaultTechnicalPackage(client, contractData);
+
       // Calculate quality bonus structure
       const qualityBonusStructure = this.calculateQualityBonusStructure(
-        contractData.quality_standards || {}
+        contractData.quality_standards || {},
       );
-      
+
       // Create contract record
       const contractResult = await client.query(
         `INSERT INTO contract_farming_agreements 
@@ -81,32 +81,32 @@ class ContractFarmingService {
           JSON.stringify(contractData.training_programs || []),
           contractData.base_price,
           JSON.stringify(qualityBonusStructure),
-          JSON.stringify(contractData.payment_schedule || {})
-        ]
+          JSON.stringify(contractData.payment_schedule || {}),
+        ],
       );
-      
+
       const contractId = contractResult.rows[0].id;
-      
+
       // Create quality testing schedule
       await this.createQualityTestingSchedule(client, contractId, contractData);
-      
+
       // Generate smart contract reference
       const smartContractRef = await this.generateSmartContractReference(
         contractId,
-        contractData
+        contractData,
       );
-      
+
       await client.query(
         `UPDATE contract_farming_agreements 
          SET smart_contract_address = $1, blockchain_tx_hash = $2
          WHERE id = $3`,
-        [smartContractRef.address, smartContractRef.txHash, contractId]
+        [smartContractRef.address, smartContractRef.txHash, contractId],
       );
-      
+
       await client.query('COMMIT');
-      
+
       logger.info(`Contract farming agreement created: ${contractId}`);
-      
+
       return {
         success: true,
         contract: {
@@ -116,10 +116,10 @@ class ContractFarmingService {
           technical_package: technicalPackage,
           quality_bonus_structure: qualityBonusStructure,
           smart_contract: smartContractRef,
-          created_at: contractResult.rows[0].created_at
-        }
+          created_at: contractResult.rows[0].created_at,
+        },
       };
-      
+
     } catch (error) {
       await client.query('ROLLBACK');
       logger.error(`Error creating contract farming agreement: ${error.message}`);
@@ -143,36 +143,36 @@ class ContractFarmingService {
                 equipment_availability, previous_contract_performance
          FROM farmers 
          WHERE id = $1`,
-        [farmerId]
+        [farmerId],
       );
-      
+
       if (farmerResult.rows.length === 0) {
         return { eligible: false, reason: 'Farmer not found' };
       }
-      
+
       const farmer = farmerResult.rows[0];
-      
+
       // Minimum land requirement (typically 2 hectares for commercial contracts)
       if (farmer.total_land_hectares < 2) {
         return { eligible: false, reason: 'Land holding below minimum requirement (2 hectares)' };
       }
-      
+
       // Irrigation access requirement
       if (!farmer.irrigation_access) {
         return { eligible: false, reason: 'No irrigation access available' };
       }
-      
+
       // Check previous contract performance if exists
       if (farmer.previous_contract_performance && farmer.previous_contract_performance < 70) {
         return { eligible: false, reason: 'Previous contract performance below threshold (70%)' };
       }
-      
-      return { 
-        eligible: true, 
+
+      return {
+        eligible: true,
         land_hectares: farmer.total_land_hectares,
-        irrigation_available: farmer.irrigation_access
+        irrigation_available: farmer.irrigation_access,
       };
-      
+
     } catch (error) {
       logger.error(`Error validating contract eligibility: ${error.message}`);
       return { eligible: false, reason: 'Validation error' };
@@ -188,16 +188,16 @@ class ContractFarmingService {
   async getTechnicalPackage(client, packageId) {
     try {
       const result = await client.query(
-        `SELECT * FROM technical_packages WHERE id = $1`,
-        [packageId]
+        'SELECT * FROM technical_packages WHERE id = $1',
+        [packageId],
       );
-      
+
       if (result.rows.length === 0) {
         throw new Error('Technical package not found');
       }
-      
+
       return result.rows[0];
-      
+
     } catch (error) {
       logger.error(`Error getting technical package: ${error.message}`);
       throw error;
@@ -218,32 +218,32 @@ class ContractFarmingService {
                 standard_irrigation_schedule, standard_pest_management
          FROM crop_recommendations 
          WHERE crop_name = $1 AND region = $2`,
-        [contractData.crop_variety, contractData.region || 'default']
+        [contractData.crop_variety, contractData.region || 'default'],
       );
-      
+
       if (cropResult.rows.length > 0) {
         return cropResult.rows[0];
       }
-      
+
       // Fallback to generic recommendations
       return {
         seed_variety: contractData.crop_variety,
         fertilizer_schedule: {
           basal: { n: 50, p: 25, k: 25, unit: 'kg_per_hectare' },
-          top_dressing: { n: 25, p: 12, k: 12, unit: 'kg_per_hectare' }
+          top_dressing: { n: 25, p: 12, k: 12, unit: 'kg_per_hectare' },
         },
         irrigation_schedule: {
           frequency: 'weekly',
           water_requirement: '5cm_per_week',
-          critical_stages: ['germination', 'flowering', 'grain_filling']
+          critical_stages: ['germination', 'flowering', 'grain_filling'],
         },
         pest_management_protocol: {
           monitoring_frequency: 'weekly',
           threshold_based_action: true,
-          integrated_pest_management: true
-        }
+          integrated_pest_management: true,
+        },
       };
-      
+
     } catch (error) {
       logger.error(`Error generating default technical package: ${error.message}`);
       throw error;
@@ -261,26 +261,26 @@ class ContractFarmingService {
         target: qualityStandards.moisture_content || 12,
         tolerance: 2,
         bonus_per_point: 0.5, // 0.5% bonus per point within tolerance
-        penalty_per_point: 1.0  // 1.0% penalty per point outside tolerance
+        penalty_per_point: 1.0, // 1.0% penalty per point outside tolerance
       },
       protein_content: {
         target: qualityStandards.protein_content || 10,
         tolerance: 1,
         bonus_per_point: 1.0,
-        penalty_per_point: 0.5
+        penalty_per_point: 0.5,
       },
       foreign_matter: {
         target: qualityStandards.foreign_matter || 1,
         tolerance: 0.5,
         bonus_per_point: 0.3,
-        penalty_per_point: 2.0
+        penalty_per_point: 2.0,
       },
       overall_grade: {
-        'A': { bonus_percentage: 10 },
-        'B': { bonus_percentage: 5 },
-        'C': { bonus_percentage: 0 },
-        'D': { penalty_percentage: -5 }
-      }
+        A: { bonus_percentage: 10 },
+        B: { bonus_percentage: 5 },
+        C: { bonus_percentage: 0 },
+        D: { penalty_percentage: -5 },
+      },
     };
   }
 
@@ -295,31 +295,31 @@ class ContractFarmingService {
       {
         test_type: 'soil',
         test_date: this.adjustDate(contractData.contract_period_start, 7),
-        status: 'scheduled'
+        status: 'scheduled',
       },
       {
         test_type: 'water',
         test_date: this.adjustDate(contractData.contract_period_start, 14),
-        status: 'scheduled'
+        status: 'scheduled',
       },
       {
         test_type: 'plant',
         test_date: this.adjustDate(contractData.contract_period_start, 60),
-        status: 'scheduled'
+        status: 'scheduled',
       },
       {
         test_type: 'harvest',
         test_date: this.adjustDate(contractData.contract_period_end, -7),
-        status: 'scheduled'
-      }
+        status: 'scheduled',
+      },
     ];
-    
+
     for (const test of qualityTests) {
       await client.query(
         `INSERT INTO contract_quality_tests 
          (contract_id, test_type, test_date, status)
          VALUES ($1, $2, $3, $4)`,
-        [contractId, test.test_type, test.test_date, test.status]
+        [contractId, test.test_type, test.test_date, test.status],
       );
     }
   }
@@ -336,7 +336,7 @@ class ContractFarmingService {
       address: `0xcontract-${contractId.replace(/-/g, '').substring(0, 36)}`,
       txHash: null,
       network: 'ethereum',
-      status: 'pending_deployment'
+      status: 'pending_deployment',
     };
   }
 
@@ -348,7 +348,7 @@ class ContractFarmingService {
   async trackCompliance(contractId) {
     try {
       const client = await this.pool.connect();
-      
+
       try {
         // Get contract details
         const contractResult = await client.query(
@@ -357,41 +357,41 @@ class ContractFarmingService {
            JOIN farmers f ON c.farmer_id = f.id
            JOIN buyers b ON c.buyer_id = b.id
            WHERE c.id = $1`,
-          [contractId]
+          [contractId],
         );
-        
+
         if (contractResult.rows.length === 0) {
           throw new Error('Contract not found');
         }
-        
+
         const contract = contractResult.rows[0];
-        
+
         // Get quality test results
         const qualityTestsResult = await client.query(
           `SELECT * FROM contract_quality_tests 
            WHERE contract_id = $1 
            ORDER BY test_date ASC`,
-          [contractId]
+          [contractId],
         );
-        
+
         // Calculate compliance score
         const completedTests = qualityTestsResult.rows.filter(t => t.status === 'completed');
         const passedTests = completedTests.filter(t => t.passed_standards);
-        const complianceScore = completedTests.length > 0 
-          ? (passedTests.length / completedTests.length) * 100 
-          : null;
-        
+        const complianceScore = completedTests.length > 0 ?
+          (passedTests.length / completedTests.length) * 100 :
+          null;
+
         // Get input usage tracking
         const inputUsageResult = await client.query(
           `SELECT input_type, planned_quantity, actual_quantity, usage_date
            FROM contract_input_usage 
            WHERE contract_id = $1
            ORDER BY usage_date DESC`,
-          [contractId]
+          [contractId],
         );
-        
+
         client.release();
-        
+
         return {
           contract: {
             id: contract.id,
@@ -402,25 +402,25 @@ class ContractFarmingService {
             expected_yield: contract.expected_yield_tons,
             contract_period: {
               start: contract.contract_period_start,
-              end: contract.contract_period_end
-            }
+              end: contract.contract_period_end,
+            },
           },
           compliance: {
             score: complianceScore ? Math.round(complianceScore) : null,
             quality_tests: {
               total: qualityTestsResult.rows.length,
               completed: completedTests.length,
-              passed: passedTests.length
+              passed: passedTests.length,
             },
-            input_usage: inputUsageResult.rows
+            input_usage: inputUsageResult.rows,
           },
-          status: this.determineContractStatus(contract, complianceScore)
+          status: this.determineContractStatus(contract, complianceScore),
         };
-        
+
       } finally {
         client.release();
       }
-      
+
     } catch (error) {
       logger.error(`Error tracking compliance: ${error.message}`);
       throw error;
@@ -437,7 +437,7 @@ class ContractFarmingService {
     const now = new Date();
     const startDate = new Date(contract.contract_period_start);
     const endDate = new Date(contract.contract_period_end);
-    
+
     if (now < startDate) {
       return 'upcoming';
     } else if (now > endDate) {
@@ -475,13 +475,13 @@ class ContractFarmingService {
           usageData.planned_quantity,
           usageData.actual_quantity,
           usageData.usage_date || new Date(),
-          usageData.notes || null
-        ]
+          usageData.notes || null,
+        ],
       );
-      
+
       logger.info(`Input usage recorded for contract ${contractId}`);
       return result.rows[0];
-      
+
     } catch (error) {
       logger.error(`Error recording input usage: ${error.message}`);
       throw error;
@@ -497,10 +497,10 @@ class ContractFarmingService {
   async submitQualityTestResult(testId, testResult) {
     try {
       const client = await this.pool.connect();
-      
+
       try {
         await client.query('BEGIN');
-        
+
         // Update test record
         const updateResult = await client.query(
           `UPDATE contract_quality_tests 
@@ -514,26 +514,26 @@ class ContractFarmingService {
             testResult.passed_standards || false,
             testResult.tester_id || null,
             testResult.laboratory_id || null,
-            testId
-          ]
+            testId,
+          ],
         );
-        
+
         // Update contract compliance score
         const contractId = updateResult.rows[0].contract_id;
         await this.updateContractComplianceScore(client, contractId);
-        
+
         await client.query('COMMIT');
-        
+
         logger.info(`Quality test result submitted: ${testId}`);
         return updateResult.rows[0];
-        
+
       } catch (error) {
         await client.query('ROLLBACK');
         throw error;
       } finally {
         client.release();
       }
-      
+
     } catch (error) {
       logger.error(`Error submitting quality test result: ${error.message}`);
       throw error;
@@ -553,21 +553,21 @@ class ContractFarmingService {
                 SUM(CASE WHEN passed_standards THEN 1 ELSE 0 END) as passed_tests
          FROM contract_quality_tests 
          WHERE contract_id = $1 AND status = 'completed'`,
-        [contractId]
+        [contractId],
       );
-      
+
       if (result.rows.length > 0 && result.rows[0].total_tests > 0) {
         const { avg_score, passed_tests, total_tests } = result.rows[0];
         const complianceScore = (passed_tests / total_tests) * 100;
-        
+
         await client.query(
           `UPDATE contract_farming_agreements 
            SET compliance_score = $1, quality_score = $2
            WHERE id = $3`,
-          [complianceScore, avg_score, contractId]
+          [complianceScore, avg_score, contractId],
         );
       }
-      
+
     } catch (error) {
       logger.error(`Error updating compliance score: ${error.message}`);
       throw error;
@@ -582,22 +582,22 @@ class ContractFarmingService {
    */
   async amendContract(contractId, amendmentData) {
     const client = await this.pool.connect();
-    
+
     try {
       await client.query('BEGIN');
-      
+
       // Get current contract
       const contractResult = await client.query(
-        `SELECT * FROM contract_farming_agreements WHERE id = $1`,
-        [contractId]
+        'SELECT * FROM contract_farming_agreements WHERE id = $1',
+        [contractId],
       );
-      
+
       if (contractResult.rows.length === 0) {
         throw new Error('Contract not found');
       }
-      
+
       const contract = contractResult.rows[0];
-      
+
       // Record amendment
       await client.query(
         `INSERT INTO contract_amendments 
@@ -612,58 +612,58 @@ class ContractFarmingService {
           amendmentData.reason,
           amendmentData.requested_by,
           amendmentData.approved_by || null,
-          new Date()
-        ]
+          new Date(),
+        ],
       );
-      
+
       // Update contract based on amendment type
       switch (amendmentData.amendment_type) {
         case 'quantity':
           await client.query(
             `UPDATE contract_farming_agreements 
              SET expected_yield_tons = $1 WHERE id = $2`,
-            [amendmentData.new_value, contractId]
+            [amendmentData.new_value, contractId],
           );
           break;
         case 'price':
           await client.query(
             `UPDATE contract_farming_agreements 
              SET base_price = $1 WHERE id = $2`,
-            [amendmentData.new_value, contractId]
+            [amendmentData.new_value, contractId],
           );
           break;
         case 'timeline':
           await client.query(
             `UPDATE contract_farming_agreements 
              SET contract_period_end = $1 WHERE id = $2`,
-            [amendmentData.new_value, contractId]
+            [amendmentData.new_value, contractId],
           );
           break;
         case 'quality_standards':
           await client.query(
             `UPDATE contract_farming_agreements 
              SET quality_standards = $1 WHERE id = $2`,
-            [JSON.stringify(amendmentData.new_value), contractId]
+            [JSON.stringify(amendmentData.new_value), contractId],
           );
           break;
       }
-      
+
       // Update smart contract if blockchain integration exists
       if (contract.smart_contract_address) {
         await this.updateSmartContract(contractId, amendmentData);
       }
-      
+
       await client.query('COMMIT');
-      
+
       logger.info(`Contract amended: ${contractId}`);
-      
+
       return {
         success: true,
         contract_id: contractId,
         amendment: amendmentData,
-        amended_at: new Date()
+        amended_at: new Date(),
       };
-      
+
     } catch (error) {
       await client.query('ROLLBACK');
       logger.error(`Error amending contract: ${error.message}`);
@@ -692,7 +692,7 @@ class ContractFarmingService {
   async getBuyerContractPortfolio(buyerId) {
     try {
       const client = await this.pool.connect();
-      
+
       try {
         // Get portfolio summary
         const summaryResult = await client.query(
@@ -703,9 +703,9 @@ class ContractFarmingService {
                   AVG(quality_score) as avg_quality_score
            FROM contract_farming_agreements 
            WHERE buyer_id = $1`,
-          [buyerId]
+          [buyerId],
         );
-        
+
         // Get status breakdown
         const statusResult = await client.query(
           `SELECT 
@@ -718,9 +718,9 @@ class ContractFarmingService {
               SUM(expected_yield_tons) as total_yield
            FROM contract_farming_agreements 
            WHERE buyer_id = $1
-           GROUP BY period_status`
+           GROUP BY period_status`,
         );
-        
+
         // Get regional distribution
         const regionResult = await client.query(
           `SELECT f.district, f.state, 
@@ -731,9 +731,9 @@ class ContractFarmingService {
            JOIN farmers f ON c.farmer_id = f.id
            WHERE c.buyer_id = $1
            GROUP BY f.district, f.state
-           ORDER BY total_yield DESC`
+           ORDER BY total_yield DESC`,
         );
-        
+
         // Get crop variety distribution
         const cropResult = await client.query(
           `SELECT crop_variety, 
@@ -742,22 +742,22 @@ class ContractFarmingService {
            FROM contract_farming_agreements 
            WHERE buyer_id = $1
            GROUP BY crop_variety
-           ORDER BY total_yield DESC`
+           ORDER BY total_yield DESC`,
         );
-        
+
         client.release();
-        
+
         return {
           summary: summaryResult.rows[0],
           status_breakdown: statusResult.rows,
           regional_distribution: regionResult.rows,
-          crop_distribution: cropResult.rows
+          crop_distribution: cropResult.rows,
         };
-        
+
       } finally {
         client.release();
       }
-      
+
     } catch (error) {
       logger.error(`Error getting buyer contract portfolio: ${error.message}`);
       throw error;
@@ -775,15 +775,15 @@ class ContractFarmingService {
       const farmerResult = await this.pool.query(
         `SELECT district, state, total_land_hectares, irrigation_access
          FROM farmers WHERE id = $1`,
-        [farmerId]
+        [farmerId],
       );
-      
+
       if (farmerResult.rows.length === 0) {
         throw new Error('Farmer not found');
       }
-      
+
       const farmer = farmerResult.rows[0];
-      
+
       // Get matching opportunities
       const result = await this.pool.query(
         `SELECT o.id, o.buyer_id, b.name as buyer_name, o.crop_variety,
@@ -798,11 +798,11 @@ class ContractFarmingService {
          AND (o.required_irrigation = false OR $2 = true)
          ORDER BY o.base_price DESC
          LIMIT 20`,
-        [farmer.total_land_hectares, farmer.irrigation_access]
+        [farmer.total_land_hectares, farmer.irrigation_access],
       );
-      
+
       return result.rows;
-      
+
     } catch (error) {
       logger.error(`Error getting contract opportunities: ${error.message}`);
       throw error;

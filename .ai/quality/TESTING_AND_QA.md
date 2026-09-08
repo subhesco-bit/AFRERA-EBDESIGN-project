@@ -1,6 +1,6 @@
 # TESTING AND QA
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Last Updated:** 24 August 2026
 
 ## Test Infrastructure
@@ -301,3 +301,4 @@ module.exports = {
 ---
 
 *This document provides a comprehensive view of the testing and QA status.*
+

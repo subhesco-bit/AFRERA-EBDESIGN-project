@@ -35,8 +35,8 @@ const OFFLINE_PAYMENT_CONFIG = {
     pin_required: true,
     biometric_required: false,
     daily_limit: 50000,
-    transaction_limit: 10000
-  }
+    transaction_limit: 10000,
+  },
 };
 
 // Production-readiness audit (2026-08-28): committed 'default-secret'
@@ -63,11 +63,11 @@ async function generateOfflinePaymentQR(merchantId, amount, reference, expiryHou
   try {
     const paymentData = {
       merchant_id: merchantId,
-      amount: amount,
-      reference: reference,
+      amount,
+      reference,
       timestamp: Date.now(),
       expiry: Date.now() + (expiryHours * 60 * 60 * 1000),
-      type: 'offline_payment'
+      type: 'offline_payment',
     };
 
     // Create digital signature
@@ -96,17 +96,17 @@ async function generateOfflinePaymentQR(merchantId, amount, reference, expiryHou
       reference,
       qrString,
       signature,
-      new Date(paymentData.expiry)
+      new Date(paymentData.expiry),
     ]);
 
     return {
       payment_code: result.rows[0].payment_code,
       qr_code: qrCode,
-      amount: amount,
+      amount,
       merchant_id: merchantId,
-      reference: reference,
+      reference,
       expires_at: new Date(paymentData.expiry),
-      payment_data: paymentData
+      payment_data: paymentData,
     };
   } catch (error) {
     logger.error('Failed to generate offline payment QR', { error: error.message, stack: error.stack });
@@ -162,13 +162,13 @@ async function processOfflinePayment(paymentCode, payerId, pin, biometricData = 
       paymentRequest.merchant_id,
       paymentRequest.amount,
       true,
-      biometricData ? JSON.stringify(biometricData) : null
+      biometricData ? JSON.stringify(biometricData) : null,
     ]);
 
     // Update payment request status
     await pool.query(
-      "UPDATE offline_payment_requests SET status = 'completed', completed_at = NOW() WHERE id = $1",
-      [paymentRequest.id]
+      'UPDATE offline_payment_requests SET status = \'completed\', completed_at = NOW() WHERE id = $1',
+      [paymentRequest.id],
     );
 
     // Add to sync queue
@@ -183,7 +183,7 @@ async function processOfflinePayment(paymentCode, payerId, pin, biometricData = 
       merchant_id: paymentRequest.merchant_id,
       status: 'completed',
       sync_status: 'pending',
-      message: 'Payment completed successfully. Will sync when online.'
+      message: 'Payment completed successfully. Will sync when online.',
     };
   } catch (error) {
     logger.error('Offline payment processing failed', { error: error.message, stack: error.stack });
@@ -283,7 +283,7 @@ async function syncOfflineTransactions() {
            SET sync_status = 'completed', 
                synced_at = NOW() 
            WHERE transaction_id = $1`,
-          [syncItem.transaction_id]
+          [syncItem.transaction_id],
         );
 
         logger.info(`Synced transaction: ${syncItem.transaction_id}`);
@@ -297,14 +297,14 @@ async function syncOfflineTransactions() {
                retry_count = retry_count + 1,
                last_sync_attempt = NOW()
            WHERE transaction_id = $1`,
-          [syncItem.transaction_id]
+          [syncItem.transaction_id],
         );
       }
     }
 
     return {
       success: true,
-      synced_count: result.rows.length
+      synced_count: result.rows.length,
     };
   } catch (error) {
     logger.error('Offline transaction sync failed', { error: error.message, stack: error.stack });
@@ -345,13 +345,13 @@ async function syncPaymentTransaction(transactionId) {
       offlineTx.amount,
       `OFFLINE-${offlineTx.payment_request_id}`,
       JSON.stringify({ source: 'offline_payment', offline_transaction_id: offlineTx.id }),
-      offlineTx.created_at
+      offlineTx.created_at,
     ]);
 
     // Update offline transaction sync status
     await pool.query(
-      "UPDATE offline_transactions SET sync_status = 'synced', synced_at = NOW() WHERE transaction_id = $1",
-      [transactionId]
+      'UPDATE offline_transactions SET sync_status = \'synced\', synced_at = NOW() WHERE transaction_id = $1',
+      [transactionId],
     );
 
     // Update wallet balances
@@ -404,10 +404,10 @@ async function generateUSSDPaymentCode(userId, amount, merchantId) {
 
     return {
       ussd_code: ussdCode,
-      reference: reference,
-      amount: amount,
+      reference,
+      amount,
       merchant_id: merchantId,
-      expires_in_minutes: 10
+      expires_in_minutes: 10,
     };
   } catch (error) {
     logger.error('Failed to generate USSD payment code', { error: error.message, stack: error.stack });
@@ -453,13 +453,13 @@ async function processUSSDPayment(ussdCode, userId, pin) {
       `INSERT INTO offline_transactions
        (transaction_id, payer_id, merchant_id, amount, pin_verified, status, created_at)
        VALUES ($1, $2, $3, $4, $5, 'completed', NOW())`,
-      [transactionId, userId, merchantId, amount, true]
+      [transactionId, userId, merchantId, amount, true],
     );
 
     // Update USSD request status
     await pool.query(
-      "UPDATE ussd_payment_requests SET status = 'completed', completed_at = NOW() WHERE id = $1",
-      [ussdRequest.id]
+      'UPDATE ussd_payment_requests SET status = \'completed\', completed_at = NOW() WHERE id = $1',
+      [ussdRequest.id],
     );
 
     // Add to sync queue
@@ -468,8 +468,8 @@ async function processUSSDPayment(ussdCode, userId, pin) {
     return {
       success: true,
       transaction_id: transactionId,
-      amount: amount,
-      message: 'USSD payment completed successfully'
+      amount,
+      message: 'USSD payment completed successfully',
     };
   } catch (error) {
     logger.error('USSD payment processing failed', { error: error.message, stack: error.stack });
@@ -519,8 +519,8 @@ router.post('/generate-qr', authMiddleware, async (req, res) => {
     }
 
     if (amount > OFFLINE_PAYMENT_CONFIG.max_offline_amount) {
-      return res.status(400).json({ 
-        error: `Amount exceeds maximum offline payment limit of ₹${OFFLINE_PAYMENT_CONFIG.max_offline_amount}` 
+      return res.status(400).json({
+        error: `Amount exceeds maximum offline payment limit of ₹${OFFLINE_PAYMENT_CONFIG.max_offline_amount}`,
       });
     }
 
@@ -528,7 +528,7 @@ router.post('/generate-qr', authMiddleware, async (req, res) => {
       merchant_id,
       amount,
       reference || `REF-${Date.now()}`,
-      expiry_hours || 24
+      expiry_hours || 24,
     );
 
     res.json(result);
@@ -691,8 +691,8 @@ router.get('/config', (req, res) => {
       ussd_payments: true,
       nfc_payments: false,
       voice_payments: true,
-      biometric_auth: false
-    }
+      biometric_auth: false,
+    },
   });
 });
 
@@ -703,7 +703,7 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     service: 'offline-payment',
-    features_enabled: ['qr', 'ussd', 'sync']
+    features_enabled: ['qr', 'ussd', 'sync'],
   });
 });
 
@@ -713,5 +713,6 @@ module.exports = {
   processOfflinePayment,
   syncOfflineTransactions,
   generateUSSDPaymentCode,
-  processUSSDPayment
+  processUSSDPayment,
 };
+

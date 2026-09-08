@@ -1,6 +1,6 @@
 # BACKEND ARCHITECTURE
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Last Updated:** 24 August 2026
 
 ## Technology Stack
@@ -355,3 +355,4 @@
 ---
 
 *This document provides a comprehensive view of the backend architecture.*
+

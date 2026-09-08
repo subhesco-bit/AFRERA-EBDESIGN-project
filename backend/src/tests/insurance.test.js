@@ -19,13 +19,13 @@ describe.skip('Insurance Enhancements', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const userResult = await pool.query(
       `INSERT INTO users (name, email, password, role) 
        VALUES ('Insurance Test', 'insurance@example.com', '$2a$10$test', 'farmer')
-       RETURNING id`
+       RETURNING id`,
     );
     testUserId = userResult.rows[0].id;
 
@@ -50,7 +50,7 @@ describe.skip('Insurance Enhancements', () => {
           areaInHectares: 2,
           sumInsuredPerHectare: 50000,
           location: 'Assam',
-          season: 'kharif'
+          season: 'kharif',
         });
 
       expect(response.status).toBe(200);
@@ -71,7 +71,7 @@ describe.skip('Insurance Enhancements', () => {
           transportMode: 'road',
           distance: 1000,
           goodsType: 'general',
-          duration: 5
+          duration: 5,
         });
 
       expect(response.status).toBe(200);
@@ -90,7 +90,7 @@ describe.skip('Insurance Enhancements', () => {
           areaInHectares: 1,
           sumInsuredPerHectare: 50000,
           location: 'Assam',
-          season: 'kharif'
+          season: 'kharif',
         });
 
       expect(response.status).toBe(200);
@@ -112,7 +112,7 @@ describe.skip('Insurance Enhancements', () => {
           paymentMethod: 'online',
           paymentReference: 'PAY123',
           startDate: '2026-08-03',
-          endDate: '2027-08-03'
+          endDate: '2027-08-03',
         });
 
       expect(response.status).toBe(200);
@@ -139,7 +139,7 @@ describe.skip('Insurance Enhancements', () => {
           amount: 208.33,
           paymentMethod: 'online',
           reference: 'PAY124',
-          transactionId: 'TXN123'
+          transactionId: 'TXN123',
         });
 
       expect(response.status).toBe(200);
@@ -154,7 +154,7 @@ describe.skip('Insurance Enhancements', () => {
         `INSERT INTO claims (policy_id, amount, status, incident_date) 
          VALUES ($1, 50000, 'submitted', '2026-08-01')
          RETURNING id`,
-        [testPolicyId]
+        [testPolicyId],
       );
       const claimId = claimResult.rows[0].id;
 

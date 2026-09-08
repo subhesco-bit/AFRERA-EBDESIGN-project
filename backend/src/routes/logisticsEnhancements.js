@@ -8,7 +8,7 @@ const router = express.Router();
 const logisticsEnhancementService = require('../services/legacy/logisticsEnhancementService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // Fleet Management Routes
 router.post('/fleet', authMiddleware, adminMiddleware, async (req, res) => {
@@ -72,7 +72,7 @@ router.post('/fleet/:vehicleId/maintenance', authMiddleware, adminMiddleware, as
 });
 
 // Real-time Tracking Routes
-router.post('/shipments/:shipmentId/tracking', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/shipments/:shipmentId/tracking', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { shipmentId } = req.params;
     const tracking = await logisticsEnhancementService.updateTracking(shipmentId, req.body);
@@ -113,7 +113,7 @@ router.post('/shipments/:shipmentId/geofence', authMiddleware, adminMiddleware, 
 });
 
 // Temperature Monitoring Routes
-router.post('/shipments/:shipmentId/temperature', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/shipments/:shipmentId/temperature', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { shipmentId } = req.params;
     const temperature = await logisticsEnhancementService.recordTemperature(shipmentId, req.body);
@@ -182,7 +182,7 @@ router.get('/warehouses/:warehouseId', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/warehouses/:warehouseId/inventory', authRateLimit, authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/warehouses/:warehouseId/inventory', authLimiter, authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { warehouseId } = req.params;
     const inventory = await logisticsEnhancementService.addInventory(warehouseId, req.body);
@@ -202,7 +202,7 @@ router.get('/warehouses/:warehouseId/inventory', authMiddleware, async (req, res
   }
 });
 
-router.post('/warehouses/:warehouseId/shipments', authRateLimit, authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/warehouses/:warehouseId/shipments', authLimiter, authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { warehouseId } = req.params;
     const shipment = await logisticsEnhancementService.processWarehouseShipment(warehouseId, req.body);
@@ -222,3 +222,4 @@ router.get('/statistics', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+

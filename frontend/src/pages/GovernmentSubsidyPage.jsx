@@ -1,41 +1,41 @@
-import { useState } from 'react'
-import { useAuthStore } from '../store/authStore'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { strategicAPI } from '../services/api'
-import { Building2, CheckCircle, AlertCircle, FileText, TrendingUp, Users } from 'lucide-react'
+import { useState } from 'react';
+import { useAuthStore } from '../store/authStore';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { strategicAPI } from '../services/api';
+import { Building2, CheckCircle, AlertCircle, FileText, TrendingUp, Users } from 'lucide-react';
 
 function GovernmentSubsidyPage() {
-  const { user } = useAuthStore()
-  const queryClient = useQueryClient()
-  const [selectedTab, setSelectedTab] = useState('programs')
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  const [selectedTab, setSelectedTab] = useState('programs');
 
   const { data: programs, isLoading: programsLoading } = useQuery({
     queryKey: ['subsidy-programs'],
     queryFn: () => strategicAPI.government.getSubsidyPrograms().then(r => r.data),
-  })
+  });
 
   const { data: applications, isLoading: applicationsLoading } = useQuery({
     queryKey: ['subsidy-applications', user?.id],
     queryFn: () => strategicAPI.government.getFarmerDashboard({ userId: user?.id }).then(r => r.data),
-    enabled: !!user?.id && user?.role === 'farmer',
-  })
+    enabled: Boolean(user?.id) && user?.role === 'farmer',
+  });
 
   const { data: dashboard, isLoading: dashboardLoading } = useQuery({
     queryKey: ['government-dashboard'],
     queryFn: () => strategicAPI.government.getDashboard().then(r => r.data),
     enabled: user?.role === 'admin',
-  })
+  });
 
   const submitApplicationMutation = useMutation({
     mutationFn: (data) => strategicAPI.government.submitApplication(data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['subsidy-applications'])
-      alert('Application submitted successfully!')
+      queryClient.invalidateQueries(['subsidy-applications']);
+      alert('Application submitted successfully!');
     },
     onError: (error) => {
-      alert(`Failed to submit application: ${error.message}`)
+      alert(`Failed to submit application: ${error.message}`);
     },
-  })
+  });
 
   const handleApply = (programId) => {
     const applicationData = {
@@ -44,9 +44,9 @@ function GovernmentSubsidyPage() {
       land_hectares: 2.5,
       annual_income: 150000,
       crops: ['rice', 'wheat'],
-    }
-    submitApplicationMutation.mutate(applicationData)
-  }
+    };
+    submitApplicationMutation.mutate(applicationData);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -207,8 +207,8 @@ function GovernmentSubsidyPage() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-sm ${
                       application.status === 'approved' ? 'bg-green-100 text-green-800' :
-                      application.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
+                        application.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
                     }`}>
                       {application.status || 'Pending'}
                     </span>
@@ -256,7 +256,7 @@ function GovernmentSubsidyPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default GovernmentSubsidyPage
+export default GovernmentSubsidyPage;

@@ -23,7 +23,7 @@ async function recordFuelPurchase(purchaseData) {
       location,
       state,
       district,
-      vehicle_id
+      vehicle_id,
     } = purchaseData;
 
     const purchase = {
@@ -39,7 +39,7 @@ async function recordFuelPurchase(purchaseData) {
       state,
       district,
       vehicle_id,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered fuel price analysis
@@ -50,8 +50,8 @@ async function recordFuelPurchase(purchaseData) {
         market_prices: await getMarketPrices(fuel_type, state, district),
         price_trends: await getPriceTrends(fuel_type, state),
         optimal_purchase_timing: await getOptimalPurchaseTiming(fuel_type, state),
-        supplier_comparison: await compareSuppliers(fuel_type, state)
-      }
+        supplier_comparison: await compareSuppliers(fuel_type, state),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -77,8 +77,8 @@ async function recordFuelPurchase(purchaseData) {
         purchase.district,
         purchase.vehicle_id,
         JSON.stringify(purchase.ai_analysis),
-        purchase.created_at
-      ]
+        purchase.created_at,
+      ],
     );
 
     logger.info(`Fuel purchase recorded: ${purchase.purchase_id}`);
@@ -103,7 +103,7 @@ async function recordFuelConsumption(consumptionData) {
       work_hours,
       operation_type,
       operator_id,
-      consumption_date
+      consumption_date,
     } = consumptionData;
 
     const consumption = {
@@ -117,7 +117,7 @@ async function recordFuelConsumption(consumptionData) {
       operation_type,
       operator_id,
       consumption_date,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered consumption analysis
@@ -128,8 +128,8 @@ async function recordFuelConsumption(consumptionData) {
         efficiency_benchmarks: await getEfficiencyBenchmarks(vehicle_id, fuel_type),
         consumption_patterns: await getConsumptionPatterns(vehicle_id),
         optimization_recommendations: await getOptimizationRecommendations(vehicle_id, operation_type),
-        abnormal_consumption: await detectAbnormalConsumption(vehicle_id, quantity_liters, work_hours)
-      }
+        abnormal_consumption: await detectAbnormalConsumption(vehicle_id, quantity_liters, work_hours),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -153,8 +153,8 @@ async function recordFuelConsumption(consumptionData) {
         consumption.operator_id,
         consumption.consumption_date,
         JSON.stringify(consumption.ai_analysis),
-        consumption.created_at
-      ]
+        consumption.created_at,
+      ],
     );
 
     logger.info(`Fuel consumption recorded: ${consumption.consumption_id}`);
@@ -179,7 +179,7 @@ async function trackFuelEfficiency(vehicleId, period) {
       liters_per_km: await getLitersPerKm(vehicleId, period),
       cost_per_hour: await getCostPerHour(vehicleId, period),
       efficiency_rating: await getEfficiencyRating(vehicleId, period),
-      recommendations: await generateEfficiencyRecommendations(vehicleId, period)
+      recommendations: await generateEfficiencyRecommendations(vehicleId, period),
     };
 
     return efficiency;
@@ -204,7 +204,7 @@ async function generateFuelReport(farmerId, reportType) {
       average_efficiency: await getAverageEfficiency(farmerId),
       fuel_cost_analysis: await getFuelCostAnalysis(farmerId),
       supplier_performance: await getSupplierPerformance(farmerId),
-      recommendations: await generateFuelRecommendations(farmerId)
+      recommendations: await generateFuelRecommendations(farmerId),
     };
 
     return report;
@@ -222,7 +222,7 @@ async function getMarketPrices(fuelType, state, district) {
   return {
     current_price: 85,
     price_range: { min: 82, max: 88 },
-    trend: 'stable'
+    trend: 'stable',
   };
 }
 
@@ -230,7 +230,7 @@ async function getPriceTrends(fuelType, state) {
   return {
     trend: 'increasing',
     weekly_change: 2,
-    monthly_change: 5
+    monthly_change: 5,
   };
 }
 
@@ -238,7 +238,7 @@ async function getOptimalPurchaseTiming(fuelType, state) {
   return {
     best_day: 'Wednesday',
     best_time: 'morning',
-    expected_savings: 3
+    expected_savings: 3,
   };
 }
 
@@ -246,7 +246,7 @@ async function compareSuppliers(fuelType, state) {
   return [
     { supplier: 'A', price: 84, quality: 'high' },
     { supplier: 'B', price: 86, quality: 'medium' },
-    { supplier: 'C', price: 85, quality: 'high' }
+    { supplier: 'C', price: 85, quality: 'high' },
   ];
 }
 
@@ -254,7 +254,7 @@ async function getEfficiencyBenchmarks(vehicleId, fuelType) {
   return {
     target_liters_per_hour: 8,
     target_liters_per_km: 0.5,
-    efficiency_range: { min: 7, max: 9 }
+    efficiency_range: { min: 7, max: 9 },
   };
 }
 
@@ -262,7 +262,7 @@ async function getConsumptionPatterns(vehicleId) {
   return {
     average_consumption: 8.5,
     peak_consumption: 10,
-    off_peak_consumption: 7
+    off_peak_consumption: 7,
   };
 }
 
@@ -270,7 +270,7 @@ async function getOptimizationRecommendations(vehicleId, operationType) {
   return [
     'Maintain steady speed',
     'Avoid idling',
-    'Use optimal gear ratios'
+    'Use optimal gear ratios',
   ];
 }
 
@@ -278,8 +278,8 @@ async function detectAbnormalConsumption(vehicleId, quantity, hours) {
   const rate = quantity / hours;
   return {
     abnormal: rate > 12,
-    rate: rate,
-    possible_causes: rate > 12 ? ['engine_issue', 'heavy_load', 'inefficient_operation'] : []
+    rate,
+    possible_causes: rate > 12 ? ['engine_issue', 'heavy_load', 'inefficient_operation'] : [],
   };
 }
 
@@ -287,7 +287,7 @@ async function getLitersPerHour(vehicleId, period) {
   return {
     average: 8.5,
     minimum: 7,
-    maximum: 10
+    maximum: 10,
   };
 }
 
@@ -295,7 +295,7 @@ async function getLitersPerKm(vehicleId, period) {
   return {
     average: 0.5,
     minimum: 0.4,
-    maximum: 0.6
+    maximum: 0.6,
   };
 }
 
@@ -303,7 +303,7 @@ async function getCostPerHour(vehicleId, period) {
   return {
     average: 722.5,
     minimum: 595,
-    maximum: 850
+    maximum: 850,
   };
 }
 
@@ -311,7 +311,7 @@ async function getEfficiencyRating(vehicleId, period) {
   return {
     rating: 'good',
     score: 85,
-    benchmark_comparison: '+5%'
+    benchmark_comparison: '+5%',
   };
 }
 
@@ -319,7 +319,7 @@ async function generateEfficiencyRecommendations(vehicleId, period) {
   return [
     'Implement fuel-saving driving techniques',
     'Schedule regular engine maintenance',
-    'Monitor tire pressure regularly'
+    'Monitor tire pressure regularly',
   ];
 }
 
@@ -327,7 +327,7 @@ async function getTotalPurchases(farmerId) {
   try {
     const result = await pool.query(
       'SELECT SUM(quantity_liters) as total, SUM(total_cost) as cost FROM fuel_purchases WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0] || { total: 0, cost: 0 };
   } catch (error) {
@@ -339,7 +339,7 @@ async function getTotalConsumption(farmerId) {
   try {
     const result = await pool.query(
       'SELECT SUM(quantity_liters) as total FROM fuel_consumption WHERE vehicle_id IN (SELECT vehicle_id FROM fleet_vehicles WHERE farmer_id = $1)',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.total || 0;
   } catch (error) {
@@ -351,7 +351,7 @@ async function getAverageEfficiency(farmerId) {
   return {
     liters_per_hour: 8.2,
     liters_per_km: 0.48,
-    efficiency_score: 82
+    efficiency_score: 82,
   };
 }
 
@@ -359,14 +359,14 @@ async function getFuelCostAnalysis(farmerId) {
   return {
     total_cost: 170000,
     cost_per_liter: 85,
-    monthly_average: 28333
+    monthly_average: 28333,
   };
 }
 
 async function getSupplierPerformance(farmerId) {
   return [
     { supplier: 'A', rating: 4.5, reliability: 95 },
-    { supplier: 'B', rating: 4.0, reliability: 90 }
+    { supplier: 'B', rating: 4.0, reliability: 90 },
   ];
 }
 
@@ -374,7 +374,7 @@ async function generateFuelRecommendations(farmerId) {
   return [
     'Consider bulk purchasing for discounts',
     'Monitor market prices for optimal timing',
-    'Implement fuel conservation practices'
+    'Implement fuel conservation practices',
   ];
 }
 
@@ -395,7 +395,7 @@ async function listFuelPurchases({ page = 1, limit = 20, farmer_id = null } = {}
   const listParams = [...params, limit, offset];
   const res = await pool.query(
     `SELECT * FROM fuel_purchases ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams
+    listParams,
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
 }
@@ -411,6 +411,6 @@ module.exports = {
   recordFuelPurchase,
   recordFuelConsumption,
   trackFuelEfficiency,
-  generateFuelReport
+  generateFuelReport,
 };
 

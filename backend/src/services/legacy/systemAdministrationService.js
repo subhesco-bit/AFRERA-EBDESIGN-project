@@ -1,6 +1,6 @@
 /**
  * System Administration Module Service - AI Enhanced
- * 
+ *
  * This service provides AI-powered system administration:
  * - AI-powered incident prediction
  * - Automated root cause analysis
@@ -10,13 +10,13 @@
  */
 
 const DatabaseService = require('../../database/connection');
-const aiBackboneService = require('./aiBackboneService');
+const aiGatewayService = require('./aiGatewayService');
 const analyticsService = require('./analyticsService');
 const { logger } = require('../../utils/logger');
 
 class SystemAdministrationService {
   constructor() {
-    this.aiGateway = aiBackboneService;
+    this.aiGateway = aiGatewayService;
     this.analytics = analyticsService;
     this.db = DatabaseService;
     this.systemMetrics = new Map();
@@ -30,19 +30,19 @@ class SystemAdministrationService {
   async initialize() {
     try {
       logger.info('Initializing System Administration Service with AI capabilities');
-      
+
       // Initialize AI-powered monitoring
       await this.initializeAIMonitoring();
-      
+
       // Load historical incident data for AI training
       await this.loadHistoricalIncidents();
-      
+
       // Start predictive monitoring
       await this.startPredictiveMonitoring();
-      
+
       // Initialize threat detection
       await this.initializeThreatDetection();
-      
+
       logger.info('System Administration Service initialized successfully');
       return { success: true, message: 'System Administration Service initialized' };
     } catch (error) {
@@ -63,22 +63,22 @@ class SystemAdministrationService {
 
       const prediction = await this.aiGateway.predict({
         type: 'incident_prediction',
-        currentSystemState: currentSystemState,
-        historicalIncidents: historicalIncidents,
-        systemTrends: systemTrends,
-        externalFactors: externalFactors,
-        timeframe: timeframe
+        currentSystemState,
+        historicalIncidents,
+        systemTrends,
+        externalFactors,
+        timeframe,
       });
 
       this.predictiveModels.set('incidents', prediction);
 
       return {
-        timeframe: timeframe,
+        timeframe,
         riskLevel: prediction.riskLevel || 'low',
         predictedIncidents: prediction.incidents || [],
         confidence: prediction.confidence || 0.85,
         recommendedActions: prediction.actions || [],
-        monitoringPriority: prediction.priority || 'normal'
+        monitoringPriority: prediction.priority || 'normal',
       };
     } catch (error) {
       logger.error('Error predicting incidents:', error);
@@ -100,12 +100,12 @@ class SystemAdministrationService {
 
       const rootCauseAnalysis = await this.aiGateway.analyze({
         type: 'root_cause_analysis',
-        incident: incident,
-        systemLogs: systemLogs,
-        metrics: metrics,
-        changes: changes,
-        dependencies: dependencies,
-        analysisDepth: 'deep'
+        incident,
+        systemLogs,
+        metrics,
+        changes,
+        dependencies,
+        analysisDepth: 'deep',
       });
 
       return {
@@ -116,7 +116,7 @@ class SystemAdministrationService {
         timeline: rootCauseAnalysis.timeline || [],
         affectedComponents: rootCauseAnalysis.affectedComponents || [],
         recommendedFixes: rootCauseAnalysis.fixes || [],
-        preventionStrategies: rootCauseAnalysis.prevention || []
+        preventionStrategies: rootCauseAnalysis.prevention || [],
       };
     } catch (error) {
       logger.error('Error analyzing root cause:', error);
@@ -137,36 +137,36 @@ class SystemAdministrationService {
 
       const healingDecision = await this.aiGateway.analyze({
         type: 'self_healing_decision',
-        issue: issue,
-        systemState: systemState,
-        availableRemedies: availableRemedies,
-        riskAssessment: riskAssessment,
-        riskTolerance: 'medium'
+        issue,
+        systemState,
+        availableRemedies,
+        riskAssessment,
+        riskTolerance: 'medium',
       });
 
       if (healingDecision.action && healingDecision.confidence > 0.7) {
         const result = await this.executeHealingAction(healingDecision.action);
-        
+
         // Verify healing effectiveness
         const verification = await this.verifyHealing(issue, result);
 
         return {
-          issue: issue,
+          issue,
           action: healingDecision.action,
-          result: result,
-          verification: verification,
+          result,
+          verification,
           success: verification.resolved,
-          confidence: healingDecision.confidence
+          confidence: healingDecision.confidence,
         };
       }
 
       return {
-        issue: issue,
+        issue,
         action: null,
         result: null,
         verification: null,
         success: false,
-        reason: 'Insufficient confidence for automated healing'
+        reason: 'Insufficient confidence for automated healing',
       };
     } catch (error) {
       logger.error('Error in self-healing:', error);
@@ -187,23 +187,23 @@ class SystemAdministrationService {
 
       const forecast = await this.aiGateway.predict({
         type: 'capacity_forecasting',
-        currentCapacity: currentCapacity,
-        historicalUsage: historicalUsage,
-        growthTrends: growthTrends,
-        seasonalPatterns: seasonalPatterns,
-        businessPlans: businessPlans,
-        timeframe: timeframe
+        currentCapacity,
+        historicalUsage,
+        growthTrends,
+        seasonalPatterns,
+        businessPlans,
+        timeframe,
       });
 
       return {
-        timeframe: timeframe,
-        currentCapacity: currentCapacity,
+        timeframe,
+        currentCapacity,
         forecastedCapacity: forecast.capacity || {},
         resourceNeeds: forecast.resourceNeeds || {},
         recommendations: forecast.recommendations || [],
         risks: forecast.risks || [],
         confidence: forecast.confidence || 0.85,
-        planningHorizon: forecast.planningHorizon || {}
+        planningHorizon: forecast.planningHorizon || {},
       };
     } catch (error) {
       logger.error('Error forecasting capacity:', error);
@@ -224,17 +224,17 @@ class SystemAdministrationService {
 
       const threatDetection = await this.aiGateway.analyze({
         type: 'security_threat_detection',
-        systemLogs: systemLogs,
-        networkTraffic: networkTraffic,
-        userBehavior: userBehavior,
-        knownThreats: knownThreats,
-        threatIntelligence: threatIntelligence,
-        sensitivity: 'high'
+        systemLogs,
+        networkTraffic,
+        userBehavior,
+        knownThreats,
+        threatIntelligence,
+        sensitivity: 'high',
       });
 
       if (threatDetection.threats && threatDetection.threats.length > 0) {
         logger.warn('Security threats detected:', threatDetection.threats);
-        
+
         // Trigger automated response for critical threats
         for (const threat of threatDetection.threats) {
           if (threat.severity === 'critical') {
@@ -249,7 +249,7 @@ class SystemAdministrationService {
         riskLevel: threatDetection.riskLevel || 'low',
         recommendations: threatDetection.recommendations || [],
         scannedAt: new Date(),
-        nextScanDue: new Date(Date.now() + 3600000) // 1 hour
+        nextScanDue: new Date(Date.now() + 3600000), // 1 hour
       };
     } catch (error) {
       logger.error('Error detecting security threats:', error);
@@ -272,28 +272,28 @@ class SystemAdministrationService {
         overview: {
           healthScore: this.calculateOverallHealth(systemMetrics, incidentRisk, securityStatus),
           status: this.determineSystemStatus(systemMetrics, incidentRisk),
-          lastUpdated: new Date()
+          lastUpdated: new Date(),
         },
         metrics: systemMetrics,
         incidents: {
           riskLevel: incidentRisk.riskLevel,
           predictedIncidents: incidentRisk.predictedIncidents,
-          activeIncidents: await this.getActiveIncidents()
+          activeIncidents: await this.getActiveIncidents(),
         },
         capacity: {
           current: capacityForecast.currentCapacity,
           forecasted: capacityForecast.forecastedCapacity,
-          recommendations: capacityForecast.recommendations
+          recommendations: capacityForecast.recommendations,
         },
         security: {
           riskLevel: securityStatus.riskLevel,
           threats: securityStatus.threats,
-          recommendations: securityStatus.recommendations
+          recommendations: securityStatus.recommendations,
         },
         performance: {
           trends: performanceTrends,
-          benchmarks: await this.getPerformanceBenchmarks()
-        }
+          benchmarks: await this.getPerformanceBenchmarks(),
+        },
       };
     } catch (error) {
       logger.error('Error getting system health dashboard:', error);
@@ -313,7 +313,7 @@ class SystemAdministrationService {
         systemState: await this.getCurrentSystemState(),
         performanceMetrics: await this.getSystemMetrics(),
         maintenanceHistory: await this.getMaintenanceHistory(),
-        priorities: ['critical', 'high', 'medium', 'low']
+        priorities: ['critical', 'high', 'medium', 'low'],
       });
 
       const results = [];
@@ -331,13 +331,13 @@ class SystemAdministrationService {
       return {
         maintenanceId: Date.now(),
         tasks: maintenanceTasks.tasks || [],
-        results: results,
+        results,
         summary: {
           total: results.length,
           successful: results.filter(r => r.status === 'success').length,
-          failed: results.filter(r => r.status === 'failed').length
+          failed: results.filter(r => r.status === 'failed').length,
         },
-        completedAt: new Date()
+        completedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error performing automated maintenance:', error);
@@ -359,7 +359,7 @@ class SystemAdministrationService {
       WHERE created_at > NOW() - INTERVAL '90 days'
       ORDER BY created_at DESC
     `);
-    
+
     this.incidentHistory.set('all', incidents.rows);
   }
 
@@ -378,7 +378,7 @@ class SystemAdministrationService {
       status: 'operational',
       components: await this.getComponentStates(),
       resources: await this.getResourceStates(),
-      performance: await this.getSystemMetrics()
+      performance: await this.getSystemMetrics(),
     };
   }
 
@@ -417,7 +417,7 @@ class SystemAdministrationService {
   async assessHealingRisk(issue, remedies) {
     return {
       overallRisk: 'medium',
-      factors: []
+      factors: [],
     };
   }
 
@@ -429,7 +429,7 @@ class SystemAdministrationService {
   async verifyHealing(issue, result) {
     return {
       resolved: true,
-      improvement: 95
+      improvement: 95,
     };
   }
 
@@ -438,7 +438,7 @@ class SystemAdministrationService {
       cpu: 80,
       memory: 70,
       storage: 60,
-      network: 50
+      network: 50,
     };
   }
 
@@ -491,7 +491,7 @@ class SystemAdministrationService {
       network: 40,
       responseTime: 120,
       errorRate: 0.01,
-      uptime: 99.9
+      uptime: 99.9,
     };
   }
 
@@ -509,20 +509,20 @@ class SystemAdministrationService {
 
   calculateOverallHealth(metrics, incidentRisk, securityStatus) {
     let score = 100;
-    
+
     // Deduct for poor metrics
     if (metrics.cpu > 80) score -= 10;
     if (metrics.memory > 85) score -= 10;
     if (metrics.errorRate > 0.05) score -= 15;
-    
+
     // Deduct for incident risk
     if (incidentRisk.riskLevel === 'high') score -= 20;
     if (incidentRisk.riskLevel === 'medium') score -= 10;
-    
+
     // Deduct for security threats
     if (securityStatus.riskLevel === 'high') score -= 25;
     if (securityStatus.riskLevel === 'medium') score -= 15;
-    
+
     return Math.max(0, score);
   }
 
@@ -552,3 +552,4 @@ class SystemAdministrationService {
 }
 
 module.exports = new SystemAdministrationService();
+

@@ -1,7 +1,7 @@
 /**
  * Accessibility Enhancements System
  * Production-level accessibility features for WCAG 2.1 AA compliance
- * 
+ *
  * Features:
  * - ARIA labels and descriptions
  * - Keyboard navigation support
@@ -14,6 +14,7 @@
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import PropTypes from 'prop-types';
 
 // ARIA attribute generators
 export const aria = {
@@ -35,7 +36,7 @@ export const aria = {
   busy: (isBusy) => ({ 'aria-busy': isBusy.toString() }),
   controls: (id) => ({ 'aria-controls': id }),
   owns: (id) => ({ 'aria-owns': id }),
-  hidden: (isHidden) => ({ 'aria-hidden': isHidden.toString() })
+  hidden: (isHidden) => ({ 'aria-hidden': isHidden.toString() }),
 };
 
 // Skip links component
@@ -43,7 +44,7 @@ export const SkipLinks = () => {
   const links = [
     { id: 'main-content', label: 'Skip to main content' },
     { id: 'navigation', label: 'Skip to navigation' },
-    { id: 'search', label: 'Skip to search' }
+    { id: 'search', label: 'Skip to search' },
   ];
 
   return (
@@ -68,16 +69,16 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
 
   const getFocusableElements = useCallback(() => {
     if (!trapRef.current) return [];
-    
+
     const focusableSelectors = [
       'a[href]',
       'button:not([disabled])',
       'textarea:not([disabled])',
       'input:not([disabled])',
       'select:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])'
+      '[tabindex]:not([tabindex="-1"])',
     ];
-    
+
     return trapRef.current.querySelectorAll(focusableSelectors.join(','));
   }, []);
 
@@ -117,7 +118,7 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
     previousFocusRef.current = document.activeElement;
 
     // Focus first focusable element
-    const focusableElements = getFocusableElements();
+    let focusableElements = getFocusableElements();
     if (focusableElements.length > 0) {
       focusableElements[0].focus();
     }
@@ -127,7 +128,7 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      
+
       // Restore focus
       if (previousFocusRef.current) {
         previousFocusRef.current.focus();
@@ -136,6 +137,12 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
   }, [isActive, handleKeyDown, getFocusableElements]);
 
   return <div ref={trapRef} tabIndex={-1}>{children}</div>;
+};
+
+FocusTrap.propTypes = {
+  children: PropTypes.node,
+  isActive: PropTypes.bool,
+  onEscape: PropTypes.func,
 };
 
 // Live region for announcements
@@ -152,6 +159,12 @@ export const LiveRegion = ({ message, level = 'polite', atomic = false }) => {
   );
 };
 
+LiveRegion.propTypes = {
+  message: PropTypes.string,
+  level: PropTypes.string,
+  atomic: PropTypes.bool,
+};
+
 // Screen reader only content
 export const ScreenReaderOnly = ({ children, as = 'span' }) => {
   const Tag = as;
@@ -162,6 +175,11 @@ export const ScreenReaderOnly = ({ children, as = 'span' }) => {
   );
 };
 
+ScreenReaderOnly.propTypes = {
+  children: PropTypes.node,
+  as: PropTypes.string,
+};
+
 // Visually hidden but accessible
 export const VisuallyHidden = ({ children, as = 'span' }) => {
   const Tag = as;
@@ -170,6 +188,11 @@ export const VisuallyHidden = ({ children, as = 'span' }) => {
       {children}
     </Tag>
   );
+};
+
+VisuallyHidden.propTypes = {
+  children: PropTypes.node,
+  as: PropTypes.string,
 };
 
 // Keyboard navigation hook
@@ -247,8 +270,8 @@ export const useFocusManagement = (initialFocus = null) => {
     focusProps: {
       ref: elementRef,
       onFocus: handleFocus,
-      onBlur: handleBlur
-    }
+      onBlur: handleBlur,
+    },
   };
 };
 
@@ -321,6 +344,16 @@ export const AccessibleButton = ({
   );
 };
 
+AccessibleButton.propTypes = {
+  children: PropTypes.node,
+  icon: PropTypes.node,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  ariaLabel: PropTypes.string,
+  ariaDescribedBy: PropTypes.string,
+  className: PropTypes.string,
+};
+
 // Accessible form field wrapper
 export const AccessibleField = ({
   label,
@@ -328,7 +361,7 @@ export const AccessibleField = ({
   helper,
   required = false,
   children,
-  id
+  id,
 }) => {
   const errorId = `${id}-error`;
   const helperId = `${id}-helper`;
@@ -344,21 +377,21 @@ export const AccessibleField = ({
         {label}
         {required && <span className="text-red-500 ml-1" aria-label="required">*</span>}
       </label>
-      
+
       {React.cloneElement(children, {
         id,
         'aria-labelledby': labelId,
         'aria-describedby': error ? errorId : helperId,
         'aria-invalid': error ? 'true' : 'false',
-        'aria-required': required ? 'true' : 'false'
+        'aria-required': required ? 'true' : 'false',
       })}
-      
+
       {helper && !error && (
         <p id={helperId} className="text-sm text-gray-500">
           {helper}
         </p>
       )}
-      
+
       {error && (
         <p id={errorId} className="text-sm text-red-600" role="alert">
           {error}
@@ -368,13 +401,22 @@ export const AccessibleField = ({
   );
 };
 
+AccessibleField.propTypes = {
+  label: PropTypes.string,
+  error: PropTypes.string,
+  helper: PropTypes.string,
+  required: PropTypes.bool,
+  children: PropTypes.node,
+  id: PropTypes.string,
+};
+
 // Accessible modal component
 export const AccessibleModal = ({
   isOpen,
   onClose,
   title,
   children,
-  size = 'md'
+  size = 'md',
 }) => {
   const modalRef = useRef(null);
   const titleId = useRef(`modal-title-${Math.random().toString(36).substr(2, 9)}`);
@@ -412,14 +454,14 @@ export const AccessibleModal = ({
         onClick={onClose}
         aria-hidden="true"
       />
-      
+
       <FocusTrap isActive={isOpen} onEscape={onClose}>
         <div
           ref={modalRef}
           className={`relative bg-white rounded-lg shadow-xl w-full ${
             size === 'sm' ? 'max-w-md' :
-            size === 'md' ? 'max-w-lg' :
-            size === 'lg' ? 'max-w-2xl' : 'max-w-4xl'
+              size === 'md' ? 'max-w-lg' :
+                size === 'lg' ? 'max-w-2xl' : 'max-w-4xl'
           }`}
           tabIndex={-1}
         >
@@ -435,7 +477,7 @@ export const AccessibleModal = ({
               <span aria-hidden="true">×</span>
             </button>
           </div>
-          
+
           <div className="p-6">
             {children}
           </div>
@@ -445,13 +487,21 @@ export const AccessibleModal = ({
   );
 };
 
+AccessibleModal.propTypes = {
+  isOpen: PropTypes.bool,
+  onClose: PropTypes.func,
+  title: PropTypes.string,
+  children: PropTypes.node,
+  size: PropTypes.string,
+};
+
 // Accessible tabs component
 export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
   const tabsRef = useRef([]);
 
   const handleKeyDown = (e, index) => {
     let targetIndex;
-    
+
     switch (e.key) {
       case 'ArrowLeft':
         e.preventDefault();
@@ -494,10 +544,10 @@ export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
             onKeyDown={(e) => handleKeyDown(e, index)}
             className={`
               px-4 py-2 text-sm font-medium border-b-2 -mb-px focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${activeTab === tab.id
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-              }
+              ${activeTab === tab.id ?
+            'border-blue-500 text-blue-600' :
+            'border-transparent text-gray-500 hover:text-gray-700'
+          }
             `}
           >
             {tab.icon && <span className="mr-2" aria-hidden="true">{tab.icon}</span>}
@@ -505,7 +555,7 @@ export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
           </button>
         ))}
       </div>
-      
+
       {tabs.map(tab => (
         <div
           key={tab.id}
@@ -520,6 +570,12 @@ export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
       ))}
     </div>
   );
+};
+
+AccessibleTabs.propTypes = {
+  tabs: PropTypes.array,
+  activeTab: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 // Accessibility announcement hook
@@ -556,5 +612,5 @@ export default {
   AccessibleField,
   AccessibleModal,
   AccessibleTabs,
-  useAnnouncement
+  useAnnouncement,
 };

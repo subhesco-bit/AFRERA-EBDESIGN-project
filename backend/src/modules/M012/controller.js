@@ -10,9 +10,9 @@ async function createSession(req, res) {
     const deviceInfo = {
       ipAddress: req.ip,
       userAgent: req.headers['user-agent'],
-      ...req.body
+      ...req.body,
     };
-    
+
     const session = await service.createSession(userId, deviceInfo);
     res.status(201).json({ success: true, data: session });
   } catch (error) {
@@ -25,7 +25,7 @@ async function validateSession(req, res) {
   try {
     const { sessionToken } = req.body;
     const session = await service.validateSession(sessionToken);
-    
+
     if (session) {
       res.json({ success: true, data: session });
     } else {
@@ -65,9 +65,9 @@ async function recordDeviceFingerprint(req, res) {
     const fingerprint = {
       ...req.body,
       ipAddress: req.ip,
-      userAgent: req.headers['user-agent']
+      userAgent: req.headers['user-agent'],
     };
-    
+
     const recorded = await service.recordDeviceFingerprint(userId, fingerprint);
     res.status(201).json({ success: true, data: recorded });
   } catch (error) {
@@ -104,7 +104,7 @@ async function changePassword(req, res) {
     const userId = req.user?.id;
     const { currentPassword, newPassword } = req.body;
     const result = await service.changePassword(userId, currentPassword, newPassword);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {

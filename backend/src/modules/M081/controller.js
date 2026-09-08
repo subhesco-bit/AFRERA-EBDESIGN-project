@@ -180,5 +180,5 @@ module.exports = {
   getDashboardFilters,
   createSnapshot,
   shareDashboard,
-  getDashboardAnalytics
+  getDashboardAnalytics,
 };

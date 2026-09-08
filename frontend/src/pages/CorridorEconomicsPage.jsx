@@ -6,34 +6,34 @@
  * alongside recorded actuals without that distinction would let a projection be
  * quoted to a buyer as a cost.
  */
-import React, { useState, useEffect } from 'react'
-import { economicAPI } from '../services/api'
+import React, { useState, useEffect } from 'react';
+import { economicAPI } from '../services/api';
 import {
   ModulePage, Section, Field, Rupees, Value, ProvenanceBadge, AsyncState, DataTable,
-} from '../components/common/DataPrimitives'
+} from '../components/common/DataPrimitives';
 
 export default function CorridorEconomicsPage() {
-  const [model, setModel] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [commodity, setCommodity] = useState('')
-  const [signal, setSignal] = useState(null)
+  const [model, setModel] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [commodity, setCommodity] = useState('');
+  const [signal, setSignal] = useState(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const r = await economicAPI.corridorModel('NE->NCR')
-        setModel(r.data?.data)
-      } catch (e) { setError(e.response?.data?.error || e.message) } finally { setLoading(false) }
-    })()
-  }, [])
+        const r = await economicAPI.corridorModel('NE->NCR');
+        setModel(r.data?.data);
+      } catch (e) { setError(e.response?.data?.error || e.message); } finally { setLoading(false); }
+    })();
+  }, []);
 
   const readMandi = async (e) => {
-    e.preventDefault()
-    if (!commodity) return
-    try { const r = await economicAPI.mandiSignal({ commodity, days: 30 }); setSignal(r.data?.data) }
-    catch (err) { setSignal({ error: err.message }) }
-  }
+    e.preventDefault();
+    if (!commodity) return;
+    try { const r = await economicAPI.mandiSignal({ commodity, days: 30 }); setSignal(r.data?.data); }
+    catch (err) { setSignal({ error: err.message }); }
+  };
 
   return (
     <ModulePage title="Corridor economics"
@@ -42,7 +42,7 @@ export default function CorridorEconomicsPage() {
       <AsyncState loading={loading} error={error}>
         <>
           <Section title="Landed cost model">
-            <p role="note" style={{ background: '#fff8c5', border: '1px solid #d4a72c66',
+            <p role="note" style={{ background: 'color-mix(in srgb, hsl(var(--sev-warning)) 16%, transparent)', border: '1px solid hsl(var(--sev-warning))',
               borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>
               <strong>Planning model, not observed cost.</strong> {model?.caveat}
             </p>
@@ -66,7 +66,7 @@ export default function CorridorEconomicsPage() {
                   render: (r) => <ProvenanceBadge provenance={r.data_provenance} /> },
               ]}
               rows={[...(model?.components || [])].sort(
-                (a, b) => Number(b.optimised_inr_per_kg) - Number(a.optimised_inr_per_kg)
+                (a, b) => Number(b.optimised_inr_per_kg) - Number(a.optimised_inr_per_kg),
               )}
               rowKey={(r) => r.sequence_no}
             />
@@ -104,5 +104,5 @@ export default function CorridorEconomicsPage() {
         </>
       </AsyncState>
     </ModulePage>
-  )
+  );
 }

@@ -182,28 +182,28 @@ module.exports = {
   getConsent,
   updateConsent,
   revokeConsent,
-  
+
   // Consent category management
   createConsentCategory,
   getConsentCategories,
-  
+
   // Consent template management
   createConsentTemplate,
   getConsentTemplates,
   applyConsentTemplate,
-  
+
   // AI-powered analysis
   analyzeConsentCompliance,
-  
+
   // Consent history and audit
   getConsentHistory,
-  
+
   // Automated expiration
   checkExpiredConsents,
-  
+
   // Analytics
   getConsentAnalytics,
-  
+
   // Bulk operations
   bulkCreateConsents,
 };

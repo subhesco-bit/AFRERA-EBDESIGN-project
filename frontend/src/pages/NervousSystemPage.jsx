@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Activity } from 'lucide-react'
-import { nervousSystemAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { Activity } from 'lucide-react';
+import { nervousSystemAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/nervousSystemRoutes.js +
@@ -15,10 +15,10 @@ const TABS = [
   ['brain', 'Brain'], ['heart', 'Heart'], ['neural', 'Neural Pathways'],
   ['reflex', 'Reflex Arcs'], ['sensor', 'Sensors'], ['motor', 'Motor Functions'],
   ['route', 'Route Control'], ['health', 'System Health'],
-]
+];
 
 function NervousSystemPage() {
-  const [tab, setTab] = useState('brain')
+  const [tab, setTab] = useState('brain');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -99,7 +99,7 @@ function NervousSystemPage() {
         <ActionCard title="Nervous System Health" description="Get an overall health snapshot across brain, heart, neural, sensors, motor and routes." onRun={() => nervousSystemAPI.getNervousSystemHealth()} />
       )}
     </div>
-  )
+  );
 }
 
-export default NervousSystemPage
+export default NervousSystemPage;

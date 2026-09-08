@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { Package, DollarSign, MapPin, CheckCircle, Loader2 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import { Package, DollarSign, MapPin, CheckCircle, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 function FarmerSellPage() {
   const [formData, setFormData] = useState({
@@ -14,27 +14,27 @@ function FarmerSellPage() {
     harvest_date: '',
     location: '',
     description: '',
-    certifications: []
-  })
+    certifications: [],
+  });
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: () => farmersAPI.getCategories().then(r => r.data),
-  })
+  });
 
   const { data: farmerProfile } = useQuery({
     queryKey: ['farmer-profile'],
     queryFn: () => farmersAPI.getFarmer('current-farmer-id').then(r => r.data),
-  })
+  });
 
   const sellMutation = useMutation({
     mutationFn: (data) => farmersAPI.createListing(data),
     onSuccess: () => {
-      toast.success('Listing created successfully!')
-      queryClient.invalidateQueries({ queryKey: ['farmer-listings'] })
+      toast.success('Listing created successfully!');
+      queryClient.invalidateQueries({ queryKey: ['farmer-listings'] });
       setFormData({
         product_name: '',
         category: '',
@@ -44,23 +44,23 @@ function FarmerSellPage() {
         harvest_date: '',
         location: farmerProfile?.location || '',
         description: '',
-        certifications: []
-      })
+        certifications: [],
+      });
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to create listing')
+      toast.error(error.message || 'Failed to create listing');
     },
-  })
+  });
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    sellMutation.mutate(formData)
-  }
+    e.preventDefault();
+    sellMutation.mutate(formData);
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -77,7 +77,7 @@ function FarmerSellPage() {
               <Package className="w-5 h-5 mr-2 text-green-600" />
               Product Information
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="product_name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -134,7 +134,7 @@ function FarmerSellPage() {
               <DollarSign className="w-5 h-5 mr-2 text-green-600" />
               Quantity & Pricing
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
@@ -203,7 +203,7 @@ function FarmerSellPage() {
               <MapPin className="w-5 h-5 mr-2 text-green-600" />
               Location
             </h2>
-            
+
             <div>
               <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
                 Farm Location *
@@ -226,7 +226,7 @@ function FarmerSellPage() {
               <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
               Certifications (Optional)
             </h2>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 'Organic',
@@ -234,7 +234,7 @@ function FarmerSellPage() {
                 'FSSAI',
                 'ISO',
                 'HACCP',
-                'Fair Trade'
+                'Fair Trade',
               ].map((cert) => (
                 <label htmlFor="type-checkbox" key={cert} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
                   <input id="type-checkbox"
@@ -244,13 +244,13 @@ function FarmerSellPage() {
                       if (e.target.checked) {
                         setFormData(prev => ({
                           ...prev,
-                          certifications: [...prev.certifications, cert]
-                        }))
+                          certifications: [...prev.certifications, cert],
+                        }));
                       } else {
                         setFormData(prev => ({
                           ...prev,
-                          certifications: prev.certifications.filter(c => c !== cert)
-                        }))
+                          certifications: prev.certifications.filter(c => c !== cert),
+                        }));
                       }
                     }}
                     className="mr-2"
@@ -284,7 +284,7 @@ function FarmerSellPage() {
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-800 mb-2">Price Guide</h3>
           <p className="text-sm text-blue-700">
-            Check current market prices before setting your expected price. 
+            Check current market prices before setting your expected price.
             Competitive pricing helps sell your products faster.
           </p>
           <button
@@ -297,7 +297,7 @@ function FarmerSellPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmerSellPage
+export default FarmerSellPage;

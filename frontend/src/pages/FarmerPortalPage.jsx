@@ -1,25 +1,25 @@
-import { Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI, financialAPI } from '../services/api'
-import { Leaf, Award, TrendingUp, DollarSign, Package, MapPin } from 'lucide-react'
-import LandRecords from '../components/FarmerPortal/LandRecords'
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI, financialAPI } from '../services/api';
+import { Leaf, Award, TrendingUp, DollarSign, Package, MapPin } from 'lucide-react';
+import LandRecords from '../components/FarmerPortal/LandRecords';
 
 function FarmerPortalPage() {
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: farmerData } = useQuery({
     queryKey: ['farmer-profile'],
     queryFn: () => farmersAPI.getFarmer('current-farmer-id').then(r => r.data),
-  })
+  });
 
   const { data: fdiData } = useQuery({
     queryKey: ['fdi'],
     queryFn: () => farmersAPI.calculateFDI('current-farmer-id').then(r => r.data),
-  })
+  });
 
   const { data: creditScore } = useQuery({
     queryKey: ['credit-score'],
     queryFn: () => financialAPI.getCreditScore('current-farmer-id').then(r => r.data),
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -127,7 +127,7 @@ function FarmerPortalPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmerPortalPage
+export default FarmerPortalPage;

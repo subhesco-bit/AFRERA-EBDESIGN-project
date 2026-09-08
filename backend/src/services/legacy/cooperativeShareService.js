@@ -45,7 +45,7 @@ class CooperativeShareService {
            share_value_inr = EXCLUDED.share_value_inr,
            updated_at = CURRENT_TIMESTAMP
          RETURNING *`,
-        [fpoId, farmerId, sharesHeld, shareValueInr, joinDate || new Date().toISOString().slice(0, 10)]
+        [fpoId, farmerId, sharesHeld, shareValueInr, joinDate || new Date().toISOString().slice(0, 10)],
       );
       return result.rows[0];
     } catch (error) {
@@ -63,7 +63,7 @@ class CooperativeShareService {
          LEFT JOIN users u ON u.id = f.user_id
         WHERE fms.fpo_id = $1
         ORDER BY fms.join_date ASC`,
-      [fpoId]
+      [fpoId],
     );
     return result.rows;
   }
@@ -74,7 +74,7 @@ class CooperativeShareService {
       `SELECT COALESCE(SUM(shares_held * share_value_inr), 0) AS total_paid_up_capital_inr,
               COUNT(*) FILTER (WHERE status = 'active') AS active_member_count
          FROM fpo_member_shares WHERE fpo_id = $1`,
-      [fpoId]
+      [fpoId],
     );
     return {
       fpoId,
@@ -99,8 +99,8 @@ class CooperativeShareService {
     if (!(Number(totalSurplusInr) >= 0)) throw new Error('totalSurplusInr must be >= 0');
 
     const members = await this.pool.query(
-      `SELECT farmer_id FROM fpo_member_shares WHERE fpo_id = $1 AND status = 'active'`,
-      [fpoId]
+      'SELECT farmer_id FROM fpo_member_shares WHERE fpo_id = $1 AND status = \'active\'',
+      [fpoId],
     );
 
     const volumeResult = await this.pool.query(
@@ -109,7 +109,7 @@ class CooperativeShareService {
         WHERE fpo_id = $1 AND entry_type = 'credit'
           AND entry_date BETWEEN $2 AND $3
         GROUP BY farmer_id`,
-      [fpoId, periodStart, periodEnd]
+      [fpoId, periodStart, periodEnd],
     );
     const volumeByFarmer = Object.fromEntries(volumeResult.rows.map((r) => [r.farmer_id, Number(r.volume)]));
 
@@ -149,7 +149,7 @@ class CooperativeShareService {
            (fpo_id, period_start, period_end, total_surplus_inr, distribution_method, computed_by, notes)
          VALUES ($1, $2, $3, $4, 'patronage', $5, $6)
          RETURNING *`,
-        [fpoId, periodStart, periodEnd, totalSurplusInr, computedBy || null, notes || null]
+        [fpoId, periodStart, periodEnd, totalSurplusInr, computedBy || null, notes || null],
       );
       const distribution = distResult.rows[0];
 
@@ -158,7 +158,7 @@ class CooperativeShareService {
           `INSERT INTO fpo_profit_distribution_lines
              (distribution_id, farmer_id, patronage_volume_inr, patronage_share_pct, dividend_amount_inr)
            VALUES ($1, $2, $3, $4, $5)`,
-          [distribution.id, line.farmerId, line.patronageVolumeInr, line.patronageSharePct, line.dividendAmountInr]
+          [distribution.id, line.farmerId, line.patronageVolumeInr, line.patronageSharePct, line.dividendAmountInr],
         );
       }
 
@@ -169,8 +169,8 @@ class CooperativeShareService {
 
   async getDistribution(distributionId) {
     const distResult = await this.pool.query(
-      `SELECT * FROM fpo_profit_distributions WHERE id = $1`,
-      [distributionId]
+      'SELECT * FROM fpo_profit_distributions WHERE id = $1',
+      [distributionId],
     );
     if (distResult.rows.length === 0) throw new Error('Distribution not found');
 
@@ -181,7 +181,7 @@ class CooperativeShareService {
          LEFT JOIN users u ON u.id = f.user_id
         WHERE dl.distribution_id = $1
         ORDER BY dl.dividend_amount_inr DESC`,
-      [distributionId]
+      [distributionId],
     );
 
     return { ...distResult.rows[0], lines: linesResult.rows };
@@ -190,11 +190,12 @@ class CooperativeShareService {
   async listDistributions(fpoId) {
     if (!fpoId) throw new Error('fpoId is required');
     const result = await this.pool.query(
-      `SELECT * FROM fpo_profit_distributions WHERE fpo_id = $1 ORDER BY period_end DESC`,
-      [fpoId]
+      'SELECT * FROM fpo_profit_distributions WHERE fpo_id = $1 ORDER BY period_end DESC',
+      [fpoId],
     );
     return result.rows;
   }
 }
 
 module.exports = new CooperativeShareService();
+

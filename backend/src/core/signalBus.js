@@ -33,7 +33,7 @@ const SEVERITY = Object.freeze({
   NOTICE: 20,
   WARNING: 30,
   CRITICAL: 40,
-  EMERGENCY: 50
+  EMERGENCY: 50,
 });
 
 /**
@@ -74,13 +74,13 @@ const SIGNAL = Object.freeze({
   SOIL_RESULT_READY: 'agronomy.soil.result_ready',
   SOIL_RECORD_CHANGED: 'agronomy.soil.record_changed',
   WATER_RECORD_CHANGED: 'agronomy.water.record_changed',
+  OPERATIONS_RECORD_CHANGED: 'operations.record_changed',
+  MAINTENANCE_RECORD_CHANGED: 'operations.maintenance.record_changed',
+  EQUIPMENT_EXCHANGE_CHANGED: 'operations.equipment_exchange.changed',
   CROP_DISEASE_DETECTED: 'agronomy.disease.detected',
   WEATHER_ALERT: 'agronomy.weather.alert',
-  CROP_RECORD_CHANGED: 'agronomy.crop.record_changed',
 
   // Livestock
-  LIVESTOCK_RECORD_CHANGED: 'livestock.record.changed',
-  FISHERIES_RECORD_CHANGED: 'fisheries.record.changed',
   ANIMAL_HEALTH_CHECK: 'livestock.animal.health_check',
   ANIMAL_TREATMENT: 'livestock.animal.treatment',
   DISEASE_OUTBREAK: 'livestock.disease.outbreak',
@@ -91,6 +91,8 @@ const SIGNAL = Object.freeze({
   VACCINATION_ADMINISTERED: 'livestock.vaccination.administered',
   FEED_CONSUMPTION_RECORDED: 'livestock.feed.consumption_recorded',
   HERD_PERFORMANCE_UPDATED: 'livestock.herd.performance_updated',
+  LIVESTOCK_RECORD_CHANGED: 'livestock.record.changed',
+  FISHERIES_RECORD_CHANGED: 'fisheries.record.changed',
 
   // Platform Foundation
   TENANT_CREATED: 'platform.tenant.created',
@@ -113,7 +115,7 @@ const SIGNAL = Object.freeze({
   EMERGENCY_ESCALATED: 'control.emergency.escalated',
 
   // Platform
-  DECISION_MADE: 'platform.decision.made'
+  DECISION_MADE: 'platform.decision.made',
 });
 
 const MAX_HISTORY = 500;
@@ -144,7 +146,7 @@ class SignalBus extends EventEmitter {
       source: meta.source || 'unknown',
       entityId: meta.entityId ?? null,
       correlationId: meta.correlationId || `sig_${Date.now()}_${Math.round(Math.random() * 1e6)}`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this._record(signal);
@@ -171,7 +173,7 @@ class SignalBus extends EventEmitter {
         const out = fn(signal);
         if (out && typeof out.catch === 'function') {
           out.catch((err) =>
-            logger.error(`Signal subscriber failed (async) on ${channel}: ${err.message}`)
+            logger.error(`Signal subscriber failed (async) on ${channel}: ${err.message}`),
           );
         }
       } catch (err) {
@@ -220,8 +222,8 @@ class SignalBus extends EventEmitter {
       totals: Object.fromEntries(this._counts),
       subscribers: this.eventNames().map((n) => ({
         channel: String(n),
-        count: this.listenerCount(n)
-      }))
+        count: this.listenerCount(n),
+      })),
     };
   }
 
@@ -240,5 +242,5 @@ module.exports = {
   signalBus: new SignalBus(),
   SIGNAL,
   SEVERITY,
-  SignalBus
+  SignalBus,
 };

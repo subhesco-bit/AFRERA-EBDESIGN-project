@@ -66,5 +66,5 @@ module.exports = {
   recordFuelPurchase,
   recordFuelConsumption,
   trackFuelEfficiency,
-  generateFuelReport
+  generateFuelReport,
 };

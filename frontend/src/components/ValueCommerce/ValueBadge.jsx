@@ -1,5 +1,4 @@
 
-
 /**
  * Value Badge Component
  * Displays value grade and score for products

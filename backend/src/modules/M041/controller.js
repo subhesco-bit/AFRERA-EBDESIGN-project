@@ -34,5 +34,5 @@ const getVillageAnalytics = async (req, res) => {
 module.exports = {
   createVillage,
   addVillageResource,
-  getVillageAnalytics
+  getVillageAnalytics,
 };

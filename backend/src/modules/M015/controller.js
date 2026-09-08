@@ -19,7 +19,7 @@ async function verifyTOTP(req, res) {
     const userId = req.user?.id;
     const { token } = req.body;
     const result = await service.verifyTOTP(userId, token);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -49,7 +49,7 @@ async function verifySMSOTP(req, res) {
     const userId = req.user?.id;
     const { otp } = req.body;
     const result = await service.verifySMSOTP(userId, otp);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -79,7 +79,7 @@ async function verifyEmailOTP(req, res) {
     const userId = req.user?.id;
     const { otp } = req.body;
     const result = await service.verifyEmailOTP(userId, otp);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -107,7 +107,7 @@ async function verifyBiometric(req, res) {
   try {
     const userId = req.user?.id;
     const result = await service.verifyBiometric(userId, req.body);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -161,7 +161,7 @@ async function verifyRecoveryCode(req, res) {
     const userId = req.user?.id;
     const { code } = req.body;
     const result = await service.verifyRecoveryCode(userId, code);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -214,31 +214,31 @@ module.exports = {
   // TOTP
   setupTOTP,
   verifyTOTP,
-  
+
   // SMS OTP
   sendSMSOTP,
   verifySMSOTP,
-  
+
   // Email OTP
   sendEmailOTP,
   verifyEmailOTP,
-  
+
   // Biometric
   registerBiometric,
   verifyBiometric,
-  
+
   // Device trust
   setDeviceTrust,
   checkDeviceTrust,
-  
+
   // Recovery codes
   generateRecoveryCodes,
   verifyRecoveryCode,
-  
+
   // Status and management
   getMFAStatus,
   disableMFA,
-  
+
   // AI-powered fraud detection
   detectMFAFraud,
 };

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { authAPI } from '../../services/api';
+import { mfaAPI } from '../../services/componentApi';
+import { useAuthStore } from '../../store/authStore';
 
 /**
  * MFA Setup Component
  * Allows users to set up multi-factor authentication
  */
 export default function MFASetup() {
+  const user = useAuthStore((state) => state.user);
   const [step, setStep] = useState(1);
   const [qrCode, setQrCode] = useState('');
   const [secret, setSecret] = useState('');
@@ -23,7 +25,7 @@ export default function MFASetup() {
   const setupMFA = async () => {
     try {
       setLoading(true);
-      const response = await authAPI.post('/mfa/setup');
+      const response = await mfaAPI.setup();
       setQrCode(response.data.data.qrCode);
       setSecret(response.data.data.otpauth_url);
       setBackupCodes(response.data.data.backupCodes);
@@ -38,7 +40,7 @@ export default function MFASetup() {
   const verifyMFA = async () => {
     try {
       setLoading(true);
-      await authAPI.post('/mfa/verify', { token: verificationCode });
+      await mfaAPI.verify(user?.id, verificationCode);
       setSuccess(true);
       setStep(4);
     } catch (err) {
@@ -73,7 +75,7 @@ export default function MFASetup() {
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Setup Multi-Factor Authentication</h2>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}

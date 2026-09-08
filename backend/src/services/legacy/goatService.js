@@ -38,38 +38,38 @@ async function listHerd({ page = 1, limit = 50, status = null, sex = null } = {}
   if (!pg) throw new Error('Database not initialized');
   try {
     const offset = (Number(page) - 1) * Number(limit);
-    
+
     let query = 'SELECT COUNT(*) FROM goat_herd';
-    let countParams = [];
-    let conditions = [];
-    
+    const countParams = [];
+    const conditions = [];
+
     if (status) {
-      conditions.push('status = $' + (countParams.length + 1));
+      conditions.push(`status = $${ countParams.length + 1}`);
       countParams.push(status);
     }
     if (sex) {
-      conditions.push('sex = $' + (countParams.length + 1));
+      conditions.push(`sex = $${ countParams.length + 1}`);
       countParams.push(sex);
     }
-    
+
     if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
+      query += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
+
     const totalRes = await pg.query(query, countParams);
     const total = parseInt(totalRes.rows[0].count || '0', 10);
-    
+
     query = 'SELECT * FROM goat_herd';
     const params = [limit, offset];
-    let paramIndex = 3;
-    
+    const paramIndex = 3;
+
     if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.map((c, i) => c.replace(/\$\d+/, '$' + (i + 3))).join(' AND ');
+      query += ` WHERE ${ conditions.map((c, i) => c.replace(/\$\d+/, `$${ i + 3}`)).join(' AND ')}`;
       if (status) params.push(status);
       if (sex) params.push(sex);
     }
     query += ' ORDER BY dob DESC LIMIT $1 OFFSET $2';
-    
+
     const res = await pg.query(query, params);
     return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
   } catch (error) {
@@ -90,7 +90,7 @@ async function createAnimal(payload) {
       `INSERT INTO goat_herd (tag_id, breed, dob, sex, status, weight_kg, house_id, notes)
        VALUES ($1, $2, $3, $4, COALESCE($5, 'active'), $6, $7, $8)
        RETURNING *`,
-      [tag_id, breed || null, dob || null, sex, status || null, weight_kg || null, house_id || null, notes || null]
+      [tag_id, breed || null, dob || null, sex, status || null, weight_kg || null, house_id || null, notes || null],
     );
     return res.rows[0];
   } catch (error) {
@@ -120,7 +120,7 @@ async function updateAnimal(id, payload) {
          updated_at = NOW()
        WHERE id = $12
        RETURNING *`,
-      [tag_id, breed, dob, sex, status, weight_kg, house_id, notes, last_vaccination_date, last_breeding_date, last_kidding_date, id]
+      [tag_id, breed, dob, sex, status, weight_kg, house_id, notes, last_vaccination_date, last_breeding_date, last_kidding_date, id],
     );
     return res.rows[0] || null;
   } catch (error) {
@@ -134,7 +134,7 @@ async function deleteAnimal(id) {
   if (!pg) throw new Error('Database not initialized');
   try {
     const res = await pg.query('DELETE FROM goat_herd WHERE id = $1 RETURNING id', [id]);
-    return !!res.rows[0];
+    return Boolean(res.rows[0]);
   } catch (error) {
     logger.error('Error deleting animal', { error: error.message });
     throw error;
@@ -153,8 +153,8 @@ async function listMilkProduction(animalId, { page = 1, limit = 100 } = {}) {
     const totalRes = await pg.query('SELECT COUNT(*) FROM goat_milk_production WHERE animal_id = $1', [animalId]);
     const total = parseInt(totalRes.rows[0].count || '0', 10);
     const res = await pg.query(
-      `SELECT * FROM goat_milk_production WHERE animal_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3`,
-      [animalId, limit, offset]
+      'SELECT * FROM goat_milk_production WHERE animal_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3',
+      [animalId, limit, offset],
     );
     return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
   } catch (error) {
@@ -177,7 +177,7 @@ async function recordMilkProduction(payload) {
        ON CONFLICT (animal_id, record_date, session)
          DO UPDATE SET quantity_liters = EXCLUDED.quantity_liters, fat_content_pct = EXCLUDED.fat_content_pct
        RETURNING *`,
-      [animal_id, record_date, session || null, quantity_liters, fat_content_pct || null, notes || null]
+      [animal_id, record_date, session || null, quantity_liters, fat_content_pct || null, notes || null],
     );
     return res.rows[0];
   } catch (error) {
@@ -198,8 +198,8 @@ async function listFeedConsumption(animalId, { page = 1, limit = 100 } = {}) {
     const totalRes = await pg.query('SELECT COUNT(*) FROM goat_feed_consumption WHERE animal_id = $1', [animalId]);
     const total = parseInt(totalRes.rows[0].count || '0', 10);
     const res = await pg.query(
-      `SELECT * FROM goat_feed_consumption WHERE animal_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3`,
-      [animalId, limit, offset]
+      'SELECT * FROM goat_feed_consumption WHERE animal_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3',
+      [animalId, limit, offset],
     );
     return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
   } catch (error) {
@@ -222,7 +222,7 @@ async function recordFeedConsumption(payload) {
        ON CONFLICT (animal_id, record_date, feed_type)
          DO UPDATE SET quantity_kg = EXCLUDED.quantity_kg, cost_per_kg = EXCLUDED.cost_per_kg
        RETURNING *`,
-      [animal_id, record_date, feed_type, quantity_kg, cost_per_kg || null, notes || null]
+      [animal_id, record_date, feed_type, quantity_kg, cost_per_kg || null, notes || null],
     );
     return res.rows[0];
   } catch (error) {
@@ -243,8 +243,8 @@ async function listBreedingRecords(femaleId, { page = 1, limit = 50 } = {}) {
     const totalRes = await pg.query('SELECT COUNT(*) FROM goat_breeding_records WHERE female_id = $1', [femaleId]);
     const total = parseInt(totalRes.rows[0].count || '0', 10);
     const res = await pg.query(
-      `SELECT * FROM goat_breeding_records WHERE female_id = $1 ORDER BY breeding_date DESC LIMIT $2 OFFSET $3`,
-      [femaleId, limit, offset]
+      'SELECT * FROM goat_breeding_records WHERE female_id = $1 ORDER BY breeding_date DESC LIMIT $2 OFFSET $3',
+      [femaleId, limit, offset],
     );
     return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
   } catch (error) {
@@ -265,7 +265,7 @@ async function recordBreeding(payload) {
       `INSERT INTO goat_breeding_records (female_id, male_id, breeding_date, expected_kidding_date, notes)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [female_id, male_id || null, breeding_date, expected_kidding_date || null, notes || null]
+      [female_id, male_id || null, breeding_date, expected_kidding_date || null, notes || null],
     );
     return res.rows[0];
   } catch (error) {
@@ -287,7 +287,7 @@ async function updateKiddingOutcome(id, payload) {
          notes = COALESCE($4, notes)
        WHERE id = $5
        RETURNING *`,
-      [actual_kidding_date, kids_count, kids_survived, notes, id]
+      [actual_kidding_date, kids_count, kids_survived, notes, id],
     );
     return res.rows[0] || null;
   } catch (error) {
@@ -308,8 +308,8 @@ async function listVaccinationRecords(animalId, { page = 1, limit = 50 } = {}) {
     const totalRes = await pg.query('SELECT COUNT(*) FROM goat_vaccination_records WHERE animal_id = $1', [animalId]);
     const total = parseInt(totalRes.rows[0].count || '0', 10);
     const res = await pg.query(
-      `SELECT * FROM goat_vaccination_records WHERE animal_id = $1 ORDER BY vaccination_date DESC LIMIT $2 OFFSET $3`,
-      [animalId, limit, offset]
+      'SELECT * FROM goat_vaccination_records WHERE animal_id = $1 ORDER BY vaccination_date DESC LIMIT $2 OFFSET $3',
+      [animalId, limit, offset],
     );
     return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
   } catch (error) {
@@ -330,7 +330,7 @@ async function recordVaccination(payload) {
       `INSERT INTO goat_vaccination_records (animal_id, vaccine_name, vaccination_date, next_due_date, administered_by, notes)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [animal_id, vaccine_name, vaccination_date, next_due_date || null, administered_by || null, notes || null]
+      [animal_id, vaccine_name, vaccination_date, next_due_date || null, administered_by || null, notes || null],
     );
     return res.rows[0];
   } catch (error) {
@@ -358,7 +358,7 @@ async function getHerdPerformance(animalId) {
          COUNT(*) as record_count
        FROM goat_milk_production
        WHERE animal_id = $1 AND record_date >= CURRENT_DATE - INTERVAL '7 days'`,
-      [animalId]
+      [animalId],
     );
     const milkData = milkRes.rows[0];
     const dailyMilkAvg = milkData.record_count > 0 ? Number(milkData.total_liters) / milkData.record_count : 0;
@@ -370,7 +370,7 @@ async function getHerdPerformance(animalId) {
          COALESCE(SUM(quantity_kg * COALESCE(cost_per_kg, 0)), 0) as total_cost
        FROM goat_feed_consumption
        WHERE animal_id = $1 AND record_date >= CURRENT_DATE - INTERVAL '7 days'`,
-      [animalId]
+      [animalId],
     );
     const feedData = feedRes.rows[0];
     const dailyFeedAvg = milkData.record_count > 0 ? Number(feedData.total_feed_kg) / milkData.record_count : 0;
@@ -379,7 +379,7 @@ async function getHerdPerformance(animalId) {
       `SELECT COUNT(*) as total_births, COALESCE(SUM(kids_survived), 0) as total_survived
        FROM goat_breeding_records
        WHERE female_id = $1 AND actual_kidding_date IS NOT NULL`,
-      [animalId]
+      [animalId],
     );
     const breedingData = breedingRes.rows[0];
     const survivalRate = breedingData.total_births > 0 ? (Number(breedingData.total_survived) / breedingData.total_births) * 100 : null;
@@ -429,7 +429,7 @@ async function getBreedingAlerts() {
       `SELECT h.id, h.tag_id, h.status, h.last_breeding_date, h.last_kidding_date
          FROM goat_herd h
         WHERE h.sex = 'female' AND h.status = 'active'
-        ORDER BY h.tag_id`
+        ORDER BY h.tag_id`,
     );
 
     const today = new Date();
@@ -486,7 +486,7 @@ async function getVaccinationAlerts() {
       `SELECT id, tag_id, sex, status, last_vaccination_date
          FROM goat_herd
         WHERE status = 'active'
-        ORDER BY tag_id`
+        ORDER BY tag_id`,
     );
 
     const today = new Date();
@@ -555,7 +555,7 @@ async function getVaccinationAlerts() {
 async function optimizeGoatMilkProduction(animalId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get historical milk production data
     const { rows } = await pg.query(
@@ -565,51 +565,51 @@ async function optimizeGoatMilkProduction(animalId) {
        WHERE mp.animal_id = $1
        ORDER BY mp.record_date DESC
        LIMIT 30`,
-      [animalId]
+      [animalId],
     );
-    
+
     if (rows.length < 7) {
       return {
         success: false,
         message: 'Insufficient data for AI analysis (minimum 7 records required)',
-        data: null
+        data: null,
       };
     }
-    
+
     // AI analysis calculations
     const recentProduction = rows.slice(0, 7);
     const avgRecentYield = recentProduction.reduce((sum, r) => sum + r.milk_liters, 0) / 7;
-    
+
     const olderProduction = rows.slice(7, 14);
     const avgOlderYield = olderProduction.reduce((sum, r) => sum + r.milk_liters, 0) / 7;
-    
+
     const yieldTrend = ((avgRecentYield - avgOlderYield) / avgOlderYield) * 100;
-    
+
     // AI recommendations based on trend analysis
     const recommendations = [];
-    
+
     if (yieldTrend < -5) {
       recommendations.push({
         type: 'yield_decline',
         severity: 'high',
         action: 'Review feed quality and nutrition',
-        reason: `Yield declined by ${yieldTrend.toFixed(1)}%`
+        reason: `Yield declined by ${yieldTrend.toFixed(1)}%`,
       });
       recommendations.push({
         type: 'health_check',
         severity: 'medium',
         action: 'Schedule veterinary health check',
-        reason: 'Declining yield may indicate health issues'
+        reason: 'Declining yield may indicate health issues',
       });
     } else if (yieldTrend > 5) {
       recommendations.push({
         type: 'yield_increase',
         severity: 'low',
         action: 'Continue current feeding regimen',
-        reason: `Yield increased by ${yieldTrend.toFixed(1)}%`
+        reason: `Yield increased by ${yieldTrend.toFixed(1)}%`,
       });
     }
-    
+
     // Fat content analysis (goat milk has higher fat than cow milk)
     const avgFatContent = recentProduction.reduce((sum, r) => sum + (r.fat_content || 4.5), 0) / 7;
     if (avgFatContent < 4.0) {
@@ -617,10 +617,10 @@ async function optimizeGoatMilkProduction(animalId) {
         type: 'nutrition',
         severity: 'medium',
         action: 'Increase dietary fat content',
-        reason: `Average fat content ${avgFatContent.toFixed(2)}% below optimal for goat milk`
+        reason: `Average fat content ${avgFatContent.toFixed(2)}% below optimal for goat milk`,
       });
     }
-    
+
     const optimization = {
       animalId,
       analysisDate: new Date().toISOString(),
@@ -630,21 +630,21 @@ async function optimizeGoatMilkProduction(animalId) {
       avgFatContent: avgFatContent.toFixed(2),
       recommendations,
       confidence: 'high',
-      dataSource: 'real_historical_records'
+      dataSource: 'real_historical_records',
     };
-    
+
     // Emit signal bus event for AI decision
     await signalBus.emit('ai.goat.milk.optimized', {
       animal_id: animalId,
       optimization,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('AI goat milk production optimization completed', { animalId, yieldTrend });
-    
+
     return {
       success: true,
-      data: optimization
+      data: optimization,
     };
   } catch (error) {
     logger.error('Error optimizing goat milk production with AI', { error: error.message, animalId });
@@ -659,7 +659,7 @@ async function optimizeGoatMilkProduction(animalId) {
 async function monitorGoatHealth(animalId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get animal data and production history
     const { rows } = await pg.query(
@@ -669,36 +669,36 @@ async function monitorGoatHealth(animalId) {
        WHERE g.id = $1
        ORDER BY mp.record_date DESC
        LIMIT 30`,
-      [animalId]
+      [animalId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Animal not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const animal = rows[0];
     const productionRecords = rows.filter(r => r.milk_liters !== null);
-    
+
     const riskFactors = [];
     let overallRisk = 'low';
-    
+
     // Analyze production patterns for health indicators
     if (productionRecords.length >= 7) {
       const recentYield = productionRecords.slice(0, 7).reduce((sum, r) => sum + r.milk_liters, 0) / 7;
       const olderYield = productionRecords.slice(7, 14).reduce((sum, r) => sum + r.milk_liters, 0) / 7;
-      
+
       const yieldDecline = ((olderYield - recentYield) / olderYield) * 100;
-      
+
       if (yieldDecline > 15) {
         riskFactors.push({
           factor: 'significant_yield_decline',
           severity: 'high',
           value: yieldDecline.toFixed(1),
-          description: `Yield declined by ${yieldDecline.toFixed(1)}%`
+          description: `Yield declined by ${yieldDecline.toFixed(1)}%`,
         });
         overallRisk = 'high';
       } else if (yieldDecline > 5) {
@@ -706,12 +706,12 @@ async function monitorGoatHealth(animalId) {
           factor: 'moderate_yield_decline',
           severity: 'medium',
           value: yieldDecline.toFixed(1),
-          description: `Yield declined by ${yieldDecline.toFixed(1)}%`
+          description: `Yield declined by ${yieldDecline.toFixed(1)}%`,
         });
         overallRisk = 'medium';
       }
     }
-    
+
     // Check age-related risks
     if (animal.dob) {
       const age = (new Date() - new Date(animal.dob)) / (365.25 * 24 * 60 * 60 * 1000);
@@ -720,12 +720,12 @@ async function monitorGoatHealth(animalId) {
           factor: 'advanced_age',
           severity: 'medium',
           value: age.toFixed(1),
-          description: `Goat is ${age.toFixed(1)} years old`
+          description: `Goat is ${age.toFixed(1)} years old`,
         });
         if (overallRisk === 'low') overallRisk = 'medium';
       }
     }
-    
+
     // Check vaccination status
     if (animal.last_vaccination_date) {
       const daysSinceVaccination = (new Date() - new Date(animal.last_vaccination_date)) / (24 * 60 * 60 * 1000);
@@ -734,7 +734,7 @@ async function monitorGoatHealth(animalId) {
           factor: 'vaccination_overdue',
           severity: 'medium',
           value: daysSinceVaccination.toFixed(0),
-          description: `Vaccination overdue by ${daysSinceVaccination.toFixed(0)} days`
+          description: `Vaccination overdue by ${daysSinceVaccination.toFixed(0)} days`,
         });
         if (overallRisk === 'low') overallRisk = 'medium';
       }
@@ -743,11 +743,11 @@ async function monitorGoatHealth(animalId) {
         factor: 'no_vaccination_record',
         severity: 'high',
         value: null,
-        description: 'No vaccination record found'
+        description: 'No vaccination record found',
       });
       overallRisk = 'high';
     }
-    
+
     const monitoring = {
       animalId,
       animalTag: animal.tag_id,
@@ -756,21 +756,21 @@ async function monitorGoatHealth(animalId) {
       riskFactors,
       recommendations: generateGoatHealthRecommendations(riskFactors),
       confidence: productionRecords.length >= 7 ? 'high' : 'medium',
-      dataSource: 'real_animal_and_production_records'
+      dataSource: 'real_animal_and_production_records',
     };
-    
+
     // Emit signal bus event for AI monitoring
     await signalBus.emit('ai.goat.health.monitored', {
       animal_id: animalId,
       monitoring,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('AI goat health monitoring completed', { animalId, overallRisk });
-    
+
     return {
       success: true,
-      data: monitoring
+      data: monitoring,
     };
   } catch (error) {
     logger.error('Error monitoring goat health with AI', { error: error.message, animalId });
@@ -785,24 +785,24 @@ async function monitorGoatHealth(animalId) {
 async function optimizeGoatFeed(animalId, productionGoal) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get animal data
     const { rows } = await pg.query(
-      `SELECT * FROM goat_herd WHERE id = $1`,
-      [animalId]
+      'SELECT * FROM goat_herd WHERE id = $1',
+      [animalId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Animal not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const animal = rows[0];
-    
+
     // AI feed optimization logic for goats
     const baseFeed = {
       dry_matter_kg: 2.5,
@@ -810,9 +810,9 @@ async function optimizeGoatFeed(animalId, productionGoal) {
       energy_mj_kg: 10,
       fiber_percentage: 25,
       calcium_percentage: 0.6,
-      phosphorus_percentage: 0.4
+      phosphorus_percentage: 0.4,
     };
-    
+
     // Adjust based on production goal
     if (productionGoal === 'maximize_milk') {
       baseFeed.protein_percentage = 16;
@@ -823,7 +823,7 @@ async function optimizeGoatFeed(animalId, productionGoal) {
       baseFeed.energy_mj_kg = 9;
       baseFeed.calcium_percentage = 0.5;
     }
-    
+
     // Adjust based on animal status
     if (animal.status === 'Lactating') {
       baseFeed.dry_matter_kg = 3.0;
@@ -832,14 +832,14 @@ async function optimizeGoatFeed(animalId, productionGoal) {
       baseFeed.protein_percentage += 2;
       baseFeed.calcium_percentage += 0.2;
     }
-    
+
     // Adjust based on breed (goat-specific)
     if (animal.breed && animal.breed.toLowerCase().includes('alpine')) {
       baseFeed.energy_mj_kg += 0.5;
     } else if (animal.breed && animal.breed.toLowerCase().includes('boer')) {
       baseFeed.protein_percentage += 1;
     }
-    
+
     const optimization = {
       animalId,
       animalTag: animal.tag_id,
@@ -852,24 +852,24 @@ async function optimizeGoatFeed(animalId, productionGoal) {
       recommendations: [
         'Monitor animal response for 2 weeks',
         'Adjust feed composition based on actual milk response',
-        'Consider browse availability in feeding regimen'
+        'Consider browse availability in feeding regimen',
       ],
       confidence: 'medium',
-      dataSource: 'ai_algorithm_based_on_goat_characteristics'
+      dataSource: 'ai_algorithm_based_on_goat_characteristics',
     };
-    
+
     // Emit signal bus event for AI optimization
     await signalBus.emit('ai.goat.feed.optimized', {
       animal_id: animalId,
       optimization,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('AI goat feed optimization completed', { animalId, productionGoal });
-    
+
     return {
       success: true,
-      data: optimization
+      data: optimization,
     };
   } catch (error) {
     logger.error('Error optimizing goat feed with AI', { error: error.message, animalId });
@@ -884,39 +884,39 @@ async function optimizeGoatFeed(animalId, productionGoal) {
 async function recommendGoatBreeding(animalId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get animal data
     const { rows } = await pg.query(
-      `SELECT * FROM goat_herd WHERE id = $1`,
-      [animalId]
+      'SELECT * FROM goat_herd WHERE id = $1',
+      [animalId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Animal not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const animal = rows[0];
-    
+
     const recommendations = [];
-    
+
     // Breeding timing recommendation (goats have shorter gestation than cattle)
     if (animal.status === 'Lactating') {
-      const daysSinceBreeding = animal.last_breeding_date 
-        ? (new Date() - new Date(animal.last_breeding_date)) / (24 * 60 * 60 * 1000)
-        : null;
-      
+      const daysSinceBreeding = animal.last_breeding_date ?
+        (new Date() - new Date(animal.last_breeding_date)) / (24 * 60 * 60 * 1000) :
+        null;
+
       if (daysSinceBreeding && daysSinceBreeding > 180) {
         recommendations.push({
           type: 'breeding_timing',
           priority: 'high',
           action: 'Animal ready for breeding',
           reasoning: `Last breeding was ${daysSinceBreeding.toFixed(0)} days ago`,
-          optimalWindow: 'Next 30 days'
+          optimalWindow: 'Next 30 days',
         });
       } else if (daysSinceBreeding && daysSinceBreeding > 120) {
         recommendations.push({
@@ -924,7 +924,7 @@ async function recommendGoatBreeding(animalId) {
           priority: 'medium',
           action: 'Consider breeding soon',
           reasoning: `Last breeding was ${daysSinceBreeding.toFixed(0)} days ago`,
-          optimalWindow: 'Next 60 days'
+          optimalWindow: 'Next 60 days',
         });
       }
     } else if (animal.status === 'Dry') {
@@ -933,10 +933,10 @@ async function recommendGoatBreeding(animalId) {
         priority: 'high',
         action: 'Optimal time for breeding',
         reasoning: 'Animal in dry period, ideal for breeding',
-        optimalWindow: 'Immediate'
+        optimalWindow: 'Immediate',
       });
     }
-    
+
     // Genetic quality considerations
     if (animal.breed) {
       recommendations.push({
@@ -944,10 +944,10 @@ async function recommendGoatBreeding(animalId) {
         priority: 'medium',
         action: `Select breeding partner from ${animal.breed} or compatible breed`,
         reasoning: 'Maintain breed characteristics and hybrid vigor',
-        compatibility: 'high'
+        compatibility: 'high',
       });
     }
-    
+
     // Age considerations
     if (animal.dob) {
       const age = (new Date() - new Date(animal.dob)) / (365.25 * 24 * 60 * 60 * 1000);
@@ -957,7 +957,7 @@ async function recommendGoatBreeding(animalId) {
           priority: 'low',
           action: 'Animal may be too young for breeding',
           reasoning: `Animal is ${age.toFixed(1)} years old`,
-          recommendedAge: '1.5-8 years'
+          recommendedAge: '1.5-8 years',
         });
       } else if (age > 8) {
         recommendations.push({
@@ -965,11 +965,11 @@ async function recommendGoatBreeding(animalId) {
           priority: 'medium',
           action: 'Consider replacement if breeding goal is long-term',
           reasoning: `Animal is ${age.toFixed(1)} years old`,
-          recommendedAge: '1.5-8 years'
+          recommendedAge: '1.5-8 years',
         });
       }
     }
-    
+
     const recommendation = {
       animalId,
       animalTag: animal.tag_id,
@@ -980,21 +980,21 @@ async function recommendGoatBreeding(animalId) {
       recommendations,
       overallBreedingReadiness: recommendations.length > 0 ? 'ready' : 'not_ready',
       confidence: 'medium',
-      dataSource: 'ai_algorithm_based_on_animal_status'
+      dataSource: 'ai_algorithm_based_on_animal_status',
     };
-    
+
     // Emit signal bus event for AI recommendation
     await signalBus.emit('ai.goat.breeding.recommended', {
       animal_id: animalId,
       recommendation,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     logger.info('AI goat breeding recommendation completed', { animalId, breedingReadiness: recommendation.overallBreedingReadiness });
-    
+
     return {
       success: true,
-      data: recommendation
+      data: recommendation,
     };
   } catch (error) {
     logger.error('Error recommending goat breeding with AI', { error: error.message, animalId });
@@ -1005,7 +1005,7 @@ async function recommendGoatBreeding(animalId) {
 // Helper function to generate goat health recommendations
 function generateGoatHealthRecommendations(riskFactors) {
   const recommendations = [];
-  
+
   riskFactors.forEach(factor => {
     if (factor.factor === 'significant_yield_decline' || factor.factor === 'moderate_yield_decline') {
       recommendations.push('Monitor goat health closely for next 7 days');
@@ -1022,7 +1022,7 @@ function generateGoatHealthRecommendations(riskFactors) {
       recommendations.push('Review retirement/replacement planning');
     }
   });
-  
+
   return recommendations;
 }
 
@@ -1052,7 +1052,8 @@ module.exports = {
 
 // Merged from backend/src/modules/M073
 {
-  const m073 = require("../../modules/M073/service");
+  const m073 = require('../../modules/M073/service');
   const { ...rest } = m073;
   Object.assign(module.exports, rest);
 }
+

@@ -1,6 +1,6 @@
 /**
  * AI Self-Healing Service - Autonomous Error Recovery Layer
- * 
+ *
  * This service provides self-healing capabilities including:
  * - Error detection and classification
  * - Automatic error recovery
@@ -18,7 +18,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../../utils/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
+    require('../../utils/logger').warn('aiClient:  is set but its SDK failed to load', { error: error.message });
     return null;
   }
 }
@@ -40,29 +40,29 @@ class AISelfHealingService {
       const { Anthropic } = require('@anthropic-ai/sdk');
       return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     });
-    
+
     // Error patterns database
     this.errorPatterns = new Map();
-    
+
     // Recovery strategies
     this.recoveryStrategies = new Map();
-    
+
     // System health metrics
     this.healthMetrics = new Map();
-    
+
     // Healing history
     this.healingHistory = [];
-    
+
     // Initialize error patterns
     this.initializeErrorPatterns();
-    
+
     // Initialize recovery strategies
     this.initializeRecoveryStrategies();
-    
+
     // Start health monitoring
     this.startHealthMonitoring();
   }
-  
+
   /**
    * Initialize error patterns
    */
@@ -71,49 +71,49 @@ class AISelfHealingService {
     this.addErrorPattern('database_connection', {
       patterns: ['ECONNREFUSED', 'connection timeout', 'database unavailable'],
       severity: 'critical',
-      category: 'infrastructure'
+      category: 'infrastructure',
     });
-    
+
     this.addErrorPattern('database_query', {
       patterns: ['syntax error', 'constraint violation', 'deadlock'],
       severity: 'high',
-      category: 'application'
+      category: 'application',
     });
-    
+
     // API errors
     this.addErrorPattern('api_timeout', {
       patterns: ['ETIMEDOUT', 'request timeout', 'gateway timeout'],
       severity: 'high',
-      category: 'infrastructure'
+      category: 'infrastructure',
     });
-    
+
     this.addErrorPattern('api_rate_limit', {
       patterns: ['429', 'rate limit exceeded', 'too many requests'],
       severity: 'medium',
-      category: 'application'
+      category: 'application',
     });
-    
+
     // Authentication errors
     this.addErrorPattern('auth_failure', {
       patterns: ['401', 'unauthorized', 'authentication failed'],
       severity: 'high',
-      category: 'security'
+      category: 'security',
     });
-    
+
     // Resource errors
     this.addErrorPattern('memory_exhaustion', {
       patterns: ['out of memory', 'heap out of memory', 'memory limit'],
       severity: 'critical',
-      category: 'infrastructure'
+      category: 'infrastructure',
     });
-    
+
     this.addErrorPattern('disk_space', {
       patterns: ['no space left', 'disk full', 'storage quota'],
       severity: 'critical',
-      category: 'infrastructure'
+      category: 'infrastructure',
     });
   }
-  
+
   /**
    * Initialize recovery strategies
    */
@@ -123,74 +123,74 @@ class AISelfHealingService {
       { action: 'retry', max_attempts: 3, delay: 1000 },
       { action: 'reconnect', max_attempts: 2, delay: 5000 },
       { action: 'failover', max_attempts: 1, delay: 0 },
-      { action: 'alert', max_attempts: 1, delay: 0 }
+      { action: 'alert', max_attempts: 1, delay: 0 },
     ]);
-    
+
     this.addRecoveryStrategy('database_query', [
       { action: 'retry', max_attempts: 2, delay: 500 },
       { action: 'optimize_query', max_attempts: 1, delay: 0 },
       { action: 'fallback', max_attempts: 1, delay: 0 },
-      { action: 'alert', max_attempts: 1, delay: 0 }
+      { action: 'alert', max_attempts: 1, delay: 0 },
     ]);
-    
+
     // API recovery
     this.addRecoveryStrategy('api_timeout', [
       { action: 'retry', max_attempts: 3, delay: 2000 },
       { action: 'circuit_breaker', max_attempts: 1, delay: 0 },
       { action: 'fallback', max_attempts: 1, delay: 0 },
-      { action: 'alert', max_attempts: 1, delay: 0 }
+      { action: 'alert', max_attempts: 1, delay: 0 },
     ]);
-    
+
     this.addRecoveryStrategy('api_rate_limit', [
       { action: 'exponential_backoff', max_attempts: 5, delay: 1000 },
       { action: 'cache_response', max_attempts: 1, delay: 0 },
-      { action: 'queue_request', max_attempts: 1, delay: 0 }
+      { action: 'queue_request', max_attempts: 1, delay: 0 },
     ]);
-    
+
     // Authentication recovery
     this.addRecoveryStrategy('auth_failure', [
       { action: 'refresh_token', max_attempts: 2, delay: 0 },
       { action: 'reauthenticate', max_attempts: 1, delay: 0 },
-      { action: 'alert', max_attempts: 1, delay: 0 }
+      { action: 'alert', max_attempts: 1, delay: 0 },
     ]);
-    
+
     // Resource recovery
     this.addRecoveryStrategy('memory_exhaustion', [
       { action: 'clear_cache', max_attempts: 1, delay: 0 },
       { action: 'restart_service', max_attempts: 1, delay: 0 },
       { action: 'scale_up', max_attempts: 1, delay: 0 },
-      { action: 'alert', max_attempts: 1, delay: 0 }
+      { action: 'alert', max_attempts: 1, delay: 0 },
     ]);
-    
+
     this.addRecoveryStrategy('disk_space', [
       { action: 'cleanup_logs', max_attempts: 1, delay: 0 },
       { action: 'cleanup_cache', max_attempts: 1, delay: 0 },
       { action: 'archive_data', max_attempts: 1, delay: 0 },
-      { action: 'alert', max_attempts: 1, delay: 0 }
+      { action: 'alert', max_attempts: 1, delay: 0 },
     ]);
   }
-  
+
   /**
    * Add error pattern
    */
   addErrorPattern(name, pattern) {
     this.errorPatterns.set(name, pattern);
   }
-  
+
   /**
    * Add recovery strategy
    */
   addRecoveryStrategy(errorType, strategies) {
     this.recoveryStrategies.set(errorType, strategies);
   }
-  
+
   /**
    * Detect and classify error
    */
   async detectAndClassifyError(error) {
     try {
       const errorMessage = error.message || error.toString();
-      
+
       // Check against known patterns
       for (const [patternName, pattern] of this.errorPatterns.entries()) {
         for (const patternStr of pattern.patterns) {
@@ -201,29 +201,29 @@ class AISelfHealingService {
                 type: patternName,
                 severity: pattern.severity,
                 category: pattern.category,
-                matched_pattern: patternStr
-              }
+                matched_pattern: patternStr,
+              },
             };
           }
         }
       }
-      
+
       // Use AI for unknown errors
       const aiClassification = await this.classifyErrorWithAI(errorMessage);
-      
+
       return {
         success: true,
-        classification: aiClassification
+        classification: aiClassification,
       };
     } catch (error) {
       console.error('Error detecting and classifying error:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Classify error with AI
    */
@@ -240,14 +240,14 @@ class AISelfHealingService {
         - category: error category (infrastructure, application, security)
         - suggested_recovery: suggested recovery action
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       return JSON.parse(response.choices[0].message.content);
     } catch (error) {
       console.error('Error classifying with AI:', error);
@@ -255,11 +255,11 @@ class AISelfHealingService {
         type: 'unknown',
         severity: 'high',
         category: 'application',
-        suggested_recovery: 'manual_intervention'
+        suggested_recovery: 'manual_intervention',
       };
     }
   }
-  
+
   /**
    * Perform root cause analysis
    */
@@ -279,49 +279,49 @@ class AISelfHealingService {
         - prevention_strategies: strategies to prevent recurrence
         - confidence: confidence level in analysis (0-1)
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const analysis = JSON.parse(response.choices[0].message.content);
-      
+
       return {
         success: true,
-        analysis: analysis
+        analysis,
       };
     } catch (error) {
       console.error('Error in root cause analysis:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Execute recovery strategy
    */
   async executeRecoveryStrategy(errorType, context = {}) {
     try {
       const strategies = this.recoveryStrategies.get(errorType);
-      
+
       if (!strategies) {
         return {
           success: false,
-          error: `No recovery strategy found for error type: ${errorType}`
+          error: `No recovery strategy found for error type: ${errorType}`,
         };
       }
-      
+
       const results = [];
-      
+
       for (const strategy of strategies) {
         const result = await this.executeRecoveryAction(strategy, context);
         results.push(result);
-        
+
         if (result.success) {
           // Recovery successful
           this.recordHealingEvent(errorType, strategy.action, result);
@@ -329,33 +329,33 @@ class AISelfHealingService {
             success: true,
             recovery: {
               action: strategy.action,
-              result: result,
-              strategies_tried: results
-            }
+              result,
+              strategies_tried: results,
+            },
           };
         }
-        
+
         // Wait before next attempt
         if (strategy.delay > 0) {
           await this.sleep(strategy.delay);
         }
       }
-      
+
       // All strategies failed
       return {
         success: false,
         error: 'All recovery strategies failed',
-        strategies_tried: results
+        strategies_tried: results,
       };
     } catch (error) {
       console.error('Error executing recovery strategy:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Execute recovery action
    */
@@ -401,18 +401,18 @@ class AISelfHealingService {
         default:
           return {
             success: false,
-            error: `Unknown recovery action: ${strategy.action}`
+            error: `Unknown recovery action: ${strategy.action}`,
           };
       }
     } catch (error) {
       console.error(`Error executing recovery action ${strategy.action}:`, error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Retry operation
    */
@@ -420,7 +420,7 @@ class AISelfHealingService {
     // Implementation for retrying operation
     return { success: true, message: 'Operation retried successfully' };
   }
-  
+
   /**
    * Reconnect service
    */
@@ -428,7 +428,7 @@ class AISelfHealingService {
     // Implementation for reconnecting to service
     return { success: true, message: 'Service reconnected successfully' };
   }
-  
+
   /**
    * Failover service
    */
@@ -436,7 +436,7 @@ class AISelfHealingService {
     // Implementation for failing over to backup service
     return { success: true, message: 'Failover completed successfully' };
   }
-  
+
   /**
    * Refresh auth token
    */
@@ -444,7 +444,7 @@ class AISelfHealingService {
     // Implementation for refreshing authentication token
     return { success: true, message: 'Auth token refreshed successfully' };
   }
-  
+
   /**
    * Reauthenticate
    */
@@ -452,7 +452,7 @@ class AISelfHealingService {
     // Implementation for reauthentication
     return { success: true, message: 'Reauthentication successful' };
   }
-  
+
   /**
    * Clear cache
    */
@@ -460,7 +460,7 @@ class AISelfHealingService {
     // Implementation for clearing cache
     return { success: true, message: 'Cache cleared successfully' };
   }
-  
+
   /**
    * Restart service
    */
@@ -468,7 +468,7 @@ class AISelfHealingService {
     // Implementation for restarting service
     return { success: true, message: 'Service restarted successfully' };
   }
-  
+
   /**
    * Scale up
    */
@@ -476,7 +476,7 @@ class AISelfHealingService {
     // Implementation for scaling up resources
     return { success: true, message: 'Scaled up successfully' };
   }
-  
+
   /**
    * Cleanup logs
    */
@@ -484,7 +484,7 @@ class AISelfHealingService {
     // Implementation for cleaning up logs
     return { success: true, message: 'Logs cleaned up successfully' };
   }
-  
+
   /**
    * Cleanup cache
    */
@@ -492,7 +492,7 @@ class AISelfHealingService {
     // Implementation for cleaning up cache
     return { success: true, message: 'Cache cleaned up successfully' };
   }
-  
+
   /**
    * Archive data
    */
@@ -500,7 +500,7 @@ class AISelfHealingService {
     // Implementation for archiving data
     return { success: true, message: 'Data archived successfully' };
   }
-  
+
   /**
    * Optimize query
    */
@@ -508,7 +508,7 @@ class AISelfHealingService {
     // Implementation for optimizing query
     return { success: true, message: 'Query optimized successfully' };
   }
-  
+
   /**
    * Use fallback
    */
@@ -516,7 +516,7 @@ class AISelfHealingService {
     // Implementation for using fallback
     return { success: true, message: 'Fallback used successfully' };
   }
-  
+
   /**
    * Activate circuit breaker
    */
@@ -524,7 +524,7 @@ class AISelfHealingService {
     // Implementation for activating circuit breaker
     return { success: true, message: 'Circuit breaker activated' };
   }
-  
+
   /**
    * Use cached response
    */
@@ -532,7 +532,7 @@ class AISelfHealingService {
     // Implementation for using cached response
     return { success: true, message: 'Cached response used' };
   }
-  
+
   /**
    * Queue request
    */
@@ -540,7 +540,7 @@ class AISelfHealingService {
     // Implementation for queuing request
     return { success: true, message: 'Request queued successfully' };
   }
-  
+
   /**
    * Exponential backoff
    */
@@ -548,7 +548,7 @@ class AISelfHealingService {
     // Implementation for exponential backoff
     return { success: true, message: 'Exponential backoff applied' };
   }
-  
+
   /**
    * Send alert
    */
@@ -556,7 +556,7 @@ class AISelfHealingService {
     // Implementation for sending alert
     return { success: true, message: 'Alert sent successfully' };
   }
-  
+
   /**
    * Record healing event
    */
@@ -564,16 +564,16 @@ class AISelfHealingService {
     this.healingHistory.push({
       timestamp: new Date(),
       error_type: errorType,
-      action: action,
-      result: result
+      action,
+      result,
     });
-    
+
     // Keep only last 1000 events
     if (this.healingHistory.length > 1000) {
       this.healingHistory = this.healingHistory.slice(-1000);
     }
   }
-  
+
   /**
    * Get system state
    */
@@ -582,20 +582,29 @@ class AISelfHealingService {
       memory_usage: process.memoryUsage(),
       uptime: process.uptime(),
       healing_history_size: this.healingHistory.length,
-      health_metrics: Array.from(this.healthMetrics.entries())
+      health_metrics: Array.from(this.healthMetrics.entries()),
     };
   }
-  
+
   /**
    * Start health monitoring
    */
   startHealthMonitoring() {
+    if (this._healthInterval) return;
+
     // Monitor system health every 30 seconds
-    setInterval(() => {
+    this._healthInterval = setInterval(() => {
       this.updateHealthMetrics();
     }, 30000);
   }
-  
+
+  stopHealthMonitoring() {
+    if (this._healthInterval) {
+      clearInterval(this._healthInterval);
+      this._healthInterval = null;
+    }
+  }
+
   /**
    * Update health metrics
    */
@@ -604,12 +613,12 @@ class AISelfHealingService {
       memory_usage: process.memoryUsage(),
       cpu_usage: process.cpuUsage(),
       uptime: process.uptime(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
-    
+
     this.healthMetrics.set('current', metrics);
   }
-  
+
   /**
    * Predictive failure prevention
    */
@@ -617,7 +626,7 @@ class AISelfHealingService {
     try {
       const systemState = this.getSystemState();
       const healingHistory = this.healingHistory.slice(-100);
-      
+
       const prompt = `
         Analyze the following system state and healing history to predict potential failures:
         
@@ -630,46 +639,46 @@ class AISelfHealingService {
         - risk_level: overall risk level (low, medium, high, critical)
         - confidence: confidence in prediction (0-1)
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const prediction = JSON.parse(response.choices[0].message.content);
-      
+
       return {
         success: true,
-        prediction: prediction
+        prediction,
       };
     } catch (error) {
       console.error('Error in predictive failure prevention:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Get healing history
    */
   getHealingHistory(limit = 100) {
     return this.healingHistory.slice(-limit);
   }
-  
+
   /**
    * Get health metrics
    */
   getHealthMetrics() {
     return {
       current: this.healthMetrics.get('current'),
-      history: Array.from(this.healthMetrics.entries())
+      history: Array.from(this.healthMetrics.entries()),
     };
   }
-  
+
   /**
    * Sleep utility
    */
@@ -678,75 +687,8 @@ class AISelfHealingService {
   }
 }
 
-// Export singleton instance with router for proper mounting
+// Export singleton instance
 const aiSelfHealingService = new AISelfHealingService();
 
-// Create Express router for AI Self-Healing endpoints
-const express = require('express');
-const router = express.Router();
-const { authMiddleware } = require('../../middleware/auth');
+module.exports = aiSelfHealingService;
 
-// AI Self-Healing health check
-router.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    service: 'ai-self-healing',
-    models_available: {
-      openai: !!aiSelfHealingService.openai,
-      gemini: !!aiSelfHealingService.gemini,
-      anthropic: !!aiSelfHealingService.anthropic
-    },
-    error_patterns_count: aiSelfHealingService.errorPatterns.size,
-    recovery_strategies_count: aiSelfHealingService.recoveryStrategies.size,
-    system_health_count: aiSelfHealingService.systemHealthMetrics.size
-  });
-});
-
-// Error detection endpoint
-router.post('/detect-error', authMiddleware, async (req, res) => {
-  try {
-    const { error, context } = req.body;
-    const result = await aiSelfHealingService.detectError(error, context);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Error recovery endpoint
-router.post('/recover-error', authMiddleware, async (req, res) => {
-  try {
-    const { error_id, recovery_strategy } = req.body;
-    const result = await aiSelfHealingService.recoverError(error_id, recovery_strategy);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Root cause analysis endpoint
-router.post('/analyze-root-cause', authMiddleware, async (req, res) => {
-  try {
-    const { error_id, context } = req.body;
-    const result = await aiSelfHealingService.analyzeRootCause(error_id, context);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// System health monitoring endpoint
-router.get('/system-health', authMiddleware, (req, res) => {
-  try {
-    const health = aiSelfHealingService.getSystemHealth();
-    res.json(health);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-module.exports = {
-  router,
-  aiSelfHealingService,
-  ...aiSelfHealingService
-};

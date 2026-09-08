@@ -28,7 +28,7 @@ async function registerAsset(assetData) {
       location,
       state,
       district,
-      status
+      status,
     } = assetData;
 
     const asset = {
@@ -49,7 +49,7 @@ async function registerAsset(assetData) {
       state,
       district,
       status: status || 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered lifecycle optimization
@@ -60,8 +60,8 @@ async function registerAsset(assetData) {
         depreciation_schedule: await calculateDepreciationSchedule(purchase_cost, estimated_useful_life, residual_value),
         replacement_timeline: await calculateReplacementTimeline(year, estimated_useful_life),
         maintenance_requirements: await getMaintenanceRequirements(asset_type),
-        disposal_options: await getDisposalOptions(asset_type, year)
-      }
+        disposal_options: await getDisposalOptions(asset_type, year),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -93,8 +93,8 @@ async function registerAsset(assetData) {
         asset.district,
         asset.status,
         JSON.stringify(asset.ai_recommendations),
-        asset.created_at
-      ]
+        asset.created_at,
+      ],
     );
 
     logger.info(`Asset registered: ${asset.asset_registry_id}`);
@@ -115,7 +115,7 @@ async function updateLifecycleStage(registryId, stageData) {
       condition,
       utilization_hours,
       maintenance_cost,
-      notes
+      notes,
     } = stageData;
 
     const stage = {
@@ -126,7 +126,7 @@ async function updateLifecycleStage(registryId, stageData) {
       utilization_hours,
       maintenance_cost,
       notes,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     // AI-powered stage analysis
@@ -137,8 +137,8 @@ async function updateLifecycleStage(registryId, stageData) {
         current_depreciation: await calculateCurrentDepreciation(registryId),
         remaining_useful_life: await getRemainingUsefulLife(registryId),
         optimal_replacement_time: await getOptimalReplacementTime(registryId),
-      resale_value: await estimateResaleValue(registryId, condition)
-      }
+        resale_value: await estimateResaleValue(registryId, condition),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -148,7 +148,7 @@ async function updateLifecycleStage(registryId, stageData) {
       `UPDATE asset_lifecycle 
        SET lifecycle_stage = $1, condition = $2, updated_at = CURRENT_TIMESTAMP
        WHERE asset_registry_id = $3`,
-      [lifecycle_stage, condition, registryId]
+      [lifecycle_stage, condition, registryId],
     );
 
     const result = await pool.query(
@@ -166,8 +166,8 @@ async function updateLifecycleStage(registryId, stageData) {
         stage.maintenance_cost,
         stage.notes,
         JSON.stringify(stage.ai_analysis),
-        stage.updated_at
-      ]
+        stage.updated_at,
+      ],
     );
 
     logger.info(`Asset lifecycle stage updated: ${registryId}`);
@@ -192,7 +192,7 @@ async function trackAssetDepreciation(registryId, period) {
       accumulated_depreciation: await getAccumulatedDepreciation(registryId),
       depreciation_rate: await getDepreciationRate(registryId),
       book_value: await getBookValue(registryId),
-      recommendations: await generateDepreciationRecommendations(registryId, period)
+      recommendations: await generateDepreciationRecommendations(registryId, period),
     };
 
     return depreciation;
@@ -217,7 +217,7 @@ async function generateLifecycleReport(farmerId, reportType) {
       total_depreciation: await getTotalDepreciation(farmerId),
       asset_distribution: await getAssetDistribution(farmerId),
       replacement_schedule: await getReplacementSchedule(farmerId),
-      recommendations: await generateLifecycleRecommendations(farmerId)
+      recommendations: await generateLifecycleRecommendations(farmerId),
     };
 
     return report;
@@ -239,7 +239,7 @@ async function calculateDepreciationSchedule(purchaseCost, usefulLife, residualV
       year: i + 1,
       depreciation: annualDepreciation,
       accumulated: annualDepreciation * (i + 1),
-      book_value: purchaseCost - (annualDepreciation * (i + 1))
+      book_value: purchaseCost - (annualDepreciation * (i + 1)),
     });
   }
   return schedule;
@@ -253,7 +253,7 @@ async function calculateReplacementTimeline(year, usefulLife) {
     current_age: assetAge,
     remaining_life: remainingLife,
     replacement_year: currentYear + remainingLife,
-    urgency: remainingLife < 2 ? 'high' : remainingLife < 5 ? 'medium' : 'low'
+    urgency: remainingLife < 2 ? 'high' : remainingLife < 5 ? 'medium' : 'low',
   };
 }
 
@@ -261,7 +261,7 @@ async function getMaintenanceRequirements(assetType) {
   return [
     { maintenance: 'routine_inspection', frequency: 'monthly' },
     { maintenance: 'preventive_maintenance', frequency: 'quarterly' },
-    { maintenance: 'major_overhaul', frequency: 'annually' }
+    { maintenance: 'major_overhaul', frequency: 'annually' },
   ];
 }
 
@@ -269,7 +269,7 @@ async function getDisposalOptions(assetType, year) {
   return [
     { option: 'sell', feasibility: 'high', expected_value: 0.3 },
     { option: 'trade_in', feasibility: 'medium', expected_value: 0.25 },
-    { option: 'scrap', feasibility: 'high', expected_value: 0.1 }
+    { option: 'scrap', feasibility: 'high', expected_value: 0.1 },
   ];
 }
 
@@ -277,11 +277,11 @@ async function calculateCurrentDepreciation(registryId) {
   try {
     const result = await pool.query(
       'SELECT purchase_date, purchase_cost, estimated_useful_life, residual_value FROM asset_lifecycle WHERE asset_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     const asset = result.rows[0];
     if (!asset) return 0;
-    
+
     const age = new Date().getFullYear() - new Date(asset.purchase_date).getFullYear();
     const annualDepreciation = (asset.purchase_cost - asset.residual_value) / asset.estimated_useful_life;
     return annualDepreciation * age;
@@ -294,11 +294,11 @@ async function getRemainingUsefulLife(registryId) {
   try {
     const result = await pool.query(
       'SELECT purchase_date, estimated_useful_life FROM asset_lifecycle WHERE asset_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     const asset = result.rows[0];
     if (!asset) return 0;
-    
+
     const age = new Date().getFullYear() - new Date(asset.purchase_date).getFullYear();
     return Math.max(0, asset.estimated_useful_life - age);
   } catch (error) {
@@ -310,7 +310,7 @@ async function getOptimalReplacementTime(registryId) {
   const remainingLife = await getRemainingUsefulLife(registryId);
   return {
     optimal_year: new Date().getFullYear() + remainingLife,
-    reason: remainingLife < 2 ? 'end_of_life' : 'planned_replacement'
+    reason: remainingLife < 2 ? 'end_of_life' : 'planned_replacement',
   };
 }
 
@@ -318,11 +318,11 @@ async function estimateResaleValue(registryId, condition) {
   try {
     const result = await pool.query(
       'SELECT purchase_cost, residual_value FROM asset_lifecycle WHERE asset_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     const asset = result.rows[0];
     if (!asset) return 0;
-    
+
     const conditionMultiplier = condition === 'excellent' ? 0.4 : condition === 'good' ? 0.3 : 0.2;
     return asset.purchase_cost * conditionMultiplier;
   } catch (error) {
@@ -334,7 +334,7 @@ async function getCurrentValue(registryId) {
   try {
     const result = await pool.query(
       'SELECT purchase_cost FROM asset_lifecycle WHERE asset_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     const purchaseCost = result.rows[0]?.purchase_cost || 0;
     const accumulatedDepreciation = await getAccumulatedDepreciation(registryId);
@@ -352,11 +352,11 @@ async function getDepreciationRate(registryId) {
   try {
     const result = await pool.query(
       'SELECT purchase_cost, estimated_useful_life, residual_value FROM asset_lifecycle WHERE asset_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     const asset = result.rows[0];
     if (!asset) return 0;
-    
+
     return ((asset.purchase_cost - asset.residual_value) / asset.purchase_cost) / asset.estimated_useful_life;
   } catch (error) {
     return 0;
@@ -371,7 +371,7 @@ async function generateDepreciationRecommendations(registryId, period) {
   return [
     'Consider accelerated depreciation for tax benefits',
     'Monitor asset condition regularly',
-    'Plan replacement before end of useful life'
+    'Plan replacement before end of useful life',
   ];
 }
 
@@ -379,7 +379,7 @@ async function getTotalAssets(farmerId) {
   try {
     const result = await pool.query(
       'SELECT COUNT(*) as count FROM asset_lifecycle WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -391,7 +391,7 @@ async function getTotalBookValue(farmerId) {
   try {
     const result = await pool.query(
       'SELECT SUM(purchase_cost - COALESCE(accumulated_depreciation, 0)) as total FROM asset_lifecycle WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.total || 0;
   } catch (error) {
@@ -403,7 +403,7 @@ async function getTotalDepreciation(farmerId) {
   try {
     const result = await pool.query(
       'SELECT SUM(accumulated_depreciation) as total FROM asset_lifecycle WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.total || 0;
   } catch (error) {
@@ -415,7 +415,7 @@ async function getAssetDistribution(farmerId) {
   try {
     const result = await pool.query(
       'SELECT asset_type, COUNT(*) as count FROM asset_lifecycle WHERE farmer_id = $1 GROUP BY asset_type',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -426,7 +426,7 @@ async function getAssetDistribution(farmerId) {
 async function getReplacementSchedule(farmerId) {
   return [
     { asset: 'Tractor A', year: 2028, urgency: 'medium' },
-    { asset: 'Implement B', year: 2027, urgency: 'high' }
+    { asset: 'Implement B', year: 2027, urgency: 'high' },
   ];
 }
 
@@ -434,7 +434,7 @@ async function generateLifecycleRecommendations(farmerId) {
   return [
     'Review asset utilization regularly',
     'Plan replacement budget in advance',
-    'Consider leasing for short-term needs'
+    'Consider leasing for short-term needs',
   ];
 }
 
@@ -455,7 +455,7 @@ async function listAssets({ page = 1, limit = 20, farmer_id = null, status = nul
   const listParams = [...params, limit, offset];
   const res = await pool.query(
     `SELECT * FROM asset_lifecycle ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams
+    listParams,
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
 }
@@ -471,6 +471,6 @@ module.exports = {
   registerAsset,
   updateLifecycleStage,
   trackAssetDepreciation,
-  generateLifecycleReport
+  generateLifecycleReport,
 };
 

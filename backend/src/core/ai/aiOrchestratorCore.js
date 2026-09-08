@@ -2,7 +2,7 @@
  * AI Orchestrator Core
  * Component ID: EBD-CMP-00000001
  * Purpose: Central AI task routing and classification
- * 
+ *
  * This is the main orchestrator that coordinates all AI components:
  * - Provider adapters for vendor-agnostic access
  * - Engine registry for capability management
@@ -100,7 +100,7 @@ class AIOrchestrator {
       costBudgetHourly: config.costBudgetHourly || 10.0,
       enableAuditLogging: config.enableAuditLogging !== false,
     };
-    
+
     this.initialized = false;
   }
 
@@ -111,7 +111,7 @@ class AIOrchestrator {
     try {
       // Create audit table if it doesn't exist
       await this.createAuditTable();
-      
+
       this.initialized = true;
       logger.info('AI Orchestrator initialized successfully');
     } catch (error) {
@@ -153,7 +153,7 @@ class AIOrchestrator {
         trace_id VARCHAR(100)
       );
     `;
-    
+
     await pool.query(createTableQuery);
   }
 
@@ -163,7 +163,7 @@ class AIOrchestrator {
   async route(taskType, payload, options = {}) {
     const traceId = generateTraceId();
     const startTime = Date.now();
-    
+
     try {
       // Find best engine for the task
       const engine = findBestEngine(taskType, {
@@ -171,44 +171,44 @@ class AIOrchestrator {
         maxCost: options.maxCost,
         minConfidence: this.config.confidenceThreshold,
       });
-      
+
       if (!engine) {
         throw new Error(`No suitable engine found for task type: ${taskType}`);
       }
-      
+
       // Validate input
       const inputValidation = validateInput(payload.input, options.inputContext);
       if (!inputValidation.valid) {
         throw new Error(`Input validation failed: ${inputValidation.violations[0].message}`);
       }
-      
+
       // Check authorization
       const authCheck = checkAuthorization(options.user, taskType, options.resource);
       if (!authCheck.authorized) {
         throw new Error(`Authorization failed: ${authCheck.reason}`);
       }
-      
+
       // Check rate limit
       const rateLimit = checkRateLimit(options.userId, taskType);
       if (!rateLimit.withinLimit) {
         throw new Error(`Rate limit exceeded: ${rateLimit.remaining} requests remaining`);
       }
-      
+
       // Estimate cost
       const estimatedCost = estimateCost(engine.provider, options.estimatedTokens || 1000);
-      
+
       // Check budget
       const costState = getCostState();
       if (costState.hourlySpend + estimatedCost > this.config.costBudgetHourly) {
         throw new Error('Budget limit would be exceeded');
       }
-      
+
       // Execute the task (this would dispatch to the actual engine)
       const result = await this.executeEngine(engine, inputValidation.sanitized, options);
-      
+
       // Validate output
       const outputValidation = validateOutput(result.output, options.outputContext);
-      
+
       // Calculate confidence
       const confidence = evaluateConfidence({
         modelScore: engine.confidence_threshold,
@@ -218,17 +218,17 @@ class AIOrchestrator {
         consistencyScore: 0.9, // Would be calculated from consistency checks
         historicalAccuracy: 0.85, // Would be loaded from historical data
       });
-      
+
       // Get recommended action
       const recommendedAction = getRecommendedAction(confidence);
-      
+
       // Record actual cost
       const actualCost = recordCost(engine.provider, options.actualTokens || 1000, {
         traceId,
         engineId: engine.id,
         taskType,
       });
-      
+
       // Log decision
       if (this.config.enableAuditLogging) {
         await logAIDecision({
@@ -256,13 +256,13 @@ class AIOrchestrator {
           traceId,
         });
       }
-      
+
       return {
         success: true,
         result: result.output,
         engine: engine.name,
         provider: engine.provider,
-        confidence: confidence,
+        confidence,
         recommendedAction,
         cost: actualCost,
         traceId,
@@ -271,7 +271,7 @@ class AIOrchestrator {
       };
     } catch (error) {
       logger.error(`AI task routing failed: ${error.message}`);
-      
+
       // Log error decision
       if (this.config.enableAuditLogging) {
         await logAIDecision({
@@ -288,7 +288,7 @@ class AIOrchestrator {
           traceId,
         });
       }
-      
+
       throw error;
     }
   }
@@ -325,8 +325,8 @@ class AIOrchestrator {
           ok: false,
           status: 'not_configured',
           engine: engine.name,
-          reason: `"${engine.name}" (${engine.id}) has no real implementation wired anywhere `
-            + 'in the codebase yet. Reported honestly rather than fabricating a result.',
+          reason: `"${engine.name}" (${engine.id}) has no real implementation wired anywhere ` +
+            'in the codebase yet. Reported honestly rather than fabricating a result.',
         },
       };
     }

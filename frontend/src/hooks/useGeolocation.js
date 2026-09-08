@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * useGeolocation — browser location with rural-connectivity defaults.
@@ -22,80 +22,80 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 
 const DEFAULTS = {
   enableHighAccuracy: false, // low accuracy is far cheaper on battery and locks faster
-  timeout: 20000,            // rural GPS fixes are slow; do not give up at 5s
-  maximumAge: 120000         // a two-minute-old fix is fine for proximity search
-}
+  timeout: 20000, // rural GPS fixes are slow; do not give up at 5s
+  maximumAge: 120000, // a two-minute-old fix is fine for proximity search
+};
 
 export function useGeolocation(options = {}) {
-  const [position, setPosition] = useState({ latitude: null, longitude: null, accuracy: null })
-  const [status, setStatus] = useState('idle') // idle | prompting | granted | denied | unavailable | error
-  const [error, setError] = useState(null)
-  const watchId = useRef(null)
+  const [position, setPosition] = useState({ latitude: null, longitude: null, accuracy: null });
+  const [status, setStatus] = useState('idle'); // idle | prompting | granted | denied | unavailable | error
+  const [error, setError] = useState(null);
+  const watchId = useRef(null);
 
-  const supported = typeof navigator !== 'undefined' && 'geolocation' in navigator
+  const supported = typeof navigator !== 'undefined' && 'geolocation' in navigator;
 
   const handleError = useCallback((err) => {
     // Map the spec's numeric codes to something the UI can act on.
     if (err?.code === 1) {
-      setStatus('denied')
-      setError('Location permission was denied. You can enable it in your browser settings.')
+      setStatus('denied');
+      setError('Location permission was denied. You can enable it in your browser settings.');
     } else if (err?.code === 2) {
-      setStatus('unavailable')
-      setError('Location is unavailable right now. Try again with a clearer view of the sky.')
+      setStatus('unavailable');
+      setError('Location is unavailable right now. Try again with a clearer view of the sky.');
     } else if (err?.code === 3) {
-      setStatus('error')
-      setError('Getting your location timed out. Check your signal and try again.')
+      setStatus('error');
+      setError('Getting your location timed out. Check your signal and try again.');
     } else {
-      setStatus('error')
-      setError('Could not determine your location.')
+      setStatus('error');
+      setError('Could not determine your location.');
     }
-  }, [])
+  }, []);
 
   const applyPosition = useCallback((pos) => {
     setPosition({
       latitude: pos.coords.latitude,
       longitude: pos.coords.longitude,
-      accuracy: pos.coords.accuracy
-    })
-    setStatus('granted')
-    setError(null)
-  }, [])
+      accuracy: pos.coords.accuracy,
+    });
+    setStatus('granted');
+    setError(null);
+  }, []);
 
   /** Request a single fix. Call from a user gesture. */
   const request = useCallback(() => {
     if (!supported) {
-      setStatus('unavailable')
-      setError('This device or browser does not support location.')
-      return
+      setStatus('unavailable');
+      setError('This device or browser does not support location.');
+      return;
     }
-    setStatus('prompting')
+    setStatus('prompting');
     navigator.geolocation.getCurrentPosition(applyPosition, handleError, {
       ...DEFAULTS,
-      ...options
-    })
-  }, [supported, applyPosition, handleError, options])
+      ...options,
+    });
+  }, [supported, applyPosition, handleError, options]);
 
   /** Continuous tracking — for live delivery/vehicle views only. */
   const startWatching = useCallback(() => {
-    if (!supported || watchId.current !== null) return
-    setStatus('prompting')
+    if (!supported || watchId.current !== null) return;
+    setStatus('prompting');
     watchId.current = navigator.geolocation.watchPosition(applyPosition, handleError, {
       ...DEFAULTS,
       enableHighAccuracy: true, // tracking justifies the battery cost
-      ...options
-    })
-  }, [supported, applyPosition, handleError, options])
+      ...options,
+    });
+  }, [supported, applyPosition, handleError, options]);
 
   const stopWatching = useCallback(() => {
     if (watchId.current !== null) {
-      navigator.geolocation.clearWatch(watchId.current)
-      watchId.current = null
+      navigator.geolocation.clearWatch(watchId.current);
+      watchId.current = null;
     }
-  }, [])
+  }, []);
 
   // Always release the watch on unmount — a leaked watch keeps the GPS awake
   // and drains a phone battery in the field.
-  useEffect(() => stopWatching, [stopWatching])
+  useEffect(() => stopWatching, [stopWatching]);
 
   return {
     ...position,
@@ -105,8 +105,8 @@ export function useGeolocation(options = {}) {
     hasPosition: position.latitude !== null && position.longitude !== null,
     request,
     startWatching,
-    stopWatching
-  }
+    stopWatching,
+  };
 }
 
-export default useGeolocation
+export default useGeolocation;

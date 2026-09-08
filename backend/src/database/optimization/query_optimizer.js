@@ -14,21 +14,21 @@ class QueryOptimizer {
       enableQueryHints: config.enableQueryHints !== false,
       enablePerformanceAnalysis: config.enablePerformanceAnalysis !== false,
       enableNPlusOneDetection: config.enableNPlusOneDetection !== false,
-      
+
       // Performance thresholds
       slowQueryThreshold: config.slowQueryThreshold || 1000, // 1 second
       nPlusOneThreshold: config.nPlusOneThreshold || 10,
-      
+
       // Optimization rules
       enableSelectStarOptimization: config.enableSelectStarOptimization !== false,
       enableJoinOptimization: config.enableJoinOptimization !== false,
       enableWhereOptimization: config.enableWhereOptimization !== false,
       enableSubqueryOptimization: config.enableSubqueryOptimization !== false,
-      
+
       // Database connection
       databaseUrl: config.databaseUrl || process.env.DATABASE_URL,
-      
-      ...config
+
+      ...config,
     };
 
     this.pool = null;
@@ -42,7 +42,7 @@ class QueryOptimizer {
   async initialize() {
     try {
       this.pool = new Pool({
-        connectionString: this.config.databaseUrl
+        connectionString: this.config.databaseUrl,
       });
 
       // Enable pg_stat_statements for query analysis
@@ -88,7 +88,7 @@ class QueryOptimizer {
         suggestions.push({
           type: 'select_star',
           message: 'Replaced SELECT * with explicit columns',
-          severity: 'info'
+          severity: 'info',
         });
       }
     }
@@ -97,7 +97,7 @@ class QueryOptimizer {
       suggestions.push({
         type: 'missing_where',
         message: 'Query lacks WHERE clause - consider adding filters to reduce result set',
-        severity: 'warning'
+        severity: 'warning',
       });
     }
 
@@ -105,7 +105,7 @@ class QueryOptimizer {
       suggestions.push({
         type: 'missing_limit',
         message: 'Query lacks LIMIT clause - consider adding to prevent large result sets',
-        severity: 'warning'
+        severity: 'warning',
       });
     }
 
@@ -113,7 +113,7 @@ class QueryOptimizer {
       suggestions.push({
         type: 'subquery',
         message: 'Query contains subquery - consider using JOIN for better performance',
-        severity: 'info'
+        severity: 'info',
       });
     }
 
@@ -121,7 +121,7 @@ class QueryOptimizer {
       suggestions.push({
         type: 'n_plus_one',
         message: 'Potential N+1 query pattern detected - consider using eager loading',
-        severity: 'warning'
+        severity: 'warning',
       });
     }
 
@@ -130,7 +130,7 @@ class QueryOptimizer {
       query: optimizedQuery,
       originalQuery: query,
       analysis,
-      suggestions
+      suggestions,
     };
   }
 
@@ -139,7 +139,7 @@ class QueryOptimizer {
    */
   analyzeQuery(query) {
     const normalizedQuery = query.toLowerCase().replace(/\s+/g, ' ');
-    
+
     const analysis = {
       hasSelect: normalizedQuery.includes('select'),
       hasJoin: normalizedQuery.includes('join'),
@@ -155,8 +155,8 @@ class QueryOptimizer {
         missingWhere: normalizedQuery.includes('select') && !normalizedQuery.includes('where'),
         missingLimit: normalizedQuery.includes('select') && !normalizedQuery.includes('limit'),
         subquery: normalizedQuery.match(/select.*select/),
-        nPlusOne: this.detectNPlusOnePattern(normalizedQuery)
-      }
+        nPlusOne: this.detectNPlusOnePattern(normalizedQuery),
+      },
     };
 
     return analysis;
@@ -176,18 +176,18 @@ class QueryOptimizer {
   detectNPlusOnePattern(query) {
     // Simple heuristic: multiple SELECTs on same table in short time
     const pattern = this.queryPatterns.get(this.extractTableName(query) || 'unknown');
-    
+
     if (pattern) {
       pattern.count++;
       pattern.lastSeen = Date.now();
-      
+
       if (pattern.count > this.config.nPlusOneThreshold) {
         return true;
       }
     } else {
       this.queryPatterns.set(this.extractTableName(query) || 'unknown', {
         count: 1,
-        lastSeen: Date.now()
+        lastSeen: Date.now(),
       });
     }
 
@@ -235,14 +235,14 @@ class QueryOptimizer {
     if (hints.index) {
       modifiedQuery = modifiedQuery.replace(
         /FROM\s+(\w+)/i,
-        `FROM $1 /*+ INDEX($1 ${hints.index}) */`
+        `FROM $1 /*+ INDEX($1 ${hints.index}) */`,
       );
     }
 
     if (hints.parallel) {
       modifiedQuery = modifiedQuery.replace(
         /SELECT/i,
-        `SELECT /*+ PARALLEL(${hints.parallel}) */`
+        `SELECT /*+ PARALLEL(${hints.parallel}) */`,
       );
     }
 
@@ -259,9 +259,9 @@ class QueryOptimizer {
 
     try {
       const startTime = Date.now();
-      
+
       // Get execution plan
-      const planResult = await this.pool.query('EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ' + query);
+      const planResult = await this.pool.query(`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${ query}`);
       const duration = Date.now() - startTime;
 
       const plan = planResult.rows[0]['QUERY PLAN'];
@@ -271,7 +271,7 @@ class QueryOptimizer {
         duration,
         plan,
         analysis,
-        isSlow: duration > this.config.slowQueryThreshold
+        isSlow: duration > this.config.slowQueryThreshold,
       };
     } catch (error) {
       logger.error('Performance analysis failed', { error: error.message });
@@ -292,7 +292,7 @@ class QueryOptimizer {
       indexScans: [],
       sequentialScans: [],
       hashJoins: [],
-      nestedLoops: []
+      nestedLoops: [],
     };
 
     function traverse(node) {
@@ -358,7 +358,7 @@ class QueryOptimizer {
             type: 'sequential_scan',
             message: `Sequential scan on ${scan['Relation Name']} returned ${scan['Actual Rows']} rows - consider adding an index`,
             severity: 'warning',
-            table: scan['Relation Name']
+            table: scan['Relation Name'],
           });
         }
       });
@@ -371,7 +371,7 @@ class QueryOptimizer {
           suggestions.push({
             type: 'nested_loop',
             message: `Nested loop executed ${loop['Actual Loops']} times - consider using Hash Join instead`,
-            severity: 'warning'
+            severity: 'warning',
           });
         }
       });
@@ -382,7 +382,7 @@ class QueryOptimizer {
       suggestions.push({
         type: 'high_cost',
         message: `Query has high total cost (${analysis.totalCost.toFixed(2)}) - consider optimization`,
-        severity: 'warning'
+        severity: 'warning',
       });
     }
 
@@ -414,7 +414,7 @@ class QueryOptimizer {
         totalTime: row.total_exec_time * 1000,
         avgTime: row.mean_exec_time * 1000,
         maxTime: row.max_exec_time * 1000,
-        rows: row.rows
+        rows: row.rows,
       }));
     } catch (error) {
       logger.error('Failed to get slow queries', { error: error.message });
@@ -448,7 +448,7 @@ class QueryOptimizer {
         column: row.attname,
         distinct: row.n_distinct,
         correlation: row.correlation,
-        suggestion: `Consider adding an index on ${row.tablename}.${row.attname}`
+        suggestion: `Consider adding an index on ${row.tablename}.${row.attname}`,
       }));
     } catch (error) {
       logger.error('Failed to get missing index suggestions', { error: error.message });
@@ -478,7 +478,7 @@ class QueryOptimizer {
         table: row.tablename,
         index: row.indexname,
         scans: row.idx_scan,
-        suggestion: `Consider dropping unused index ${row.indexname} on ${row.tablename}`
+        suggestion: `Consider dropping unused index ${row.indexname} on ${row.tablename}`,
       }));
     } catch (error) {
       logger.error('Failed to get unused indexes', { error: error.message });
@@ -512,7 +512,7 @@ class QueryOptimizer {
 
       const optionStr = vacuumOptions.length > 0 ? vacuumOptions.join(' ') : '';
       await this.pool.query(`VACUUM ${optionStr} ${tableName}`);
-      
+
       logger.info(`Table vacuumed: ${tableName}`, { options: vacuumOptions });
       return { success: true, table: tableName };
     } catch (error) {
@@ -616,5 +616,5 @@ module.exports = {
   QueryOptimizer,
   getQueryOptimizer,
   initializeQueryOptimizer,
-  shutdownQueryOptimizer
+  shutdownQueryOptimizer,
 };

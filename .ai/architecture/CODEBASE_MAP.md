@@ -1,6 +1,6 @@
 # CODEBASE MAP
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Last Updated:** 24 August 2026
 
 ## Repository Structure
@@ -377,3 +377,4 @@ database
 ---
 
 *This map provides Claude with a clear understanding of where to look for specific functionality in the codebase.*
+

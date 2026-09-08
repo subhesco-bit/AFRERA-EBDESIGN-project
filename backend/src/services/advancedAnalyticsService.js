@@ -20,7 +20,7 @@ const ANALYTICS_QUERYABLE_COLUMNS = new Set(['id', 'metric_name', 'dimensions', 
  */
 function toSafeInterval(timeRange, fallback = '30 days') {
   const match = /^(\d{1,4})\s*(day|days|d|hour|hours|h|week|weeks|w|month|months|mo|year|years|y)$/i.exec(
-    String(timeRange || '').trim()
+    String(timeRange || '').trim(),
   );
   if (!match) return fallback;
 
@@ -30,7 +30,7 @@ function toSafeInterval(timeRange, fallback = '30 days') {
     h: 'hours', hour: 'hours', hours: 'hours',
     w: 'weeks', week: 'weeks', weeks: 'weeks',
     mo: 'months', month: 'months', months: 'months',
-    y: 'years', year: 'years', years: 'years'
+    y: 'years', year: 'years', years: 'years',
   };
   const unit = unitMap[match[2].toLowerCase()];
   return `${amount} ${unit}`;
@@ -49,7 +49,7 @@ class AdvancedAnalyticsService {
   async getFarmerPerformanceAnalytics(farmerId, timeRange = '30d') {
     try {
       const cacheKey = `farmer:${farmerId}:performance:${timeRange}`;
-      
+
       if (this.cache.has(cacheKey)) {
         return this.cache.get(cacheKey);
       }
@@ -73,7 +73,7 @@ class AdvancedAnalyticsService {
       `;
 
       const result = await db.query(query, [farmerId]);
-      
+
       const analytics = {
         farmerId,
         timeRange,
@@ -82,7 +82,7 @@ class AdvancedAnalyticsService {
         averageOrderValue: parseFloat(result.rows[0].avg_order_value),
         totalCrops: result.rows[0].total_crops,
         totalProduction: parseFloat(result.rows[0].total_production),
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
       };
 
       this.cache.set(cacheKey, analytics);
@@ -91,10 +91,10 @@ class AdvancedAnalyticsService {
       return { success: true, data: analytics };
     } catch (error) {
       logger.error(`${this.serviceName} - getFarmerPerformanceAnalytics error:`, error);
-      return { 
-        success: false, 
+      return {
+        success: false,
         error: 'Failed to retrieve farmer performance analytics',
-        details: error.message 
+        details: error.message,
       };
     }
   }
@@ -105,7 +105,7 @@ class AdvancedAnalyticsService {
   async getMarketTrendAnalytics(cropType, region, timeRange = '90d') {
     try {
       const cacheKey = `market:${cropType}:${region}:trends:${timeRange}`;
-      
+
       if (this.cache.has(cacheKey)) {
         return this.cache.get(cacheKey);
       }
@@ -127,7 +127,7 @@ class AdvancedAnalyticsService {
       `;
 
       const result = await db.query(query, [cropType, region]);
-      
+
       const analytics = {
         cropType,
         region,
@@ -136,10 +136,10 @@ class AdvancedAnalyticsService {
           date: row.date,
           orders: row.daily_orders,
           revenue: parseFloat(row.daily_revenue),
-          averageOrder: parseFloat(row.avg_daily_order)
+          averageOrder: parseFloat(row.avg_daily_order),
         })),
         trends: this.calculateTrends(result.rows),
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
       };
 
       this.cache.set(cacheKey, analytics);
@@ -148,10 +148,10 @@ class AdvancedAnalyticsService {
       return { success: true, data: analytics };
     } catch (error) {
       logger.error(`${this.serviceName} - getMarketTrendAnalytics error:`, error);
-      return { 
-        success: false, 
+      return {
+        success: false,
         error: 'Failed to retrieve market trend analytics',
-        details: error.message 
+        details: error.message,
       };
     }
   }
@@ -162,7 +162,7 @@ class AdvancedAnalyticsService {
   async getPlatformAnalytics(timeRange = '30d') {
     try {
       const cacheKey = `platform:analytics:${timeRange}`;
-      
+
       if (this.cache.has(cacheKey)) {
         return this.cache.get(cacheKey);
       }
@@ -181,7 +181,7 @@ class AdvancedAnalyticsService {
       `;
 
       const result = await db.query(query);
-      
+
       const analytics = {
         timeRange,
         activeFarmers: result.rows[0].active_farmers,
@@ -190,7 +190,7 @@ class AdvancedAnalyticsService {
         totalRevenue: parseFloat(result.rows[0].total_revenue),
         activeCrops: result.rows[0].active_crops,
         averageOrderValue: parseFloat(result.rows[0].avg_order_value),
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
       };
 
       this.cache.set(cacheKey, analytics);
@@ -199,10 +199,10 @@ class AdvancedAnalyticsService {
       return { success: true, data: analytics };
     } catch (error) {
       logger.error(`${this.serviceName} - getPlatformAnalytics error:`, error);
-      return { 
-        success: false, 
+      return {
+        success: false,
         error: 'Failed to retrieve platform analytics',
-        details: error.message 
+        details: error.message,
       };
     }
   }
@@ -218,10 +218,10 @@ class AdvancedAnalyticsService {
     const values = data.map(d => parseFloat(d.daily_revenue || 0));
     const firstValue = values[0];
     const lastValue = values[values.length - 1];
-    
-    const growthRate = firstValue > 0 
-      ? ((lastValue - firstValue) / firstValue) * 100 
-      : 0;
+
+    const growthRate = firstValue > 0 ?
+      ((lastValue - firstValue) / firstValue) * 100 :
+      0;
 
     let trend = 'stable';
     if (growthRate > 5) trend = 'increasing';
@@ -236,25 +236,25 @@ class AdvancedAnalyticsService {
   async generateCustomReport(config) {
     try {
       const { metrics, filters, groupBy, timeRange } = config;
-      
+
       // Build dynamic query based on configuration
       const query = this.buildCustomQuery(metrics, filters, groupBy, timeRange);
       const result = await db.query(query.text, query.values);
-      
-      return { 
-        success: true, 
+
+      return {
+        success: true,
         data: result.rows,
         metadata: {
           generatedAt: new Date().toISOString(),
-          config
-        }
+          config,
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - generateCustomReport error:`, error);
-      return { 
-        success: false, 
+      return {
+        success: false,
         error: 'Failed to generate custom report',
-        details: error.message 
+        details: error.message,
       };
     }
   }
@@ -281,7 +281,7 @@ class AdvancedAnalyticsService {
 
     return {
       text: `SELECT ${selectClause} FROM analytics_data ${whereClause} ${groupClause}`,
-      values
+      values,
     };
   }
 
@@ -307,7 +307,7 @@ class AdvancedAnalyticsService {
 
     return {
       clause: conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '',
-      values
+      values,
     };
   }
 

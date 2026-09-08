@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ShieldCheck, KeyRound, LogIn, Smartphone, Fingerprint, FileCheck, Clock } from 'lucide-react'
+import { useState } from 'react';
+import { ShieldCheck, KeyRound, LogIn, Smartphone, Fingerprint, FileCheck, Clock } from 'lucide-react';
 import {
   roleManagementAPI,
   permissionManagementAPI,
@@ -8,8 +8,8 @@ import {
   digitalIdentityAPI,
   consentManagementAPI,
   sessionManagementAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Identity domain sub-modules, batch 4: M014 (Role Management),
@@ -34,23 +34,23 @@ const TABS = [
   { id: 'digital-identity', label: 'Digital Identity', icon: Fingerprint },
   { id: 'consent', label: 'Consent', icon: FileCheck },
   { id: 'sessions', label: 'Sessions', icon: Clock },
-]
+];
 
-const PERMISSION_LEVELS = ['Basic', 'Standard', 'Elevated', 'Admin']
-const ROLE_STATUS = ['Active', 'Inactive']
-const ACTIONS = ['Create', 'Read', 'Update', 'Delete', 'Manage']
-const PROTOCOLS = ['SAML', 'OAuth2', 'OIDC']
-const ENABLED_STATUS = ['Enabled', 'Disabled']
-const DEVICE_TYPES = ['Authenticator App', 'SMS', 'Email', 'Hardware Key']
-const MFA_STATUS = ['Active', 'Revoked']
-const IDENTITY_TYPES = ['Aadhaar', 'PAN', 'Voter ID', 'Passport', 'Other']
-const VERIFICATION_STATUS = ['Pending', 'Verified', 'Rejected']
-const CONSENT_TYPES = ['Data Sharing', 'Marketing', 'Third-Party', 'Research']
-const CONSENT_STATUS = ['Granted', 'Revoked', 'Expired']
-const SESSION_STATUS = ['Active', 'Expired', 'Terminated']
+const PERMISSION_LEVELS = ['Basic', 'Standard', 'Elevated', 'Admin'];
+const ROLE_STATUS = ['Active', 'Inactive'];
+const ACTIONS = ['Create', 'Read', 'Update', 'Delete', 'Manage'];
+const PROTOCOLS = ['SAML', 'OAuth2', 'OIDC'];
+const ENABLED_STATUS = ['Enabled', 'Disabled'];
+const DEVICE_TYPES = ['Authenticator App', 'SMS', 'Email', 'Hardware Key'];
+const MFA_STATUS = ['Active', 'Revoked'];
+const IDENTITY_TYPES = ['Aadhaar', 'PAN', 'Voter ID', 'Passport', 'Other'];
+const VERIFICATION_STATUS = ['Pending', 'Verified', 'Rejected'];
+const CONSENT_TYPES = ['Data Sharing', 'Marketing', 'Third-Party', 'Research'];
+const CONSENT_STATUS = ['Granted', 'Revoked', 'Expired'];
+const SESSION_STATUS = ['Active', 'Expired', 'Terminated'];
 
 function IdentityManagementPage() {
-  const [activeTab, setActiveTab] = useState('roles')
+  const [activeTab, setActiveTab] = useState('roles');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -322,7 +322,7 @@ function IdentityManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default IdentityManagementPage
+export default IdentityManagementPage;

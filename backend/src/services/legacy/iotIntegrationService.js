@@ -60,7 +60,7 @@ async function registerIoTDevice(data) {
     location_id,
     assigned_to,
     device_config,
-    metadata
+    metadata,
   } = data;
 
   try {
@@ -81,8 +81,8 @@ async function registerIoTDevice(data) {
         location_id,
         assigned_to,
         JSON.stringify(device_config),
-        JSON.stringify(metadata)
-      ]
+        JSON.stringify(metadata),
+      ],
     );
 
     return result.rows[0];
@@ -114,17 +114,17 @@ async function getIoTDevices(filters = {}) {
     const params = [];
 
     if (filters.device_type) {
-      query += ' AND device_type = $' + (params.length + 1);
+      query += ` AND device_type = $${ params.length + 1}`;
       params.push(filters.device_type);
     }
 
     if (filters.status) {
-      query += ' AND status = $' + (params.length + 1);
+      query += ` AND status = $${ params.length + 1}`;
       params.push(filters.status);
     }
 
     if (filters.assigned_to) {
-      query += ' AND assigned_to = $' + (params.length + 1);
+      query += ` AND assigned_to = $${ params.length + 1}`;
       params.push(filters.assigned_to);
     }
 
@@ -162,7 +162,7 @@ async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength
        SET status = $1, battery_level = $2, signal_strength = $3, last_seen = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
        WHERE id = $4
        RETURNING *`,
-      [status, batteryLevel, signalStrength, deviceId]
+      [status, batteryLevel, signalStrength, deviceId],
     );
 
     if (result.rows.length === 0) {
@@ -184,9 +184,9 @@ async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength
           deviceId: device.id,
           deviceType: device.device_type ?? null,
           locationId: device.location_id ?? null,
-          lastSeen: device.last_seen
+          lastSeen: device.last_seen,
         },
-        { severity: SEVERITY.WARNING, source: 'iotIntegrationService.updateDeviceStatus', entityId: device.id }
+        { severity: SEVERITY.WARNING, source: 'iotIntegrationService.updateDeviceStatus', entityId: device.id },
       );
     }
 
@@ -227,7 +227,7 @@ async function recordSensorData(data) {
     reading_timestamp,
     location_id,
     quality_score,
-    metadata
+    metadata,
   } = data;
 
   try {
@@ -244,8 +244,8 @@ async function recordSensorData(data) {
         reading_timestamp || new Date(),
         location_id,
         quality_score,
-        JSON.stringify(metadata)
-      ]
+        JSON.stringify(metadata),
+      ],
     );
 
     const reading = result.rows[0];
@@ -264,8 +264,8 @@ async function recordSensorData(data) {
             severity: temp > COLD_CHAIN_MAX_C + 5 ? SEVERITY.CRITICAL : SEVERITY.WARNING,
             source: 'iotIntegrationService',
             // Correlate on the shipment when known, else the device itself.
-            entityId: metadata?.shipment_id || device_id
-          }
+            entityId: metadata?.shipment_id || device_id,
+          },
         );
       }
     }
@@ -304,16 +304,16 @@ async function getSensorData(deviceId, sensorType = null, startDate = null, endD
     }
 
     if (startDate) {
-      query += ' AND reading_timestamp >= $' + (params.length + 1);
+      query += ` AND reading_timestamp >= $${ params.length + 1}`;
       params.push(startDate);
     }
 
     if (endDate) {
-      query += ' AND reading_timestamp <= $' + (params.length + 1);
+      query += ` AND reading_timestamp <= $${ params.length + 1}`;
       params.push(endDate);
     }
 
-    query += ' ORDER BY reading_timestamp DESC LIMIT $' + (params.length + 1);
+    query += ` ORDER BY reading_timestamp DESC LIMIT $${ params.length + 1}`;
     params.push(limit);
 
     const result = await pool.query(query, params);
@@ -335,7 +335,7 @@ router.get('/sensor-data/:deviceId', async (req, res) => {
       sensor_type,
       start_date,
       end_date,
-      parseInt(limit) || 100
+      parseInt(limit) || 100,
     );
     res.json(result);
   } catch (error) {
@@ -355,7 +355,7 @@ async function sendDeviceCommand(data) {
   const {
     device_id,
     command_type,
-    command_payload
+    command_payload,
   } = data;
 
   try {
@@ -364,7 +364,7 @@ async function sendDeviceCommand(data) {
        (device_id, command_type, command_payload, status, sent_at)
        VALUES ($1, $2, $3, 'sent', CURRENT_TIMESTAMP)
        RETURNING *`,
-      [device_id, command_type, JSON.stringify(command_payload)]
+      [device_id, command_type, JSON.stringify(command_payload)],
     );
 
     return result.rows[0];
@@ -437,7 +437,7 @@ async function createDeviceAlert(data) {
     alert_type,
     alert_severity,
     alert_message,
-    alert_data
+    alert_data,
   } = data;
 
   try {
@@ -451,8 +451,8 @@ async function createDeviceAlert(data) {
         alert_type,
         alert_severity,
         alert_message,
-        JSON.stringify(alert_data)
-      ]
+        JSON.stringify(alert_data),
+      ],
     );
 
     return result.rows[0];
@@ -485,7 +485,7 @@ async function getUnacknowledgedAlerts() {
        FROM device_alerts da
        LEFT JOIN iot_devices d ON da.device_id = d.id
        WHERE da.is_acknowledged = false
-       ORDER BY da.created_at DESC`
+       ORDER BY da.created_at DESC`,
     );
 
     return result.rows;
@@ -519,7 +519,7 @@ async function checkDeviceHealth(deviceId) {
   try {
     const result = await pool.query(
       'SELECT check_device_health($1) as health',
-      [deviceId]
+      [deviceId],
     );
 
     return result.rows[0].health;
@@ -570,8 +570,8 @@ async function recordIoTAnalytics(metrics) {
         metrics.anomaly_count || 0,
         metrics.alert_count || 0,
         metrics.avg_signal || 0,
-        metrics.avg_battery || 0
-      ]
+        metrics.avg_battery || 0,
+      ],
     );
 
     return result.rows[0];
@@ -616,5 +616,6 @@ module.exports = {
   getUnacknowledgedAlerts,
   checkDeviceHealth,
   recordIoTAnalytics,
-  isHealthy
+  isHealthy,
 };
+

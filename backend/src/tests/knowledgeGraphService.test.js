@@ -13,7 +13,7 @@ describe('Knowledge Graph Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('Knowledge Graph Service', () => {
       .send({
         email: 'kg-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
 
     authToken = registerResponse.body.token;
@@ -43,7 +43,7 @@ describe('Knowledge Graph Service', () => {
           description: 'Premium long-grain rice',
           properties: { variety: 'Basmati', origin: 'India' },
           source_system: 'products',
-          confidence_score: 0.95
+          confidence_score: 0.95,
         })
         .expect(201);
 
@@ -57,7 +57,7 @@ describe('Knowledge Graph Service', () => {
         .post('/api/v1/knowledge-graph/knowledge-nodes')
         .send({
           node_type: 'product',
-          name: 'Test Node'
+          name: 'Test Node',
         })
         .expect(401);
     });
@@ -90,7 +90,7 @@ describe('Knowledge Graph Service', () => {
           relationship_type: 'related_to',
           relationship_properties: { strength: 0.8 },
           confidence_score: 0.9,
-          source: 'manual'
+          source: 'manual',
         })
         .expect(201);
 
@@ -119,7 +119,7 @@ describe('Knowledge Graph Service', () => {
           query_type: 'neighbor',
           query_definition: { max_depth: 2 },
           parameters: { node_id: 'required' },
-          description: 'Find products related to a given node'
+          description: 'Find products related to a given node',
         })
         .expect(201);
 
@@ -135,7 +135,7 @@ describe('Knowledge Graph Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           node_id: testNodeId,
-          relationship_type: 'related_to'
+          relationship_type: 'related_to',
         })
         .expect(200);
 
@@ -156,8 +156,8 @@ describe('Knowledge Graph Service', () => {
             total_queries: 50,
             avg_query_time: 150,
             unique_users: 20,
-            most_queried_types: { product: 30, farmer: 15 }
-          }
+            most_queried_types: { product: 30, farmer: 15 },
+          },
         })
         .expect(200);
 

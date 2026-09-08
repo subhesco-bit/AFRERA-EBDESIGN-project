@@ -10,7 +10,7 @@
  * - SMS/WhatsApp
  * - Government APIs
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class IntegrationHub {
   constructor() {

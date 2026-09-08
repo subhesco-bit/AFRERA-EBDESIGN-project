@@ -39,7 +39,7 @@ const pool = require('../../database/pool');
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_ACCESS_MODELS = [
   'storage_as_a_service', 'processing_as_a_service', 'infrastructure_as_a_service',
-  'cooperative', 'fpo_owned', 'village_owned'
+  'cooperative', 'fpo_owned', 'village_owned',
 ];
 
 function isUuid(value) {
@@ -86,7 +86,7 @@ async function registerSharedAsset(assetData) {
       owner_type,
       owner_id,
       gst_applicable,
-      gst_rate
+      gst_rate,
     } = assetData || {};
 
     if (!asset_name || !asset_type) {
@@ -104,7 +104,7 @@ async function registerSharedAsset(assetData) {
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (name) DO UPDATE SET category = COALESCE(asset_types.category, EXCLUDED.category)
        RETURNING id`,
-      [typeName, typeCode, `Shared rural infrastructure type: ${typeName}`, category || null]
+      [typeName, typeCode, `Shared rural infrastructure type: ${typeName}`, category || null],
     );
     const typeId = typeResult.rows[0].id;
 
@@ -120,8 +120,8 @@ async function registerSharedAsset(assetData) {
       specifications: specifications || null,
       owner_type: owner_type || null,
       owner_id: owner_id || null,
-      gst_applicable: gst_applicable !== undefined ? !!gst_applicable : true,
-      gst_rate: gst_rate || 18
+      gst_applicable: gst_applicable !== undefined ? Boolean(gst_applicable) : true,
+      gst_rate: gst_rate || 18,
     };
 
     // responsible_user_id is a real FK to users(id); only set it when owner_id
@@ -142,8 +142,8 @@ async function registerSharedAsset(assetData) {
         (specifications && specifications.unit) || null,
         false,
         responsibleUserId,
-        availability === false ? 'unavailable' : 'available'
-      ]
+        availability === false ? 'unavailable' : 'available',
+      ],
     );
 
     const row = insertResult.rows[0];
@@ -168,7 +168,7 @@ async function registerSharedAsset(assetData) {
       created_at: row.created_at,
       utilization_rate: Number(row.utilization_rate) || 0,
       total_bookings: 0,
-      rating: 0
+      rating: 0,
     };
 
     logger.info(`Shared asset registered: ${asset.asset_id}`);
@@ -194,7 +194,7 @@ async function searchSharedInfrastructure(searchParams) {
       date_to,
       max_rental_rate,
       state,
-      district
+      district,
     } = searchParams || {};
 
     // AI-powered search and recommendation
@@ -212,8 +212,8 @@ async function searchSharedInfrastructure(searchParams) {
         district,
         available_assets: await getAvailableAssets(searchParams),
         demand_forecast: await getDemandForecast(location, asset_type),
-        pricing_optimization: await getPricingOptimization(asset_type, location)
-      }
+        pricing_optimization: await getPricingOptimization(asset_type, location),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -236,11 +236,11 @@ async function searchSharedInfrastructure(searchParams) {
         rating: asset.rating,
         utilization_rate: asset.utilization_rate,
         match_score: asset.match_score,
-        recommended: asset.recommended
+        recommended: asset.recommended,
       })),
       recommendations: aiResponse.recommendations,
       pricing_insights: aiResponse.pricing_insights,
-      total_results: aiResponse.available_assets.length
+      total_results: aiResponse.available_assets.length,
     };
 
     return results;
@@ -265,7 +265,7 @@ async function bookSharedAsset(bookingData) {
       purpose,
       total_amount,
       gst_amount,
-      payment_status
+      payment_status,
     } = bookingData || {};
 
     if (!asset_id || !user_id || !date_from || !date_to || quantity == null || total_amount == null) {
@@ -276,8 +276,8 @@ async function bookSharedAsset(bookingData) {
     // not directly to a user — it has no user_id column. Resolve the caller's
     // REU rather than inventing one on the table.
     const reuResult = await pool.query(
-      `SELECT id FROM rural_economic_units WHERE user_id = $1 AND status = 'active' ORDER BY created_at DESC LIMIT 1`,
-      [user_id]
+      'SELECT id FROM rural_economic_units WHERE user_id = $1 AND status = \'active\' ORDER BY created_at DESC LIMIT 1',
+      [user_id],
     );
     if (reuResult.rows.length === 0) {
       throw expectedError('No active Rural Economic Unit found for this user; register one before booking shared infrastructure');
@@ -318,8 +318,8 @@ async function bookSharedAsset(bookingData) {
         unitRate,
         grandTotal,
         JSON.stringify({ gst_amount: gst, payment_status: payment_status || 'pending', booking_type: booking_type || null }),
-        purpose || null
-      ]
+        purpose || null,
+      ],
     );
 
     const row = insertResult.rows[0];
@@ -339,7 +339,7 @@ async function bookSharedAsset(bookingData) {
       payment_status: payment_status || 'pending',
       status: row.status,
       booking_date: row.created_at,
-      confirmation_number: row.booking_number
+      confirmation_number: row.booking_number,
     };
 
     logger.info(`Shared asset booked: ${booking.booking_id}`);
@@ -372,31 +372,31 @@ async function listSecondLifeEquipment(equipmentData) {
       seller_type,
       inspection_report,
       warranty_info,
-      images
+      images,
     } = equipmentData;
 
     const listing = {
       listing_id: generateId(),
-      equipment_name: equipment_name,
-      equipment_type: equipment_type,
-      category: category,
-      original_manufacturer: original_manufacturer,
-      year_of_manufacture: year_of_manufacture,
-      condition: condition,
-      remaining_life: remaining_life,
-      specifications: specifications,
-      location: location,
-      listing_type: listing_type,
-      price: price,
-      seller_id: seller_id,
-      seller_type: seller_type,
-      inspection_report: inspection_report,
-      warranty_info: warranty_info,
-      images: images,
+      equipment_name,
+      equipment_type,
+      category,
+      original_manufacturer,
+      year_of_manufacture,
+      condition,
+      remaining_life,
+      specifications,
+      location,
+      listing_type,
+      price,
+      seller_id,
+      seller_type,
+      inspection_report,
+      warranty_info,
+      images,
       status: 'active',
       created_at: new Date().toISOString(),
       views: 0,
-      inquiries: 0
+      inquiries: 0,
     };
 
     // AI-powered pricing recommendation
@@ -406,8 +406,8 @@ async function listSecondLifeEquipment(equipmentData) {
         equipment_data: equipmentData,
         market_data: await getSecondLifeMarketData(equipment_type, category),
         depreciation_analysis: await calculateDepreciation(equipmentData),
-        demand_forecast: await getEquipmentDemandForecast(equipment_type)
-      }
+        demand_forecast: await getEquipmentDemandForecast(equipment_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -438,7 +438,7 @@ async function searchSecondLifeEquipment(searchParams) {
       max_price,
       min_condition,
       listing_type,
-      max_age
+      max_age,
     } = searchParams;
 
     const results = {
@@ -446,7 +446,7 @@ async function searchSecondLifeEquipment(searchParams) {
       timestamp: new Date().toISOString(),
       search_params: searchParams,
       listings: await getSecondLifeListings(searchParams),
-      total_results: 0
+      total_results: 0,
     };
 
     results.total_results = results.listings.length;
@@ -477,28 +477,28 @@ async function listSecondLifeBattery(batteryData) {
       seller_id,
       certification,
       warranty,
-      test_report
+      test_report,
     } = batteryData;
 
     const battery = {
       battery_id: generateId(),
-      battery_type: battery_type,
-      capacity_kwh: capacity_kwh,
-      original_application: original_application,
-      year_of_manufacture: year_of_manufacture,
-      cycles_used: cycles_used,
-      remaining_capacity: remaining_capacity,
-      health_score: health_score,
-      manufacturer: manufacturer,
-      location: location,
-      price: price,
-      seller_id: seller_id,
-      certification: certification,
-      warranty: warranty,
-      test_report: test_report,
+      battery_type,
+      capacity_kwh,
+      original_application,
+      year_of_manufacture,
+      cycles_used,
+      remaining_capacity,
+      health_score,
+      manufacturer,
+      location,
+      price,
+      seller_id,
+      certification,
+      warranty,
+      test_report,
       status: 'available',
       created_at: new Date().toISOString(),
-      agricultural_applicability: await assessAgriculturalApplicability(batteryData)
+      agricultural_applicability: await assessAgriculturalApplicability(batteryData),
     };
 
     // AI-powered agricultural applicability assessment
@@ -508,8 +508,8 @@ async function listSecondLifeBattery(batteryData) {
         battery_data: batteryData,
         agricultural_use_cases: ['solar_pumping', 'cold_storage', 'farm_lighting', 'electric_vehicles'],
         safety_requirements: await getBatterySafetyRequirements(),
-        cost_benefit_analysis: await calculateCostBenefit(batteryData)
-      }
+        cost_benefit_analysis: await calculateCostBenefit(batteryData),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -538,7 +538,7 @@ async function getRenewablePowerSupport(location, requirements) {
       application_type, // irrigation, cold_storage, processing, general
       budget,
       existing_infrastructure,
-      grid_availability
+      grid_availability,
     } = requirements;
 
     // AI-powered renewable energy recommendation
@@ -555,16 +555,16 @@ async function getRenewablePowerSupport(location, requirements) {
         wind_potential: await getWindPotential(location),
         biomass_availability: await getBiomassAvailability(location),
         government_schemes: await getRenewableSchemes(location),
-        cost_benefit: await calculateRenewableCostBenefit(requirements)
-      }
+        cost_benefit: await calculateRenewableCostBenefit(requirements),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendations = {
       recommendation_id: generateId(),
-      location: location,
-      requirements: requirements,
+      location,
+      requirements,
       recommended_solutions: aiResponse.solutions.map(solution => ({
         solution_type: solution.type,
         capacity: solution.capacity,
@@ -575,12 +575,12 @@ async function getRenewablePowerSupport(location, requirements) {
         annual_savings: solution.annual_savings,
         co2_reduction: solution.co2_reduction,
         implementation_timeline: solution.timeline,
-        confidence: solution.confidence
+        confidence: solution.confidence,
       })),
       comparison: aiResponse.comparison,
       government_schemes: aiResponse.schemes,
       next_steps: aiResponse.next_steps,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     return recommendations;
@@ -600,8 +600,8 @@ async function getEquipmentUtilizationAnalytics(assetId, period) {
     }
 
     const assetResult = await pool.query(
-      `SELECT id, utilization_rate, status FROM assets WHERE id = $1`,
-      [assetId]
+      'SELECT id, utilization_rate, status FROM assets WHERE id = $1',
+      [assetId],
     );
     if (assetResult.rows.length === 0) {
       throw expectedError('Asset not found');
@@ -617,7 +617,7 @@ async function getEquipmentUtilizationAnalytics(assetId, period) {
          FROM shared_infrastructure_access
         WHERE infrastructure_id = $1
           AND created_at >= NOW() - ($2 || ' days')::interval`,
-      [assetId, String(intervalDays)]
+      [assetId, String(intervalDays)],
     );
     const stats = statsResult.rows[0];
 
@@ -632,7 +632,7 @@ async function getEquipmentUtilizationAnalytics(assetId, period) {
       peak_usage_times: [],
       user_demographics: {},
       maintenance_schedule: {},
-      optimization_recommendations: []
+      optimization_recommendations: [],
     };
 
     return analytics;
@@ -658,7 +658,7 @@ async function getAvailableAssets(searchParams) {
   // NOTE: `assets` (000_base_schema.sql) has no location/state/district
   // columns, so those search filters cannot be applied at this layer yet —
   // see file header. type/category/rate filters are real.
-  const where = [`a.status = 'available'`];
+  const where = ['a.status = \'available\''];
   const params = [];
 
   if (asset_type) {
@@ -682,7 +682,7 @@ async function getAvailableAssets(searchParams) {
       WHERE ${where.join(' AND ')}
       ORDER BY a.created_at DESC
       LIMIT 100`,
-    params
+    params,
   );
 
   return rows.map((r) => ({
@@ -699,7 +699,7 @@ async function getAvailableAssets(searchParams) {
     rating: null,
     utilization_rate: r.utilization_rate != null ? Number(r.utilization_rate) : 0,
     match_score: null,
-    recommended: false
+    recommended: false,
   }));
 }
 
@@ -810,7 +810,7 @@ function setupRoutes(app) {
       if (!asset_id || !user_id || !date_from || !date_to || quantity == null || total_amount == null) {
         return res.status(400).json({
           success: false,
-          error: 'asset_id, user_id, date_from, date_to, quantity and total_amount are required'
+          error: 'asset_id, user_id, date_from, date_to, quantity and total_amount are required',
         });
       }
       const booking = await bookSharedAsset(req.body);
@@ -875,6 +875,6 @@ module.exports = {
   listSecondLifeBattery,
   getRenewablePowerSupport,
   getEquipmentUtilizationAnalytics,
-  setupRoutes
+  setupRoutes,
 };
 

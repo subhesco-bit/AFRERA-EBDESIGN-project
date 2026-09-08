@@ -36,14 +36,15 @@ function authMiddleware(req, res, next) {
           id: process.env.TEST_USER_ID || 'test-user',
           email: process.env.TEST_USER_EMAIL || 'test@example.com',
           role: 'consumer',
-          permissions: []
+          permissions: [],
+          organization_id: process.env.TEST_ORGANIZATION_ID,
         };
         return next();
       }
 
       logger.error(
         'SKIP_AUTH=true was requested but ignored: NODE_ENV is not "test" or "development"',
-        { nodeEnv }
+        { nodeEnv },
       );
     }
 
@@ -51,9 +52,9 @@ function authMiddleware(req, res, next) {
     if (nodeEnv === 'test') {
       const authHeader = req.headers.authorization;
       if (!authHeader) {
-        return res.status(401).json({ 
+        return res.status(401).json({
           error: 'No authorization header provided',
-          code: 'NO_TOKEN'
+          code: 'NO_TOKEN',
         });
       }
 
@@ -64,7 +65,8 @@ function authMiddleware(req, res, next) {
           id: payload.userId || payload.id,
           email: payload.email,
           role: payload.role || 'consumer',
-          permissions: payload.permissions || []
+          permissions: payload.permissions || [],
+          organization_id: payload.organization_id,
         };
 
         return next();
@@ -74,47 +76,48 @@ function authMiddleware(req, res, next) {
     }
 
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'No authorization header provided',
-        code: 'NO_TOKEN'
+        code: 'NO_TOKEN',
       });
     }
-    
+
     const token = authHeader.replace('Bearer ', '');
-    
+
     if (!token) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'No token provided',
-        code: 'NO_TOKEN'
+        code: 'NO_TOKEN',
       });
     }
-    
+
     const payload = verifyToken(token);
-    
+
     // Attach user info to request
     req.user = {
       id: payload.userId,
       email: payload.email,
       role: payload.role,
-      permissions: payload.permissions
+      permissions: payload.permissions,
+      organization_id: payload.organization_id,
     };
-    
+
     next();
   } catch (error) {
     logger.error('Authentication failed', { error: error.message, stack: error.stack });
-    
+
     if (error.message === 'Token expired') {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Token expired',
-        code: 'TOKEN_EXPIRED'
+        code: 'TOKEN_EXPIRED',
       });
     }
-    
-    return res.status(401).json({ 
+
+    return res.status(401).json({
       error: 'Invalid token',
-      code: 'INVALID_TOKEN'
+      code: 'INVALID_TOKEN',
     });
   }
 }
@@ -125,21 +128,21 @@ function authMiddleware(req, res, next) {
 function requireRole(...allowedRoles) {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Authentication required',
-        code: 'AUTH_REQUIRED'
+        code: 'AUTH_REQUIRED',
       });
     }
-    
+
     if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Insufficient permissions',
         code: 'INSUFFICIENT_PERMISSIONS',
         requiredRoles: allowedRoles,
-        userRole: req.user.role
+        userRole: req.user.role,
       });
     }
-    
+
     next();
   };
 }
@@ -150,20 +153,20 @@ function requireRole(...allowedRoles) {
 function requirePermission(permission) {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Authentication required',
-        code: 'AUTH_REQUIRED'
+        code: 'AUTH_REQUIRED',
       });
     }
-    
+
     if (!hasPermission(req.user.permissions, permission)) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Permission denied',
         code: 'PERMISSION_DENIED',
-        requiredPermission: permission
+        requiredPermission: permission,
       });
     }
-    
+
     next();
   };
 }
@@ -174,21 +177,22 @@ function requirePermission(permission) {
 function optionalAuth(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
-      
+
       if (token) {
         const payload = verifyToken(token);
         req.user = {
           id: payload.userId,
           email: payload.email,
           role: payload.role,
-          permissions: payload.permissions
+          permissions: payload.permissions,
+          organization_id: payload.organization_id,
         };
       }
     }
-    
+
     next();
   } catch (error) {
     // Don't fail, just continue without user
@@ -201,32 +205,32 @@ function optionalAuth(req, res, next) {
  */
 function userRateLimit(limit = 100, windowMs = 60000) {
   const userRequests = new Map();
-  
+
   return (req, res, next) => {
     if (!req.user) {
       return next();
     }
-    
+
     const userId = req.user.id;
     const now = Date.now();
     const windowStart = now - windowMs;
-    
+
     // Clean old entries
     const userWindow = userRequests.get(userId) || [];
     const recentRequests = userWindow.filter(time => time > windowStart);
-    
+
     if (recentRequests.length >= limit) {
-      return res.status(429).json({ 
+      return res.status(429).json({
         error: 'Too many requests',
         code: 'RATE_LIMIT_EXCEEDED',
-        limit: limit,
-        window: windowMs
+        limit,
+        window: windowMs,
       });
     }
-    
+
     recentRequests.push(now);
     userRequests.set(userId, recentRequests);
-    
+
     next();
   };
 }
@@ -236,6 +240,6 @@ module.exports = Object.assign(authMiddleware, {
   requireRole,
   requirePermission,
   optionalAuth,
-  userRateLimit
+  userRateLimit,
 });
 module.exports.default = authMiddleware;

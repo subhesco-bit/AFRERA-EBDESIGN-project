@@ -127,18 +127,62 @@ class LibraryKnowledgeService {
     this.indexLibraryCatalogues();
     this.indexLibraryModuleCards();
     this.indexModularSystems();
+    this.indexUntrackedLibraryFiles();
     this.indexRuntimeModules();
     this.indexBackendModules();
     return this.index;
+  }
+
+  indexUntrackedLibraryFiles() {
+    if (!fs.existsSync(this.libraryRoot)) return;
+
+    const visit = (directory) => {
+      for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+        const filePath = path.join(directory, entry.name);
+        if (entry.isDirectory()) {
+          visit(filePath);
+          continue;
+        }
+
+        const relativePath = path.relative(this.libraryRoot, filePath).split(path.sep).join('/');
+        const key = `LIBRARY:${relativePath}`;
+        if (this.index.has(key) || Array.from(this.index.values()).some((item) => item.path === filePath)) continue;
+
+        const extension = path.extname(entry.name).toLowerCase();
+        const stat = safeStat(filePath);
+        const data = {
+          name: entry.name,
+          relativePath,
+          extension,
+          fileSize: stat ? stat.size : 0
+        };
+
+        if (['.json', '.jsonl'].includes(extension)) {
+          Object.assign(data, readJson(filePath));
+        } else if (['.md', '.txt', '.csv', '.yaml', '.yml', '.xml'].includes(extension)) {
+          data.content = fs.readFileSync(filePath, 'utf8').slice(0, 12000);
+        }
+
+        this.indexFile(key, 'library-file', filePath, data);
+      }
+    };
+
+    visit(this.libraryRoot);
   }
 
   indexFile(key, type, filePath, data = {}) {
     const stat = safeStat(filePath);
     if (!stat) return;
 
+    let uniqueKey = key;
+    if (this.index.has(uniqueKey) && this.index.get(uniqueKey).path !== filePath) {
+      const relativePath = path.relative(this.libraryRoot, filePath).split(path.sep).join('/');
+      uniqueKey = `${key}:${relativePath}`;
+    }
+
     if (data.parseError) {
       this.indexingWarnings.push({
-        key,
+        key: uniqueKey,
         type,
         path: filePath,
         warning: 'invalid_json',
@@ -146,8 +190,8 @@ class LibraryKnowledgeService {
       });
     }
 
-    this.index.set(key, {
-      key,
+    this.index.set(uniqueKey, {
+      key: uniqueKey,
       type,
       path: filePath,
       data,
@@ -343,6 +387,33 @@ class LibraryKnowledgeService {
     return results.sort((a, b) => b.relevance - a.relevance || a.key.localeCompare(b.key));
   }
 
+  async discoverModules(query = '', context = {}) {
+    const results = await this.searchLibrary(query, context);
+    const modules = results
+      .filter((result) => ['runtime-module', 'backend-module', 'library-module-card'].includes(result.type))
+      .slice(0, 10)
+      .map((result) => ({
+        moduleId: result.data.moduleId || result.data.module_id || result.key,
+        name: result.data.name || result.data.ModuleName || result.key,
+        matchScore: result.relevance,
+        capabilities: result.data.discovery?.capabilities || [],
+        aiContext: result.data.discovery?.aiContext || '',
+        dependencies: result.data.dependencies || { modules: [] },
+        status: result.data.status || result.data.Status || 'catalogued',
+        category: result.data.category || result.data.domain || null,
+        isProductionReady: result.data.status === 'production'
+      }));
+
+    return {
+      success: true,
+      modules,
+      metadata: {
+        totalMatches: modules.length,
+        queryProcessed: true
+      }
+    };
+  }
+
   async listModules(filters = {}) {
     await this.ensureInitialized();
     const typeSet = new Set(['runtime-module', 'backend-module', 'library-module-card']);
@@ -379,6 +450,38 @@ class LibraryKnowledgeService {
     return { success: false, error: `Module not found: ${moduleId}` };
   }
 
+  async resolveDependencies(moduleId) {
+    const moduleResult = await this.getModule(moduleId);
+    if (!moduleResult.success) return moduleResult;
+
+    const resolutionOrder = [];
+    const visiting = new Set();
+    const visited = new Set();
+
+    const visit = async (candidateId) => {
+      if (visited.has(candidateId)) return;
+      if (visiting.has(candidateId)) throw new Error(`Circular dependency detected: ${candidateId}`);
+      visiting.add(candidateId);
+
+      const candidate = await this.getModule(candidateId);
+      if (candidate.success) {
+        const dependencies = candidate.module.data.dependencies?.modules || [];
+        for (const dependency of dependencies) await visit(dependency);
+      }
+
+      visiting.delete(candidateId);
+      visited.add(candidateId);
+      resolutionOrder.push(candidateId);
+    };
+
+    try {
+      await visit(moduleId);
+      return { success: true, resolutionOrder, modules: resolutionOrder };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async buildAIContext(query = '', context = {}) {
     const results = await this.searchLibrary(query, context);
     return {
@@ -413,10 +516,21 @@ class LibraryKnowledgeService {
       }
     }
 
+    const semanticTypes = new Set(['catalogue', 'library-module-card', 'modular-system-card']);
+    const semanticItemCount = Array.from(this.index.values())
+      .filter((item) => semanticTypes.has(item.type)).length;
+    if (semanticItemCount === 0) {
+      issues.push({
+        type: 'missing_semantic_catalogue',
+        message: 'No catalogue, module-card, or modular-system records were discovered in the library root.'
+      });
+    }
+
     return {
       verified: issues.length === 0,
       totalItems: this.index.size,
       hashedFiles: this.contentHashes.size,
+      semanticItemCount,
       issues,
       warnings: this.indexingWarnings,
       verificationDate: new Date().toISOString()

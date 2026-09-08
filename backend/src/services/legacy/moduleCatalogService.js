@@ -17,7 +17,7 @@ const moduleCatalog = [
     capabilities: ['GI certified catalog', 'dynamic pricing', 'cart and checkout'],
     status: 'ready',
     route: '/marketplace',
-    technologies: ['React', 'Express', 'PostgreSQL', 'Redis']
+    technologies: ['React', 'Express', 'PostgreSQL', 'Redis'],
   },
   {
     id: 'farmers',
@@ -27,7 +27,7 @@ const moduleCatalog = [
     capabilities: ['farmer onboarding', 'FDI scoring', 'training records'],
     status: 'ready',
     route: '/farmer-portal',
-    technologies: ['React', 'Node.js', 'MongoDB']
+    technologies: ['React', 'Node.js', 'MongoDB'],
   },
   {
     id: 'logistics',
@@ -37,7 +37,7 @@ const moduleCatalog = [
     capabilities: ['shipment booking', 'live tracking', 'fleet management'],
     status: 'ready',
     route: '/logistics',
-    technologies: ['Socket.IO', 'Geo APIs', 'Redis']
+    technologies: ['Socket.IO', 'Geo APIs', 'Redis'],
   },
   {
     id: 'insurance',
@@ -47,7 +47,7 @@ const moduleCatalog = [
     capabilities: ['policy issuance', 'claims workflows', 'premium automation'],
     status: 'ready',
     route: '/insurance',
-    technologies: ['Express', 'PostgreSQL', 'Rule engine']
+    technologies: ['Express', 'PostgreSQL', 'Rule engine'],
   },
   {
     id: 'forms',
@@ -57,7 +57,7 @@ const moduleCatalog = [
     capabilities: ['form builder', 'workflow stages', 'submission tracking'],
     status: 'ready',
     route: '/forms',
-    technologies: ['React', 'Express', 'JSON storage']
+    technologies: ['React', 'Express', 'JSON storage'],
   },
   {
     id: 'analytics',
@@ -67,7 +67,7 @@ const moduleCatalog = [
     capabilities: ['pipeline analytics', 'recommendations', 'insight dashboard'],
     status: 'ready',
     route: '/analytics',
-    technologies: ['React', 'Node.js', 'Charts']
+    technologies: ['React', 'Node.js', 'Charts'],
   },
   {
     id: 'traceability',
@@ -77,7 +77,7 @@ const moduleCatalog = [
     capabilities: ['transaction tracking', 'verification requests', 'certificate issuance'],
     status: 'beta',
     route: '/blockchain',
-    technologies: ['Blockchain APIs', 'IPFS', 'Express']
+    technologies: ['Blockchain APIs', 'IPFS', 'Express'],
   },
   {
     id: 'ai-assistant',
@@ -87,7 +87,7 @@ const moduleCatalog = [
     capabilities: ['assistant prompts', 'module suggestions', 'action recommendations'],
     status: 'ready',
     route: '/modules',
-    technologies: ['LLM-ready heuristics', 'React', 'Express']
+    technologies: ['LLM-ready heuristics', 'React', 'Express'],
   },
   {
     id: 'iot',
@@ -97,7 +97,7 @@ const moduleCatalog = [
     capabilities: ['sensor telemetry', 'threshold alerts', 'device monitoring'],
     status: 'beta',
     route: '/iot',
-    technologies: ['IoT APIs', 'WebSockets', 'Redis']
+    technologies: ['IoT APIs', 'WebSockets', 'Redis'],
   },
   {
     id: 'experience',
@@ -107,7 +107,7 @@ const moduleCatalog = [
     capabilities: ['immersive demos', 'product view', 'training experience'],
     status: 'beta',
     route: '/ar-vr',
-    technologies: ['Three.js', 'WebGL', 'React']
+    technologies: ['Three.js', 'WebGL', 'React'],
   },
   {
     id: 'governance',
@@ -117,7 +117,7 @@ const moduleCatalog = [
     capabilities: ['scheme tracking', 'compliance checks', 'audit dashboards'],
     status: 'ready',
     route: '/dashboard',
-    technologies: ['Express', 'PostgreSQL', 'Charts']
+    technologies: ['Express', 'PostgreSQL', 'Charts'],
   },
   {
     id: 'labs',
@@ -127,8 +127,8 @@ const moduleCatalog = [
     capabilities: ['lab registration', 'quality reports', 'test lifecycle'],
     status: 'ready',
     route: '/dashboard',
-    technologies: ['Express', 'PostgreSQL', 'Reporting']
-  }
+    technologies: ['Express', 'PostgreSQL', 'Reporting'],
+  },
 ];
 
 function getModuleCatalog() {
@@ -146,7 +146,7 @@ function buildPlatformOverview() {
     betaModules,
     categories,
     highestPriority: 'AI-assisted operations',
-    narrative: 'AFRERA now covers commerce, finance, logistics, governance, quality, analytics, and AI-native experiences for a complete rural enterprise platform.'
+    narrative: 'AFRERA now covers commerce, finance, logistics, governance, quality, analytics, and AI-native experiences for a complete rural enterprise platform.',
   };
 }
 
@@ -157,9 +157,9 @@ function buildAssistantResponse(prompt = '') {
     return haystack.includes(normalizedPrompt) || normalizedPrompt.includes(module.category.toLowerCase()) || normalizedPrompt.includes(module.title.toLowerCase());
   });
 
-  const suggestions = matchedModules.length > 0
-    ? matchedModules.slice(0, 3)
-    : moduleCatalog.slice(0, 3);
+  const suggestions = matchedModules.length > 0 ?
+    matchedModules.slice(0, 3) :
+    moduleCatalog.slice(0, 3);
 
   let reply = 'I recommend launching the commerce, logistics, and analytics modules together for the fastest business impact.';
 
@@ -174,7 +174,7 @@ function buildAssistantResponse(prompt = '') {
   return {
     reply,
     suggestedModules: suggestions.map((module) => module.title),
-    confidence: 'high'
+    confidence: 'high',
   };
 }
 
@@ -183,7 +183,7 @@ router.get('/', (req, res) => {
     res.json({
       success: true,
       modules: getModuleCatalog(),
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     });
   } catch (error) {
     logger.error('Unable to fetch module catalog', { error: error.message, stack: error.stack });
@@ -196,7 +196,7 @@ router.get('/overview', (req, res) => {
     res.json({
       success: true,
       overview: buildPlatformOverview(),
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     });
   } catch (error) {
     logger.error('Unable to build module overview', { error: error.message, stack: error.stack });
@@ -232,5 +232,6 @@ module.exports = {
   router,
   getModuleCatalog,
   buildPlatformOverview,
-  buildAssistantResponse
+  buildAssistantResponse,
 };
+

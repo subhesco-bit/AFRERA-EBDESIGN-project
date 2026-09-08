@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Cattle Registry (backend/src/modules/M122). Generic operation panel -
@@ -12,5 +12,5 @@ export default function CattleRegistryPage() {
       title="Cattle Registry"
       description="Comprehensive livestock cattle registry."
     />
-  )
+  );
 }

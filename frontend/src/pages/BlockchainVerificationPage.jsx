@@ -10,6 +10,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
+import { blockchainVerificationAPI } from '../services/api';
 
 const BlockchainVerificationPage = () => {
   const [productId, setProductId] = useState('');
@@ -19,20 +20,17 @@ const BlockchainVerificationPage = () => {
   // Get blockchain stats
   const { data: blockchainStats } = useQuery({
     queryKey: ['blockchainStats'],
-    queryFn: () => fetch('/api/blockchain/stats')
-      .then(res => res.json())
-      .then(res => res.data),
-    refetchInterval: 300000 // 5 minutes
+    queryFn: () => blockchainVerificationAPI.getStats().then(res => res.data.data),
+    refetchInterval: 300000, // 5 minutes
   });
 
   const handleVerify = async () => {
     if (!productId.trim()) return;
-    
+
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/blockchain/products/${productId}/verify`);
-      const result = await response.json();
-      setSearchResult(result.data);
+      const response = await blockchainVerificationAPI.verifyProduct(productId);
+      setSearchResult(response.data.data);
     } catch (error) {
       console.error('Verification failed:', error);
     } finally {
@@ -136,17 +134,17 @@ const BlockchainVerificationPage = () => {
               <div>
                 <p className="text-sm text-gray-600">First Transaction</p>
                 <p className="font-medium">
-                  {searchResult.firstTransaction?.timestamp 
-                    ? new Date(searchResult.firstTransaction.timestamp).toLocaleString()
-                    : 'N/A'}
+                  {searchResult.firstTransaction?.timestamp ?
+                    new Date(searchResult.firstTransaction.timestamp).toLocaleString() :
+                    'N/A'}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Last Transaction</p>
                 <p className="font-medium">
-                  {searchResult.lastTransaction?.timestamp
-                    ? new Date(searchResult.lastTransaction.timestamp).toLocaleString()
-                    : 'N/A'}
+                  {searchResult.lastTransaction?.timestamp ?
+                    new Date(searchResult.lastTransaction.timestamp).toLocaleString() :
+                    'N/A'}
                 </p>
               </div>
             </div>
@@ -173,17 +171,17 @@ const BlockchainVerificationPage = () => {
           <div>
             <p className="text-sm text-gray-600">Genesis Block</p>
             <p className="font-medium">
-              {blockchainStats?.genesisTimestamp
-                ? new Date(blockchainStats.genesisTimestamp).toLocaleString()
-                : 'N/A'}
+              {blockchainStats?.genesisTimestamp ?
+                new Date(blockchainStats.genesisTimestamp).toLocaleString() :
+                'N/A'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Latest Activity</p>
             <p className="font-medium">
-              {blockchainStats?.latestTimestamp
-                ? new Date(blockchainStats.latestTimestamp).toLocaleString()
-                : 'N/A'}
+              {blockchainStats?.latestTimestamp ?
+                new Date(blockchainStats.latestTimestamp).toLocaleString() :
+                'N/A'}
             </p>
           </div>
           <div>

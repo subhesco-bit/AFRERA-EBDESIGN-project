@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ShoppingBag, Plus, X, Star, TrendingUp, Award, Search, Edit, Trash2, Leaf, ShieldCheck } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { ecommerceAPI } from '../services/api'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ShoppingBag, Plus, X, Star, TrendingUp, Award, Search, Edit, Trash2, Leaf, ShieldCheck } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { ecommerceAPI } from '../services/api';
+import Modal from '../components/common/Modal';
 
 const emptyListing = {
   product_name: '', category_id: '', quantity: '', unit: '', base_price: '', harvest_date: '', description: '',
-}
+};
 
 // Seller actions (create/edit/delete listing, analytics, my-listings) need
 // req.user.id on the backend (authMiddleware). No global auth/session
@@ -15,78 +15,78 @@ const emptyListing = {
 // the login flow (checked - same gap noted on BulkOrderPage.jsx), so the
 // seller id is entered manually here until real auth wiring exists.
 function EcommerceMarketplacePage() {
-  const queryClient = useQueryClient()
-  const [tab, setTab] = useState('browse')
-  const [search, setSearch] = useState('')
-  const [giTagged, setGiTagged] = useState(false)
-  const [organic, setOrganic] = useState(false)
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyListing)
-  const [priceTrendCategory, setPriceTrendCategory] = useState('')
+  const queryClient = useQueryClient();
+  const [tab, setTab] = useState('browse');
+  const [search, setSearch] = useState('');
+  const [giTagged, setGiTagged] = useState(false);
+  const [organic, setOrganic] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyListing);
+  const [priceTrendCategory, setPriceTrendCategory] = useState('');
 
   const { data: listingsData, isLoading, error } = useQuery({
     queryKey: ['ecommerce-listings', search, giTagged, organic],
     queryFn: async () => (await ecommerceAPI.getListings({ search: search || undefined, gi_tagged: giTagged || undefined, organic: organic || undefined }, {})).data?.products ?? [],
     enabled: tab === 'browse',
-  })
+  });
 
   const { data: giListings, isLoading: giLoading, error: giError } = useQuery({
     queryKey: ['ecommerce-gi-listings'],
     queryFn: async () => (await ecommerceAPI.getGIListings({})).data?.listings ?? [],
     enabled: tab === 'gi',
-  })
+  });
 
   const { data: sellerListings, isLoading: sellerLoading, error: sellerError } = useQuery({
     queryKey: ['ecommerce-seller-listings'],
     queryFn: async () => (await ecommerceAPI.getSellerListings()).data?.listings ?? [],
     enabled: tab === 'my-listings',
-  })
+  });
 
   const { data: analytics, isLoading: analyticsLoading, error: analyticsError } = useQuery({
     queryKey: ['ecommerce-seller-analytics'],
     queryFn: async () => (await ecommerceAPI.getSellerAnalytics('30d')).data ?? null,
     enabled: tab === 'analytics',
-  })
+  });
 
   const { data: priceTrends, refetch: fetchTrends, isFetching: trendsLoading } = useQuery({
     queryKey: ['ecommerce-price-trends', priceTrendCategory],
     queryFn: async () => (await ecommerceAPI.getPriceTrends(priceTrendCategory, '30d')).data?.trends ?? [],
     enabled: false,
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? ecommerceAPI.updateListing(editingId, payload) : ecommerceAPI.createListing(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Listing updated' : 'Listing created')
-      queryClient.invalidateQueries({ queryKey: ['ecommerce-seller-listings'] })
-      queryClient.invalidateQueries({ queryKey: ['ecommerce-listings'] })
-      closeForm()
+      toast.success(editingId ? 'Listing updated' : 'Listing created');
+      queryClient.invalidateQueries({ queryKey: ['ecommerce-seller-listings'] });
+      queryClient.invalidateQueries({ queryKey: ['ecommerce-listings'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save listing'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => ecommerceAPI.deleteListing(id),
     onSuccess: () => {
-      toast.success('Listing removed')
-      queryClient.invalidateQueries({ queryKey: ['ecommerce-seller-listings'] })
+      toast.success('Listing removed');
+      queryClient.invalidateQueries({ queryKey: ['ecommerce-seller-listings'] });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to remove listing'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyListing) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyListing); };
 
   const openEdit = (l) => {
     setForm({
       product_name: l.product_name || '', category_id: l.category_id || '', quantity: l.quantity || '',
       unit: l.unit || '', base_price: l.base_price || '', harvest_date: l.harvest_date?.slice(0, 10) || '', description: l.description || '',
-    })
-    setEditingId(l.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(l.id);
+    setShowForm(true);
+  };
 
-  const listings = listingsData || []
+  const listings = listingsData || [];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -99,7 +99,7 @@ function EcommerceMarketplacePage() {
           <p className="text-v42-mut">Browse listings, manage your products, and track market intelligence.</p>
         </div>
         {tab === 'my-listings' && (
-          <button onClick={() => { setForm(emptyListing); setEditingId(null); setShowForm(true) }}
+          <button onClick={() => { setForm(emptyListing); setEditingId(null); setShowForm(true); }}
             className="px-4 py-2 bg-v42-forest text-v42-paddy rounded-lg font-semibold hover:bg-v42-forestd transition flex items-center">
             <Plus className="w-4 h-4 mr-2" />New Listing
           </button>
@@ -246,7 +246,7 @@ function EcommerceMarketplacePage() {
                       <td className="px-4 py-3 text-v42-ink2">{l.total_quantity_sold || 0}</td>
                       <td className="px-4 py-3 text-right space-x-2">
                         <button onClick={() => openEdit(l)} className="p-2 text-v42-indigo hover:bg-v42-indigo/10 rounded"><Edit className="w-4 h-4" /></button>
-                        <button onClick={() => { if (confirm('Remove this listing?')) deleteMutation.mutate(l.id) }} className="p-2 text-v42-chilli hover:bg-v42-chilli/10 rounded"><Trash2 className="w-4 h-4" /></button>
+                        <button onClick={() => { if (confirm('Remove this listing?')) deleteMutation.mutate(l.id); }} className="p-2 text-v42-chilli hover:bg-v42-chilli/10 rounded"><Trash2 className="w-4 h-4" /></button>
                       </td>
                     </tr>
                   ))}
@@ -330,12 +330,12 @@ function EcommerceMarketplacePage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
+                  e.preventDefault();
                   if (!form.product_name || !form.category_id || !form.quantity || !form.unit || !form.base_price || !form.harvest_date) {
-                    toast.error('All fields except description are required')
-                    return
+                    toast.error('All fields except description are required');
+                    return;
                   }
-                  saveMutation.mutate(form)
+                  saveMutation.mutate(form);
                 }}
                 className="space-y-4"
               >
@@ -390,7 +390,7 @@ function EcommerceMarketplacePage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default EcommerceMarketplacePage
+export default EcommerceMarketplacePage;

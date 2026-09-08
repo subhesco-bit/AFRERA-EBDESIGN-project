@@ -9,7 +9,7 @@ describe('Authentication Service', () => {
         email: 'test@example.com',
         password: 'Test@123',
         name: 'Test User',
-        phone: '+919876543210'
+        phone: '+919876543210',
       };
 
       // Mock response
@@ -20,8 +20,8 @@ describe('Authentication Service', () => {
           email: userData.email,
           name: userData.name,
           phone: userData.phone,
-          createdAt: new Date()
-        }
+          createdAt: new Date(),
+        },
       };
 
       expect(response.status).toBe(201);
@@ -32,12 +32,12 @@ describe('Authentication Service', () => {
       const userData = {
         email: 'invalid-email',
         password: 'Test@123',
-        name: 'Test User'
+        name: 'Test User',
       };
 
       const error = {
         status: 400,
-        message: 'Invalid email format'
+        message: 'Invalid email format',
       };
 
       expect(error.status).toBe(400);
@@ -48,12 +48,12 @@ describe('Authentication Service', () => {
       const userData = {
         email: 'test@example.com',
         password: 'weak',
-        name: 'Test User'
+        name: 'Test User',
       };
 
       const error = {
         status: 400,
-        message: 'Password must be at least 8 characters'
+        message: 'Password must be at least 8 characters',
       };
 
       expect(error.status).toBe(400);
@@ -65,13 +65,13 @@ describe('Authentication Service', () => {
     it('should login successfully with valid credentials', async () => {
       const credentials = {
         email: 'test@example.com',
-        password: 'Test@123'
+        password: 'Test@123',
       };
 
       const token = jwt.sign(
         { id: '123', email: credentials.email },
         process.env.JWT_SECRET,
-        { expiresIn: '24h' }
+        { expiresIn: '24h' },
       );
 
       expect(token).toBeDefined();
@@ -81,12 +81,12 @@ describe('Authentication Service', () => {
     it('should fail login with invalid credentials', async () => {
       const credentials = {
         email: 'test@example.com',
-        password: 'wrongpassword'
+        password: 'wrongpassword',
       };
 
       const error = {
         status: 401,
-        message: 'Invalid credentials'
+        message: 'Invalid credentials',
       };
 
       expect(error.status).toBe(401);
@@ -99,7 +99,7 @@ describe('Authentication Service', () => {
       const token = jwt.sign(
         { id: '123', email: 'test@example.com' },
         process.env.JWT_SECRET,
-        { expiresIn: '24h' }
+        { expiresIn: '24h' },
       );
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -120,7 +120,7 @@ describe('Authentication Service', () => {
       const expiredToken = jwt.sign(
         { id: '123', email: 'test@example.com' },
         process.env.JWT_SECRET,
-        { expiresIn: '-1h' }
+        { expiresIn: '-1h' },
       );
 
       expect(() => {

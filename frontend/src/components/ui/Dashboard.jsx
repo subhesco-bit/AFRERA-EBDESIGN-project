@@ -7,13 +7,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Select, DatePicker } from './common';
 
-const Dashboard = ({ 
-  title, 
-  widgets = [], 
+const Dashboard = ({
+  title,
+  widgets = [],
   layout = 'grid',
   refreshInterval = 60000,
   onRefresh,
-  onLayoutChange 
+  onLayoutChange,
 }) => {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,7 @@ const Dashboard = ({
 
   useEffect(() => {
     loadDashboardData();
-    
+
     if (autoRefresh) {
       const interval = setInterval(loadDashboardData, refreshInterval);
       return () => clearInterval(interval);
@@ -34,11 +34,11 @@ const Dashboard = ({
     try {
       // Simulate data loading - in production, this would call actual APIs
       const dashboardData = {};
-      
+
       for (const widget of widgets) {
         dashboardData[widget.id] = await fetchWidgetData(widget, selectedPeriod);
       }
-      
+
       setData(dashboardData);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -88,7 +88,7 @@ const Dashboard = ({
 
   const renderWidget = (widget) => {
     const widgetData = data[widget.id];
-    
+
     switch (widget.type) {
       case 'metric':
         return <MetricWidget widget={widget} data={widgetData} />;
@@ -127,7 +127,7 @@ const Dashboard = ({
             Last updated: {new Date().toLocaleString()}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <Select
             value={selectedPeriod}
@@ -136,11 +136,11 @@ const Dashboard = ({
               { value: '1d', label: '1 Day' },
               { value: '7d', label: '7 Days' },
               { value: '30d', label: '30 Days' },
-              { value: '90d', label: '90 Days' }
+              { value: '90d', label: '90 Days' },
             ]}
             className="w-32"
           />
-          
+
           <Button
             variant={autoRefresh ? 'primary' : 'outline'}
             size="sm"
@@ -148,7 +148,7 @@ const Dashboard = ({
           >
             {autoRefresh ? '🔄 Auto' : '⏸️ Auto'}
           </Button>
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -156,7 +156,7 @@ const Dashboard = ({
           >
             🔄 Refresh
           </Button>
-          
+
           {onLayoutChange && (
             <Select
               value={layout}
@@ -164,7 +164,7 @@ const Dashboard = ({
               options={[
                 { value: 'grid', label: 'Grid' },
                 { value: 'masonry', label: 'Masonry' },
-                { value: 'list', label: 'List' }
+                { value: 'list', label: 'List' },
               ]}
               className="w-24"
             />
@@ -179,12 +179,12 @@ const Dashboard = ({
       ) : (
         <div className={getLayoutClasses()}>
           {widgets.map(widget => (
-            <Card 
-              key={widget.id} 
+            <Card
+              key={widget.id}
               className={`widget widget-${widget.type}`}
-              style={{ 
+              style={{
                 gridColumn: widget.colSpan ? `span ${widget.colSpan}` : 'auto',
-                gridRow: widget.rowSpan ? `span ${widget.rowSpan}` : 'auto'
+                gridRow: widget.rowSpan ? `span ${widget.rowSpan}` : 'auto',
               }}
             >
               <div className="flex items-center justify-between mb-4">
@@ -243,20 +243,20 @@ const MetricWidget = ({ widget, data }) => {
 
 const ChartWidget = ({ widget, data }) => {
   if (!data) return null;
-  
+
   // Simple chart rendering - in production, use a charting library like Chart.js or Recharts
   const maxValue = Math.max(...data.datasets[0].data);
-  
+
   return (
     <div className="chart-widget">
       <div className="flex items-end justify-between h-48">
         {data.labels.map((label, index) => {
           const value = data.datasets[0].data[index];
           const height = (value / maxValue) * 100;
-          
+
           return (
             <div key={index} className="flex flex-col items-center flex-1">
-              <div 
+              <div
                 className="w-full bg-blue-500 rounded-t transition-all hover:bg-blue-600"
                 style={{ height: `${height}%` }}
                 title={`${label}: ${value.toFixed(2)}`}
@@ -274,7 +274,7 @@ const ChartWidget = ({ widget, data }) => {
 
 const TableWidget = ({ widget, data }) => {
   if (!data) return null;
-  
+
   return (
     <div className="table-widget overflow-x-auto">
       <table className="w-full">
@@ -305,23 +305,23 @@ const TableWidget = ({ widget, data }) => {
 
 const GaugeWidget = ({ widget, data }) => {
   if (!data) return null;
-  
+
   const percentage = (data.value / data.max) * 100;
   const getColor = () => {
     if (percentage < 33) return 'bg-red-500';
     if (percentage < 66) return 'bg-yellow-500';
     return 'bg-green-500';
   };
-  
+
   return (
     <div className="gauge-widget">
       <div className="relative h-48 flex items-center justify-center">
         <div className="w-40 h-40 rounded-full border-8 border-gray-200 relative">
-          <div 
+          <div
             className={`absolute inset-0 rounded-full ${getColor()} transition-all`}
             style={{
-              clipPath: `polygon(0 0, 100% 0, 100% 100%, 0 100%)`,
-              transform: `rotate(${(percentage / 100) * 360}deg)`
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+              transform: `rotate(${(percentage / 100) * 360}deg)`,
             }}
           />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -346,7 +346,7 @@ const GaugeWidget = ({ widget, data }) => {
 
 const MapWidget = ({ widget, data }) => {
   if (!data) return null;
-  
+
   return (
     <div className="map-widget">
       <div className="h-48 bg-gray-100 rounded relative overflow-hidden">
@@ -363,7 +363,7 @@ const MapWidget = ({ widget, data }) => {
             className="absolute w-3 h-3 bg-blue-500 rounded-full animate-pulse"
             style={{
               left: `${((marker.lng + 180) / 360) * 100}%`,
-              top: `${((marker.lat + 90) / 180) * 100}%`
+              top: `${((marker.lat + 90) / 180) * 100}%`,
             }}
             title={`Value: ${marker.value.toFixed(2)}`}
           />

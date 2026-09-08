@@ -14,35 +14,35 @@ class DatabaseSecurity {
       enableColumnEncryption: config.enableColumnEncryption !== false,
       encryptionKey: config.encryptionKey || process.env.DB_ENCRYPTION_KEY,
       encryptionAlgorithm: config.encryptionAlgorithm || 'aes-256-gcm',
-      
+
       // Row-level security
       enableRowLevelSecurity: config.enableRowLevelSecurity !== false,
-      
+
       // Audit logging
       enableAuditLogging: config.enableAuditLogging !== false,
       auditSensitiveOperations: config.auditSensitiveOperations !== false,
-      
+
       // SQL injection protection
       enableSqlInjectionProtection: config.enableSqlInjectionProtection !== false,
       maxQueryLength: config.maxQueryLength || 10000,
-      
+
       // Rate limiting
       enableRateLimiting: config.enableRateLimiting !== false,
       maxQueriesPerMinute: config.maxQueriesPerMinute || 1000,
       maxConcurrentQueries: config.maxConcurrentQueries || 100,
-      
+
       // Data masking
       enableDataMasking: config.enableDataMasking !== false,
       maskSensitiveFields: config.maskSensitiveFields !== false,
-      
+
       // Connection security
       requireSSL: config.requireSSL || process.env.PG_SSL === 'true',
       allowedIPs: config.allowedIPs || [],
-      
+
       // Database connection
       databaseUrl: config.databaseUrl || process.env.DATABASE_URL,
-      
-      ...config
+
+      ...config,
     };
 
     this.pool = null;
@@ -58,7 +58,7 @@ class DatabaseSecurity {
     try {
       this.pool = new Pool({
         connectionString: this.config.databaseUrl,
-        ssl: this.config.requireSSL ? { rejectUnauthorized: true } : undefined
+        ssl: this.config.requireSSL ? { rejectUnauthorized: true } : undefined,
       });
 
       // Initialize encryption key
@@ -92,7 +92,7 @@ class DatabaseSecurity {
     this.encryptionKey = crypto.scryptSync(
       this.config.encryptionKey,
       'database-encryption-salt',
-      32
+      32,
     );
 
     logger.info('Encryption key initialized');
@@ -111,7 +111,7 @@ class DatabaseSecurity {
       const cipher = crypto.createCipheriv(
         this.config.encryptionAlgorithm,
         this.encryptionKey,
-        iv
+        iv,
       );
 
       let encrypted = cipher.update(plaintext, 'utf8', 'hex');
@@ -122,7 +122,7 @@ class DatabaseSecurity {
       const result = Buffer.concat([
         iv,
         authTag,
-        Buffer.from(encrypted, 'hex')
+        Buffer.from(encrypted, 'hex'),
       ]).toString('base64');
 
       return result;
@@ -142,7 +142,7 @@ class DatabaseSecurity {
 
     try {
       const buffer = Buffer.from(ciphertext, 'base64');
-      
+
       // Extract IV (12 bytes), auth tag (16 bytes), and encrypted data
       const iv = buffer.slice(0, 12);
       const authTag = buffer.slice(12, 28);
@@ -151,7 +151,7 @@ class DatabaseSecurity {
       const decipher = crypto.createDecipheriv(
         this.config.encryptionAlgorithm,
         this.encryptionKey,
-        iv
+        iv,
       );
 
       decipher.setAuthTag(authTag);
@@ -184,7 +184,7 @@ class DatabaseSecurity {
         'loans',
         'policies',
         'contracts',
-        'financial_transactions'
+        'financial_transactions',
       ];
 
       for (const table of sensitiveTables) {
@@ -232,7 +232,7 @@ class DatabaseSecurity {
            WHERE ur.user_id = current_setting('app.user_id')::uuid
            AND r.name = 'admin'
          )
-       )`
+       )`,
     ];
 
     for (const policy of policies) {
@@ -290,7 +290,7 @@ class DatabaseSecurity {
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         resolved BOOLEAN DEFAULT FALSE,
         resolved_at TIMESTAMP
-      )`
+      )`,
     ];
 
     const indexes = [
@@ -300,7 +300,7 @@ class DatabaseSecurity {
       'CREATE INDEX IF NOT EXISTS idx_access_log_user ON access_log(user_id)',
       'CREATE INDEX IF NOT EXISTS idx_access_log_resource ON access_log(resource_type, resource_id)',
       'CREATE INDEX IF NOT EXISTS idx_security_events_type ON security_events(event_type)',
-      'CREATE INDEX IF NOT EXISTS idx_security_events_severity ON security_events(severity)'
+      'CREATE INDEX IF NOT EXISTS idx_security_events_severity ON security_events(severity)',
     ];
 
     for (const table of tables) {
@@ -328,7 +328,7 @@ class DatabaseSecurity {
        FOR UPDATE USING (
          NOT (old_values ? 'created_at' : false) OR
          NOT (old_values ? 'id' : false)
-       )`
+       )`,
     ];
 
     for (const policy of policies) {
@@ -346,7 +346,7 @@ class DatabaseSecurity {
   async enableSecurityExtensions() {
     const extensions = [
       'pgcrypto', // For cryptographic functions
-      'pg_stat_statements' // For query monitoring
+      'pg_stat_statements', // For query monitoring
     ];
 
     for (const ext of extensions) {
@@ -373,7 +373,7 @@ class DatabaseSecurity {
       /(\bdrop\b|\btruncate\b|\balter\b)/i,
       /(\bexec\b|\beval\b|\bsp_executesql\b)/i,
       /(--\s*|\b;\s*\/\*|\*\/\s*;)/i,
-      /(\bxp_cmdshell\b|\bsp_oacreate\b)/i
+      /(\bxp_cmdshell\b|\bsp_oacreate\b)/i,
     ];
 
     for (const pattern of suspiciousPatterns) {
@@ -382,7 +382,7 @@ class DatabaseSecurity {
         return {
           safe: false,
           reason: 'Suspicious SQL pattern detected',
-          pattern: pattern.toString()
+          pattern: pattern.toString(),
         };
       }
     }
@@ -393,7 +393,7 @@ class DatabaseSecurity {
       return {
         safe: false,
         reason: 'Query exceeds maximum length',
-        length: query.length
+        length: query.length,
       };
     }
 
@@ -427,7 +427,7 @@ class DatabaseSecurity {
         allowed: false,
         reason: 'Rate limit exceeded',
         limit: this.config.maxQueriesPerMinute,
-        resetTime: new Date(userStats.resetTime)
+        resetTime: new Date(userStats.resetTime),
       };
     }
 
@@ -449,7 +449,7 @@ class DatabaseSecurity {
     logger.warn('IP not in whitelist', { ipAddress });
     return {
       allowed: false,
-      reason: 'IP address not in whitelist'
+      reason: 'IP address not in whitelist',
     };
   }
 
@@ -463,7 +463,7 @@ class DatabaseSecurity {
 
     const sensitiveFields = [
       'password', 'password_hash', 'credit_card', 'ssn', 'pan',
-      'account_number', 'ifsc', 'aadhaar', 'phone', 'email'
+      'account_number', 'ifsc', 'aadhaar', 'phone', 'email',
     ];
 
     const maskedData = { ...data };
@@ -515,7 +515,7 @@ class DatabaseSecurity {
         event.ipAddress || null,
         event.userAgent || null,
         event.success !== false,
-        event.errorMessage || null
+        event.errorMessage || null,
       ]);
     } catch (error) {
       logger.error('Failed to log audit event', { error: error.message });
@@ -543,7 +543,7 @@ class DatabaseSecurity {
         event.action,
         event.granted,
         event.denialReason || null,
-        event.ipAddress || null
+        event.ipAddress || null,
       ]);
     } catch (error) {
       logger.error('Failed to log access event', { error: error.message });
@@ -564,7 +564,7 @@ class DatabaseSecurity {
         event.severity,
         event.description,
         event.affectedUserId || null,
-        event.metadata ? JSON.stringify(event.metadata) : null
+        event.metadata ? JSON.stringify(event.metadata) : null,
       ]);
 
       // Emit event for real-time monitoring
@@ -612,7 +612,7 @@ class DatabaseSecurity {
         severity: 'critical',
         description: 'SQL injection attempt detected',
         affectedUserId: userId,
-        metadata: { query: query.substring(0, 100), ...injectionCheck }
+        metadata: { query: query.substring(0, 100), ...injectionCheck },
       });
       return { valid: false, reason: injectionCheck.reason };
     }
@@ -625,7 +625,7 @@ class DatabaseSecurity {
         severity: 'warning',
         description: 'Rate limit exceeded',
         affectedUserId: userId,
-        metadata: rateLimitCheck
+        metadata: rateLimitCheck,
       });
       return { valid: false, reason: rateLimitCheck.reason };
     }
@@ -638,7 +638,7 @@ class DatabaseSecurity {
         severity: 'warning',
         description: 'Unauthorized IP access attempt',
         affectedUserId: userId,
-        metadata: { ipAddress, ...ipCheck }
+        metadata: { ipAddress, ...ipCheck },
       });
       return { valid: false, reason: ipCheck.reason };
     }
@@ -676,13 +676,13 @@ class DatabaseSecurity {
           FROM security_events
           WHERE timestamp > NOW() - INTERVAL '24 hours'
           GROUP BY severity
-        `)
+        `),
       ]);
 
       return {
         audit: auditStats.rows,
         access: accessStats.rows,
-        events: eventStats.rows
+        events: eventStats.rows,
       };
     } catch (error) {
       logger.error('Failed to get security statistics', { error: error.message });
@@ -720,5 +720,5 @@ function getDatabaseSecurity(config = {}) {
 
 module.exports = {
   DatabaseSecurity,
-  getDatabaseSecurity
+  getDatabaseSecurity,
 };

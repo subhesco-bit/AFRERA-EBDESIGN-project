@@ -37,7 +37,7 @@ class AnalyticsService {
       daily: this.aggregateDaily,
       weekly: this.aggregateWeekly,
       monthly: this.aggregateMonthly,
-      yearly: this.aggregateYearly
+      yearly: this.aggregateYearly,
     };
   }
 
@@ -48,7 +48,7 @@ class AnalyticsService {
     this.processors = {
       stream: this.processStream,
       batch: this.processBatch,
-      event: this.processEvent
+      event: this.processEvent,
     };
   }
 
@@ -58,7 +58,7 @@ class AnalyticsService {
   async generateReport(reportType, parameters, options = {}) {
     try {
       const cacheKey = `${reportType}_${JSON.stringify(parameters)}`;
-      
+
       // Check cache
       if (this.reportCache.has(cacheKey)) {
         const cached = this.reportCache.get(cacheKey);
@@ -69,11 +69,11 @@ class AnalyticsService {
       }
 
       const report = await this.buildReport(reportType, parameters, options);
-      
+
       // Cache report
       this.reportCache.set(cacheKey, {
         report,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       logger.info(`Report generated: ${reportType}`);
@@ -89,16 +89,16 @@ class AnalyticsService {
    */
   async buildReport(reportType, parameters, options) {
     const reports = {
-      'agricultural_overview': this.buildAgriculturalOverview,
-      'financial_performance': this.buildFinancialPerformance,
-      'operational_efficiency': this.buildOperationalEfficiency,
-      'market_intelligence': this.buildMarketIntelligence,
-      'resource_utilization': this.buildResourceUtilization,
-      'risk_assessment': this.buildRiskAssessment,
-      'sustainability_metrics': this.buildSustainabilityMetrics,
-      'user_analytics': this.buildUserAnalytics,
-      'supply_chain': this.buildSupplyChain,
-      'custom': this.buildCustomReport
+      agricultural_overview: this.buildAgriculturalOverview,
+      financial_performance: this.buildFinancialPerformance,
+      operational_efficiency: this.buildOperationalEfficiency,
+      market_intelligence: this.buildMarketIntelligence,
+      resource_utilization: this.buildResourceUtilization,
+      risk_assessment: this.buildRiskAssessment,
+      sustainability_metrics: this.buildSustainabilityMetrics,
+      user_analytics: this.buildUserAnalytics,
+      supply_chain: this.buildSupplyChain,
+      custom: this.buildCustomReport,
     };
 
     const reportBuilder = reports[reportType] || reports['custom'];
@@ -110,12 +110,12 @@ class AnalyticsService {
    */
   async buildAgriculturalOverview(parameters, options) {
     const pg = getPostgreSQL();
-    
+
     // Fetch agricultural data
     const cropData = await this.fetchCropData(parameters);
     const farmerData = await this.fetchFarmerData(parameters);
     const productionData = await this.fetchProductionData(parameters);
-    
+
     return {
       report_type: 'agricultural_overview',
       period: parameters.period || 'monthly',
@@ -124,13 +124,13 @@ class AnalyticsService {
         total_farmers: farmerData.total,
         active_crops: cropData.active,
         total_production: productionData.total,
-        average_yield: productionData.average
+        average_yield: productionData.average,
       },
       crop_performance: this.analyzeCropPerformance(cropData),
       farmer_demographics: this.analyzeFarmerDemographics(farmerData),
       production_trends: this.analyzeProductionTrends(productionData),
       regional_breakdown: this.analyzeRegionalData(parameters),
-      recommendations: this.generateAgriculturalRecommendations(cropData, productionData)
+      recommendations: this.generateAgriculturalRecommendations(cropData, productionData),
     };
   }
 
@@ -139,11 +139,11 @@ class AnalyticsService {
    */
   async buildFinancialPerformance(parameters, options) {
     const pg = getPostgreSQL();
-    
+
     const revenueData = await this.fetchRevenueData(parameters);
     const expenseData = await this.fetchExpenseData(parameters);
     const profitData = await this.fetchProfitData(parameters);
-    
+
     return {
       report_type: 'financial_performance',
       period: parameters.period || 'monthly',
@@ -152,14 +152,14 @@ class AnalyticsService {
         total_revenue: revenueData.total,
         total_expenses: expenseData.total,
         net_profit: profitData.net,
-        profit_margin: profitData.margin
+        profit_margin: profitData.margin,
       },
       revenue_breakdown: this.analyzeRevenueBreakdown(revenueData),
       expense_analysis: this.analyzeExpenses(expenseData),
       profit_trends: this.analyzeProfitTrends(profitData),
       cash_flow: this.analyzeCashFlow(parameters),
       financial_health: this.assessFinancialHealth(revenueData, expenseData, profitData),
-      recommendations: this.generateFinancialRecommendations(revenueData, expenseData)
+      recommendations: this.generateFinancialRecommendations(revenueData, expenseData),
     };
   }
 
@@ -174,12 +174,12 @@ class AnalyticsService {
       summary: {
         overall_efficiency: 85,
         resource_utilization: 78,
-        process_optimization: 82
+        process_optimization: 82,
       },
       efficiency_metrics: this.calculateEfficiencyMetrics(parameters),
       bottleneck_analysis: this.identifyBottlenecks(parameters),
       optimization_opportunities: this.identifyOptimizationOpportunities(parameters),
-      benchmark_comparison: this.compareWithBenchmarks(parameters)
+      benchmark_comparison: this.compareWithBenchmarks(parameters),
     };
   }
 
@@ -194,13 +194,13 @@ class AnalyticsService {
       summary: {
         market_trend: 'bullish',
         price_volatility: 'medium',
-      demand_outlook: 'strong'
+        demand_outlook: 'strong',
       },
       price_analysis: this.analyzePriceTrends(parameters),
       demand_forecast: this.forecastDemand(parameters),
       competitive_landscape: this.analyzeCompetition(parameters),
       market_opportunities: this.identifyMarketOpportunities(parameters),
-      risk_factors: this.identifyMarketRisks(parameters)
+      risk_factors: this.identifyMarketRisks(parameters),
     };
   }
 
@@ -216,12 +216,12 @@ class AnalyticsService {
         land_utilization: 75,
         water_utilization: 68,
         labor_utilization: 82,
-        equipment_utilization: 71
+        equipment_utilization: 71,
       },
       resource_breakdown: this.analyzeResourceBreakdown(parameters),
       utilization_trends: this.analyzeUtilizationTrends(parameters),
       optimization_potential: this.identifyResourceOptimization(parameters),
-      waste_analysis: this.analyzeResourceWaste(parameters)
+      waste_analysis: this.analyzeResourceWaste(parameters),
     };
   }
 
@@ -237,12 +237,12 @@ class AnalyticsService {
         overall_risk_level: 'medium',
         high_priority_risks: 3,
         medium_priority_risks: 7,
-        low_priority_risks: 12
+        low_priority_risks: 12,
       },
       risk_categories: this.categorizeRisks(parameters),
       risk_matrix: this.generateRiskMatrix(parameters),
       mitigation_strategies: this.generateMitigationStrategies(parameters),
-      early_warning_indicators: this.identifyEarlyWarningIndicators(parameters)
+      early_warning_indicators: this.identifyEarlyWarningIndicators(parameters),
     };
   }
 
@@ -258,12 +258,12 @@ class AnalyticsService {
         sustainability_score: 72,
         carbon_footprint: 'moderate',
         water_efficiency: 'good',
-        soil_health: 'improving'
+        soil_health: 'improving',
       },
       environmental_impact: this.assessEnvironmentalImpact(parameters),
       social_impact: this.assessSocialImpact(parameters),
       economic_sustainability: this.assessEconomicSustainability(parameters),
-      improvement_recommendations: this.generateSustainabilityRecommendations(parameters)
+      improvement_recommendations: this.generateSustainabilityRecommendations(parameters),
     };
   }
 
@@ -279,12 +279,12 @@ class AnalyticsService {
         total_users: 15420,
         active_users: 8934,
         new_users: 1245,
-        retention_rate: 78
+        retention_rate: 78,
       },
       user_demographics: this.analyzeUserDemographics(parameters),
       engagement_metrics: this.analyzeUserEngagement(parameters),
       feature_usage: this.analyzeFeatureUsage(parameters),
-      user_journey: this.analyzeUserJourney(parameters)
+      user_journey: this.analyzeUserJourney(parameters),
     };
   }
 
@@ -300,12 +300,12 @@ class AnalyticsService {
         supply_chain_health: 82,
         on_time_delivery: 89,
         inventory_turnover: 7.2,
-      supplier_performance: 85
+        supplier_performance: 85,
       },
       supply_chain_mapping: this.mapSupplyChain(parameters),
       performance_metrics: this.measureSupplyChainPerformance(parameters),
       risk_analysis: this.analyzeSupplyChainRisks(parameters),
-      optimization_opportunities: this.identifySupplyChainOptimizations(parameters)
+      optimization_opportunities: this.identifySupplyChainOptimizations(parameters),
     };
   }
 
@@ -315,12 +315,12 @@ class AnalyticsService {
   async buildCustomReport(parameters, options) {
     return {
       report_type: 'custom',
-      parameters: parameters,
-      options: options,
+      parameters,
+      options,
       generated_at: new Date().toISOString(),
       data: await this.fetchCustomData(parameters),
       analysis: this.performCustomAnalysis(parameters, options),
-      visualizations: this.generateCustomVisualizations(parameters, options)
+      visualizations: this.generateCustomVisualizations(parameters, options),
     };
   }
 
@@ -332,7 +332,7 @@ class AnalyticsService {
       const processor = this.processors[processingType] || this.processors.stream;
       return await processor.call(this, data);
     } catch (error) {
-      logger.error(`Error processing realtime data:`, error);
+      logger.error('Error processing realtime data:', error);
       throw error;
     }
   }
@@ -347,9 +347,9 @@ class AnalyticsService {
       data_points: data.length,
       processed_data: data.map(item => this.transformDataPoint(item)),
       alerts: this.generateAlerts(data),
-      metrics: this.calculateRealtimeMetrics(data)
+      metrics: this.calculateRealtimeMetrics(data),
     };
-    
+
     return processed;
   }
 
@@ -364,9 +364,9 @@ class AnalyticsService {
       records_processed: data.length,
       aggregations: this.performAggregations(data),
       trends: this.calculateTrends(data),
-      anomalies: this.detectAnomalies(data)
+      anomalies: this.detectAnomalies(data),
     };
-    
+
     return processed;
   }
 
@@ -381,9 +381,9 @@ class AnalyticsService {
       event_type: data.type,
       processed_data: this.transformEventData(data),
       triggers: this.identifyTriggers(data),
-      actions: this.determineActions(data)
+      actions: this.determineActions(data),
     };
-    
+
     return processed;
   }
 
@@ -393,7 +393,7 @@ class AnalyticsService {
   async analyzeTrends(data, trendType = 'linear') {
     try {
       const cacheKey = `${trendType}_${JSON.stringify(data)}`;
-      
+
       if (this.trendCache.has(cacheKey)) {
         const cached = this.trendCache.get(cacheKey);
         if (Date.now() - cached.timestamp < 1800000) { // 30 minutes cache
@@ -402,10 +402,10 @@ class AnalyticsService {
       }
 
       const trends = this.calculateTrends(data, trendType);
-      
+
       this.trendCache.set(cacheKey, {
         trends,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return trends;
@@ -425,9 +425,9 @@ class AnalyticsService {
       magnitude: this.calculateTrendMagnitude(data),
       confidence: this.calculateTrendConfidence(data),
       forecast: this.generateTrendForecast(data, trendType),
-      seasonality: this.detectSeasonality(data)
+      seasonality: this.detectSeasonality(data),
     };
-    
+
     return trends;
   }
 
@@ -455,14 +455,14 @@ class AnalyticsService {
    */
   async aggregateByPeriod(data, period) {
     const aggregated = {
-      period: period,
+      period,
       start_date: data.start_date,
       end_date: data.end_date,
       total_records: data.length,
       metrics: this.calculateAggregationMetrics(data, period),
-      breakdown: this.createTimeBreakdown(data, period)
+      breakdown: this.createTimeBreakdown(data, period),
     };
-    
+
     return aggregated;
   }
 
@@ -472,7 +472,7 @@ class AnalyticsService {
     return {
       total: 150,
       active: 120,
-      varieties: ['wheat', 'rice', 'maize', 'vegetables']
+      varieties: ['wheat', 'rice', 'maize', 'vegetables'],
     };
   }
 
@@ -480,7 +480,7 @@ class AnalyticsService {
     return {
       total: 5000,
       active: 4500,
-      new_this_month: 150
+      new_this_month: 150,
     };
   }
 
@@ -488,7 +488,7 @@ class AnalyticsService {
     return {
       total: 10000,
       average: 2.5,
-      trend: 'increasing'
+      trend: 'increasing',
     };
   }
 
@@ -496,14 +496,14 @@ class AnalyticsService {
     return {
       total: 5000000,
       growth: 15,
-      sources: ['crop_sales', 'services', 'government_schemes']
+      sources: ['crop_sales', 'services', 'government_schemes'],
     };
   }
 
   async fetchExpenseData(parameters) {
     return {
       total: 3500000,
-      categories: ['labor', 'inputs', 'equipment', 'infrastructure']
+      categories: ['labor', 'inputs', 'equipment', 'infrastructure'],
     };
   }
 
@@ -511,7 +511,7 @@ class AnalyticsService {
     return {
       net: 1500000,
       margin: 30,
-      trend: 'stable'
+      trend: 'stable',
     };
   }
 
@@ -521,15 +521,15 @@ class AnalyticsService {
       top_performing: ['wheat', 'rice'],
       underperforming: ['maize'],
       average_yield: 2.5,
-      yield_variance: 0.3
+      yield_variance: 0.3,
     };
   }
 
   analyzeFarmerDemographics(farmerData) {
     return {
       age_distribution: { '25-35': 20, '36-45': 35, '46-55': 30, '55+': 15 },
-      land_holding: { 'small': 40, 'medium': 45, 'large': 15 },
-      education: { 'primary': 30, 'secondary': 50, 'graduate': 20 }
+      land_holding: { small: 40, medium: 45, large: 15 },
+      education: { primary: 30, secondary: 50, graduate: 20 },
     };
   }
 
@@ -537,7 +537,7 @@ class AnalyticsService {
     return {
       trend: 'increasing',
       growth_rate: 8.5,
-      seasonal_variance: 0.2
+      seasonal_variance: 0.2,
     };
   }
 
@@ -545,7 +545,7 @@ class AnalyticsService {
     return {
       regions: ['north', 'south', 'east', 'west'],
       top_performing: 'north',
-      growth_potential: 'east'
+      growth_potential: 'east',
     };
   }
 
@@ -553,7 +553,7 @@ class AnalyticsService {
     return [
       'focus on high-yield varieties',
       'improve irrigation efficiency',
-      'adopt precision farming'
+      'adopt precision farming',
     ];
   }
 
@@ -624,21 +624,22 @@ class AnalyticsService {
         cache_size: {
           data: this.dataCache.size,
           reports: this.reportCache.size,
-          trends: this.trendCache.size
+          trends: this.trendCache.size,
         },
         aggregators: Object.keys(this.aggregators),
         processors: Object.keys(this.processors),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Analytics Service health check failed:', error);
       return {
         status: 'unhealthy',
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
 }
 
 module.exports = new AnalyticsService();
+

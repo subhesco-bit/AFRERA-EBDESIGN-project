@@ -1,53 +1,53 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { vendorsAPI } from '../services/api'
-import { Building2, ShoppingCart, TrendingUp, CheckCircle, FileText, Truck, DollarSign, Users, Package } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
-import { useAuthStore } from '../store/authStore'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { vendorsAPI } from '../services/api';
+import { Building2, ShoppingCart, TrendingUp, CheckCircle, FileText, Truck, DollarSign, Users, Package } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
+import { useAuthStore } from '../store/authStore';
 
 function CorporateBuyerPage() {
-  const [activeTab, setActiveTab] = useState('overview')
-  const [showOrderModal, setShowOrderModal] = useState(false)
-  const queryClient = useQueryClient()
-  const { user } = useAuthStore()
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   // Was hardcoded to the literal string 'current-buyer-id' for every visitor,
   // so every corporate buyer landing here saw the same profile/orders instead
   // of their own. Use the logged-in user's real id and don't fire the
   // queries until we actually have one.
-  const buyerId = user?.id
+  const buyerId = user?.id;
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: buyerProfile } = useQuery({
     queryKey: ['buyer-profile', buyerId],
     queryFn: () => vendorsAPI.getBuyerProfile(buyerId).then(r => r.data),
-    enabled: !!buyerId,
-  })
+    enabled: Boolean(buyerId),
+  });
 
   const { data: creditStatus } = useQuery({
     queryKey: ['credit-status', buyerId],
     queryFn: () => vendorsAPI.getCreditStatus(buyerId).then(r => r.data),
-    enabled: !!buyerId,
-  })
+    enabled: Boolean(buyerId),
+  });
 
   const { data: activeOrders } = useQuery({
     queryKey: ['active-orders', buyerId],
     queryFn: () => vendorsAPI.getActiveOrders(buyerId).then(r => r.data),
-    enabled: !!buyerId,
-  })
+    enabled: Boolean(buyerId),
+  });
 
   const createOrderMutation = useMutation({
     mutationFn: (data) => vendorsAPI.createCorporateOrder(data),
     onSuccess: () => {
-      toast.success('Order created successfully')
-      queryClient.invalidateQueries({ queryKey: ['active-orders'] })
-      setShowOrderModal(false)
+      toast.success('Order created successfully');
+      queryClient.invalidateQueries({ queryKey: ['active-orders'] });
+      setShowOrderModal(false);
     },
     onError: () => {
-      toast.error('Failed to create order')
+      toast.error('Failed to create order');
     },
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -60,15 +60,15 @@ function CorporateBuyerPage() {
       {creditStatus && (
         <div className={`rounded-lg p-4 mb-6 ${
           creditStatus.term === 'net60' ? 'bg-green-50 border border-green-200' :
-          creditStatus.term === 'net30' ? 'bg-blue-50 border border-blue-200' :
-          'bg-gray-50 border border-gray-200'
+            creditStatus.term === 'net30' ? 'bg-blue-50 border border-blue-200' :
+              'bg-gray-50 border border-gray-200'
         }`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <CheckCircle className={`w-6 h-6 mr-3 ${
                 creditStatus.term === 'net60' ? 'text-green-600' :
-                creditStatus.term === 'net30' ? 'text-blue-600' :
-                'text-gray-600'
+                  creditStatus.term === 'net30' ? 'text-blue-600' :
+                    'text-gray-600'
               }`} />
               <div>
                 <div className="font-semibold text-gray-800">Credit Status: {creditStatus.term.toUpperCase()}</div>
@@ -90,15 +90,15 @@ function CorporateBuyerPage() {
           { id: 'orders', label: 'Orders', icon: ShoppingCart },
           { id: 'catalog', label: 'Product Catalog', icon: Package },
           { id: 'logistics', label: 'Logistics', icon: Truck },
-          { id: 'reports', label: 'Reports', icon: FileText }
+          { id: 'reports', label: 'Reports', icon: FileText },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center ${
-              activeTab === tab.id
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              activeTab === tab.id ?
+                'bg-green-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             <tab.icon className="w-5 h-5 mr-2" />
@@ -162,7 +162,7 @@ function CorporateBuyerPage() {
                 { min: 0, max: 299, discount: 0, label: 'Starter' },
                 { min: 300, max: 999, discount: 5, label: 'Bronze' },
                 { min: 1000, max: 4999, discount: 10, label: 'Silver' },
-                { min: 5000, max: 99999, discount: 15, label: 'Gold' }
+                { min: 5000, max: 99999, discount: 15, label: 'Gold' },
               ].map((tier) => (
                 <div key={tier.label} className="border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-gray-800 mb-2">{tier.discount}%</div>
@@ -183,14 +183,14 @@ function CorporateBuyerPage() {
               {[
                 { term: 'NET 0', days: 0, desc: 'Pay on delivery - for new accounts' },
                 { term: 'NET 30', days: 30, desc: '30 days credit - requires ₹1Cr+ turnover' },
-                { term: 'NET 60', days: 60, desc: '60 days credit - requires ₹5Cr+ turnover & 3+ years vintage' }
+                { term: 'NET 60', days: 60, desc: '60 days credit - requires ₹5Cr+ turnover & 3+ years vintage' },
               ].map((term) => (
                 <div
                   key={term.term}
                   className={`flex items-center justify-between p-4 border rounded-lg ${
-                    creditStatus?.term === term.term.toLowerCase()
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-200'
+                    creditStatus?.term === term.term.toLowerCase() ?
+                      'border-green-500 bg-green-50' :
+                      'border-gray-200'
                   }`}
                 >
                   <div>
@@ -228,9 +228,9 @@ function CorporateBuyerPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                    order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                    'bg-gray-100 text-gray-800'
+                      order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                        order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                          'bg-gray-100 text-gray-800'
                   }`}>
                     {order.status}
                   </span>
@@ -365,7 +365,7 @@ function CorporateBuyerPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default CorporateBuyerPage
+export default CorporateBuyerPage;

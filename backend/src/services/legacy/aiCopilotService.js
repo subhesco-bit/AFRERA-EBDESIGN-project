@@ -31,7 +31,7 @@ router.post('/session', authMiddleware, async (req, res) => {
        (user_id, copilot_type, context, session_metadata, status, created_at, updated_at)
        VALUES ($1, $2, $3, $4, 'active', NOW(), NOW())
        RETURNING *`,
-      [req.user.id, copilot_type, JSON.stringify(context), JSON.stringify(session_metadata)]
+      [req.user.id, copilot_type, JSON.stringify(context), JSON.stringify(session_metadata)],
     );
 
     logger.info(`Copilot session created: ${result.rows[0].id} for ${copilot_type}`);
@@ -52,7 +52,7 @@ router.post('/session/:id/message', authMiddleware, async (req, res) => {
     // Get session details
     const sessionResult = await pool.query(
       'SELECT * FROM copilot_sessions WHERE id = $1 AND user_id = $2',
-      [req.params.id, req.user.id]
+      [req.params.id, req.user.id],
     );
 
     if (sessionResult.rows.length === 0) {
@@ -66,7 +66,7 @@ router.post('/session/:id/message', authMiddleware, async (req, res) => {
       `INSERT INTO copilot_messages 
        (session_id, role, content, context, created_at)
        VALUES ($1, 'user', $2, $3, NOW())`,
-      [req.params.id, message, JSON.stringify(context)]
+      [req.params.id, message, JSON.stringify(context)],
     );
 
     // Generate AI response based on copilot type
@@ -77,7 +77,7 @@ router.post('/session/:id/message', authMiddleware, async (req, res) => {
       `INSERT INTO copilot_messages 
        (session_id, role, content, context, metadata, created_at)
        VALUES ($1, 'assistant', $2, $3, $4, NOW())`,
-      [req.params.id, aiResponse.content, JSON.stringify(context), JSON.stringify(aiResponse.metadata)]
+      [req.params.id, aiResponse.content, JSON.stringify(context), JSON.stringify(aiResponse.metadata)],
     );
 
     // Update session
@@ -85,12 +85,12 @@ router.post('/session/:id/message', authMiddleware, async (req, res) => {
       `UPDATE copilot_sessions 
        SET updated_at = NOW(), message_count = message_count + 1
        WHERE id = $1`,
-      [req.params.id]
+      [req.params.id],
     );
 
     res.json({
       session_id: req.params.id,
-      response: aiResponse
+      response: aiResponse,
     });
   } catch (error) {
     logger.error('Send copilot message error', { error: error.message, stack: error.stack });
@@ -131,7 +131,7 @@ router.get('/session/:id/history', authMiddleware, async (req, res) => {
       `SELECT * FROM copilot_messages 
        WHERE session_id = $1 
        ORDER BY created_at ASC`,
-      [req.params.id]
+      [req.params.id],
     );
 
     res.json(result.rows);
@@ -151,7 +151,7 @@ router.put('/session/:id/close', authMiddleware, async (req, res) => {
        SET status = 'closed', ended_at = NOW(), updated_at = NOW()
        WHERE id = $1 AND user_id = $2
        RETURNING *`,
-      [req.params.id, req.user.id]
+      [req.params.id, req.user.id],
     );
 
     if (result.rows.length === 0) {
@@ -180,7 +180,7 @@ async function generateFinanceCopilotResponse(message, context, session) {
         `SELECT SUM(amount) AS total, AVG(amount) AS avg_amount, COUNT(*) AS txn_count
            FROM financial_transactions
           WHERE user_id = $1 AND transaction_date > NOW() - INTERVAL '90 days'`,
-        [userId]
+        [userId],
       );
       const row = result.rows[0];
       if (row && Number(row.txn_count) > 0) {
@@ -195,7 +195,7 @@ async function generateFinanceCopilotResponse(message, context, session) {
   }
 
   return {
-    content: `I can help you with financial analysis, budget planning, and cash flow, based on your actual recorded transactions. Ask about "cash flow" for a real summary of your last 90 days, or use /finance/analytics for a fuller report. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    content: 'I can help you with financial analysis, budget planning, and cash flow, based on your actual recorded transactions. Ask about "cash flow" for a real summary of your last 90 days, or use /finance/analytics for a fuller report. I don\'t have a general-purpose AI model configured here, so I only answer from what\'s actually recorded.',
     metadata: { capabilities: ['financial_analysis', 'cash_flow'], source: userId ? 'financial_transactions' : 'none', matched_on_real_data: false },
   };
 }
@@ -240,7 +240,7 @@ async function generateLogisticsCopilotResponse(message, context, session) {
         `SELECT origin_address, destination_address, weight_kg, estimated_cost, actual_cost, status
            FROM shipments
           ORDER BY created_at DESC
-          LIMIT 5`
+          LIMIT 5`,
       );
       if (result.rows.length > 0) {
         const lines = result.rows.map((r) => `${r.origin_address} -> ${r.destination_address}: ${r.status}, est. ₹${r.estimated_cost ?? 'n/a'}${r.actual_cost ? ` (actual ₹${r.actual_cost})` : ''}`).join('\n');
@@ -255,7 +255,7 @@ async function generateLogisticsCopilotResponse(message, context, session) {
   }
 
   return {
-    content: `I can look up your real recent shipments — ask about "route" or "shipment" for a live status summary. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    content: 'I can look up your real recent shipments — ask about "route" or "shipment" for a live status summary. I don\'t have a general-purpose AI model configured here, so I only answer from what\'s actually recorded.',
     metadata: { capabilities: ['tracking'], source: 'none', matched_on_real_data: false },
   };
 }
@@ -278,7 +278,7 @@ router.get('/logistics/routes', authMiddleware, async (req, res) => {
           AND ($2::text IS NULL OR destination_address ILIKE $2)
         ORDER BY created_at DESC
         LIMIT 5`,
-      [origin ? `%${origin}%` : null, destination ? `%${destination}%` : null]
+      [origin ? `%${origin}%` : null, destination ? `%${destination}%` : null],
     );
 
     res.json({ routes: routes.rows });
@@ -305,7 +305,7 @@ async function generateWarehouseCopilotResponse(message, context, session) {
           WHERE wi.warehouse_id = $1
           ORDER BY wi.quantity ASC
           LIMIT 5`,
-        [warehouseId]
+        [warehouseId],
       );
       if (result.rows.length > 0) {
         const lowest = result.rows.map((r) => `${r.name}: ${r.quantity} units (zone ${r.zone || 'unassigned'})`).join('\n');
@@ -320,7 +320,7 @@ async function generateWarehouseCopilotResponse(message, context, session) {
   }
 
   return {
-    content: `I can help with real recorded inventory levels for a specific warehouse — ask about "inventory" or "stock" with a warehouse_id in context for a live low-stock summary. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    content: 'I can help with real recorded inventory levels for a specific warehouse — ask about "inventory" or "stock" with a warehouse_id in context for a live low-stock summary. I don\'t have a general-purpose AI model configured here, so I only answer from what\'s actually recorded.',
     metadata: { capabilities: ['inventory_management'], source: warehouseId ? 'warehouse_inventory' : 'none', matched_on_real_data: false },
   };
 }
@@ -348,7 +348,7 @@ router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
         WHERE wi.warehouse_id = $1
           AND ($2::integer IS NULL OR p.category_id = $2)
         ORDER BY wi.quantity ASC`,
-      [warehouse_id, category_id || null]
+      [warehouse_id, category_id || null],
     );
 
     res.json(inventory.rows);
@@ -375,7 +375,7 @@ async function generateInsuranceCopilotResponse(message, context, session) {
             WHERE user_id = $1
             ORDER BY policy_end_date ASC
             LIMIT 5`,
-          [userId]
+          [userId],
         );
         if (result.rows.length > 0) {
           const lines = result.rows.map((p) => `${p.policy_number}: ${p.status}, coverage ₹${p.coverage_amount}, expires ${new Date(p.policy_end_date).toLocaleDateString('en-IN')}`).join('\n');
@@ -391,7 +391,7 @@ async function generateInsuranceCopilotResponse(message, context, session) {
   }
 
   return {
-    content: `I can look up your real recorded policies — ask about "claim", "policy", or "coverage" for a live summary. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    content: 'I can look up your real recorded policies — ask about "claim", "policy", or "coverage" for a live summary. I don\'t have a general-purpose AI model configured here, so I only answer from what\'s actually recorded.',
     metadata: { capabilities: ['policy_analysis'], source: userId ? 'policies' : 'none', matched_on_real_data: false },
   };
 }
@@ -411,7 +411,7 @@ router.get('/insurance/policies', authMiddleware, async (req, res) => {
          FROM policies
         WHERE user_id = $1
         ORDER BY policy_end_date ASC`,
-      [req.user.id]
+      [req.user.id],
     );
 
     res.json(policies.rows);
@@ -497,7 +497,7 @@ async function generateNutritionCopilotResponse(message, context, session) {
 
   // Honest fallback — no fabricated confidence score, no canned advice.
   return {
-    content: `I can look up real, evidence-labeled traditional/natural remedies (try naming an ingredient, e.g. "honey"), real nutrient data for a specific food, or a general Wikipedia reference. I don't have a general-purpose AI model configured in this environment, so I can only answer from what's actually recorded in the database or cited from a real external source.`,
+    content: 'I can look up real, evidence-labeled traditional/natural remedies (try naming an ingredient, e.g. "honey"), real nutrient data for a specific food, or a general Wikipedia reference. I don\'t have a general-purpose AI model configured in this environment, so I can only answer from what\'s actually recorded in the database or cited from a real external source.',
     metadata: { source: 'none', matched_on_real_data: false },
   };
 }
@@ -527,7 +527,7 @@ router.get('/nutrition/analysis', authMiddleware, async (req, res) => {
     res.json({
       analysis: analysis.rows,
       total_nutrition: calculateTotalNutrition(analysis.rows),
-      recommendations: generateNutritionRecommendations(analysis.rows)
+      recommendations: generateNutritionRecommendations(analysis.rows),
     });
   } catch (error) {
     logger.error('Get nutrition analysis error', { error: error.message, stack: error.stack });
@@ -541,7 +541,7 @@ function calculateTotalNutrition(foods) {
     protein: total.protein + (food.protein || 0),
     carbohydrates: total.carbohydrates + (food.carbohydrates || 0),
     fats: total.fats + (food.fats || 0),
-    fiber: total.fiber + (food.fiber || 0)
+    fiber: total.fiber + (food.fiber || 0),
   }), { calories: 0, protein: 0, carbohydrates: 0, fats: 0, fiber: 0 });
 }
 
@@ -550,7 +550,7 @@ function generateNutritionRecommendations(foods) {
     'Ensure adequate protein intake for muscle health',
     'Include fiber-rich foods for digestive health',
     'Balance macronutrients throughout the day',
-    'Consider vitamin and mineral supplementation if needed'
+    'Consider vitamin and mineral supplementation if needed',
   ];
 }
 
@@ -570,7 +570,7 @@ async function generateMarketplaceCopilotResponse(message, context, session) {
           WHERE category_id = $1
           ORDER BY record_date DESC
           LIMIT 1`,
-        [categoryId]
+        [categoryId],
       );
       if (result.rows.length > 0) {
         const r = result.rows[0];
@@ -585,7 +585,7 @@ async function generateMarketplaceCopilotResponse(message, context, session) {
   }
 
   return {
-    content: `I can look up real recorded market pricing for a category — ask about "price" or "market" with a category_id in context for a live summary. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    content: 'I can look up real recorded market pricing for a category — ask about "price" or "market" with a category_id in context for a live summary. I don\'t have a general-purpose AI model configured here, so I only answer from what\'s actually recorded.',
     metadata: { capabilities: ['pricing_analysis'], source: categoryId ? 'market_price_history' : 'none', matched_on_real_data: false },
   };
 }
@@ -610,7 +610,7 @@ router.get('/marketplace/trends', authMiddleware, async (req, res) => {
           AND ($2::integer IS NULL OR state_id = $2)
           AND record_date >= CURRENT_DATE - ($3 || ' days')::interval
         ORDER BY record_date DESC`,
-      [category_id, state_id || null, days || '30']
+      [category_id, state_id || null, days || '30'],
     );
 
     res.json(trends.rows);
@@ -626,11 +626,11 @@ router.get('/marketplace/trends', authMiddleware, async (req, res) => {
 
 async function generateGenericCopilotResponse(message, context, session) {
   return {
-    content: `I'm your AI copilot assistant. I can help you with various tasks across the platform. Please let me know what specific assistance you need, and I'll connect you with the right specialized copilot.`,
+    content: 'I\'m your AI copilot assistant. I can help you with various tasks across the platform. Please let me know what specific assistance you need, and I\'ll connect you with the right specialized copilot.',
     metadata: {
       capabilities: ['general_assistance'],
-      available_copilots: ['finance', 'logistics', 'warehouse', 'insurance', 'nutrition', 'marketplace']
-    }
+      available_copilots: ['finance', 'logistics', 'warehouse', 'insurance', 'nutrition', 'marketplace'],
+    },
   };
 }
 
@@ -670,5 +670,6 @@ module.exports = {
   // Exported (additive only, no logic changed) so services/whatsappService.js
   // can reuse the existing generic-copilot template response for default
   // farmer queries instead of duplicating it.
-  generateCopilotResponse
+  generateCopilotResponse,
 };
+

@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Equipment Rental (backend/src/modules/M104). Generic operation panel -
@@ -12,5 +12,5 @@ export default function EquipmentRentalPage() {
       title="Equipment Rental"
       description="Equipment rental marketplace and booking."
     />
-  )
+  );
 }

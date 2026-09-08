@@ -127,5 +127,5 @@ module.exports = {
   addSkill,
   enrichProfile,
   analyzeProfileCompleteness,
-  getFullProfile
+  getFullProfile,
 };

@@ -26,7 +26,7 @@ class LogisticsEnhancementService {
 
       const result = await this.pool.query(query, [
         type, registrationNumber, capacity, make, model, year, driverId,
-        JSON.stringify(features)
+        JSON.stringify(features),
       ]);
 
       logger.info(`Vehicle added to fleet: ${result.rows[0].id}`);
@@ -102,7 +102,7 @@ class LogisticsEnhancementService {
         updateData.currentLocation ? JSON.stringify(updateData.currentLocation) : null,
         updateData.mileage,
         updateData.fuelLevel,
-        vehicleId
+        vehicleId,
       ]);
 
       if (result.rows.length === 0) {
@@ -128,7 +128,7 @@ class LogisticsEnhancementService {
       `;
 
       const result = await this.pool.query(query, [
-        vehicleId, type, scheduledDate, description, estimatedCost, priority
+        vehicleId, type, scheduledDate, description, estimatedCost, priority,
       ]);
 
       logger.info(`Maintenance scheduled for vehicle ${vehicleId}`);
@@ -172,14 +172,14 @@ class LogisticsEnhancementService {
                 last_maintenance_date, next_maintenance_date
            FROM fleet_vehicles
           WHERE status != 'retired'
-          ORDER BY registration_number`
+          ORDER BY registration_number`,
       );
 
       const { rows: openWork } = await this.pool.query(
         `SELECT vehicle_id, id, type, scheduled_date, priority, description
            FROM vehicle_maintenance
           WHERE status = 'scheduled'
-          ORDER BY scheduled_date`
+          ORDER BY scheduled_date`,
       );
       const openWorkByVehicle = new Map();
       for (const w of openWork) {
@@ -261,13 +261,13 @@ class LogisticsEnhancementService {
       `;
 
       const result = await this.pool.query(query, [
-        shipmentId, latitude, longitude, speed, heading, timestamp, status
+        shipmentId, latitude, longitude, speed, heading, timestamp, status,
       ]);
 
       // Update shipment current location
       await this.pool.query(
         'UPDATE shipments SET current_location = $1, updated_at = NOW() WHERE id = $2',
-        [JSON.stringify({ latitude, longitude }), shipmentId]
+        [JSON.stringify({ latitude, longitude }), shipmentId],
       );
 
       logger.info(`Tracking updated for shipment ${shipmentId}`);
@@ -341,7 +341,7 @@ class LogisticsEnhancementService {
       `;
 
       const result = await this.pool.query(query, [
-        shipmentId, type, radius, JSON.stringify(coordinates), alertEnabled
+        shipmentId, type, radius, JSON.stringify(coordinates), alertEnabled,
       ]);
 
       logger.info(`Geofence set for shipment ${shipmentId}`);
@@ -365,7 +365,7 @@ class LogisticsEnhancementService {
       `;
 
       const result = await this.pool.query(query, [
-        shipmentId, sensorId, temperature, humidity, timestamp, zone
+        shipmentId, sensorId, temperature, humidity, timestamp, zone,
       ]);
 
       // Check for temperature alerts
@@ -432,7 +432,7 @@ class LogisticsEnhancementService {
 
       const result = await this.pool.query(query, [
         shipmentId, minTemp, maxTemp, minHumidity, maxHumidity,
-        JSON.stringify(alertChannels)
+        JSON.stringify(alertChannels),
       ]);
 
       logger.info(`Temperature alert configured for shipment ${shipmentId}`);
@@ -508,7 +508,7 @@ class LogisticsEnhancementService {
 
       const result = await this.pool.query(query, [
         name, JSON.stringify(location), type, capacity,
-        JSON.stringify(zones), JSON.stringify(features)
+        JSON.stringify(zones), JSON.stringify(features),
       ]);
 
       logger.info(`Warehouse created: ${result.rows[0].id}`);
@@ -579,7 +579,7 @@ class LogisticsEnhancementService {
       `;
 
       const result = await this.pool.query(query, [
-        warehouseId, productId, quantity, zone, location, expiryDate
+        warehouseId, productId, quantity, zone, location, expiryDate,
       ]);
 
       logger.info(`Inventory added to warehouse ${warehouseId}`);
@@ -623,7 +623,7 @@ class LogisticsEnhancementService {
       `;
 
       const result = await this.pool.query(query, [
-        warehouseId, type, JSON.stringify(items), referenceId
+        warehouseId, type, JSON.stringify(items), referenceId,
       ]);
 
       // Update inventory based on shipment type
@@ -634,7 +634,7 @@ class LogisticsEnhancementService {
             quantity: item.quantity,
             zone: item.zone,
             location: item.location,
-            expiryDate: item.expiryDate
+            expiryDate: item.expiryDate,
           });
         } else if (type === 'outbound') {
           await this.removeInventory(warehouseId, item.productId, item.quantity);
@@ -726,7 +726,7 @@ class LogisticsEnhancementService {
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8, CURRENT_TIMESTAMP)
          RETURNING *`,
         [driverId, shipmentId ?? null, latitude, longitude, speedKmph ?? null,
-          headingDeg ?? null, accuracyM ?? null, batteryPct ?? null]
+          headingDeg ?? null, accuracyM ?? null, batteryPct ?? null],
       );
       return rows[0];
     } catch (error) {
@@ -752,16 +752,16 @@ class LogisticsEnhancementService {
                 EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - recorded_at))/60 AS minutes_since_ping
            FROM driver_location
           WHERE recorded_at >= CURRENT_TIMESTAMP - INTERVAL '24 hours'
-          ORDER BY driver_id, recorded_at DESC`
+          ORDER BY driver_id, recorded_at DESC`,
       );
       return {
         drivers: rows.map((r) => ({
           ...r,
           stale: Number(r.minutes_since_ping) > staleAfterMinutes,
-          note: Number(r.minutes_since_ping) > staleAfterMinutes
-            ? `Last ping ${Math.round(r.minutes_since_ping)} minutes ago. Position is a `
-            + 'last-known, not a current one — likely out of coverage rather than stopped.'
-            : null,
+          note: Number(r.minutes_since_ping) > staleAfterMinutes ?
+            `Last ping ${Math.round(r.minutes_since_ping)} minutes ago. Position is a ` +
+            'last-known, not a current one — likely out of coverage rather than stopped.' :
+            null,
           lowBattery: r.battery_pct !== null && Number(r.battery_pct) < 20,
         })),
         active: rows.filter((r) => Number(r.minutes_since_ping) <= staleAfterMinutes).length,
@@ -780,21 +780,21 @@ class LogisticsEnhancementService {
         this.pool.query(
           `SELECT latitude, longitude, speed_kmph, recorded_at
              FROM driver_location WHERE shipment_id = $1 ORDER BY recorded_at`,
-          [shipmentId]
+          [shipmentId],
         ),
         this.pool.query(
-          `SELECT * FROM shipment_tracking WHERE shipment_id = $1 ORDER BY created_at`,
-          [shipmentId]
+          'SELECT * FROM shipment_tracking WHERE shipment_id = $1 ORDER BY created_at',
+          [shipmentId],
         ),
       ]);
       return {
         shipmentId,
         driverTrack: driver.rows,
         consignmentEvents: consignment.rows,
-        note: driver.rows.length === 0
-          ? 'No driver pings for this shipment. The consignment events below are status '
-          + 'updates entered by a person, not observed positions.'
-          : null,
+        note: driver.rows.length === 0 ?
+          'No driver pings for this shipment. The consignment events below are status ' +
+          'updates entered by a person, not observed positions.' :
+          null,
       };
     } catch (error) {
       logger.error('Error getting shipment trail', { error: error.message });
@@ -804,3 +804,4 @@ class LogisticsEnhancementService {
 }
 
 module.exports = new LogisticsEnhancementService();
+

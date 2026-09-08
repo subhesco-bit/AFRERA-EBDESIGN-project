@@ -24,7 +24,7 @@ async function createKPIDefinition(kpiData) {
       threshold_min,
       threshold_max,
       aggregation_type,
-      time_granularity
+      time_granularity,
     } = kpiData;
 
     const kpi = {
@@ -42,7 +42,7 @@ async function createKPIDefinition(kpiData) {
       aggregation_type,
       time_granularity,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered KPI optimization
@@ -52,8 +52,8 @@ async function createKPIDefinition(kpiData) {
         kpi_category: category,
         industry_best_practices: await getIndustryBestPractices(category),
         similar_kpis: await getSimilarKPIs(category),
-        calculation_validation: await validateCalculationFormula(calculation_formula)
-      }
+        calculation_validation: await validateCalculationFormula(calculation_formula),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -81,8 +81,8 @@ async function createKPIDefinition(kpiData) {
         kpi.aggregation_type,
         kpi.time_granularity,
         kpi.status,
-        kpi.created_at
-      ]
+        kpi.created_at,
+      ],
     );
 
     logger.info(`KPI definition created: ${kpi.kpi_id}`);
@@ -100,7 +100,7 @@ async function getKPIDefinition(kpiId) {
   try {
     const result = await pool.query(
       'SELECT * FROM kpi_definitions WHERE kpi_id = $1',
-      [kpiId]
+      [kpiId],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -156,7 +156,7 @@ async function recordKPIMeasurement(measurementData) {
       period_start,
       period_end,
       dimensions,
-      metadata
+      metadata,
     } = measurementData;
 
     const measurement = {
@@ -171,19 +171,19 @@ async function recordKPIMeasurement(measurementData) {
       period_end,
       dimensions: dimensions || {},
       metadata: metadata || {},
-      recorded_at: new Date().toISOString()
+      recorded_at: new Date().toISOString(),
     };
 
     // AI-powered anomaly detection
     const aiRequest = {
       task: 'kpi_anomaly_detection',
       parameters: {
-        kpi_id: kpi_id,
+        kpi_id,
         current_value: measurement_value,
         historical_values: await getHistoricalMeasurements(kpi_id, entity_id),
         seasonality: await detectSeasonality(kpi_id),
-        thresholds: await getKPIThresholds(kpi_id)
-      }
+        thresholds: await getKPIThresholds(kpi_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -208,8 +208,8 @@ async function recordKPIMeasurement(measurementData) {
         measurement.period_end,
         JSON.stringify(measurement.dimensions),
         JSON.stringify(measurement.metadata),
-        measurement.recorded_at
-      ]
+        measurement.recorded_at,
+      ],
     );
 
     // Check for alerts
@@ -276,7 +276,7 @@ async function setKPITarget(targetData) {
       period_start,
       period_end,
       weight,
-      is_stretch
+      is_stretch,
     } = targetData;
 
     const result = await pool.query(
@@ -298,8 +298,8 @@ async function setKPITarget(targetData) {
         weight || 1.0,
         is_stretch || false,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`KPI target set: ${result.rows[0].target_id}`);
@@ -358,13 +358,13 @@ async function calculateKPIScore(entityId, entityType, periodType, periodStart, 
       const measurements = await getKPIMeasurements(kpi.kpi_id, {
         entity_id: entityId,
         period_start: periodStart,
-        period_end: periodEnd
+        period_end: periodEnd,
       });
 
       const targets = await getKPITargets(kpi.kpi_id, {
         entity_id: entityId,
         period_start: periodStart,
-        period_end: periodEnd
+        period_end: periodEnd,
       });
 
       const score = await calculateIndividualKPIScore(kpi, measurements, targets);
@@ -387,7 +387,7 @@ async function calculateKPIScore(entityId, entityType, periodType, periodStart, 
       trend: await calculateTrend(entityId, entityType, periodType),
       rank: await calculateRank(entityId, entityType, overallScore),
       percentile: await calculatePercentile(entityId, entityType, overallScore),
-      calculated_at: new Date().toISOString()
+      calculated_at: new Date().toISOString(),
     };
 
     const result = await pool.query(
@@ -409,8 +409,8 @@ async function calculateKPIScore(entityId, entityType, periodType, periodStart, 
         scoreRecord.trend,
         scoreRecord.rank,
         scoreRecord.percentile,
-        scoreRecord.calculated_at
-      ]
+        scoreRecord.calculated_at,
+      ],
     );
 
     logger.info(`KPI score calculated: ${scoreRecord.score_id}`);
@@ -433,7 +433,7 @@ async function createKPIAlert(alertData) {
       threshold_value,
       severity,
       notification_channels,
-      recipients
+      recipients,
     } = alertData;
 
     const result = await pool.query(
@@ -452,8 +452,8 @@ async function createKPIAlert(alertData) {
         notification_channels,
         recipients,
         true,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`KPI alert created: ${result.rows[0].alert_id}`);
@@ -471,7 +471,7 @@ async function getKPIAlerts(kpiId) {
   try {
     const result = await pool.query(
       'SELECT * FROM kpi_alerts WHERE kpi_id = $1 AND is_active = $2',
-      [kpiId, true]
+      [kpiId, true],
     );
     return result.rows;
   } catch (error) {
@@ -495,7 +495,7 @@ async function addBenchmark(benchmarkData) {
       region,
       period,
       is_percentile,
-      percentile_value
+      percentile_value,
     } = benchmarkData;
 
     const result = await pool.query(
@@ -517,8 +517,8 @@ async function addBenchmark(benchmarkData) {
         is_percentile || false,
         percentile_value,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Benchmark added: ${result.rows[0].benchmark_id}`);
@@ -536,7 +536,7 @@ async function getBenchmarks(kpiId) {
   try {
     const result = await pool.query(
       'SELECT * FROM metric_benchmarks WHERE kpi_id = $1 AND status = $2',
-      [kpiId, 'active']
+      [kpiId, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -556,7 +556,7 @@ async function addDimension(dimensionData) {
       dimension_type,
       dimension_values,
       is_drillable,
-      hierarchy_config
+      hierarchy_config,
     } = dimensionData;
 
     const result = await pool.query(
@@ -574,8 +574,8 @@ async function addDimension(dimensionData) {
         is_drillable || true,
         JSON.stringify(hierarchy_config),
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Dimension added: ${result.rows[0].dimension_id}`);
@@ -593,7 +593,7 @@ async function getDimensions(kpiId) {
   try {
     const result = await pool.query(
       'SELECT * FROM kpi_dimensions WHERE kpi_id = $1 AND status = $2',
-      [kpiId, 'active']
+      [kpiId, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -611,7 +611,7 @@ async function getIndustryBestPractices(category) {
   return {
     recommended_kpis: ['revenue', 'profit_margin', 'customer_satisfaction'],
     benchmark_sources: ['industry_reports', 'competitor_analysis'],
-    calculation_methods: ['standard', 'weighted_average', 'compounded']
+    calculation_methods: ['standard', 'weighted_average', 'compounded'],
   };
 }
 
@@ -619,7 +619,7 @@ async function getSimilarKPIs(category) {
   try {
     const result = await pool.query(
       'SELECT * FROM kpi_definitions WHERE category = $1 LIMIT 5',
-      [category]
+      [category],
     );
     return result.rows;
   } catch (error) {
@@ -631,7 +631,7 @@ async function validateCalculationFormula(formula) {
   return {
     is_valid: true,
     syntax_errors: [],
-    suggested_improvements: []
+    suggested_improvements: [],
   };
 }
 
@@ -639,7 +639,7 @@ async function getHistoricalMeasurements(kpiId, entityId) {
   try {
     const result = await pool.query(
       'SELECT measurement_value, measurement_date FROM kpi_measurements WHERE kpi_id = $1 AND entity_id = $2 ORDER BY measurement_date DESC LIMIT 30',
-      [kpiId, entityId]
+      [kpiId, entityId],
     );
     return result.rows;
   } catch (error) {
@@ -651,7 +651,7 @@ async function detectSeasonality(kpiId) {
   return {
     has_seasonality: true,
     seasonal_pattern: 'quarterly',
-    peak_periods: ['Q1', 'Q4']
+    peak_periods: ['Q1', 'Q4'],
   };
 }
 
@@ -659,7 +659,7 @@ async function getKPIThresholds(kpiId) {
   try {
     const result = await pool.query(
       'SELECT threshold_min, threshold_max FROM kpi_definitions WHERE kpi_id = $1',
-      [kpiId]
+      [kpiId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -709,9 +709,9 @@ async function calculateIndividualKPIScore(kpi, measurements, targets) {
   const score = Math.min(100, Math.max(0, achievement));
 
   return {
-    score: score,
-    achievement: achievement,
-    status: achievement >= 100 ? 'achieved' : achievement >= 80 ? 'on_track' : 'behind'
+    score,
+    achievement,
+    status: achievement >= 100 ? 'achieved' : achievement >= 80 ? 'on_track' : 'behind',
   };
 }
 
@@ -765,6 +765,6 @@ module.exports = {
   addBenchmark,
   getBenchmarks,
   addDimension,
-  getDimensions
+  getDimensions,
 };
 

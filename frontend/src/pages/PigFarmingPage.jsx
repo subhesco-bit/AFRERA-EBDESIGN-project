@@ -1,128 +1,128 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { pigAPI, pigAIAPI } from '../services/api'
-import { PiggyBank, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Baby, Scale } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { pigAPI, pigAIAPI } from '../services/api';
+import { PiggyBank, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Baby, Scale } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
+import ActionCard from '../components/common/ActionCard';
 
-const BREEDS = ['Large White', 'Landrace', 'Duroc', 'Hampshire', 'Pietrain', 'Crossbred', 'Local / Desi']
-const STATUSES = ['Active', 'Pregnant', 'Farrowing', 'Weaning', 'Finishing', 'Sold', 'Deceased']
+const BREEDS = ['Large White', 'Landrace', 'Duroc', 'Hampshire', 'Pietrain', 'Crossbred', 'Local / Desi'];
+const STATUSES = ['Active', 'Pregnant', 'Farrowing', 'Weaning', 'Finishing', 'Sold', 'Deceased'];
 
 const emptyAnimal = {
   tag_id: '', breed: 'Local / Desi', dob: '', sex: 'female', status: 'Active', notes: '',
   last_vaccination_date: '', last_breeding_date: '',
-}
+};
 
 function PigFarmingPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyAnimal)
-  const [weightForm, setWeightForm] = useState({ animal_id: '', record_date: '', weight_kg: '', body_condition_score: '', notes: '' })
-  const [feedForm, setFeedForm] = useState({ animal_id: '', record_date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
-  const [breedingForm, setBreedingForm] = useState({ sow_id: '', boar_id: '', breeding_date: '', expected_farrowing_date: '' })
-  const [tab, setTab] = useState('herd')
-  const [aiAnimalId, setAiAnimalId] = useState('')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyAnimal);
+  const [weightForm, setWeightForm] = useState({ animal_id: '', record_date: '', weight_kg: '', body_condition_score: '', notes: '' });
+  const [feedForm, setFeedForm] = useState({ animal_id: '', record_date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' });
+  const [breedingForm, setBreedingForm] = useState({ sow_id: '', boar_id: '', breeding_date: '', expected_farrowing_date: '' });
+  const [tab, setTab] = useState('herd');
+  const [aiAnimalId, setAiAnimalId] = useState('');
 
   const { data: herdData, isLoading, error } = useQuery({
     queryKey: ['pig-herd'],
     queryFn: async () => (await pigAPI.listHerd()).data?.data ?? [],
-  })
+  });
 
   const { data: weightData, isLoading: weightLoading, error: weightError } = useQuery({
     queryKey: ['pig-weight-records'],
     queryFn: async () => (await pigAPI.listWeightRecords()).data?.data ?? [],
-  })
+  });
 
   const { data: performanceData, isLoading: performanceLoading, error: performanceError } = useQuery({
     queryKey: ['pig-herd-performance'],
     queryFn: async () => (await pigAPI.getHerdPerformance()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: breedingAlertsData, isLoading: breedingAlertsLoading, error: breedingAlertsError } = useQuery({
     queryKey: ['pig-breeding-alerts'],
     queryFn: async () => (await pigAPI.getBreedingAlerts()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: vaccinationAlertsData, isLoading: vaccinationAlertsLoading, error: vaccinationAlertsError } = useQuery({
     queryKey: ['pig-vaccination-alerts'],
     queryFn: async () => (await pigAPI.getVaccinationAlerts()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: fcrData, isLoading: fcrLoading, error: fcrError } = useQuery({
     queryKey: ['pig-fcr'],
     queryFn: async () => (await pigAPI.getFeedConversionRatio()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? pigAPI.updateAnimal(editingId, payload) : pigAPI.createAnimal(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Animal updated' : 'Animal registered')
-      queryClient.invalidateQueries({ queryKey: ['pig-herd'] })
-      closeForm()
+      toast.success(editingId ? 'Animal updated' : 'Animal registered');
+      queryClient.invalidateQueries({ queryKey: ['pig-herd'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save animal'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => pigAPI.deleteAnimal(id),
-    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['pig-herd'] }) },
+    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['pig-herd'] }); },
     onError: () => toast.error('Failed to remove animal'),
-  })
+  });
 
   const recordWeightMutation = useMutation({
     mutationFn: (payload) => pigAPI.recordWeight(payload),
     onSuccess: () => {
-      toast.success('Weight recorded')
-      queryClient.invalidateQueries({ queryKey: ['pig-weight-records'] })
-      setWeightForm({ animal_id: '', record_date: '', weight_kg: '', body_condition_score: '', notes: '' })
+      toast.success('Weight recorded');
+      queryClient.invalidateQueries({ queryKey: ['pig-weight-records'] });
+      setWeightForm({ animal_id: '', record_date: '', weight_kg: '', body_condition_score: '', notes: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record weight'),
-  })
+  });
 
   const recordFeedMutation = useMutation({
     mutationFn: (payload) => pigAPI.recordFeedConsumption(payload),
     onSuccess: () => {
-      toast.success('Feed consumption recorded')
-      queryClient.invalidateQueries({ queryKey: ['pig-feed-consumption'] })
-      setFeedForm({ animal_id: '', record_date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
+      toast.success('Feed consumption recorded');
+      queryClient.invalidateQueries({ queryKey: ['pig-feed-consumption'] });
+      setFeedForm({ animal_id: '', record_date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record feed consumption'),
-  })
+  });
 
   const recordBreedingMutation = useMutation({
     mutationFn: (payload) => pigAPI.recordBreeding(payload),
     onSuccess: () => {
-      toast.success('Breeding recorded')
-      queryClient.invalidateQueries({ queryKey: ['pig-breeding-records'] })
-      setBreedingForm({ sow_id: '', boar_id: '', breeding_date: '', expected_farrowing_date: '' })
+      toast.success('Breeding recorded');
+      queryClient.invalidateQueries({ queryKey: ['pig-breeding-records'] });
+      setBreedingForm({ sow_id: '', boar_id: '', breeding_date: '', expected_farrowing_date: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record breeding'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyAnimal) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyAnimal); };
 
   const openEdit = (a) => {
     setForm({
-      tag_id: a.tag_id || '', breed: a.breed || 'Local / Desi', dob: a.dob ? a.dob.slice(0, 10) : '', 
+      tag_id: a.tag_id || '', breed: a.breed || 'Local / Desi', dob: a.dob ? a.dob.slice(0, 10) : '',
       sex: a.sex || 'female', status: a.status || 'Active', notes: a.notes || '',
       last_vaccination_date: a.last_vaccination_date ? a.last_vaccination_date.slice(0, 10) : '',
       last_breeding_date: a.last_breeding_date ? a.last_breeding_date.slice(0, 10) : '',
-    })
-    setEditingId(a.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(a.id);
+    setShowForm(true);
+  };
 
-  const herd = herdData || []
-  const weightRecords = weightData || []
-  const pregnant = herd.filter((a) => a.status === 'Pregnant').length
-  const farrowing = herd.filter((a) => a.status === 'Farrowing').length
-  const avgWeight = weightRecords.length > 0 ? weightRecords.reduce((s, w) => s + (Number(w.weight_kg) || 0), 0) / weightRecords.length : 0
+  const herd = herdData || [];
+  const weightRecords = weightData || [];
+  const pregnant = herd.filter((a) => a.status === 'Pregnant').length;
+  const farrowing = herd.filter((a) => a.status === 'Farrowing').length;
+  const avgWeight = weightRecords.length > 0 ? weightRecords.reduce((s, w) => s + (Number(w.weight_kg) || 0), 0) / weightRecords.length : 0;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -135,7 +135,7 @@ function PigFarmingPage() {
           <p className="text-gray-600">Track herd health, weight gain, and breeding records</p>
         </div>
         {tab === 'herd' && (
-          <button onClick={() => { setForm(emptyAnimal); setEditingId(null); setShowForm(true) }}
+          <button onClick={() => { setForm(emptyAnimal); setEditingId(null); setShowForm(true); }}
             className="px-4 py-2 bg-pink-600 text-white rounded-lg font-semibold hover:bg-pink-700 transition flex items-center">
             <Plus className="w-4 h-4 mr-2" /> Add Animal
           </button>
@@ -321,7 +321,7 @@ function PigFarmingPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default PigFarmingPage
+export default PigFarmingPage;

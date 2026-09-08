@@ -8,9 +8,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
+import { NativeSelect as Select } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
+import { enterpriseIntegrationAPI } from '../services/api';
 
 const EnterpriseIntegrationPage = () => {
   const [selectedIntegration, setSelectedIntegration] = useState(null);
@@ -18,30 +19,27 @@ const EnterpriseIntegrationPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Get organization integrations
-  const { data: integrationsData, isLoading: integrationsLoading } = useQuery({
+  const { data: integrationsData, isLoading: integrationsLoading, error: integrationsError } = useQuery({
     queryKey: ['organizationIntegrations'],
-    queryFn: () => fetch('/api/enterprise/organizations/current/integrations')
-      .then(res => res.json())
-      .then(res => res.data),
-    refetchInterval: 180000 // 3 minutes
+    queryFn: () => enterpriseIntegrationAPI.getCurrentOrganizationIntegrations()
+      .then(res => res.data.data),
+    refetchInterval: 180000, // 3 minutes
   });
 
   // Get system status
   const { data: systemStatus } = useQuery({
     queryKey: ['enterpriseSystemStatus'],
-    queryFn: () => fetch('/api/enterprise/system/status')
-      .then(res => res.json())
-      .then(res => res.data),
-    refetchInterval: 300000 // 5 minutes
+    queryFn: () => enterpriseIntegrationAPI.getSystemStatus()
+      .then(res => res.data.data),
+    refetchInterval: 300000, // 5 minutes
   });
 
   // Get integration health when selected
   const { data: integrationHealth } = useQuery({
     queryKey: ['integrationHealth', selectedIntegration],
-    queryFn: () => fetch(`/api/enterprise/integrations/${selectedIntegration}/health`)
-      .then(res => res.json())
-      .then(res => res.data),
-    enabled: !!selectedIntegration
+    queryFn: () => enterpriseIntegrationAPI.getIntegrationHealth(selectedIntegration)
+      .then(res => res.data.data),
+    enabled: Boolean(selectedIntegration),
   });
 
   const integrations = integrationsData?.integrations || [];
@@ -51,7 +49,7 @@ const EnterpriseIntegrationPage = () => {
     { value: 'payment_gateway', label: 'Payment Gateway', icon: '💳' },
     { value: 'logistics', label: 'Logistics Provider', icon: '🚚' },
     { value: 'analytics', label: 'Analytics Platform', icon: '📊' },
-    { value: 'communication', label: 'Communication Service', icon: '📧' }
+    { value: 'communication', label: 'Communication Service', icon: '📧' },
   ];
 
   return (
@@ -140,6 +138,8 @@ const EnterpriseIntegrationPage = () => {
           <div className="space-y-3">
             {integrationsLoading ? (
               <LoadingSkeleton variant="rectangular" lines={3} />
+            ) : integrationsError ? (
+              <p className="text-red-600 text-sm">Unable to load integrations: {integrationsError.message}</p>
             ) : integrations.length === 0 ? (
               <p className="text-gray-500 text-sm">No integrations registered</p>
             ) : (

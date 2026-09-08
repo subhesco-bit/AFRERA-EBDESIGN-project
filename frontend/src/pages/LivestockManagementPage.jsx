@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Beef, Bird, Rabbit, PiggyBank, Stethoscope, Wheat, GitBranch, BarChart3, Milk } from 'lucide-react'
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Beef, Bird, Rabbit, PiggyBank, Stethoscope, Wheat, GitBranch, BarChart3, Milk } from 'lucide-react';
 import {
   cattleRegistryAPI,
   poultryManagementAPI,
@@ -10,8 +10,8 @@ import {
   animalHealthAPI,
   livestockAnalyticsAPI,
   feedManagementAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Livestock domain sub-modules: M122 (Cattle Registry),
@@ -41,29 +41,29 @@ const TABS = [
   { id: 'feed', label: 'Feed Management', icon: Wheat },
   { id: 'breeding', label: 'Breeding', icon: GitBranch },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-]
+];
 
-const CATTLE_BREEDS = ['Gir', 'Sahiwal', 'Red Sindhi', 'Jersey Cross', 'Holstein Friesian Cross', 'Local/Indigenous', 'Other']
-const CATTLE_PURPOSE = ['Dairy', 'Draught', 'Dual Purpose']
+const CATTLE_BREEDS = ['Gir', 'Sahiwal', 'Red Sindhi', 'Jersey Cross', 'Holstein Friesian Cross', 'Local/Indigenous', 'Other'];
+const CATTLE_PURPOSE = ['Dairy', 'Draught', 'Dual Purpose'];
 // Matches the real poultry_flocks.flock_type CHECK constraint (migration 067) exactly.
-const POULTRY_TYPES = ['broiler', 'layer', 'duck', 'quail', 'turkey']
-const POULTRY_STATUS = ['active', 'sold', 'culled', 'closed']
-const GOAT_BREEDS = ['Black Bengal', 'Beetal', 'Jamunapari', 'Sirohi', 'Local/Indigenous', 'Other']
+const POULTRY_TYPES = ['broiler', 'layer', 'duck', 'quail', 'turkey'];
+const POULTRY_STATUS = ['active', 'sold', 'culled', 'closed'];
+const GOAT_BREEDS = ['Black Bengal', 'Beetal', 'Jamunapari', 'Sirohi', 'Local/Indigenous', 'Other'];
 // Matches the real goat_herd.status CHECK constraint (migration 068) exactly.
-const GOAT_STATUS = ['active', 'milking', 'dry', 'pregnant', 'sold', 'culled', 'dead']
-const SHEEP_BREEDS = ['Deccani', 'Nellore', 'Marwari', 'Local/Indigenous', 'Other']
+const GOAT_STATUS = ['active', 'milking', 'dry', 'pregnant', 'sold', 'culled', 'dead'];
+const SHEEP_BREEDS = ['Deccani', 'Nellore', 'Marwari', 'Local/Indigenous', 'Other'];
 // Matches the real sheep_flock.status CHECK constraint (migration 069) exactly.
-const SHEEP_STATUS = ['active', 'breeding', 'lactating', 'dry', 'market_ready', 'sold', 'culled', 'dead']
-const PIG_BREEDS = ['Large White Yorkshire', 'Landrace', 'Hampshire', 'Local/Indigenous', 'Other']
+const SHEEP_STATUS = ['active', 'breeding', 'lactating', 'dry', 'market_ready', 'sold', 'culled', 'dead'];
+const PIG_BREEDS = ['Large White Yorkshire', 'Landrace', 'Hampshire', 'Local/Indigenous', 'Other'];
 // Matches the real pig_herd.status CHECK constraint (migration 070) exactly.
-const PIG_STATUS = ['active', 'breeding', 'lactating', 'fattening', 'market_ready', 'sold', 'culled', 'dead']
-const HEALTH_TYPES = ['Vaccination', 'Deworming', 'Treatment', 'Checkup', 'Disease Outbreak']
-const HEALTH_STATUSES = ['Healthy', 'Under Observation', 'Sick', 'Critical', 'Recovered']
-const FEED_TYPES = ['Concentrate', 'Green Fodder', 'Dry Fodder', 'Mineral Mixture', 'Silage']
-const ANALYTICS_CATEGORIES = ['Herd Growth', 'Mortality Rate', 'Productivity', 'Cost per Animal', 'Revenue']
+const PIG_STATUS = ['active', 'breeding', 'lactating', 'fattening', 'market_ready', 'sold', 'culled', 'dead'];
+const HEALTH_TYPES = ['Vaccination', 'Deworming', 'Treatment', 'Checkup', 'Disease Outbreak'];
+const HEALTH_STATUSES = ['Healthy', 'Under Observation', 'Sick', 'Critical', 'Recovered'];
+const FEED_TYPES = ['Concentrate', 'Green Fodder', 'Dry Fodder', 'Mineral Mixture', 'Silage'];
+const ANALYTICS_CATEGORIES = ['Herd Growth', 'Mortality Rate', 'Productivity', 'Cost per Animal', 'Revenue'];
 
 function LivestockManagementPage() {
-  const [activeTab, setActiveTab] = useState('cattle')
+  const [activeTab, setActiveTab] = useState('cattle');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -441,7 +441,7 @@ function LivestockManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default LivestockManagementPage
+export default LivestockManagementPage;

@@ -24,6 +24,8 @@
 
 const express = require('express');
 
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const risk = require('../services/legacy/riskPricingService');
 const { authMiddleware } = require('../middleware/auth');
@@ -51,13 +53,13 @@ router.get('/forward', async (req, res) => {
     if (!crop || !months || !spot) {
       throw new Error('crop, months and spot are required');
     }
-    const weather = rainfall
-      ? {
+    const weather = rainfall ?
+      {
         rainfallMm: Number(rainfall),
         meanTempC: Number(temp),
         heatDaysAboveThresh: Number(heatDays || 0),
-      }
-      : null;
+      } :
+      null;
     const data = await risk.computeAdvanceRate({
       cropKey: crop,
       monthsAhead: Number(months),
@@ -78,9 +80,9 @@ router.get('/calibration/:state/:district/:cropKey', async (req, res) => {
       data: {
         ...c,
         mayAdvise: c.confidence >= 0.5,
-        standing: c.confidence >= 0.8 ? 'calibrated'
-          : c.confidence >= 0.5 ? 'usable with caveats'
-            : 'must decline — advising here would be guessing with someone else\'s harvest',
+        standing: c.confidence >= 0.8 ? 'calibrated' :
+          c.confidence >= 0.5 ? 'usable with caveats' :
+            'must decline — advising here would be guessing with someone else\'s harvest',
       },
     });
   } catch (error) { fail(res, error); }
@@ -118,8 +120,8 @@ router.post('/publish', authMiddleware, async (req, res) => {
     if (!rate.calibrated) {
       return res.status(409).json({
         success: false,
-        error: 'This district is not calibrated for this crop, so the rate cannot be '
-             + 'published as binding.',
+        error: 'This district is not calibrated for this crop, so the rate cannot be ' +
+             'published as binding.',
         confidence: rate.confidence,
         indicativeRate: rate,
       });
@@ -139,7 +141,6 @@ router.post('/basis', authMiddleware, async (req, res) => {
     res.json({ success: true, data: await risk.recordBasis(b) });
   } catch (error) { fail(res, error); }
 });
-
 
 // ---------------------------------------------------------------------------
 // Yield management (059). Added to the existing pricing routes — one module

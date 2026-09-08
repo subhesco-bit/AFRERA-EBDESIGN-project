@@ -44,7 +44,7 @@ class FisheriesService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting fisheries:', error);
@@ -59,11 +59,11 @@ class FisheriesService {
     try {
       const query = 'SELECT * FROM fisheries WHERE id = $1';
       const result = await this.pool.query(query, [fisheryId]);
-      
+
       if (result.rows.length === 0) {
         throw new Error('Fishery not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting fishery by ID:', error);
@@ -84,7 +84,7 @@ class FisheriesService {
         pond_size_sqft,
         water_source,
         stock_count,
-        average_weight_kg
+        average_weight_kg,
       } = fisheryData;
 
       const query = `
@@ -94,7 +94,7 @@ class FisheriesService {
       `;
 
       const result = await this.pool.query(query, [
-        farmer_id, name, location, species, pond_size_sqft, water_source, stock_count, average_weight_kg
+        farmer_id, name, location, species, pond_size_sqft, water_source, stock_count, average_weight_kg,
       ]);
 
       return result.rows[0];
@@ -166,7 +166,8 @@ module.exports = new FisheriesService();
 
 // Merged from backend/src/modules/M132
 {
-  const m132 = require("../../modules/M132/service");
+  const m132 = require('../../modules/M132/service');
   const { ...rest } = m132;
   Object.assign(module.exports, rest);
 }
+

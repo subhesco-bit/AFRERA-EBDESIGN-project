@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { blockchainTraceabilityAPI } from '../../services/api';
+import { blockchainTraceabilityAPI } from '../../services/componentApi';
 
 /**
  * Traceability Viewer Component
@@ -30,7 +30,7 @@ const TraceabilityViewer = ({ productId, batchNumber, traceabilityEvents: events
     try {
       const [eventsRes, custodyRes] = await Promise.all([
         blockchainTraceabilityAPI.getTraceabilityEvents(productId, batchNumber),
-        blockchainTraceabilityAPI.verifyChainOfCustody(productId, batchNumber)
+        blockchainTraceabilityAPI.verifyChainOfCustody(productId, batchNumber),
       ]);
 
       setTraceabilityEvents(eventsRes.data);
@@ -49,7 +49,7 @@ const TraceabilityViewer = ({ productId, batchNumber, traceabilityEvents: events
       packaging: '📦',
       shipping: '🚚',
       delivery: '📬',
-      sale: '🏪'
+      sale: '🏪',
     };
     return icons[eventType] || '📍';
   };
@@ -61,7 +61,7 @@ const TraceabilityViewer = ({ productId, batchNumber, traceabilityEvents: events
       packaging: 'bg-purple-100 border-purple-300',
       shipping: 'bg-orange-100 border-orange-300',
       delivery: 'bg-teal-100 border-teal-300',
-      sale: 'bg-pink-100 border-pink-300'
+      sale: 'bg-pink-100 border-pink-300',
     };
     return colors[eventType] || 'bg-gray-100 border-gray-300';
   };

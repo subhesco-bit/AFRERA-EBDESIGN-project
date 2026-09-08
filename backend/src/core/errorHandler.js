@@ -1,5 +1,5 @@
 // Enterprise Error Handler - Production Grade
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class AppError extends Error {
   constructor(message, statusCode, code = null, details = null) {

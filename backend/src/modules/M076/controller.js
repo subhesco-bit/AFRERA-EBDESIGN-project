@@ -45,5 +45,5 @@ module.exports = {
   createWaterBudget,
   trackWaterUsage,
   optimizeWaterAllocation,
-  generateBudgetReport
+  generateBudgetReport,
 };

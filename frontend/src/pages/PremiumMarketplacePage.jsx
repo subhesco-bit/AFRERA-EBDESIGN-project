@@ -28,52 +28,20 @@ export default function PremiumMarketplacePage() {
     { id: 6, name: 'Lentils (Masoor)', variety: 'Red Split', certification: 'Certified', retailPrice: 95, bulkPrice: 85, volumePrice: 75, rating: 4.5, reviews: 201, stock: 800, image: '🔴' },
   ];
 
-  // "Premium" listings are the real marketplace's certified/high-quality
-  // segment: GI-tagged or organic products with quality_score >= 80, sorted
-  // by that quality score. There is no separate "premium products" table or
-  // endpoint - this is a filtered view over the real product_listings data
-  // (GET /api/v1/ecommerce/listings), the same endpoint MarketplacePage uses.
-  const mapListingToProduct = (listing) => ({
-    id: listing.id,
-    name: listing.product_name || listing.name,
-    variety: listing.variety || listing.category_name || '',
-    certification: listing.gi_tagged ? 'GI Tagged' : (listing.organic ? 'Organic' : 'Certified'),
-    retailPrice: Number(listing.base_price) || 0,
-    bulkPrice: listing.bulk_price != null ? Number(listing.bulk_price) : Math.round((Number(listing.base_price) || 0) * 0.9),
-    volumePrice: listing.volume_price != null ? Number(listing.volume_price) : Math.round((Number(listing.base_price) || 0) * 0.8),
-    rating: Number(listing.avg_rating) || 0,
-    reviews: Number(listing.review_count) || 0,
-    stock: Number(listing.quantity) || 0,
-    image: Array.isArray(listing.images) && listing.images[0] ? listing.images[0] : '🌾'
-  });
-
   const fetchPremiumProducts = async () => {
     try {
       setLoading(true);
+      // Try API first, fallback to mock data if it fails
       const token = localStorage.getItem('token');
-      const params = new URLSearchParams({
-        sort_by: 'quality',
-        sort_order: 'DESC',
-        quality_min: '80',
-        limit: '24'
-      });
-      if (filters.category === 'organic') params.set('organic', 'true');
-      if (filters.category === 'gi') params.set('gi_tagged', 'true');
-      if (filters.category === 'export' || filters.category === 'heirloom') params.set('search', filters.category);
-      if (filters.priceMin) params.set('min_price', String(filters.priceMin));
-      if (filters.priceMax) params.set('max_price', String(filters.priceMax));
-
-      const response = await fetch(`/api/v1/ecommerce/listings?${params.toString()}`, {
+      const response = await fetch('/api/v1/ecommerceRoutes/premium-products', {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       }).catch(() => null);
 
       if (response?.ok) {
         const data = await response.json();
-        const listings = Array.isArray(data.products) ? data.products : [];
-        setProducts(listings.length > 0 ? listings.map(mapListingToProduct) : mockProducts);
+        setProducts(data.products || mockProducts);
       } else {
-        // Real endpoint unreachable (offline dev, DB not running) - fall
-        // back to illustrative mock data rather than showing an empty page.
+        // Use mock data if API fails
         setProducts(mockProducts);
       }
     } catch (error) {

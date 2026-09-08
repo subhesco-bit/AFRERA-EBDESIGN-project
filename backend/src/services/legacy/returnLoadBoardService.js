@@ -21,13 +21,13 @@ class ReturnLoadBoardService {
       `INSERT INTO return_load_postings
         (vehicle_id, posted_by, origin_address, destination_address, available_capacity_kg, available_from, available_until, asking_rate_per_kg_inr)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [vehicleId || null, postedBy, originAddress, destinationAddress, availableCapacityKg, availableFrom, availableUntil, askingRatePerKgInr || null]
+      [vehicleId || null, postedBy, originAddress, destinationAddress, availableCapacityKg, availableFrom, availableUntil, askingRatePerKgInr || null],
     );
     return result.rows[0];
   }
 
   async searchAvailable({ originAddress, destinationAddress, minCapacityKg }) {
-    const conditions = [`status = 'open'`, `available_until > NOW()`];
+    const conditions = ['status = \'open\'', 'available_until > NOW()'];
     const params = [];
     if (originAddress) { params.push(`%${originAddress}%`); conditions.push(`origin_address ILIKE $${params.length}`); }
     if (destinationAddress) { params.push(`%${destinationAddress}%`); conditions.push(`destination_address ILIKE $${params.length}`); }
@@ -35,7 +35,7 @@ class ReturnLoadBoardService {
 
     const result = await pool.query(
       `SELECT * FROM return_load_postings WHERE ${conditions.join(' AND ')} ORDER BY available_from ASC`,
-      params
+      params,
     );
     return result.rows;
   }
@@ -44,7 +44,7 @@ class ReturnLoadBoardService {
     const result = await pool.query(
       `UPDATE return_load_postings SET status = 'booked', booked_shipment_id = $1, updated_at = NOW()
        WHERE id = $2 AND status = 'open' RETURNING *`,
-      [shipmentId, postingId]
+      [shipmentId, postingId],
     );
     if (result.rows.length === 0) throw new Error('Posting not found or not open');
     return result.rows[0];
@@ -54,7 +54,7 @@ class ReturnLoadBoardService {
     const result = await pool.query(
       `UPDATE return_load_postings SET status = 'cancelled', updated_at = NOW()
        WHERE id = $1 AND posted_by = $2 AND status = 'open' RETURNING *`,
-      [postingId, postedBy]
+      [postingId, postedBy],
     );
     if (result.rows.length === 0) throw new Error('Posting not found, not yours, or not open');
     return result.rows[0];
@@ -62,3 +62,4 @@ class ReturnLoadBoardService {
 }
 
 module.exports = new ReturnLoadBoardService();
+

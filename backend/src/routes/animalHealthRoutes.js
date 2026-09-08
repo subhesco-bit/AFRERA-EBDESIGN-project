@@ -29,11 +29,13 @@ const {
   getActiveQuarantines,
 } = require('../services/legacy/animalHealthService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
+protectLivestockRouter(router);
 
 // Route params here are DB integer IDs; a non-numeric id (e.g. "invalid")
 // used to fall through to the service layer and surface as a raw 500 -
@@ -46,7 +48,7 @@ router.param('id', (req, res, next, value) => {
 });
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/v1/animal-health/examinations
@@ -70,20 +72,20 @@ router.get('/examinations', async (req, res, next) => {
 router.post('/examinations', async (req, res, next) => {
   try {
     const examination = await createExamination(req.body);
-    
+
     // Emit signal for animal health check
     signalBus.emitSignal(SIGNAL.ANIMAL_HEALTH_CHECK, {
       examinationId: examination.id,
       animalId: examination.animal_id,
       animalType: examination.animal_type,
       healthStatus: examination.health_status,
-      examinationDate: examination.examination_date
+      examinationDate: examination.examination_date,
     }, {
       severity: examination.health_status === 'critical' ? SEVERITY.WARNING : SEVERITY.INFO,
       source: 'animal_health_routes',
-      entityId: examination.animal_id
+      entityId: examination.animal_id,
     });
-    
+
     res.json({ success: true, data: examination });
   } catch (error) {
     logger.error('animalHealthRoutes:createExamination', { error: error.message });
@@ -147,7 +149,7 @@ router.get('/treatments', async (req, res, next) => {
 router.post('/treatments', async (req, res, next) => {
   try {
     const treatment = await createTreatment(req.body);
-    
+
     // Emit signal for animal treatment
     signalBus.emitSignal(SIGNAL.ANIMAL_TREATMENT, {
       treatmentId: treatment.id,
@@ -155,13 +157,13 @@ router.post('/treatments', async (req, res, next) => {
       animalType: treatment.animal_type,
       treatmentType: treatment.treatment_type,
       medication: treatment.medication,
-      treatmentDate: treatment.treatment_date
+      treatmentDate: treatment.treatment_date,
     }, {
       severity: SEVERITY.INFO,
       source: 'animal_health_routes',
-      entityId: treatment.animal_id
+      entityId: treatment.animal_id,
     });
-    
+
     res.json({ success: true, data: treatment });
   } catch (error) {
     logger.error('animalHealthRoutes:createTreatment', { error: error.message });
@@ -225,7 +227,7 @@ router.get('/outbreaks', async (req, res, next) => {
 router.post('/outbreaks', async (req, res, next) => {
   try {
     const outbreak = await createOutbreak(req.body);
-    
+
     // Emit signal for disease outbreak
     signalBus.emitSignal(SIGNAL.DISEASE_OUTBREAK, {
       outbreakId: outbreak.id,
@@ -233,13 +235,13 @@ router.post('/outbreaks', async (req, res, next) => {
       affectedAnimalType: outbreak.affected_animal_type,
       location: outbreak.location,
       severity: outbreak.severity,
-      startDate: outbreak.start_date
+      startDate: outbreak.start_date,
     }, {
       severity: outbreak.severity === 'critical' ? SEVERITY.CRITICAL : SEVERITY.WARNING,
       source: 'animal_health_routes',
-      entityId: outbreak.id
+      entityId: outbreak.id,
     });
-    
+
     res.json({ success: true, data: outbreak });
   } catch (error) {
     logger.error('animalHealthRoutes:createOutbreak', { error: error.message });
@@ -303,7 +305,7 @@ router.get('/quarantines', async (req, res, next) => {
 router.post('/quarantines', async (req, res, next) => {
   try {
     const quarantine = await createQuarantine(req.body);
-    
+
     // Emit signal for quarantine establishment
     signalBus.emitSignal(SIGNAL.QUARANTINE_ESTABLISHED, {
       quarantineId: quarantine.id,
@@ -311,13 +313,13 @@ router.post('/quarantines', async (req, res, next) => {
       animalType: quarantine.animal_type,
       reason: quarantine.reason,
       startDate: quarantine.start_date,
-      expectedEndDate: quarantine.expected_end_date
+      expectedEndDate: quarantine.expected_end_date,
     }, {
       severity: SEVERITY.WARNING,
       source: 'animal_health_routes',
-      entityId: quarantine.animal_id
+      entityId: quarantine.animal_id,
     });
-    
+
     res.json({ success: true, data: quarantine });
   } catch (error) {
     logger.error('animalHealthRoutes:createQuarantine', { error: error.message });

@@ -2,7 +2,7 @@
  * Monitoring Service Stub
  * Placeholder for monitoring functionality
  */
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class MonitoringService {
   constructor() {

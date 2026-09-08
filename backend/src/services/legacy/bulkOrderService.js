@@ -25,7 +25,7 @@ class BulkOrderService {
       budgetPerUnit,
       contactPerson,
       contactPhone,
-      contactEmail
+      contactEmail,
     } = requestData;
 
     try {
@@ -63,13 +63,13 @@ class BulkOrderService {
         estimatedTotal,
         contactPerson,
         contactPhone,
-        contactEmail
+        contactEmail,
       ]);
 
       logger.info(`Bulk order request created: ${result.rows[0].id}`);
       return {
         ...result.rows[0],
-        productDetails: product
+        productDetails: product,
       };
     } catch (error) {
       logger.error('Error creating bulk order request', { error: error.message, stack: error.stack });
@@ -158,7 +158,7 @@ class BulkOrderService {
 
       return {
         orders: result.rows,
-        pagination: { page, limit }
+        pagination: { page, limit },
       };
     } catch (error) {
       logger.error('Error getting user bulk orders', { error: error.message, stack: error.stack });
@@ -216,7 +216,7 @@ class BulkOrderService {
 
       return {
         orders: result.rows,
-        pagination: { page, limit }
+        pagination: { page, limit },
       };
     } catch (error) {
       logger.error('Error getting all bulk orders', { error: error.message, stack: error.stack });
@@ -265,8 +265,8 @@ class BulkOrderService {
   async getQuotationsForOrder(orderId) {
     try {
       const result = await this.pool.query(
-        `SELECT * FROM bulk_order_quotations WHERE bulk_order_id = $1 ORDER BY created_at DESC`,
-        [orderId]
+        'SELECT * FROM bulk_order_quotations WHERE bulk_order_id = $1 ORDER BY created_at DESC',
+        [orderId],
       );
       return result.rows;
     } catch (error) {
@@ -283,7 +283,7 @@ class BulkOrderService {
       terms,
       conditions,
       deliveryTimeline,
-      paymentTerms
+      paymentTerms,
     } = quotationData;
 
     try {
@@ -303,7 +303,7 @@ class BulkOrderService {
         terms,
         conditions,
         deliveryTimeline,
-        paymentTerms
+        paymentTerms,
       ]);
 
       // Update bulk order status
@@ -378,7 +378,7 @@ class BulkOrderService {
         bulkOrder.contact_person,
         bulkOrder.contact_phone,
         bulkOrder.contact_email,
-        bulkOrder.special_requirements
+        bulkOrder.special_requirements,
       ]);
 
       const order = orderResult.rows[0];
@@ -396,7 +396,7 @@ class BulkOrderService {
         bulkOrder.product_id,
         bulkOrder.quantity,
         quotation.price_per_unit,
-        quotation.total_price
+        quotation.total_price,
       ]);
 
       // Update bulk order status
@@ -528,7 +528,8 @@ module.exports = new BulkOrderService();
 
 // Merged from backend/src/modules/M053
 {
-  const m053 = require("../../modules/M053/service");
+  const m053 = require('../../modules/M053/service');
   const { ...rest } = m053;
   Object.assign(module.exports, rest);
 }
+

@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { Calculator, Beaker, CloudRain, Mountain, BarChart3 } from 'lucide-react'
+import { useState } from 'react';
+import { Calculator, Beaker, CloudRain, Mountain, BarChart3 } from 'lucide-react';
 import {
   waterBudgetingAPI,
   waterQualityAPI,
   rainwaterHarvestingAPI,
   watershedManagementAPI,
   waterAnalyticsAPI,
-} from '../services/api'
+} from '../services/api';
 
 /**
  * Consolidated Water domain sub-modules: M076 (Water Budgeting), M077 (Water
@@ -30,41 +30,41 @@ const TABS = [
   { id: 'harvesting', label: 'Rainwater Harvesting', icon: CloudRain },
   { id: 'watershed', label: 'Watershed', icon: Mountain },
   { id: 'analytics', label: 'Water Analytics', icon: BarChart3 },
-]
+];
 
 /** One real backend operation: a small form of scalar fields plus an optional
  * JSON textarea for whatever nested payload shape the operation expects. */
 function ActionCard({ title, description, fields = [], hasJsonPayload, jsonLabel, jsonPlaceholder, onRun }) {
-  const [values, setValues] = useState({})
-  const [jsonText, setJsonText] = useState('')
-  const [jsonError, setJsonError] = useState('')
-  const [result, setResult] = useState(null)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [values, setValues] = useState({});
+  const [jsonText, setJsonText] = useState('');
+  const [jsonError, setJsonError] = useState('');
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleRun = async () => {
-    setError('')
-    setResult(null)
-    let payload
+    setError('');
+    setResult(null);
+    let payload;
     if (hasJsonPayload) {
       try {
-        payload = jsonText.trim() ? JSON.parse(jsonText) : {}
-        setJsonError('')
+        payload = jsonText.trim() ? JSON.parse(jsonText) : {};
+        setJsonError('');
       } catch {
-        setJsonError('Not valid JSON')
-        return
+        setJsonError('Not valid JSON');
+        return;
       }
     }
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await onRun(values, payload)
-      setResult(res?.data ?? res)
+      const res = await onRun(values, payload);
+      setResult(res?.data ?? res);
     } catch (e) {
-      setError(e?.response?.data?.error || e.message || 'Request failed')
+      setError(e?.response?.data?.error || e.message || 'Request failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
@@ -119,11 +119,11 @@ function ActionCard({ title, description, fields = [], hasJsonPayload, jsonLabel
         </pre>
       )}
     </div>
-  )
+  );
 }
 
 function WaterManagementPage() {
-  const [activeTab, setActiveTab] = useState('budgeting')
+  const [activeTab, setActiveTab] = useState('budgeting');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -320,7 +320,7 @@ function WaterManagementPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default WaterManagementPage
+export default WaterManagementPage;

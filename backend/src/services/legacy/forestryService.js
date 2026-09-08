@@ -44,7 +44,7 @@ class ForestryService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting forestry:', error);
@@ -59,11 +59,11 @@ class ForestryService {
     try {
       const query = 'SELECT * FROM forestry WHERE id = $1';
       const result = await this.pool.query(query, [forestryId]);
-      
+
       if (result.rows.length === 0) {
         throw new Error('Forestry not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting forestry by ID:', error);
@@ -84,7 +84,7 @@ class ForestryService {
         area_hectares,
         species,
         planting_date,
-        expected_harvest_date
+        expected_harvest_date,
       } = forestryData;
 
       const query = `
@@ -94,7 +94,7 @@ class ForestryService {
       `;
 
       const result = await this.pool.query(query, [
-        farmer_id, name, location, type, area_hectares, species, planting_date, expected_harvest_date
+        farmer_id, name, location, type, area_hectares, species, planting_date, expected_harvest_date,
       ]);
 
       return result.rows[0];
@@ -144,3 +144,4 @@ class ForestryService {
 }
 
 module.exports = new ForestryService();
+

@@ -159,17 +159,17 @@ module.exports = {
   createRole,
   updateRole,
   deleteRole,
-  
+
   // Permission management
   listPermissions,
   createPermission,
-  
+
   // User role assignment
   assignRoleToUser,
   removeRoleFromUser,
   getUserRoles,
   getUserPermissions,
-  
+
   // AI-powered features
   recommendRoleForUser,
   getPermissionMatrix,

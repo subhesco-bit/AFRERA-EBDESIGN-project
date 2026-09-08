@@ -57,7 +57,8 @@ module.exports = { cattleRegistry, feedManagement, livestockAnalytics };
 
 // Merged from backend/src/modules/M122
 {
-  const m122 = require("../../modules/M122/service");
+  const m122 = require('../../modules/M122/service');
   const { ...rest } = m122;
   Object.assign(module.exports, rest);
 }
+

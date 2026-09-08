@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Environment Management (backend/src/modules/M005). Generic operation panel -
@@ -12,5 +12,5 @@ export default function EnvironmentManagementPage() {
       title="Environment Management"
       description="Environment configuration, staging, and deployment."
     />
-  )
+  );
 }

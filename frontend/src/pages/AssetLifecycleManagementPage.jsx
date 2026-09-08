@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Asset Lifecycle Management (backend/src/modules/M110). Generic operation panel -
@@ -12,5 +12,5 @@ export default function AssetLifecycleManagementPage() {
       title="Asset Lifecycle Management"
       description="Asset lifecycle tracking, depreciation, and disposal."
     />
-  )
+  );
 }

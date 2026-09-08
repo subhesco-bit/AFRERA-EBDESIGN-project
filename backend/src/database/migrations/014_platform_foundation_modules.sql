@@ -1,8 +1,6 @@
 -- Platform Foundation Modules Migration
 -- Phase 1: Platform Foundation Enhancement (M001-M020)
 -- Core platform tables with AI enhancement support
--- NOTE: This migration wraps statements in error handling to avoid conflicts
--- with existing tables from base schema
 
 -- Platform Configurations Table
 CREATE TABLE IF NOT EXISTS platform_configurations (
@@ -146,21 +144,26 @@ CREATE TABLE IF NOT EXISTS master_configurations (
 CREATE INDEX idx_master_config_group ON master_configurations(config_group);
 CREATE INDEX idx_master_config_key ON master_configurations(config_key);
 
--- Roles Table (Enhanced) - Add missing columns from base schema
-DO $$
-BEGIN
-  ALTER TABLE IF EXISTS roles
-    ADD COLUMN IF NOT EXISTS is_system_role BOOLEAN DEFAULT false;
-  ALTER TABLE IF EXISTS roles
-    ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 0;
-  ALTER TABLE IF EXISTS roles
-    ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
-EXCEPTION WHEN OTHERS THEN
-  NULL;
-END $$;
+-- Roles Table (Enhanced)
+CREATE TABLE IF NOT EXISTS roles (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  description TEXT,
+  permissions JSONB DEFAULT '[]',
+  is_system_role BOOLEAN DEFAULT false,
+  level INTEGER DEFAULT 0,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-CREATE INDEX IF NOT EXISTS idx_roles_system ON roles(is_system_role);
-CREATE INDEX IF NOT EXISTS idx_roles_level ON roles(level);
+-- 2026-08-30: removed unconditional CREATE INDEX on is_system_role/level -
+-- this file's own CREATE TABLE roles above is a no-op (000_base_schema.sql's
+-- narrower roles table already exists and runs first), so these columns
+-- don't exist on the real table and the index creation fails outright
+-- ("column is_system_role does not exist"). The equivalent indexes are
+-- already created safely, with IF NOT EXISTS, after the columns actually
+-- exist, by 9999_zzzzzzzzzzzzzzzzzzz_roles_collision_repair.sql.
 
 -- Permissions Table
 CREATE TABLE IF NOT EXISTS permissions (
@@ -179,20 +182,25 @@ CREATE TABLE IF NOT EXISTS permissions (
 CREATE INDEX idx_permissions_category ON permissions(category);
 CREATE INDEX idx_permissions_resource ON permissions(resource);
 
--- User Roles Table (Enhanced) - Add missing columns from base schema
-DO $$
-BEGIN
-  ALTER TABLE IF EXISTS user_roles
-    ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP;
-  ALTER TABLE IF EXISTS user_roles
-    ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
-EXCEPTION WHEN OTHERS THEN
-  NULL;
-END $$;
+-- User Roles Table
+CREATE TABLE IF NOT EXISTS user_roles (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role_id INTEGER NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  assigned_by UUID REFERENCES users(id),
+  assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP,
+  is_active BOOLEAN DEFAULT true,
+  UNIQUE(user_id, role_id)
+);
 
-CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_roles_role ON user_roles(role_id);
-CREATE INDEX IF NOT EXISTS idx_user_roles_active ON user_roles(is_active);
+CREATE INDEX idx_user_roles_user ON user_roles(user_id);
+CREATE INDEX idx_user_roles_role ON user_roles(role_id);
+-- 2026-08-30: removed idx_user_roles_active - this file's own CREATE TABLE
+-- user_roles above is a no-op (000_base_schema.sql's user_roles already
+-- exists and runs first, with no is_active column), so this unconditional
+-- index creation fails with "column is_active does not exist" against a
+-- real database. See schema-decisions.json ("user_roles", kind: deferred).
 
 -- Role Permissions Table
 CREATE TABLE IF NOT EXISTS role_permissions (
@@ -264,7 +272,7 @@ CREATE INDEX idx_sessions_expires ON user_sessions(expires_at);
 -- Audit Log Table
 CREATE TABLE IF NOT EXISTS audit_logs (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
+  user_id UUID REFERENCES users(id),
   action VARCHAR(100) NOT NULL,
   entity_type VARCHAR(100),
   entity_id INTEGER,
@@ -279,7 +287,11 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE INDEX idx_audit_user ON audit_logs(user_id);
 CREATE INDEX idx_audit_action ON audit_logs(action);
 CREATE INDEX idx_audit_entity ON audit_logs(entity_type, entity_id);
-CREATE INDEX idx_audit_created ON audit_logs(created_at);
+-- 2026-08-30: removed idx_audit_created ON audit_logs(created_at) - this
+-- file's own CREATE TABLE audit_logs above is a no-op (000_base_schema.sql's
+-- audit_logs already exists and runs first; its equivalent column is named
+-- `timestamp`, not `created_at`), so this unconditional index creation fails
+-- with "column created_at does not exist" against a real database.
 
 -- Create trigger functions
 CREATE OR REPLACE FUNCTION update_updated_at_column()

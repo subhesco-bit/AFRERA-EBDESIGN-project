@@ -1,8 +1,8 @@
-import { Users } from 'lucide-react'
-import { farmerFamilyAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { Users } from 'lucide-react';
+import { farmerFamilyAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const RELATIONS = ['Spouse', 'Son', 'Daughter', 'Father', 'Mother', 'Sibling', 'Other Dependent']
+const RELATIONS = ['Spouse', 'Son', 'Daughter', 'Father', 'Mother', 'Sibling', 'Other Dependent'];
 
 const initialForm = {
   farmer_name: '',
@@ -13,7 +13,7 @@ const initialForm = {
   occupation: '',
   is_dependent: 'Yes',
   notes: '',
-}
+};
 
 function FarmerFamilyPage() {
   return (
@@ -58,7 +58,7 @@ function FarmerFamilyPage() {
         { label: 'Households', value: new Set(items.map((i) => i.farmer_name).filter(Boolean)).size },
       ]}
     />
-  )
+  );
 }
 
-export default FarmerFamilyPage
+export default FarmerFamilyPage;

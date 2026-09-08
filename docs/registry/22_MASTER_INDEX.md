@@ -1,6 +1,6 @@
 # 22 — MASTER INDEX: specified vs built
 
-**Generated:** 2026-08-05 by `tools/master-index.js`  
+**Generated:** 2026-09-02 by `tools/master-index.js`  
 **Specification:** `docs/registry/SOURCE_CATALOGUE.json` — No project chats (1).docx  md5 d217a852325fb6c0cbc4437ba26590c8
 
 Every status below is derived from an artefact on disk, never from a
@@ -12,13 +12,13 @@ found. `NO_UI` means the backend exists and nothing renders it.
 |---|---|
 | Enterprise domains catalogued (D01–D100) | 100 |
 | Modules catalogued (M001–M150) | 150 |
-| **BUILT** (backend + UI) | **26** |
-| **NO_UI** (backend only) | **14** |
-| **PARTIAL** (schema only) | **53** |
-| **ABSENT** (no artefact) | **57** |
+| **BUILT** (backend + UI) | **78** |
+| **NO_UI** (backend only) | **9** |
+| **PARTIAL** (schema only) | **60** |
+| **ABSENT** (no artefact) | **3** |
 | Modules the source explicitly names as missing | 17 |
 
-Evidence corpus: 582 tables, 82 services, 24 route files, 88 components, 0 agents.
+Evidence corpus: 1291 tables, 230 services, 157 route files, 769 components, 0 agents.
 
 ## Enterprise domains (D01–D100)
 
@@ -130,155 +130,155 @@ Evidence corpus: 582 tables, 82 services, 24 route files, 88 components, 0 agent
 | ID | Module | Domain | Status | Match | Evidence |
 |---|---|---|---|---|---|
 | M001 | Platform Core | Platform Foundation | **ABSENT** | — | — |
-| M002 | Platform Configuration | Platform Foundation | **PARTIAL** | strong | `migrations/037_omnichannel_ai_schema.sql` |
-| M003 | Tenant Management | Platform Foundation | **ABSENT** | — | — |
-| M004 | Organization Management | Platform Foundation | **ABSENT** | — | — |
-| M005 | Environment Management | Platform Foundation | **ABSENT** | — | — |
-| M006 | System Administration | Platform Foundation | **PARTIAL** | strong | `frontend/src/pages/AdminDashboardPage.jsx` |
-| M007 | Feature Flag Management | Platform Foundation | **NO_UI** | subject | `backend/src/services/advancedFeaturesService.js`<br>`backend/src/routes/advancedFeatures.js` |
-| M008 | Localization Management | Platform Foundation | **ABSENT** | — | — |
-| M009 | Time Zone Management | Platform Foundation | **PARTIAL** | subject | `frontend/src/components/Logistics/RealTimeTracking.jsx` |
-| M010 | Master Configuration | Platform Foundation | **PARTIAL** | strong | `migrations/037_omnichannel_ai_schema.sql` |
+| M002 | Platform Configuration | Platform Foundation | **NO_UI** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/014_platform_foundation_modules.sql`<br>`migrations/014_platform_foundation_modules.sql` |
+| M003 | Tenant Management | Platform Foundation | **NO_UI** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/9502_m003_tenant_management.sql`<br>`migrations/9502_m003_tenant_management.sql` |
+| M004 | Organization Management | Platform Foundation | **NO_UI** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/4000_comprehensive_erp_schema.sql`<br>`migrations/9503_m004_organization_management.sql` |
+| M005 | Environment Management | Platform Foundation | **PARTIAL** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/9501_m002_platform_configuration.sql`<br>`migrations/9504_m005_environment_management.sql` |
+| M006 | System Administration | Platform Foundation | **BUILT** | strong | `migrations/1002_system_administration.sql`<br>`backend/src/services/legacy/systemAdministrationService.js`<br>`backend/src/routes/systemAdministrationRoutes.js` |
+| M007 | Feature Flag Management | Platform Foundation | **NO_UI** | strong | `migrations/9500_m001_platform_core.sql`<br>`backend/src/services/legacy/advancedFeaturesService.js`<br>`backend/src/routes/advancedFeatures.js` |
+| M008 | Localization Management | Platform Foundation | **PARTIAL** | strong | `migrations/014_platform_foundation_modules.sql` |
+| M009 | Time Zone Management | Platform Foundation | **PARTIAL** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/3200_hr_module_schema.sql`<br>`migrations/3200_hr_module_schema.sql` |
+| M010 | Master Configuration | Platform Foundation | **NO_UI** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/014_platform_foundation_modules.sql`<br>`migrations/014_platform_foundation_modules.sql` |
 | M011 | User Management | Identity | **PARTIAL** | strong | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql` |
-| M012 | Authentication | Identity | **BUILT** | strong | `migrations/027_gi_intelligence_schema.sql`<br>`migrations/050_sms_auth_tables.sql`<br>`backend/src/services/authService.js` |
-| M013 | Authorization | Identity | **BUILT** | strong | `migrations/050_sms_auth_tables.sql`<br>`backend/src/services/authService.js`<br>`backend/src/services/smsAuthService.js` |
-| M014 | Role Management | Identity | **PARTIAL** | strong | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/994_recovered_capabilities.sql` |
-| M015 | Permission Management | Identity | **ABSENT** | — | — |
+| M012 | Authentication | Identity | **BUILT** | strong | `migrations/027_gi_intelligence_schema.sql`<br>`migrations/050_sms_auth_tables.sql`<br>`backend/src/services/dual-use/authService.js` |
+| M013 | Authorization | Identity | **BUILT** | strong | `migrations/015_authorization_service.sql`<br>`migrations/015_authorization_service.sql`<br>`migrations/050_sms_auth_tables.sql` |
+| M014 | Role Management | Identity | **BUILT** | strong | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/014_platform_foundation_modules.sql` |
+| M015 | Permission Management | Identity | **PARTIAL** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/014_platform_foundation_modules.sql`<br>`migrations/015_authorization_service.sql` |
 | M016 | Single Sign-On | Identity | **ABSENT** | — | — |
-| M017 | Multi-Factor Authentication | Identity | **BUILT** | subject | `backend/src/services/multilingualService.js`<br>`frontend/src/components/Multilingual/MultilingualProvider.jsx` |
-| M018 | Digital Identity | Identity | **NO_UI** | subject | `migrations/023_engineering_schema.sql`<br>`migrations/023_engineering_schema.sql`<br>`backend/src/services/digitalProductPassportService.js` |
-| M019 | Consent Management | Identity | **ABSENT** | — | — |
-| M020 | Session Management | Identity | **PARTIAL** | strong | `migrations/016_ai_copilot_schema.sql`<br>`migrations/017_ar_vr_schema.sql`<br>`migrations/021_conversational_ai_schema.sql` |
+| M017 | Multi-Factor Authentication | Identity | **BUILT** | subject | `backend/src/services/legacy/multilingualService.js`<br>`frontend/src/components/Multilingual/MultilingualProvider.jsx` |
+| M018 | Digital Identity | Identity | **BUILT** | subject | `migrations/023_engineering_schema.sql`<br>`migrations/023_engineering_schema.sql`<br>`migrations/072_tier1_m025_m030_schema.sql` |
+| M019 | Consent Management | Identity | **PARTIAL** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/3017_m017_consent_management.sql`<br>`migrations/3017_m017_consent_management.sql` |
+| M020 | Session Management | Identity | **PARTIAL** | strong | `migrations/014_platform_foundation_modules.sql`<br>`migrations/016_ai_copilot_schema.sql`<br>`migrations/017_ar_vr_schema.sql` |
 | M021 | Farmer Registry | Farmer | **BUILT** | strong | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M022 | Farmer Profile | Farmer | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M023 | Farmer Family | Farmer | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M024 | Farmer KYC | Farmer | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M025 | Farmer Verification | Farmer | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M026 | Farmer Skill Management | Farmer | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
+| M022 | Farmer Profile | Farmer | **BUILT** | strong | `migrations/9505_m022_farmer_profiles.sql`<br>`frontend/src/pages/FarmerProfilePage.jsx`<br>`migrations/000_base_schema.sql` |
+| M023 | Farmer Family | Farmer | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql`<br>`backend/src/services/legacy/farmerFamilyService.js`<br>`backend/src/routes/farmerFamilyRoutes.js` |
+| M024 | Farmer KYC | Farmer | **BUILT** | strong | `frontend/src/pages/FarmerKycPage.jsx`<br>`migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql` |
+| M025 | Farmer Verification | Farmer | **BUILT** | strong | `migrations/3021_m021_farmer_registration.sql`<br>`frontend/src/pages/FarmerVerificationPage.jsx`<br>`migrations/000_base_schema.sql` |
+| M026 | Farmer Skill Management | Farmer | **BUILT** | strong | `migrations/9505_m022_farmer_profiles.sql`<br>`frontend/src/pages/FarmerSkillPage.jsx`<br>`migrations/000_base_schema.sql` |
 | M027 | Farmer Certification | Farmer | **BUILT** | strong | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
 | M028 | Farmer Advisory | Farmer | **BUILT** | strong | `frontend/src/pages/FarmAdvisorPage.jsx`<br>`migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql` |
-| M029 | Farmer Health & Welfare | Farmer | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
+| M029 | Farmer Health & Welfare | Farmer | **BUILT** | strong | `frontend/src/pages/FarmerHealthWelfarePage.jsx`<br>`migrations/013_farmer_health_welfare_module.sql`<br>`backend/src/routes/farmerHealthRoutes.js` |
 | M030 | Farmer Performance | Farmer | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M031 | Land Registry | Land | **BUILT** | strong | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/055_business_report_recovery.sql`<br>`migrations/991_aeos_folu_ne_policy.sql` |
-| M032 | Land Ownership | Land | **BUILT** | subject | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/055_business_report_recovery.sql`<br>`migrations/991_aeos_folu_ne_policy.sql` |
-| M033 | Land Lease Management | Land | **BUILT** | subject | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/055_business_report_recovery.sql`<br>`migrations/991_aeos_folu_ne_policy.sql` |
-| M034 | Parcel Mapping | Land | **PARTIAL** | subject | `migrations/991_aeos_folu_ne_policy.sql` |
-| M035 | GIS Land Mapping | Land | **ABSENT** | — | — |
-| M036 | Soil Mapping | Land | **NO_UI** | subject | `backend/src/services/soilTestingService.js` |
-| M037 | Water Resource Mapping | Land | **ABSENT** | — | — |
-| M038 | Geo Boundary Management | Land | **PARTIAL** | subject | `migrations/013_logistics_enhancements.sql`<br>`frontend/src/hooks/useGeolocation.js` |
-| M039 | Survey Management | Land | **PARTIAL** | strong | `migrations/023_engineering_schema.sql` |
-| M040 | Digital Land Records | Land | **NO_UI** | subject | `migrations/023_engineering_schema.sql`<br>`migrations/023_engineering_schema.sql`<br>`backend/src/services/digitalProductPassportService.js` |
-| M041 | Village Registry | Community | **PARTIAL** | strong | `migrations/012_governance_module.sql`<br>`migrations/052_economic_layer.sql` |
+| M031 | Land Registry | Land | **BUILT** | strong | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/055_business_report_recovery.sql`<br>`migrations/3000_M034_generated.sql` |
+| M032 | Land Ownership | Land | **BUILT** | subject | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/055_business_report_recovery.sql`<br>`migrations/3000_M034_generated.sql` |
+| M033 | Land Lease Management | Land | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql`<br>`migrations/055_business_report_recovery.sql` |
+| M034 | Parcel Mapping | Land | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql`<br>`migrations/9509_m031_land_parcels_b.sql`<br>`migrations/991_aeos_folu_ne_policy.sql` |
+| M035 | GIS Land Mapping | Land | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql` |
+| M036 | Soil Mapping | Land | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql`<br>`migrations/3000_M074_generated.sql`<br>`migrations/9510_m032_land_records_extra.sql` |
+| M037 | Water Resource Mapping | Land | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql`<br>`migrations/3000_M075_generated.sql`<br>`migrations/3000_M076_generated.sql` |
+| M038 | Geo Boundary Management | Land | **BUILT** | subject | `migrations/013_logistics_enhancements.sql`<br>`migrations/9997_geofencing.sql`<br>`migrations/9997_geofencing.sql` |
+| M039 | Survey Management | Land | **PARTIAL** | strong | `migrations/023_engineering_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql` |
+| M040 | Digital Land Records | Land | **BUILT** | subject | `migrations/023_engineering_schema.sql`<br>`migrations/023_engineering_schema.sql`<br>`migrations/072_tier1_m025_m030_schema.sql` |
+| M041 | Village Registry | Community | **BUILT** | strong | `migrations/012_governance_module.sql`<br>`migrations/052_economic_layer.sql`<br>`migrations/9511_m041_m041.sql` |
 | M042 | Panchayat Management | Community | **PARTIAL** | strong | `migrations/012_governance_module.sql`<br>`migrations/012_governance_module.sql` |
-| M043 | Block Management | Community | **NO_UI** | strong | `migrations/019_blockchain_traceability_schema.sql`<br>`migrations/019_blockchain_traceability_schema.sql`<br>`migrations/019_blockchain_traceability_schema.sql` |
-| M044 | District Management | Community | **PARTIAL** | strong | `migrations/051_arp_forward_pricing.sql` |
-| M045 | State Management | Community | **PARTIAL** | strong | `migrations/000_base_schema.sql` |
-| M046 | SHG Management | Community | **ABSENT** | — | — |
-| M047 | Cooperative Management | Community | **PARTIAL** | strong | `migrations/012_governance_module.sql`<br>`migrations/012_governance_module.sql` |
-| M048 | Producer Group Management | Community | **PARTIAL** | subject | `migrations/027_gi_intelligence_schema.sql` |
-| M049 | Community Asset Management | Community | **ABSENT** | — | — |
-| M050 | Rural Development Management | Community | **PARTIAL** | subject | `migrations/041_rural_life_os_schema.sql`<br>`migrations/041_rural_life_os_schema.sql`<br>`migrations/041_rural_life_os_schema.sql` |
+| M043 | Block Management | Community | **BUILT** | strong | `migrations/019_blockchain_traceability_schema.sql`<br>`migrations/019_blockchain_traceability_schema.sql`<br>`migrations/019_blockchain_traceability_schema.sql` |
+| M044 | District Management | Community | **PARTIAL** | strong | `migrations/051_arp_forward_pricing.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql` |
+| M045 | State Management | Community | **PARTIAL** | strong | `migrations/000_base_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql` |
+| M046 | SHG Management | Community | **PARTIAL** | strong | `frontend/src/pages/ShgManagementPage.jsx` |
+| M047 | Cooperative Management | Community | **BUILT** | strong | `migrations/012_governance_module.sql`<br>`migrations/012_governance_module.sql`<br>`backend/src/services/legacy/cooperativeShareService.js` |
+| M048 | Producer Group Management | Community | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql`<br>`migrations/027_gi_intelligence_schema.sql` |
+| M049 | Community Asset Management | Community | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql`<br>`migrations/3000_M041_generated.sql`<br>`migrations/3000_M042_generated.sql` |
+| M050 | Rural Development Management | Community | **NO_UI** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql`<br>`migrations/041_rural_life_os_schema.sql`<br>`migrations/041_rural_life_os_schema.sql` |
 | M051 | FPO Registration | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
 | M052 | FPO Governance | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
-| M053 | FPO Membership | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
+| M053 | FPO Membership | FPO | **PARTIAL** | strong | `migrations/3106_fpo_member_shares_schema.sql`<br>`migrations/9513_m051_m051.sql`<br>`migrations/000_base_schema.sql` |
 | M054 | FPO Finance | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
-| M055 | FPO Procurement | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
-| M056 | FPO Inventory | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
+| M055 | FPO Procurement | FPO | **PARTIAL** | strong | `migrations/3000_M055_generated.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql` |
+| M056 | FPO Inventory | FPO | **PARTIAL** | strong | `migrations/3000_M056_generated.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql` |
 | M057 | FPO Marketing | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
 | M058 | FPO Sales | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
 | M059 | FPO Compliance | FPO | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
 | M060 | FPO Analytics | FPO | **PARTIAL** | strong | `migrations/000_base_schema.sql`<br>`migrations/056_named_missing_modules.sql`<br>`migrations/056_named_missing_modules.sql` |
-| M061 | Crop Planning | Crop | **NO_UI** | strong | `backend/src/services/cropPlanningService.js`<br>`migrations/011_farmer_portal_enhancements.sql`<br>`migrations/018_biodiversity_schema.sql` |
-| M062 | Crop Calendar | Crop | **NO_UI** | subject | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/018_biodiversity_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M063 | Crop Registration | Crop | **NO_UI** | subject | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/018_biodiversity_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M064 | Crop Variety Management | Crop | **NO_UI** | subject | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/018_biodiversity_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M065 | Seed Planning | Crop | **PARTIAL** | subject | `frontend/src/pages/SeedVaultPage.jsx` |
-| M066 | Nursery Management | Crop | **ABSENT** | — | — |
-| M067 | Sowing Management | Crop | **ABSENT** | — | — |
-| M068 | Crop Monitoring | Crop | **NO_UI** | subject | `migrations/011_farmer_portal_enhancements.sql`<br>`migrations/018_biodiversity_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M069 | Harvest Planning | Crop | **PARTIAL** | strong | `frontend/src/pages/HarvestPlanPage.jsx`<br>`migrations/038_organic_traceability_schema.sql`<br>`frontend/src/pages/HarvestScorePage.jsx` |
-| M070 | Yield Recording | Crop | **PARTIAL** | subject | `migrations/991_aeos_folu_ne_policy.sql` |
-| M071 | Soil Health Management | Soil | **NO_UI** | subject | `backend/src/services/soilTestingService.js` |
-| M072 | Soil Test Management | Soil | **NO_UI** | strong | `backend/src/services/soilTestingService.js` |
-| M073 | Nutrient Management | Soil | **PARTIAL** | strong | `migrations/036_nutrition_intelligence_schema.sql`<br>`migrations/036_nutrition_intelligence_schema.sql` |
-| M074 | Fertility Management | Soil | **ABSENT** | — | — |
-| M075 | Irrigation Management | Water | **ABSENT** | — | — |
-| M076 | Water Budgeting | Water | **ABSENT** | — | — |
-| M077 | Water Quality Monitoring | Water | **ABSENT** | — | — |
-| M078 | Rainwater Harvesting | Water | **ABSENT** | — | — |
-| M079 | Watershed Management | Water | **ABSENT** | — | — |
-| M080 | Water Analytics | Water | **ABSENT** | — | — |
+| M061 | Crop Planning | Crop | **BUILT** | strong | `backend/src/services/legacy/cropPlanningService.js`<br>`backend/src/routes/cropPlanningRoutes.js`<br>`migrations/011_farmer_portal_enhancements.sql` |
+| M062 | Crop Calendar | Crop | **BUILT** | strong | `frontend/src/pages/CropCalendarPage.jsx`<br>`migrations/011_farmer_portal_enhancements.sql`<br>`migrations/014_horticulture_module.sql` |
+| M063 | Crop Registration | Crop | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql`<br>`frontend/src/pages/CropRegistrationPage.jsx`<br>`migrations/011_farmer_portal_enhancements.sql` |
+| M064 | Crop Variety Management | Crop | **BUILT** | strong | `frontend/src/pages/CropVarietyPage.jsx`<br>`migrations/011_farmer_portal_enhancements.sql`<br>`migrations/014_horticulture_module.sql` |
+| M065 | Seed Planning | Crop | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql`<br>`frontend/src/pages/SeedPlanningPage.jsx`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql` |
+| M066 | Nursery Management | Crop | **PARTIAL** | strong | `frontend/src/pages/NurseryManagementPage.jsx` |
+| M067 | Sowing Management | Crop | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql`<br>`frontend/src/pages/SowingManagementPage.jsx` |
+| M068 | Crop Monitoring | Crop | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql`<br>`frontend/src/pages/CropMonitoringPage.jsx`<br>`migrations/011_farmer_portal_enhancements.sql` |
+| M069 | Harvest Planning | Crop | **PARTIAL** | strong | `frontend/src/pages/HarvestPlanPage.jsx`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql` |
+| M070 | Yield Recording | Crop | **PARTIAL** | subject | `migrations/991_aeos_folu_ne_policy.sql`<br>`frontend/src/pages/YieldManagementPage.jsx` |
+| M071 | Soil Health Management | Soil | **BUILT** | strong | `migrations/9510_m032_land_records_extra.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql`<br>`migrations/3000_M074_generated.sql` |
+| M072 | Soil Test Management | Soil | **BUILT** | strong | `backend/src/services/legacy/soilTestingService.js`<br>`migrations/3000_M074_generated.sql`<br>`migrations/9510_m032_land_records_extra.sql` |
+| M073 | Nutrient Management | Soil | **BUILT** | strong | `migrations/036_nutrition_intelligence_schema.sql`<br>`migrations/036_nutrition_intelligence_schema.sql`<br>`migrations/3103_nutrient_value_sales.sql` |
+| M074 | Fertility Management | Soil | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql` |
+| M075 | Irrigation Management | Water | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql` |
+| M076 | Water Budgeting | Water | **BUILT** | subject | `migrations/3000_M075_generated.sql`<br>`migrations/3000_M076_generated.sql`<br>`migrations/3000_M077_generated.sql` |
+| M077 | Water Quality Monitoring | Water | **BUILT** | partial | `migrations/9523_m077_m077.sql`<br>`migrations/9525_m079_m079.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql` |
+| M078 | Rainwater Harvesting | Water | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql` |
+| M079 | Watershed Management | Water | **BUILT** | strong | `migrations/3000_M075_generated.sql`<br>`migrations/3000_M076_generated.sql`<br>`migrations/3000_M077_generated.sql` |
+| M080 | Water Analytics | Water | **BUILT** | strong | `migrations/3000_M075_generated.sql`<br>`migrations/3000_M076_generated.sql`<br>`migrations/3000_M077_generated.sql` |
 | M081 | Weather Monitoring | Climate | **BUILT** | subject | `migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql` |
 | M082 | Weather Forecasting | Climate | **BUILT** | subject | `migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql` |
-| M083 | Climate Advisory | Climate | **PARTIAL** | subject | `migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql` |
+| M083 | Climate Advisory | Climate | **BUILT** | strong | `backend/src/routes/climateAdvisoryRoutes.js`<br>`frontend/src/pages/ClimateAdvisoryPage.jsx`<br>`migrations/057_climate_weather_d14.sql` |
 | M084 | Disaster Alerts | Climate | **ABSENT** | — | — |
-| M085 | Drought Monitoring | Climate | **ABSENT** | — | — |
-| M086 | Flood Monitoring | Climate | **ABSENT** | — | — |
-| M087 | Pest Forecasting | Climate | **PARTIAL** | subject | `migrations/057_climate_weather_d14.sql` |
-| M088 | Disease Forecasting | Climate | **PARTIAL** | subject | `migrations/057_climate_weather_d14.sql` |
-| M089 | Climate Risk Assessment | Climate | **PARTIAL** | strong | `migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql` |
-| M090 | Agro-Meteorology | Climate | **PARTIAL** | subject | `migrations/057_climate_weather_d14.sql` |
+| M085 | Drought Monitoring | Climate | **PARTIAL** | subject | `migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql` |
+| M086 | Flood Monitoring | Climate | **PARTIAL** | subject | `migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql` |
+| M087 | Pest Forecasting | Climate | **PARTIAL** | subject | `migrations/057_climate_weather_d14.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql` |
+| M088 | Disease Forecasting | Climate | **PARTIAL** | subject | `migrations/057_climate_weather_d14.sql`<br>`migrations/071_animal_health_schema.sql`<br>`migrations/9543_m127_m127.sql` |
+| M089 | Climate Risk Assessment | Climate | **BUILT** | strong | `migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql`<br>`migrations/057_climate_weather_d14.sql` |
+| M090 | Agro-Meteorology | Climate | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql`<br>`migrations/057_climate_weather_d14.sql`<br>`migrations/3000_M031_generated.sql` |
 | M091 | Farm Activity Management | Operations | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M092 | Farm Task Scheduling | Operations | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M093 | Labour Management | Operations | **ABSENT** | — | — |
-| M094 | Contractor Management | Operations | **PARTIAL** | strong | `migrations/000_base_schema.sql`<br>`migrations/054_v8_v9_commerce_recovery.sql` |
-| M095 | Machinery Operations | Operations | **PARTIAL** | subject | `migrations/041_rural_life_os_schema.sql` |
-| M096 | Equipment Scheduling | Operations | **PARTIAL** | subject | `migrations/023_engineering_schema.sql`<br>`migrations/033_laboratory_erp_schema.sql`<br>`migrations/053_v42_recovered_finance.sql` |
-| M097 | Input Consumption | Operations | **PARTIAL** | subject | `migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M098 | Farm Costing | Operations | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M099 | Farm Productivity | Operations | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M100 | Farm Operations Dashboard | Operations | **BUILT** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/011_farmer_portal_enhancements.sql` |
-| M101 | Tractor Management | Machinery | **ABSENT** | — | — |
-| M102 | Implement Management | Machinery | **ABSENT** | — | — |
-| M103 | Equipment Inventory | Machinery | **PARTIAL** | subject | `migrations/023_engineering_schema.sql`<br>`migrations/033_laboratory_erp_schema.sql`<br>`migrations/053_v42_recovered_finance.sql` |
-| M104 | Equipment Rental | Machinery | **PARTIAL** | subject | `migrations/023_engineering_schema.sql`<br>`migrations/033_laboratory_erp_schema.sql`<br>`migrations/053_v42_recovered_finance.sql` |
-| M105 | Fleet Management | Machinery | **PARTIAL** | strong | `migrations/013_logistics_enhancements.sql` |
-| M106 | Preventive Maintenance | Machinery | **BUILT** | subject | `backend/src/services/preSeasonOrderService.js`<br>`frontend/src/pages/PreOrderPage.jsx` |
-| M107 | Breakdown Maintenance | Machinery | **ABSENT** | — | — |
-| M108 | Fuel Management | Machinery | **ABSENT** | — | — |
-| M109 | Spare Parts Management | Machinery | **ABSENT** | — | — |
-| M110 | Asset Lifecycle Management | Machinery | **PARTIAL** | subject | `migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql` |
-| M111 | Seed Inventory | Input Supply | **PARTIAL** | subject | `frontend/src/pages/SeedVaultPage.jsx` |
-| M112 | Fertilizer Inventory | Input Supply | **ABSENT** | — | — |
-| M113 | Biofertilizer Management | Input Supply | **ABSENT** | — | — |
-| M114 | Pesticide Inventory | Input Supply | **PARTIAL** | subject | `migrations/057_climate_weather_d14.sql` |
-| M115 | Bio-Pesticide Management | Input Supply | **NO_UI** | subject | `migrations/018_biodiversity_schema.sql`<br>`backend/src/services/biodiversityService.js` |
-| M116 | Micronutrient Management | Input Supply | **ABSENT** | — | — |
+| M092 | Farm Task Scheduling | Operations | **BUILT** | partial | `migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql` |
+| M093 | Labour Management | Operations | **PARTIAL** | strong | `frontend/src/pages/LabourManagementPage.jsx` |
+| M094 | Contractor Management | Operations | **BUILT** | strong | `migrations/000_base_schema.sql`<br>`migrations/054_v8_v9_commerce_recovery.sql`<br>`migrations/3102_ecommerce_ai_erp_business_marketing.sql` |
+| M095 | Machinery Operations | Operations | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql`<br>`migrations/041_rural_life_os_schema.sql`<br>`migrations/3000_M101_generated.sql` |
+| M096 | Equipment Scheduling | Operations | **BUILT** | subject | `migrations/023_engineering_schema.sql`<br>`migrations/033_laboratory_erp_schema.sql`<br>`migrations/053_v42_recovered_finance.sql` |
+| M097 | Input Consumption | Operations | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
+| M098 | Farm Costing | Operations | **BUILT** | strong | `frontend/src/pages/FarmCostingPage.jsx`<br>`migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql` |
+| M099 | Farm Productivity | Operations | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql` |
+| M100 | Farm Operations Dashboard | Operations | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql`<br>`migrations/000_base_schema.sql`<br>`migrations/000_base_schema.sql` |
+| M101 | Tractor Management | Machinery | **PARTIAL** | strong | `migrations/9533_m101_tractor_registry.sql`<br>`migrations/9533_m101_tractor_registry.sql`<br>`migrations/9533_m101_tractor_registry.sql` |
+| M102 | Implement Management | Machinery | **PARTIAL** | strong | `migrations/9525_m079_m079.sql`<br>`migrations/9534_m102_m102.sql`<br>`migrations/9534_m102_m102.sql` |
+| M103 | Equipment Inventory | Machinery | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql`<br>`frontend/src/pages/EquipmentInventoryPage.jsx`<br>`migrations/023_engineering_schema.sql` |
+| M104 | Equipment Rental | Machinery | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql`<br>`migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql`<br>`frontend/src/pages/EquipmentRentalPage.jsx` |
+| M105 | Fleet Management | Machinery | **PARTIAL** | strong | `migrations/013_logistics_enhancements.sql`<br>`migrations/9537_m105_m105.sql`<br>`migrations/9537_m105_m105.sql` |
+| M106 | Preventive Maintenance | Machinery | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzz_preventive_maintenance_schema.sql`<br>`backend/src/services/legacy/preventiveMaintenanceService.js`<br>`backend/src/routes/preventiveMaintenanceRoutes.js` |
+| M107 | Breakdown Maintenance | Machinery | **PARTIAL** | strong | `frontend/src/pages/BreakdownMaintenancePage.jsx`<br>`migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql` |
+| M108 | Fuel Management | Machinery | **PARTIAL** | strong | `migrations/9537_m105_m105.sql`<br>`migrations/9539_m108_m108.sql`<br>`migrations/9539_m108_m108.sql` |
+| M109 | Spare Parts Management | Machinery | **PARTIAL** | strong | `migrations/9540_m109_m109.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql` |
+| M110 | Asset Lifecycle Management | Machinery | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql`<br>`frontend/src/pages/AssetLifecycleManagementPage.jsx` |
+| M111 | Seed Inventory | Input Supply | **BUILT** | subject | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql` |
+| M112 | Fertilizer Inventory | Input Supply | **BUILT** | strong | `migrations/066_fertilizer_inventory_schema.sql`<br>`backend/src/services/legacy/fertilizerInventoryService.js`<br>`frontend/src/pages/FertilizerInventoryPage.jsx` |
+| M113 | Biofertilizer Management | Input Supply | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql` |
+| M114 | Pesticide Inventory | Input Supply | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql`<br>`migrations/057_climate_weather_d14.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql` |
+| M115 | Bio-Pesticide Management | Input Supply | **NO_UI** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql`<br>`migrations/018_biodiversity_schema.sql`<br>`migrations/3015_m015_mfa.sql` |
+| M116 | Micronutrient Management | Input Supply | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql` |
 | M117 | Organic Input Management | Input Supply | **BUILT** | strong | `migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M118 | Input Procurement | Input Supply | **PARTIAL** | subject | `migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M119 | Input Distribution | Input Supply | **PARTIAL** | subject | `migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M120 | Input Traceability | Input Supply | **PARTIAL** | subject | `migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
-| M121 | Dairy Management | Livestock | **ABSENT** | — | — |
-| M122 | Cattle Registry | Livestock | **ABSENT** | — | — |
-| M123 | Poultry Management | Livestock | **ABSENT** | — | — |
-| M124 | Goat Farming Management | Livestock | **ABSENT** | — | — |
-| M125 | Sheep Farming Management | Livestock | **ABSENT** | — | — |
-| M126 | Pig Farming Management | Livestock | **ABSENT** | — | — |
-| M127 | Animal Health Management | Livestock | **ABSENT** | — | — |
-| M128 | Feed Management | Livestock | **PARTIAL** | strong | `migrations/046_advanced_voice_ai_tables.sql` |
-| M129 | Breeding Management | Livestock | **ABSENT** | — | — |
-| M130 | Livestock Analytics | Livestock | **ABSENT** | — | — |
-| M131 | Biofloc Farm Management | Fisheries | **ABSENT** | — | — |
-| M132 | Pond Management | Fisheries | **ABSENT** | — | — |
-| M133 | Hatchery Management | Fisheries | **ABSENT** | — | — |
-| M134 | Fish Feed Management | Fisheries | **ABSENT** | — | — |
-| M135 | Water Quality Control | Fisheries | **ABSENT** | — | — |
-| M136 | Fish Health Management | Fisheries | **ABSENT** | — | — |
-| M137 | Harvest Management (Fisheries) | Fisheries | **PARTIAL** | strong | `migrations/038_organic_traceability_schema.sql`<br>`frontend/src/pages/HarvestPlanPage.jsx`<br>`frontend/src/pages/HarvestScorePage.jsx` |
-| M138 | Fish Processing Management | Fisheries | **ABSENT** | — | — |
-| M139 | Cold Fish Chain | Fisheries | **PARTIAL** | subject | `migrations/994_recovered_capabilities.sql`<br>`migrations/994_recovered_capabilities.sql` |
-| M140 | Aquaculture Analytics | Fisheries | **ABSENT** | — | — |
-| M141 | Orchard Management | Horticulture | **ABSENT** | — | — |
-| M142 | Vegetable Production | Horticulture | **ABSENT** | — | — |
-| M143 | Floriculture Management | Horticulture | **ABSENT** | — | — |
-| M144 | Greenhouse Management | Horticulture | **NO_UI** | strong | `backend/src/services/greenhouseService.js` |
-| M145 | Polyhouse Management | Horticulture | **ABSENT** | — | — |
-| M146 | Hydroponics Management | Horticulture | **ABSENT** | — | — |
-| M147 | Aeroponics Management | Horticulture | **ABSENT** | — | — |
-| M148 | Precision Horticulture | Horticulture | **BUILT** | subject | `backend/src/services/preSeasonOrderService.js`<br>`frontend/src/pages/PreOrderPage.jsx` |
-| M149 | Protected Cultivation | Horticulture | **PARTIAL** | subject | `frontend/src/components/ProtectedRoute.jsx` |
-| M150 | Horticulture Analytics | Horticulture | **ABSENT** | — | — |
+| M118 | Input Procurement | Input Supply | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
+| M119 | Input Distribution | Input Supply | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
+| M120 | Input Traceability | Input Supply | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql`<br>`migrations/038_organic_traceability_schema.sql`<br>`migrations/038_organic_traceability_schema.sql` |
+| M121 | Dairy Management | Livestock | **BUILT** | strong | `migrations/065_dairy_management_schema.sql`<br>`migrations/065_dairy_management_schema.sql`<br>`backend/src/services/legacy/dairyService.js` |
+| M122 | Cattle Registry | Livestock | **PARTIAL** | strong | `migrations/9541_m122_m122.sql`<br>`migrations/9541_m122_m122.sql`<br>`migrations/9541_m122_m122.sql` |
+| M123 | Poultry Management | Livestock | **BUILT** | strong | `migrations/067_poultry_management_schema.sql`<br>`migrations/067_poultry_management_schema.sql`<br>`migrations/067_poultry_management_schema.sql` |
+| M124 | Goat Farming Management | Livestock | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql`<br>`frontend/src/pages/GoatFarmingPage.jsx`<br>`migrations/068_goat_farming_schema.sql` |
+| M125 | Sheep Farming Management | Livestock | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql`<br>`frontend/src/pages/SheepFarmingPage.jsx`<br>`migrations/069_sheep_farming_schema.sql` |
+| M126 | Pig Farming Management | Livestock | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql`<br>`frontend/src/pages/PigFarmingPage.jsx`<br>`migrations/070_pig_farming_schema.sql` |
+| M127 | Animal Health Management | Livestock | **BUILT** | strong | `migrations/071_animal_health_schema.sql`<br>`migrations/9543_m127_m127.sql`<br>`backend/src/services/legacy/animalHealthService.js` |
+| M128 | Feed Management | Livestock | **NO_UI** | strong | `migrations/046_advanced_voice_ai_tables.sql`<br>`migrations/060_experience_layer_dxp.sql`<br>`migrations/067_poultry_management_schema.sql` |
+| M129 | Breeding Management | Livestock | **PARTIAL** | strong | `migrations/068_goat_farming_schema.sql`<br>`migrations/069_sheep_farming_schema.sql`<br>`migrations/070_pig_farming_schema.sql` |
+| M130 | Livestock Analytics | Livestock | **BUILT** | strong | `migrations/3000_M121_generated.sql`<br>`migrations/3000_M122_generated.sql`<br>`migrations/3000_M123_generated.sql` |
+| M131 | Biofloc Farm Management | Fisheries | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql` |
+| M132 | Pond Management | Fisheries | **PARTIAL** | strong | `migrations/016_advanced_ponds_iot.sql`<br>`migrations/016_advanced_ponds_iot.sql`<br>`migrations/016_advanced_ponds_iot.sql` |
+| M133 | Hatchery Management | Fisheries | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql` |
+| M134 | Fish Feed Management | Fisheries | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql`<br>`migrations/3000_M131_generated.sql`<br>`migrations/3000_M132_generated.sql` |
+| M135 | Water Quality Control | Fisheries | **BUILT** | partial | `migrations/9523_m077_m077.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql` |
+| M136 | Fish Health Management | Fisheries | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql`<br>`migrations/3000_M131_generated.sql`<br>`migrations/3000_M132_generated.sql` |
+| M137 | Harvest Management (Fisheries) | Fisheries | **PARTIAL** | strong | `migrations/038_organic_traceability_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql` |
+| M138 | Fish Processing Management | Fisheries | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql`<br>`migrations/3000_M131_generated.sql`<br>`migrations/3000_M132_generated.sql` |
+| M139 | Cold Fish Chain | Fisheries | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql`<br>`migrations/3104_cold_storage_schema.sql`<br>`migrations/3104_cold_storage_schema.sql` |
+| M140 | Aquaculture Analytics | Fisheries | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql` |
+| M141 | Orchard Management | Horticulture | **PARTIAL** | strong | `migrations/014_horticulture_module.sql`<br>`migrations/014_horticulture_module.sql`<br>`frontend/src/pages/OrchardManagementPage.jsx` |
+| M142 | Vegetable Production | Horticulture | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql`<br>`migrations/014_horticulture_module.sql` |
+| M143 | Floriculture Management | Horticulture | **PARTIAL** | strong | `migrations/014_horticulture_module.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql` |
+| M144 | Greenhouse Management | Horticulture | **NO_UI** | strong | `migrations/014_horticulture_module.sql`<br>`backend/src/services/legacy/greenhouseService.js` |
+| M145 | Polyhouse Management | Horticulture | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql` |
+| M146 | Hydroponics Management | Horticulture | **PARTIAL** | strong | `migrations/014_horticulture_module.sql`<br>`migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql` |
+| M147 | Aeroponics Management | Horticulture | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql` |
+| M148 | Precision Horticulture | Horticulture | **BUILT** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql`<br>`migrations/strategic_services_schema.sql`<br>`migrations/strategic_services_schema.sql` |
+| M149 | Protected Cultivation | Horticulture | **PARTIAL** | strong | `migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql`<br>`frontend/src/components/ProtectedRoute.jsx` |
+| M150 | Horticulture Analytics | Horticulture | **BUILT** | strong | `migrations/014_horticulture_module.sql`<br>`migrations/3000_M141_generated.sql`<br>`migrations/3000_M142_generated.sql` |
 
 ## Modules the source names as missing
 

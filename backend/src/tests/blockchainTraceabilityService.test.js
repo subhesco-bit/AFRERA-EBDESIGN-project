@@ -13,7 +13,7 @@ describe('Blockchain Traceability Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('Blockchain Traceability Service', () => {
       .send({
         email: 'blockchain-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
 
     authToken = registerResponse.body.token;
@@ -33,22 +33,22 @@ describe('Blockchain Traceability Service', () => {
 
   describe('POST /api/v1/blockchain-traceability/blockchain-transactions', () => {
     it('should record blockchain transaction', async () => {
-      testTransactionHash = '0x' + 'a'.repeat(64);
-      
+      testTransactionHash = `0x${ 'a'.repeat(64)}`;
+
       const response = await request(app)
         .post('/api/v1/blockchain-traceability/blockchain-transactions')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           transaction_hash: testTransactionHash,
           block_number: 12345,
-          block_hash: '0x' + 'b'.repeat(64),
+          block_hash: `0x${ 'b'.repeat(64)}`,
           transaction_index: 0,
-          from_address: '0x' + 'c'.repeat(40),
-          to_address: '0x' + 'd'.repeat(40),
+          from_address: `0x${ 'c'.repeat(40)}`,
+          to_address: `0x${ 'd'.repeat(40)}`,
           gas_used: 21000,
           gas_price: 5000000000,
           status: 'confirmed',
-          metadata: {}
+          metadata: {},
         })
         .expect(201);
 
@@ -60,7 +60,7 @@ describe('Blockchain Traceability Service', () => {
       const response = await request(app)
         .post('/api/v1/blockchain-traceability/blockchain-transactions')
         .send({
-          transaction_hash: '0x' + 'a'.repeat(64)
+          transaction_hash: `0x${ 'a'.repeat(64)}`,
         })
         .expect(401);
     });
@@ -77,7 +77,7 @@ describe('Blockchain Traceability Service', () => {
 
     it('should return 404 for non-existent transaction', async () => {
       const response = await request(app)
-        .get('/api/v1/blockchain-traceability/blockchain-transactions/0x' + 'z'.repeat(64))
+        .get(`/api/v1/blockchain-traceability/blockchain-transactions/0x${ 'z'.repeat(64)}`)
         .expect(404);
     });
   });
@@ -95,7 +95,7 @@ describe('Blockchain Traceability Service', () => {
           actor_type: 'farmer',
           transaction_hash: testTransactionHash,
           event_data: { temperature: 25, humidity: 60 },
-          ipfs_hash: 'Qm' + 'a'.repeat(44)
+          ipfs_hash: `Qm${ 'a'.repeat(44)}`,
         })
         .expect(201);
 
@@ -107,7 +107,7 @@ describe('Blockchain Traceability Service', () => {
       const response = await request(app)
         .post('/api/v1/blockchain-traceability/traceability-events')
         .send({
-          event_type: 'harvest'
+          event_type: 'harvest',
         })
         .expect(401);
     });
@@ -135,7 +135,7 @@ describe('Blockchain Traceability Service', () => {
           holder_type: 'processor',
           from_holder_id: 'farmer-001',
           transaction_hash: testTransactionHash,
-          transfer_document_url: null
+          transfer_document_url: null,
         })
         .expect(201);
 
@@ -170,7 +170,7 @@ describe('Blockchain Traceability Service', () => {
           expiry_date: '2025-01-15',
           certificate_data: { standard: 'NPOP', level: 'Level 1' },
           transaction_hash: testTransactionHash,
-          ipfs_hash: 'Qm' + 'b'.repeat(44)
+          ipfs_hash: `Qm${ 'b'.repeat(44)}`,
         })
         .expect(201);
 
@@ -203,7 +203,7 @@ describe('Blockchain Traceability Service', () => {
         .send({
           product_id: 'test-product-id',
           batch_number: 'BATCH-001',
-          request_type: 'traceability'
+          request_type: 'traceability',
         })
         .expect(201);
 
@@ -226,8 +226,8 @@ describe('Blockchain Traceability Service', () => {
             average_gas_price: 5000000000,
             total_traceability_events: 50,
             total_certificates_issued: 10,
-            unique_products_tracked: 25
-          }
+            unique_products_tracked: 25,
+          },
         })
         .expect(200);
 

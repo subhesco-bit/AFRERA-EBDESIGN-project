@@ -2,7 +2,7 @@
  * Logger Service (Section 23: Observability)
  * Centralized logging service
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class LoggerService {
   constructor() {

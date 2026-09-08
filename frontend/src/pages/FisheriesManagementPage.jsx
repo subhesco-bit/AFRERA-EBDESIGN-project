@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Waves, Egg, Fish, Droplet, HeartPulse, Anchor, Factory, Snowflake, BarChart3 } from 'lucide-react'
+import { useState } from 'react';
+import { Waves, Egg, Fish, Droplet, HeartPulse, Anchor, Factory, Snowflake, BarChart3 } from 'lucide-react';
 import {
   biofloccFarmAPI,
   hatcheryManagementAPI,
@@ -10,8 +10,8 @@ import {
   fishProcessingAPI,
   coldFishChainAPI,
   aquacultureAnalyticsAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Fisheries domain sub-modules, batch 4: M131 (Biofloc Farm
@@ -33,15 +33,15 @@ const TABS = [
   { id: 'processing', label: 'Processing', icon: Factory },
   { id: 'coldchain', label: 'Cold Chain', icon: Snowflake },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-]
+];
 
-const FEED_TYPES = ['Pellet', 'Natural', 'Supplementary']
-const PROCESSING_TYPES = ['Cleaning', 'Filleting', 'Freezing', 'Smoking', 'Drying']
-const SHIPMENT_STATUS = ['In Transit', 'Delivered', 'Delayed']
-const HATCHERY_STATUS = ['Incubating', 'Hatched', 'Failed']
+const FEED_TYPES = ['Pellet', 'Natural', 'Supplementary'];
+const PROCESSING_TYPES = ['Cleaning', 'Filleting', 'Freezing', 'Smoking', 'Drying'];
+const SHIPMENT_STATUS = ['In Transit', 'Delivered', 'Delayed'];
+const HATCHERY_STATUS = ['Incubating', 'Hatched', 'Failed'];
 
 function FisheriesManagementPage() {
-  const [activeTab, setActiveTab] = useState('biofloc')
+  const [activeTab, setActiveTab] = useState('biofloc');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -405,7 +405,7 @@ function FisheriesManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default FisheriesManagementPage
+export default FisheriesManagementPage;

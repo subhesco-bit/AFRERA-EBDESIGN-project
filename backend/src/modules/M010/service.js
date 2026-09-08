@@ -8,49 +8,49 @@ const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 async function createNotification(notificationData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { userId, type, title, message, data, priority, channels, scheduledFor } = notificationData;
-  
+
   // AI-powered priority assignment if not provided
   const finalPriority = priority || await calculateNotificationPriority(type, data);
-  
+
   const res = await pg.query(
     `INSERT INTO notifications (user_id, type, title, message, data, priority, channels, scheduled_for, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending', NOW(), NOW())
      RETURNING *`,
-    [userId, type, title, message, data ? JSON.stringify(data) : null, finalPriority, JSON.stringify(channels || ['in_app']), scheduledFor]
+    [userId, type, title, message, data ? JSON.stringify(data) : null, finalPriority, JSON.stringify(channels || ['in_app']), scheduledFor],
   );
-  
+
   // Emit signal for notification creation
   signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
     entityType: 'notification',
     notificationId: res.rows[0].id,
     userId,
     type,
-    priority: finalPriority
+    priority: finalPriority,
   }, {
     severity: finalPriority === 'critical' ? SEVERITY.CRITICAL : finalPriority === 'high' ? SEVERITY.WARNING : SEVERITY.INFO,
     source: 'notification_service',
-    entityId: userId
+    entityId: userId,
   });
-  
+
   // Trigger delivery if not scheduled
   if (!scheduledFor) {
     await deliverNotification(res.rows[0].id);
   }
-  
+
   return res.rows[0];
 }
 
 async function getNotifications({ page = 1, limit = 20, userId, type, status, priority } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const offset = (page - 1) * limit;
   let query = 'SELECT * FROM notifications WHERE 1=1';
   const params = [];
   let paramIndex = 1;
-  
+
   if (userId) {
     query += ` AND user_id = $${paramIndex++}`;
     params.push(userId);
@@ -67,15 +67,15 @@ async function getNotifications({ page = 1, limit = 20, userId, type, status, pr
     query += ` AND priority = $${paramIndex++}`;
     params.push(priority);
   }
-  
+
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
-  
+
   const res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace(`SELECT * FROM notifications`, 'SELECT COUNT(*) FROM notifications').split('LIMIT')[0], params.slice(0, -2));
+  const totalRes = await pg.query(query.replace('SELECT * FROM notifications', 'SELECT COUNT(*) FROM notifications').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
-  
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function getNotification(id) {
@@ -93,7 +93,7 @@ async function markAsRead(id, userId) {
      SET read = true, read_at = NOW(), updated_at = NOW()
      WHERE id = $1 AND user_id = $2
      RETURNING *`,
-    [id, userId]
+    [id, userId],
   );
   return res.rows[0] || null;
 }
@@ -106,7 +106,7 @@ async function markAllAsRead(userId) {
      SET read = true, read_at = NOW(), updated_at = NOW()
      WHERE user_id = $1 AND read = false
      RETURNING *`,
-    [userId]
+    [userId],
   );
   return res.rows;
 }
@@ -115,49 +115,49 @@ async function markAllAsRead(userId) {
 async function deliverNotification(notificationId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const notification = await getNotification(notificationId);
   if (!notification) {
     logger.error('Notification not found for delivery', { notificationId });
     return { success: false, error: 'Notification not found' };
   }
-  
+
   const deliveryResults = [];
   const channels = notification.channels || ['in_app'];
-  
+
   for (const channel of channels) {
     try {
       const result = await deliverViaChannel(notification, channel);
       deliveryResults.push({ channel, success: true, result });
-      
+
       // Log delivery
       await pg.query(
         `INSERT INTO notification_deliveries (notification_id, channel, status, delivered_at, details)
          VALUES ($1, $2, 'delivered', NOW(), $3)`,
-        [notificationId, channel, JSON.stringify(result)]
+        [notificationId, channel, JSON.stringify(result)],
       );
     } catch (error) {
       logger.error(`Failed to deliver notification via ${channel}`, { error: error.message, notificationId });
       deliveryResults.push({ channel, success: false, error: error.message });
-      
+
       // Log failure
       await pg.query(
         `INSERT INTO notification_deliveries (notification_id, channel, status, error_message, details)
          VALUES ($1, $2, 'failed', $3, $4)`,
-        [notificationId, channel, error.message, JSON.stringify({ stack: error.stack })]
+        [notificationId, channel, error.message, JSON.stringify({ stack: error.stack })],
       );
     }
   }
-  
+
   // Update notification status
   const allDelivered = deliveryResults.every(r => r.success);
   await pg.query(
     `UPDATE notifications 
      SET status = $1, delivered_at = NOW(), updated_at = NOW()
      WHERE id = $2`,
-    [allDelivered ? 'delivered' : 'partial', notificationId]
+    [allDelivered ? 'delivered' : 'partial', notificationId],
   );
-  
+
   return { success: allDelivered, deliveryResults };
 }
 
@@ -166,19 +166,19 @@ async function deliverViaChannel(notification, channel) {
     case 'in_app':
       // In-app notifications are stored and fetched by frontend
       return { method: 'in_app', status: 'queued' };
-    
+
     case 'email':
       // Email delivery (would integrate with email service)
       return await deliverEmail(notification);
-    
+
     case 'sms':
       // SMS delivery (would integrate with SMS service)
       return await deliverSMS(notification);
-    
+
     case 'push':
       // Push notification (would integrate with push service)
       return await deliverPush(notification);
-    
+
     default:
       throw new Error(`Unknown channel: ${channel}`);
   }
@@ -209,21 +209,21 @@ async function deliverPush(notification) {
 async function getUserPreferences(userId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const res = await pg.query(
     'SELECT * FROM notification_preferences WHERE user_id = $1',
-    [userId]
+    [userId],
   );
-  
+
   return res.rows[0] || getDefaultPreferences();
 }
 
 async function updateUserPreferences(userId, preferences) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { channels, types, quietHours, digestFrequency } = preferences;
-  
+
   const res = await pg.query(
     `INSERT INTO notification_preferences (user_id, channels, types, quiet_hours, digest_frequency, updated_at)
      VALUES ($1, $2, $3, $4, $5, NOW())
@@ -234,9 +234,9 @@ async function updateUserPreferences(userId, preferences) {
        digest_frequency = COALESCE(EXCLUDED.digest_frequency, notification_preferences.digest_frequency),
        updated_at = NOW()
      RETURNING *`,
-    [userId, JSON.stringify(channels), JSON.stringify(types), JSON.stringify(quietHours), digestFrequency]
+    [userId, JSON.stringify(channels), JSON.stringify(types), JSON.stringify(quietHours), digestFrequency],
   );
-  
+
   return res.rows[0];
 }
 
@@ -245,7 +245,7 @@ function getDefaultPreferences() {
     channels: ['in_app', 'email'],
     types: ['all'],
     quietHours: { enabled: false, start: '22:00', end: '08:00' },
-    digestFrequency: 'daily'
+    digestFrequency: 'daily',
   };
 }
 
@@ -253,48 +253,48 @@ function getDefaultPreferences() {
 async function createTemplate(templateData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { name, type, subject, bodyTemplate, variables, language } = templateData;
-  
+
   const res = await pg.query(
     `INSERT INTO notification_templates (name, type, subject, body_template, variables, language, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
      RETURNING *`,
-    [name, type, subject, bodyTemplate, JSON.stringify(variables), language || 'en']
+    [name, type, subject, bodyTemplate, JSON.stringify(variables), language || 'en'],
   );
-  
+
   return res.rows[0];
 }
 
 async function getTemplate(type, language = 'en') {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const res = await pg.query(
     'SELECT * FROM notification_templates WHERE type = $1 AND language = $2 AND is_active = true',
-    [type, language]
+    [type, language],
   );
-  
+
   return res.rows[0] || null;
 }
 
 async function renderTemplate(templateId, variables) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const template = await pg.query(
     'SELECT * FROM notification_templates WHERE id = $1',
-    [templateId]
+    [templateId],
   );
-  
+
   if (!template.rows[0]) {
     throw new Error('Template not found');
   }
-  
+
   const tmpl = template.rows[0];
   let renderedSubject = tmpl.subject;
   let renderedBody = tmpl.body_template;
-  
+
   // Simple variable substitution
   const vars = tmpl.variables || [];
   vars.forEach(variable => {
@@ -302,10 +302,10 @@ async function renderTemplate(templateId, variables) {
     renderedSubject = renderedSubject.replace(new RegExp(`{{${variable}}}`, 'g'), value);
     renderedBody = renderedBody.replace(new RegExp(`{{${variable}}}`, 'g'), value);
   });
-  
+
   return {
     subject: renderedSubject,
-    body: renderedBody
+    body: renderedBody,
   };
 }
 
@@ -315,16 +315,16 @@ async function calculateNotificationPriority(type, data) {
   const criticalTypes = ['security_alert', 'emergency', 'system_critical', 'payment_failed'];
   const highTypes = ['deadline_reminder', 'approval_required', 'account_change', 'subscription_expiry'];
   const mediumTypes = ['update', 'announcement', 'report_ready', 'task_assigned'];
-  
+
   if (criticalTypes.includes(type)) return 'critical';
   if (highTypes.includes(type)) return 'high';
   if (mediumTypes.includes(type)) return 'medium';
-  
+
   // Context-aware priority
   if (data && data.urgency) {
     return data.urgency;
   }
-  
+
   return 'low';
 }
 
@@ -332,11 +332,11 @@ async function calculateNotificationPriority(type, data) {
 async function batchNotifications(notificationIds) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const notifications = await Promise.all(
-    notificationIds.map(id => getNotification(id))
+    notificationIds.map(id => getNotification(id)),
   );
-  
+
   // Group by user and channel
   const grouped = {};
   notifications.forEach(notification => {
@@ -346,9 +346,9 @@ async function batchNotifications(notificationIds) {
     }
     grouped[key].push(notification);
   });
-  
+
   const batchResults = [];
-  
+
   for (const [key, group] of Object.entries(grouped)) {
     if (group.length > 1) {
       // Create digest notification
@@ -360,14 +360,14 @@ async function batchNotifications(notificationIds) {
       batchResults.push({ type: 'individual', notifications: 1 });
     }
   }
-  
+
   return batchResults;
 }
 
 async function createDigestNotification(notifications) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const first = notifications[0];
   const digestData = {
     userId: first.user_id,
@@ -376,9 +376,9 @@ async function createDigestNotification(notifications) {
     message: `Summary of ${notifications.length} notifications`,
     data: { notificationIds: notifications.map(n => n.id) },
     priority: 'low',
-    channels: ['in_app', 'email']
+    channels: ['in_app', 'email'],
   };
-  
+
   return await createNotification(digestData);
 }
 
@@ -386,11 +386,11 @@ async function createDigestNotification(notifications) {
 async function getNotificationAnalytics({ userId, startDate, endDate } = {}) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = 'SELECT type, status, COUNT(*) as count FROM notifications WHERE 1=1';
   const params = [];
   let paramIndex = 1;
-  
+
   if (userId) {
     query += ` AND user_id = $${paramIndex++}`;
     params.push(userId);
@@ -403,16 +403,16 @@ async function getNotificationAnalytics({ userId, startDate, endDate } = {}) {
     query += ` AND created_at <= $${paramIndex++}`;
     params.push(endDate);
   }
-  
+
   query += ' GROUP BY type, status';
-  
+
   const res = await pg.query(query, params);
-  
+
   return {
     summary: res.rows,
     total: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
     byType: groupBy(res.rows, 'type'),
-    byStatus: groupBy(res.rows, 'status')
+    byStatus: groupBy(res.rows, 'status'),
   };
 }
 
@@ -431,11 +431,11 @@ async function emitRealTimeNotification(notification) {
     entityType: 'realtime_notification',
     notificationId: notification.id,
     userId: notification.user_id,
-    type: notification.type
+    type: notification.type,
   }, {
     severity: SEVERITY.INFO,
     source: 'notification_service',
-    entityId: notification.user_id
+    entityId: notification.user_id,
   });
 }
 
@@ -446,30 +446,30 @@ module.exports = {
   getNotification,
   markAsRead,
   markAllAsRead,
-  
+
   // Notification delivery
   deliverNotification,
   deliverViaChannel,
-  
+
   // User preferences
   getUserPreferences,
   updateUserPreferences,
-  
+
   // Templates
   createTemplate,
   getTemplate,
   renderTemplate,
-  
+
   // AI-powered features
   calculateNotificationPriority,
-  
+
   // Batching
   batchNotifications,
   createDigestNotification,
-  
+
   // Analytics
   getNotificationAnalytics,
-  
+
   // Real-time
   emitRealTimeNotification,
 };

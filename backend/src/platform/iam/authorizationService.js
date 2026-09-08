@@ -2,7 +2,7 @@
  * Authorization Service (RBAC/ABAC)
  * Checks user permissions and role-based access
  */
-const { logger } = require('../../utils/logger');
+const logger = require('../../utils/logger');
 
 class AuthorizationService {
   constructor() {

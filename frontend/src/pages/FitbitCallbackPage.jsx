@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { wearableAPI } from '../services/api'
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { wearableAPI } from '../services/api';
 
 /**
  * Fitbit redirects the browser here (FITBIT_REDIRECT_URI) with ?code=...
@@ -9,28 +9,28 @@ import { wearableAPI } from '../services/api'
  * .handleFitbitCallback) — this page never sees or stores a token itself.
  */
 export default function FitbitCallbackPage() {
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const [status, setStatus] = useState('connecting')
-  const [error, setError] = useState(null)
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [status, setStatus] = useState('connecting');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const code = searchParams.get('code')
+    const code = searchParams.get('code');
     if (!code) {
-      setStatus('error')
-      setError('No authorization code was returned by Fitbit.')
-      return
+      setStatus('error');
+      setError('No authorization code was returned by Fitbit.');
+      return;
     }
     wearableAPI.handleFitbitCallback(code)
       .then(() => {
-        setStatus('done')
-        setTimeout(() => navigate('/wearables'), 1200)
+        setStatus('done');
+        setTimeout(() => navigate('/wearables'), 1200);
       })
       .catch((err) => {
-        setStatus('error')
-        setError(err.response?.data?.error || err.message)
-      })
-  }, [searchParams, navigate])
+        setStatus('error');
+        setError(err.response?.data?.error || err.message);
+      });
+  }, [searchParams, navigate]);
 
   return (
     <main className="mx-auto flex max-w-md flex-col items-center gap-3 px-4 py-16 text-center">
@@ -42,5 +42,5 @@ export default function FitbitCallbackPage() {
         </div>
       )}
     </main>
-  )
+  );
 }

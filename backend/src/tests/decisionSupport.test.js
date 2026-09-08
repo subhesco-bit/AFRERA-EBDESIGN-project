@@ -14,7 +14,7 @@ describe('MCDA framework', () => {
   test('computes the weighted total exactly', () => {
     const r = mcda([
       { name: 'A', weight: 0.6, score: 80, dataQuality: 'real' },
-      { name: 'B', weight: 0.4, score: 50, dataQuality: 'assumed' }
+      { name: 'B', weight: 0.4, score: 50, dataQuality: 'assumed' },
     ]);
     expect(r.total).toBe(68); // 0.6*80 + 0.4*50
   });
@@ -34,7 +34,7 @@ describe('MCDA framework', () => {
   test('reports which criterion the result is most fragile to', () => {
     const r = mcda([
       { name: 'Dominant', weight: 0.8, score: 90, dataQuality: 'real' },
-      { name: 'Minor', weight: 0.2, score: 90, dataQuality: 'real' }
+      { name: 'Minor', weight: 0.2, score: 90, dataQuality: 'real' },
     ]);
     expect(r.mostSensitiveTo).toBe('Dominant');
   });
@@ -48,7 +48,7 @@ describe('MCDA framework', () => {
   test('flags a close call rather than declaring a winner', () => {
     const close = rankOptions([
       { option: 'a', criteria: [{ name: 'c', weight: 1, score: 70, dataQuality: 'real' }] },
-      { option: 'b', criteria: [{ name: 'c', weight: 1, score: 68, dataQuality: 'real' }] }
+      { option: 'b', criteria: [{ name: 'c', weight: 1, score: 68, dataQuality: 'real' }] },
     ]);
     expect(close.decisive).toBe(false);
     expect(close.note).toMatch(/close call/);
@@ -86,8 +86,8 @@ describe('farmerSelectionDecision', () => {
     const r = ds.farmerSelectionDecision({
       candidates: [
         { farmer: 'High FDI', price: 120, fdiScore: 88, fulfilledOrders: 14 },
-        { farmer: 'Cheaper', price: 95, fdiScore: 52, fulfilledOrders: 9 }
-      ]
+        { farmer: 'Cheaper', price: 95, fdiScore: 52, fulfilledOrders: 9 },
+      ],
     });
     expect(r.ranked[0].farmer).toBe('High FDI');
   });
@@ -98,7 +98,7 @@ describe('farmerSelectionDecision', () => {
 
   test('marks a farmer with no track record as assumed data', () => {
     const r = ds.farmerSelectionDecision({
-      candidates: [{ farmer: 'New', price: 100, fdiScore: 60, fulfilledOrders: 0 }]
+      candidates: [{ farmer: 'New', price: 100, fdiScore: 60, fulfilledOrders: 0 }],
     });
     const track = r.ranked[0].result.criteria.find((c) => c.name.includes('Fulfilment'));
     expect(track.dataQuality).toBe('assumed');
@@ -109,7 +109,7 @@ describe('claimFraudScore', () => {
   test('every point added carries a stated reason', () => {
     const r = ds.claimFraudScore({
       documentsSubmitted: 1, documentsRequired: 4,
-      lateDays: 45, amount: 90000, sumInsured: 100000, priorClaims: 3
+      lateDays: 45, amount: 90000, sumInsured: 100000, priorClaims: 3,
     });
     expect(r.band).toBe('high');
     expect(r.reasons.length).toBeGreaterThanOrEqual(4);
@@ -119,7 +119,7 @@ describe('claimFraudScore', () => {
   test('a high score triggers investigation, never automatic rejection', () => {
     const r = ds.claimFraudScore({
       documentsSubmitted: 0, documentsRequired: 4,
-      lateDays: 90, amount: 99000, sumInsured: 100000, priorClaims: 5
+      lateDays: 90, amount: 99000, sumInsured: 100000, priorClaims: 5,
     });
     expect(r.action).toBe('investigate');
     expect(r.action).not.toBe('reject');
@@ -128,7 +128,7 @@ describe('claimFraudScore', () => {
   test('a clean claim is auto-processed and says why', () => {
     const r = ds.claimFraudScore({
       documentsSubmitted: 4, documentsRequired: 4,
-      lateDays: 2, amount: 1000, sumInsured: 100000, priorClaims: 0
+      lateDays: 2, amount: 1000, sumInsured: 100000, priorClaims: 0,
     });
     expect(r.action).toBe('auto_process');
     expect(r.reasons[0]).toMatch(/No risk flags/);
@@ -137,7 +137,7 @@ describe('claimFraudScore', () => {
   test('score is capped at 100', () => {
     const r = ds.claimFraudScore({
       documentsSubmitted: 0, documentsRequired: 9,
-      lateDays: 999, amount: 1e9, sumInsured: 1, priorClaims: 99
+      lateDays: 999, amount: 1e9, sumInsured: 1, priorClaims: 99,
     });
     expect(r.score).toBeLessThanOrEqual(100);
   });
@@ -148,7 +148,7 @@ describe('moqPrice', () => {
     [100, 0],
     [300, 5],
     [600, 9],
-    [5000, 14]
+    [5000, 14],
   ])('quantity %i falls in the %i%% tier', (qty, discPct) => {
     expect(ds.moqPrice({ basePrice: 100, qty }).discountPct).toBe(discPct);
   });

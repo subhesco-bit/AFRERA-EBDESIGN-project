@@ -45,5 +45,5 @@ module.exports = {
   createOrganization,
   getOrganization,
   updateOrganization,
-  listOrganizations
+  listOrganizations,
 };

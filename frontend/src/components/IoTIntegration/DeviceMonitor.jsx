@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { iotAPI } from '../../services/api';
+import { iotAPI } from '../../services/componentApi';
 
 /**
  * Device Monitor Component
@@ -47,7 +47,7 @@ const DeviceMonitor = ({ devices: devicesProp, alerts: alertsProp }) => {
 
   const fetchAlerts = async () => {
     try {
-      const response = await iotAPI.getUnacknowledgedAlerts();
+      let response = await iotAPI.getUnacknowledgedAlerts();
       setAlerts(response.data);
     } catch (err) {
       console.error('Failed to fetch alerts:', err);
@@ -56,7 +56,7 @@ const DeviceMonitor = ({ devices: devicesProp, alerts: alertsProp }) => {
 
   const fetchSensorData = async (deviceId) => {
     try {
-      const response = await iotAPI.getSensorData(deviceId);
+      let response = await iotAPI.getSensorData(deviceId);
       setSensorData(response.data);
     } catch (err) {
       console.error('Failed to fetch sensor data:', err);
@@ -123,21 +123,21 @@ const DeviceMonitor = ({ devices: devicesProp, alerts: alertsProp }) => {
             {devices.map((device) => (
               <div
                 key={device.id}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
                 // Enter and Space are what a native <button> responds to.
                 // Without this the card is unreachable by keyboard entirely.
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click() }
-              }}
+                  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); }
+                }}
                 onClick={() => {
                   setSelectedDevice(device);
                   fetchSensorData(device.id);
                 }}
                 className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                  selectedDevice?.id === device.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                  selectedDevice?.id === device.id ?
+                    'border-blue-500 bg-blue-50' :
+                    'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center justify-between">

@@ -49,7 +49,7 @@ async function listAnimals({ page = 1, limit = 50 } = {}) {
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await pg.query(
     'SELECT * FROM dairy_animals ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-    [limit, offset]
+    [limit, offset],
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
@@ -63,7 +63,7 @@ async function createAnimal(payload) {
     `INSERT INTO dairy_animals (tag_id, breed, dob, status, notes, last_vaccination_date, last_breeding_date)
      VALUES ($1, $2, $3, COALESCE($4, 'Lactating'), $5, $6, $7)
      RETURNING *`,
-    [tag_id, breed || null, dob || null, status || null, notes || null, last_vaccination_date || null, last_breeding_date || null]
+    [tag_id, breed || null, dob || null, status || null, notes || null, last_vaccination_date || null, last_breeding_date || null],
   );
   return res.rows[0];
 }
@@ -84,7 +84,7 @@ async function updateAnimal(id, payload) {
        updated_at = NOW()
      WHERE id = $8
      RETURNING *`,
-    [tag_id, breed, dob, status, notes, last_vaccination_date, last_breeding_date, id]
+    [tag_id, breed, dob, status, notes, last_vaccination_date, last_breeding_date, id],
   );
   return res.rows[0] || null;
 }
@@ -93,7 +93,7 @@ async function deleteAnimal(id) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const res = await pg.query('DELETE FROM dairy_animals WHERE id = $1 RETURNING id', [id]);
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 // ---------------------------------------------------------------------
@@ -112,7 +112,7 @@ async function listMilkRecords({ page = 1, limit = 100 } = {}) {
        JOIN dairy_animals a ON a.id = m.animal_id
       ORDER BY m.date DESC, m.created_at DESC
       LIMIT $1 OFFSET $2`,
-    [limit, offset]
+    [limit, offset],
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
@@ -130,7 +130,7 @@ async function recordMilk(payload) {
      ON CONFLICT (animal_id, date, session)
        DO UPDATE SET quantity_liters = EXCLUDED.quantity_liters
      RETURNING *`,
-    [animal_id, date, session || null, quantity_liters]
+    [animal_id, date, session || null, quantity_liters],
   );
   return res.rows[0];
 }
@@ -157,7 +157,7 @@ async function getMilkYieldTrends() {
         FROM dairy_animals a
         LEFT JOIN dairy_milk_records m ON m.animal_id = a.id
         GROUP BY a.id, a.tag_id, a.status
-        ORDER BY a.tag_id`
+        ORDER BY a.tag_id`,
     );
 
     const trends = rows.map((r) => {
@@ -207,7 +207,7 @@ async function getHealthAlerts() {
     const { rows } = await pg.query(
       `SELECT id, tag_id, status, last_vaccination_date, last_breeding_date
          FROM dairy_animals
-        ORDER BY tag_id`
+        ORDER BY tag_id`,
     );
 
     const today = new Date();
@@ -293,7 +293,7 @@ async function getHealthAlerts() {
 async function optimizeMilkProduction(animalId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get historical milk production data
     const { rows } = await pg.query(
@@ -303,27 +303,27 @@ async function optimizeMilkProduction(animalId) {
        WHERE m.animal_id = $1
        ORDER BY m.date DESC
        LIMIT 30`,
-      [animalId]
+      [animalId],
     );
-    
+
     if (rows.length < 7) {
       return {
         success: false,
         message: 'Insufficient data for AI analysis (minimum 7 records required)',
-        data: null
+        data: null,
       };
     }
-    
+
     // Prepare data for AI analysis
     const recentProduction = rows.slice(0, 7);
     const avgRecentYield = recentProduction.reduce((sum, r) => sum + r.quantity_liters, 0) / 7;
-    
+
     const olderProduction = rows.slice(7, 14);
     const avgOlderYield = olderProduction.reduce((sum, r) => sum + r.quantity_liters, 0) / 7;
-    
+
     const yieldTrend = ((avgRecentYield - avgOlderYield) / avgOlderYield) * 100;
     const avgFatContent = recentProduction.reduce((sum, r) => sum + (r.fat_content || 3.5), 0) / 7;
-    
+
     // Call real AI backbone for analysis
     const livestockData = {
       health: {
@@ -332,27 +332,27 @@ async function optimizeMilkProduction(animalId) {
         status: rows[0].status,
         age: new Date(rows[0].dob),
         yieldTrend,
-        avgFatContent
+        avgFatContent,
       },
       production: {
         recentYield: avgRecentYield,
         olderYield: avgOlderYield,
         trend: yieldTrend,
-        records: rows.length
+        records: rows.length,
       },
       feed: {
         recentConsumption: avgRecentYield * 0.05, // Sample data
-        efficiency: avgRecentYield / (avgRecentYield * 0.05)
+        efficiency: avgRecentYield / (avgRecentYield * 0.05),
       },
       breeding: {
         lastBreeding: rows[0].last_breeding_date,
-        pregnancyStatus: rows[0].status === 'pregnant'
-      }
+        pregnancyStatus: rows[0].status === 'pregnant',
+      },
     };
-    
+
     // Call real AI for optimization
     const aiOptimization = await aiBackbone.optimizeLivestock(livestockData);
-    
+
     const optimization = {
       animalId,
       analysisDate: new Date().toISOString(),
@@ -364,25 +364,25 @@ async function optimizeMilkProduction(animalId) {
       aiProvider: aiOptimization.provider,
       aiModel: aiOptimization.model,
       confidence: 'high',
-      dataSource: 'real_historical_records_with_ai_analysis'
+      dataSource: 'real_historical_records_with_ai_analysis',
     };
-    
+
     // Emit signal bus event for AI decision
     await signalBus.emit('ai.dairy.production.optimized', {
       animal_id: animalId,
       optimization,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
-    logger.info('AI milk production optimization completed', { 
-      animalId, 
+
+    logger.info('AI milk production optimization completed', {
+      animalId,
       yieldTrend,
-      aiProvider: aiOptimization.provider 
+      aiProvider: aiOptimization.provider,
     });
-    
+
     return {
       success: true,
-      data: optimization
+      data: optimization,
     };
   } catch (error) {
     logger.error('Error optimizing milk production with AI', { error: error.message, animalId });
@@ -397,7 +397,7 @@ async function optimizeMilkProduction(animalId) {
 async function predictHealthRisks(animalId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get animal data and production history
     const { rows } = await pg.query(
@@ -407,20 +407,20 @@ async function predictHealthRisks(animalId) {
        WHERE a.id = $1
        ORDER BY m.date DESC
        LIMIT 30`,
-      [animalId]
+      [animalId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Animal not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const animal = rows[0];
     const productionRecords = rows.filter(r => r.quantity_liters !== null);
-    
+
     // Prepare data for AI analysis
     const livestockData = {
       health: {
@@ -429,58 +429,58 @@ async function predictHealthRisks(animalId) {
         status: animal.status,
         age: new Date(animal.dob),
         lastVaccination: animal.last_vaccination_date,
-        lastBreeding: animal.last_breeding_date
+        lastBreeding: animal.last_breeding_date,
       },
       production: {
         records: productionRecords.length,
-        recentYield: productionRecords.length >= 7 ? 
+        recentYield: productionRecords.length >= 7 ?
           productionRecords.slice(0, 7).reduce((sum, r) => sum + r.quantity_liters, 0) / 7 : 0,
-        olderYield: productionRecords.length >= 14 ? 
-          productionRecords.slice(7, 14).reduce((sum, r) => sum + r.quantity_liters, 0) / 7 : 0
+        olderYield: productionRecords.length >= 14 ?
+          productionRecords.slice(7, 14).reduce((sum, r) => sum + r.quantity_liters, 0) / 7 : 0,
       },
       feed: {
-        recentConsumption: productionRecords.length >= 7 ? 
-          productionRecords.slice(0, 7).reduce((sum, r) => sum + r.quantity_liters, 0) / 7 * 0.05 : 0
+        recentConsumption: productionRecords.length >= 7 ?
+          productionRecords.slice(0, 7).reduce((sum, r) => sum + r.quantity_liters, 0) / 7 * 0.05 : 0,
       },
       breeding: {
         lastBreeding: animal.last_breeding_date,
-        pregnancyStatus: animal.status === 'pregnant'
-      }
+        pregnancyStatus: animal.status === 'pregnant',
+      },
     };
-    
+
     // Call real AI for health prediction
     const aiPrediction = await aiBackbone.optimizeLivestock(livestockData);
-    
+
     const healthPrediction = {
       animalId,
       analysisDate: new Date().toISOString(),
       animalInfo: {
         breed: animal.breed,
         status: animal.status,
-        age: animal.dob
+        age: animal.dob,
       },
       aiHealthAnalysis: aiPrediction.optimization,
       aiProvider: aiPrediction.provider,
       aiModel: aiPrediction.model,
       confidence: 'high',
-      dataSource: 'real_historical_records_with_ai_analysis'
+      dataSource: 'real_historical_records_with_ai_analysis',
     };
-    
+
     // Emit signal bus event for AI prediction
     await signalBus.emit('ai.dairy.health.predicted', {
       animal_id: animalId,
       prediction: healthPrediction,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
-    logger.info('AI health prediction completed', { 
+
+    logger.info('AI health prediction completed', {
       animalId,
-      aiProvider: aiPrediction.provider 
+      aiProvider: aiPrediction.provider,
     });
-    
+
     return {
       success: true,
-      data: healthPrediction
+      data: healthPrediction,
     };
   } catch (error) {
     logger.error('Error predicting health risks with AI', { error: error.message, animalId });
@@ -495,24 +495,24 @@ async function predictHealthRisks(animalId) {
 async function optimizeFeedComposition(animalId, productionGoal) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get animal data
     const { rows } = await pg.query(
-      `SELECT * FROM dairy_animals WHERE id = $1`,
-      [animalId]
+      'SELECT * FROM dairy_animals WHERE id = $1',
+      [animalId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Animal not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const animal = rows[0];
-    
+
     // Prepare data for AI analysis
     const livestockData = {
       health: {
@@ -520,11 +520,11 @@ async function optimizeFeedComposition(animalId, productionGoal) {
         breed: animal.breed,
         status: animal.status,
         age: new Date(animal.dob),
-        weight: animal.weight_kg
+        weight: animal.weight_kg,
       },
       production: {
         goal: productionGoal || 'maximize_milk',
-        currentYield: animal.current_milk_yield || 20
+        currentYield: animal.current_milk_yield || 20,
       },
       feed: {
         currentComposition: {
@@ -532,18 +532,18 @@ async function optimizeFeedComposition(animalId, productionGoal) {
           protein_percentage: 16,
           energy_mj: 10,
           fiber_percentage: 18,
-          fat_percentage: 4
-        }
+          fat_percentage: 4,
+        },
       },
       breeding: {
         pregnancyStatus: animal.status === 'pregnant',
-        lactationStage: animal.lactation_stage || 'mid'
-      }
+        lactationStage: animal.lactation_stage || 'mid',
+      },
     };
-    
+
     // Call real AI for feed optimization
     const aiOptimization = await aiBackbone.optimizeLivestock(livestockData);
-    
+
     const feedOptimization = {
       animalId,
       productionGoal: productionGoal || 'maximize_milk',
@@ -552,25 +552,25 @@ async function optimizeFeedComposition(animalId, productionGoal) {
       aiProvider: aiOptimization.provider,
       aiModel: aiOptimization.model,
       confidence: 'high',
-      dataSource: 'real_animal_data_with_ai_analysis'
+      dataSource: 'real_animal_data_with_ai_analysis',
     };
-    
+
     // Emit signal bus event for AI optimization
     await signalBus.emit('ai.dairy.feed.optimized', {
       animal_id: animalId,
       optimization: feedOptimization,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
-    logger.info('AI feed optimization completed', { 
+
+    logger.info('AI feed optimization completed', {
       animalId,
       productionGoal,
-      aiProvider: aiOptimization.provider 
+      aiProvider: aiOptimization.provider,
     });
-    
+
     return {
       success: true,
-      data: feedOptimization
+      data: feedOptimization,
     };
   } catch (error) {
     logger.error('Error optimizing feed composition with AI', { error: error.message, animalId });
@@ -585,22 +585,22 @@ async function optimizeFeedComposition(animalId, productionGoal) {
 async function recommendBreeding(animalId) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   try {
     // Get animal data
     const { rows } = await pg.query(
-      `SELECT * FROM dairy_animals WHERE id = $1`,
-      [animalId]
+      'SELECT * FROM dairy_animals WHERE id = $1',
+      [animalId],
     );
-    
+
     if (rows.length === 0) {
       return {
         success: false,
         message: 'Animal not found',
-        data: null
+        data: null,
       };
     }
-    
+
     const animal = rows[0];
 
     // Prepare data for AI analysis
@@ -610,28 +610,28 @@ async function recommendBreeding(animalId) {
         breed: animal.breed,
         status: animal.status,
         age: new Date(animal.dob),
-        lastBreeding: animal.last_breeding_date
+        lastBreeding: animal.last_breeding_date,
       },
       production: {
         currentYield: animal.current_milk_yield || 20,
-        productionGoals: 'genetic_improvement'
+        productionGoals: 'genetic_improvement',
       },
       feed: {
         currentComposition: {
           protein_percentage: 16,
-          energy_mj: 10
-        }
+          energy_mj: 10,
+        },
       },
       breeding: {
         lastBreeding: animal.last_breeding_date,
         pregnancyStatus: animal.status === 'pregnant',
-        breedingHistory: animal.breeding_count || 0
-      }
+        breedingHistory: animal.breeding_count || 0,
+      },
     };
-    
+
     // Call real AI for breeding recommendations
     const aiRecommendation = await aiBackbone.optimizeLivestock(livestockData);
-    
+
     const breedingRecommendation = {
       animalId,
       analysisDate: new Date().toISOString(),
@@ -639,24 +639,24 @@ async function recommendBreeding(animalId) {
       aiProvider: aiRecommendation.provider,
       aiModel: aiRecommendation.model,
       confidence: 'high',
-      dataSource: 'real_animal_data_with_ai_analysis'
+      dataSource: 'real_animal_data_with_ai_analysis',
     };
-    
+
     // Emit signal bus event for AI recommendation
     await signalBus.emit('ai.dairy.breeding.recommended', {
       animal_id: animalId,
       recommendation: breedingRecommendation,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
-    logger.info('AI breeding recommendation completed', { 
+
+    logger.info('AI breeding recommendation completed', {
       animalId,
-      aiProvider: aiRecommendation.provider 
+      aiProvider: aiRecommendation.provider,
     });
-    
+
     return {
       success: true,
-      data: breedingRecommendation
+      data: breedingRecommendation,
     };
   } catch (error) {
     logger.error('Error recommending breeding with AI', { error: error.message, animalId });
@@ -677,12 +677,13 @@ module.exports = {
   optimizeMilkProduction,
   predictHealthRisks,
   optimizeFeedComposition,
-  recommendBreeding
+  recommendBreeding,
 };
 
 // Merged from backend/src/modules/M071
 {
-  const m071 = require("../../modules/M071/service");
+  const m071 = require('../../modules/M071/service');
   const { ...rest } = m071;
   Object.assign(module.exports, rest);
 }
+

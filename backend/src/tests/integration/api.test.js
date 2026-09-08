@@ -8,8 +8,8 @@ describe('API Integration Tests', () => {
         data: {
           status: 'healthy',
           timestamp: new Date(),
-          uptime: 3600
-        }
+          uptime: 3600,
+        },
       };
 
       expect(response.status).toBe(200);
@@ -23,7 +23,7 @@ describe('API Integration Tests', () => {
         email: 'test@example.com',
         password: 'Test@123',
         name: 'Test User',
-        phone: '+919876543210'
+        phone: '+919876543210',
       };
 
       const response = {
@@ -32,8 +32,8 @@ describe('API Integration Tests', () => {
           id: '123',
           email: userData.email,
           name: userData.name,
-          token: 'jwt-token-here'
-        }
+          token: 'jwt-token-here',
+        },
       };
 
       expect(response.status).toBe(201);
@@ -43,7 +43,7 @@ describe('API Integration Tests', () => {
     it('should login user via API', async () => {
       const credentials = {
         email: 'test@example.com',
-        password: 'Test@123'
+        password: 'Test@123',
       };
 
       const response = {
@@ -52,9 +52,9 @@ describe('API Integration Tests', () => {
           token: 'jwt-token-here',
           user: {
             id: '123',
-            email: credentials.email
-          }
-        }
+            email: credentials.email,
+          },
+        },
       };
 
       expect(response.status).toBe(200);
@@ -69,12 +69,12 @@ describe('API Integration Tests', () => {
         data: {
           products: [
             { id: '1', name: 'Rice', price: 50 },
-            { id: '2', name: 'Wheat', price: 40 }
+            { id: '2', name: 'Wheat', price: 40 },
           ],
           total: 2,
           page: 1,
-          limit: 10
-        }
+          limit: 10,
+        },
       };
 
       expect(response.status).toBe(200);
@@ -89,8 +89,8 @@ describe('API Integration Tests', () => {
           id: productId,
           name: 'Rice',
           price: 50,
-          category: 'Cereals'
-        }
+          category: 'Cereals',
+        },
       };
 
       expect(response.status).toBe(200);
@@ -103,10 +103,10 @@ describe('API Integration Tests', () => {
         status: 200,
         data: {
           products: [
-            { id: '1', name: 'Organic Rice', price: 50 }
+            { id: '1', name: 'Organic Rice', price: 50 },
           ],
-          total: 1
-        }
+          total: 1,
+        },
       };
 
       expect(response.status).toBe(200);
@@ -123,8 +123,8 @@ describe('API Integration Tests', () => {
           id: farmerId,
           name: 'Test Farmer',
           fdiScore: 75,
-          fdiGrade: 'B'
-        }
+          fdiGrade: 'B',
+        },
       };
 
       expect(response.status).toBe(200);
@@ -135,7 +135,7 @@ describe('API Integration Tests', () => {
       const farmerId = '123';
       const updateData = {
         name: 'Updated Name',
-        phone: '+919876543211'
+        phone: '+919876543211',
       };
 
       const response = {
@@ -143,8 +143,8 @@ describe('API Integration Tests', () => {
         data: {
           id: farmerId,
           ...updateData,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       };
 
       expect(response.status).toBe(200);
@@ -156,14 +156,14 @@ describe('API Integration Tests', () => {
     it('should create order', async () => {
       const orderData = {
         items: [
-          { productId: '1', quantity: 5 }
+          { productId: '1', quantity: 5 },
         ],
         shippingAddress: {
           street: '123 Main St',
           city: 'Guwahati',
           state: 'Assam',
-          zip: '781001'
-        }
+          zip: '781001',
+        },
       };
 
       const response = {
@@ -172,8 +172,8 @@ describe('API Integration Tests', () => {
           id: 'order-123',
           ...orderData,
           status: 'pending',
-          totalAmount: 250
-        }
+          totalAmount: 250,
+        },
       };
 
       expect(response.status).toBe(201);
@@ -187,8 +187,8 @@ describe('API Integration Tests', () => {
         data: {
           id: orderId,
           status: 'pending',
-          totalAmount: 250
-        }
+          totalAmount: 250,
+        },
       };
 
       expect(response.status).toBe(200);

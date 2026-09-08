@@ -1,6 +1,6 @@
 /**
  * HR Controller with AI Integration
- * 
+ *
  * Controller layer for HR module with AI-powered capabilities
  * Handles HTTP requests and responses, delegates to service layer
  */
@@ -17,12 +17,12 @@ class HRController {
       res.status(201).json({
         success: true,
         message: 'Employee created successfully with AI recommendations',
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -36,12 +36,12 @@ class HRController {
       const result = await hrService.predictEmployeeAttrition(employeeId);
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -56,12 +56,12 @@ class HRController {
       const result = await hrService.analyzeEmployeeSentiment(employeeId, timeframe);
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -75,12 +75,12 @@ class HRController {
       const result = await hrService.recommendTraining(employeeId);
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -95,12 +95,12 @@ class HRController {
       res.json({
         success: true,
         message: 'Shift schedule optimized successfully',
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -113,12 +113,12 @@ class HRController {
       const result = await hrService.detectTimesheetAnomalies(req.body);
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -136,13 +136,13 @@ class HRController {
           'skill_gap_analysis',
           'performance_distribution',
           'sentiment_trends',
-          'training_effectiveness'
-        ]
+          'training_effectiveness',
+        ],
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -159,13 +159,13 @@ class HRController {
           'headcount_forecasting',
           'budget_predictions',
           'succession_planning',
-          'hiring_demand_forecast'
-        ]
+          'hiring_demand_forecast',
+        ],
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }

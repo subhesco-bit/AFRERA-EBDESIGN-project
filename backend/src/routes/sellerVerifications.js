@@ -10,7 +10,7 @@ const express = require('express');
 const sellerVerificationService = require('../services/sellerVerificationService');
 const { authMiddleware: authenticateToken, requireRole: authorize } = require('../middleware/auth');
 const { validateBody: validateRequest } = require('../middleware/validation');
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 

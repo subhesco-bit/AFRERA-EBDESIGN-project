@@ -1,6 +1,6 @@
-import { Activity } from 'lucide-react'
-import { realtimeMonitoringAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Activity } from 'lucide-react';
+import { realtimeMonitoringAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/realtimeMonitoringRoutes.js +
@@ -51,7 +51,7 @@ function RealtimeMonitoringPage() {
         onRun={() => realtimeMonitoringAPI.healthCheck()}
       />
     </div>
-  )
+  );
 }
 
-export default RealtimeMonitoringPage
+export default RealtimeMonitoringPage;

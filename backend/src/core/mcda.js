@@ -30,9 +30,9 @@
 
 /** Weight applied to a criterion's contribution to overall confidence. */
 const DATA_QUALITY_WEIGHT = Object.freeze({
-  real: 1,        // measured or recorded fact
+  real: 1, // measured or recorded fact
   estimated: 0.7, // derived from a model or proxy
-  assumed: 0.4    // a stated assumption with no backing data
+  assumed: 0.4, // a stated assumption with no backing data
 });
 
 const DEFAULT_DATA_QUALITY = 0.5;
@@ -76,7 +76,7 @@ function mcda(criteria) {
     return {
       ...c,
       score,
-      contribution: round1(c.weight * score)
+      contribution: round1(c.weight * score),
     };
   });
 
@@ -85,8 +85,8 @@ function mcda(criteria) {
   const confidence = Math.round(
     criteria.reduce(
       (s, c) => s + (DATA_QUALITY_WEIGHT[c.dataQuality] ?? DEFAULT_DATA_QUALITY) * c.weight,
-      0
-    ) * 100
+      0,
+    ) * 100,
   );
 
   // The criterion the result leans on hardest — what would have to change.
@@ -99,11 +99,11 @@ function mcda(criteria) {
     mostSensitiveTo: mostSensitive.name,
     verdict: total >= 70 ? 'Strong' : total >= 45 ? 'Moderate' : 'Weak',
     confidenceLabel:
-      confidence >= 80
-        ? 'High confidence'
-        : confidence >= 55
-          ? 'Moderate confidence'
-          : 'Low confidence — mostly assumptions'
+      confidence >= 80 ?
+        'High confidence' :
+        confidence >= 55 ?
+          'Moderate confidence' :
+          'Low confidence — mostly assumptions',
   };
 }
 
@@ -119,18 +119,18 @@ function rankOptions(options) {
     .map((o) => ({ ...o, result: mcda(o.criteria) }))
     .sort((a, b) => b.result.total - a.result.total);
 
-  const margin = ranked.length > 1
-    ? Math.round((ranked[0].result.total - ranked[1].result.total) * 10) / 10
-    : ranked[0].result.total;
+  const margin = ranked.length > 1 ?
+    Math.round((ranked[0].result.total - ranked[1].result.total) * 10) / 10 :
+    ranked[0].result.total;
 
   return {
     ranked,
     margin,
     // A <5-point gap is inside the noise of a subjective weighting.
     decisive: margin >= 5,
-    note: margin < 5 && ranked.length > 1
-      ? 'Top options are within 5 points — treat this as a close call, not a clear winner.'
-      : null
+    note: margin < 5 && ranked.length > 1 ?
+      'Top options are within 5 points — treat this as a close call, not a clear winner.' :
+      null,
   };
 }
 
@@ -183,8 +183,8 @@ async function gatedMcda(actorId, criteria) {
     // the system has lost the ability to check it.
     return { ...base, gate: 'unreadable', effectiveTotal: Math.round(base.total * 0.5 * 10) / 10,
       mayAutoExecute: false,
-      gateNote: `Could not read the calibration gate (${err.message}). Authority halved — `
-              + 'an unverifiable record is not a good one.' };
+      gateNote: `Could not read the calibration gate (${err.message}). Authority halved — ` +
+              'an unverifiable record is not a good one.' };
   }
 
   const effectiveTotal = Math.round(base.total * g.authorityMultiplier * 10) / 10;

@@ -23,184 +23,184 @@ const pool = require('../database/pool');
 
 // Language Configuration for Northeast India
 const LANGUAGE_CONFIG = {
-  'en': {
+  en: {
     name: 'English',
     code: 'en',
     speech_code: 'en-US',
     voice_code: 'en-US',
     voice_gender: 'female',
-    confidence_threshold: 0.85
+    confidence_threshold: 0.85,
   },
-  'hi': {
+  hi: {
     name: 'Hindi',
     code: 'hi',
     speech_code: 'hi-IN',
     voice_code: 'hi-IN',
     voice_gender: 'female',
-    confidence_threshold: 0.80
+    confidence_threshold: 0.80,
   },
-  'as': {
+  as: {
     name: 'Assamese',
     code: 'as',
     speech_code: 'as-IN',
     voice_code: 'as-IN',
     voice_gender: 'female',
-    confidence_threshold: 0.75
+    confidence_threshold: 0.75,
   },
-  'bn': {
+  bn: {
     name: 'Bengali',
     code: 'bn',
     speech_code: 'bn-IN',
     voice_code: 'bn-IN',
     voice_gender: 'female',
-    confidence_threshold: 0.75
+    confidence_threshold: 0.75,
   },
-  'mni': {
+  mni: {
     name: 'Manipuri',
     code: 'mni',
     speech_code: 'mni-IN',
     voice_code: 'mni-IN',
     voice_gender: 'female',
-    confidence_threshold: 0.70
+    confidence_threshold: 0.70,
   },
-  'or': {
+  or: {
     name: 'Odia',
     code: 'or',
     speech_code: 'or-IN',
     voice_code: 'or-IN',
     voice_gender: 'female',
-    confidence_threshold: 0.75
+    confidence_threshold: 0.75,
   },
-  'khasi': {
+  khasi: {
     name: 'Khasi',
     code: 'kha',
     speech_code: 'kha-IN',
     voice_code: 'kha-IN',
     voice_gender: 'female',
-    confidence_threshold: 0.65
+    confidence_threshold: 0.65,
   },
-  'mizo': {
+  mizo: {
     name: 'Mizo',
     code: 'miz',
     speech_code: 'miz-IN',
     voice_code: 'miz-IN',
     voice_gender: 'female',
-    confidence_threshold: 0.65
+    confidence_threshold: 0.65,
   },
-  'naga': {
+  naga: {
     name: 'Naga',
     code: 'nag',
     speech_code: 'nag-IN',
     voice_code: 'nag-IN',
     voice_gender: 'female',
-    confidence_threshold: 0.60
-  }
+    confidence_threshold: 0.60,
+  },
 };
 
 // Agricultural Intent Classification
 const AGRICULTURAL_INTENTS = {
   // Market-related
-  'price_inquiry': {
+  price_inquiry: {
     keywords: ['price', 'rate', 'cost', 'दाम', 'দাম', 'মূল্য', 'খরিদ'],
     entities: ['crop', 'product', 'location', 'date'],
-    response_template: 'The current price of {crop} in {location} is ₹{price} per kg.'
+    response_template: 'The current price of {crop} in {location} is ₹{price} per kg.',
   },
-  'selling_intent': {
+  selling_intent: {
     keywords: ['sell', 'want to sell', 'बेचना', 'বিক্রি', 'বিক্রি করিব'],
     entities: ['crop', 'quantity', 'quality', 'expected_price'],
-    response_template: 'I can help you sell your {crop}. How much {quantity} do you have?'
+    response_template: 'I can help you sell your {crop}. How much {quantity} do you have?',
   },
-  'buying_intent': {
+  buying_intent: {
     keywords: ['buy', 'purchase', 'खरीद', 'কিনা', 'কিনিব'],
     entities: ['product', 'quantity', 'budget'],
-    response_template: 'I can help you buy {product}. What quantity do you need?'
+    response_template: 'I can help you buy {product}. What quantity do you need?',
   },
-  
+
   // Farming-related
-  'crop_advice': {
+  crop_advice: {
     keywords: ['grow', 'cultivate', 'plant', 'farming', 'खेती', 'খেতি', 'চাষ'],
     entities: ['crop', 'season', 'soil_type', 'location'],
-    response_template: 'For {crop} cultivation in {season}, I recommend {recommendation}.'
+    response_template: 'For {crop} cultivation in {season}, I recommend {recommendation}.',
   },
-  'weather_inquiry': {
+  weather_inquiry: {
     keywords: ['weather', 'rain', 'temperature', 'मौसम', 'বাৰিষা', 'বৃষ্টি'],
     entities: ['location', 'date', 'duration'],
-    response_template: 'The weather in {location} for {date} is expected to be {weather}.'
+    response_template: 'The weather in {location} for {date} is expected to be {weather}.',
   },
-  'soil_health': {
+  soil_health: {
     keywords: ['soil', 'land', 'fertility', 'मिट्टी', 'মাটি', 'মাটিৰ স্বাস্থ্য'],
     entities: ['location', 'soil_type'],
-    response_template: 'Your soil health index is {index}. Recommended actions: {actions}.'
+    response_template: 'Your soil health index is {index}. Recommended actions: {actions}.',
   },
-  
+
   // Financial-related
-  'loan_inquiry': {
+  loan_inquiry: {
     keywords: ['loan', 'credit', 'finance', 'कर्ज़', 'ঋণ', 'ঋণ'],
     entities: ['amount', 'purpose', 'duration'],
-    response_template: 'You are eligible for a loan of ₹{amount} at {interest_rate}% interest.'
+    response_template: 'You are eligible for a loan of ₹{amount} at {interest_rate}% interest.',
   },
-  'subsidy_inquiry': {
+  subsidy_inquiry: {
     keywords: ['subsidy', 'scheme', 'government', 'सब्सिडी', 'অনুদান', 'যোজনা'],
     entities: ['crop', 'scheme_type'],
-    response_template: 'You are eligible for {scheme} subsidy of ₹{amount}.'
+    response_template: 'You are eligible for {scheme} subsidy of ₹{amount}.',
   },
-  'insurance_inquiry': {
+  insurance_inquiry: {
     keywords: ['insurance', 'crop insurance', 'बीमा', 'বীমা', 'বীমা কৰা'],
     entities: ['crop', 'coverage_type'],
-    response_template: 'Crop insurance for {crop} costs ₹{premium} with coverage up to ₹{coverage}.'
+    response_template: 'Crop insurance for {crop} costs ₹{premium} with coverage up to ₹{coverage}.',
   },
-  
+
   // Platform-related
-  'order_status': {
+  order_status: {
     keywords: ['order', 'delivery', 'status', 'ऑर्डर', 'অর্ডার', 'ডেলিভারি'],
     entities: ['order_id'],
-    response_template: 'Your order {order_id} is currently {status} and will arrive by {date}.'
+    response_template: 'Your order {order_id} is currently {status} and will arrive by {date}.',
   },
-  'payment_inquiry': {
+  payment_inquiry: {
     keywords: ['payment', 'money', 'receive', 'भुगतान', 'পেমেন্ট', 'টকা'],
     entities: ['transaction_id', 'amount'],
-    response_template: 'Your payment of ₹{amount} is {status}.'
+    response_template: 'Your payment of ₹{amount} is {status}.',
   },
-  'account_inquiry': {
+  account_inquiry: {
     keywords: ['account', 'profile', 'balance', 'खाता', 'হিচাপ', 'বেলেন্স'],
     entities: ['account_type'],
-    response_template: 'Your account balance is ₹{balance}.'
+    response_template: 'Your account balance is ₹{balance}.',
   },
-  
+
   // Technical support
-  'problem_report': {
+  problem_report: {
     keywords: ['problem', 'issue', 'not working', 'समस्या', 'সমস্যা', 'সমস্যা আছে'],
     entities: ['problem_type', 'description'],
-    response_template: 'I understand you are facing {problem}. Let me help you resolve this.'
+    response_template: 'I understand you are facing {problem}. Let me help you resolve this.',
   },
-  'help_request': {
+  help_request: {
     keywords: ['help', 'assist', 'guide', 'मदद', 'সহায়তা', 'সহায়'],
     entities: ['topic'],
-    response_template: 'I can help you with {topic}. Would you like me to explain?'
-  }
+    response_template: 'I can help you with {topic}. Would you like me to explain?',
+  },
 };
 
 // Entity Extraction Patterns
 const ENTITY_PATTERNS = {
-  'crop': [
+  crop: [
     /\b(rice|wheat|maize|potato|tomato|onion|brinjal|chilli|ginger|turmeric|cotton|tea|coffee|rubber)\b/i,
     /\b(चावल|गेहूं|मक्का|आलू|टमाटर|प्याज|बैंगन|मिर्च|अदरक|हल्दी|कपास|चाय|कॉफी)\b/i,
-    /\b(ধান|গম|ভুট্টা|আলু|টমেটা|পেঁয়াজ|বেগুন|মরিচ|আদা|হলুদ|তুলা|চা|কফি)\b/i
+    /\b(ধান|গম|ভুট্টা|আলু|টমেটা|পেঁয়াজ|বেগুন|মরিচ|আদা|হলুদ|তুলা|চা|কফি)\b/i,
   ],
-  'quantity': [
+  quantity: [
     /\b(\d+)\s*(kg|kilogram|ton|quintal|kg|kg|किलो|क्विंटल|কেজি|কুইন্টাল)\b/i,
-    /\b(\d+)\s*(liter|litre|ml|लीटर|লিটার)\b/i
+    /\b(\d+)\s*(liter|litre|ml|लीटर|লিটার)\b/i,
   ],
-  'location': [
-    /\b(village|district|state|গ্রাম|জেলা|রাজ্য|गांव|जिला|राज्य)\s+(\w+)\b/i
+  location: [
+    /\b(village|district|state|গ্রাম|জেলা|রাজ্য|गांव|जिला|राज्य)\s+(\w+)\b/i,
   ],
-  'price': [
-    /\b₹?(\d+(?:,\d+)*(?:\.\d{2})?)\b/
+  price: [
+    /\b₹?(\d+(?:,\d+)*(?:\.\d{2})?)\b/,
   ],
-  'date': [
+  date: [
     /\b(today|tomorrow|yesterday|next week|next month|आज|कल|परसों|अगले सप्ताह|আজ|কাল|আগামী সপ্তাহ)\b/i,
-    /\b(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})\b/
-  ]
+    /\b(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})\b/,
+  ],
 };
 
 /**
@@ -246,7 +246,7 @@ function detectIntentWithContext(transcript, language, conversationHistory = [])
         intent: intentName,
         confidence: Math.min(score, 1.0),
         matched_keywords: matchedKeywords,
-        entities: extractEntities(transcript, intentConfig.entities)
+        entities: extractEntities(transcript, intentConfig.entities),
       };
     }
   }
@@ -255,7 +255,7 @@ function detectIntentWithContext(transcript, language, conversationHistory = [])
     intent: 'general',
     confidence: 0.5,
     matched_keywords: [],
-    entities: {}
+    entities: {},
   };
 }
 
@@ -304,15 +304,15 @@ async function generateVoiceResponse(intent, entities, language, userId) {
 
     return {
       text: responseText,
-      intent: intent,
+      intent,
       confidence: intentConfig ? 0.85 : 0.5,
-      data: data,
-      language: language,
+      data,
+      language,
       voice_parameters: {
         gender: LANGUAGE_CONFIG[language]?.voice_gender || 'female',
         rate: 0.9,
-        pitch: 1.0
-      }
+        pitch: 1.0,
+      },
     };
   } catch (error) {
     logger.error('Voice response generation failed', { error: error.message, stack: error.stack });
@@ -320,7 +320,7 @@ async function generateVoiceResponse(intent, entities, language, userId) {
       text: getDefaultErrorResponse(language),
       intent: 'error',
       confidence: 0.0,
-      language: language
+      language,
     };
   }
 }
@@ -391,12 +391,12 @@ async function fetchIntentData(intent, entities, userId) {
 async function getCurrentPrice(crop, location) {
   // In production, fetch from real database
   const mockPrices = {
-    'rice': { price: 25 },
-    'wheat': { price: 22 },
-    'maize': { price: 18 },
-    'potato': { price: 15 },
-    'tomato': { price: 30 },
-    'onion': { price: 35 }
+    rice: { price: 25 },
+    wheat: { price: 22 },
+    maize: { price: 18 },
+    potato: { price: 15 },
+    tomato: { price: 30 },
+    onion: { price: 35 },
   };
 
   return mockPrices[crop.toLowerCase()] || { price: 20 };
@@ -409,7 +409,7 @@ async function getMarketDemand(crop) {
   // In production, fetch from AI demand forecasting
   return {
     demand: 'high',
-    price: 25
+    price: 25,
   };
 }
 
@@ -429,13 +429,13 @@ async function getUserCreditProfile(userId) {
     const fdi = result.rows[0].fdi_score || 50;
     return {
       eligible_amount: fdi * 10000,
-      interest_rate: fdi > 70 ? 8.5 : 12.0
+      interest_rate: fdi > 70 ? 8.5 : 12.0,
     };
   }
 
   return {
     eligible_amount: 50000,
-    interest_rate: 12.0
+    interest_rate: 12.0,
   };
 }
 
@@ -446,7 +446,7 @@ async function getUserEligibleSubsidies(userId, crop) {
   // In production, fetch from government scheme database
   return {
     scheme_name: 'PM-KISAN',
-    amount: 6000
+    amount: 6000,
   };
 }
 
@@ -465,13 +465,13 @@ async function getOrderStatus(orderId, userId) {
   if (result.rows.length > 0) {
     return {
       status: result.rows[0].status,
-      estimated_delivery: result.rows[0].estimated_delivery
+      estimated_delivery: result.rows[0].estimated_delivery,
     };
   }
 
   return {
     status: 'not found',
-    estimated_delivery: 'N/A'
+    estimated_delivery: 'N/A',
   };
 }
 
@@ -481,24 +481,24 @@ async function getOrderStatus(orderId, userId) {
 async function translateResponse(text, targetLanguage) {
   // In production, use Google Translate API or similar
   const translations = {
-    'hi': {
+    hi: {
       'The current price of': 'वर्तमान मूल्य',
-      'in': 'में',
-      'is': 'है',
-      'per kg': 'प्रति किलो'
+      in: 'में',
+      is: 'है',
+      'per kg': 'प्रति किलो',
     },
-    'as': {
+    as: {
       'The current price of': 'বৰ্তমান দাম',
-      'in': 'ত',
-      'is': 'হ',
-      'per kg': 'প্ৰতি কিলোগ্রাম'
+      in: 'ত',
+      is: 'হ',
+      'per kg': 'প্ৰতি কিলোগ্রাম',
     },
-    'bn': {
+    bn: {
       'The current price of': 'বর্তমান দাম',
-      'in': 'মধ্যে',
-      'is': 'হল',
-      'per kg': 'প্রতি কেজি'
-    }
+      in: 'মধ্যে',
+      is: 'হল',
+      'per kg': 'প্রতি কেজি',
+    },
   };
 
   let translatedText = text;
@@ -518,12 +518,12 @@ async function translateResponse(text, targetLanguage) {
  */
 function getDefaultErrorResponse(language) {
   const errorResponses = {
-    'en': 'I apologize, but I could not understand your request. Could you please repeat?',
-    'hi': 'मैं क्षमा चाहता हूं, लेकिन मैं आपका अनुरोध नहीं समझ पाया। क्या आप दोहरा सकते हैं?',
-    'as': 'মই ক্ষমা প্ৰাৰ্থনা কৰোঁ, কিন্তু মই আপোনাৰ অনুৰোধ বুজিব নোৱাৰিলো। আপুনি পুনৰ কব পাৰেনে?',
-    'bn': 'আমি দুঃখিত, আমি আপনার অনুরোধ বুঝতে পারিনি। আপনি কি আবার বলতে পারেন?',
-    'mni': 'অতোয়া মাফ চাগৎনবা, অতোয়া অমুদা য়াম্বা শক্তে ঙাইদোক। অমুদা পুনর ওইবা ঙাইদে?',
-    'or': 'ମୁଁ ଦୁଃଖିତ, ମୁଁ ଆପଣଙ୍କର ଅନୁରୋଧ ବୁଝିପାରିଲି ନାହିଁ। ଆପଣ କଣ ପୁନର୍ବାର କହିପାରିବେ କି?'
+    en: 'I apologize, but I could not understand your request. Could you please repeat?',
+    hi: 'मैं क्षमा चाहता हूं, लेकिन मैं आपका अनुरोध नहीं समझ पाया। क्या आप दोहरा सकते हैं?',
+    as: 'মই ক্ষমা প্ৰাৰ্থনা কৰোঁ, কিন্তু মই আপোনাৰ অনুৰোধ বুজিব নোৱাৰিলো। আপুনি পুনৰ কব পাৰেনে?',
+    bn: 'আমি দুঃখিত, আমি আপনার অনুরোধ বুঝতে পারিনি। আপনি কি আবার বলতে পারেন?',
+    mni: 'অতোয়া মাফ চাগৎনবা, অতোয়া অমুদা য়াম্বা শক্তে ঙাইদোক। অমুদা পুনর ওইবা ঙাইদে?',
+    or: 'ମୁଁ ଦୁଃଖିତ, ମୁଁ ଆପଣଙ୍କର ଅନୁରୋଧ ବୁଝିପାରିଲି ନାହିଁ। ଆପଣ କଣ ପୁନର୍ବାର କହିପାରିବେ କି?',
   };
 
   return errorResponses[language] || errorResponses['en'];
@@ -548,18 +548,18 @@ async function processAdvancedVoiceCommand(userId, audioData, language, conversa
       intentResult.intent,
       intentResult.entities,
       language,
-      userId
+      userId,
     );
 
     // Store conversation turn
     await storeConversationTurn(conversationId, userId, transcript, intentResult, response);
 
     return {
-      transcript: transcript,
+      transcript,
       intent: intentResult.intent,
       confidence: intentResult.confidence,
-      response: response,
-      conversation_id: conversationId
+      response,
+      conversation_id: conversationId,
     };
   } catch (error) {
     logger.error('Advanced voice command processing failed', { error: error.message, stack: error.stack });
@@ -572,7 +572,7 @@ async function processAdvancedVoiceCommand(userId, audioData, language, conversa
  */
 async function transcribeAudio(audioData, language) {
   // In production, use Google Speech-to-Text, Azure Speech, or similar
-  return "What is the current price of rice in the local market?";
+  return 'What is the current price of rice in the local market?';
 }
 
 /**
@@ -609,7 +609,7 @@ async function storeConversationTurn(conversationId, userId, transcript, intentR
     intentResult.confidence,
     JSON.stringify(intentResult.entities),
     response.text,
-    JSON.stringify(response.data)
+    JSON.stringify(response.data),
   ]);
 }
 
@@ -665,7 +665,7 @@ router.post('/process', authMiddleware, async (req, res) => {
       req.user.id,
       audio_data,
       language || 'en',
-      conversation_id
+      conversation_id,
     );
 
     res.json(result);
@@ -686,8 +686,8 @@ router.get('/languages', (req, res) => {
       name: lang.name,
       speech_code: lang.speech_code,
       voice_code: lang.voice_code,
-      confidence_threshold: lang.confidence_threshold
-    }))
+      confidence_threshold: lang.confidence_threshold,
+    })),
   });
 });
 
@@ -700,8 +700,8 @@ router.get('/intents', (req, res) => {
     intents: Object.keys(AGRICULTURAL_INTENTS).map(intent => ({
       name: intent,
       description: AGRICULTURAL_INTENTS[intent].response_template,
-      entities: AGRICULTURAL_INTENTS[intent].entities
-    }))
+      entities: AGRICULTURAL_INTENTS[intent].entities,
+    })),
   });
 });
 
@@ -723,14 +723,14 @@ router.post('/text-query', authMiddleware, async (req, res) => {
       intentResult.intent,
       intentResult.entities,
       language || 'en',
-      req.user.id
+      req.user.id,
     );
 
     res.json({
-      text: text,
+      text,
       intent: intentResult.intent,
       confidence: intentResult.confidence,
-      response: response
+      response,
     });
   } catch (error) {
     logger.error('Text query processing error', { error: error.message, stack: error.stack });
@@ -746,7 +746,7 @@ router.get('/health', (req, res) => {
     status: 'healthy',
     service: 'advanced-voice-ai',
     languages_supported: Object.keys(LANGUAGE_CONFIG).length,
-    intents_supported: Object.keys(AGRICULTURAL_INTENTS).length
+    intents_supported: Object.keys(AGRICULTURAL_INTENTS).length,
   });
 });
 
@@ -755,5 +755,5 @@ module.exports = {
   processAdvancedVoiceCommand,
   createVoiceConversation,
   detectIntentWithContext,
-  generateVoiceResponse
+  generateVoiceResponse,
 };

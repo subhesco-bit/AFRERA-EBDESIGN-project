@@ -4,6 +4,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const predictiveService = require('../services/predictiveIntelligenceService');
 const apiResponseHandler = require('../middleware/apiResponseHandler');
@@ -11,11 +13,11 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/predictive/demand/:cropType
@@ -29,18 +31,18 @@ router.get('/demand/:cropType',
       const { region, forecastDays = 30 } = req.query;
 
       const result = await predictiveService.predictCropDemand(cropType, region, parseInt(forecastDays));
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Demand forecast generated');
       } else {
         return apiResponseHandler.sendError(res, result.error, 400, 'PREDICTION_ERROR', null, {
-          dataPoints: result.dataPoints
+          dataPoints: result.dataPoints,
         });
       }
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to generate demand forecast', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -55,18 +57,18 @@ router.get('/pricing/:cropType',
       const { region, qualityGrade = 'standard' } = req.query;
 
       const result = await predictiveService.predictOptimalPricing(cropType, region, qualityGrade);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Pricing prediction generated');
       } else {
         return apiResponseHandler.sendError(res, result.error, 400, 'PREDICTION_ERROR', null, {
-          dataPoints: result.dataPoints
+          dataPoints: result.dataPoints,
         });
       }
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to generate pricing prediction', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -89,7 +91,7 @@ router.post('/yield',
       }
 
       const result = await predictiveService.predictCropYield(farmerId, cropId, conditions);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Yield prediction generated');
       } else {
@@ -98,7 +100,7 @@ router.post('/yield',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to generate yield prediction', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -112,7 +114,7 @@ router.get('/seasonal/:region/:season',
       const { region, season } = req.params;
 
       const result = await predictiveService.getSeasonalRecommendations(region, season);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Seasonal recommendations retrieved');
       } else {
@@ -121,7 +123,7 @@ router.get('/seasonal/:region/:season',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get seasonal recommendations', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -137,14 +139,14 @@ router.get('/models/status',
         pricing: predictiveService.models.pricing,
         yield: predictiveService.models.yield,
         overallStatus: 'operational',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
 
       return apiResponseHandler.sendSuccess(res, modelsStatus, 'Predictive models status retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get models status', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 module.exports = router;

@@ -4,36 +4,47 @@
  */
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ordersAPI } from '../services/api';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
+import { NativeSelect as Select } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
 
 const PaymentProcessingPage = () => {
+  const queryClient = useQueryClient();
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [activeTab, setActiveTab] = useState('transactions');
+  const [paymentOrderId, setPaymentOrderId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('upi');
 
   // Get payment transactions
-  const { data: transactionsData, isLoading: transactionsLoading } = useQuery({
+  const { data: transactionsData, isLoading: transactionsLoading, error: transactionsError } = useQuery({
     queryKey: ['paymentTransactions'],
-    queryFn: () => fetch('/api/financial/payments')
-      .then(res => res.json())
+    queryFn: () => ordersAPI.getOrders({}, { page: 1, limit: 50 })
       .then(res => res.data),
-    refetchInterval: 120000 // 2 minutes
+    refetchInterval: 120000, // 2 minutes
   });
 
-  // Get payment methods
-  const { data: paymentMethods } = useQuery({
-    queryKey: ['paymentMethods'],
-    queryFn: () => fetch('/api/financial/payment-methods')
-      .then(res => res.json())
-      .then(res => res.data)
+  const paymentMutation = useMutation({
+    mutationFn: ({ orderId, method }) => ordersAPI.processPayment(orderId, { payment_method: method }),
+    onSuccess: () => {
+      setShowPaymentForm(false);
+      setPaymentOrderId('');
+      queryClient.invalidateQueries({ queryKey: ['paymentTransactions'] });
+    },
   });
 
-  const transactions = transactionsData?.transactions || [];
+  const transactions = transactionsData?.orders || [];
+
+  const handlePayment = (event) => {
+    event.preventDefault();
+    if (paymentOrderId) {
+      paymentMutation.mutate({ orderId: paymentOrderId, method: paymentMethod });
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -50,38 +61,48 @@ const PaymentProcessingPage = () => {
           <h2 className="text-xl font-semibold mb-4">Make Payment</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Payment Type</label>
-              <Select>
-                <option value="loan">Loan EMI</option>
-                <option value="insurance">Insurance Premium</option>
-                <option value="purchase">Purchase Payment</option>
-                <option value="other">Other Payment</option>
+              <label htmlFor="payment-order" className="block text-sm font-medium mb-2">Order</label>
+              <Select id="payment-order" value={paymentOrderId} onChange={(event) => setPaymentOrderId(event.target.value)} required>
+                <option value="">Select an order</option>
+                {transactions
+                  .filter((order) => order.payment_status !== 'completed')
+                  .map((order) => (
+                    <option key={order.id} value={order.id}>
+                      {order.order_number || order.id} - ₹{Number(order.total_amount || 0).toLocaleString('en-IN')}
+                    </option>
+                  ))}
               </Select>
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Amount</label>
-              <Input type="number" placeholder="Enter amount" />
+              <Input
+                type="text"
+                value={paymentOrderId ? `₹${Number(transactions.find((order) => String(order.id) === String(paymentOrderId))?.total_amount || 0).toLocaleString('en-IN')}` : ''}
+                readOnly
+                placeholder="Select an order"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Payment Method</label>
-              <Select>
+              <label htmlFor="payment-method" className="block text-sm font-medium mb-2">Payment Method</label>
+              <Select id="payment-method" value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value)}>
                 <option value="upi">UPI</option>
                 <option value="bank_transfer">Bank Transfer</option>
                 <option value="card">Credit/Debit Card</option>
-                <option value="wallet">Digital Wallet</option>
+                <option value="cod">Cash on Delivery</option>
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Reference ID</label>
-              <Input placeholder="Enter reference ID (optional)" />
+              <p className="text-sm text-v42-mut">Payment amount is calculated and verified by the backend from the selected order.</p>
             </div>
           </div>
-          <div className="mt-4 flex gap-2">
-            <Button>Process Payment</Button>
-            <Button variant="outline" onClick={() => setShowPaymentForm(false)}>
+          <form onSubmit={handlePayment} className="mt-4 flex gap-2">
+            <Button type="submit" disabled={paymentMutation.isPending || !paymentOrderId}>
+              {paymentMutation.isPending ? 'Processing...' : 'Process Payment'}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => setShowPaymentForm(false)}>
               Cancel
             </Button>
-          </div>
+          </form>
         </Card>
       )}
 
@@ -100,6 +121,10 @@ const PaymentProcessingPage = () => {
 
       {transactionsLoading ? (
         <LoadingSkeleton variant="rectangular" lines={4} />
+      ) : transactionsError ? (
+        <Card className="p-6">
+          <p className="text-red-700">Unable to load payment records: {transactionsError.message}</p>
+        </Card>
       ) : (
         <>
           {/* Transactions Tab */}

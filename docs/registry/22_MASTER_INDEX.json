@@ -1,20 +1,20 @@
 {
   "summary": {
-    "generated": "2026-08-05",
+    "generated": "2026-09-02",
     "source": "No project chats (1).docx  md5 d217a852325fb6c0cbc4437ba26590c8",
     "catalogued_domains": 100,
     "catalogued_modules": 150,
-    "BUILT": 26,
-    "NO_UI": 14,
-    "PARTIAL": 53,
-    "ABSENT": 57,
-    "subject_only_matches": 62,
+    "BUILT": 78,
+    "NO_UI": 9,
+    "PARTIAL": 60,
+    "ABSENT": 3,
+    "subject_only_matches": 23,
     "named_missing_modules": 17,
     "corpus": {
-      "tables": 582,
-      "services": 82,
-      "routes": 24,
-      "components": 88,
+      "tables": 1291,
+      "services": 230,
+      "routes": 157,
+      "components": 769,
       "agents": 0
     }
   },
@@ -32,71 +32,242 @@
       "id": "M002",
       "name": "Platform Configuration",
       "domain": "Platform Foundation",
-      "status": "PARTIAL",
+      "status": "NO_UI",
       "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
         {
           "kind": "table",
           "where": "migrations/037_omnichannel_ai_schema.sql",
           "quality": "strong",
           "matched": "configuration"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3101_ecommerce_integration_tables.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3101_ecommerce_integration_tables.sql",
+          "quality": "strong",
+          "matched": "configuration"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 14
     },
     {
       "id": "M003",
       "name": "Tenant Management",
       "domain": "Platform Foundation",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "NO_UI",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "tenant"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9502_m003_tenant_management.sql",
+          "quality": "strong",
+          "matched": "tenant"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9502_m003_tenant_management.sql",
+          "quality": "strong",
+          "matched": "tenant"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9502_m003_tenant_management.sql",
+          "quality": "strong",
+          "matched": "tenant"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9502_m003_tenant_management.sql",
+          "quality": "strong",
+          "matched": "tenant"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/tenantManagementService.js",
+          "quality": "strong",
+          "matched": "tenant"
+        }
+      ],
+      "evidence_count": 7
     },
     {
       "id": "M004",
       "name": "Organization Management",
       "domain": "Platform Foundation",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "NO_UI",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "organization"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/4000_comprehensive_erp_schema.sql",
+          "quality": "strong",
+          "matched": "organization"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9503_m004_organization_management.sql",
+          "quality": "strong",
+          "matched": "organization"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9503_m004_organization_management.sql",
+          "quality": "strong",
+          "matched": "organization"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9503_m004_organization_management.sql",
+          "quality": "strong",
+          "matched": "organization"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9503_m004_organization_management.sql",
+          "quality": "strong",
+          "matched": "organization"
+        }
+      ],
+      "evidence_count": 8
     },
     {
       "id": "M005",
       "name": "Environment Management",
       "domain": "Platform Foundation",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "environment"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9501_m002_platform_configuration.sql",
+          "quality": "strong",
+          "matched": "environment"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9504_m005_environment_management.sql",
+          "quality": "strong",
+          "matched": "environment"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9504_m005_environment_management.sql",
+          "quality": "strong",
+          "matched": "environment"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/config/env.js",
+          "quality": "strong",
+          "matched": "environment"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/EnvironmentManagementPage.jsx",
+          "quality": "strong",
+          "matched": "environment"
+        }
+      ],
+      "evidence_count": 6
     },
     {
       "id": "M006",
       "name": "System Administration",
       "domain": "Platform Foundation",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/1002_system_administration.sql",
+          "quality": "strong",
+          "matched": "administration"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/systemAdministrationService.js",
+          "quality": "strong",
+          "matched": "administration"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/systemAdministrationRoutes.js",
+          "quality": "strong",
+          "matched": "administration"
+        },
         {
           "kind": "component",
           "where": "frontend/src/pages/AdminDashboardPage.jsx",
           "quality": "strong",
           "matched": "administration"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/SystemAdministrationPage.jsx",
+          "quality": "strong",
+          "matched": "administration"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 5
     },
     {
       "id": "M007",
       "name": "Feature Flag Management",
       "domain": "Platform Foundation",
       "status": "NO_UI",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
+          "kind": "table",
+          "where": "migrations/9500_m001_platform_core.sql",
+          "quality": "strong",
+          "matched": "feature+flag"
+        },
+        {
           "kind": "service",
-          "where": "backend/src/services/advancedFeaturesService.js",
+          "where": "backend/src/services/legacy/advancedFeaturesService.js",
           "quality": "subject",
           "matched": "feature"
         },
@@ -107,48 +278,115 @@
           "matched": "feature"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 3
     },
     {
       "id": "M008",
       "name": "Localization Management",
-      "domain": "Platform Foundation",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
-    },
-    {
-      "id": "M009",
-      "name": "Time Zone Management",
-      "domain": "Platform Foundation",
-      "status": "PARTIAL",
-      "match_quality": "subject",
-      "evidence": [
-        {
-          "kind": "component",
-          "where": "frontend/src/components/Logistics/RealTimeTracking.jsx",
-          "quality": "subject",
-          "matched": "time"
-        }
-      ],
-      "evidence_count": 1
-    },
-    {
-      "id": "M010",
-      "name": "Master Configuration",
       "domain": "Platform Foundation",
       "status": "PARTIAL",
       "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "localization"
+        }
+      ],
+      "evidence_count": 1
+    },
+    {
+      "id": "M009",
+      "name": "Time Zone Management",
+      "domain": "Platform Foundation",
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "time+zone"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3200_hr_module_schema.sql",
+          "quality": "subject",
+          "matched": "time"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3200_hr_module_schema.sql",
+          "quality": "subject",
+          "matched": "time"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9532_m086_monitoring_alerts.sql",
+          "quality": "subject",
+          "matched": "time"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/components/Logistics/RealTimeTracking.jsx",
+          "quality": "subject",
+          "matched": "time"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/services/realTimeService.jsx",
+          "quality": "subject",
+          "matched": "time"
+        }
+      ],
+      "evidence_count": 6
+    },
+    {
+      "id": "M010",
+      "name": "Master Configuration",
+      "domain": "Platform Foundation",
+      "status": "NO_UI",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
+        {
+          "kind": "table",
           "where": "migrations/037_omnichannel_ai_schema.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3101_ecommerce_integration_tables.sql",
+          "quality": "strong",
+          "matched": "configuration"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3101_ecommerce_integration_tables.sql",
           "quality": "strong",
           "matched": "configuration"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 14
     },
     {
       "id": "M011",
@@ -177,13 +415,13 @@
         },
         {
           "kind": "table",
-          "where": "migrations/035_multilingual_schema.sql",
+          "where": "migrations/014_platform_foundation_modules.sql",
           "quality": "strong",
           "matched": "user"
         },
         {
           "kind": "table",
-          "where": "migrations/048_offline_payment_tables.sql",
+          "where": "migrations/035_multilingual_schema.sql",
           "quality": "strong",
           "matched": "user"
         },
@@ -194,7 +432,7 @@
           "matched": "user"
         }
       ],
-      "evidence_count": 9
+      "evidence_count": 19
     },
     {
       "id": "M012",
@@ -217,13 +455,19 @@
         },
         {
           "kind": "service",
-          "where": "backend/src/services/authService.js",
+          "where": "backend/src/services/dual-use/authService.js",
           "quality": "strong",
           "matched": "authentication"
         },
         {
           "kind": "service",
-          "where": "backend/src/services/smsAuthService.js",
+          "where": "backend/src/services/legacy/smsAuthService.js",
+          "quality": "strong",
+          "matched": "authentication"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/__tests__/authService.test.js",
           "quality": "strong",
           "matched": "authentication"
         },
@@ -234,7 +478,7 @@
           "matched": "authentication"
         }
       ],
-      "evidence_count": 5
+      "evidence_count": 6
     },
     {
       "id": "M013",
@@ -245,36 +489,48 @@
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/015_authorization_service.sql",
+          "quality": "strong",
+          "matched": "authorization"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/015_authorization_service.sql",
+          "quality": "strong",
+          "matched": "authorization"
+        },
+        {
+          "kind": "table",
           "where": "migrations/050_sms_auth_tables.sql",
           "quality": "strong",
           "matched": "authorization"
         },
         {
           "kind": "service",
-          "where": "backend/src/services/authService.js",
+          "where": "backend/src/services/dual-use/authService.js",
           "quality": "strong",
           "matched": "authorization"
         },
         {
           "kind": "service",
-          "where": "backend/src/services/smsAuthService.js",
+          "where": "backend/src/services/legacy/smsAuthService.js",
           "quality": "strong",
           "matched": "authorization"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/store/authStore.js",
+          "kind": "service",
+          "where": "backend/src/services/__tests__/authService.test.js",
           "quality": "strong",
           "matched": "authorization"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 8
     },
     {
       "id": "M014",
       "name": "Role Management",
       "domain": "Identity",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
@@ -291,21 +547,70 @@
         },
         {
           "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "role"
+        },
+        {
+          "kind": "table",
           "where": "migrations/994_recovered_capabilities.sql",
+          "quality": "strong",
+          "matched": "role"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/roleManagementService.js",
+          "quality": "strong",
+          "matched": "role"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/roleManagementRoutes.js",
           "quality": "strong",
           "matched": "role"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 7
     },
     {
       "id": "M015",
       "name": "Permission Management",
       "domain": "Identity",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "permission"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "permission"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/015_authorization_service.sql",
+          "quality": "strong",
+          "matched": "permission"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+          "quality": "strong",
+          "matched": "permission"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/RolePermissionPage.jsx",
+          "quality": "strong",
+          "matched": "permission"
+        }
+      ],
+      "evidence_count": 5
     },
     {
       "id": "M016",
@@ -325,7 +630,7 @@
       "evidence": [
         {
           "kind": "service",
-          "where": "backend/src/services/multilingualService.js",
+          "where": "backend/src/services/legacy/multilingualService.js",
           "quality": "subject",
           "matched": "multi"
         },
@@ -342,7 +647,7 @@
       "id": "M018",
       "name": "Digital Identity",
       "domain": "Identity",
-      "status": "NO_UI",
+      "status": "BUILT",
       "match_quality": "subject",
       "evidence": [
         {
@@ -358,22 +663,77 @@
           "matched": "digital"
         },
         {
+          "kind": "table",
+          "where": "migrations/072_tier1_m025_m030_schema.sql",
+          "quality": "subject",
+          "matched": "digital"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+          "quality": "subject",
+          "matched": "digital"
+        },
+        {
           "kind": "service",
-          "where": "backend/src/services/digitalProductPassportService.js",
+          "where": "backend/src/services/digitalTwinService.js",
+          "quality": "subject",
+          "matched": "digital"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/digitalProductPassportService.js",
           "quality": "subject",
           "matched": "digital"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 9
     },
     {
       "id": "M019",
       "name": "Consent Management",
       "domain": "Identity",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "consent"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3017_m017_consent_management.sql",
+          "quality": "strong",
+          "matched": "consent"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3017_m017_consent_management.sql",
+          "quality": "strong",
+          "matched": "consent"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3017_m017_consent_management.sql",
+          "quality": "strong",
+          "matched": "consent"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3017_m017_consent_management.sql",
+          "quality": "strong",
+          "matched": "consent"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+          "quality": "strong",
+          "matched": "consent"
+        }
+      ],
+      "evidence_count": 7
     },
     {
       "id": "M020",
@@ -382,6 +742,12 @@
       "status": "PARTIAL",
       "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_platform_foundation_modules.sql",
+          "quality": "strong",
+          "matched": "session"
+        },
         {
           "kind": "table",
           "where": "migrations/016_ai_copilot_schema.sql",
@@ -413,7 +779,7 @@
           "matched": "session"
         }
       ],
-      "evidence_count": 5
+      "evidence_count": 9
     },
     {
       "id": "M021",
@@ -448,7 +814,7 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "strong",
           "matched": "farmer"
         },
@@ -459,17 +825,29 @@
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M022",
       "name": "Farmer Profile",
       "domain": "Farmer",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/9505_m022_farmer_profiles.sql",
+          "quality": "strong",
+          "matched": "farmer+profile"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/FarmerProfilePage.jsx",
+          "quality": "strong",
+          "matched": "farmer+profile"
+        },
+        {
+          "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
           "matched": "farmer"
@@ -489,36 +867,42 @@
         {
           "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
           "quality": "subject",
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M023",
       "name": "Farmer Family",
       "domain": "Farmer",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
-          "where": "migrations/000_base_schema.sql",
-          "quality": "subject",
-          "matched": "farmer"
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "strong",
+          "matched": "farmer+family"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/farmerFamilyService.js",
+          "quality": "strong",
+          "matched": "farmer+family"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/farmerFamilyRoutes.js",
+          "quality": "strong",
+          "matched": "farmer+family"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/FarmerFamilyPage.jsx",
+          "quality": "strong",
+          "matched": "farmer+family"
         },
         {
           "kind": "table",
@@ -528,39 +912,27 @@
         },
         {
           "kind": "table",
-          "where": "migrations/011_farmer_portal_enhancements.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/011_farmer_portal_enhancements.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/000_base_schema.sql",
           "quality": "subject",
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M024",
       "name": "Farmer KYC",
       "domain": "Farmer",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
+          "kind": "component",
+          "where": "frontend/src/pages/FarmerKycPage.jsx",
+          "quality": "strong",
+          "matched": "farmer+kyc"
+        },
+        {
           "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
@@ -586,28 +958,34 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M025",
       "name": "Farmer Verification",
       "domain": "Farmer",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/3021_m021_farmer_registration.sql",
+          "quality": "strong",
+          "matched": "farmer+verification"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/FarmerVerificationPage.jsx",
+          "quality": "strong",
+          "matched": "farmer+verification"
+        },
+        {
+          "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
           "matched": "farmer"
@@ -627,33 +1005,33 @@
         {
           "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
           "quality": "subject",
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M026",
       "name": "Farmer Skill Management",
       "domain": "Farmer",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/9505_m022_farmer_profiles.sql",
+          "quality": "strong",
+          "matched": "farmer+skill"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/FarmerSkillPage.jsx",
+          "quality": "strong",
+          "matched": "farmer+skill"
+        },
+        {
+          "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
           "matched": "farmer"
@@ -673,23 +1051,11 @@
         {
           "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
           "quality": "subject",
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M027",
@@ -724,7 +1090,7 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farmer"
         },
@@ -735,7 +1101,7 @@
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M028",
@@ -776,21 +1142,39 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M029",
       "name": "Farmer Health & Welfare",
       "domain": "Farmer",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
+          "kind": "component",
+          "where": "frontend/src/pages/FarmerHealthWelfarePage.jsx",
+          "quality": "strong",
+          "matched": "farmer+health+welfare"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
+          "quality": "partial",
+          "matched": "farmer+health"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/farmerHealthRoutes.js",
+          "quality": "partial",
+          "matched": "farmer+health"
+        },
+        {
           "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
@@ -805,29 +1189,11 @@
         {
           "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/011_farmer_portal_enhancements.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farmer"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
           "quality": "subject",
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M030",
@@ -862,7 +1228,7 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farmer"
         },
@@ -873,7 +1239,7 @@
           "matched": "farmer"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 71
     },
     {
       "id": "M031",
@@ -896,30 +1262,30 @@
         },
         {
           "kind": "table",
-          "where": "migrations/991_aeos_folu_ne_policy.sql",
+          "where": "migrations/3000_M034_generated.sql",
           "quality": "strong",
           "matched": "land"
         },
         {
           "kind": "table",
-          "where": "migrations/991_aeos_folu_ne_policy.sql",
+          "where": "migrations/3000_M035_generated.sql",
           "quality": "strong",
           "matched": "land"
         },
         {
-          "kind": "service",
-          "where": "backend/src/services/landRecordsService.js",
+          "kind": "table",
+          "where": "migrations/3000_M037_generated.sql",
           "quality": "strong",
           "matched": "land"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/components/FarmerPortal/LandRecords.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M038_generated.sql",
           "quality": "strong",
           "matched": "land"
         }
       ],
-      "evidence_count": 6
+      "evidence_count": 23
     },
     {
       "id": "M032",
@@ -942,38 +1308,44 @@
         },
         {
           "kind": "table",
-          "where": "migrations/991_aeos_folu_ne_policy.sql",
+          "where": "migrations/3000_M034_generated.sql",
           "quality": "subject",
           "matched": "land"
         },
         {
           "kind": "table",
-          "where": "migrations/991_aeos_folu_ne_policy.sql",
+          "where": "migrations/3000_M035_generated.sql",
           "quality": "subject",
           "matched": "land"
         },
         {
-          "kind": "service",
-          "where": "backend/src/services/landRecordsService.js",
+          "kind": "table",
+          "where": "migrations/3000_M037_generated.sql",
           "quality": "subject",
           "matched": "land"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/components/FarmerPortal/LandRecords.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M038_generated.sql",
           "quality": "subject",
           "matched": "land"
         }
       ],
-      "evidence_count": 6
+      "evidence_count": 23
     },
     {
       "id": "M033",
       "name": "Land Lease Management",
       "domain": "Land",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "strong",
+          "matched": "land+lease"
+        },
         {
           "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
@@ -988,38 +1360,44 @@
         },
         {
           "kind": "table",
-          "where": "migrations/991_aeos_folu_ne_policy.sql",
+          "where": "migrations/3000_M034_generated.sql",
           "quality": "subject",
           "matched": "land"
         },
         {
           "kind": "table",
-          "where": "migrations/991_aeos_folu_ne_policy.sql",
+          "where": "migrations/3000_M035_generated.sql",
           "quality": "subject",
           "matched": "land"
         },
         {
-          "kind": "service",
-          "where": "backend/src/services/landRecordsService.js",
-          "quality": "subject",
-          "matched": "land"
-        },
-        {
-          "kind": "component",
-          "where": "frontend/src/components/FarmerPortal/LandRecords.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M037_generated.sql",
           "quality": "subject",
           "matched": "land"
         }
       ],
-      "evidence_count": 6
+      "evidence_count": 23
     },
     {
       "id": "M034",
       "name": "Parcel Mapping",
       "domain": "Land",
       "status": "PARTIAL",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "strong",
+          "matched": "parcel+mapping"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9509_m031_land_parcels_b.sql",
+          "quality": "subject",
+          "matched": "parcel"
+        },
         {
           "kind": "table",
           "where": "migrations/991_aeos_folu_ne_policy.sql",
@@ -1027,47 +1405,121 @@
           "matched": "parcel"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 3
     },
     {
       "id": "M035",
       "name": "GIS Land Mapping",
       "domain": "Land",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
-    },
-    {
-      "id": "M036",
-      "name": "Soil Mapping",
-      "domain": "Land",
-      "status": "NO_UI",
-      "match_quality": "subject",
+      "status": "PARTIAL",
+      "match_quality": "strong",
       "evidence": [
         {
-          "kind": "service",
-          "where": "backend/src/services/soilTestingService.js",
-          "quality": "subject",
-          "matched": "soil"
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "strong",
+          "matched": "gis+land+mapping"
         }
       ],
       "evidence_count": 1
     },
     {
+      "id": "M036",
+      "name": "Soil Mapping",
+      "domain": "Land",
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "strong",
+          "matched": "soil+mapping"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M074_generated.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9510_m032_land_records_extra.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9510_m032_land_records_extra.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/soilManagementService.js",
+          "quality": "subject",
+          "matched": "soil"
+        }
+      ],
+      "evidence_count": 9
+    },
+    {
       "id": "M037",
       "name": "Water Resource Mapping",
       "domain": "Land",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "strong",
+          "matched": "water+resource+mapping"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M075_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M076_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M077_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M078_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M079_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        }
+      ],
+      "evidence_count": 29
     },
     {
       "id": "M038",
       "name": "Geo Boundary Management",
       "domain": "Land",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "subject",
       "evidence": [
         {
@@ -1077,13 +1529,37 @@
           "matched": "geo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/hooks/useGeolocation.js",
+          "kind": "table",
+          "where": "migrations/9997_geofencing.sql",
+          "quality": "subject",
+          "matched": "geo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9997_geofencing.sql",
+          "quality": "subject",
+          "matched": "geo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "subject",
+          "matched": "geo"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/geofencingService.js",
+          "quality": "subject",
+          "matched": "geo"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/geofencingRoutes.js",
           "quality": "subject",
           "matched": "geo"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 7
     },
     {
       "id": "M039",
@@ -1097,15 +1573,21 @@
           "where": "migrations/023_engineering_schema.sql",
           "quality": "strong",
           "matched": "survey"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "strong",
+          "matched": "survey"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 2
     },
     {
       "id": "M040",
       "name": "Digital Land Records",
       "domain": "Land",
-      "status": "NO_UI",
+      "status": "BUILT",
       "match_quality": "subject",
       "evidence": [
         {
@@ -1121,19 +1603,37 @@
           "matched": "digital"
         },
         {
+          "kind": "table",
+          "where": "migrations/072_tier1_m025_m030_schema.sql",
+          "quality": "subject",
+          "matched": "digital"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+          "quality": "subject",
+          "matched": "digital"
+        },
+        {
           "kind": "service",
-          "where": "backend/src/services/digitalProductPassportService.js",
+          "where": "backend/src/services/digitalTwinService.js",
+          "quality": "subject",
+          "matched": "digital"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/digitalProductPassportService.js",
           "quality": "subject",
           "matched": "digital"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 9
     },
     {
       "id": "M041",
       "name": "Village Registry",
       "domain": "Community",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
@@ -1147,9 +1647,27 @@
           "where": "migrations/052_economic_layer.sql",
           "quality": "strong",
           "matched": "village"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9511_m041_m041.sql",
+          "quality": "strong",
+          "matched": "village"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/villageProfileService.js",
+          "quality": "strong",
+          "matched": "village"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/VillageRegistryPage.jsx",
+          "quality": "strong",
+          "matched": "village"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 5
     },
     {
       "id": "M042",
@@ -1177,7 +1695,7 @@
       "id": "M043",
       "name": "Block Management",
       "domain": "Community",
-      "status": "NO_UI",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
@@ -1199,13 +1717,25 @@
           "matched": "block"
         },
         {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+          "quality": "strong",
+          "matched": "block"
+        },
+        {
           "kind": "service",
-          "where": "backend/src/services/blockchainTraceabilityService.js",
+          "where": "backend/src/services/blockchainVerificationService.js",
+          "quality": "strong",
+          "matched": "block"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/blockchainTraceabilityService.js",
           "quality": "strong",
           "matched": "block"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 8
     },
     {
       "id": "M044",
@@ -1219,9 +1749,15 @@
           "where": "migrations/051_arp_forward_pricing.sql",
           "quality": "strong",
           "matched": "district"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+          "quality": "strong",
+          "matched": "district"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 2
     },
     {
       "id": "M045",
@@ -1235,24 +1771,37 @@
           "where": "migrations/000_base_schema.sql",
           "quality": "strong",
           "matched": "state"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+          "quality": "strong",
+          "matched": "state"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 2
     },
     {
       "id": "M046",
       "name": "SHG Management",
       "domain": "Community",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/ShgManagementPage.jsx",
+          "quality": "strong",
+          "matched": "shg"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M047",
       "name": "Cooperative Management",
       "domain": "Community",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
@@ -1266,17 +1815,41 @@
           "where": "migrations/012_governance_module.sql",
           "quality": "strong",
           "matched": "cooperative"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/cooperativeShareService.js",
+          "quality": "strong",
+          "matched": "cooperative"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/cooperativeShareRoutes.js",
+          "quality": "strong",
+          "matched": "cooperative"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/CooperativeSharePage.jsx",
+          "quality": "strong",
+          "matched": "cooperative"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 5
     },
     {
       "id": "M048",
       "name": "Producer Group Management",
       "domain": "Community",
       "status": "PARTIAL",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+          "quality": "strong",
+          "matched": "producer+group"
+        },
         {
           "kind": "table",
           "where": "migrations/027_gi_intelligence_schema.sql",
@@ -1284,26 +1857,75 @@
           "matched": "producer"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 2
     },
     {
       "id": "M049",
       "name": "Community Asset Management",
       "domain": "Community",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+          "quality": "strong",
+          "matched": "community+asset"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M041_generated.sql",
+          "quality": "subject",
+          "matched": "community"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M042_generated.sql",
+          "quality": "subject",
+          "matched": "community"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M043_generated.sql",
+          "quality": "subject",
+          "matched": "community"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M044_generated.sql",
+          "quality": "subject",
+          "matched": "community"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M045_generated.sql",
+          "quality": "subject",
+          "matched": "community"
+        }
+      ],
+      "evidence_count": 18
     },
     {
       "id": "M050",
       "name": "Rural Development Management",
       "domain": "Community",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "NO_UI",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+          "quality": "strong",
+          "matched": "rural+development"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/041_rural_life_os_schema.sql",
+          "quality": "subject",
+          "matched": "rural"
+        },
+        {
+          "kind": "table",
           "where": "migrations/041_rural_life_os_schema.sql",
           "quality": "subject",
           "matched": "rural"
@@ -1315,13 +1937,19 @@
           "matched": "rural"
         },
         {
-          "kind": "table",
-          "where": "migrations/041_rural_life_os_schema.sql",
+          "kind": "service",
+          "where": "backend/src/services/legacy/ruralEnterpriseService.js",
+          "quality": "subject",
+          "matched": "rural"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/ruralFinanceService.js",
           "quality": "subject",
           "matched": "rural"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 6
     },
     {
       "id": "M051",
@@ -1349,13 +1977,25 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M053_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M052",
@@ -1383,21 +2023,45 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M053_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M053",
       "name": "FPO Membership",
       "domain": "FPO",
       "status": "PARTIAL",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/3106_fpo_member_shares_schema.sql",
+          "quality": "strong",
+          "matched": "fpo+membership"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9513_m051_m051.sql",
+          "quality": "strong",
+          "matched": "fpo+membership"
+        },
         {
           "kind": "table",
           "where": "migrations/000_base_schema.sql",
@@ -1417,13 +2081,13 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M054",
@@ -1451,21 +2115,39 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M053_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M055",
       "name": "FPO Procurement",
       "domain": "FPO",
       "status": "PARTIAL",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/3000_M055_generated.sql",
+          "quality": "strong",
+          "matched": "fpo+procurement"
+        },
         {
           "kind": "table",
           "where": "migrations/000_base_schema.sql",
@@ -1485,21 +2167,33 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M056",
       "name": "FPO Inventory",
       "domain": "FPO",
       "status": "PARTIAL",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/3000_M056_generated.sql",
+          "quality": "strong",
+          "matched": "fpo+inventory"
+        },
         {
           "kind": "table",
           "where": "migrations/000_base_schema.sql",
@@ -1519,13 +2213,19 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M057",
@@ -1553,13 +2253,25 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M053_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M058",
@@ -1587,13 +2299,25 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M053_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M059",
@@ -1621,13 +2345,25 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
+          "quality": "subject",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M053_generated.sql",
           "quality": "subject",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M060",
@@ -1655,24 +2391,42 @@
           "matched": "fpo"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/FPODashboardPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M051_generated.sql",
+          "quality": "strong",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M052_generated.sql",
+          "quality": "strong",
+          "matched": "fpo"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M053_generated.sql",
           "quality": "strong",
           "matched": "fpo"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 29
     },
     {
       "id": "M061",
       "name": "Crop Planning",
       "domain": "Crop",
-      "status": "NO_UI",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
           "kind": "service",
-          "where": "backend/src/services/cropPlanningService.js",
+          "where": "backend/src/services/legacy/cropPlanningService.js",
+          "quality": "strong",
+          "matched": "crop+planning"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/cropPlanningRoutes.js",
           "quality": "strong",
           "matched": "crop+planning"
         },
@@ -1684,6 +2438,12 @@
         },
         {
           "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
+          "quality": "subject",
+          "matched": "crop"
+        },
+        {
+          "kind": "table",
           "where": "migrations/018_biodiversity_schema.sql",
           "quality": "subject",
           "matched": "crop"
@@ -1693,32 +2453,32 @@
           "where": "migrations/038_organic_traceability_schema.sql",
           "quality": "subject",
           "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/041_rural_life_os_schema.sql",
-          "quality": "subject",
-          "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/051_arp_forward_pricing.sql",
-          "quality": "subject",
-          "matched": "crop"
         }
       ],
-      "evidence_count": 8
+      "evidence_count": 36
     },
     {
       "id": "M062",
       "name": "Crop Calendar",
       "domain": "Crop",
-      "status": "NO_UI",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/CropCalendarPage.jsx",
+          "quality": "strong",
+          "matched": "crop+calendar"
+        },
         {
           "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
+          "quality": "subject",
+          "matched": "crop"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
           "quality": "subject",
           "matched": "crop"
         },
@@ -1739,32 +2499,38 @@
           "where": "migrations/041_rural_life_os_schema.sql",
           "quality": "subject",
           "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/051_arp_forward_pricing.sql",
-          "quality": "subject",
-          "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/992_v42_recovered_intelligence.sql",
-          "quality": "subject",
-          "matched": "crop"
         }
       ],
-      "evidence_count": 8
+      "evidence_count": 36
     },
     {
       "id": "M063",
       "name": "Crop Registration",
       "domain": "Crop",
-      "status": "NO_UI",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+          "quality": "strong",
+          "matched": "crop+registration"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/CropRegistrationPage.jsx",
+          "quality": "strong",
+          "matched": "crop+registration"
+        },
+        {
+          "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
+          "quality": "subject",
+          "matched": "crop"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
           "quality": "subject",
           "matched": "crop"
         },
@@ -1779,38 +2545,32 @@
           "where": "migrations/038_organic_traceability_schema.sql",
           "quality": "subject",
           "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/041_rural_life_os_schema.sql",
-          "quality": "subject",
-          "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/051_arp_forward_pricing.sql",
-          "quality": "subject",
-          "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/992_v42_recovered_intelligence.sql",
-          "quality": "subject",
-          "matched": "crop"
         }
       ],
-      "evidence_count": 8
+      "evidence_count": 36
     },
     {
       "id": "M064",
       "name": "Crop Variety Management",
       "domain": "Crop",
-      "status": "NO_UI",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/CropVarietyPage.jsx",
+          "quality": "strong",
+          "matched": "crop+variety"
+        },
         {
           "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
+          "quality": "subject",
+          "matched": "crop"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
           "quality": "subject",
           "matched": "crop"
         },
@@ -1831,66 +2591,122 @@
           "where": "migrations/041_rural_life_os_schema.sql",
           "quality": "subject",
           "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/051_arp_forward_pricing.sql",
-          "quality": "subject",
-          "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/992_v42_recovered_intelligence.sql",
-          "quality": "subject",
-          "matched": "crop"
         }
       ],
-      "evidence_count": 8
+      "evidence_count": 36
     },
     {
       "id": "M065",
       "name": "Seed Planning",
       "domain": "Crop",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
         {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+          "quality": "strong",
+          "matched": "seed+planning"
+        },
+        {
           "kind": "component",
-          "where": "frontend/src/pages/SeedVaultPage.jsx",
+          "where": "frontend/src/pages/SeedPlanningPage.jsx",
+          "quality": "strong",
+          "matched": "seed+planning"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql",
+          "quality": "subject",
+          "matched": "seed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql",
+          "quality": "subject",
+          "matched": "seed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzz_seed_vault_schema.sql",
+          "quality": "subject",
+          "matched": "seed"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/seedVaultService.js",
           "quality": "subject",
           "matched": "seed"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 8
     },
     {
       "id": "M066",
       "name": "Nursery Management",
       "domain": "Crop",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/NurseryManagementPage.jsx",
+          "quality": "strong",
+          "matched": "nursery"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M067",
       "name": "Sowing Management",
       "domain": "Crop",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+          "quality": "strong",
+          "matched": "sowing"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/SowingManagementPage.jsx",
+          "quality": "strong",
+          "matched": "sowing"
+        }
+      ],
+      "evidence_count": 2
     },
     {
       "id": "M068",
       "name": "Crop Monitoring",
       "domain": "Crop",
-      "status": "NO_UI",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+          "quality": "strong",
+          "matched": "crop+monitoring"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/CropMonitoringPage.jsx",
+          "quality": "strong",
+          "matched": "crop+monitoring"
+        },
+        {
+          "kind": "table",
           "where": "migrations/011_farmer_portal_enhancements.sql",
+          "quality": "subject",
+          "matched": "crop"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
           "quality": "subject",
           "matched": "crop"
         },
@@ -1905,27 +2721,9 @@
           "where": "migrations/038_organic_traceability_schema.sql",
           "quality": "subject",
           "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/041_rural_life_os_schema.sql",
-          "quality": "subject",
-          "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/051_arp_forward_pricing.sql",
-          "quality": "subject",
-          "matched": "crop"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/992_v42_recovered_intelligence.sql",
-          "quality": "subject",
-          "matched": "crop"
         }
       ],
-      "evidence_count": 8
+      "evidence_count": 36
     },
     {
       "id": "M069",
@@ -1947,13 +2745,31 @@
           "matched": "harvest"
         },
         {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "subject",
+          "matched": "harvest"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+          "quality": "subject",
+          "matched": "harvest"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+          "quality": "subject",
+          "matched": "harvest"
+        },
+        {
           "kind": "component",
           "where": "frontend/src/pages/HarvestScorePage.jsx",
           "quality": "subject",
           "matched": "harvest"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 6
     },
     {
       "id": "M070",
@@ -1967,47 +2783,113 @@
           "where": "migrations/991_aeos_folu_ne_policy.sql",
           "quality": "subject",
           "matched": "yield"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/YieldManagementPage.jsx",
+          "quality": "subject",
+          "matched": "yield"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 2
     },
     {
       "id": "M071",
       "name": "Soil Health Management",
       "domain": "Soil",
-      "status": "NO_UI",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
         {
+          "kind": "table",
+          "where": "migrations/9510_m032_land_records_extra.sql",
+          "quality": "strong",
+          "matched": "soil+health"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+          "quality": "strong",
+          "matched": "soil+health"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M074_generated.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9510_m032_land_records_extra.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
           "kind": "service",
-          "where": "backend/src/services/soilTestingService.js",
+          "where": "backend/src/services/legacy/soilManagementService.js",
           "quality": "subject",
           "matched": "soil"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 9
     },
     {
       "id": "M072",
       "name": "Soil Test Management",
       "domain": "Soil",
-      "status": "NO_UI",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
           "kind": "service",
-          "where": "backend/src/services/soilTestingService.js",
+          "where": "backend/src/services/legacy/soilTestingService.js",
           "quality": "strong",
           "matched": "soil+test"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M074_generated.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9510_m032_land_records_extra.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9510_m032_land_records_extra.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "quality": "subject",
+          "matched": "soil"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+          "quality": "subject",
+          "matched": "soil"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 9
     },
     {
       "id": "M073",
       "name": "Nutrient Management",
       "domain": "Soil",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
@@ -2021,72 +2903,301 @@
           "where": "migrations/036_nutrition_intelligence_schema.sql",
           "quality": "strong",
           "matched": "nutrient"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3103_nutrient_value_sales.sql",
+          "quality": "strong",
+          "matched": "nutrient"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3103_nutrient_value_sales.sql",
+          "quality": "strong",
+          "matched": "nutrient"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3103_nutrient_value_sales.sql",
+          "quality": "strong",
+          "matched": "nutrient"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3103_nutrient_value_sales.sql",
+          "quality": "strong",
+          "matched": "nutrient"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 11
     },
     {
       "id": "M074",
       "name": "Fertility Management",
       "domain": "Soil",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+          "quality": "strong",
+          "matched": "fertility"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M075",
       "name": "Irrigation Management",
       "domain": "Water",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql",
+          "quality": "strong",
+          "matched": "irrigation"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql",
+          "quality": "strong",
+          "matched": "irrigation"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql",
+          "quality": "strong",
+          "matched": "irrigation"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/irrigationManagementService.js",
+          "quality": "strong",
+          "matched": "irrigation"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/irrigationManagementRoutes.js",
+          "quality": "strong",
+          "matched": "irrigation"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/IrrigationManagementPage.jsx",
+          "quality": "strong",
+          "matched": "irrigation"
+        }
+      ],
+      "evidence_count": 6
     },
     {
       "id": "M076",
       "name": "Water Budgeting",
       "domain": "Water",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "subject",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/3000_M075_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M076_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M077_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M078_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M079_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M080_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        }
+      ],
+      "evidence_count": 29
     },
     {
       "id": "M077",
       "name": "Water Quality Monitoring",
       "domain": "Water",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "partial",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9523_m077_m077.sql",
+          "quality": "partial",
+          "matched": "water+quality"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9525_m079_m079.sql",
+          "quality": "partial",
+          "matched": "water+monitoring"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "partial",
+          "matched": "water+quality"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+          "quality": "partial",
+          "matched": "water+quality"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M075_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M076_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        }
+      ],
+      "evidence_count": 29
     },
     {
       "id": "M078",
       "name": "Rainwater Harvesting",
       "domain": "Water",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+          "quality": "strong",
+          "matched": "rainwater+harvesting"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+          "quality": "strong",
+          "matched": "rainwater+harvesting"
+        }
+      ],
+      "evidence_count": 2
     },
     {
       "id": "M079",
       "name": "Watershed Management",
       "domain": "Water",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/3000_M075_generated.sql",
+          "quality": "strong",
+          "matched": "watershed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M076_generated.sql",
+          "quality": "strong",
+          "matched": "watershed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M077_generated.sql",
+          "quality": "strong",
+          "matched": "watershed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M078_generated.sql",
+          "quality": "strong",
+          "matched": "watershed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M079_generated.sql",
+          "quality": "strong",
+          "matched": "watershed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M080_generated.sql",
+          "quality": "strong",
+          "matched": "watershed"
+        }
+      ],
+      "evidence_count": 29
     },
     {
       "id": "M080",
       "name": "Water Analytics",
       "domain": "Water",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/3000_M075_generated.sql",
+          "quality": "strong",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M076_generated.sql",
+          "quality": "strong",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M077_generated.sql",
+          "quality": "strong",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M078_generated.sql",
+          "quality": "strong",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M079_generated.sql",
+          "quality": "strong",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M080_generated.sql",
+          "quality": "strong",
+          "matched": "water"
+        }
+      ],
+      "evidence_count": 29
     },
     {
       "id": "M081",
@@ -2115,7 +3226,7 @@
         },
         {
           "kind": "service",
-          "where": "backend/src/services/weatherService.js",
+          "where": "backend/src/services/legacy/weatherService.js",
           "quality": "subject",
           "matched": "weather"
         },
@@ -2132,7 +3243,7 @@
           "matched": "weather"
         }
       ],
-      "evidence_count": 6
+      "evidence_count": 7
     },
     {
       "id": "M082",
@@ -2161,7 +3272,7 @@
         },
         {
           "kind": "service",
-          "where": "backend/src/services/weatherService.js",
+          "where": "backend/src/services/legacy/weatherService.js",
           "quality": "subject",
           "matched": "weather"
         },
@@ -2178,41 +3289,53 @@
           "matched": "weather"
         }
       ],
-      "evidence_count": 6
+      "evidence_count": 7
     },
     {
       "id": "M083",
       "name": "Climate Advisory",
       "domain": "Climate",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
         {
-          "kind": "table",
-          "where": "migrations/057_climate_weather_d14.sql",
-          "quality": "subject",
-          "matched": "climate"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/057_climate_weather_d14.sql",
-          "quality": "subject",
-          "matched": "climate"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/057_climate_weather_d14.sql",
-          "quality": "subject",
-          "matched": "climate"
+          "kind": "route",
+          "where": "backend/src/routes/climateAdvisoryRoutes.js",
+          "quality": "strong",
+          "matched": "climate+advisory"
         },
         {
           "kind": "component",
-          "where": "frontend/src/pages/ClimateWeatherPage.jsx",
+          "where": "frontend/src/pages/ClimateAdvisoryPage.jsx",
+          "quality": "strong",
+          "matched": "climate+advisory"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/057_climate_weather_d14.sql",
+          "quality": "subject",
+          "matched": "climate"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/057_climate_weather_d14.sql",
+          "quality": "subject",
+          "matched": "climate"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/057_climate_weather_d14.sql",
+          "quality": "subject",
+          "matched": "climate"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M083_generated.sql",
           "quality": "subject",
           "matched": "climate"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 13
     },
     {
       "id": "M084",
@@ -2227,19 +3350,33 @@
       "id": "M085",
       "name": "Drought Monitoring",
       "domain": "Climate",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "subject",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+          "quality": "subject",
+          "matched": "drought"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M086",
       "name": "Flood Monitoring",
       "domain": "Climate",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "subject",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+          "quality": "subject",
+          "matched": "flood"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M087",
@@ -2253,9 +3390,21 @@
           "where": "migrations/057_climate_weather_d14.sql",
           "quality": "subject",
           "matched": "pest"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "subject",
+          "matched": "pest"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "subject",
+          "matched": "pest"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 3
     },
     {
       "id": "M088",
@@ -2269,15 +3418,33 @@
           "where": "migrations/057_climate_weather_d14.sql",
           "quality": "subject",
           "matched": "disease"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/071_animal_health_schema.sql",
+          "quality": "subject",
+          "matched": "disease"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9543_m127_m127.sql",
+          "quality": "subject",
+          "matched": "disease"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+          "quality": "subject",
+          "matched": "disease"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 4
     },
     {
       "id": "M089",
       "name": "Climate Risk Assessment",
       "domain": "Climate",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
@@ -2299,29 +3466,71 @@
           "matched": "climate"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/ClimateWeatherPage.jsx",
+          "kind": "table",
+          "where": "migrations/3000_M083_generated.sql",
+          "quality": "subject",
+          "matched": "climate"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M087_generated.sql",
+          "quality": "subject",
+          "matched": "climate"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M088_generated.sql",
           "quality": "subject",
           "matched": "climate"
         }
       ],
-      "evidence_count": 4
+      "evidence_count": 13
     },
     {
       "id": "M090",
       "name": "Agro-Meteorology",
       "domain": "Climate",
       "status": "PARTIAL",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+          "quality": "strong",
+          "matched": "agro+meteorology"
+        },
         {
           "kind": "table",
           "where": "migrations/057_climate_weather_d14.sql",
           "quality": "subject",
           "matched": "agro"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M031_generated.sql",
+          "quality": "subject",
+          "matched": "agro"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M032_generated.sql",
+          "quality": "subject",
+          "matched": "agro"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M033_generated.sql",
+          "quality": "subject",
+          "matched": "agro"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M036_generated.sql",
+          "quality": "subject",
+          "matched": "agro"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 10
     },
     {
       "id": "M091",
@@ -2356,7 +3565,7 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farm"
         },
@@ -2367,17 +3576,23 @@
           "matched": "farm"
         }
       ],
-      "evidence_count": 26
+      "evidence_count": 86
     },
     {
       "id": "M092",
       "name": "Farm Task Scheduling",
       "domain": "Operations",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "partial",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+          "quality": "partial",
+          "matched": "farm+task"
+        },
+        {
+          "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
           "matched": "farm"
@@ -2402,33 +3617,34 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farm"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farm"
         }
       ],
-      "evidence_count": 26
+      "evidence_count": 86
     },
     {
       "id": "M093",
       "name": "Labour Management",
       "domain": "Operations",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/LabourManagementPage.jsx",
+          "quality": "strong",
+          "matched": "labour"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M094",
       "name": "Contractor Management",
       "domain": "Operations",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "strong",
       "evidence": [
         {
@@ -2442,31 +3658,85 @@
           "where": "migrations/054_v8_v9_commerce_recovery.sql",
           "quality": "strong",
           "matched": "contractor"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3102_ecommerce_ai_erp_business_marketing.sql",
+          "quality": "strong",
+          "matched": "contractor"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9995_scheme_verification_map_protection.sql",
+          "quality": "strong",
+          "matched": "contractor"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+          "quality": "strong",
+          "matched": "contractor"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/strategic_services_schema.sql",
+          "quality": "strong",
+          "matched": "contractor"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 14
     },
     {
       "id": "M095",
       "name": "Machinery Operations",
       "domain": "Operations",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+          "quality": "strong",
+          "matched": "machinery+operations"
+        },
         {
           "kind": "table",
           "where": "migrations/041_rural_life_os_schema.sql",
           "quality": "subject",
           "matched": "machinery"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M101_generated.sql",
+          "quality": "subject",
+          "matched": "machinery"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M102_generated.sql",
+          "quality": "subject",
+          "matched": "machinery"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M103_generated.sql",
+          "quality": "subject",
+          "matched": "machinery"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M104_generated.sql",
+          "quality": "subject",
+          "matched": "machinery"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 13
     },
     {
       "id": "M096",
       "name": "Equipment Scheduling",
       "domain": "Operations",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "subject",
       "evidence": [
         {
@@ -2486,17 +3756,41 @@
           "where": "migrations/053_v42_recovered_finance.sql",
           "quality": "subject",
           "matched": "equipment"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/4000_comprehensive_erp_schema.sql",
+          "quality": "subject",
+          "matched": "equipment"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9512_m042_m042.sql",
+          "quality": "subject",
+          "matched": "equipment"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9535_m103_m103.sql",
+          "quality": "subject",
+          "matched": "equipment"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 18
     },
     {
       "id": "M097",
       "name": "Input Consumption",
       "domain": "Operations",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+          "quality": "strong",
+          "matched": "input+consumption"
+        },
         {
           "kind": "table",
           "where": "migrations/038_organic_traceability_schema.sql",
@@ -2523,21 +3817,27 @@
         },
         {
           "kind": "table",
-          "where": "migrations/992_v42_recovered_intelligence.sql",
+          "where": "migrations/3000_M112_generated.sql",
           "quality": "subject",
           "matched": "input"
         }
       ],
-      "evidence_count": 5
+      "evidence_count": 18
     },
     {
       "id": "M098",
       "name": "Farm Costing",
       "domain": "Operations",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
+          "kind": "component",
+          "where": "frontend/src/pages/FarmCostingPage.jsx",
+          "quality": "strong",
+          "matched": "farm+costing"
+        },
+        {
           "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
@@ -2563,28 +3863,28 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farm"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farm"
         }
       ],
-      "evidence_count": 26
+      "evidence_count": 86
     },
     {
       "id": "M099",
       "name": "Farm Productivity",
       "domain": "Operations",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+          "quality": "strong",
+          "matched": "farm+productivity"
+        },
+        {
+          "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
           "matched": "farm"
@@ -2609,28 +3909,28 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farm"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farm"
         }
       ],
-      "evidence_count": 26
+      "evidence_count": 86
     },
     {
       "id": "M100",
       "name": "Farm Operations Dashboard",
       "domain": "Operations",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+          "quality": "strong",
+          "matched": "farm+operations"
+        },
+        {
+          "kind": "table",
           "where": "migrations/000_base_schema.sql",
           "quality": "subject",
           "matched": "farm"
@@ -2655,44 +3955,124 @@
         },
         {
           "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
-          "quality": "subject",
-          "matched": "farm"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/022_digital_product_passport_schema.sql",
+          "where": "migrations/013_farmer_health_welfare_module.sql",
           "quality": "subject",
           "matched": "farm"
         }
       ],
-      "evidence_count": 26
+      "evidence_count": 86
     },
     {
       "id": "M101",
       "name": "Tractor Management",
       "domain": "Machinery",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9533_m101_tractor_registry.sql",
+          "quality": "strong",
+          "matched": "tractor"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9533_m101_tractor_registry.sql",
+          "quality": "strong",
+          "matched": "tractor"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9533_m101_tractor_registry.sql",
+          "quality": "strong",
+          "matched": "tractor"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9533_m101_tractor_registry.sql",
+          "quality": "strong",
+          "matched": "tractor"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9533_m101_tractor_registry.sql",
+          "quality": "strong",
+          "matched": "tractor"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/TractorManagementPage.jsx",
+          "quality": "strong",
+          "matched": "tractor"
+        }
+      ],
+      "evidence_count": 6
     },
     {
       "id": "M102",
       "name": "Implement Management",
       "domain": "Machinery",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9525_m079_m079.sql",
+          "quality": "strong",
+          "matched": "implement"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9534_m102_m102.sql",
+          "quality": "strong",
+          "matched": "implement"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9534_m102_m102.sql",
+          "quality": "strong",
+          "matched": "implement"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9534_m102_m102.sql",
+          "quality": "strong",
+          "matched": "implement"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+          "quality": "strong",
+          "matched": "implement"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/ImplementManagementPage.jsx",
+          "quality": "strong",
+          "matched": "implement"
+        }
+      ],
+      "evidence_count": 6
     },
     {
       "id": "M103",
       "name": "Equipment Inventory",
       "domain": "Machinery",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+          "quality": "strong",
+          "matched": "equipment+inventory"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/EquipmentInventoryPage.jsx",
+          "quality": "strong",
+          "matched": "equipment+inventory"
+        },
         {
           "kind": "table",
           "where": "migrations/023_engineering_schema.sql",
@@ -2710,17 +4090,41 @@
           "where": "migrations/053_v42_recovered_finance.sql",
           "quality": "subject",
           "matched": "equipment"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/4000_comprehensive_erp_schema.sql",
+          "quality": "subject",
+          "matched": "equipment"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 18
     },
     {
       "id": "M104",
       "name": "Equipment Rental",
       "domain": "Machinery",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+          "quality": "strong",
+          "matched": "equipment+rental"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+          "quality": "strong",
+          "matched": "equipment+rental"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/EquipmentRentalPage.jsx",
+          "quality": "strong",
+          "matched": "equipment+rental"
+        },
         {
           "kind": "table",
           "where": "migrations/023_engineering_schema.sql",
@@ -2740,7 +4144,7 @@
           "matched": "equipment"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 18
     },
     {
       "id": "M105",
@@ -2754,71 +4158,206 @@
           "where": "migrations/013_logistics_enhancements.sql",
           "quality": "strong",
           "matched": "fleet"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9537_m105_m105.sql",
+          "quality": "strong",
+          "matched": "fleet"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9537_m105_m105.sql",
+          "quality": "strong",
+          "matched": "fleet"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9537_m105_m105.sql",
+          "quality": "strong",
+          "matched": "fleet"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9537_m105_m105.sql",
+          "quality": "strong",
+          "matched": "fleet"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 5
     },
     {
       "id": "M106",
       "name": "Preventive Maintenance",
       "domain": "Machinery",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzz_preventive_maintenance_schema.sql",
+          "quality": "strong",
+          "matched": "preventive+maintenance"
+        },
+        {
           "kind": "service",
-          "where": "backend/src/services/preSeasonOrderService.js",
+          "where": "backend/src/services/legacy/preventiveMaintenanceService.js",
+          "quality": "strong",
+          "matched": "preventive+maintenance"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/preventiveMaintenanceRoutes.js",
+          "quality": "strong",
+          "matched": "preventive+maintenance"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/strategic_services_schema.sql",
           "quality": "subject",
           "matched": "preventive"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/PreOrderPage.jsx",
+          "kind": "table",
+          "where": "migrations/strategic_services_schema.sql",
+          "quality": "subject",
+          "matched": "preventive"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/strategic_services_schema.sql",
           "quality": "subject",
           "matched": "preventive"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 11
     },
     {
       "id": "M107",
       "name": "Breakdown Maintenance",
       "domain": "Machinery",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/BreakdownMaintenancePage.jsx",
+          "quality": "strong",
+          "matched": "breakdown+maintenance"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+          "quality": "subject",
+          "matched": "breakdown"
+        }
+      ],
+      "evidence_count": 2
     },
     {
       "id": "M108",
       "name": "Fuel Management",
       "domain": "Machinery",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9537_m105_m105.sql",
+          "quality": "strong",
+          "matched": "fuel"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9539_m108_m108.sql",
+          "quality": "strong",
+          "matched": "fuel"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9539_m108_m108.sql",
+          "quality": "strong",
+          "matched": "fuel"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+          "quality": "strong",
+          "matched": "fuel"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+          "quality": "strong",
+          "matched": "fuel"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/FuelManagementPage.jsx",
+          "quality": "strong",
+          "matched": "fuel"
+        }
+      ],
+      "evidence_count": 6
     },
     {
       "id": "M109",
       "name": "Spare Parts Management",
       "domain": "Machinery",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9540_m109_m109.sql",
+          "quality": "strong",
+          "matched": "spare+parts"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+          "quality": "strong",
+          "matched": "spare+parts"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+          "quality": "strong",
+          "matched": "spare+parts"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/SparePartsManagementPage.jsx",
+          "quality": "strong",
+          "matched": "spare+parts"
+        }
+      ],
+      "evidence_count": 4
     },
     {
       "id": "M110",
       "name": "Asset Lifecycle Management",
       "domain": "Machinery",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
-          "where": "migrations/000_base_schema.sql",
-          "quality": "subject",
-          "matched": "asset"
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql",
+          "quality": "strong",
+          "matched": "asset+lifecycle"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql",
+          "quality": "strong",
+          "matched": "asset+lifecycle"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/AssetLifecycleManagementPage.jsx",
+          "quality": "strong",
+          "matched": "asset+lifecycle"
         },
         {
           "kind": "table",
@@ -2834,82 +4373,156 @@
         },
         {
           "kind": "table",
-          "where": "migrations/017_ar_vr_schema.sql",
-          "quality": "subject",
-          "matched": "asset"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/017_ar_vr_schema.sql",
-          "quality": "subject",
-          "matched": "asset"
-        },
-        {
-          "kind": "table",
-          "where": "migrations/056_named_missing_modules.sql",
+          "where": "migrations/000_base_schema.sql",
           "quality": "subject",
           "matched": "asset"
         }
       ],
-      "evidence_count": 8
+      "evidence_count": 16
     },
     {
       "id": "M111",
       "name": "Seed Inventory",
       "domain": "Input Supply",
-      "status": "PARTIAL",
+      "status": "BUILT",
       "match_quality": "subject",
       "evidence": [
         {
-          "kind": "component",
-          "where": "frontend/src/pages/SeedVaultPage.jsx",
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql",
+          "quality": "subject",
+          "matched": "seed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql",
+          "quality": "subject",
+          "matched": "seed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+          "quality": "subject",
+          "matched": "seed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzz_seed_vault_schema.sql",
+          "quality": "subject",
+          "matched": "seed"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/seedVaultService.js",
+          "quality": "subject",
+          "matched": "seed"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/seedVaultRoutes.js",
           "quality": "subject",
           "matched": "seed"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 8
     },
     {
       "id": "M112",
       "name": "Fertilizer Inventory",
       "domain": "Input Supply",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/066_fertilizer_inventory_schema.sql",
+          "quality": "strong",
+          "matched": "fertilizer+inventory"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/fertilizerInventoryService.js",
+          "quality": "strong",
+          "matched": "fertilizer+inventory"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/FertilizerInventoryPage.jsx",
+          "quality": "strong",
+          "matched": "fertilizer+inventory"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/fertilizerRoutes.js",
+          "quality": "subject",
+          "matched": "fertilizer"
+        }
+      ],
+      "evidence_count": 4
     },
     {
       "id": "M113",
       "name": "Biofertilizer Management",
       "domain": "Input Supply",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "biofertilizer"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "biofertilizer"
+        }
+      ],
+      "evidence_count": 2
     },
     {
       "id": "M114",
       "name": "Pesticide Inventory",
       "domain": "Input Supply",
       "status": "PARTIAL",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "pesticide+inventory"
+        },
         {
           "kind": "table",
           "where": "migrations/057_climate_weather_d14.sql",
           "quality": "subject",
           "matched": "pesticide"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "subject",
+          "matched": "pesticide"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 3
     },
     {
       "id": "M115",
       "name": "Bio-Pesticide Management",
       "domain": "Input Supply",
       "status": "NO_UI",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "bio+pesticide"
+        },
         {
           "kind": "table",
           "where": "migrations/018_biodiversity_schema.sql",
@@ -2917,22 +4530,47 @@
           "matched": "bio"
         },
         {
-          "kind": "service",
-          "where": "backend/src/services/biodiversityService.js",
+          "kind": "table",
+          "where": "migrations/3015_m015_mfa.sql",
+          "quality": "subject",
+          "matched": "bio"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9525_m079_m079.sql",
+          "quality": "subject",
+          "matched": "bio"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "subject",
+          "matched": "bio"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
           "quality": "subject",
           "matched": "bio"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 7
     },
     {
       "id": "M116",
       "name": "Micronutrient Management",
       "domain": "Input Supply",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "micronutrient"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M117",
@@ -2967,9 +4605,9 @@
         },
         {
           "kind": "table",
-          "where": "migrations/038_organic_traceability_schema.sql",
-          "quality": "subject",
-          "matched": "organic"
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "organic+input"
         },
         {
           "kind": "table",
@@ -2978,15 +4616,21 @@
           "matched": "organic"
         }
       ],
-      "evidence_count": 24
+      "evidence_count": 30
     },
     {
       "id": "M118",
       "name": "Input Procurement",
       "domain": "Input Supply",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "input+procurement"
+        },
         {
           "kind": "table",
           "where": "migrations/038_organic_traceability_schema.sql",
@@ -3013,20 +4657,26 @@
         },
         {
           "kind": "table",
-          "where": "migrations/992_v42_recovered_intelligence.sql",
+          "where": "migrations/3000_M112_generated.sql",
           "quality": "subject",
           "matched": "input"
         }
       ],
-      "evidence_count": 5
+      "evidence_count": 18
     },
     {
       "id": "M119",
       "name": "Input Distribution",
       "domain": "Input Supply",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "input+distribution"
+        },
         {
           "kind": "table",
           "where": "migrations/038_organic_traceability_schema.sql",
@@ -3053,20 +4703,26 @@
         },
         {
           "kind": "table",
-          "where": "migrations/992_v42_recovered_intelligence.sql",
+          "where": "migrations/3000_M112_generated.sql",
           "quality": "subject",
           "matched": "input"
         }
       ],
-      "evidence_count": 5
+      "evidence_count": 18
     },
     {
       "id": "M120",
       "name": "Input Traceability",
       "domain": "Input Supply",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "strong",
+          "matched": "input+traceability"
+        },
         {
           "kind": "table",
           "where": "migrations/038_organic_traceability_schema.sql",
@@ -3093,81 +4749,334 @@
         },
         {
           "kind": "table",
-          "where": "migrations/992_v42_recovered_intelligence.sql",
+          "where": "migrations/3000_M112_generated.sql",
           "quality": "subject",
           "matched": "input"
         }
       ],
-      "evidence_count": 5
+      "evidence_count": 18
     },
     {
       "id": "M121",
       "name": "Dairy Management",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/065_dairy_management_schema.sql",
+          "quality": "strong",
+          "matched": "dairy"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/065_dairy_management_schema.sql",
+          "quality": "strong",
+          "matched": "dairy"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/dairyService.js",
+          "quality": "strong",
+          "matched": "dairy"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/dairyRoutes.js",
+          "quality": "strong",
+          "matched": "dairy"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/DairyManagementPage.jsx",
+          "quality": "strong",
+          "matched": "dairy"
+        }
+      ],
+      "evidence_count": 5
     },
     {
       "id": "M122",
       "name": "Cattle Registry",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9541_m122_m122.sql",
+          "quality": "strong",
+          "matched": "cattle"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9541_m122_m122.sql",
+          "quality": "strong",
+          "matched": "cattle"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9541_m122_m122.sql",
+          "quality": "strong",
+          "matched": "cattle"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9541_m122_m122.sql",
+          "quality": "strong",
+          "matched": "cattle"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+          "quality": "strong",
+          "matched": "cattle"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/CattleRegistryPage.jsx",
+          "quality": "strong",
+          "matched": "cattle"
+        }
+      ],
+      "evidence_count": 6
     },
     {
       "id": "M123",
       "name": "Poultry Management",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/067_poultry_management_schema.sql",
+          "quality": "strong",
+          "matched": "poultry"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/067_poultry_management_schema.sql",
+          "quality": "strong",
+          "matched": "poultry"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/067_poultry_management_schema.sql",
+          "quality": "strong",
+          "matched": "poultry"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/067_poultry_management_schema.sql",
+          "quality": "strong",
+          "matched": "poultry"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/067_poultry_management_schema.sql",
+          "quality": "strong",
+          "matched": "poultry"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9542_m123_poultry_registry.sql",
+          "quality": "strong",
+          "matched": "poultry"
+        }
+      ],
+      "evidence_count": 14
     },
     {
       "id": "M124",
       "name": "Goat Farming Management",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+          "quality": "strong",
+          "matched": "goat+farming"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/GoatFarmingPage.jsx",
+          "quality": "strong",
+          "matched": "goat+farming"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/068_goat_farming_schema.sql",
+          "quality": "subject",
+          "matched": "goat"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/068_goat_farming_schema.sql",
+          "quality": "subject",
+          "matched": "goat"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/068_goat_farming_schema.sql",
+          "quality": "subject",
+          "matched": "goat"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/068_goat_farming_schema.sql",
+          "quality": "subject",
+          "matched": "goat"
+        }
+      ],
+      "evidence_count": 9
     },
     {
       "id": "M125",
       "name": "Sheep Farming Management",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+          "quality": "strong",
+          "matched": "sheep+farming"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/SheepFarmingPage.jsx",
+          "quality": "strong",
+          "matched": "sheep+farming"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/069_sheep_farming_schema.sql",
+          "quality": "subject",
+          "matched": "sheep"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/069_sheep_farming_schema.sql",
+          "quality": "subject",
+          "matched": "sheep"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/069_sheep_farming_schema.sql",
+          "quality": "subject",
+          "matched": "sheep"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/069_sheep_farming_schema.sql",
+          "quality": "subject",
+          "matched": "sheep"
+        }
+      ],
+      "evidence_count": 9
     },
     {
       "id": "M126",
       "name": "Pig Farming Management",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+          "quality": "strong",
+          "matched": "pig+farming"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/PigFarmingPage.jsx",
+          "quality": "strong",
+          "matched": "pig+farming"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/070_pig_farming_schema.sql",
+          "quality": "subject",
+          "matched": "pig"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/070_pig_farming_schema.sql",
+          "quality": "subject",
+          "matched": "pig"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/070_pig_farming_schema.sql",
+          "quality": "subject",
+          "matched": "pig"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/070_pig_farming_schema.sql",
+          "quality": "subject",
+          "matched": "pig"
+        }
+      ],
+      "evidence_count": 9
     },
     {
       "id": "M127",
       "name": "Animal Health Management",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/071_animal_health_schema.sql",
+          "quality": "strong",
+          "matched": "animal+health"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9543_m127_m127.sql",
+          "quality": "strong",
+          "matched": "animal+health"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/animalHealthService.js",
+          "quality": "strong",
+          "matched": "animal+health"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/animalHealthRoutes.js",
+          "quality": "strong",
+          "matched": "animal+health"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/AnimalHealthPage.jsx",
+          "quality": "strong",
+          "matched": "animal+health"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/065_dairy_management_schema.sql",
+          "quality": "subject",
+          "matched": "animal"
+        }
+      ],
+      "evidence_count": 11
     },
     {
       "id": "M128",
       "name": "Feed Management",
       "domain": "Livestock",
-      "status": "PARTIAL",
+      "status": "NO_UI",
       "match_quality": "strong",
       "evidence": [
         {
@@ -3175,81 +5084,353 @@
           "where": "migrations/046_advanced_voice_ai_tables.sql",
           "quality": "strong",
           "matched": "feed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/060_experience_layer_dxp.sql",
+          "quality": "strong",
+          "matched": "feed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/067_poultry_management_schema.sql",
+          "quality": "strong",
+          "matched": "feed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/068_goat_farming_schema.sql",
+          "quality": "strong",
+          "matched": "feed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/069_sheep_farming_schema.sql",
+          "quality": "strong",
+          "matched": "feed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/070_pig_farming_schema.sql",
+          "quality": "strong",
+          "matched": "feed"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 11
     },
     {
       "id": "M129",
       "name": "Breeding Management",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/068_goat_farming_schema.sql",
+          "quality": "strong",
+          "matched": "breeding"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/069_sheep_farming_schema.sql",
+          "quality": "strong",
+          "matched": "breeding"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/070_pig_farming_schema.sql",
+          "quality": "strong",
+          "matched": "breeding"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9541_m122_m122.sql",
+          "quality": "strong",
+          "matched": "breeding"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9542_m123_poultry_registry.sql",
+          "quality": "strong",
+          "matched": "breeding"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+          "quality": "strong",
+          "matched": "breeding"
+        }
+      ],
+      "evidence_count": 6
     },
     {
       "id": "M130",
       "name": "Livestock Analytics",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/3000_M121_generated.sql",
+          "quality": "strong",
+          "matched": "livestock"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M122_generated.sql",
+          "quality": "strong",
+          "matched": "livestock"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M123_generated.sql",
+          "quality": "strong",
+          "matched": "livestock"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M127_generated.sql",
+          "quality": "strong",
+          "matched": "livestock"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M129_generated.sql",
+          "quality": "strong",
+          "matched": "livestock"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M130_generated.sql",
+          "quality": "strong",
+          "matched": "livestock"
+        }
+      ],
+      "evidence_count": 11
     },
     {
       "id": "M131",
       "name": "Biofloc Farm Management",
       "domain": "Fisheries",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "strong",
+          "matched": "biofloc+farm"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "quality": "subject",
+          "matched": "biofloc"
+        }
+      ],
+      "evidence_count": 2
     },
     {
       "id": "M132",
       "name": "Pond Management",
       "domain": "Fisheries",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/016_advanced_ponds_iot.sql",
+          "quality": "strong",
+          "matched": "pond"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/016_advanced_ponds_iot.sql",
+          "quality": "strong",
+          "matched": "pond"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/016_advanced_ponds_iot.sql",
+          "quality": "strong",
+          "matched": "pond"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/016_advanced_ponds_iot.sql",
+          "quality": "strong",
+          "matched": "pond"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/016_advanced_ponds_iot.sql",
+          "quality": "strong",
+          "matched": "pond"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/016_advanced_ponds_iot.sql",
+          "quality": "strong",
+          "matched": "pond"
+        }
+      ],
+      "evidence_count": 7
     },
     {
       "id": "M133",
       "name": "Hatchery Management",
       "domain": "Fisheries",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "strong",
+          "matched": "hatchery"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M134",
       "name": "Fish Feed Management",
       "domain": "Fisheries",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "strong",
+          "matched": "fish+feed"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M131_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M132_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M133_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M134_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M135_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        }
+      ],
+      "evidence_count": 19
     },
     {
       "id": "M135",
       "name": "Water Quality Control",
       "domain": "Fisheries",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "partial",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9523_m077_m077.sql",
+          "quality": "partial",
+          "matched": "water+quality"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "partial",
+          "matched": "water+quality"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+          "quality": "partial",
+          "matched": "water+quality"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M075_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M076_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M077_generated.sql",
+          "quality": "subject",
+          "matched": "water"
+        }
+      ],
+      "evidence_count": 29
     },
     {
       "id": "M136",
       "name": "Fish Health Management",
       "domain": "Fisheries",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "strong",
+          "matched": "fish+health"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M131_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M132_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M133_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M134_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M135_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        }
+      ],
+      "evidence_count": 19
     },
     {
       "id": "M137",
@@ -3261,6 +5442,24 @@
         {
           "kind": "table",
           "where": "migrations/038_organic_traceability_schema.sql",
+          "quality": "strong",
+          "matched": "harvest"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "strong",
+          "matched": "harvest"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+          "quality": "strong",
+          "matched": "harvest"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
           "quality": "strong",
           "matched": "harvest"
         },
@@ -3277,27 +5476,76 @@
           "matched": "harvest"
         }
       ],
-      "evidence_count": 3
+      "evidence_count": 6
     },
     {
       "id": "M138",
       "name": "Fish Processing Management",
       "domain": "Fisheries",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "strong",
+          "matched": "fish+processing"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M131_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M132_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M133_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M134_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M135_generated.sql",
+          "quality": "subject",
+          "matched": "fish"
+        }
+      ],
+      "evidence_count": 19
     },
     {
       "id": "M139",
       "name": "Cold Fish Chain",
       "domain": "Fisheries",
-      "status": "PARTIAL",
-      "match_quality": "subject",
+      "status": "BUILT",
+      "match_quality": "strong",
       "evidence": [
         {
           "kind": "table",
-          "where": "migrations/994_recovered_capabilities.sql",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "strong",
+          "matched": "cold+fish+chain"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3104_cold_storage_schema.sql",
+          "quality": "subject",
+          "matched": "cold"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3104_cold_storage_schema.sql",
           "quality": "subject",
           "matched": "cold"
         },
@@ -3306,45 +5554,109 @@
           "where": "migrations/994_recovered_capabilities.sql",
           "quality": "subject",
           "matched": "cold"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/coldStorageService.js",
+          "quality": "subject",
+          "matched": "cold"
+        },
+        {
+          "kind": "route",
+          "where": "backend/src/routes/coldStorageRoutes.js",
+          "quality": "subject",
+          "matched": "cold"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 7
     },
     {
       "id": "M140",
       "name": "Aquaculture Analytics",
       "domain": "Fisheries",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "quality": "strong",
+          "matched": "aquaculture"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M141",
       "name": "Orchard Management",
       "domain": "Horticulture",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
+          "quality": "strong",
+          "matched": "orchard"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
+          "quality": "strong",
+          "matched": "orchard"
+        },
+        {
+          "kind": "component",
+          "where": "frontend/src/pages/OrchardManagementPage.jsx",
+          "quality": "strong",
+          "matched": "orchard"
+        }
+      ],
+      "evidence_count": 3
     },
     {
       "id": "M142",
       "name": "Vegetable Production",
       "domain": "Horticulture",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "quality": "strong",
+          "matched": "vegetable+production"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
+          "quality": "subject",
+          "matched": "vegetable"
+        }
+      ],
+      "evidence_count": 2
     },
     {
       "id": "M143",
       "name": "Floriculture Management",
       "domain": "Horticulture",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
+          "quality": "strong",
+          "matched": "floriculture"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "quality": "strong",
+          "matched": "floriculture"
+        }
+      ],
+      "evidence_count": 2
     },
     {
       "id": "M144",
@@ -3354,70 +5666,133 @@
       "match_quality": "strong",
       "evidence": [
         {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
+          "quality": "strong",
+          "matched": "greenhouse"
+        },
+        {
           "kind": "service",
-          "where": "backend/src/services/greenhouseService.js",
+          "where": "backend/src/services/legacy/greenhouseService.js",
           "quality": "strong",
           "matched": "greenhouse"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 2
     },
     {
       "id": "M145",
       "name": "Polyhouse Management",
       "domain": "Horticulture",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "quality": "strong",
+          "matched": "polyhouse"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M146",
       "name": "Hydroponics Management",
       "domain": "Horticulture",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
+          "quality": "strong",
+          "matched": "hydroponics"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "quality": "strong",
+          "matched": "hydroponics"
+        }
+      ],
+      "evidence_count": 2
     },
     {
       "id": "M147",
       "name": "Aeroponics Management",
       "domain": "Horticulture",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "PARTIAL",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "quality": "strong",
+          "matched": "aeroponics"
+        }
+      ],
+      "evidence_count": 1
     },
     {
       "id": "M148",
       "name": "Precision Horticulture",
       "domain": "Horticulture",
       "status": "BUILT",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
         {
-          "kind": "service",
-          "where": "backend/src/services/preSeasonOrderService.js",
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "quality": "strong",
+          "matched": "precision+horticulture"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/strategic_services_schema.sql",
           "quality": "subject",
           "matched": "precision"
         },
         {
-          "kind": "component",
-          "where": "frontend/src/pages/PreOrderPage.jsx",
+          "kind": "table",
+          "where": "migrations/strategic_services_schema.sql",
+          "quality": "subject",
+          "matched": "precision"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/strategic_services_schema.sql",
+          "quality": "subject",
+          "matched": "precision"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/legacy/preSeasonOrderService.js",
+          "quality": "subject",
+          "matched": "precision"
+        },
+        {
+          "kind": "service",
+          "where": "backend/src/services/strategic/preSeasonPurchaseService.js",
           "quality": "subject",
           "matched": "precision"
         }
       ],
-      "evidence_count": 2
+      "evidence_count": 9
     },
     {
       "id": "M149",
       "name": "Protected Cultivation",
       "domain": "Horticulture",
       "status": "PARTIAL",
-      "match_quality": "subject",
+      "match_quality": "strong",
       "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "quality": "strong",
+          "matched": "protected+cultivation"
+        },
         {
           "kind": "component",
           "where": "frontend/src/components/ProtectedRoute.jsx",
@@ -3425,16 +5800,53 @@
           "matched": "protected"
         }
       ],
-      "evidence_count": 1
+      "evidence_count": 2
     },
     {
       "id": "M150",
       "name": "Horticulture Analytics",
       "domain": "Horticulture",
-      "status": "ABSENT",
-      "match_quality": null,
-      "evidence": [],
-      "evidence_count": 0
+      "status": "BUILT",
+      "match_quality": "strong",
+      "evidence": [
+        {
+          "kind": "table",
+          "where": "migrations/014_horticulture_module.sql",
+          "quality": "strong",
+          "matched": "horticulture"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M141_generated.sql",
+          "quality": "strong",
+          "matched": "horticulture"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M142_generated.sql",
+          "quality": "strong",
+          "matched": "horticulture"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M143_generated.sql",
+          "quality": "strong",
+          "matched": "horticulture"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M145_generated.sql",
+          "quality": "strong",
+          "matched": "horticulture"
+        },
+        {
+          "kind": "table",
+          "where": "migrations/3000_M146_generated.sql",
+          "quality": "strong",
+          "matched": "horticulture"
+        }
+      ],
+      "evidence_count": 13
     }
   ]
 }

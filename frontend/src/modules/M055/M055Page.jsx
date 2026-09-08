@@ -1,13 +1,15 @@
 ﻿import React, { useEffect, useState } from 'react';
+import { moduleCrudAPI } from '../../services/api';
 import './styles.css';
 
-export default function M055Page(){
+export default function M055Page() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  useEffect(()=>{ setLoading(true); fetch('/api/v1/').then(r=>r.json()).then(b=>{ if(b.success) setItems(b.data.items||[]); setLoading(false); }).catch(()=>setLoading(false)); }, []);
+  const [error, setError] = useState('');
+  useEffect(() => { setLoading(true); moduleCrudAPI.list('M055').then(({ data }) => setItems(data?.data?.items || data?.data || [])).catch(() => setError('Unable to load module records')).finally(() => setLoading(false)); }, []);
   return (<div className='module-M055 p-4'>
     <h1>M055 Module</h1>
-    {loading? <div>Loading…</div> : (
+    {loading ? <div>Loading…</div> : error ? <div>{error}</div> : (
       <ul>{items.map(it => <li key={it.id}>{JSON.stringify(it.data)}</li>)}</ul>
     )}
   </div>);

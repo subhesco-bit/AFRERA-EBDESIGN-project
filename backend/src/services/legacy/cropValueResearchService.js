@@ -124,7 +124,7 @@ If none of the results actually state a number for this, respond with ONLY: {"no
      VALUES ($1, $2, $3, $4, $5, $6, 'published_study', $7, CURRENT_DATE, FALSE)
      ON CONFLICT (variety_name, compound_key, source_url) DO NOTHING
      RETURNING *`,
-    [varietyName, compoundKey, parsed.typical_min, parsed.typical_max, parsed.unit || 'unknown', parsed.notes || null, parsed.source_url]
+    [varietyName, compoundKey, parsed.typical_min, parsed.typical_max, parsed.unit || 'unknown', parsed.notes || null, parsed.source_url],
   );
 
   logger.info('AI-suggested crop value compound reference saved (unverified)', { varietyName, compoundKey });
@@ -135,7 +135,7 @@ If none of the results actually state a number for this, respond with ONLY: {"no
 async function researchOnProductAdded(varietyName, compoundKeys) {
   for (const key of compoundKeys) {
     researchValueCompound(varietyName, key).catch((error) =>
-      logger.warn('Crop value research failed (non-blocking)', { varietyName, compoundKey: key, error: error.message })
+      logger.warn('Crop value research failed (non-blocking)', { varietyName, compoundKey: key, error: error.message }),
     );
   }
 }
@@ -143,7 +143,7 @@ async function researchOnProductAdded(varietyName, compoundKeys) {
 async function getPendingSuggestions() {
   const pg = getPostgreSQL();
   const { rows } = await pg.query(
-    `SELECT * FROM crop_value_compound_reference WHERE verified = FALSE ORDER BY created_at DESC`
+    'SELECT * FROM crop_value_compound_reference WHERE verified = FALSE ORDER BY created_at DESC',
   );
   return rows;
 }
@@ -152,12 +152,12 @@ async function reviewSuggestion(id, approve, userId) {
   const pg = getPostgreSQL();
   if (approve) {
     const { rows } = await pg.query(
-      `UPDATE crop_value_compound_reference SET verified = TRUE, verified_by = $1, verified_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *`,
-      [userId, id]
+      'UPDATE crop_value_compound_reference SET verified = TRUE, verified_by = $1, verified_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+      [userId, id],
     );
     return rows[0];
   }
-  await pg.query(`DELETE FROM crop_value_compound_reference WHERE id = $1`, [id]);
+  await pg.query('DELETE FROM crop_value_compound_reference WHERE id = $1', [id]);
   return { deleted: true, id };
 }
 

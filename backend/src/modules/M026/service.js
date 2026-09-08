@@ -65,7 +65,7 @@ function normalizeSkill(payload = {}, existing = {}) {
     aiReadinessScore,
     aiSignals: buildSkillSignals({ proficiencyScore, evidence, trainingNeeds, yearsExperience }),
     status: source.status ?? 'active',
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 }
 
@@ -95,12 +95,12 @@ async function listItems({ page = 1, limit = 20, farmerId, category, certificati
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await client.query(
     `SELECT * FROM ${tableName} ${where} ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
-    [...params, safeLimit, offset]
+    [...params, safeLimit, offset],
   );
 
   return {
     items: res.rows.map(row => ({ ...row, data: normalizeSkill(row.data || {}, row) })),
-    pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) }
+    pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
   };
 }
 
@@ -114,7 +114,7 @@ async function createItem(payload) {
   const data = normalizeSkill(payload);
   const res = await pg().query(
     `INSERT INTO ${tableName} (data, created_at, updated_at) VALUES ($1, NOW(), NOW()) RETURNING *`,
-    [data]
+    [data],
   );
   return res.rows[0];
 }
@@ -125,22 +125,22 @@ async function updateItem(id, payload) {
   const data = normalizeSkill(payload, current);
   const res = await pg().query(
     `UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-    [data, id]
+    [data, id],
   );
   return res.rows[0] || null;
 }
 
 async function deleteItem(id) {
   const res = await pg().query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 async function getSkillPassport(farmerId) {
   const records = await listItems({ farmerId, limit: 100 });
   const skills = records.items.map(item => item.data);
-  const readiness = skills.length
-    ? Math.round(skills.reduce((sum, skill) => sum + skill.aiReadinessScore, 0) / skills.length)
-    : 0;
+  const readiness = skills.length ?
+    Math.round(skills.reduce((sum, skill) => sum + skill.aiReadinessScore, 0) / skills.length) :
+    0;
 
   return {
     farmerId,
@@ -149,7 +149,7 @@ async function getSkillPassport(farmerId) {
     certificationReadyCount: skills.filter(skill => skill.certificationReady).length,
     readiness,
     topSkills: skills.slice().sort((a, b) => b.aiReadinessScore - a.aiReadinessScore).slice(0, 5),
-    trainingNeeds: [...new Set(skills.flatMap(skill => skill.trainingNeeds))]
+    trainingNeeds: [...new Set(skills.flatMap(skill => skill.trainingNeeds))],
   };
 }
 
@@ -161,9 +161,9 @@ async function recommendTraining(farmerId) {
       priority: index + 1,
       trainingNeed: need,
       reason: 'Listed as a gap in the farmer skill passport',
-      action: 'Assign local training provider and collect completion evidence'
+      action: 'Assign local training provider and collect completion evidence',
     })),
-    readyForCertification: passport.topSkills.filter(skill => skill.certificationReady)
+    readyForCertification: passport.topSkills.filter(skill => skill.certificationReady),
   };
 }
 
@@ -203,5 +203,5 @@ module.exports = {
   getSkillPassport,
   recommendTraining,
   healthCheck,
-  execute
+  execute,
 };

@@ -3,6 +3,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const returnLoadBoardService = require('../services/legacy/returnLoadBoardService');
 const { authMiddleware } = require('../middleware/auth');

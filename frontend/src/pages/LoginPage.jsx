@@ -1,55 +1,57 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
-import { authAPI } from '../services/api'
-import { useAuthStore } from '../store/authStore'
-import toast from 'react-hot-toast'
-import { LogIn, Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { authAPI } from '../services/api';
+import { useAuthStore, demoAccounts } from '../store/authStore';
+import toast from 'react-hot-toast';
+import { LogIn, Eye, EyeOff, ShieldCheck, Store, UserRound, Landmark } from 'lucide-react';
 
 function LoginPage() {
-  const navigate = useNavigate()
-  const { setAuth } = useAuthStore()
-  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate();
+  const { setAuth, loginDemo } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-  })
+  });
 
-  // NOTE: @tanstack/react-query v5 (installed) removed the `useMutation(fn, opts)`
-  // shorthand — the object form below is the only supported signature. This was
-  // silently broken (login itself would throw on render), and `isLoading` was
-  // renamed to `isPending` for mutations specifically in v5.
   const loginMutation = useMutation({
     mutationFn: authAPI.login,
     onSuccess: (response) => {
-      // authAPI.login resolves to the raw axios response; the actual payload
-      // (user/accessToken/refreshToken) is in response.data, not on response
-      // itself. Previously this read response.user/response.accessToken
-      // directly, which are always undefined, so login silently stored a
-      // null user and undefined token while still saying "Login successful".
-      const { user, accessToken, refreshToken } = response.data
-      setAuth(user, accessToken, refreshToken)
-      toast.success('Login successful')
-      navigate('/dashboard')
+      const { user, accessToken, refreshToken } = response.data;
+      setAuth(user, accessToken, refreshToken);
+      toast.success('Login successful');
+      navigate(user?.role === 'admin' ? '/admin/settings' : '/dashboard');
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Login failed')
+      toast.error(error.response?.data?.error || 'Login failed');
     },
-  })
+  });
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    loginMutation.mutate(formData)
-  }
+    e.preventDefault();
+    loginMutation.mutate(formData);
+  };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleDemoLogin = (role) => {
+    const ok = loginDemo(role);
+    if (!ok) {
+      toast.error('Demo account not available');
+      return;
+    }
+
+    toast.success('Demo account connected successfully');
+    navigate(role === 'admin' ? '/admin/settings' : role === 'banker' ? '/banker-dashboard' : role === 'farmer' ? '/farmer-portal' : '/dashboard');
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-v42-paddy2 py-12 px-4">
-      <div className="max-w-md w-full">
-        <div className="bg-v42-paddy border border-v42-line rounded-lg shadow-lg p-8">
+      <div className="max-w-5xl w-full grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="bg-v42-paddy border border-v42-line rounded-2xl shadow-lg p-8">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-v42-forest rounded-lg flex items-center justify-center mx-auto mb-4">
               <span className="text-white font-bold text-3xl">A</span>
@@ -133,9 +135,49 @@ function LoginPage() {
             </p>
           </div>
         </div>
+
+        <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <ShieldCheck className="h-6 w-6 text-emerald-400" />
+            <div>
+              <div className="text-xs uppercase tracking-[0.18em] text-slate-300">Secure access</div>
+              <h2 className="text-2xl font-bold">Platform access by role</h2>
+            </div>
+          </div>
+
+          <p className="mb-6 text-sm text-slate-300">
+            Public browsing is open to everyone. Orders, payouts, admin controls, and client-sensitive tools are gated behind login and role-based access.
+          </p>
+
+          <div className="space-y-3">
+            {demoAccounts.map((account) => {
+              const Icon = account.role === 'admin' ? ShieldCheck : account.role === 'banker' ? Landmark : account.role === 'farmer' ? UserRound : Store;
+
+              return (
+                <button
+                  key={account.role}
+                  type="button"
+                  onClick={() => handleDemoLogin(account.role)}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800/80 p-3 text-left transition hover:border-emerald-400 hover:bg-slate-800"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 rounded-lg bg-slate-700 p-2 text-emerald-300">
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-white">{account.label}</div>
+                      <div className="text-xs text-slate-400">{account.email}</div>
+                      <div className="mt-1 text-xs text-slate-300">{account.description}</div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default LoginPage
+export default LoginPage;

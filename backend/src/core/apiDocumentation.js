@@ -1,5 +1,5 @@
 // Automatic API Documentation Generator
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class APIDocumentation {
   constructor() {

@@ -1,6 +1,6 @@
 /**
  * Role & Permission Management Page (M007) - AI Enhanced
- * 
+ *
  * This page provides AI-powered role and permission management:
  * - Dynamic role management
  * - Permission matrix
@@ -30,24 +30,24 @@ const RolePermissionPage = () => {
   const loadRoleData = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       if (activeTab === 'roles') {
         // /api/v1/roles returns {roles, total} unwrapped, not {success, data}.
         const res = await rolePermissionAPI.listRoles();
         setRoles(res.data.roles);
       } else if (activeTab === 'permissions') {
-        const res = await rolePermissionAPI.listPermissions();
+        let res = await rolePermissionAPI.listPermissions();
         setPermissions(res.data.data);
       } else if (activeTab === 'matrix') {
-        const res = await rolePermissionAPI.getPermissionMatrix();
+        let res = await rolePermissionAPI.getPermissionMatrix();
         setPermissionMatrix(res.data.data);
       } else if (activeTab === 'hierarchy') {
-        const res = await rolePermissionAPI.getRoleHierarchy();
+        let res = await rolePermissionAPI.getRoleHierarchy();
         setRoleHierarchy(res.data.data);
       }
     } catch (err) {
-      setError('Failed to load role data: ' + err.message);
+      setError(`Failed to load role data: ${ err.message}`);
     } finally {
       setLoading(false);
     }
@@ -59,23 +59,23 @@ const RolePermissionPage = () => {
       alert('Role created successfully!');
       loadRoleData();
     } catch (err) {
-      alert('Failed to create role: ' + err.message);
+      alert(`Failed to create role: ${ err.message}`);
     }
   };
 
   const handleRecommendRole = async (userId) => {
     try {
       const recommendation = await rolePermissionAPI.recommendRoleForUser(userId);
-      alert('Role recommendation: ' + JSON.stringify(recommendation));
+      alert(`Role recommendation: ${ JSON.stringify(recommendation)}`);
     } catch (err) {
-      alert('Failed to get recommendation: ' + err.message);
+      alert(`Failed to get recommendation: ${ err.message}`);
     }
   };
 
   return (
     <div className="p-8 space-y-6">
       <h1 className="text-3xl font-bold">Role & Permission Management</h1>
-      
+
       {/* Tabs */}
       <div className="flex space-x-4 border-b">
         {['roles', 'permissions', 'matrix', 'hierarchy'].map(tab => (

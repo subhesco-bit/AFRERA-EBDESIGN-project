@@ -21,7 +21,7 @@ async function getNotifications(req, res) {
       userId: req.query.userId,
       type: req.query.type,
       status: req.query.status,
-      priority: req.query.priority
+      priority: req.query.priority,
     };
     const result = await service.getNotifications(filters);
     res.json({ success: true, data: result });
@@ -164,22 +164,22 @@ module.exports = {
   getNotification,
   markAsRead,
   markAllAsRead,
-  
+
   // Notification delivery
   deliverNotification,
-  
+
   // User preferences
   getUserPreferences,
   updateUserPreferences,
-  
+
   // Templates
   createTemplate,
   getTemplate,
   renderTemplate,
-  
+
   // Batching
   batchNotifications,
-  
+
   // Analytics
   getNotificationAnalytics,
 };

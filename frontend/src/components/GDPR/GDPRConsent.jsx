@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { authAPI } from '../../services/api';
+import { privacyAPI } from '../../services/componentApi';
 
 /**
  * GDPR Consent Component
@@ -9,7 +9,7 @@ export default function GDPRConsent() {
   const [consents, setConsents] = useState({
     marketing: false,
     analytics: false,
-    personalization: false
+    personalization: false,
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -18,24 +18,24 @@ export default function GDPRConsent() {
     {
       key: 'marketing',
       title: 'Marketing Communications',
-      description: 'Receive marketing emails and promotional content'
+      description: 'Receive marketing emails and promotional content',
     },
     {
       key: 'analytics',
       title: 'Analytics and Tracking',
-      description: 'Allow us to analyze your usage to improve our services'
+      description: 'Allow us to analyze your usage to improve our services',
     },
     {
       key: 'personalization',
       title: 'Personalization',
-      description: 'Personalize your experience based on your preferences'
-    }
+      description: 'Personalize your experience based on your preferences',
+    },
   ];
 
   const handleConsentChange = (key) => {
     setConsents(prev => ({
       ...prev,
-      [key]: !prev[key]
+      [key]: !prev[key],
     }));
   };
 
@@ -43,10 +43,7 @@ export default function GDPRConsent() {
     try {
       setLoading(true);
       for (const [consentType, consentGiven] of Object.entries(consents)) {
-        await authAPI.post('/privacy/consent', {
-          consentType,
-          consentGiven
-        });
+        await privacyAPI.recordConsent(consentType, consentGiven);
       }
       setSuccess(true);
     } catch (err) {

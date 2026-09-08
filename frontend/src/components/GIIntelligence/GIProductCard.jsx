@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { giIntelligenceAPI } from '../../services/api';
+import { giIntelligenceAPI } from '../../services/componentApi';
 
 /**
  * GI Product Card Component

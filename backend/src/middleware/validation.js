@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Request Validation Middleware
- * 
+ *
  * Production-ready validation with:
  * - Schema-based validation with nested object support
  * - Async validation support
@@ -44,7 +44,7 @@ function getPattern(pattern) {
   if (patternCache.has(pattern)) {
     return patternCache.get(pattern);
   }
-  
+
   const regex = new RegExp(pattern);
   patternCache.set(pattern, regex);
   return regex;
@@ -55,25 +55,25 @@ function getPattern(pattern) {
  */
 function sanitizeString(value, options = {}) {
   if (typeof value !== 'string') return value;
-  
+
   let sanitized = value.trim();
-  
+
   if (options.toLowerCase) {
     sanitized = sanitized.toLowerCase();
   }
-  
+
   if (options.toUpperCase) {
     sanitized = sanitized.toUpperCase();
   }
-  
+
   if (options.removeWhitespace) {
     sanitized = sanitized.replace(/\s+/g, '');
   }
-  
+
   if (options.maxLength) {
     sanitized = sanitized.substring(0, options.maxLength);
   }
-  
+
   return sanitized;
 }
 
@@ -82,7 +82,7 @@ function sanitizeString(value, options = {}) {
  */
 function coerceType(value, targetType) {
   if (value === null || value === undefined) return value;
-  
+
   switch (targetType) {
     case 'string':
       return String(value);
@@ -127,7 +127,7 @@ function validateField(field, value, rules, data, path = '') {
       field: fieldPath,
       message: rules.requiredMessage || `${field} is required`,
       code: 'REQUIRED',
-      value
+      value,
     });
     return errors;
   }
@@ -156,7 +156,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.minLengthMessage || `${field} must be at least ${rules.minLength} characters`,
         code: 'MIN_LENGTH',
         value,
-        constraint: rules.minLength
+        constraint: rules.minLength,
       });
     }
     if (rules.maxLength && value.length > rules.maxLength) {
@@ -165,7 +165,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.maxLengthMessage || `${field} must not exceed ${rules.maxLength} characters`,
         code: 'MAX_LENGTH',
         value,
-        constraint: rules.maxLength
+        constraint: rules.maxLength,
       });
     }
     if (rules.pattern) {
@@ -176,7 +176,7 @@ function validateField(field, value, rules, data, path = '') {
           message: rules.patternMessage || `${field} format is invalid`,
           code: 'PATTERN_MISMATCH',
           value,
-          pattern: rules.pattern
+          pattern: rules.pattern,
         });
       }
     }
@@ -186,7 +186,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.enumMessage || `${field} must be one of: ${rules.enum.join(', ')}`,
         code: 'ENUM_MISMATCH',
         value,
-        allowedValues: rules.enum
+        allowedValues: rules.enum,
       });
     }
   }
@@ -199,7 +199,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.minMessage || `${field} must be at least ${rules.min}`,
         code: 'MIN_VALUE',
         value,
-        constraint: rules.min
+        constraint: rules.min,
       });
     }
     if (rules.max !== undefined && value > rules.max) {
@@ -208,7 +208,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.maxMessage || `${field} must not exceed ${rules.max}`,
         code: 'MAX_VALUE',
         value,
-        constraint: rules.max
+        constraint: rules.max,
       });
     }
     if (rules.multipleOf !== undefined && value % rules.multipleOf !== 0) {
@@ -217,7 +217,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.multipleOfMessage || `${field} must be a multiple of ${rules.multipleOf}`,
         code: 'MULTIPLE_OF',
         value,
-        constraint: rules.multipleOf
+        constraint: rules.multipleOf,
       });
     }
   }
@@ -229,7 +229,7 @@ function validateField(field, value, rules, data, path = '') {
         field: fieldPath,
         message: `${field} must be a valid date`,
         code: 'INVALID_DATE',
-        value
+        value,
       });
     }
     if (rules.minDate && value < new Date(rules.minDate)) {
@@ -238,7 +238,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.minDateMessage || `${field} must be after ${rules.minDate}`,
         code: 'MIN_DATE',
         value,
-        constraint: rules.minDate
+        constraint: rules.minDate,
       });
     }
     if (rules.maxDate && value > new Date(rules.maxDate)) {
@@ -247,7 +247,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.maxDateMessage || `${field} must be before ${rules.maxDate}`,
         code: 'MAX_DATE',
         value,
-        constraint: rules.maxDate
+        constraint: rules.maxDate,
       });
     }
   }
@@ -260,7 +260,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.minItemsMessage || `${field} must have at least ${rules.minItems} items`,
         code: 'MIN_ITEMS',
         value,
-        constraint: rules.minItems
+        constraint: rules.minItems,
       });
     }
     if (rules.maxItems && value.length > rules.maxItems) {
@@ -269,7 +269,7 @@ function validateField(field, value, rules, data, path = '') {
         message: rules.maxItemsMessage || `${field} must not exceed ${rules.maxItems} items`,
         code: 'MAX_ITEMS',
         value,
-        constraint: rules.maxItems
+        constraint: rules.maxItems,
       });
     }
     // new Set(value) dedupes by reference, so it never caught duplicate
@@ -279,7 +279,7 @@ function validateField(field, value, rules, data, path = '') {
         field: fieldPath,
         message: rules.uniqueItemsMessage || `${field} must contain unique items`,
         code: 'DUPLICATE_ITEMS',
-        value
+        value,
       });
     }
     // Validate array items if schema provided
@@ -304,7 +304,7 @@ function validateField(field, value, rules, data, path = '') {
             field: `${fieldPath}.${requiredField}`,
             message: `${requiredField} is required`,
             code: 'REQUIRED',
-            value
+            value,
           });
         }
       }
@@ -319,7 +319,7 @@ function validateField(field, value, rules, data, path = '') {
         field: fieldPath,
         message: rules.formatMessage || `${field} must be a valid email address`,
         code: 'INVALID_EMAIL',
-        value
+        value,
       });
     }
   }
@@ -332,7 +332,7 @@ function validateField(field, value, rules, data, path = '') {
         field: fieldPath,
         message: rules.formatMessage || `${field} must be a valid UUID`,
         code: 'INVALID_UUID',
-        value
+        value,
       });
     }
   }
@@ -346,7 +346,7 @@ function validateField(field, value, rules, data, path = '') {
         field: fieldPath,
         message: rules.formatMessage || `${field} must be a valid URL`,
         code: 'INVALID_URL',
-        value
+        value,
       });
     }
   }
@@ -359,7 +359,7 @@ function validateField(field, value, rules, data, path = '') {
         field: fieldPath,
         message: rules.formatMessage || `${field} must be a valid phone number`,
         code: 'INVALID_PHONE',
-        value
+        value,
       });
     }
   }
@@ -372,7 +372,7 @@ function validateField(field, value, rules, data, path = '') {
         field: fieldPath,
         message: customError,
         code: 'CUSTOM_VALIDATION',
-        value
+        value,
       });
     }
   }
@@ -393,7 +393,7 @@ function validateField(field, value, rules, data, path = '') {
  */
 function validateType(field, value, type) {
   if (value === undefined || value === null) return null;
-  
+
   switch (type) {
     case 'string':
       if (typeof value !== 'string') {
@@ -441,13 +441,13 @@ function validateType(field, value, type) {
  */
 function validate(data, schema, path = '') {
   const errors = [];
-  
+
   for (const [field, rules] of Object.entries(schema)) {
     const value = data[field];
     const fieldErrors = validateField(field, value, rules, data, path);
     errors.push(...fieldErrors);
   }
-  
+
   // Check for additional properties if strict mode is enabled
   if (schema._strict !== false) {
     for (const field of Object.keys(data)) {
@@ -456,12 +456,12 @@ function validate(data, schema, path = '') {
           field: path ? `${path}.${field}` : field,
           message: `Unexpected field: ${field}`,
           code: 'UNEXPECTED_FIELD',
-          value: data[field]
+          value: data[field],
         });
       }
     }
   }
-  
+
   return errors;
 }
 
@@ -470,17 +470,17 @@ function validate(data, schema, path = '') {
  */
 function sanitize(data, schema) {
   const sanitized = { ...data };
-  
+
   for (const [field, rules] of Object.entries(schema)) {
     if (sanitized[field] !== undefined && rules.type === 'string') {
       sanitized[field] = sanitizeString(sanitized[field], rules);
     }
-    
+
     if (sanitized[field] !== undefined && rules.type) {
       sanitized[field] = coerceType(sanitized[field], rules.type);
     }
   }
-  
+
   return sanitized;
 }
 
@@ -494,20 +494,20 @@ function validateBody(schema, options = {}) {
       if (options.sanitize !== false) {
         req.body = sanitize(req.body, schema);
       }
-      
+
       const errors = validate(req.body, schema);
-      
+
       if (errors.length > 0) {
         logger.warn('Validation failed', {
           path: req.path,
           method: req.method,
           errors,
-          body: req.body
+          body: req.body,
         });
-        
+
         throw new ValidationError(errors);
       }
-      
+
       next();
     } catch (error) {
       if (error instanceof ValidationError) {
@@ -517,7 +517,7 @@ function validateBody(schema, options = {}) {
           message: error.message,
           details: error.errors,
           errorCode: error.errorCode,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
       next(error);
@@ -534,20 +534,20 @@ function validateQuery(schema, options = {}) {
       if (options.sanitize !== false) {
         req.query = sanitize(req.query, schema);
       }
-      
+
       const errors = validate(req.query, schema);
-      
+
       if (errors.length > 0) {
         logger.warn('Query validation failed', {
           path: req.path,
           method: req.method,
           errors,
-          query: req.query
+          query: req.query,
         });
-        
+
         throw new ValidationError(errors);
       }
-      
+
       next();
     } catch (error) {
       if (error instanceof ValidationError) {
@@ -557,7 +557,7 @@ function validateQuery(schema, options = {}) {
           message: error.message,
           details: error.errors,
           errorCode: error.errorCode,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
       next(error);
@@ -574,20 +574,20 @@ function validateParams(schema, options = {}) {
       if (options.sanitize !== false) {
         req.params = sanitize(req.params, schema);
       }
-      
+
       const errors = validate(req.params, schema);
-      
+
       if (errors.length > 0) {
         logger.warn('Params validation failed', {
           path: req.path,
           method: req.method,
           errors,
-          params: req.params
+          params: req.params,
         });
-        
+
         throw new ValidationError(errors);
       }
-      
+
       next();
     } catch (error) {
       if (error instanceof ValidationError) {
@@ -597,7 +597,7 @@ function validateParams(schema, options = {}) {
           message: error.message,
           details: error.errors,
           errorCode: error.errorCode,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
       next(error);
@@ -610,10 +610,10 @@ function validateParams(schema, options = {}) {
  */
 async function validateAsync(data, schema, path = '') {
   const errors = [];
-  
+
   for (const [field, rules] of Object.entries(schema)) {
     const value = data[field];
-    
+
     // Handle async custom validators
     if (rules.customAsync && typeof rules.customAsync === 'function') {
       try {
@@ -623,7 +623,7 @@ async function validateAsync(data, schema, path = '') {
             field: path ? `${path}.${field}` : field,
             message: customError,
             code: 'ASYNC_CUSTOM_VALIDATION',
-            value
+            value,
           });
         }
       } catch (error) {
@@ -631,15 +631,15 @@ async function validateAsync(data, schema, path = '') {
           field: path ? `${path}.${field}` : field,
           message: `Async validation failed: ${error.message}`,
           code: 'ASYNC_VALIDATION_ERROR',
-          value
+          value,
         });
       }
     }
-    
+
     const fieldErrors = validateField(field, value, rules, data, path);
     errors.push(...fieldErrors);
   }
-  
+
   return errors;
 }
 
@@ -652,20 +652,20 @@ function validateBodyAsync(schema, options = {}) {
       if (options.sanitize !== false) {
         req.body = sanitize(req.body, schema);
       }
-      
+
       const errors = await validateAsync(req.body, schema);
-      
+
       if (errors.length > 0) {
         logger.warn('Async validation failed', {
           path: req.path,
           method: req.method,
           errors,
-          body: req.body
+          body: req.body,
         });
-        
+
         throw new ValidationError(errors);
       }
-      
+
       next();
     } catch (error) {
       if (error instanceof ValidationError) {
@@ -675,7 +675,7 @@ function validateBodyAsync(schema, options = {}) {
           message: error.message,
           details: error.errors,
           errorCode: error.errorCode,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
       next(error);
@@ -694,5 +694,5 @@ module.exports = {
   validateField,
   validateType,
   coerceType,
-  sanitizeString
+  sanitizeString,
 };

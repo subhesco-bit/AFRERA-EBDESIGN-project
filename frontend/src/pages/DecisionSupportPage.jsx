@@ -1,6 +1,6 @@
-import { Gavel } from 'lucide-react'
-import { decisionSupportAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Gavel } from 'lucide-react';
+import { decisionSupportAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/decisionSupportRoutes.js +
@@ -82,7 +82,7 @@ function DecisionSupportPage() {
         onRun={(_, payload) => decisionSupportAPI.complianceGaps({ complianceRecord: payload })}
       />
     </div>
-  )
+  );
 }
 
-export default DecisionSupportPage
+export default DecisionSupportPage;

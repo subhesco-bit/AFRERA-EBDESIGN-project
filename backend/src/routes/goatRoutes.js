@@ -30,14 +30,16 @@ const {
   recommendGoatBreeding,
 } = require('../services/legacy/goatService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
+protectLivestockRouter(router);
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/v1/goat/herd
@@ -142,7 +144,7 @@ router.get('/herd/:animalId/milk-production', async (req, res, next) => {
 router.post('/herd/:animalId/milk-production', async (req, res, next) => {
   try {
     const record = await recordMilkProduction({ ...req.body, animal_id: req.params.animalId });
-    
+
     // Emit signal for milk production recording
     signalBus.emitSignal(SIGNAL.MILK_PRODUCTION_RECORDED, {
       recordId: record.id,
@@ -150,13 +152,13 @@ router.post('/herd/:animalId/milk-production', async (req, res, next) => {
       animalType: 'goat',
       quantity: record.quantity,
       quality: record.quality,
-      recordingDate: record.recording_date
+      recordingDate: record.recording_date,
     }, {
       severity: SEVERITY.INFO,
       source: 'goat_routes',
-      entityId: req.params.animalId
+      entityId: req.params.animalId,
     });
-    
+
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('goatRoutes:recordMilkProduction', { error: error.message });
@@ -186,7 +188,7 @@ router.get('/herd/:animalId/feed-consumption', async (req, res, next) => {
 router.post('/herd/:animalId/feed-consumption', async (req, res, next) => {
   try {
     const record = await recordFeedConsumption({ ...req.body, animal_id: req.params.animalId });
-    
+
     // Emit signal for feed consumption recording
     signalBus.emitSignal(SIGNAL.FEED_CONSUMPTION_RECORDED, {
       recordId: record.id,
@@ -194,13 +196,13 @@ router.post('/herd/:animalId/feed-consumption', async (req, res, next) => {
       animalType: 'goat',
       feedType: record.feed_type,
       quantity: record.quantity,
-      recordingDate: record.recording_date
+      recordingDate: record.recording_date,
     }, {
       severity: SEVERITY.INFO,
       source: 'goat_routes',
-      entityId: req.params.animalId
+      entityId: req.params.animalId,
     });
-    
+
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('goatRoutes:recordFeedConsumption', { error: error.message });
@@ -230,7 +232,7 @@ router.get('/herd/:femaleId/breeding', async (req, res, next) => {
 router.post('/herd/:femaleId/breeding', async (req, res, next) => {
   try {
     const record = await recordBreeding({ ...req.body, female_id: req.params.femaleId });
-    
+
     // Emit signal for breeding recording
     signalBus.emitSignal(SIGNAL.BREEDING_RECORDED, {
       recordId: record.id,
@@ -238,13 +240,13 @@ router.post('/herd/:femaleId/breeding', async (req, res, next) => {
       animalType: 'goat',
       maleId: record.male_id,
       breedingDate: record.breeding_date,
-      expectedKiddingDate: record.expected_kidding_date
+      expectedKiddingDate: record.expected_kidding_date,
     }, {
       severity: SEVERITY.INFO,
       source: 'goat_routes',
-      entityId: req.params.femaleId
+      entityId: req.params.femaleId,
     });
-    
+
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('goatRoutes:recordBreeding', { error: error.message });
@@ -298,7 +300,7 @@ router.get('/herd/:animalId/vaccinations', async (req, res, next) => {
 router.post('/herd/:animalId/vaccinations', async (req, res, next) => {
   try {
     const record = await recordVaccination({ ...req.body, animal_id: req.params.animalId });
-    
+
     // Emit signal for vaccination administration
     signalBus.emitSignal(SIGNAL.VACCINATION_ADMINISTERED, {
       recordId: record.id,
@@ -306,13 +308,13 @@ router.post('/herd/:animalId/vaccinations', async (req, res, next) => {
       animalType: 'goat',
       vaccineType: record.vaccine_type,
       vaccinationDate: record.vaccination_date,
-      nextDueDate: record.next_due_date
+      nextDueDate: record.next_due_date,
     }, {
       severity: SEVERITY.INFO,
       source: 'goat_routes',
-      entityId: req.params.animalId
+      entityId: req.params.animalId,
     });
-    
+
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('goatRoutes:recordVaccination', { error: error.message });

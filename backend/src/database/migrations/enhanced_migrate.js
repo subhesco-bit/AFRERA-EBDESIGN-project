@@ -8,14 +8,16 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { logger } = require('../../utils/logger');
+const { ensureSchemaMigrations } = require('../schema_migrations');
+const { isMechanicallyCertainTypeError, quarantineMigration } = require('../migration_quarantine');
 
 class EnhancedMigrationSystem {
   constructor(config = {}) {
     this.pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      ...config.poolConfig
+      ...config.poolConfig,
     });
-    this.migrationsDir = config.migrationsDir || path.join(__dirname, 'migrations');
+    this.migrationsDir = config.migrationsDir || __dirname;
     this.lockTimeout = config.lockTimeout || 300000; // 5 minutes default
     this.dryRun = config.dryRun || false;
     this.force = config.force || false;
@@ -26,21 +28,7 @@ class EnhancedMigrationSystem {
    */
   async initialize() {
     try {
-      // Create migrations table with enhanced tracking
-      await this.pool.query(`
-        CREATE TABLE IF NOT EXISTS schema_migrations (
-          id SERIAL PRIMARY KEY,
-          filename VARCHAR(255) UNIQUE NOT NULL,
-          version VARCHAR(50) NOT NULL,
-          checksum VARCHAR(64) NOT NULL,
-          executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          execution_time_ms INTEGER,
-          success BOOLEAN DEFAULT TRUE,
-          rollback_filename VARCHAR(255),
-          dependencies TEXT[],
-          description TEXT
-        )
-      `);
+      await ensureSchemaMigrations(this.pool);
 
       // Create migration lock table
       await this.pool.query(`
@@ -82,7 +70,7 @@ class EnhancedMigrationSystem {
       // Verify we got the lock
       const { rows } = await this.pool.query(
         'SELECT * FROM migration_locks WHERE lock_key = $1 AND locked_by = $2',
-        [lockKey, lockedBy]
+        [lockKey, lockedBy],
       );
 
       if (rows.length === 0) {
@@ -123,7 +111,7 @@ class EnhancedMigrationSystem {
     const metadata = {
       version: filename.split('_')[0] || '1.0.0',
       description: '',
-      dependencies: []
+      dependencies: [],
     };
 
     // Parse comments for metadata
@@ -149,13 +137,15 @@ class EnhancedMigrationSystem {
    * Get all migration files with metadata
    */
   getMigrationFiles() {
-    if (!fs.Exists(this.migrationsDir)) {
+    if (!fs.existsSync(this.migrationsDir)) {
       fs.mkdirSync(this.migrationsDir, { recursive: true });
     }
 
     const files = fs.readdirSync(this.migrationsDir)
       .filter(file => file.endsWith('.sql'))
       .sort();
+
+    this.logPrefixCollisions(files);
 
     return files.map(file => {
       const filePath = path.join(this.migrationsDir, file);
@@ -168,9 +158,23 @@ class EnhancedMigrationSystem {
         path: filePath,
         content,
         checksum,
-        ...metadata
+        ...metadata,
       };
     });
+  }
+
+  logPrefixCollisions(files) {
+    const prefixes = new Map();
+    for (const file of files) {
+      const prefix = file.match(/^([^_]+)_/)?.[1] || '[no-prefix]';
+      if (!prefixes.has(prefix)) prefixes.set(prefix, []);
+      prefixes.get(prefix).push(file);
+    }
+    for (const [prefix, names] of prefixes) {
+      if (names.length > 1) {
+        logger.warn(`Migration filename prefix collision ${prefix}; deterministic lexical order: ${names.join(', ')}`);
+      }
+    }
   }
 
   /**
@@ -179,7 +183,7 @@ class EnhancedMigrationSystem {
   async getExecutedMigrations() {
     try {
       const { rows } = await this.pool.query(
-        'SELECT filename, version, checksum, executed_at FROM schema_migrations ORDER BY executed_at'
+        'SELECT filename, version, checksum, executed_at FROM schema_migrations ORDER BY executed_at',
       );
       return new Map(rows.map(row => [row.filename, row]));
     } catch (error) {
@@ -201,6 +205,7 @@ class EnhancedMigrationSystem {
           errors.push(`Migration ${migration.filename} depends on ${dep} which has not been executed`);
         }
       }
+      executedSet.add(migration.filename);
     }
 
     return errors;
@@ -217,7 +222,7 @@ class EnhancedMigrationSystem {
       if (executed && executed.checksum !== migration.checksum) {
         warnings.push(
           `Migration ${migration.filename} has changed since execution. ` +
-          `Original: ${executed.checksum.substring(0, 8)}..., Current: ${migration.checksum.substring(0, 8)}...`
+          `Original: ${executed.checksum.substring(0, 8)}..., Current: ${migration.checksum.substring(0, 8)}...`,
         );
       }
     }
@@ -258,7 +263,7 @@ class EnhancedMigrationSystem {
         executionTime,
         true,
         migration.dependencies,
-        migration.description
+        migration.description,
       ]);
 
       await client.query('COMMIT');
@@ -267,7 +272,7 @@ class EnhancedMigrationSystem {
       return { success: true, executionTime };
     } catch (error) {
       await client.query('ROLLBACK');
-      
+
       // Record failed migration
       await client.query(`
         INSERT INTO schema_migrations (
@@ -281,7 +286,7 @@ class EnhancedMigrationSystem {
         Date.now() - startTime,
         false,
         migration.dependencies,
-        migration.description
+        migration.description,
       ]);
 
       logger.error(`Migration failed: ${migration.filename}`, { error: error.message });
@@ -296,6 +301,21 @@ class EnhancedMigrationSystem {
    */
   async runMigrations() {
     try {
+      if (this.dryRun) {
+        const migrations = this.getMigrationFiles();
+        logger.info(`[DRY RUN] Would inspect ${migrations.length} migration files`);
+        migrations.forEach(migration => {
+          logger.info(`[DRY RUN] Would execute migration: ${migration.filename}`);
+        });
+        return {
+          success: true,
+          executed: 0,
+          failed: 0,
+          totalTime: 0,
+          dryRun: true,
+        };
+      }
+
       await this.initialize();
       await this.acquireLock();
 
@@ -344,6 +364,10 @@ class EnhancedMigrationSystem {
           }
         } catch (error) {
           failedCount++;
+          if (isMechanicallyCertainTypeError(error)) {
+            const quarantinePath = quarantineMigration(this.migrationsDir, migration.filename, error);
+            logger.error(`Quarantined ${migration.filename} after confirmed type/FK incompatibility: ${quarantinePath}`);
+          }
           logger.error(`Migration ${migration.filename} failed, stopping execution`);
           break;
         }
@@ -356,13 +380,15 @@ class EnhancedMigrationSystem {
         success: failedCount === 0,
         executed: executedCount,
         failed: failedCount,
-        totalTime: totalExecutionTime
+        totalTime: totalExecutionTime,
       };
     } catch (error) {
       logger.error('Migration process failed', { error: error.message, stack: error.stack });
       throw error;
     } finally {
-      await this.releaseLock();
+      if (!this.dryRun) {
+        await this.releaseLock();
+      }
       await this.pool.end();
     }
   }
@@ -389,7 +415,7 @@ class EnhancedMigrationSystem {
       }
 
       const lastMigration = rows[0];
-      
+
       if (!lastMigration.rollback_filename) {
         throw new Error(`Migration ${lastMigration.filename} does not have a rollback file`);
       }
@@ -444,7 +470,7 @@ class EnhancedMigrationSystem {
           const checksumChanged = executed.checksum !== migration.checksum;
           const status = checksumChanged ? '⚠️  MODIFIED' : '✅';
           statusLines.push(
-            `${status} ${migration.filename} - Executed at ${new Date(executed.executed_at).toLocaleString()}`
+            `${status} ${migration.filename} - Executed at ${new Date(executed.executed_at).toLocaleString()}`,
           );
         } else {
           statusLines.push(`⏳ ${migration.filename} - Pending`);
@@ -463,7 +489,7 @@ class EnhancedMigrationSystem {
         total: migrations.length,
         executed: executedMigrations.size,
         pending: migrations.length - executedMigrations.size,
-        warnings: checksumWarnings.length
+        warnings: checksumWarnings.length,
       };
     } catch (error) {
       logger.error('Failed to get migration status', { error: error.message });
@@ -506,7 +532,7 @@ if (require.main === module) {
 
   const system = new EnhancedMigrationSystem({
     dryRun: args.includes('--dry-run'),
-    force: args.includes('--force')
+    force: args.includes('--force'),
   });
 
   switch (command) {

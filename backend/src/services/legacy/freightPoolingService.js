@@ -48,7 +48,7 @@ class FreightPoolingService {
           AND s.destination_address ILIKE $2
           AND NOT EXISTS (SELECT 1 FROM freight_pool_shipments fps WHERE fps.shipment_id = s.id)
         ORDER BY s.created_at ASC`,
-      [`%${originAddress}%`, `%${destinationAddress}%`]
+      [`%${originAddress}%`, `%${destinationAddress}%`],
     );
     return result.rows;
   }
@@ -60,7 +60,7 @@ class FreightPoolingService {
     const result = await pool.query(
       `INSERT INTO freight_pool_windows (origin_address, destination_address, vehicle_capacity_kg, closes_at)
        VALUES ($1, $2, $3, $4) RETURNING *`,
-      [originAddress, destinationAddress, vehicleCapacityKg, closesAt || null]
+      [originAddress, destinationAddress, vehicleCapacityKg, closesAt || null],
     );
     return result.rows[0];
   }
@@ -76,7 +76,7 @@ class FreightPoolingService {
          JOIN shipments s ON s.id = fps.shipment_id
         WHERE fps.window_id = $1
         ORDER BY fps.joined_at ASC`,
-      [windowId]
+      [windowId],
     );
 
     const totalWeightKg = shipmentsResult.rows.reduce((sum, r) => sum + Number(r.weight_kg), 0);
@@ -105,7 +105,7 @@ class FreightPoolingService {
     return withTransaction(async (client) => {
       const windowResult = await client.query(
         'SELECT * FROM freight_pool_windows WHERE id = $1 FOR UPDATE',
-        [windowId]
+        [windowId],
       );
       if (windowResult.rows.length === 0) throw new Error('Freight pool window not found');
       const window = windowResult.rows[0];
@@ -113,20 +113,20 @@ class FreightPoolingService {
 
       const shipmentResult = await client.query(
         'SELECT * FROM shipments WHERE id = $1 AND status = $2 FOR UPDATE',
-        [shipmentId, 'pending']
+        [shipmentId, 'pending'],
       );
       if (shipmentResult.rows.length === 0) throw new Error('Shipment not found or not pending');
       const shipment = shipmentResult.rows[0];
 
       const alreadyPooled = await client.query(
         'SELECT 1 FROM freight_pool_shipments WHERE shipment_id = $1 LIMIT 1',
-        [shipmentId]
+        [shipmentId],
       );
       if (alreadyPooled.rows.length > 0) throw new Error('Shipment is already in a freight pool window');
 
       const existingResult = await client.query(
         'SELECT COALESCE(SUM(weight_kg), 0) AS total FROM freight_pool_shipments WHERE window_id = $1',
-        [windowId]
+        [windowId],
       );
       const existingWeight = Number(existingResult.rows[0].total);
       const newTotal = existingWeight + Number(shipment.weight_kg);
@@ -140,7 +140,7 @@ class FreightPoolingService {
       const result = await client.query(
         `INSERT INTO freight_pool_shipments (window_id, shipment_id, weight_kg, rate_per_kg_inr)
          VALUES ($1, $2, $3, $4) RETURNING *`,
-        [windowId, shipmentId, shipment.weight_kg, ratePerKg]
+        [windowId, shipmentId, shipment.weight_kg, ratePerKg],
       );
 
       logger.info('Shipment joined freight pool window', { windowId, shipmentId, fillPctAfterJoin: fillPctAfterJoin.toFixed(1) });
@@ -149,7 +149,7 @@ class FreightPoolingService {
   }
 
   async listOpenWindows() {
-    const result = await pool.query(`SELECT * FROM freight_pool_windows WHERE status = 'open' ORDER BY created_at DESC`);
+    const result = await pool.query('SELECT * FROM freight_pool_windows WHERE status = \'open\' ORDER BY created_at DESC');
     return result.rows;
   }
 
@@ -157,7 +157,7 @@ class FreightPoolingService {
     const result = await pool.query(
       `UPDATE freight_pool_windows SET status = 'dispatched', dispatched_at = NOW(), updated_at = NOW()
        WHERE id = $1 AND status = 'open' RETURNING *`,
-      [windowId]
+      [windowId],
     );
     if (result.rows.length === 0) throw new Error('Window not found or not open');
     return result.rows[0];
@@ -165,3 +165,4 @@ class FreightPoolingService {
 }
 
 module.exports = new FreightPoolingService();
+

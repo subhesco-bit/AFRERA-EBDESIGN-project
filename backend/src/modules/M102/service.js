@@ -28,7 +28,7 @@ async function registerImplement(implementData) {
       state,
       district,
       condition,
-      status
+      status,
     } = implementData;
 
     const implement = {
@@ -49,7 +49,7 @@ async function registerImplement(implementData) {
       district,
       condition: condition || 'good',
       status: status || 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered implement optimization
@@ -60,8 +60,8 @@ async function registerImplement(implementData) {
         type_specifics: await getImplementTypeSpecifics(implement_type),
         regional_suitability: await getRegionalSuitability(state, district, implement_type),
         maintenance_requirements: await getMaintenanceRequirements(implement_type, brand),
-        usage_recommendations: await getUsageRecommendations(implement_type, working_width)
-      }
+        usage_recommendations: await getUsageRecommendations(implement_type, working_width),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -93,8 +93,8 @@ async function registerImplement(implementData) {
         implement.condition,
         implement.status,
         JSON.stringify(implement.ai_recommendations),
-        implement.created_at
-      ]
+        implement.created_at,
+      ],
     );
 
     logger.info(`Implement registered: ${implement.implement_registry_id}`);
@@ -119,7 +119,7 @@ async function updateImplementMaintenance(registryId, maintenanceData) {
       service_center,
       condition_after,
       next_service_date,
-      notes
+      notes,
     } = maintenanceData;
 
     const maintenanceRecord = {
@@ -134,7 +134,7 @@ async function updateImplementMaintenance(registryId, maintenanceData) {
       condition_after,
       next_service_date,
       notes,
-      recorded_at: new Date().toISOString()
+      recorded_at: new Date().toISOString(),
     };
 
     // AI-powered maintenance analysis
@@ -145,8 +145,8 @@ async function updateImplementMaintenance(registryId, maintenanceData) {
         maintenance_data: maintenanceData,
         maintenance_history: await getImplementMaintenanceHistory(registryId),
         wear_patterns: await analyzeWearPatterns(registryId),
-        implement_specs: await getImplementSpecs(registryId)
-      }
+        implement_specs: await getImplementSpecs(registryId),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -156,7 +156,7 @@ async function updateImplementMaintenance(registryId, maintenanceData) {
       `UPDATE implement_registry 
        SET condition = $1, updated_at = CURRENT_TIMESTAMP
        WHERE implement_registry_id = $2`,
-      [condition_after, registryId]
+      [condition_after, registryId],
     );
 
     await pool.query(
@@ -178,8 +178,8 @@ async function updateImplementMaintenance(registryId, maintenanceData) {
         next_service_date,
         notes,
         JSON.stringify(maintenanceRecord.ai_analysis),
-        maintenanceRecord.recorded_at
-      ]
+        maintenanceRecord.recorded_at,
+      ],
     );
 
     logger.info(`Implement maintenance updated: ${registryId}`);
@@ -204,7 +204,7 @@ async function trackImplementUsage(registryId, period) {
       area_covered: await getAreaCovered(registryId, period),
       efficiency_metrics: await getEfficiencyMetrics(registryId, period),
       wear_analysis: await analyzeWear(registryId, period),
-      recommendations: await generateUsageRecommendations(registryId, period)
+      recommendations: await generateUsageRecommendations(registryId, period),
     };
 
     return usage;
@@ -229,7 +229,7 @@ async function generateImplementReport(farmerId, reportType) {
       condition_summary: await getConditionSummary(farmerId),
       utilization_metrics: await getUtilizationMetrics(farmerId),
       maintenance_costs: await getMaintenanceCosts(farmerId),
-      recommendations: await generateFarmerRecommendations(farmerId)
+      recommendations: await generateFarmerRecommendations(farmerId),
     };
 
     return report;
@@ -248,7 +248,7 @@ async function getImplementTypeSpecifics(implementType) {
     plow: { optimal_depth: '15-25cm', soil_type: 'all', speed: '3-5 km/h' },
     harrow: { optimal_depth: '5-15cm', soil_type: 'all', speed: '5-8 km/h' },
     cultivator: { optimal_depth: '5-15cm', soil_type: 'all', speed: '4-6 km/h' },
-    seeder: { optimal_depth: '2-5cm', soil_type: 'prepared', speed: '4-6 km/h' }
+    seeder: { optimal_depth: '2-5cm', soil_type: 'prepared', speed: '4-6 km/h' },
   };
   return specifics[implementType] || {};
 }
@@ -257,7 +257,7 @@ async function getRegionalSuitability(state, district, implementType) {
   return {
     soil_compatibility: 'high',
     crop_suitability: ['wheat', 'rice', 'maize'],
-    seasonal_relevance: ['kharif', 'rabi']
+    seasonal_relevance: ['kharif', 'rabi'],
   };
 }
 
@@ -265,7 +265,7 @@ async function getMaintenanceRequirements(implementType, brand) {
   return [
     { part: 'blades', replacement_interval: '200_hours', condition: 'check' },
     { part: 'bearings', replacement_interval: '500_hours', condition: 'grease' },
-    { part: 'hitch', replacement_interval: '1000_hours', condition: 'inspect' }
+    { part: 'hitch', replacement_interval: '1000_hours', condition: 'inspect' },
   ];
 }
 
@@ -273,7 +273,7 @@ async function getUsageRecommendations(implementType, workingWidth) {
   return {
     optimal_tractor_hp: workingWidth * 15,
     recommended_speed: '5 km/h',
-    field_conditions: 'dry soil'
+    field_conditions: 'dry soil',
   };
 }
 
@@ -281,7 +281,7 @@ async function getImplementMaintenanceHistory(registryId) {
   try {
     const result = await pool.query(
       'SELECT * FROM implement_maintenance_records WHERE registry_id = $1 ORDER BY service_date DESC LIMIT 10',
-      [registryId]
+      [registryId],
     );
     return result.rows;
   } catch (error) {
@@ -293,7 +293,7 @@ async function analyzeWearPatterns(registryId) {
   return {
     blade_wear: 'moderate',
     bearing_wear: 'low',
-    structural_wear: 'minimal'
+    structural_wear: 'minimal',
   };
 }
 
@@ -301,7 +301,7 @@ async function getImplementSpecs(registryId) {
   try {
     const result = await pool.query(
       'SELECT * FROM implement_registry WHERE implement_registry_id = $1',
-      [registryId]
+      [registryId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -313,7 +313,7 @@ async function getFieldHours(registryId, period) {
   return {
     total_hours: 120,
     average_daily: 4,
-    peak_hours: 8
+    peak_hours: 8,
   };
 }
 
@@ -321,7 +321,7 @@ async function getAreaCovered(registryId, period) {
   return {
     total_hectares: 60,
     hectares_per_hour: 0.5,
-    efficiency_rating: 'good'
+    efficiency_rating: 'good',
   };
 }
 
@@ -329,7 +329,7 @@ async function getEfficiencyMetrics(registryId, period) {
   return {
     fuel_efficiency: 'optimal',
     time_efficiency: 85,
-    quality_rating: 'excellent'
+    quality_rating: 'excellent',
   };
 }
 
@@ -337,7 +337,7 @@ async function analyzeWear(registryId, period) {
   return {
     overall_wear: 'moderate',
     critical_components: [],
-    replacement_needed: false
+    replacement_needed: false,
   };
 }
 
@@ -345,7 +345,7 @@ async function generateUsageRecommendations(registryId, period) {
   return [
     'Schedule blade sharpening',
     'Check bearing lubrication',
-    'Inspect hitch points'
+    'Inspect hitch points',
   ];
 }
 
@@ -353,7 +353,7 @@ async function getImplementCount(farmerId) {
   try {
     const result = await pool.query(
       'SELECT COUNT(*) as count FROM implement_registry WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -365,7 +365,7 @@ async function getTypeDistribution(farmerId) {
   try {
     const result = await pool.query(
       'SELECT implement_type, COUNT(*) as count FROM implement_registry WHERE farmer_id = $1 GROUP BY implement_type',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -378,7 +378,7 @@ async function getConditionSummary(farmerId) {
     excellent: 40,
     good: 45,
     fair: 10,
-    poor: 5
+    poor: 5,
   };
 }
 
@@ -386,7 +386,7 @@ async function getUtilizationMetrics(farmerId) {
   return {
     average_utilization: 75,
     peak_utilization: 90,
-    idle_time: 25
+    idle_time: 25,
   };
 }
 
@@ -395,7 +395,7 @@ async function getMaintenanceCosts(farmerId) {
     total_cost: 25000,
     parts_cost: 15000,
     labor_cost: 10000,
-    cost_per_hectare: 416
+    cost_per_hectare: 416,
   };
 }
 
@@ -403,7 +403,7 @@ async function generateFarmerRecommendations(farmerId) {
   return [
     'Implement preventive maintenance schedule',
     'Monitor wear patterns regularly',
-    'Optimize implement selection for field conditions'
+    'Optimize implement selection for field conditions',
   ];
 }
 
@@ -426,7 +426,7 @@ async function listImplements({ page = 1, limit = 20, farmer_id = null, status =
   const listParams = [...params, limit, offset];
   const res = await pool.query(
     `SELECT * FROM implement_registry ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams
+    listParams,
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
 }
@@ -442,6 +442,6 @@ module.exports = {
   registerImplement,
   updateImplementMaintenance,
   trackImplementUsage,
-  generateImplementReport
+  generateImplementReport,
 };
 

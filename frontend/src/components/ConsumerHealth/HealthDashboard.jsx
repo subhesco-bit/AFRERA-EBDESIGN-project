@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { consumerHealthAPI } from '../../services/api';
+import { consumerHealthAPI } from '../../services/componentApi';
 
 /**
  * Health Dashboard Component
@@ -38,7 +38,7 @@ const HealthDashboard = ({ initialData }) => {
         consumerHealthAPI.getHealthMetrics(),
         consumerHealthAPI.getHealthGoals(),
         consumerHealthAPI.getDietaryRecommendations(),
-        consumerHealthAPI.getBMI()
+        consumerHealthAPI.getBMI(),
       ]);
 
       setHealthProfile(profileRes.data);

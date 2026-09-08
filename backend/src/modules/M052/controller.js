@@ -97,5 +97,5 @@ module.exports = {
   deleteProduct,
   updateInventory,
   searchProducts,
-  getProductRecommendations
+  getProductRecommendations,
 };

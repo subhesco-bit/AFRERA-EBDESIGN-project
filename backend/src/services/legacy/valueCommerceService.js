@@ -19,13 +19,13 @@ if (process.env.NODE_ENV === 'test') {
   getValueFactors = async () => ([{ id: 'vf-1', name: 'nutrition', weight: 1.5 }]);
 
   calculateProductValueScore = async (data) => {
-    const score = (Number(data.nutrition_score||0) + Number(data.quality_score||0)) / 2;
+    const score = (Number(data.nutrition_score || 0) + Number(data.quality_score || 0)) / 2;
     return {
       id: `pvs-${Date.now()}`,
       product_id: data.product_id || 'test-product-id',
       overall_value_score: score,
       value_grade: score > 85 ? 'A' : 'B',
-      calculated_at: now
+      calculated_at: now,
     };
   };
 
@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === 'test') {
       product_id: productId,
       overall_value_score: 88,
       value_grade: 'A',
-      calculated_at: now
+      calculated_at: now,
     };
   };
 
@@ -49,7 +49,7 @@ if (process.env.NODE_ENV === 'test') {
       base_price: basePrice || 100,
       value_premium: premium,
       final_price: (basePrice || 100) + premium,
-      premium_percentage: 12
+      premium_percentage: 12,
     };
   };
 
@@ -74,7 +74,7 @@ const pool = require('../../database/pool');
 async function getValueFactors() {
   try {
     const result = await pool.query(
-      'SELECT * FROM value_factors WHERE is_active = true ORDER BY weight DESC'
+      'SELECT * FROM value_factors WHERE is_active = true ORDER BY weight DESC',
     );
     return result.rows;
   } catch (error) {
@@ -111,18 +111,18 @@ async function calculateProductValueScore(data) {
     gi_score,
     freshness_score,
     sustainability_score,
-    quality_score
+    quality_score,
   } = data;
 
   try {
     const overallScore = await pool.query(
-      `SELECT calculate_value_score($1, $2, $3, $4, $5, $6) as score`,
-      [nutrition_score, organic_score, gi_score, freshness_score, sustainability_score, quality_score]
+      'SELECT calculate_value_score($1, $2, $3, $4, $5, $6) as score',
+      [nutrition_score, organic_score, gi_score, freshness_score, sustainability_score, quality_score],
     );
 
     const gradeResult = await pool.query(
       'SELECT assign_value_grade($1) as grade',
-      [overallScore.rows[0].score]
+      [overallScore.rows[0].score],
     );
 
     const validUntil = new Date();
@@ -144,8 +144,8 @@ async function calculateProductValueScore(data) {
         quality_score,
         overallScore.rows[0].score,
         gradeResult.rows[0].grade,
-        validUntil
-      ]
+        validUntil,
+      ],
     );
 
     return result.rows[0];
@@ -179,7 +179,7 @@ async function getProductValueScore(productId) {
        AND (valid_until IS NULL OR valid_until > CURRENT_TIMESTAMP)
        ORDER BY calculated_at DESC 
        LIMIT 1`,
-      [productId]
+      [productId],
     );
 
     if (result.rows.length === 0) {
@@ -219,7 +219,7 @@ async function calculateValueBasedPrice(productId, basePrice) {
 
     const pricing = await pool.query(
       'SELECT calculate_value_price($1, $2, $3) as pricing',
-      [basePrice, valueScore.overall_value_score, valueScore.value_grade]
+      [basePrice, valueScore.overall_value_score, valueScore.value_grade],
     );
 
     const pricingData = pricing.rows[0].pricing;
@@ -236,8 +236,8 @@ async function calculateValueBasedPrice(productId, basePrice) {
         pricingData.value_premium,
         pricingData.final_price,
         pricingData.premium_percentage,
-        JSON.stringify(pricingData)
-      ]
+        JSON.stringify(pricingData),
+      ],
     );
 
     return pricingData;
@@ -297,8 +297,8 @@ async function setConsumerValuePreferences(userId, preferences) {
         preferences.sustainability_importance || 1.0,
         preferences.quality_importance || 1.0,
         preferences.min_value_score,
-        JSON.stringify(preferences.preferred_tiers || [])
-      ]
+        JSON.stringify(preferences.preferred_tiers || []),
+      ],
     );
 
     return result.rows[0];
@@ -328,7 +328,7 @@ async function getConsumerValuePreferences(userId) {
   try {
     const result = await pool.query(
       'SELECT * FROM consumer_value_preferences WHERE user_id = $1',
-      [userId]
+      [userId],
     );
 
     if (result.rows.length === 0) {
@@ -339,7 +339,7 @@ async function getConsumerValuePreferences(userId) {
         gi_importance: 1.0,
         freshness_importance: 1.0,
         sustainability_importance: 1.0,
-        quality_importance: 1.0
+        quality_importance: 1.0,
       };
     }
 
@@ -384,7 +384,7 @@ async function generateValueRecommendations(userId, limit = 10) {
        AND (pvs.valid_until IS NULL OR pvs.valid_until > CURRENT_TIMESTAMP)
        ORDER BY pvs.overall_value_score DESC
        LIMIT $2`,
-      [preferences.min_value_score, limit]
+      [preferences.min_value_score, limit],
     );
 
     const recommendations = result.rows.map(row => {
@@ -404,8 +404,8 @@ async function generateValueRecommendations(userId, limit = 10) {
         price_value_ratio: priceValueRatio,
         recommendation_reasons: [
           `High value grade: ${row.value_grade}`,
-          `Overall score: ${row.overall_value_score}`
-        ]
+          `Overall score: ${row.overall_value_score}`,
+        ],
       };
     });
 
@@ -430,8 +430,8 @@ async function generateValueRecommendations(userId, limit = 10) {
           recommendations.map((rec) => rec.recommendation_score),
           recommendations.map((rec) => JSON.stringify(rec.recommendation_reasons)),
           recommendations.map((rec) => rec.value_match_score),
-          recommendations.map((rec) => rec.price_value_ratio)
-        ]
+          recommendations.map((rec) => rec.price_value_ratio),
+        ],
       );
     }
 
@@ -466,7 +466,7 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
 async function getValueTiers() {
   try {
     const result = await pool.query(
-      'SELECT * FROM value_tiers WHERE is_active = true ORDER BY min_score DESC'
+      'SELECT * FROM value_tiers WHERE is_active = true ORDER BY min_score DESC',
     );
     return result.rows;
   } catch (error) {
@@ -506,5 +506,6 @@ module.exports = {
   getConsumerValuePreferences,
   generateValueRecommendations,
   getValueTiers,
-  isHealthy
+  isHealthy,
 };
+

@@ -1,6 +1,6 @@
 /**
  * Vendor Routes
- * 
+ *
  * API endpoints for vendor-facing interfaces including:
  * - Corporate Buyers (bulk procurement, credit terms)
  * - Logistics Providers (cold-chain management, return trucks)
@@ -9,9 +9,14 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
+const { protectRouter } = require('./enterpriseRouteSupport');
+
+protectRouter(router, { signal: 'commerce.vendor.changed', params: { buyerId: true, providerId: true, processorId: true, retailerId: true } });
 
 /**
  * Corporate Buyer Endpoints
@@ -30,7 +35,7 @@ router.get('/corporate/:buyerId/profile', authMiddleware, async (req, res) => {
       supplier_count: 12,
       ytd_savings: 8.5,
       turnover_cr: 4,
-      vintage_years: 3
+      vintage_years: 3,
     };
     res.json({ success: true, data: profile });
   } catch (error) {
@@ -43,18 +48,18 @@ router.get('/corporate/:buyerId/credit-status', authMiddleware, async (req, res)
   try {
     const { buyerId } = req.params;
     const decisionSupportService = require('../services/legacy/decisionSupportService');
-    
+
     // Get buyer profile to determine credit eligibility
     const profile = {
       turnover_cr: 4,
-      vintage_years: 3
+      vintage_years: 3,
     };
-    
+
     const creditStatus = decisionSupportService.corpCreditEligible(
       profile.turnover_cr,
-      profile.vintage_years
+      profile.vintage_years,
     );
-    
+
     res.json({ success: true, data: creditStatus });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -74,7 +79,7 @@ router.get('/corporate/:buyerId/orders', authMiddleware, async (req, res) => {
         unit_price: 180,
         total_value: 270000,
         status: 'processing',
-        delivery_date: '2026-08-15'
+        delivery_date: '2026-08-15',
       },
       {
         id: 'ORD-002',
@@ -83,8 +88,8 @@ router.get('/corporate/:buyerId/orders', authMiddleware, async (req, res) => {
         unit_price: 780,
         total_value: 390000,
         status: 'pending',
-        delivery_date: '2026-08-20'
-      }
+        delivery_date: '2026-08-20',
+      },
     ];
     res.json({ success: true, data: orders });
   } catch (error) {
@@ -96,26 +101,26 @@ router.get('/corporate/:buyerId/orders', authMiddleware, async (req, res) => {
 router.post('/corporate/orders', authMiddleware, async (req, res) => {
   try {
     const { product, quantity, destination, delivery_date } = req.body;
-    
+
     // Validate input
     if (!product || !quantity || !destination) {
       return res.status(400).json({
         success: false,
-        error: 'Product, quantity, and destination are required'
+        error: 'Product, quantity, and destination are required',
       });
     }
-    
+
     // Create order logic here
     const order = {
-      id: 'ORD-' + Date.now(),
+      id: `ORD-${ Date.now()}`,
       product,
       quantity,
       destination,
       delivery_date,
       status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    
+
     res.json({ success: true, data: order });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -136,7 +141,7 @@ router.get('/logistics/:providerId/profile', authMiddleware, async (req, res) =>
       revenue: 12500000,
       on_time_rate: 94.5,
       active_shipments: 38,
-      fleet_size: 45
+      fleet_size: 45,
     };
     res.json({ success: true, data: profile });
   } catch (error) {
@@ -157,7 +162,7 @@ router.get('/logistics/:providerId/shipments', authMiddleware, async (req, res) 
         quantity: 5000,
         temp: 4,
         status: 'in_transit',
-        eta: '2026-08-06'
+        eta: '2026-08-06',
       },
       {
         id: 'SHP-002',
@@ -167,8 +172,8 @@ router.get('/logistics/:providerId/shipments', authMiddleware, async (req, res) 
         quantity: 10000,
         temp: 25,
         status: 'loading',
-        eta: '2026-08-07'
-      }
+        eta: '2026-08-07',
+      },
     ];
     res.json({ success: true, data: shipments });
   } catch (error) {
@@ -185,7 +190,7 @@ router.get('/logistics/coldchain-nodes', authMiddleware, async (req, res) => {
       { id: 3, name: 'Imphal Production', type: 'production', capacity: 200, utilization: 85, temp: 4 },
       { id: 4, name: 'Kohima Production', type: 'production', capacity: 150, utilization: 70, temp: 4 },
       { id: 5, name: 'NCR Distribution', type: 'distribution', capacity: 1000, utilization: 82, temp: 4 },
-      { id: 6, name: 'Kolkata Distribution', type: 'distribution', capacity: 800, utilization: 75, temp: 4 }
+      { id: 6, name: 'Kolkata Distribution', type: 'distribution', capacity: 800, utilization: 75, temp: 4 },
     ];
     res.json({ success: true, data: nodes });
   } catch (error) {
@@ -206,7 +211,7 @@ router.get('/logistics/return-trucks', authMiddleware, async (req, res) => {
         capacity: 20,
         available_date: '2026-08-10',
         rate: 45,
-        status: 'available'
+        status: 'available',
       },
       {
         id: 'RT-002',
@@ -217,8 +222,8 @@ router.get('/logistics/return-trucks', authMiddleware, async (req, res) => {
         capacity: 15,
         available_date: '2026-08-12',
         rate: 52,
-        status: 'available'
-      }
+        status: 'available',
+      },
     ];
     res.json({ success: true, data: lanes });
   } catch (error) {
@@ -230,25 +235,25 @@ router.get('/logistics/return-trucks', authMiddleware, async (req, res) => {
 router.post('/logistics/bookings', authMiddleware, async (req, res) => {
   try {
     const { origin, destination, quantity, temperature, pickup_date } = req.body;
-    
+
     if (!origin || !destination || !quantity) {
       return res.status(400).json({
         success: false,
-        error: 'Origin, destination, and quantity are required'
+        error: 'Origin, destination, and quantity are required',
       });
     }
-    
+
     const booking = {
-      id: 'BK-' + Date.now(),
+      id: `BK-${ Date.now()}`,
       origin,
       destination,
       quantity,
       temperature,
       pickup_date,
       status: 'confirmed',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    
+
     res.json({ success: true, data: booking });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -267,7 +272,7 @@ router.get('/processor/:processorId/profile', authMiddleware, async (req, res) =
       name: 'NE Food Processing Ltd',
       capacity: 500,
       utilization: 72,
-      product_lines: ['Pickles', 'Spices', 'Flours']
+      product_lines: ['Pickles', 'Spices', 'Flours'],
     };
     res.json({ success: true, data: profile });
   } catch (error) {
@@ -287,7 +292,7 @@ router.get('/retailer/:retailerId/profile', authMiddleware, async (req, res) => 
       name: 'NE Flagship Store',
       locations: 8,
       monthly_sales: 1800000,
-      top_products: ['Chak-Hao Rice', 'Lakadong Turmeric', 'Mizo Chilli']
+      top_products: ['Chak-Hao Rice', 'Lakadong Turmeric', 'Mizo Chilli'],
     };
     res.json({ success: true, data: profile });
   } catch (error) {

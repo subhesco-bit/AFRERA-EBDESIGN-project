@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Share2 } from 'lucide-react'
-import { informationSharingAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { Share2 } from 'lucide-react';
+import { informationSharingAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/informationSharingRoutes.js +
@@ -20,10 +20,10 @@ const TABS = [
   ['collaboration', 'Collaboration Sessions'],
   ['ai', 'AI Recommendations'],
   ['analytics', 'Activity & Analytics'],
-]
+];
 
 function InformationSharingPage() {
-  const [tab, setTab] = useState('documents')
+  const [tab, setTab] = useState('documents');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -101,7 +101,7 @@ function InformationSharingPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default InformationSharingPage
+export default InformationSharingPage;

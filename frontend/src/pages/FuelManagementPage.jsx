@@ -1,4 +1,4 @@
-import ModuleOperationPanel from '../components/common/ModuleOperationPanel'
+import ModuleOperationPanel from '../components/common/ModuleOperationPanel';
 
 /**
  * Fuel Management (backend/src/modules/M108). Generic operation panel -
@@ -12,5 +12,5 @@ export default function FuelManagementPage() {
       title="Fuel Management"
       description="Fuel inventory and consumption tracking."
     />
-  )
+  );
 }

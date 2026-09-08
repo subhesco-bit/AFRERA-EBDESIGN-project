@@ -42,12 +42,12 @@ if (process.env.NODE_ENV === 'test') {
     confidence: 0.9,
     used_memory: false,
     auto_translated: true,
-    processing_time_ms: 1
+    processing_time_ms: 1,
   });
 
   getAvailableLanguages = async () => ([
     { id: 'en', iso_code: 'en', name: 'English', native_name: 'English', direction: 'ltr', is_active: true, priority: 100 },
-    { id: 'hi', iso_code: 'hi', name: 'Hindi', native_name: 'हिन्दी', direction: 'ltr', is_active: true, priority: 90 }
+    { id: 'hi', iso_code: 'hi', name: 'Hindi', native_name: 'हिन्दी', direction: 'ltr', is_active: true, priority: 90 },
   ]);
 
   getContentTranslation = async (contentKey, languageCode, entityType = null, entityId = null) => {
@@ -97,25 +97,25 @@ if (process.env.NODE_ENV === 'test') {
  */
 async function detectLanguage(text, options = {}) {
   const startTime = Date.now();
-  
+
   try {
     // Call PostgreSQL function for basic detection
     const result = await pool.query(
       'SELECT detect_language($1) as language_id',
-      [text]
+      [text],
     );
-    
+
     const languageId = result.rows[0].language_id;
-    
+
     // Get language details
     const langResult = await pool.query(
       'SELECT * FROM languages WHERE id = $1',
-      [languageId]
+      [languageId],
     );
-    
+
     const language = langResult.rows[0];
     const processingTime = Date.now() - startTime;
-    
+
     // Log detection
     if (options.userId || options.sessionId) {
       await pool.query(
@@ -129,11 +129,11 @@ async function detectLanguage(text, options = {}) {
           languageId,
           0.85, // Default confidence for heuristic
           'heuristic',
-          processingTime
-        ]
+          processingTime,
+        ],
       );
     }
-    
+
     return {
       language_id: language.id,
       iso_code: language.iso_code,
@@ -141,7 +141,7 @@ async function detectLanguage(text, options = {}) {
       native_name: language.native_name,
       direction: language.direction,
       confidence: 0.85,
-      processing_time_ms: processingTime
+      processing_time_ms: processingTime,
     };
   } catch (error) {
     logger.error('Language detection error', { error: error.message, stack: error.stack });
@@ -155,16 +155,16 @@ async function detectLanguage(text, options = {}) {
 router.post('/detect', authMiddleware, async (req, res) => {
   try {
     const { text } = req.body;
-    
+
     if (!text || text.trim().length === 0) {
       return res.status(400).json({ error: 'Text is required' });
     }
-    
+
     const result = await detectLanguage(text, {
       userId: req.user.id,
-      sessionId: req.sessionID
+      sessionId: req.sessionID,
     });
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Detect language API error', { error: error.message, stack: error.stack });
@@ -182,43 +182,43 @@ router.post('/detect', authMiddleware, async (req, res) => {
  */
 async function translateText(sourceText, sourceLang, targetLang, options = {}) {
   const startTime = Date.now();
-  
+
   try {
     // Get language IDs
     const sourceLangResult = await pool.query(
       'SELECT id FROM languages WHERE iso_code = $1',
-      [sourceLang]
+      [sourceLang],
     );
     const targetLangResult = await pool.query(
       'SELECT id FROM languages WHERE iso_code = $1',
-      [targetLang]
+      [targetLang],
     );
-    
+
     if (sourceLangResult.rows.length === 0 || targetLangResult.rows.length === 0) {
       throw new Error('Invalid language code');
     }
-    
+
     const sourceLangId = sourceLangResult.rows[0].id;
     const targetLangId = targetLangResult.rows[0].id;
-    
+
     // Check translation memory first
     const memoryResult = await pool.query(
       'SELECT get_translation_from_memory($1, $2, $3, $4) as memory_id',
-      [sourceText, sourceLangId, targetLangId, options.domain || null]
+      [sourceText, sourceLangId, targetLangId, options.domain || null],
     );
-    
+
     const memoryId = memoryResult.rows[0].memory_id;
-    
+
     let translatedText;
     let usedMemory = false;
     let autoTranslated = false;
     let confidence = 1.0;
-    
+
     if (memoryId) {
       // Get translation from memory
       const memResult = await pool.query(
         'SELECT target_text, confidence_score FROM translation_memory WHERE id = $1',
-        [memoryId]
+        [memoryId],
       );
       translatedText = memResult.rows[0].target_text;
       confidence = memResult.rows[0].confidence_score;
@@ -228,37 +228,37 @@ async function translateText(sourceText, sourceLang, targetLang, options = {}) {
       translatedText = await translateWithExternalAPI(sourceText, sourceLang, targetLang);
       autoTranslated = true;
       confidence = 0.90; // Default confidence for API translation
-      
+
       // Store in translation memory
       await pool.query(
         `INSERT INTO translation_memory 
          (source_text, source_language_id, target_language_id, target_text, context, domain, confidence_score, is_auto_translated)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [sourceText, sourceLangId, targetLangId, translatedText, options.context || null, options.domain || null, confidence, true]
+        [sourceText, sourceLangId, targetLangId, translatedText, options.context || null, options.domain || null, confidence, true],
       );
     }
-    
+
     const processingTime = Date.now() - startTime;
-    
+
     // Log translation request
     if (options.userId) {
       await pool.query(
         `INSERT INTO translation_requests 
          (user_id, source_language_id, target_language_id, source_text, translated_text, status, used_memory, memory_match_id, processing_time_ms, completed_at)
          VALUES ($1, $2, $3, $4, $5, 'completed', $6, $7, $8, NOW())`,
-        [options.userId, sourceLangId, targetLangId, sourceText, translatedText, usedMemory, memoryId, processingTime]
+        [options.userId, sourceLangId, targetLangId, sourceText, translatedText, usedMemory, memoryId, processingTime],
       );
     }
-    
+
     return {
       source_text: sourceText,
       source_language: sourceLang,
       target_language: targetLang,
       translated_text: translatedText,
-      confidence: confidence,
+      confidence,
       used_memory: usedMemory,
       auto_translated: autoTranslated,
-      processing_time_ms: processingTime
+      processing_time_ms: processingTime,
     };
   } catch (error) {
     logger.error('Translation error', { error: error.message, stack: error.stack });
@@ -274,10 +274,10 @@ async function translateWithExternalAPI(text, sourceLang, targetLang) {
   // Mock implementation - in production, integrate with Google Cloud Translation
   // const { TranslationServiceClient } = require('@google-cloud/translate').v3;
   // const client = new TranslationServiceClient();
-  
+
   // For now, return a placeholder
   logger.info(`Translation request: ${sourceLang} -> ${targetLang}: "${text.substring(0, 50)}..."`);
-  
+
   // In production, this would be:
   // const [response] = await client.translateText({
   //   parent: `projects/${process.env.GOOGLE_PROJECT_ID}/locations/global`,
@@ -286,7 +286,7 @@ async function translateWithExternalAPI(text, sourceLang, targetLang) {
   //   targetLanguageCode: targetLang
   // });
   // return response.translations[0].translatedText;
-  
+
   // Mock response for development
   return `[Translated from ${sourceLang} to ${targetLang}]: ${text}`;
 }
@@ -297,19 +297,19 @@ async function translateWithExternalAPI(text, sourceLang, targetLang) {
 router.post('/translate', authMiddleware, async (req, res) => {
   try {
     const { text, source_language, target_language, domain, context } = req.body;
-    
+
     if (!text || !source_language || !target_language) {
-      return res.status(400).json({ 
-        error: 'text, source_language, and target_language are required' 
+      return res.status(400).json({
+        error: 'text, source_language, and target_language are required',
       });
     }
-    
+
     const result = await translateText(text, source_language, target_language, {
       userId: req.user.id,
       domain,
-      context
+      context,
     });
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Translate API error', { error: error.message, stack: error.stack });
@@ -328,28 +328,28 @@ async function getContentTranslation(contentKey, languageCode, entityType = null
   try {
     const langResult = await pool.query(
       'SELECT id FROM languages WHERE iso_code = $1',
-      [languageCode]
+      [languageCode],
     );
-    
+
     if (langResult.rows.length === 0) {
       throw new Error('Invalid language code');
     }
-    
+
     const languageId = langResult.rows[0].id;
-    
+
     const result = await pool.query(
       `SELECT * FROM content_translations 
        WHERE content_key = $1 AND language_id = $2 
        AND ($3::text IS NULL OR entity_type = $3)
        AND ($4::uuid IS NULL OR entity_id = $4)
        LIMIT 1`,
-      [contentKey, languageId, entityType, entityId]
+      [contentKey, languageId, entityType, entityId],
     );
-    
+
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Get content translation error', { error: error.message, stack: error.stack });
@@ -363,18 +363,18 @@ async function getContentTranslation(contentKey, languageCode, entityType = null
 async function saveContentTranslation(data) {
   try {
     const { content_key, entity_type, entity_id, language_code, translated_text, context } = data;
-    
+
     const langResult = await pool.query(
       'SELECT id FROM languages WHERE iso_code = $1',
-      [language_code]
+      [language_code],
     );
-    
+
     if (langResult.rows.length === 0) {
       throw new Error('Invalid language code');
     }
-    
+
     const languageId = langResult.rows[0].id;
-    
+
     const result = await pool.query(
       `INSERT INTO content_translations 
        (content_key, entity_type, entity_id, language_id, translated_text, context, is_auto_translated, auto_translation_confidence)
@@ -385,9 +385,9 @@ async function saveContentTranslation(data) {
          context = EXCLUDED.context,
          updated_at = CURRENT_TIMESTAMP
        RETURNING *`,
-      [content_key, entity_type, entity_id, languageId, translated_text, context, false, 1.0]
+      [content_key, entity_type, entity_id, languageId, translated_text, context, false, 1.0],
     );
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Save content translation error', { error: error.message, stack: error.stack });
@@ -401,7 +401,7 @@ async function saveContentTranslation(data) {
 router.get('/content', authMiddleware, async (req, res) => {
   try {
     const { language, entity_type, entity_id } = req.query;
-    
+
     if (!language) {
       return res.status(400).json({ error: 'language query parameter is required' });
     }
@@ -428,17 +428,17 @@ router.get('/content/:key', authMiddleware, async (req, res) => {
   try {
     const { key } = req.params;
     const { language, entity_type, entity_id } = req.query;
-    
+
     if (!language) {
       return res.status(400).json({ error: 'language parameter is required' });
     }
-    
+
     const result = await getContentTranslation(key, language, entity_type, entity_id);
-    
+
     if (!result) {
       return res.status(404).json({ error: 'Translation not found' });
     }
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Get content translation API error', { error: error.message, stack: error.stack });
@@ -476,20 +476,20 @@ async function getUserLanguagePreferences(userId) {
        LEFT JOIN languages l1 ON ulp.primary_language_id = l1.id
        LEFT JOIN languages l2 ON ulp.secondary_language_id = l2.id
        WHERE ulp.user_id = $1`,
-      [userId]
+      [userId],
     );
-    
+
     if (result.rows.length === 0) {
       // Create default preferences
       await pool.query(
         `INSERT INTO user_language_preferences (user_id, primary_language_id, auto_detect_language)
          VALUES ($1, (SELECT id FROM languages WHERE iso_code = 'en' LIMIT 1), true)`,
-        [userId]
+        [userId],
       );
-      
+
       return await getUserLanguagePreferences(userId);
     }
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Get user language preferences error', { error: error.message, stack: error.stack });
@@ -503,30 +503,30 @@ async function getUserLanguagePreferences(userId) {
 async function updateUserLanguagePreferences(userId, preferences) {
   try {
     const { primary_language, secondary_language, auto_detect_language, auto_translate_content, preferred_translation_service } = preferences;
-    
+
     let primaryLangId = null;
     let secondaryLangId = null;
-    
+
     if (primary_language) {
       const langResult = await pool.query(
         'SELECT id FROM languages WHERE iso_code = $1',
-        [primary_language]
+        [primary_language],
       );
       if (langResult.rows.length > 0) {
         primaryLangId = langResult.rows[0].id;
       }
     }
-    
+
     if (secondary_language) {
       const langResult = await pool.query(
         'SELECT id FROM languages WHERE iso_code = $1',
-        [secondary_language]
+        [secondary_language],
       );
       if (langResult.rows.length > 0) {
         secondaryLangId = langResult.rows[0].id;
       }
     }
-    
+
     const result = await pool.query(
       `UPDATE user_language_preferences
        SET primary_language_id = COALESCE($1, primary_language_id),
@@ -537,9 +537,9 @@ async function updateUserLanguagePreferences(userId, preferences) {
            updated_at = CURRENT_TIMESTAMP
        WHERE user_id = $6
        RETURNING *`,
-      [primaryLangId, secondaryLangId, auto_detect_language, auto_translate_content, preferred_translation_service, userId]
+      [primaryLangId, secondaryLangId, auto_detect_language, auto_translate_content, preferred_translation_service, userId],
     );
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Update user language preferences error', { error: error.message, stack: error.stack });
@@ -583,7 +583,7 @@ router.put('/preferences', authMiddleware, async (req, res) => {
 async function getAvailableLanguages() {
   try {
     const result = await pool.query(
-      'SELECT * FROM languages WHERE is_active = true ORDER BY priority DESC, name'
+      'SELECT * FROM languages WHERE is_active = true ORDER BY priority DESC, name',
     );
     return result.rows;
   } catch (error) {
@@ -624,7 +624,7 @@ async function getPronunciation(term, languageCode, region = null) {
          CASE WHEN region = $3 THEN 0 ELSE 1 END,
          is_verified DESC
        LIMIT 1`,
-      [term, languageCode, region]
+      [term, languageCode, region],
     );
 
     return result.rows[0] || null;
@@ -645,7 +645,7 @@ async function searchPronunciations(query, languageCode = null, limit = 20) {
          AND ($2::varchar IS NULL OR language_code = $2)
        ORDER BY is_verified DESC, term
        LIMIT $3`,
-      [query, languageCode, limit]
+      [query, languageCode, limit],
     );
 
     return result.rows;
@@ -670,7 +670,7 @@ async function savePronunciation(data) {
     domain = 'agriculture',
     region = null,
     isVerified = false,
-    verifiedBy = null
+    verifiedBy = null,
   } = data;
 
   if (!term || !languageCode) {
@@ -695,7 +695,7 @@ async function savePronunciation(data) {
          updated_at = CURRENT_TIMESTAMP
        RETURNING *`,
       [term, languageCode, ipa, phoneticSpelling, syllables, audioUrl,
-       ttsHint, domain, region, isVerified, verifiedBy]
+        ttsHint, domain, region, isVerified, verifiedBy],
     );
 
     return result.rows[0];
@@ -774,7 +774,7 @@ async function getTranslationMemoryStats() {
         SUM(usage_count) as total_usage
       FROM translation_memory
     `);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Get translation memory stats error', { error: error.message, stack: error.stack });
@@ -816,5 +816,6 @@ module.exports = {
   searchPronunciations,
   savePronunciation,
   getTranslationMemoryStats,
-  isHealthy
+  isHealthy,
 };
+

@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Trash2, Edit, X } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from './Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus, Trash2, Edit, X } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from './Modal';
 
 /**
  * Shared list/create/edit/delete scaffold for the second-batch domain
@@ -30,10 +30,10 @@ const ACCENTS = {
   teal: { btn: 'bg-teal-600 hover:bg-teal-700', ring: 'focus:ring-teal-500', text: 'text-teal-600', icon: 'text-teal-600' },
   indigo: { btn: 'bg-indigo-600 hover:bg-indigo-700', ring: 'focus:ring-indigo-500', text: 'text-indigo-600', icon: 'text-indigo-600' },
   rose: { btn: 'bg-rose-600 hover:bg-rose-700', ring: 'focus:ring-rose-500', text: 'text-rose-600', icon: 'text-rose-600' },
-}
+};
 
 function inputClass(ring) {
-  return `w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 ${ring}`
+  return `w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 ${ring}`;
 }
 
 export default function ResourceManager({
@@ -59,61 +59,61 @@ export default function ResourceManager({
   stats,
   backendNote,
 }) {
-  const a = ACCENTS[accent] || ACCENTS.green
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(initialForm)
-  const [search, setSearch] = useState('')
+  const a = ACCENTS[accent] || ACCENTS.green;
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(initialForm);
+  const [search, setSearch] = useState('');
 
   const { data, isLoading, error } = useQuery({
     queryKey: [queryKey, search],
     queryFn: async () => {
-      const res = await list(search ? { search } : {})
-      return res.data?.data ?? res.data ?? []
+      const res = await list(search ? { search } : {});
+      return res.data?.data ?? res.data ?? [];
     },
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? update(editingId, payload) : create(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Saved changes' : 'Created successfully')
-      queryClient.invalidateQueries({ queryKey: [queryKey] })
-      closeForm()
+      toast.success(editingId ? 'Saved changes' : 'Created successfully');
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => remove(id),
     onSuccess: () => {
-      toast.success('Removed')
-      queryClient.invalidateQueries({ queryKey: [queryKey] })
+      toast.success('Removed');
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
     },
     onError: () => toast.error('Failed to remove'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(initialForm) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(initialForm); };
 
   const openEdit = (row) => {
-    const next = { ...initialForm }
-    Object.keys(next).forEach((k) => { next[k] = row[k] ?? next[k] })
-    setForm(next)
-    setEditingId(row[idField])
-    setShowForm(true)
-  }
+    const next = { ...initialForm };
+    Object.keys(next).forEach((k) => { next[k] = row[k] ?? next[k]; });
+    setForm(next);
+    setEditingId(row[idField]);
+    setShowForm(true);
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    const missing = requiredFields.some((f) => form[f] === '' || form[f] === null || form[f] === undefined)
+    e.preventDefault();
+    const missing = requiredFields.some((f) => form[f] === '' || form[f] === null || form[f] === undefined);
     if (missing) {
-      toast.error(requiredMessage)
-      return
+      toast.error(requiredMessage);
+      return;
     }
-    saveMutation.mutate(form)
-  }
+    saveMutation.mutate(form);
+  };
 
-  const rows = data || []
+  const rows = data || [];
 
   return (
     <div className={compact ? '' : 'container mx-auto px-4 py-8'}>
@@ -128,7 +128,7 @@ export default function ResourceManager({
           </div>
           {create && (
             <button
-              onClick={() => { setForm(initialForm); setEditingId(null); setShowForm(true) }}
+              onClick={() => { setForm(initialForm); setEditingId(null); setShowForm(true); }}
               className={`px-4 py-2 text-white rounded-lg font-semibold transition flex items-center ${a.btn}`}
             >
               <Plus className="w-5 h-5 mr-2" />
@@ -141,7 +141,7 @@ export default function ResourceManager({
       {compact && create && (
         <div className="flex justify-end mb-4">
           <button
-            onClick={() => { setForm(initialForm); setEditingId(null); setShowForm(true) }}
+            onClick={() => { setForm(initialForm); setEditingId(null); setShowForm(true); }}
             className={`px-4 py-2 text-white rounded-lg font-semibold transition flex items-center ${a.btn}`}
           >
             <Plus className="w-5 h-5 mr-2" />
@@ -210,7 +210,7 @@ export default function ResourceManager({
                       )}
                       {remove && (
                         <button
-                          onClick={() => { if (confirm('Remove this record?')) deleteMutation.mutate(row[idField]) }}
+                          onClick={() => { if (confirm('Remove this record?')) deleteMutation.mutate(row[idField]); }}
                           className="p-2 text-red-600 hover:bg-red-50 rounded"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -251,9 +251,9 @@ export default function ResourceManager({
                               objects (e.g. a fiscal year: id as value, code as a
                               readable label) — both forms are used across pages. */}
                           {(f.options || []).map((o) => {
-                            const value = o && typeof o === 'object' ? o.value : o
-                            const label = o && typeof o === 'object' ? o.label : o
-                            return <option key={value} value={value}>{label}</option>
+                            const value = o && typeof o === 'object' ? o.value : o;
+                            const label = o && typeof o === 'object' ? o.label : o;
+                            return <option key={value} value={value}>{label}</option>;
                           })}
                         </select>
                       ) : f.type === 'textarea' ? (
@@ -293,5 +293,5 @@ export default function ResourceManager({
         </Modal>
       )}
     </div>
-  )
+  );
 }

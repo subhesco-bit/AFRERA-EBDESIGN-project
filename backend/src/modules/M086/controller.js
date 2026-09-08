@@ -27,7 +27,7 @@ const ingestRealTimeData = async (req, res) => {
   try {
     const { metric_id, value, timestamp, metadata } = req.body;
     const data = await monitoringService.ingestRealTimeData(metric_id, value, timestamp, metadata);
-    res.status(201).json({ success: true, data: data });
+    res.status(201).json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -36,7 +36,7 @@ const ingestRealTimeData = async (req, res) => {
 const getRealTimeData = async (req, res) => {
   try {
     const data = await monitoringService.getRealTimeData(req.params.id, req.query);
-    res.status(200).json({ success: true, data: data });
+    res.status(200).json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -106,5 +106,5 @@ module.exports = {
   createMonitoringAlert,
   getMonitoringAlerts,
   logMonitoringEvent,
-  getAlertHistory
+  getAlertHistory,
 };

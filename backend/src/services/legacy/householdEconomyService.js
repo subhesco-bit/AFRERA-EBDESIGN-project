@@ -1,6 +1,6 @@
 /**
  * Household Economy Service
- * 
+ *
  * Wires the existing `household_economy` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for household-level economic data
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getHouseholdEconomy(householdId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM household_economy WHERE household_id = $1`,
-      [householdId]
+      'SELECT * FROM household_economy WHERE household_id = $1',
+      [householdId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Household economy not found: ${householdId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get household economy: ${error.message}`);
@@ -43,10 +43,10 @@ async function getHouseholdEconomy(householdId) {
 async function getHouseholdEconomiesByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM household_economy WHERE village_id = $1 ORDER by household_id`,
-      [villageId]
+      'SELECT * FROM household_economy WHERE village_id = $1 ORDER by household_id',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get household economies by village: ${error.message}`);
@@ -74,7 +74,7 @@ async function upsertHouseholdEconomy(economy) {
       savings_amount,
       debt_amount,
       credit_score,
-      last_updated
+      last_updated,
     } = economy;
 
     const { rows } = await pool.query(
@@ -99,8 +99,8 @@ async function upsertHouseholdEconomy(economy) {
          last_updated = NOW()
        RETURNING *`,
       [household_id, village_id, district, farmer_id, annual_income,
-       income_sources, major_expenses, assets_value, liabilities_value,
-       savings_amount, debt_amount, credit_score]
+        income_sources, major_expenses, assets_value, liabilities_value,
+        savings_amount, debt_amount, credit_score],
     );
 
     logger.info(`Household economy upserted: ${household_id}`);
@@ -134,7 +134,7 @@ async function getVillageHouseholdEconomySummary(villageId) {
          AVG(credit_score) as avg_credit_score
        FROM household_economy
        WHERE village_id = $1`,
-      [villageId]
+      [villageId],
     );
 
     if (!rows.length) {
@@ -155,7 +155,7 @@ async function getVillageHouseholdEconomySummary(villageId) {
       avgSavings: r2(summary.avg_savings),
       totalDebt: r2(summary.total_debt),
       avgDebt: r2(summary.avg_debt),
-      avgCreditScore: r2(summary.avg_credit_score)
+      avgCreditScore: r2(summary.avg_credit_score),
     };
   } catch (error) {
     logger.error(`Failed to get village household economy summary: ${error.message}`);
@@ -215,5 +215,6 @@ module.exports = {
   getHouseholdEconomiesByVillage,
   upsertHouseholdEconomy,
   getVillageHouseholdEconomySummary,
-  setupRoutes
+  setupRoutes,
 };
+

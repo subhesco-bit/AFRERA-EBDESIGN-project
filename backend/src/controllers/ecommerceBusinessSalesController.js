@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce Business Sales Controller
- * 
+ *
  * Handles all B2B and business sales endpoints:
  * - Bulk Order Management
  * - Contract Farming
@@ -9,7 +9,7 @@
  * - Commission Management
  */
 
-const ecommerceService = require('../services/legacy/ecommerceService');
+const ecommerceBusinessSalesService = require('../services/legacy/ecommerceBusinessSalesService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
@@ -23,14 +23,14 @@ const { logger } = require('../utils/logger');
 async function createBulkOrder(req, res) {
   try {
     const buyerId = req.user.id;
-    const result = await ecommerceService.createBulkOrder(buyerId, req.body);
-    
+    const result = await ecommerceBusinessSalesService.createBulkOrder(buyerId, req.body);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in createBulkOrder controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to create bulk order'
+      error: error.message || 'Failed to create bulk order',
     });
   }
 }
@@ -42,15 +42,15 @@ async function createBulkOrder(req, res) {
 async function submitQuotation(req, res) {
   try {
     const { bulkOrderId, sellerId, quotationData } = req.body;
-    
-    const result = await ecommerceService.submitQuotation(bulkOrderId, sellerId, quotationData);
-    
+
+    const result = await ecommerceBusinessSalesService.submitQuotation(bulkOrderId, sellerId, quotationData);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in submitQuotation controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to submit quotation'
+      error: error.message || 'Failed to submit quotation',
     });
   }
 }
@@ -63,15 +63,15 @@ async function acceptQuotation(req, res) {
   try {
     const { quotationId } = req.params;
     const buyerId = req.user.id;
-    
-    const result = await ecommerceService.acceptQuotation(quotationId, buyerId);
-    
+
+    const result = await ecommerceBusinessSalesService.acceptQuotation(quotationId, buyerId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in acceptQuotation controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to accept quotation'
+      error: error.message || 'Failed to accept quotation',
     });
   }
 }
@@ -87,14 +87,14 @@ async function acceptQuotation(req, res) {
 async function createContractFarming(req, res) {
   try {
     const buyerId = req.user.id;
-    const result = await ecommerceService.createContractFarming(buyerId, req.body);
-    
+    const result = await ecommerceBusinessSalesService.createContractFarming(buyerId, req.body);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in createContractFarming controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to create contract farming agreement'
+      error: error.message || 'Failed to create contract farming agreement',
     });
   }
 }
@@ -106,15 +106,15 @@ async function createContractFarming(req, res) {
 async function recordContractMilestone(req, res) {
   try {
     const { contractId, milestoneData } = req.body;
-    
-    const result = await ecommerceService.recordContractMilestone(contractId, milestoneData);
-    
+
+    const result = await ecommerceBusinessSalesService.recordContractMilestone(contractId, milestoneData);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in recordContractMilestone controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to record contract milestone'
+      error: error.message || 'Failed to record contract milestone',
     });
   }
 }
@@ -130,15 +130,15 @@ async function recordContractMilestone(req, res) {
 async function getSalesAnalytics(req, res) {
   try {
     const filters = req.query;
-    
-    const result = await ecommerceService.getSalesAnalytics(filters);
-    
+
+    const result = await ecommerceBusinessSalesService.getSalesAnalytics(filters);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getSalesAnalytics controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get sales analytics'
+      error: error.message || 'Failed to get sales analytics',
     });
   }
 }
@@ -150,15 +150,15 @@ async function getSalesAnalytics(req, res) {
 async function getB2BConversionMetrics(req, res) {
   try {
     const { periodDays } = req.query;
-    
-    const result = await ecommerceService.getB2BConversionMetrics(parseInt(periodDays) || 30);
-    
+
+    const result = await ecommerceBusinessSalesService.getB2BConversionMetrics(parseInt(periodDays) || 30);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getB2BConversionMetrics controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get B2B conversion metrics'
+      error: error.message || 'Failed to get B2B conversion metrics',
     });
   }
 }
@@ -174,15 +174,15 @@ async function getB2BConversionMetrics(req, res) {
 async function calculateCommission(req, res) {
   try {
     const { orderId } = req.params;
-    
-    const result = await ecommerceService.calculateCommission(orderId);
-    
+
+    const result = await ecommerceBusinessSalesService.calculateCommission(orderId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in calculateCommission controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to calculate commission'
+      error: error.message || 'Failed to calculate commission',
     });
   }
 }
@@ -196,16 +196,15 @@ module.exports = {
   createBulkOrder,
   submitQuotation,
   acceptQuotation,
-  
+
   // Contract Farming
   createContractFarming,
   recordContractMilestone,
-  
+
   // Sales Analytics
   getSalesAnalytics,
   getB2BConversionMetrics,
-  
-  // Commission Management
-  calculateCommission
-};
 
+  // Commission Management
+  calculateCommission,
+};

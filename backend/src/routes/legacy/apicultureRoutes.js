@@ -5,12 +5,12 @@
 
 const express = require('express');
 const router = express.Router();
-const apicultureService = require('../../services/legacy/apicultureService');
+const apicultureService = require('../../services/legacy/apicultureService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - this route file could never be mounted without crashing
 // the boot. That is the real reason it sat unwired. Fixed to the real
 // middleware module.
-const { authMiddleware: authenticate } = require('../../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth.js');
 
 // GET /api/v1/apiculture - Get all apiculture
 router.get('/', authenticate, async (req, res) => {
@@ -18,7 +18,7 @@ router.get('/', authenticate, async (req, res) => {
     const filters = {
       farmer_id: req.query.farmer_id,
       honey_type: req.query.honey_type,
-      status: req.query.status
+      status: req.query.status,
     };
     const apiculture = await apicultureService.getAllApiculture(filters);
     res.json({ success: true, data: apiculture });

@@ -53,11 +53,11 @@ async function getForecast({ productId, regionId, from, to, limit = 200 } = {}) 
     count: rows.length,
     basis: rows.length ? 'stored_forecasts' : 'none',
     totalForecastQty: scalar.reduce((s, r) => s + Number(r.forecast_qty), 0) || null,
-    note: rows.length
-      ? 'claimed_confidence is stated at forecast time; measured_accuracy is scored '
-      + 'afterwards. They are different quantities — do not average them.'
-      : 'No forecasts stored for this filter. This is an absence of data, not a '
-      + 'forecast of zero demand.',
+    note: rows.length ?
+      'claimed_confidence is stated at forecast time; measured_accuracy is scored ' +
+      'afterwards. They are different quantities — do not average them.' :
+      'No forecasts stored for this filter. This is an absence of data, not a ' +
+      'forecast of zero demand.',
   };
 }
 
@@ -84,7 +84,7 @@ async function getHeatmap({ date, productId } = {}) {
       WHERE ${where.join(' AND ')}
       GROUP BY region_id
       ORDER BY qty DESC NULLS LAST`,
-    params
+    params,
   );
 
   return {
@@ -97,8 +97,8 @@ async function getHeatmap({ date, productId } = {}) {
       latestForecastDate: r.latest_forecast_date,
     })),
     cellsWithData: rows.length,
-    note: 'Regions absent from this list have no stored forecast. They are unmeasured, '
-        + 'not zero — do not render them as cold cells.',
+    note: 'Regions absent from this list have no stored forecast. They are unmeasured, ' +
+        'not zero — do not render them as cold cells.',
   };
 }
 
@@ -118,13 +118,13 @@ async function getMandiSignal({ commodity, days = 30 } = {}) {
       WHERE commodity ILIKE $1
         AND price_date >= CURRENT_DATE - ($2 || ' days')::interval
       ORDER BY price_date DESC`,
-    [`%${commodity}%`, Number(days)]
+    [`%${commodity}%`, Number(days)],
   );
   if (!rows.length) {
     return {
       commodity, observations: 0, signal: 'unknown',
-      note: 'No mandi price data. The Agmarknet/e-NAM feed has not been connected, so '
-          + 'there is no market read available for this commodity.',
+      note: 'No mandi price data. The Agmarknet/e-NAM feed has not been connected, so ' +
+          'there is no market read available for this commodity.',
     };
   }
 
@@ -142,14 +142,15 @@ async function getMandiSignal({ commodity, days = 30 } = {}) {
     meanModalRecent: rNow === null ? null : Math.round(rNow * 100) / 100,
     meanModalEarlier: rThen === null ? null : Math.round(rThen * 100) / 100,
     changePct: changePct === null ? null : Math.round(changePct * 100) / 100,
-    signal: changePct === null ? 'unknown'
-      : changePct < -10 ? 'falling — possible glut, holding may cost more than selling'
-        : changePct > 10 ? 'rising — but check whether you have volume left to sell into it'
-          : 'stable',
+    signal: changePct === null ? 'unknown' :
+      changePct < -10 ? 'falling — possible glut, holding may cost more than selling' :
+        changePct > 10 ? 'rising — but check whether you have volume left to sell into it' :
+          'stable',
     sources: [...new Set(rows.map((r) => r.source))],
-    caveat: 'A mandi read is a regional signal, not a quote. NE hill markets are thin '
-          + 'and a single large arrival can move the modal price without reflecting demand.',
+    caveat: 'A mandi read is a regional signal, not a quote. NE hill markets are thin ' +
+          'and a single large arrival can move the modal price without reflecting demand.',
   };
 }
 
 module.exports = { getForecast, getHeatmap, getMandiSignal };
+

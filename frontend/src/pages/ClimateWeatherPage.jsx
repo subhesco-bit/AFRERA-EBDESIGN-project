@@ -6,39 +6,39 @@
  * coverage table below is not a nice-to-have: every district missing from it is
  * a district where forward prices are computed from a constant.
  */
-import React, { useState, useEffect } from 'react'
-import { weatherAPI } from '../services/api'
-import { ModulePage, Section, Field, Value, AsyncState, DataTable } from '../components/common/DataPrimitives'
+import React, { useState, useEffect } from 'react';
+import { weatherAPI } from '../services/api';
+import { ModulePage, Section, Field, Value, AsyncState, DataTable } from '../components/common/DataPrimitives';
 
 export default function ClimateWeatherPage() {
-  const [coverage, setCoverage] = useState(null)
-  const [alerts, setAlerts] = useState(null)
-  const [accuracy, setAccuracy] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [districts, setDistricts] = useState('')
-  const [check, setCheck] = useState(null)
+  const [coverage, setCoverage] = useState(null);
+  const [alerts, setAlerts] = useState(null);
+  const [accuracy, setAccuracy] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [districts, setDistricts] = useState('');
+  const [check, setCheck] = useState(null);
 
   useEffect(() => {
     (async () => {
       try {
         const [c, a, f] = await Promise.all([
           weatherAPI.coverage(), weatherAPI.activeAlerts(), weatherAPI.forecastAccuracy(),
-        ])
-        setCoverage(c.data?.data); setAlerts(a.data?.data); setAccuracy(f.data?.data)
-      } catch (e) { setError(e.response?.data?.error || e.message) } finally { setLoading(false) }
-    })()
-  }, [])
+        ]);
+        setCoverage(c.data?.data); setAlerts(a.data?.data); setAccuracy(f.data?.data);
+      } catch (e) { setError(e.response?.data?.error || e.message); } finally { setLoading(false); }
+    })();
+  }, []);
 
   const runCheck = async (e) => {
-    e.preventDefault()
-    const d = districts.split(',').map((s) => s.trim()).filter(Boolean)
-    if (!d.length) return
+    e.preventDefault();
+    const d = districts.split(',').map((s) => s.trim()).filter(Boolean);
+    if (!d.length) return;
     try {
-      const r = await weatherAPI.dispatchCheck(d)
-      setCheck(r.data?.data)
-    } catch (err) { setCheck({ error: err.message }) }
-  }
+      const r = await weatherAPI.dispatchCheck(d);
+      setCheck(r.data?.data);
+    } catch (err) { setCheck({ error: err.message }); }
+  };
 
   return (
     <ModulePage
@@ -49,8 +49,8 @@ export default function ClimateWeatherPage() {
       <AsyncState loading={loading} error={error}>
         <>
           {alerts && alerts.blocked && (
-            <div role="alert" style={{ border: '1px solid #cf222e', borderLeft: '4px solid #cf222e',
-              background: '#ffebe9', borderRadius: 6, padding: '12px 14px', marginTop: 16 }}>
+            <div role="alert" style={{ border: '1px solid hsl(var(--destructive))', borderLeft: '4px solid hsl(var(--destructive))',
+              background: 'color-mix(in srgb, hsl(var(--destructive)) 12%, transparent)', borderRadius: 6, padding: '12px 14px', marginTop: 16 }}>
               <h2 style={{ margin: '0 0 6px', fontSize: 16 }}>
                 {alerts.blocks.length} alert(s) currently block dispatch
               </h2>
@@ -75,9 +75,9 @@ export default function ClimateWeatherPage() {
             </form>
             {check && (
               <p role="status" style={{ marginTop: 10, fontWeight: 600,
-                color: check.safe ? '#1a7f37' : '#cf222e' }}>
-                {check.safe ? 'No active dispatch blocks on these districts.'
-                  : `Blocked — ${check.blocks.length} active alert(s).`}
+                color: check.safe ? 'hsl(var(--data-real))' : 'hsl(var(--destructive))' }}>
+                {check.safe ? 'No active dispatch blocks on these districts.' :
+                  `Blocked — ${check.blocks.length} active alert(s).`}
               </p>
             )}
           </Section>
@@ -85,7 +85,7 @@ export default function ClimateWeatherPage() {
           <Section title="Weather coverage"
             description="Districts with no station are districts where forward prices rest on a fallback constant, not on observed weather.">
             {coverage?.note && (
-              <p role="note" style={{ background: '#fff8c5', border: '1px solid #d4a72c66',
+              <p role="note" style={{ background: 'color-mix(in srgb, hsl(var(--sev-warning)) 16%, transparent)', border: '1px solid hsl(var(--sev-warning))',
                 borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>{coverage.note}</p>
             )}
             <p style={{ fontSize: 14 }}>
@@ -135,5 +135,5 @@ export default function ClimateWeatherPage() {
         </>
       </AsyncState>
     </ModulePage>
-  )
+  );
 }

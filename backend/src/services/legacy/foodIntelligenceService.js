@@ -51,7 +51,7 @@ async function createFoodItem(data) {
     gi_id,
     shelf_life_days,
     storage_conditions,
-    allergens
+    allergens,
   } = data;
 
   try {
@@ -76,8 +76,8 @@ async function createFoodItem(data) {
         gi_id,
         shelf_life_days,
         JSON.stringify(storage_conditions),
-        JSON.stringify(allergens)
-      ]
+        JSON.stringify(allergens),
+      ],
     );
 
     // Fallback for test-mode mock only — see isTestMode() note above.
@@ -101,7 +101,7 @@ async function createFoodItem(data) {
         gi_id: gi_id || null,
         shelf_life_days: shelf_life_days || null,
         storage_conditions: storage_conditions || {},
-        allergens: allergens || []
+        allergens: allergens || [],
       };
       persistTestFallback('food_items', fallback.id, fallback);
       return fallback;
@@ -186,25 +186,25 @@ async function createQualityAssessment(data) {
     assessor_id,
     assessment_type,
     quality_scores,
-    recommendations
+    recommendations,
   } = data;
 
   try {
     const overallScore = await pool.query(
       'SELECT calculate_overall_quality_score($1) as score',
-      [JSON.stringify(quality_scores)]
+      [JSON.stringify(quality_scores)],
     );
 
     // Defensive: fall back to local calculation if DB UDF not available in test-mode
     let overall = (overallScore && overallScore.rows && overallScore.rows[0]) ? overallScore.rows[0].score : null;
     if (overall === null || typeof overall === 'undefined') {
       const vals = Object.values(quality_scores).filter(v => typeof v === 'number');
-      overall = vals.length ? Math.round(vals.reduce((a,b) => a+b,0) / vals.length) : 0;
+      overall = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
     }
 
     const gradeResult = await pool.query(
       'SELECT assign_quality_grade($1) as grade',
-      [overall]
+      [overall],
     );
 
     const grade = (gradeResult && gradeResult.rows && gradeResult.rows[0]) ? gradeResult.rows[0].grade : (overall >= 85 ? 'A' : overall >= 70 ? 'B' : overall >= 50 ? 'C' : 'D');
@@ -223,8 +223,8 @@ async function createQualityAssessment(data) {
         JSON.stringify(quality_scores),
         overall,
         grade,
-        JSON.stringify(recommendations)
-      ]
+        JSON.stringify(recommendations),
+      ],
     );
 
     // If DB didn't return a row (test-mode mismatch), construct fallback and
@@ -243,7 +243,7 @@ async function createQualityAssessment(data) {
         overall_quality_score: overall,
         quality_grade: grade,
         compliance_status: 'compliant',
-        recommendations
+        recommendations,
       };
       persistTestFallback('food_quality_assessments', food_item_id, fallback, true);
       return fallback;
@@ -276,7 +276,7 @@ async function getQualityAssessments(foodItemId) {
   try {
     const result = await pool.query(
       'SELECT * FROM food_quality_assessments WHERE food_item_id = $1 ORDER BY assessment_date DESC',
-      [foodItemId]
+      [foodItemId],
     );
 
     return result.rows;
@@ -315,14 +315,14 @@ async function recordContaminantTest(data) {
     contaminant_level,
     unit,
     detection_limit,
-    test_method
+    test_method,
   } = data;
 
   try {
     // Get legal limit for contaminant
     const contaminantResult = await pool.query(
       'SELECT legal_limit, legal_limit_unit FROM contaminant_types WHERE id = $1',
-      [contaminant_id]
+      [contaminant_id],
     );
 
     let resultStatus = 'compliant';
@@ -350,8 +350,8 @@ async function recordContaminantTest(data) {
         unit,
         detection_limit,
         resultStatus,
-        test_method
-      ]
+        test_method,
+      ],
     );
 
     // Fallback for test-mode mock only — see isTestMode() note above.
@@ -369,7 +369,7 @@ async function recordContaminantTest(data) {
         unit,
         detection_limit,
         result_status: resultStatus,
-        test_method
+        test_method,
       };
       persistTestFallback('food_contaminant_tests', food_item_id, fallback, true);
       return fallback;
@@ -406,7 +406,7 @@ async function getContaminantTests(foodItemId) {
        LEFT JOIN contaminant_types ct ON fct.contaminant_id = ct.id
        WHERE fct.food_item_id = $1
        ORDER BY fct.test_date DESC`,
-      [foodItemId]
+      [foodItemId],
     );
 
     return result.rows;
@@ -441,20 +441,20 @@ async function createFreshnessAssessment(data) {
     food_item_id,
     assessment_date,
     freshness_scores,
-    storage_recommendations
+    storage_recommendations,
   } = data;
 
   try {
     const overallScore = await pool.query(
       'SELECT calculate_overall_quality_score($1) as score',
-      [JSON.stringify(freshness_scores)]
+      [JSON.stringify(freshness_scores)],
     );
 
     // Defensive fallback when DB UDF not present
     let score = (overallScore && overallScore.rows && overallScore.rows[0]) ? overallScore.rows[0].score : null;
     if (score === null || typeof score === 'undefined') {
       const vals = Object.values(freshness_scores).filter(v => typeof v === 'number');
-      score = vals.length ? Math.round(vals.reduce((a,b) => a+b,0) / vals.length) : 0;
+      score = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
     }
 
     let freshnessStatus = 'fresh';
@@ -490,8 +490,8 @@ async function createFreshnessAssessment(data) {
         score,
         freshnessStatus,
         remainingDays,
-        JSON.stringify(storage_recommendations)
-      ]
+        JSON.stringify(storage_recommendations),
+      ],
     );
 
     // Fallback for test-mode mock only — see isTestMode() note above.
@@ -507,7 +507,7 @@ async function createFreshnessAssessment(data) {
         overall_freshness_score: score,
         freshness_status: freshnessStatus,
         estimated_remaining_days: remainingDays,
-        storage_recommendations
+        storage_recommendations,
       };
       persistTestFallback('food_freshness_assessments', food_item_id, fallback, true);
       return fallback;
@@ -550,7 +550,7 @@ async function createFoodRecall(data) {
     hazard_level,
     affected_batches,
     affected_regions,
-    recalling_firm
+    recalling_firm,
   } = data;
 
   try {
@@ -569,8 +569,8 @@ async function createFoodRecall(data) {
         hazard_level,
         JSON.stringify(affected_batches),
         JSON.stringify(affected_regions),
-        recalling_firm
-      ]
+        recalling_firm,
+      ],
     );
 
     // Fallback for test-mode mock only — see isTestMode() note above.
@@ -589,7 +589,7 @@ async function createFoodRecall(data) {
         affected_batches,
         affected_regions,
         recalling_firm,
-        recall_status: 'active'
+        recall_status: 'active',
       };
       persistTestFallback('food_recalls', fallback.id, fallback);
       return fallback;
@@ -625,7 +625,7 @@ async function getActiveRecalls() {
        FROM food_recalls fr
        LEFT JOIN food_items fi ON fr.food_item_id = fi.id
        WHERE fr.recall_status = 'active'
-       ORDER BY fr.recall_date DESC`
+       ORDER BY fr.recall_date DESC`,
     );
 
     return result.rows;
@@ -677,8 +677,8 @@ async function recordFoodIntelligence(foodItemId, metrics) {
         metrics.freshness_score || 0,
         metrics.market_price || 0,
         metrics.demand_index || 0,
-        metrics.supply_index || 0
-      ]
+        metrics.supply_index || 0,
+      ],
     );
 
     // Fallback for test-mode mock only — see isTestMode() note above.
@@ -689,7 +689,7 @@ async function recordFoodIntelligence(foodItemId, metrics) {
       const fallback = {
         id: `fia-${Date.now()}`,
         food_item_id: foodItemId,
-        date: new Date().toISOString().slice(0,10),
+        date: new Date().toISOString().slice(0, 10),
         total_inspections: metrics.inspections || 0,
         quality_pass_rate: metrics.quality_pass_rate || 0,
         safety_incidents: metrics.safety_incidents || 0,
@@ -697,7 +697,7 @@ async function recordFoodIntelligence(foodItemId, metrics) {
         average_freshness_score: metrics.freshness_score || 0,
         market_price: metrics.market_price || 0,
         demand_index: metrics.demand_index || 0,
-        supply_index: metrics.supply_index || 0
+        supply_index: metrics.supply_index || 0,
       };
       persistTestFallback('food_intelligence_analytics', foodItemId, fallback);
       return fallback;
@@ -744,47 +744,48 @@ module.exports = {
   createFoodRecall,
   getActiveRecalls,
   recordFoodIntelligence,
-  isHealthy
+  isHealthy,
 };
 
 // Merged from backend/src/modules/M081
 {
-  const m081 = require("../../modules/M081/service");
+  const m081 = require('../../modules/M081/service');
   const { ...rest } = m081;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M082
 {
-  const m082 = require("../../modules/M082/service");
+  const m082 = require('../../modules/M082/service');
   const { ...rest } = m082;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M083
 {
-  const m083 = require("../../modules/M083/service");
+  const m083 = require('../../modules/M083/service');
   const { ...rest } = m083;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M084
 {
-  const m084 = require("../../modules/M084/service");
+  const m084 = require('../../modules/M084/service');
   const { ...rest } = m084;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M085 - 3 name(s) collided and were aliased
 {
-  const m085 = require("../../modules/M085/service");
+  const m085 = require('../../modules/M085/service');
   const { addBenchmark: addBenchmarkFromBE085, getBenchmarks: getBenchmarksFromBE085, createSnapshot: createSnapshotFromBE085, ...rest } = m085;
   Object.assign(module.exports, rest, { addBenchmarkFromBE085, getBenchmarksFromBE085, createSnapshotFromBE085 });
 }
 
 // Merged from backend/src/modules/M087
 {
-  const m087 = require("../../modules/M087/service");
+  const m087 = require('../../modules/M087/service');
   const { ...rest } = m087;
   Object.assign(module.exports, rest);
 }
+

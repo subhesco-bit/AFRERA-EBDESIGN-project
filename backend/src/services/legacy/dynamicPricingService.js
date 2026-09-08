@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiBackboneService');
+const { aiAPI } = require('./aiService');
 const { authMiddleware } = require('../../middleware/auth');
 const { mcda } = require('../../core/mcda');
 
@@ -28,12 +28,12 @@ async function calculateLocalMarketPricing(productDetails) {
       quality_grade,
       freshness_score,
       organic_status,
-      gi_status
+      gi_status,
     } = productDetails;
 
     // Fetch local market data
     const marketData = await getLocalMarketData(location, category);
-    
+
     // AI-powered pricing recommendation
     const aiRequest = {
       task: 'dynamic_pricing',
@@ -55,17 +55,17 @@ async function calculateLocalMarketPricing(productDetails) {
         gi_status,
         market_trends: marketData.trends,
         historical_prices: await getHistoricalPrices(product_id, location),
-        supply_demand_ratio: marketData.supply_demand_ratio
-      }
+        supply_demand_ratio: marketData.supply_demand_ratio,
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const pricing = {
-      product_id: product_id,
-      location: location,
+      product_id,
+      location,
       timestamp: new Date().toISOString(),
-      base_price: base_price,
+      base_price,
       recommended_price: aiResponse.recommended_price,
       price_adjustments: {
         demand_factor: aiResponse.demand_factor,
@@ -75,23 +75,23 @@ async function calculateLocalMarketPricing(productDetails) {
         freshness_factor: aiResponse.freshness_factor,
         organic_premium: aiResponse.organic_premium,
         gi_premium: aiResponse.gi_premium,
-        inventory_pressure: aiResponse.inventory_pressure
+        inventory_pressure: aiResponse.inventory_pressure,
       },
       price_range: {
         minimum: aiResponse.min_price,
         maximum: aiResponse.max_price,
-        optimal: aiResponse.recommended_price
+        optimal: aiResponse.recommended_price,
       },
       market_insights: {
         current_demand: marketData.current_demand,
         demand_trend: marketData.demand_trend,
         supply_level: marketData.supply_level,
         price_elasticity: aiResponse.price_elasticity,
-        competitor_analysis: aiResponse.competitor_analysis
+        competitor_analysis: aiResponse.competitor_analysis,
       },
       recommendations: aiResponse.recommendations,
       confidence: aiResponse.confidence,
-      valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
 
     logger.info(`Dynamic pricing calculated for product ${product_id} in ${location}`);
@@ -116,7 +116,7 @@ async function calculateNutrientBasedPricing(productDetails) {
       lab_test_results,
       quality_certifications,
       organic_status,
-      location
+      location,
     } = productDetails;
 
     // AI-powered nutrient-based pricing
@@ -134,43 +134,43 @@ async function calculateNutrientBasedPricing(productDetails) {
         location,
         industry_standards: await getIndustryNutrientStandards(category),
         premium_nutrients: await getPremiumNutrients(category),
-        market_premiums: await getNutrientMarketPremiums(category)
-      }
+        market_premiums: await getNutrientMarketPremiums(category),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const pricing = {
-      product_id: product_id,
+      product_id,
       timestamp: new Date().toISOString(),
-      base_price: base_price,
+      base_price,
       nutrient_based_price: aiResponse.nutrient_based_price,
       nutrient_analysis: {
         overall_score: aiResponse.nutrient_score,
         premium_nutrients: aiResponse.premium_nutrients,
         deficiencies: aiResponse.deficiencies,
-        comparison_with_standard: aiResponse.standard_comparison
+        comparison_with_standard: aiResponse.standard_comparison,
       },
       price_breakdown: {
         base_component: aiResponse.base_component,
         nutrient_premium: aiResponse.nutrient_premium,
         quality_premium: aiResponse.quality_premium,
         organic_premium: aiResponse.organic_premium,
-        certification_premium: aiResponse.certification_premium
+        certification_premium: aiResponse.certification_premium,
       },
       lab_verification: {
         lab_name: lab_test_results?.lab_name,
         test_date: lab_test_results?.test_date,
         certificate_number: lab_test_results?.certificate_number,
-        verified: aiResponse.lab_verified
+        verified: aiResponse.lab_verified,
       },
       market_comparison: {
         average_market_price: aiResponse.avg_market_price,
         premium_percentage: aiResponse.premium_percentage,
-        value_proposition: aiResponse.value_proposition
+        value_proposition: aiResponse.value_proposition,
       },
       recommendations: aiResponse.recommendations,
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
 
     logger.info(`Nutrient-based pricing calculated for product ${product_id}`);
@@ -193,7 +193,7 @@ async function optimizeFarmerSelection(orderRequirements) {
       delivery_location,
       delivery_deadline,
       price_sensitivity,
-      buyer_preferences
+      buyer_preferences,
     } = orderRequirements;
 
     // AI-powered farmer selection optimization
@@ -210,8 +210,8 @@ async function optimizeFarmerSelection(orderRequirements) {
         available_farmers: await getAvailableFarmers(product_id, quantity_required),
         farmer_performance: await getFarmerPerformanceData(product_id),
         logistics_costs: await getLogisticsCosts(delivery_location),
-        historical_margins: await getHistoricalMargins(product_id)
-      }
+        historical_margins: await getHistoricalMargins(product_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -232,18 +232,18 @@ async function optimizeFarmerSelection(orderRequirements) {
         margin: farmer.margin,
         margin_percentage: farmer.margin_percentage,
         delivery_estimate: farmer.delivery_estimate,
-        match_score: farmer.match_score
+        match_score: farmer.match_score,
       })),
       optimal_allocation: aiResponse.optimal_allocation,
       margin_analysis: {
         total_margin: aiResponse.total_margin,
         average_margin_percentage: aiResponse.avg_margin_percentage,
         margin_distribution: aiResponse.margin_distribution,
-        margin_optimization_potential: aiResponse.optimization_potential
+        margin_optimization_potential: aiResponse.optimization_potential,
       },
       risk_factors: aiResponse.risk_factors,
       recommendations: aiResponse.recommendations,
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
 
     logger.info(`Farmer selection optimization completed for order ${optimization.order_id}`);
@@ -265,11 +265,11 @@ async function getPriceAlerts(userId, productIds) {
       const currentPricing = await calculateLocalMarketPricing({
         product_id: productId,
         location: await getUserLocation(userId),
-        base_price: await getBasePrice(productId)
+        base_price: await getBasePrice(productId),
       });
 
       const threshold = await getUserPriceThreshold(userId, productId);
-      
+
       if (currentPricing.recommended_price <= threshold.max_price ||
           currentPricing.recommended_price >= threshold.min_price) {
         alerts.push({
@@ -280,7 +280,7 @@ async function getPriceAlerts(userId, productIds) {
           price_change: currentPricing.recommended_price - threshold.last_price,
           percentage_change: ((currentPricing.recommended_price - threshold.last_price) / threshold.last_price) * 100,
           recommendation: currentPricing.recommendations[0],
-          valid_until: currentPricing.valid_until
+          valid_until: currentPricing.valid_until,
         });
       }
     }
@@ -288,8 +288,8 @@ async function getPriceAlerts(userId, productIds) {
     return {
       user_id: userId,
       timestamp: new Date().toISOString(),
-      alerts: alerts,
-      total_alerts: alerts.length
+      alerts,
+      total_alerts: alerts.length,
     };
   } catch (error) {
     logger.error('Error getting price alerts', { error: error.message, stack: error.stack });
@@ -316,14 +316,14 @@ async function setPricingRules(productId, rules) {
         seasonality_enabled: rules.seasonality_enabled || false,
         quality_premium_enabled: rules.quality_premium_enabled || true,
         organic_premium_enabled: rules.organic_premium_enabled || true,
-        gi_premium_enabled: rules.gi_premium_enabled || true
+        gi_premium_enabled: rules.gi_premium_enabled || true,
       },
       created_at: new Date().toISOString(),
-      created_by: rules.created_by
+      created_by: rules.created_by,
     };
 
     // In production, save to database
-    
+
     logger.info(`Pricing rules set for product ${productId}`);
     return pricingRules;
   } catch (error) {
@@ -341,7 +341,7 @@ async function getLocalMarketData(location, category) {
     supply_demand_ratio: 0.8,
     current_demand: 'high',
     demand_trend: 'upward',
-    supply_level: 'moderate'
+    supply_level: 'moderate',
   };
 }
 
@@ -355,7 +355,7 @@ async function getIndustryNutrientStandards(category) {
   return {
     protein: { min: 10, max: 25, unit: 'g' },
     vitamins: { min: 5, max: 50, unit: 'mg' },
-    minerals: { min: 100, max: 500, unit: 'mg' }
+    minerals: { min: 100, max: 500, unit: 'mg' },
   };
 }
 
@@ -370,7 +370,7 @@ async function getNutrientMarketPremiums(category) {
     omega_3: 0.15,
     antioxidants: 0.10,
     organic: 0.25,
-    gi: 0.20
+    gi: 0.20,
   };
 }
 
@@ -409,7 +409,7 @@ async function getUserPriceThreshold(userId, productId) {
   return {
     max_price: 55,
     min_price: 40,
-    last_price: 48
+    last_price: 48,
   };
 }
 
@@ -446,17 +446,17 @@ const ymPool = require('../../database/pool');
  */
 async function priceForLot(lotCode) {
   const { rows: lots } = await ymPool.query(
-    'SELECT * FROM pricing_lots WHERE lot_code = $1', [lotCode]
+    'SELECT * FROM pricing_lots WHERE lot_code = $1', [lotCode],
   );
   if (!lots.length) throw new Error(`Lot ${lotCode} not found`);
   const lot = lots[0];
 
   const daysToExpiry = Math.max(0, Math.ceil(
-    (new Date(lot.expires_on) - Date.now()) / 86400000
+    (new Date(lot.expires_on) - Date.now()) / 86400000,
   ));
 
   const { rows: buckets } = await ymPool.query(
-    'SELECT * FROM pricing_buckets WHERE lot_code = $1 ORDER BY sequence_no', [lotCode]
+    'SELECT * FROM pricing_buckets WHERE lot_code = $1 ORDER BY sequence_no', [lotCode],
   );
   const allocated = buckets.reduce((s, b) => s + Number(b.allocated_kg), 0);
   const sold = buckets.reduce((s, b) => s + Number(b.sold_kg), 0);
@@ -475,7 +475,7 @@ async function priceForLot(lotCode) {
         AND pct_unsold_at_or_above <= $3
       ORDER BY discount_pct DESC
       LIMIT 1`,
-    [lot.crop_key ?? null, daysToExpiry, pctUnsold]
+    [lot.crop_key ?? null, daysToExpiry, pctUnsold],
   );
 
   const listPrice = Number(lot.list_price_inr_per_kg);
@@ -504,21 +504,21 @@ async function priceForLot(lotCode) {
     discountPct,
     priceInrPerKg: Math.round(price * 100) / 100,
     floorApplied,
-    activeBucket: openBucket
-      ? { code: openBucket.bucket_code, price: Number(openBucket.price_inr_per_kg),
-        remainingKg: Number(openBucket.remaining_kg) }
-      : null,
-    reasoning: rule
-      ? [`${daysToExpiry} day(s) to expiry with ${Math.round(pctUnsold)}% unsold`,
+    activeBucket: openBucket ?
+      { code: openBucket.bucket_code, price: Number(openBucket.price_inr_per_kg),
+        remainingKg: Number(openBucket.remaining_kg) } :
+      null,
+    reasoning: rule ?
+      [`${daysToExpiry} day(s) to expiry with ${Math.round(pctUnsold)}% unsold`,
         `rule: ${discountPct}% off when <=${rule.days_to_expiry_at_or_below} days and >=${rule.pct_unsold_at_or_above}% unsold`,
         rule.rationale]
-        .filter(Boolean)
-      : [`${daysToExpiry} day(s) to expiry, ${Math.round(pctSold)}% sold — no markdown triggered`],
-    floorNote: floorApplied
-      ? 'Markdown was capped at the farmer floor. Below this the platform would be '
-      + "funding the discount out of the farmer's income, which inverts the point of "
-      + 'the floor.'
-      : null,
+        .filter(Boolean) :
+      [`${daysToExpiry} day(s) to expiry, ${Math.round(pctSold)}% sold — no markdown triggered`],
+    floorNote: floorApplied ?
+      'Markdown was capped at the farmer floor. Below this the platform would be ' +
+      'funding the discount out of the farmer\'s income, which inverts the point of ' +
+      'the floor.' :
+      null,
     // Allocated less than the lot means unpriced stock nobody can buy.
     unallocatedKg: Math.round((lotSize - allocated) * 1000) / 1000,
   };
@@ -536,7 +536,7 @@ async function openNextBucket(lotCode) {
     `SELECT * FROM pricing_buckets
       WHERE lot_code = $1 AND status = 'closed'
       ORDER BY sequence_no LIMIT 1`,
-    [lotCode]
+    [lotCode],
   );
   if (!rows.length) return { opened: null, note: 'No closed buckets remain for this lot.' };
 
@@ -544,19 +544,19 @@ async function openNextBucket(lotCode) {
   await ymPool.query(
     `UPDATE pricing_buckets SET status = 'sold_out'
       WHERE lot_code = $1 AND status = 'open' AND remaining_kg <= 0`,
-    [lotCode]
+    [lotCode],
   );
   const { rows: opened } = await ymPool.query(
     `UPDATE pricing_buckets
         SET status = 'open', opens_at = COALESCE(opens_at, CURRENT_TIMESTAMP)
       WHERE id = $1 RETURNING *`,
-    [next.id]
+    [next.id],
   );
   return {
     opened: opened[0],
-    note: `Bucket ${next.bucket_code} open at Rs ${next.price_inr_per_kg}/kg for `
-        + `${next.allocated_kg} kg. Buckets do not re-open cheaper — a price that falls `
-        + 'back after someone commits teaches them never to commit early again.',
+    note: `Bucket ${next.bucket_code} open at Rs ${next.price_inr_per_kg}/kg for ` +
+        `${next.allocated_kg} kg. Buckets do not re-open cheaper — a price that falls ` +
+        'back after someone commits teaches them never to commit early again.',
   };
 }
 
@@ -570,20 +570,20 @@ async function openNextBucket(lotCode) {
 async function bookingCurve(cropKey) {
   const { rows } = await ymPool.query(
     'SELECT * FROM v_booking_curve WHERE crop_key = $1 ORDER BY days_to_expiry DESC',
-    [cropKey]
+    [cropKey],
   );
   const usable = rows.filter((r) => r.statistically_usable);
   return {
     cropKey,
     points: rows,
     usablePoints: usable.length,
-    note: rows.length === 0
-      ? 'No booking observations for this crop. Demand timing is unknown — markdown '
-      + 'rules will fire on the calendar alone until sales history accumulates.'
-      : usable.length === 0
-        ? `${rows.length} point(s) recorded but none has 10+ observations. This is an `
-        + 'anecdote, not a curve. Airlines build these on thousands of departures.'
-        : null,
+    note: rows.length === 0 ?
+      'No booking observations for this crop. Demand timing is unknown — markdown ' +
+      'rules will fire on the calendar alone until sales history accumulates.' :
+      usable.length === 0 ?
+        `${rows.length} point(s) recorded but none has 10+ observations. This is an ` +
+        'anecdote, not a curve. Airlines build these on thousands of departures.' :
+        null,
   };
 }
 
@@ -595,7 +595,7 @@ async function recordBookingPoint({ lotCode, cropKey, productId, daysToExpiry, p
         realised_price_inr_per_kg, lot_code, season, data_provenance)
      VALUES ($1,$2,$3,$4,$5,$6,$7,'real') RETURNING *`,
     [cropKey ?? null, productId ?? null, daysToExpiry, pctSold,
-      realisedPrice ?? null, lotCode ?? null, season ?? null]
+      realisedPrice ?? null, lotCode ?? null, season ?? null],
   );
   return rows[0];
 }
@@ -612,23 +612,23 @@ async function lotsNeedingAttention({ withinDays = 7 } = {}) {
         AND l.expires_on <= CURRENT_DATE + ($1 || ' days')::interval
       GROUP BY l.id
       ORDER BY l.expires_on`,
-    [Number(withinDays)]
+    [Number(withinDays)],
   );
   return {
     lots: rows.map((r) => {
-      const pctSold = Number(r.lot_size_kg)
-        ? (Number(r.sold_kg) / Number(r.lot_size_kg)) * 100 : 0;
+      const pctSold = Number(r.lot_size_kg) ?
+        (Number(r.sold_kg) / Number(r.lot_size_kg)) * 100 : 0;
       return {
         ...r,
         pctSold: Math.round(pctSold * 100) / 100,
         atRiskKg: Math.round((Number(r.lot_size_kg) - Number(r.sold_kg)) * 1000) / 1000,
-        urgency: r.days_to_expiry <= 1 ? 'today'
-          : r.days_to_expiry <= 3 ? 'high' : 'watch',
+        urgency: r.days_to_expiry <= 1 ? 'today' :
+          r.days_to_expiry <= 3 ? 'high' : 'watch',
       };
     }),
     count: rows.length,
-    note: 'The alternative to a deep discount on these is not a lower price — it is a '
-        + 'total loss plus disposal cost, with the farmer floor still owed.',
+    note: 'The alternative to a deep discount on these is not a lower price — it is a ' +
+        'total loss plus disposal cost, with the farmer floor still owed.',
   };
 }
 
@@ -663,7 +663,7 @@ async function floorBenchmark(categoryOrName) {
         AND (c.category ILIKE '%' || $1 || '%'
              OR c.common_name ILIKE '%' || $1 || '%'
              OR fl.title ILIKE '%' || $1 || '%')`,
-    [q]
+    [q],
   );
   const vals = rows.map((r) => Number(r.floor_price_per_kg));
 
@@ -673,7 +673,7 @@ async function floorBenchmark(categoryOrName) {
       max: vals.length ? vals[0] : null,
       avg: vals.length ? vals[0] : null,
       count: vals.length,
-      note: 'not enough data - need at least 2 peer farmers'
+      note: 'not enough data - need at least 2 peer farmers',
     };
   }
 
@@ -710,7 +710,7 @@ async function floorBenchmark(categoryOrName) {
 // ===========================================================================
 async function allocScore(lotCode, dest) {
   const { rows: lots } = await ymPool.query(
-    'SELECT * FROM pricing_lots WHERE lot_code = $1', [lotCode]
+    'SELECT * FROM pricing_lots WHERE lot_code = $1', [lotCode],
   );
   if (!lots.length) throw new Error(`Lot ${lotCode} not found`);
   const lot = lots[0];
@@ -720,16 +720,16 @@ async function allocScore(lotCode, dest) {
        FROM farmers f
        LEFT JOIN addresses a ON a.id = f.farm_location_id
       WHERE f.id = $1`,
-    [lot.farmer_id]
+    [lot.farmer_id],
   );
   const farmer = farmerRows[0] || {};
   const fdiScore = farmer.fdi_score !== null && farmer.fdi_score !== undefined ? Number(farmer.fdi_score) : 50;
   const fdiGrade = farmer.fdi_grade || 'C';
 
   const { rows: cropRows } = await ymPool.query(
-    'SELECT is_perishable FROM crops WHERE crop_code = $1', [lot.crop_key]
+    'SELECT is_perishable FROM crops WHERE crop_code = $1', [lot.crop_key],
   );
-  const perish = cropRows.length ? !!cropRows[0].is_perishable : true;
+  const perish = cropRows.length ? Boolean(cropRows[0].is_perishable) : true;
 
   const grade = lot.current_quality_score !== null && Number(lot.current_quality_score) >= 80 ? 'A' : 'B';
 
@@ -741,7 +741,7 @@ async function allocScore(lotCode, dest) {
         WHERE (origin ILIKE $1 AND destination ILIKE $2)
            OR (origin ILIKE $2 AND destination ILIKE $1)
         LIMIT 1`,
-      [farmer.region, dest]
+      [farmer.region, dest],
     );
     if (laneRows.length) { dist = Number(laneRows[0].distance_km); distQuality = 'real'; }
   }
@@ -754,27 +754,27 @@ async function allocScore(lotCode, dest) {
     {
       name: `FDI grade ${fdiGrade}`, weight: 0.30,
       score: Math.max(0, Math.min(100, fdiScore)),
-      dataQuality: farmer.fdi_score !== null && farmer.fdi_score !== undefined ? 'real' : 'assumed'
+      dataQuality: farmer.fdi_score !== null && farmer.fdi_score !== undefined ? 'real' : 'assumed',
     },
     {
       name: `Quality grade ${grade}`, weight: 0.20,
       score: grade === 'A' ? 100 : 60,
-      dataQuality: lot.current_quality_score !== null ? 'real' : 'assumed'
+      dataQuality: lot.current_quality_score !== null ? 'real' : 'assumed',
     },
     {
       name: `${dist} km to destination`, weight: 0.20,
       score: Math.max(0, Math.min(100, 100 - (dist / 2400) * 100)),
-      dataQuality: distQuality
+      dataQuality: distQuality,
     },
     {
       name: 'Price headroom above farmer floor', weight: 0.15,
       score: Math.max(0, Math.min(100, margin * (25 / 0.15))),
-      dataQuality: 'real'
+      dataQuality: 'real',
     },
     {
       name: `Freshness: ${perish ? 'perishable' : 'durable'}`, weight: 0.15,
       score: perish ? 100 : (10 / 0.15),
-      dataQuality: cropRows.length ? 'real' : 'assumed'
+      dataQuality: cropRows.length ? 'real' : 'assumed',
     },
   ];
 
@@ -813,7 +813,7 @@ async function allocScore(lotCode, dest) {
 //   different prices for the same lot.
 //
 //   catalogIntelligenceService.js's SEASONALITY is availability (what can be
-//   sold this month); omnichannelaiBackboneService.js is channel plumbing (web/
+//   sold this month); omnichannelAIService.js is channel plumbing (web/
 //   WhatsApp/SMS delivery), not pricing at all. Neither overlaps with a
 //   festival-demand price adjustment, which is why this is a genuine gap
 //   rather than a duplicate of either file.
@@ -894,7 +894,7 @@ async function festivalPricingAdjustment(lotCode, { asOfDate } = {}) {
   const base = await priceForLot(lotCode);
 
   const { rows: lots } = await ymPool.query(
-    'SELECT crop_key, farmer_floor_inr_per_kg FROM pricing_lots WHERE lot_code = $1', [lotCode]
+    'SELECT crop_key, farmer_floor_inr_per_kg FROM pricing_lots WHERE lot_code = $1', [lotCode],
   );
   if (!lots.length) throw new Error(`Lot ${lotCode} not found`);
   const floor = Number(lots[0].farmer_floor_inr_per_kg);
@@ -903,7 +903,7 @@ async function festivalPricingAdjustment(lotCode, { asOfDate } = {}) {
   let commonName = null;
   if (lots[0].crop_key) {
     const { rows: cropRows } = await ymPool.query(
-      'SELECT category, common_name FROM crops WHERE crop_code = $1', [lots[0].crop_key]
+      'SELECT category, common_name FROM crops WHERE crop_code = $1', [lots[0].crop_key],
     );
     if (cropRows.length) {
       category = cropRows[0].category;
@@ -950,8 +950,8 @@ async function festivalPricingAdjustment(lotCode, { asOfDate } = {}) {
   // fraction of price.
   if (!Number.isFinite(rawFestivalPrice)) {
     throw new Error(
-      `Festival pricing for lot ${lotCode} produced a non-finite price `
-      + `(base=${preFestivalPrice}, upliftPct=${upliftPct}). Refusing to quote it.`
+      `Festival pricing for lot ${lotCode} produced a non-finite price ` +
+      `(base=${preFestivalPrice}, upliftPct=${upliftPct}). Refusing to quote it.`,
     );
   }
   let festivalPrice = INR_ROUND(rawFestivalPrice);
@@ -963,7 +963,7 @@ async function festivalPricingAdjustment(lotCode, { asOfDate } = {}) {
     // silently, matching the correctness bar for every price-computing
     // function in this service.
     logger.error('Festival pricing computed below farmer floor — clamping', {
-      lotCode, computed: festivalPrice, floor
+      lotCode, computed: festivalPrice, floor,
     });
     festivalPrice = floor;
     floorEnforced = true;
@@ -979,13 +979,13 @@ async function festivalPricingAdjustment(lotCode, { asOfDate } = {}) {
     priceInrPerKg: festivalPrice,
     floorEnforced,
     consideredFestivals: matches,
-    note: strongest
-      ? `${strongest.name} demand window (${strongest.daysFromFestival >= 0 ? '+' : ''}`
-        + `${strongest.daysFromFestival}d from festival date) applied a ${upliftPct}% uplift `
-        + 'over the yield-managed price.'
-        + (base.floorApplied ? ' The underlying yield-managed price was already floor-capped; '
-          + 'the uplift is computed on that floor price, not list price.' : '')
-      : 'No festival demand window applies to this product/category right now.',
+    note: strongest ?
+      `${strongest.name} demand window (${strongest.daysFromFestival >= 0 ? '+' : ''}` +
+        `${strongest.daysFromFestival}d from festival date) applied a ${upliftPct}% uplift ` +
+        `over the yield-managed price.${
+          base.floorApplied ? ' The underlying yield-managed price was already floor-capped; ' +
+          'the uplift is computed on that floor price, not list price.' : ''}` :
+      'No festival demand window applies to this product/category right now.',
   };
 }
 
@@ -1083,10 +1083,10 @@ module.exports = {
   optimizeFarmerSelection,
   getPriceAlerts,
   setPricingRules,
-  setupRoutes
+  setupRoutes,
 };
 
 // Merged unique operations from backend/src/modules/M055 (see git history there for
 // full context) - complementary functionality this service did not have.
-Object.assign(module.exports, require("../../modules/M055/service"));
+Object.assign(module.exports, require('../../modules/M055/service'));
 

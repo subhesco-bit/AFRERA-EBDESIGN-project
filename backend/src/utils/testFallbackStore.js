@@ -30,7 +30,7 @@ function persistTestFallback(table, key, value, append = false) {
   if (!isTestMode()) {
     throw new Error(
       `Write to "${table}" returned no row; refusing to report success for ` +
-      'data that was not persisted. Check the database connection and schema.'
+      'data that was not persisted. Check the database connection and schema.',
     );
   }
 

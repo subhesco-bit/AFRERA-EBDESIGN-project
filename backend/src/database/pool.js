@@ -106,7 +106,7 @@ const testStores = {
   test_methods: new Map(),
   samples: new Map(),
   test_assignments: new Map(),
-  test_results: new Map()
+  test_results: new Map(),
 };
 
 // Seed useful defaults for test-mode so endpoints expecting pre-seeded reference data pass
@@ -117,7 +117,7 @@ if (process.env.NODE_ENV === 'test' || process.env.USE_TEST_DB === 'true') {
     { id: 'PRO', symbol: 'PRO', name: 'Protein', unit: 'g', rda: 50 },
     { id: 'CARB', symbol: 'CARB', name: 'Carbohydrate', unit: 'g', rda: 300 },
     { id: 'FAT', symbol: 'FAT', name: 'Fat', unit: 'g', rda: 70 },
-    { id: 'FIB', symbol: 'FIB', name: 'Fiber', unit: 'g', rda: 30 }
+    { id: 'FIB', symbol: 'FIB', name: 'Fiber', unit: 'g', rda: 30 },
   ];
   defaultNutrients.forEach(n => testStores.nutrients.set(n.id, n));
 
@@ -178,7 +178,7 @@ function splitTopLevelCommas(s) {
       if (c === quote && s[i + 1] === quote) { current += s[++i]; } else if (c === quote) { quote = null; }
       continue;
     }
-    if (c === "'" || c === '"') { quote = c; current += c; continue; }
+    if (c === '\'' || c === '"') { quote = c; current += c; continue; }
     if (c === '(') depth += 1;
     if (c === ')') depth -= 1;
     if (c === ',' && depth === 0) { parts.push(current.trim()); current = ''; continue; }
@@ -207,7 +207,7 @@ function evalSqlValueExpr(expr, params) {
   }
 
   const str = e.match(/^'([\s\S]*)'$/);
-  if (str) return str[1].replace(/''/g, "'");
+  if (str) return str[1].replace(/''/g, '\'');
 
   const lower = e.toLowerCase();
   if (lower === 'null') return null;
@@ -236,7 +236,7 @@ function evalSqlValueExpr(expr, params) {
 /** `INSERT INTO t (a, b) VALUES ($1, 'x') RETURNING *` -> { table, row } | null */
 function parseInsertReturning(text, params) {
   const m = String(text).match(
-    /insert\s+into\s+"?([a-z_][a-z0-9_]*)"?\s*\(([\s\S]*?)\)\s*values\s*\(([\s\S]*?)\)\s*(?:on\s+conflict|returning|;|$)/i
+    /insert\s+into\s+"?([a-z_][a-z0-9_]*)"?\s*\(([\s\S]*?)\)\s*values\s*\(([\s\S]*?)\)\s*(?:on\s+conflict|returning|;|$)/i,
   );
   if (!m) return null;
 
@@ -262,7 +262,7 @@ function parseInsertReturning(text, params) {
 /** `UPDATE t SET a = $1, b = 'x' WHERE id = $3 RETURNING *` -> { table, patch, whereParam } | null */
 function parseUpdateReturning(text, params) {
   const m = String(text).match(
-    /update\s+"?([a-z_][a-z0-9_]*)"?\s+set\s+([\s\S]*?)(?:\s+where\s+([\s\S]*?))?\s*(?:returning|;|$)/i
+    /update\s+"?([a-z_][a-z0-9_]*)"?\s+set\s+([\s\S]*?)(?:\s+where\s+([\s\S]*?))?\s*(?:returning|;|$)/i,
   );
   if (!m) return null;
 
@@ -338,8 +338,6 @@ function makeTestPool() {
       // Very small, conservative parser for the queries used in tests.
       const t = (text || '').toLowerCase();
 
-
-
       // INSERT INTO health_profiles ... RETURNING *
       if (t.includes('insert into health_profiles')) {
         const userId = params[0];
@@ -348,7 +346,7 @@ function makeTestPool() {
           user_id: userId,
           profile_name: params[1] || 'Test Profile',
           height_cm: params[4] || null,
-          weight_kg: params[5] || null
+          weight_kg: params[5] || null,
         };
         testStores.health_profiles.set(userId, row);
         return { rows: [row] };
@@ -381,7 +379,7 @@ function makeTestPool() {
           gi_premium: giPremium,
           final_price: finalPrice,
           premium_percentage: 20,
-          pricing_factors: { region_bonus: 0.1 }
+          pricing_factors: { region_bonus: 0.1 },
         };
         return { rows: [{ pricing }] };
       }
@@ -405,7 +403,7 @@ function makeTestPool() {
           unique_characteristics: params[10] ? JSON.parse(params[10]) : [],
           production_methods: params[11] ? JSON.parse(params[11]) : [],
           quality_standards: params[12] ? JSON.parse(params[12]) : [],
-          status: 'registered'
+          status: 'registered',
         };
         testStores.gi_products.set(productId, row);
         return { rows: [row] };
@@ -435,7 +433,7 @@ function makeTestPool() {
           certified_area_hectares: params[6] || null,
           annual_production_tonnes: params[7] || null,
           certification_status: 'active',
-          registration_date: new Date().toISOString()
+          registration_date: new Date().toISOString(),
         };
         const arr = testStores.gi_producers.get(giProductId) || [];
         arr.push(row);
@@ -462,7 +460,7 @@ function makeTestPool() {
           gi_premium: params[3] || 0,
           final_price: params[4] || params[2] || 0,
           premium_percentage: params[5] || 0,
-          pricing_factors: params[6] ? JSON.parse(params[6]) : {}
+          pricing_factors: params[6] ? JSON.parse(params[6]) : {},
         };
         const arr = testStores.gi_product_pricing.get(productId) || [];
         arr.push(row);
@@ -483,7 +481,7 @@ function makeTestPool() {
           authentication_code: authCode,
           producer_id: producerId,
           production_date: new Date().toISOString(),
-          authentication_status: 'verified'
+          authentication_status: 'verified',
         };
         testStores.gi_authentication.set(authCode, row);
         return { rows: [row] };
@@ -495,7 +493,6 @@ function makeTestPool() {
         const row = testStores.gi_authentication.get(authCode);
         return { rows: row ? [row] : [] };
       }
-
 
       // INSERT into gi_marketplace_listings
       if (t.includes('insert into gi_marketplace_listings')) {
@@ -523,13 +520,13 @@ function makeTestPool() {
           available_quantity: availableQuantity,
           unit,
           price_per_unit: pricePerUnit,
-          is_premium_priced: !!isPremium,
+          is_premium_priced: Boolean(isPremium),
           premium_percentage: premiumPercentage,
           quality_tier: qualityTier,
           harvest_date: harvestDate,
           location_id: locationId,
           listing_status: 'active',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.gi_marketplace.set(row.id, row);
         return { rows: [row] };
@@ -557,7 +554,7 @@ function makeTestPool() {
           total_sales: params[4] || 0,
           total_quantity_sold: params[5] || 0,
           average_premium_percentage: params[6] || 0,
-          unique_consumers: params[7] || 0
+          unique_consumers: params[7] || 0,
         };
         const arr = testStores.gi_analytics.get(giProductId) || [];
         arr.push(row);
@@ -567,7 +564,7 @@ function makeTestPool() {
 
       // INSERT into blockchain_transactions
       if (t.includes('insert into blockchain_transactions')) {
-        const txHash = params[0] || `0x${Math.random().toString(16).slice(2,66)}`;
+        const txHash = params[0] || `0x${Math.random().toString(16).slice(2, 66)}`;
         const row = {
           transaction_hash: txHash,
           block_number: params[1] || null,
@@ -578,7 +575,7 @@ function makeTestPool() {
           gas_used: params[6] || 0,
           gas_price: params[7] || 0,
           status: params[8] || 'confirmed',
-          metadata: params[9] ? JSON.parse(params[9]) : {}
+          metadata: params[9] ? JSON.parse(params[9]) : {},
         };
         // Store with the exact transaction hash as key
         testStores.blockchain_transactions.set(txHash, row);
@@ -590,7 +587,7 @@ function makeTestPool() {
         const txHash = params[0];
         // Direct key lookup first
         let row = testStores.blockchain_transactions.get(txHash);
-        
+
         // If not found, try normalization (0x/no-0x, case-insensitive)
         if (!row) {
           const normalize = (h) => (h || '').toString().toLowerCase().replace(/^0x/, '');
@@ -599,7 +596,7 @@ function makeTestPool() {
           row = all.find(r => {
             if (!r || !r.transaction_hash) return false;
             const candidate = normalize(r.transaction_hash);
-            return candidate === targetNorm || candidate === ('0x'+targetNorm) || ('0x'+candidate) === targetNorm;
+            return candidate === targetNorm || candidate === (`0x${targetNorm}`) || (`0x${candidate}`) === targetNorm;
           });
         }
         return { rows: row ? [row] : [] };
@@ -619,7 +616,7 @@ function makeTestPool() {
           micronutrient_targets: params[4] || {},
           meal_frequency: params[5] || null,
           meal_timing: params[6] || {},
-          hydration_target_ml: params[7] || null
+          hydration_target_ml: params[7] || null,
         };
         testStores.dietary_profiles.set(userId, row);
         return { rows: [row] };
@@ -641,7 +638,7 @@ function makeTestPool() {
           certificate_data: params[8] ? JSON.parse(params[8]) : {},
           transaction_hash: params[9] || null,
           ipfs_hash: params[10] || null,
-          is_revoked: false
+          is_revoked: false,
         };
         testStores.blockchain_certificates.set(row.certificate_number, row);
         return { rows: [row] };
@@ -667,7 +664,7 @@ function makeTestPool() {
           average_gas_price: params[4] || 0,
           total_traceability_events: params[5] || 0,
           total_certificates_issued: params[6] || 0,
-          unique_products_tracked: params[7] || 0
+          unique_products_tracked: params[7] || 0,
         };
         testStores.blockchain_analytics.set(key, row);
         return { rows: [row] };
@@ -683,7 +680,7 @@ function makeTestPool() {
           metric_value: params[2] || null,
           unit: params[3] || null,
           notes: params[4] || null,
-          source: params[5] || 'manual'
+          source: params[5] || 'manual',
         };
         const arr = testStores.health_metrics.get(userId) || [];
         arr.push(row);
@@ -711,7 +708,7 @@ function makeTestPool() {
           gi_id: params[11] || null,
           shelf_life_days: params[12] || null,
           storage_conditions: params[13] ? JSON.parse(params[13]) : {},
-          allergens: params[14] ? JSON.parse(params[14]) : []
+          allergens: params[14] ? JSON.parse(params[14]) : [],
         };
         testStores.food_items.set(row.id, row);
         return { rows: [row] };
@@ -730,7 +727,7 @@ function makeTestPool() {
         try {
           const obj = JSON.parse(params[0] || '{}');
           const values = Object.values(obj).filter(v => typeof v === 'number');
-          const score = values.length ? Math.round((values.reduce((a,b) => a+b,0) / values.length)) : 0;
+          const score = values.length ? Math.round((values.reduce((a, b) => a + b, 0) / values.length)) : 0;
           return { rows: [{ score }] };
         } catch (e) {
           return { rows: [{ score: 0 }] };
@@ -767,7 +764,7 @@ function makeTestPool() {
           overall_quality_score: overall,
           quality_grade: grade,
           compliance_status: 'compliant',
-          recommendations
+          recommendations,
         };
         const arr = testStores.food_quality_assessments.get(foodItemId) || [];
         arr.push(row);
@@ -794,7 +791,7 @@ function makeTestPool() {
           unit: params[4] || null,
           start_date: params[5] || null,
           target_date: params[6] || null,
-          status: 'active'
+          status: 'active',
         };
         const arr = testStores.health_goals.get(userId) || [];
         arr.push(row);
@@ -812,7 +809,7 @@ function makeTestPool() {
           recommendation_text: params[2] || null,
           priority: params[3] || null,
           category: params[4] || null,
-          reasoning: params[5] || null
+          reasoning: params[5] || null,
         };
         const arr = testStores.dietary_recommendations.get(userId) || [];
         arr.push(row);
@@ -829,7 +826,7 @@ function makeTestPool() {
           alert_type: params[1] || null,
           severity: params[2] || null,
           alert_message: params[3] || null,
-          trigger_data: params[4] || null
+          trigger_data: params[4] || null,
         };
         const arr = testStores.health_alerts.get(userId) || [];
         arr.push(row);
@@ -849,7 +846,7 @@ function makeTestPool() {
           quantity_g: params[4] || null,
           calories_consumed: params[5] || null,
           nutritional_intake: params[6] || null,
-          notes: params[7] || null
+          notes: params[7] || null,
         };
         const arr = testStores.food_consumption_logs.get(userId) || [];
         arr.push(row);
@@ -888,7 +885,7 @@ function makeTestPool() {
           unit,
           detection_limit: detectionLimit,
           result_status: status,
-          test_method: method
+          test_method: method,
         };
         const arr = testStores.food_contaminant_tests.get(foodItemId) || [];
         arr.push(row);
@@ -920,7 +917,7 @@ function makeTestPool() {
           overall_freshness_score: overall,
           freshness_status: freshnessStatus,
           estimated_remaining_days: remainingDays,
-          storage_recommendations: storageRecs
+          storage_recommendations: storageRecs,
         };
         const arr = testStores.food_freshness_assessments.get(foodItemId) || [];
         arr.push(row);
@@ -950,7 +947,7 @@ function makeTestPool() {
           affected_batches: affectedBatches,
           affected_regions: affectedRegions,
           recalling_firm: firm,
-          recall_status: 'active'
+          recall_status: 'active',
         };
         testStores.food_recalls.set(row.id, row);
         return { rows: [row] };
@@ -977,7 +974,7 @@ function makeTestPool() {
           average_freshness_score: params[5] || 0,
           market_price: params[6] || 0,
           demand_index: params[7] || 0,
-          supply_index: params[8] || 0
+          supply_index: params[8] || 0,
         };
         const arr = testStores.food_intelligence_analytics.get(foodItemId) || [];
         arr.push(row);
@@ -1044,7 +1041,7 @@ function makeTestPool() {
           file_size_bytes: params[4] || null,
           thumbnail_url: params[5] || null,
           metadata: params[6] ? JSON.parse(params[6]) : {},
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         // legacy name
         row.name = row.asset_name;
@@ -1068,7 +1065,7 @@ function makeTestPool() {
           position_x: params[3] || 0,
           position_y: params[4] || 0,
           position_z: params[5] || 0,
-          interaction_data: params[6] ? JSON.parse(params[6]) : {}
+          interaction_data: params[6] ? JSON.parse(params[6]) : {},
         };
         testStores.arvr_interaction_points = testStores.arvr_interaction_points || new Map();
         const arr = testStores.arvr_interaction_points.get(row.experience_id) || [];
@@ -1093,7 +1090,7 @@ function makeTestPool() {
           device_type: params[3] || 'mobile',
           session_data: params[4] ? JSON.parse(params[4]) : {},
           started_at: new Date().toISOString(),
-          ended_at: null
+          ended_at: null,
         };
         testStores.arvr_sessions = testStores.arvr_sessions || new Map();
         testStores.arvr_sessions.set(row.id, row);
@@ -1127,7 +1124,7 @@ function makeTestPool() {
             platform_requirements: {},
             is_published: true,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           };
           testStores.arvr_experiences.set(created.id, created);
           return { rows: [created] };
@@ -1160,7 +1157,7 @@ function makeTestPool() {
             started_at: new Date(Date.now() - 1000 * 60).toISOString(),
             ended_at: new Date().toISOString(),
             duration_seconds: 60,
-            interaction_count: interactionCount
+            interaction_count: interactionCount,
           };
           testStores.arvr_sessions.set(created.id, created);
           return { rows: [created] };
@@ -1196,7 +1193,7 @@ function makeTestPool() {
           avg_duration,
           total_interactions,
           most_viewed_experiences: most_viewed,
-          device_distribution
+          device_distribution,
         };
         testStores.arvr_analytics = testStores.arvr_analytics || new Map();
         testStores.arvr_analytics.set(row.id, row);
@@ -1209,7 +1206,7 @@ function makeTestPool() {
         const id = params[0] || `nut-${Date.now()}`;
         const name = params[1] || 'Protein';
         const unit = params[2] || 'g';
-        const row = { id, symbol: (name || '').slice(0,3).toUpperCase(), name, unit, rda: params[3] || null };
+        const row = { id, symbol: (name || '').slice(0, 3).toUpperCase(), name, unit, rda: params[3] || null };
         testStores.nutrients = testStores.nutrients || new Map();
         testStores.nutrients.set(row.id, row);
         return { rows: [row] };
@@ -1236,7 +1233,7 @@ function makeTestPool() {
           payload.is_organic = params[6] || payload.is_organic;
           payload.nutrition_data = params[7] ? JSON.parse(params[7]) : payload.nutrition_data || {};
         }
-        const row = { id, food_name: payload.food_name || 'Test Food', scientific_name: payload.scientific_name || null, food_group: payload.food_group || null, botanical_family: payload.botanical_family || null, variety: payload.variety || null, origin_region: payload.origin_region || null, is_organic: !!payload.is_organic, nutrition_data: payload.nutrition_data || {} };
+        const row = { id, food_name: payload.food_name || 'Test Food', scientific_name: payload.scientific_name || null, food_group: payload.food_group || null, botanical_family: payload.botanical_family || null, variety: payload.variety || null, origin_region: payload.origin_region || null, is_organic: Boolean(payload.is_organic), nutrition_data: payload.nutrition_data || {} };
         testStores.food_profiles = testStores.food_profiles || new Map();
         testStores.food_profiles.set(id, row);
         return { rows: [row] };
@@ -1279,7 +1276,7 @@ function makeTestPool() {
       if (t.includes('select calculate_nutrition_score') || t.includes('select calculate_nutrition_score(')) {
         const payload = params[0] ? JSON.parse(params[0]) : {};
         const nutrients = Object.values(payload).filter(v => typeof v === 'number');
-        const score = nutrients.length ? Math.round((nutrients.reduce((a,b)=>a+b,0)/nutrients.length)) : 0;
+        const score = nutrients.length ? Math.round((nutrients.reduce((a, b) => a + b, 0) / nutrients.length)) : 0;
         // assign grade
         let grade = 'D';
         if (score >= 85) grade = 'A';
@@ -1293,7 +1290,7 @@ function makeTestPool() {
         const base = Number(params[1]) || 100;
         const premium = Number((base * 0.15).toFixed(2));
         const finalPrice = Number((base + premium).toFixed(2));
-        return { rows: [{ base_price: base, final_price: finalPrice, price_premium_percentage: Math.round((premium/base)*100) }] };
+        return { rows: [{ base_price: base, final_price: finalPrice, price_premium_percentage: Math.round((premium / base) * 100) }] };
       }
 
       // Conversational AI: domains, sessions, messages, context, simple intent detection
@@ -1354,12 +1351,12 @@ function makeTestPool() {
         const intentDetected = params[5] || null;
         const confidenceScore = params[6] || null;
         const processingTime = params[7] || 0;
-        
+
         const id = `msg-${Date.now()}`;
-        const row = { 
-          id, 
-          message_id: id, 
-          session_id: sessionId, 
+        const row = {
+          id,
+          message_id: id,
+          session_id: sessionId,
           role,
           content,
           content_type: contentType,
@@ -1367,7 +1364,7 @@ function makeTestPool() {
           intent_detected: intentDetected,
           confidence_score: confidenceScore,
           processing_time_ms: processingTime,
-          created_at: new Date().toISOString() 
+          created_at: new Date().toISOString(),
         };
         testStores.conversation_messages = testStores.conversation_messages || new Map();
         const arr = testStores.conversation_messages.get(sessionId) || [];
@@ -1399,12 +1396,12 @@ function makeTestPool() {
         const sessionId = params[0];
         const contextKey = params[1];
         const contextValue = params[2] ? JSON.parse(params[2]) : {};
-        
+
         testStores.conversation_context = testStores.conversation_context || new Map();
         const contextMap = testStores.conversation_context.get(sessionId) || new Map();
         contextMap.set(contextKey, contextValue);
         testStores.conversation_context.set(sessionId, contextMap);
-        
+
         return { rows: [{ session_id: sessionId, context_key: contextKey, context_value: contextValue }] };
       }
 
@@ -1412,18 +1409,18 @@ function makeTestPool() {
         const sessionId = params[0];
         testStores.conversation_context = testStores.conversation_context || new Map();
         const contextMap = testStores.conversation_context.get(sessionId) || new Map();
-        
+
         if (t.includes('and context_key')) {
           const contextKey = params[1];
           const value = contextMap.get(contextKey);
           return { rows: value ? [{ session_id: sessionId, context_key: contextKey, context_value: value }] : [] };
         }
-        
+
         // Return all context as array
         const allContext = Array.from(contextMap.entries()).map(([key, value]) => ({
           session_id: sessionId,
           context_key: key,
-          context_value: value
+          context_value: value,
         }));
         return { rows: allContext };
       }
@@ -1480,9 +1477,9 @@ function makeTestPool() {
       if (t.includes('select calculate_crop_recommendation')) {
         const soilType = params[0] || 'loam';
         const season = params[1] || 'kharif';
-        const recommendations = soilType === 'loam' && season === 'kharif' 
-          ? ['rice', 'maize', 'cotton'] 
-          : ['wheat', 'barley', 'mustard'];
+        const recommendations = soilType === 'loam' && season === 'kharif' ?
+          ['rice', 'maize', 'cotton'] :
+          ['wheat', 'barley', 'mustard'];
         return { rows: [{ recommended_crops: recommendations, soil_type: soilType, season }] };
       }
 
@@ -1505,7 +1502,7 @@ function makeTestPool() {
           session_id: sessionId,
           language,
           status: 'active',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.voice_sessions = testStores.voice_sessions || new Map();
         testStores.voice_sessions.set(sessionId, row);
@@ -1552,7 +1549,7 @@ function makeTestPool() {
           confidence_score: confidenceScore,
           parameters,
           execution_status: 'executed',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.voice_commands = testStores.voice_commands || new Map();
         const arr = testStores.voice_commands.get(sessionId) || [];
@@ -1585,7 +1582,7 @@ function makeTestPool() {
           language_detected: languageDetected,
           recognition_provider: recognitionProvider,
           processing_time_ms: processingTime,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.speech_recognition_logs = testStores.speech_recognition_logs || new Map();
         const arr = testStores.speech_recognition_logs.get(sessionId) || [];
@@ -1609,7 +1606,7 @@ function makeTestPool() {
           content,
           audio_url: audioUrl,
           language,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.voice_responses = testStores.voice_responses || new Map();
         const arr = testStores.voice_responses.get(sessionId) || [];
@@ -1628,7 +1625,7 @@ function makeTestPool() {
           voice_speed: params[3] || 1.0,
           voice_volume: params[4] || 1.0,
           auto_response_enabled: params[5] !== false,
-          confirmation_required: params[6] !== false
+          confirmation_required: params[6] !== false,
         };
         testStores.voice_preferences = testStores.voice_preferences || new Map();
         testStores.voice_preferences.set(userId, row);
@@ -1655,7 +1652,7 @@ function makeTestPool() {
           avg_confidence: metrics.avg_confidence || 0,
           avg_duration: metrics.avg_duration || 0,
           most_used_commands: metrics.most_used_commands || {},
-          date: new Date().toISOString().split('T')[0]
+          date: new Date().toISOString().split('T')[0],
         };
         testStores.voice_analytics = testStores.voice_analytics || new Map();
         const arr = testStores.voice_analytics.get(userId) || [];
@@ -1681,7 +1678,7 @@ function makeTestPool() {
           coverage_amount: Number(params[3]) || 0,
           premium: Number(params[4]) || 0,
           status: 'active',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.insurance_policies = testStores.insurance_policies || new Map();
         testStores.insurance_policies.set(row.id, row);
@@ -1705,7 +1702,7 @@ function makeTestPool() {
           gst_amount: Number(params[2]) || 0,
           total_amount: Number(params[3]) || 0,
           gst_rate: Number(params[4]) || 0.18,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.gst_invoices = testStores.gst_invoices || new Map();
         testStores.gst_invoices.set(row.id, row);
@@ -1721,7 +1718,7 @@ function makeTestPool() {
           rating: Number(params[2]) || 5,
           review_text: params[3] || '',
           helpful_count: 0,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.product_reviews = testStores.product_reviews || new Map();
         const arr = testStores.product_reviews.get(row.product_id) || [];
@@ -1746,7 +1743,7 @@ function makeTestPool() {
           product_id: params[1],
           quantity: Number(params[2]) || 0,
           status: 'pending',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.bulk_orders = testStores.bulk_orders || new Map();
         testStores.bulk_orders.set(row.id, row);
@@ -1762,7 +1759,7 @@ function makeTestPool() {
           location: params[2] || '',
           soil_type: params[3] || 'loam',
           ownership_type: params[4] || 'owned',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.land_records = testStores.land_records || new Map();
         const arr = testStores.land_records.get(row.farmer_id) || [];
@@ -1780,7 +1777,7 @@ function makeTestPool() {
           sowing_date: params[2] || new Date().toISOString().split('T')[0],
           expected_harvest: params[3] || '',
           status: 'planned',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.crop_plans = testStores.crop_plans || new Map();
         const arr = testStores.crop_plans.get(row.farmer_id) || [];
@@ -1796,7 +1793,7 @@ function makeTestPool() {
           farmer_id: params[0],
           balance: Number(params[1]) || 0,
           currency: 'INR',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.farmer_wallets = testStores.farmer_wallets || new Map();
         testStores.farmer_wallets.set(row.farmer_id, row);
@@ -1828,7 +1825,7 @@ function makeTestPool() {
           glycemic_load: Number(params[11]) || 0,
           anti_inflammatory_score: Number(params[12]) || 0,
           antioxidant_capacity: Number(params[13]) || 0,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.food_nutrition_profiles = testStores.food_nutrition_profiles || new Map();
         testStores.food_nutrition_profiles.set(row.id, row);
@@ -1850,7 +1847,7 @@ function makeTestPool() {
           servings_per_container: parseFloat(params[9]) || 1,
           verification_method: params[10] || 'unknown',
           confidence_score: parseFloat(params[11]) || 0,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         testStores.product_nutrition = testStores.product_nutrition || new Map();
         testStores.product_nutrition.set(row.product_id, row);
@@ -1901,7 +1898,7 @@ function makeTestPool() {
       if (t.includes('select calculate_nutrition_score')) {
         const nutritionData = params[0] ? JSON.parse(params[0]) : {};
         const scoringModelId = params[1] || 1;
-        
+
         // Simple scoring algorithm
         let score = 70; // base score
         if (nutritionData.PRO > 5) score += 5;
@@ -1910,37 +1907,37 @@ function makeTestPool() {
         if (nutritionData.SAT_FAT < 1) score += 5;
         if (nutritionData.VIT_C > 5) score += 3;
         if (nutritionData.IRON > 1) score += 3;
-        
+
         score = Math.min(100, Math.max(0, score));
         const grade = score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F';
-        
+
         return { rows: [{ overall_score: score, grade, scoring_model_id: scoringModelId }] };
       }
 
       if (t.includes('select calculate_nutrition_score_from_data')) {
         const nutritionData = params[0] ? JSON.parse(params[0]) : {};
         const scoringModelId = params[1] || 1;
-        
+
         // Calculate individual component scores
         const proteinScore = Math.min(100, (nutritionData.PRO || 0) * 10);
         const fiberScore = Math.min(100, (nutritionData.FIB || 0) * 15);
         const sugarScore = Math.max(0, 100 - (nutritionData.SUGAR || 0) * 5);
         const sodiumScore = Math.max(0, 100 - (nutritionData.SOD || 0) * 2);
         const fatScore = Math.max(0, 100 - (nutritionData.FAT || 0) * 10);
-        
+
         // Overall score (weighted average)
         const overallScore = Math.round((proteinScore * 0.25 + fiberScore * 0.25 + sugarScore * 0.15 + sodiumScore * 0.15 + fatScore * 0.20));
         const grade = overallScore >= 90 ? 'A' : overallScore >= 80 ? 'B' : overallScore >= 70 ? 'C' : overallScore >= 60 ? 'D' : 'F';
-        
-        return { rows: [{ 
-          overall_score: overallScore, 
-          grade, 
+
+        return { rows: [{
+          overall_score: overallScore,
+          grade,
           scoring_model_id: scoringModelId,
           protein_score: proteinScore,
           fiber_score: fiberScore,
           sugar_score: sugarScore,
           sodium_score: sodiumScore,
-          fat_score: fatScore
+          fat_score: fatScore,
         }]};
       }
 
@@ -1948,11 +1945,11 @@ function makeTestPool() {
         const basePrice = Number(params[0]) || 100;
         const nutritionScore = Number(params[1]) || 70;
         const pricingRuleId = params[2] || 1;
-        
+
         // Premium pricing for higher nutrition scores
         const premiumMultiplier = 1 + ((nutritionScore - 70) / 100) * 0.3;
         const finalPrice = Math.round(basePrice * premiumMultiplier);
-        
+
         return { rows: [{ base_price: basePrice, final_price: finalPrice, nutrition_score: nutritionScore, premium_multiplier: premiumMultiplier }] };
       }
 
@@ -1960,21 +1957,21 @@ function makeTestPool() {
       if (t.includes('select compare_nutrition_profiles')) {
         const productAId = params[0];
         const productBId = params[1];
-        
+
         testStores.product_nutrition = testStores.product_nutrition || new Map();
         const productA = testStores.product_nutrition.get(productAId) || { nutrition_data: {} };
         const productB = testStores.product_nutrition.get(productBId) || { nutrition_data: {} };
-        
+
         const comparison = {
           product_a: { id: productAId, nutrition_data: productA.nutrition_data },
           product_b: { id: productBId, nutrition_data: productB.nutrition_data },
           summary: {
             protein_diff: (productA.nutrition_data.PRO || 0) - (productB.nutrition_data.PRO || 0),
             fiber_diff: (productA.nutrition_data.FIB || 0) - (productB.nutrition_data.FIB || 0),
-            calories_diff: (productA.nutrition_data.CAL || 0) - (productB.nutrition_data.CAL || 0)
-          }
+            calories_diff: (productA.nutrition_data.CAL || 0) - (productB.nutrition_data.CAL || 0),
+          },
         };
-        
+
         return { rows: [comparison] };
       }
 
@@ -1989,7 +1986,7 @@ function makeTestPool() {
           base_premium_percentage: 10,
           max_premium_percentage: 30,
           is_active: true,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         return { rows: [rule] };
       }
@@ -2007,7 +2004,7 @@ function makeTestPool() {
           sodium_score: parseFloat(params[6]) || 0,
           fat_score: parseFloat(params[7]) || 0,
           scoring_model_id: params[8] || 1,
-          calculated_at: new Date().toISOString()
+          calculated_at: new Date().toISOString(),
         };
         testStores.nutrition_scores = testStores.nutrition_scores || new Map();
         testStores.nutrition_scores.set(row.product_id, row);
@@ -2158,7 +2155,7 @@ function makeTestPool() {
           const defaultStandards = [
             { id: 1, code: 'NOP', name: 'National Organic Program', is_active: true },
             { id: 2, code: 'EU-ORG', name: 'EU Organic', is_active: true },
-            { id: 3, code: 'USDA', name: 'USDA Organic', is_active: true }
+            { id: 3, code: 'USDA', name: 'USDA Organic', is_active: true },
           ];
           for (const row of defaultStandards) {
             testStores.organic_standards.set(row.id, row);
@@ -2207,12 +2204,12 @@ function makeTestPool() {
           }
           return self.query(text, params);
         },
-        release: () => {}
+        release: () => {},
       };
     },
 
     raw: () => ({ /* not used in tests */ }),
-    isReady: () => true
+    isReady: () => true,
   };
 }
 
@@ -2226,8 +2223,8 @@ function resolve() {
   const pool = getPostgreSQL();
   if (!pool) {
     throw new Error(
-      'PostgreSQL pool is not initialised. Call database/connection.initialize() '
-      + 'during boot before serving requests.'
+      'PostgreSQL pool is not initialised. Call database/connection.initialize() ' +
+      'during boot before serving requests.',
     );
   }
   return pool;
@@ -2277,5 +2274,5 @@ module.exports = {
   /** Test harness helper: seed or append test data into the in-memory stores */
   setTestData,
   getTestData,
-  getAllTestData
+  getAllTestData,
 };

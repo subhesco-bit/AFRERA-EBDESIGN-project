@@ -8,7 +8,7 @@ import React from 'react';
 // Card Component
 export const Card = ({ children, className = '', ...props }) => {
   return (
-    <div 
+    <div
       className={`bg-white rounded-lg shadow-md p-6 ${className}`}
       {...props}
     >
@@ -18,15 +18,15 @@ export const Card = ({ children, className = '', ...props }) => {
 };
 
 // Button Component
-export const Button = ({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
+export const Button = ({
+  children,
+  variant = 'primary',
+  size = 'md',
   className = '',
-  ...props 
+  ...props
 }) => {
   const baseClasses = 'font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-  
+
   const variantClasses = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
     secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
@@ -34,15 +34,15 @@ export const Button = ({
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     warning: 'bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500',
     outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
-    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
+    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
   };
-  
+
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg'
+    lg: 'px-6 py-3 text-lg',
   };
-  
+
   return (
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
@@ -55,21 +55,21 @@ export const Button = ({
 
 // Badge Component
 export const Badge = ({ children, variant = 'primary', size = 'md', className = '' }) => {
-  const variantClasses = {
+  let variantClasses = {
     primary: 'bg-blue-100 text-blue-800',
     secondary: 'bg-gray-100 text-gray-800',
     success: 'bg-green-100 text-green-800',
     danger: 'bg-red-100 text-red-800',
     warning: 'bg-yellow-100 text-yellow-800',
-    info: 'bg-blue-100 text-blue-800'
+    info: 'bg-blue-100 text-blue-800',
   };
-  
-  const sizeClasses = {
+
+  let sizeClasses = {
     sm: 'px-2 py-0.5 text-xs',
     md: 'px-2.5 py-0.5 text-sm',
-    lg: 'px-3 py-1 text-base'
+    lg: 'px-3 py-1 text-base',
   };
-  
+
   return (
     <span className={`inline-flex items-center rounded-full font-medium ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}>
       {children}
@@ -79,24 +79,24 @@ export const Badge = ({ children, variant = 'primary', size = 'md', className = 
 
 // Alert Component
 export const Alert = ({ children, variant = 'info', className = '', ...props }) => {
-  const variantClasses = {
+  let variantClasses = {
     primary: 'bg-blue-50 border-blue-200 text-blue-800',
     secondary: 'bg-gray-50 border-gray-200 text-gray-800',
     success: 'bg-green-50 border-green-200 text-green-800',
     danger: 'bg-red-50 border-red-200 text-red-800',
     warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    info: 'bg-blue-50 border-blue-200 text-blue-800'
+    info: 'bg-blue-50 border-blue-200 text-blue-800',
   };
-  
+
   const icons = {
     primary: 'ℹ️',
     secondary: '📋',
     success: '✅',
     danger: '⚠️',
     warning: '⚡',
-    info: 'ℹ️'
+    info: 'ℹ️',
   };
-  
+
   return (
     <div
       className={`border rounded-lg p-4 ${variantClasses[variant]} ${className}`}
@@ -112,12 +112,12 @@ export const Alert = ({ children, variant = 'info', className = '', ...props }) 
 
 // Spinner Component
 export const Spinner = ({ size = 'md', className = '' }) => {
-  const sizeClasses = {
+  let sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',
-    lg: 'h-12 w-12'
+    lg: 'h-12 w-12',
   };
-  
+
   return (
     <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 ${sizeClasses[size]} ${className}`}></div>
   );
@@ -157,22 +157,22 @@ export const DatePicker = ({ value, onChange, className = '', ...props }) => {
 // Modal Component
 export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   if (!isOpen) return null;
-  
-  const sizeClasses = {
+
+  let sizeClasses = {
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
-    xl: 'max-w-4xl'
+    xl: 'max-w-4xl',
   };
-  
+
   return (
     <div className="fixed inset-0 z-modal overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div 
+        <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={onClose}
         ></div>
-        
+
         <div className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]}`}>
           <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-center justify-between mb-4">
@@ -202,9 +202,9 @@ export const Tabs = ({ tabs, activeTab, onChange }) => {
             key={tab.id}
             onClick={() => onChange(tab.id)}
             className={`${
-              activeTab === tab.id
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              activeTab === tab.id ?
+                'border-blue-500 text-blue-600' :
+                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
             {tab.icon && <span className="mr-2">{tab.icon}</span>}
@@ -224,13 +224,13 @@ export const Progress = ({ value, max = 100, color = 'blue', showLabel = true })
     green: 'bg-green-600',
     yellow: 'bg-yellow-500',
     red: 'bg-red-600',
-    purple: 'bg-purple-600'
+    purple: 'bg-purple-600',
   };
-  
+
   const progressStyle = {
-    width: `${percentage}%`
+    width: `${percentage}%`,
   };
-  
+
   return (
     <div className="w-full">
       {showLabel && (
@@ -240,7 +240,7 @@ export const Progress = ({ value, max = 100, color = 'blue', showLabel = true })
         </div>
       )}
       <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div 
+        <div
           className={`${colorClasses[color]} h-2.5 rounded-full transition-all`}
           style={progressStyle}
         ></div>
@@ -252,17 +252,17 @@ export const Progress = ({ value, max = 100, color = 'blue', showLabel = true })
 // Tooltip Component
 export const Tooltip = ({ children, content, position = 'top' }) => {
   const [isVisible, setIsVisible] = React.useState(false);
-  
+
   const positionClasses = {
     top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',
     bottom: 'top-full left-1/2 transform -translate-x-1/2 mt-2',
     left: 'right-full top-1/2 transform -translate-y-1/2 mr-2',
-    right: 'left-full top-1/2 transform -translate-y-1/2 ml-2'
+    right: 'left-full top-1/2 transform -translate-y-1/2 ml-2',
   };
-  
+
   return (
     <div className="relative inline-block">
-      <div 
+      <div
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
       >
@@ -286,7 +286,7 @@ export const Breadcrumb = ({ items }) => {
           <li key={`breadcrumb-${index}-${item.label}`} className="flex items-center">
             {index > 0 && <span className="mx-2 text-gray-400">/</span>}
             {item.href ? (
-              <a 
+              <a
                 href={item.href}
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
@@ -310,11 +310,11 @@ export const StatusBadge = ({ status }) => {
     pending: { color: 'warning', label: 'Pending' },
     completed: { color: 'success', label: 'Completed' },
     failed: { color: 'danger', label: 'Failed' },
-    processing: { color: 'info', label: 'Processing' }
+    processing: { color: 'info', label: 'Processing' },
   };
-  
+
   const config = statusConfig[status.toLowerCase()] || { color: 'secondary', label: status };
-  
+
   return (
     <Badge variant={config.color}>
       {config.label}
@@ -361,7 +361,7 @@ export const DataTable = ({ columns, data, onRowClick, loading }) => {
       </div>
     );
   }
-  
+
   if (!data || data.length === 0) {
     return (
       <EmptyState
@@ -371,14 +371,14 @@ export const DataTable = ({ columns, data, onRowClick, loading }) => {
       />
     );
   }
-  
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
           <tr className="border-b bg-gray-50">
             {columns.map((column, index) => (
-              <th 
+              <th
                 key={`header-${column.header || index}`}
                 className="text-left py-3 px-4 text-sm font-semibold text-gray-700"
               >
@@ -389,7 +389,7 @@ export const DataTable = ({ columns, data, onRowClick, loading }) => {
         </thead>
         <tbody>
           {data.map((row, rowIndex) => (
-            <tr 
+            <tr
               key={`row-${rowIndex}-${row.id || rowIndex}`}
               onClick={() => onRowClick && onRowClick(row)}
               className={`border-b hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
@@ -423,5 +423,5 @@ export default {
   StatusBadge,
   EmptyState,
   SearchInput,
-  DataTable
+  DataTable,
 };

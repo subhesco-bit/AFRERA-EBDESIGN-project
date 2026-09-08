@@ -14,7 +14,7 @@ class PredictiveIntelligenceService {
     this.models = {
       demand: this.loadDemandModel(),
       pricing: this.loadPricingModel(),
-      yield: this.loadYieldModel()
+      yield: this.loadYieldModel(),
     };
   }
 
@@ -25,35 +25,35 @@ class PredictiveIntelligenceService {
     try {
       // Get historical data
       const historicalData = await this.getHistoricalDemandData(cropType, region, 90);
-      
+
       if (historicalData.length < 10) {
         return {
           success: false,
           error: 'Insufficient historical data for prediction',
-          dataPoints: historicalData.length
+          dataPoints: historicalData.length,
         };
       }
 
       // Apply predictive model
       const forecast = this.applyDemandModel(historicalData, forecastDays);
-      
+
       return {
         success: true,
         data: {
           cropType,
           region,
           forecastDays,
-          forecast: forecast,
+          forecast,
           confidence: this.calculateConfidence(historicalData),
-          generatedAt: new Date().toISOString()
-        }
+          generatedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - predictCropDemand error:`, error);
       return {
         success: false,
         error: 'Failed to predict crop demand',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -62,19 +62,22 @@ class PredictiveIntelligenceService {
    * Predict optimal pricing
    */
   async predictOptimalPricing(cropType, region, qualityGrade) {
+  // Validate inputs
+    if (!cropType) throw new Error('Missing required parameter');
+
     try {
       const marketData = await this.getMarketPricingData(cropType, region, 60);
-      
+
       if (marketData.length < 5) {
         return {
           success: false,
           error: 'Insufficient market data for pricing prediction',
-          dataPoints: marketData.length
+          dataPoints: marketData.length,
         };
       }
 
       const pricePrediction = this.applyPricingModel(marketData, qualityGrade);
-      
+
       return {
         success: true,
         data: {
@@ -85,15 +88,15 @@ class PredictiveIntelligenceService {
           priceRange: pricePrediction.range,
           marketFactors: pricePrediction.factors,
           confidence: pricePrediction.confidence,
-          generatedAt: new Date().toISOString()
-        }
+          generatedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - predictOptimalPricing error:`, error);
       return {
         success: false,
         error: 'Failed to predict optimal pricing',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -106,14 +109,14 @@ class PredictiveIntelligenceService {
       const farmerHistory = await this.getFarmerYieldHistory(farmerId);
       const cropData = await this.getCropCharacteristics(cropId);
       const environmentalData = await this.getEnvironmentalConditions(conditions.location);
-      
+
       const yieldPrediction = this.applyYieldModel({
         farmerHistory,
         cropData,
         environmentalData,
-        conditions
+        conditions,
       });
-      
+
       return {
         success: true,
         data: {
@@ -125,15 +128,15 @@ class PredictiveIntelligenceService {
           recommendations: yieldPrediction.recommendations,
           confidence: yieldPrediction.confidence,
           environmentalDataConfigured: environmentalData.configured !== false,
-          generatedAt: new Date().toISOString()
-        }
+          generatedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - predictCropYield error:`, error);
       return {
         success: false,
         error: 'Failed to predict crop yield',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -161,13 +164,13 @@ class PredictiveIntelligenceService {
       `;
 
       const result = await db.query(query, [region, season]);
-      
+
       const recommendations = result.rows.map(row => ({
         cropType: row.crop_type,
         variety: row.variety,
         expectedYield: parseFloat(row.avg_yield),
         expectedProfit: parseFloat(row.avg_profit),
-        confidence: this.calculateSeasonalConfidence(row.sample_count)
+        confidence: this.calculateSeasonalConfidence(row.sample_count),
       }));
 
       return {
@@ -176,15 +179,15 @@ class PredictiveIntelligenceService {
           region,
           season,
           recommendations,
-          generatedAt: new Date().toISOString()
-        }
+          generatedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - getSeasonalRecommendations error:`, error);
       return {
         success: false,
         error: 'Failed to get seasonal recommendations',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -294,7 +297,7 @@ class PredictiveIntelligenceService {
       soilType: 'loam',
       location,
       configured: false,
-      dataSource: 'placeholder_no_weather_api_configured'
+      dataSource: 'placeholder_no_weather_api_configured',
     };
   }
 
@@ -305,17 +308,17 @@ class PredictiveIntelligenceService {
     // Simplified linear regression model
     const values = historicalData.map(d => parseFloat(d.total_quantity));
     const days = historicalData.map((_, i) => i);
-    
+
     // Calculate trend
     const n = values.length;
     const sumX = days.reduce((a, b) => a + b, 0);
     const sumY = values.reduce((a, b) => a + b, 0);
     const sumXY = days.reduce((sum, x, i) => sum + x * values[i], 0);
     const sumX2 = days.reduce((sum, x) => sum + x * x, 0);
-    
+
     const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
     const intercept = (sumY - slope * sumX) / n;
-    
+
     // Generate forecast
     const forecast = [];
     for (let i = 0; i < forecastDays; i++) {
@@ -323,10 +326,10 @@ class PredictiveIntelligenceService {
       forecast.push({
         date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         predictedDemand: Math.max(0, predictedValue),
-        trend: slope > 0 ? 'increasing' : slope < 0 ? 'decreasing' : 'stable'
+        trend: slope > 0 ? 'increasing' : slope < 0 ? 'decreasing' : 'stable',
       });
     }
-    
+
     return forecast;
   }
 
@@ -337,25 +340,25 @@ class PredictiveIntelligenceService {
     const prices = marketData.map(d => parseFloat(d.avg_price));
     const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
     const priceStdDev = Math.sqrt(
-      prices.reduce((sum, price) => sum + Math.pow(price - avgPrice, 2), 0) / prices.length
+      prices.reduce((sum, price) => sum + Math.pow(price - avgPrice, 2), 0) / prices.length,
     );
-    
+
     // Quality adjustment
     const qualityMultiplier = this.getQualityMultiplier(qualityGrade);
     const predictedPrice = avgPrice * qualityMultiplier;
-    
+
     return {
       price: parseFloat(predictedPrice.toFixed(2)),
       range: {
         min: parseFloat((predictedPrice - priceStdDev).toFixed(2)),
-        max: parseFloat((predictedPrice + priceStdDev).toFixed(2))
+        max: parseFloat((predictedPrice + priceStdDev).toFixed(2)),
       },
       factors: {
         marketAverage: parseFloat(avgPrice.toFixed(2)),
         qualityAdjustment: qualityMultiplier,
-        marketVolatility: parseFloat(priceStdDev.toFixed(2))
+        marketVolatility: parseFloat(priceStdDev.toFixed(2)),
       },
-      confidence: this.calculatePricingConfidence(marketData.length)
+      confidence: this.calculatePricingConfidence(marketData.length),
     };
   }
 
@@ -364,38 +367,38 @@ class PredictiveIntelligenceService {
    */
   applyYieldModel(data) {
     const { farmerHistory, cropData, environmentalData, conditions } = data;
-    
+
     // Base yield from crop characteristics
     let predictedYield = cropData.expected_yield_kg || 1000;
-    
+
     // Adjust based on farmer history
     if (farmerHistory.length > 0) {
       const avgFarmerYield = farmerHistory.reduce((sum, h) => sum + h.yield_kg, 0) / farmerHistory.length;
       predictedYield = (predictedYield + avgFarmerYield) / 2;
     }
-    
+
     // Environmental adjustments
     const tempFactor = this.getTemperatureFactor(environmentalData.temperature);
     const humidityFactor = this.getHumidityFactor(environmentalData.humidity);
     const rainfallFactor = this.getRainfallFactor(environmentalData.rainfall);
-    
+
     predictedYield *= tempFactor * humidityFactor * rainfallFactor;
-    
+
     return {
       yield: Math.round(predictedYield),
       range: {
         min: Math.round(predictedYield * 0.8),
-        max: Math.round(predictedYield * 1.2)
+        max: Math.round(predictedYield * 1.2),
       },
       factors: {
         baseYield: cropData.expected_yield_kg,
         farmerPerformance: farmerHistory.length > 0,
-        environmentalScore: (tempFactor + humidityFactor + rainfallFactor) / 3
+        environmentalScore: (tempFactor + humidityFactor + rainfallFactor) / 3,
       },
       recommendations: this.generateYieldRecommendations(environmentalData),
       // Confidence is capped when environmental data is a placeholder, not a real weather
       // reading - the model's other inputs (farmer/crop history) may still be real.
-      confidence: environmentalData.configured === false ? 0.4 : 0.75
+      confidence: environmentalData.configured === false ? 0.4 : 0.75,
     };
   }
 
@@ -404,11 +407,11 @@ class PredictiveIntelligenceService {
    */
   getQualityMultiplier(qualityGrade) {
     const multipliers = {
-      'premium': 1.3,
-      'grade_a': 1.15,
-      'grade_b': 1.0,
-      'grade_c': 0.85,
-      'standard': 1.0
+      premium: 1.3,
+      grade_a: 1.15,
+      grade_b: 1.0,
+      grade_c: 0.85,
+      standard: 1.0,
     };
     return multipliers[qualityGrade] || 1.0;
   }
@@ -472,7 +475,7 @@ class PredictiveIntelligenceService {
    */
   generateYieldRecommendations(environmentalData) {
     const recommendations = [];
-    
+
     if (environmentalData.temperature < 20) {
       recommendations.push('Consider temperature control measures');
     }
@@ -482,7 +485,7 @@ class PredictiveIntelligenceService {
     if (environmentalData.rainfall < 100) {
       recommendations.push('Implement supplemental irrigation');
     }
-    
+
     return recommendations;
   }
 

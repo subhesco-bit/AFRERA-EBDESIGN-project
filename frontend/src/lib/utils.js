@@ -1,5 +1,5 @@
-import { clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 /**
  * Merge Tailwind class strings safely — clsx resolves conditionals,
@@ -12,5 +12,5 @@ import { twMerge } from 'tailwind-merge'
  * docs/registry/20_FRONTEND_BOUNDARIES.md.
  */
 export function cn(...inputs) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }

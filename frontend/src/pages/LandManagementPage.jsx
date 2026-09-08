@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { FileSignature, Map, FlaskConical, Droplets, Milestone, Ruler } from 'lucide-react'
+import { useState } from 'react';
+import { FileSignature, Map, FlaskConical, Droplets, Milestone, Ruler } from 'lucide-react';
 import {
   landLeaseAPI,
   gisLandMappingAPI,
@@ -7,8 +7,8 @@ import {
   waterResourceMappingAPI,
   geoBoundaryAPI,
   surveyManagementAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Land domain sub-modules: M033 (Lease), M035 (GIS Mapping),
@@ -32,17 +32,17 @@ const TABS = [
   { id: 'water', label: 'Water Resources', icon: Droplets },
   { id: 'boundaries', label: 'Geo Boundaries', icon: Milestone },
   { id: 'surveys', label: 'Surveys', icon: Ruler },
-]
+];
 
-const LEASE_TYPES = ['Cash Lease', 'Share Cropping', 'Fixed Term', 'Seasonal']
-const LEASE_STATUS = ['Active', 'Expired', 'Terminated', 'Pending Renewal']
-const SOIL_TYPES = ['Alluvial', 'Black', 'Red', 'Laterite', 'Sandy', 'Clay', 'Loamy']
-const WATER_TYPES = ['Well', 'Borewell', 'Canal', 'Pond', 'River', 'Check Dam', 'Rainwater Harvesting']
-const BOUNDARY_TYPES = ['Village', 'Gram Panchayat', 'Block', 'District', 'Watershed']
-const SURVEY_STATUS = ['Scheduled', 'In Progress', 'Completed', 'Disputed']
+const LEASE_TYPES = ['Cash Lease', 'Share Cropping', 'Fixed Term', 'Seasonal'];
+const LEASE_STATUS = ['Active', 'Expired', 'Terminated', 'Pending Renewal'];
+const SOIL_TYPES = ['Alluvial', 'Black', 'Red', 'Laterite', 'Sandy', 'Clay', 'Loamy'];
+const WATER_TYPES = ['Well', 'Borewell', 'Canal', 'Pond', 'River', 'Check Dam', 'Rainwater Harvesting'];
+const BOUNDARY_TYPES = ['Village', 'Gram Panchayat', 'Block', 'District', 'Watershed'];
+const SURVEY_STATUS = ['Scheduled', 'In Progress', 'Completed', 'Disputed'];
 
 function LandManagementPage() {
-  const [activeTab, setActiveTab] = useState('leases')
+  const [activeTab, setActiveTab] = useState('leases');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -302,7 +302,7 @@ function LandManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default LandManagementPage
+export default LandManagementPage;

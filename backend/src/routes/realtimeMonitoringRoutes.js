@@ -10,6 +10,8 @@
 'use strict';
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');

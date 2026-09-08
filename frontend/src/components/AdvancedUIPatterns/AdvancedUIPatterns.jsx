@@ -1,7 +1,7 @@
 /**
  * Advanced UI Patterns System
  * Production-level advanced UI patterns for enhanced user experience
- * 
+ *
  * Features:
  * - Skeleton screens for loading states
  * - Progressive loading for large content
@@ -20,12 +20,12 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 // ============================================
 
 // Base skeleton component
-export const Skeleton = ({ 
-  variant = 'text', 
-  width, 
-  height, 
+export const Skeleton = ({
+  variant = 'text',
+  width,
+  height,
   className = '',
-  animation = 'pulse' 
+  animation = 'pulse',
 }) => {
   const variantStyles = {
     text: { height: '1rem', borderRadius: '0.25rem' },
@@ -34,19 +34,19 @@ export const Skeleton = ({
     avatar: { width: '2.5rem', height: '2.5rem', borderRadius: '50%' },
     button: { height: '2.5rem', borderRadius: '0.5rem', width: '8rem' },
     input: { height: '2.5rem', borderRadius: '0.375rem' },
-    card: { height: '12rem', borderRadius: '0.75rem' }
+    card: { height: '12rem', borderRadius: '0.75rem' },
   };
 
   const animationStyles = {
     pulse: 'animate-pulse',
     wave: 'animate-wave',
-    none: ''
+    none: '',
   };
 
   const style = {
     width: width || '100%',
     height: height || variantStyles[variant]?.height,
-    ...variantStyles[variant]
+    ...variantStyles[variant],
   };
 
   return (
@@ -162,14 +162,14 @@ export const ProgressiveContent = ({
   content,
   chunks = 3,
   delay = 200,
-  className = ''
+  className = '',
 }) => {
   const [visibleChunks, setVisibleChunks] = useState(1);
   const contentChunks = useMemo(() => {
     if (typeof content === 'string') {
       const chunkSize = Math.ceil(content.length / chunks);
       return Array.from({ length: chunks }, (_, i) =>
-        content.slice(i * chunkSize, (i + 1) * chunkSize)
+        content.slice(i * chunkSize, (i + 1) * chunkSize),
       );
     }
     return Array.isArray(content) ? content : [content];
@@ -208,7 +208,7 @@ export const ProgressiveList = ({
   items,
   batchSize = 10,
   renderItem,
-  className = ''
+  className = '',
 }) => {
   const [visibleCount, setVisibleCount] = useState(batchSize);
   const [ref, inView] = useInView();
@@ -285,7 +285,7 @@ export const useOptimisticUpdate = (initialData, updateFn) => {
     update,
     isUpdating,
     error,
-    isOptimistic: !!optimisticData
+    isOptimistic: Boolean(optimisticData),
   };
 };
 
@@ -304,12 +304,12 @@ export const useOptimisticList = (initialItems, addItemFn, removeItemFn, updateI
     const tempId = `temp-${Date.now()}`;
     const optimisticItem = { ...item, id: tempId, isOptimistic: true };
     const newItems = [...items, optimisticItem];
-    
+
     setOptimisticItems(newItems);
     setItems(newItems);
 
     try {
-      const result = await addItemFn(item);
+      let result = await addItemFn(item);
       setItems(prev => prev.map(i => i.id === tempId ? result : i));
       setOptimisticItems(null);
       return result;
@@ -327,9 +327,9 @@ export const useOptimisticList = (initialItems, addItemFn, removeItemFn, updateI
     setIsUpdating(true);
     setError(null);
 
-    const previousItems = items;
-    const newItems = items.filter(item => item.id !== itemId);
-    
+    let previousItems = items;
+    let newItems = items.filter(item => item.id !== itemId);
+
     setOptimisticItems(newItems);
     setItems(newItems);
 
@@ -346,20 +346,20 @@ export const useOptimisticList = (initialItems, addItemFn, removeItemFn, updateI
     }
   }, [items, removeItemFn]);
 
-  const update = useCallback(async (itemId, updates) => {
+  let update = useCallback(async (itemId, updates) => {
     setIsUpdating(true);
     setError(null);
 
-    const previousItems = items;
-    const newItems = items.map(item =>
-      item.id === itemId ? { ...item, ...updates, isOptimistic: true } : item
+    let previousItems = items;
+    let newItems = items.map(item =>
+      item.id === itemId ? { ...item, ...updates, isOptimistic: true } : item,
     );
-    
+
     setOptimisticItems(newItems);
     setItems(newItems);
 
     try {
-      const result = await updateItemFn(itemId, updates);
+      let result = await updateItemFn(itemId, updates);
       setItems(prev => prev.map(i => i.id === itemId ? result : i));
       setOptimisticItems(null);
       return result;
@@ -380,15 +380,15 @@ export const useOptimisticList = (initialItems, addItemFn, removeItemFn, updateI
     update,
     isUpdating,
     error,
-    isOptimistic: !!optimisticItems
+    isOptimistic: Boolean(optimisticItems),
   };
 };
 
 // Optimistic UI component
-export const OptimisticUI = ({ 
-  children, 
-  isOptimistic, 
-  className = '' 
+export const OptimisticUI = ({
+  children,
+  isOptimistic,
+  className = '',
 }) => (
   <div className={`${isOptimistic ? 'opacity-70' : ''} ${className}`}>
     {children}
@@ -413,7 +413,7 @@ export const useInfiniteScroll = (fetchFn, options = {}) => {
   const [page, setPage] = useState(1);
 
   const { ref, inView } = useInView({
-    threshold: options.threshold || 0.1
+    threshold: options.threshold || 0.1,
   });
 
   const loadMore = useCallback(async () => {
@@ -424,7 +424,7 @@ export const useInfiniteScroll = (fetchFn, options = {}) => {
 
     try {
       const newData = await fetchFn(page, options.limit || 20);
-      
+
       setData(prev => [...prev, ...newData]);
       setHasMore(newData.length >= (options.limit || 20));
       setPage(prev => prev + 1);
@@ -460,7 +460,7 @@ export const useInfiniteScroll = (fetchFn, options = {}) => {
     hasMore,
     refresh,
     loadMore,
-    sentinelRef: ref
+    sentinelRef: ref,
   };
 };
 
@@ -469,24 +469,24 @@ export const InfiniteScrollList = ({
   fetchFn,
   renderItem,
   className = '',
-  options = {}
+  options = {},
 }) => {
   const { data, loading, error, hasMore, sentinelRef } = useInfiniteScroll(fetchFn, options);
 
   return (
     <div className={className}>
       {data.map((item, index) => renderItem(item, index))}
-      
+
       {error && (
         <div className="text-center py-8 text-red-500">
           Failed to load data. <button onClick={() => window.location.reload()}>Retry</button>
         </div>
       )}
-      
+
       {loading && <SkeletonList count={3} />}
-      
+
       {hasMore && <div ref={sentinelRef} className="h-4" />}
-      
+
       {!hasMore && data.length > 0 && (
         <div className="text-center py-8 text-gray-500">
           No more items to load
@@ -549,8 +549,8 @@ export const usePullToRefresh = (onRefresh, threshold = 80) => {
     pullToRefreshProps: {
       onTouchStart: handleTouchStart,
       onTouchMove: handleTouchMove,
-      onTouchEnd: handleTouchEnd
-    }
+      onTouchEnd: handleTouchEnd,
+    },
   };
 };
 
@@ -581,10 +581,10 @@ export const PullToRefreshIndicator = ({ pullDistance, threshold, isRefreshing }
 // ============================================
 
 // Staggered children animation
-export const StaggeredAnimation = ({ 
-  children, 
-  staggerDelay = 0.1, 
-  className = '' 
+export const StaggeredAnimation = ({
+  children,
+  staggerDelay = 0.1,
+  className = '',
 }) => {
   const childArray = React.Children.toArray(children);
 
@@ -605,11 +605,11 @@ export const StaggeredAnimation = ({
 };
 
 // Staggered list animation
-export const StaggeredList = ({ 
-  items, 
-  renderItem, 
-  staggerDelay = 0.05, 
-  className = '' 
+export const StaggeredList = ({
+  items,
+  renderItem,
+  staggerDelay = 0.05,
+  className = '',
 }) => (
   <div className={className}>
     {items.map((item, index) => (
@@ -635,7 +635,7 @@ export const EmptyState = ({
   title,
   description,
   action,
-  className = ''
+  className = '',
 }) => (
   <div className={`text-center py-12 ${className}`}>
     <motion.div
@@ -665,7 +665,7 @@ export const ErrorState = ({
   title = 'Something went wrong',
   description = 'An error occurred while loading data',
   onRetry,
-  className = ''
+  className = '',
 }) => (
   <div className={`text-center py-12 ${className}`}>
     <motion.div
@@ -697,7 +697,7 @@ export const LoadingState = ({ message = 'Loading...', className = '' }) => (
   <div className={`text-center py-12 ${className}`}>
     <motion.div
       animate={{ rotate: 360 }}
-      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
       className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
     />
     <p className="text-gray-500">{message}</p>
@@ -713,12 +713,12 @@ export const ProgressiveSkeleton = ({
   content,
   skeleton,
   delay = 1000,
-  className = ''
+  className = '',
 }) => {
   const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), delay);
+    let timer = setTimeout(() => setShowContent(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
 
@@ -755,20 +755,20 @@ export const InfiniteScrollWithSkeleton = ({
   renderItem,
   skeletonComponent,
   className = '',
-  options = {}
+  options = {},
 }) => {
   const { data, loading, error, hasMore, sentinelRef } = useInfiniteScroll(fetchFn, options);
 
   return (
     <div className={className}>
       {data.map((item, index) => renderItem(item, index))}
-      
+
       {loading && skeletonComponent}
-      
+
       {error && <ErrorState onRetry={() => window.location.reload()} />}
-      
+
       {hasMore && <div ref={sentinelRef} className="h-4" />}
-      
+
       {!hasMore && data.length === 0 && !loading && (
         <EmptyState
           icon="📋"
@@ -787,35 +787,35 @@ export default {
   SkeletonList,
   SkeletonTable,
   SkeletonForm,
-  
+
   // Progressive loading
   ProgressiveImage,
   ProgressiveContent,
   ProgressiveList,
-  
+
   // Optimistic updates
   useOptimisticUpdate,
   useOptimisticList,
   OptimisticUI,
-  
+
   // Infinite scroll
   useInfiniteScroll,
   InfiniteScrollList,
-  
+
   // Pull to refresh
   usePullToRefresh,
   PullToRefreshIndicator,
-  
+
   // Staggered animations
   StaggeredAnimation,
   StaggeredList,
-  
+
   // Content placeholders
   EmptyState,
   ErrorState,
   LoadingState,
-  
+
   // Combined patterns
   ProgressiveSkeleton,
-  InfiniteScrollWithSkeleton
+  InfiniteScrollWithSkeleton,
 };

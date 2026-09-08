@@ -79,13 +79,13 @@ async function getPredictiveMaintenance(req, res) {
   }
 }
 
-module.exports = { 
-  listSettings, 
-  getSetting, 
-  upsertSetting, 
+module.exports = {
+  listSettings,
+  getSetting,
+  upsertSetting,
   ingestAudit,
   getSystemAnalytics,
   detectAnomalies,
-  getPredictiveMaintenance
+  getPredictiveMaintenance,
 };
 

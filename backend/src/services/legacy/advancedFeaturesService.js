@@ -43,7 +43,7 @@ class AdvancedFeaturesService {
         module,
         recommendations,
         generatedAt: new Date(),
-        algorithm: 'collaborative-filtering+content-based'
+        algorithm: 'collaborative-filtering+content-based',
       };
     } catch (error) {
       logger.error('Error generating personalized recommendations', { error: error.message, stack: error.stack });
@@ -61,14 +61,14 @@ class AdvancedFeaturesService {
           title: 'Seasonal Products for Your Region',
           items: ['Kharif Crops', 'Organic Vegetables', 'GI Tagged Products'],
           confidence: 0.85,
-          reason: 'Based on your location and purchase history'
+          reason: 'Based on your location and purchase history',
         });
         recommendations.push({
           type: 'promotion',
           title: 'Bulk Purchase Discount',
           description: 'Get 15% off on orders above ₹50,000',
           confidence: 0.72,
-          reason: 'Your average order value qualifies'
+          reason: 'Your average order value qualifies',
         });
         break;
 
@@ -78,7 +78,7 @@ class AdvancedFeaturesService {
           title: 'Comprehensive Crop Insurance Bundle',
           items: ['PMFBY + Weather Index + Livestock'],
           confidence: 0.88,
-          reason: 'Complete coverage for your farming operations'
+          reason: 'Complete coverage for your farming operations',
         });
         break;
 
@@ -89,7 +89,7 @@ class AdvancedFeaturesService {
           amount: (userData.avg_order_value || 10000) * 3,
           interestRate: '7.5%',
           confidence: 0.91,
-          reason: 'Based on your FDI score and payment history'
+          reason: 'Based on your FDI score and payment history',
         });
         break;
     }
@@ -107,7 +107,7 @@ class AdvancedFeaturesService {
       terms,
       conditions,
       value,
-      currency = 'INR'
+      currency = 'INR',
     } = contractData;
 
     try {
@@ -139,7 +139,7 @@ class AdvancedFeaturesService {
         JSON.stringify(conditions),
         value,
         currency,
-        blockchainHash
+        blockchainHash,
       ]);
 
       logger.info(`Smart contract recorded (not deployed to any blockchain network — no provider configured): ${result.rows[0].id}`);
@@ -169,7 +169,7 @@ class AdvancedFeaturesService {
         action === 'fulfill' ? 'fulfilled' : 'rejected',
         JSON.stringify({ action, parameters }),
         executorId,
-        contractId
+        contractId,
       ]);
 
       logger.info(`Smart contract ${contractId} executed: ${action}`);
@@ -190,7 +190,7 @@ class AdvancedFeaturesService {
       location,
       capabilities,
       owner,
-      metadata = {}
+      metadata = {},
     } = deviceData;
 
     try {
@@ -207,7 +207,7 @@ class AdvancedFeaturesService {
         JSON.stringify(location),
         JSON.stringify(capabilities),
         owner,
-        JSON.stringify(metadata)
+        JSON.stringify(metadata),
       ]);
 
       logger.info(`IoT device registered: ${deviceId}`);
@@ -233,7 +233,7 @@ class AdvancedFeaturesService {
         deviceId,
         JSON.stringify(readings),
         timestamp,
-        deviceStatus
+        deviceStatus,
       ]);
 
       // Trigger automation based on sensor data
@@ -325,7 +325,7 @@ class AdvancedFeaturesService {
         region,
         timeframe,
         JSON.stringify(forecast),
-        forecast.accuracy
+        forecast.accuracy,
       ]);
 
       logger.info(`Demand forecast generated for product ${productId}`);
@@ -350,7 +350,7 @@ class AdvancedFeaturesService {
       averageDemand: average,
       trend: trend > 0 ? 'increasing' : trend < 0 ? 'decreasing' : 'stable',
       confidence: 0.75,
-      accuracy: 0.85
+      accuracy: 0.85,
     };
 
     // Generate predictions for each period
@@ -359,7 +359,7 @@ class AdvancedFeaturesService {
       const predictedValue = average + (trend * i);
       forecast.predictions.push({
         period: i,
-        predictedValue: Math.max(0, predictedValue)
+        predictedValue: Math.max(0, predictedValue),
       });
     }
 
@@ -382,7 +382,7 @@ class AdvancedFeaturesService {
         intent,
         result,
         confidence: intent.confidence,
-        processedAt: new Date()
+        processedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error processing voice command', { error: error.message, stack: error.stack });
@@ -440,7 +440,7 @@ class AdvancedFeaturesService {
       productId,
       content,
       interactivity,
-      requirements
+      requirements,
     } = experienceData;
 
     try {
@@ -456,7 +456,7 @@ class AdvancedFeaturesService {
         productId,
         JSON.stringify(content),
         JSON.stringify(interactivity),
-        JSON.stringify(requirements)
+        JSON.stringify(requirements),
       ]);
 
       logger.info(`AR/VR experience created: ${result.rows[0].id}`);
@@ -478,7 +478,7 @@ class AdvancedFeaturesService {
         queryType,
         params,
         graphData,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error querying knowledge graph', { error: error.message, stack: error.stack });
@@ -491,17 +491,17 @@ class AdvancedFeaturesService {
     const graphData = {
       nodes: [],
       edges: [],
-      relationships: []
+      relationships: [],
     };
 
     switch (queryType) {
       case 'product_connections':
         graphData.nodes = [
           { id: 'rice', type: 'crop', properties: { season: 'kharif', regions: ['Assam', 'Bengal'] } },
-          { id: 'fertilizer', type: 'input', properties: { type: 'urea', brands: ['IFFCO', 'KRIBHCO'] } }
+          { id: 'fertilizer', type: 'input', properties: { type: 'urea', brands: ['IFFCO', 'KRIBHCO'] } },
         ];
         graphData.edges = [
-          { from: 'rice', to: 'fertilizer', relationship: 'requires', strength: 0.9 }
+          { from: 'rice', to: 'fertilizer', relationship: 'requires', strength: 0.9 },
         ];
         break;
 
@@ -510,12 +510,12 @@ class AdvancedFeaturesService {
           { id: 'farmer', type: 'entity' },
           { id: 'fpo', type: 'organization' },
           { id: 'processor', type: 'entity' },
-          { id: 'retailer', type: 'entity' }
+          { id: 'retailer', type: 'entity' },
         ];
         graphData.edges = [
           { from: 'farmer', to: 'fpo', relationship: 'supplies_to' },
           { from: 'fpo', to: 'processor', relationship: 'sells_to' },
-          { from: 'processor', to: 'retailer', relationship: 'distributes_to' }
+          { from: 'processor', to: 'retailer', relationship: 'distributes_to' },
         ];
         break;
     }
@@ -525,3 +525,4 @@ class AdvancedFeaturesService {
 }
 
 module.exports = new AdvancedFeaturesService();
+

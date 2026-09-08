@@ -26,14 +26,14 @@ class AICollaborationService {
   async getSharedContext() {
     try {
       const contextPath = path.join(this.collaborationPath, 'shared_context.json');
-      
+
       if (fs.existsSync(contextPath)) {
         return JSON.parse(fs.readFileSync(contextPath, 'utf8'));
       }
 
       // Initialize default context
       const defaultContext = {
-        project_name: 'SVESCO/EBDESIGN',
+        project_name: 'Subhesco/EBDESIGN',
         project_root: this.projectRoot,
         last_updated: new Date().toISOString(),
         active_ai: 'both',
@@ -43,21 +43,21 @@ class AICollaborationService {
           'Fix library catalog and integrate with AI',
           'Complete frontend/UI development',
           'Run database migrations',
-          'Achieve launch readiness'
+          'Achieve launch readiness',
         ],
         devin_focus: [
           'Backend implementation',
           'Service development',
           'Database migrations',
-          'API development'
+          'API development',
         ],
         claude_focus: [
           'AI integration',
           'Library knowledge system',
           'Frontend components',
-          'Architecture planning'
+          'Architecture planning',
         ],
-        work_history: []
+        work_history: [],
       };
 
       fs.writeFileSync(contextPath, JSON.stringify(defaultContext, null, 2));
@@ -77,7 +77,7 @@ class AICollaborationService {
       const updatedContext = {
         ...context,
         ...updates,
-        last_updated: new Date().toISOString()
+        last_updated: new Date().toISOString(),
       };
 
       const contextPath = path.join(this.collaborationPath, 'shared_context.json');
@@ -96,7 +96,7 @@ class AICollaborationService {
   async logWork(aiSource, workData) {
     try {
       const workLogPath = path.join(this.collaborationPath, 'work_log.json');
-      
+
       let workLog = [];
       if (fs.existsSync(workLogPath)) {
         workLog = JSON.parse(fs.readFileSync(workLogPath, 'utf8'));
@@ -106,7 +106,7 @@ class AICollaborationService {
         id: `${aiSource}_${Date.now()}`,
         ai_source: aiSource, // 'devin' or 'claude'
         timestamp: new Date().toISOString(),
-        ...workData
+        ...workData,
       };
 
       workLog.push(workEntry);
@@ -134,7 +134,7 @@ class AICollaborationService {
   async syncWorkToDatabase(workEntry) {
     try {
       const pool = await getPostgreSQL();
-      
+
       await pool.query(`
         CREATE TABLE IF NOT EXISTS ai_collaboration_log (
           id VARCHAR(255) PRIMARY KEY,
@@ -166,7 +166,7 @@ class AICollaborationService {
         workEntry.description || '',
         workEntry.files_affected || [],
         workEntry.status || 'completed',
-        JSON.stringify(workEntry.metadata || {})
+        JSON.stringify(workEntry.metadata || {}),
       ]);
     } catch (error) {
       console.error('Error syncing work to database:', error);
@@ -179,13 +179,13 @@ class AICollaborationService {
   async getWorkHistory(aiSource, limit = 20) {
     try {
       const workLogPath = path.join(this.collaborationPath, 'work_log.json');
-      
+
       if (!fs.existsSync(workLogPath)) {
         return [];
       }
 
       const workLog = JSON.parse(fs.readFileSync(workLogPath, 'utf8'));
-      
+
       const filtered = workLog
         .filter(entry => entry.ai_source === aiSource)
         .slice(-limit);
@@ -204,11 +204,11 @@ class AICollaborationService {
     try {
       const otherAI = currentAI === 'devin' ? 'claude' : 'devin';
       const otherAIWork = await this.getWorkHistory(otherAI, 10);
-      
-      const continuable = otherAIWork.filter(entry => 
-        entry.status === 'in_progress' || 
+
+      const continuable = otherAIWork.filter(entry =>
+        entry.status === 'in_progress' ||
         entry.status === 'partial' ||
-        entry.requires_collaboration === true
+        entry.requires_collaboration === true,
       );
 
       return continuable;
@@ -224,7 +224,7 @@ class AICollaborationService {
   async createHandoff(fromAI, toAI, workData) {
     try {
       const handoffPath = path.join(this.collaborationPath, 'handoffs.json');
-      
+
       let handoffs = [];
       if (fs.existsSync(handoffPath)) {
         handoffs = JSON.parse(fs.readFileSync(handoffPath, 'utf8'));
@@ -236,7 +236,7 @@ class AICollaborationService {
         to_ai: toAI,
         timestamp: new Date().toISOString(),
         status: 'pending',
-        ...workData
+        ...workData,
       };
 
       handoffs.push(handoff);
@@ -247,7 +247,7 @@ class AICollaborationService {
         work_type: 'handoff',
         description: `Handing off work to ${toAI}`,
         handoff_id: handoff.id,
-        ...workData
+        ...workData,
       });
 
       return handoff;
@@ -264,7 +264,7 @@ class AICollaborationService {
     try {
       const handoffPath = path.join(this.collaborationPath, 'handoffs.json');
       const handoffs = JSON.parse(fs.readFileSync(handoffPath, 'utf8'));
-      
+
       const handoffIndex = handoffs.findIndex(h => h.id === handoffId);
       if (handoffIndex === -1) {
         throw new Error('Handoff not found');
@@ -280,7 +280,7 @@ class AICollaborationService {
       await this.logWork(acceptingAI, {
         work_type: 'handoff_acceptance',
         description: `Accepted handoff from ${handoffs[handoffIndex].from_ai}`,
-        handoff_id: handoffId
+        handoff_id: handoffId,
       });
 
       return handoffs[handoffIndex];
@@ -296,15 +296,15 @@ class AICollaborationService {
   async getPendingHandoffs(forAI) {
     try {
       const handoffPath = path.join(this.collaborationPath, 'handoffs.json');
-      
+
       if (!fs.existsSync(handoffPath)) {
         return [];
       }
 
       const handoffs = JSON.parse(fs.readFileSync(handoffPath, 'utf8'));
-      
-      return handoffs.filter(h => 
-        h.to_ai === forAI && h.status === 'pending'
+
+      return handoffs.filter(h =>
+        h.to_ai === forAI && h.status === 'pending',
       );
     } catch (error) {
       console.error('Error getting pending handoffs:', error);
@@ -318,23 +318,23 @@ class AICollaborationService {
   async getCollaborationStats() {
     try {
       const workLogPath = path.join(this.collaborationPath, 'work_log.json');
-      
+
       if (!fs.existsSync(workLogPath)) {
         return {
           total_work_entries: 0,
           devin_work: 0,
           claude_work: 0,
-          handoffs: 0
+          handoffs: 0,
         };
       }
 
       const workLog = JSON.parse(fs.readFileSync(workLogPath, 'utf8'));
-      
+
       const stats = {
         total_work_entries: workLog.length,
         devin_work: workLog.filter(w => w.ai_source === 'devin').length,
         claude_work: workLog.filter(w => w.ai_source === 'claude').length,
-        handoffs: 0
+        handoffs: 0,
       };
 
       const handoffPath = path.join(this.collaborationPath, 'handoffs.json');
@@ -370,8 +370,8 @@ class AICollaborationService {
           'Continue mutual support on skeleton module development',
           'Coordinate on frontend component integration',
           'Sync on database migration execution',
-          'Collaborate on AI integration testing'
-        ]
+          'Collaborate on AI integration testing',
+        ],
       };
 
       const reportPath = path.join(this.collaborationPath, 'collaboration_report.json');
@@ -386,3 +386,4 @@ class AICollaborationService {
 }
 
 module.exports = new AICollaborationService();
+

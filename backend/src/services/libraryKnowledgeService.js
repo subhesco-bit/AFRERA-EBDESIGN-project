@@ -14,10 +14,10 @@ async function queryLibraryKnowledge(query, options = {}) {
     name: item.data?.name || item.data?.moduleId || item.key,
     description: item.data?.description || item.data?.aiContext || item.path,
     relevance: item.relevance,
-    path: item.path
+    path: item.path,
   }));
 }
 
 module.exports = Object.assign(libraryKnowledgeService, {
-  queryLibraryKnowledge
+  queryLibraryKnowledge,
 });

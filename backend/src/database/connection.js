@@ -60,9 +60,9 @@ async function initPostgreSQL() {
     // rather than as if it had never been told where to look.
     //
     // PG_* still works and is what CI supplies, so both paths are supported.
-    const pgConfig = process.env.DATABASE_URL
-      ? { connectionString: process.env.DATABASE_URL }
-      : {
+    const pgConfig = process.env.DATABASE_URL ?
+      { connectionString: process.env.DATABASE_URL } :
+      {
         host: process.env.PG_HOST || 'localhost',
         port: parseInt(process.env.PG_PORT, 10) || 5432,
         database: process.env.PG_DATABASE || 'afrera_db',
@@ -88,7 +88,7 @@ async function initPostgreSQL() {
     const client = await pgPool.connect();
     await client.query('SELECT NOW()');
     client.release();
-    
+
     logger.info('PostgreSQL connection established successfully');
     return pgPool;
   } catch (error) {
@@ -112,7 +112,7 @@ async function initMongoDB() {
 
     await mongoClient.connect();
     await mongoClient.db('admin').command({ ping: 1 });
-    
+
     logger.info('MongoDB connection established successfully');
     return mongoClient;
   } catch (error) {
@@ -182,7 +182,7 @@ function isHealthy() {
     postgresql: pgHealthy,
     mongodb: mongoHealthy,
     overall: pgHealthy && mongoHealthy,
-    fallback: initializationError !== null
+    fallback: initializationError !== null,
   };
 }
 
@@ -218,6 +218,6 @@ module.exports = {
   getMongoDB,
   getMongoDatabase,
   isHealthy,
-  close
+  close,
 };
 

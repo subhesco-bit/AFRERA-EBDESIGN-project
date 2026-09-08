@@ -97,5 +97,5 @@ module.exports = {
   setPerformanceTarget,
   getPerformanceTargets,
   createPerformanceAlert,
-  getPerformanceAlerts
+  getPerformanceAlerts,
 };

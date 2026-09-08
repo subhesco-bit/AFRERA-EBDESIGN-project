@@ -1,6 +1,6 @@
 /**
  * Platform Foundation Page - AI Enhanced Platform Foundation
- * 
+ *
  * This page demonstrates the AI-enhanced platform foundation capabilities:
  * - Platform health monitoring
  * - AI-powered scaling recommendations
@@ -73,7 +73,7 @@ const PlatformFoundationPage = () => {
       alert('Configuration optimized successfully!');
       loadPlatformData();
     } catch (err) {
-      alert('Failed to optimize configuration: ' + err.message);
+      alert(`Failed to optimize configuration: ${ err.message}`);
     }
   };
 
@@ -81,12 +81,12 @@ const PlatformFoundationPage = () => {
     try {
       const result = await systemAdministrationAPI.triggerSelfHealing({
         type: 'performance',
-        severity: 'medium'
+        severity: 'medium',
       });
-      alert('Self-healing triggered: ' + JSON.stringify(result));
+      alert(`Self-healing triggered: ${ JSON.stringify(result)}`);
       loadPlatformData();
     } catch (err) {
-      alert('Failed to trigger self-healing: ' + err.message);
+      alert(`Failed to trigger self-healing: ${ err.message}`);
     }
   };
 
@@ -110,7 +110,7 @@ const PlatformFoundationPage = () => {
   return (
     <div className="p-8 space-y-6">
       <h1 className="text-3xl font-bold">Platform Foundation Dashboard</h1>
-      
+
       {/* Platform Health */}
       <Card>
         <CardHeader>

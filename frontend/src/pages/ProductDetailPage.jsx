@@ -1,62 +1,74 @@
-import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { productsAPI } from '../services/api'
-import { ShoppingCart, Star, Leaf, Award, Truck } from 'lucide-react'
-import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel'
-import { updateMetaDescription, updateCanonicalUrl, updateOpenGraphTags, updateTwitterCardTags } from '../components/RouteAnalytics'
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { productsAPI, productReviewsAPI, ordersAPI, productMediaAIAPI } from '../services/api';
+import { ShoppingCart, Star, Leaf, Award, Truck, ChevronLeft, Minus, Plus, Sparkles } from 'lucide-react';
+import toast from 'react-hot-toast';
+import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel';
+import { buildProductImagePrompt } from '../utils/aiStudio';
 
 function ProductDetailPage() {
-  const { id } = useParams()
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [quantity, setQuantity] = useState(1);
+  const [aiImage, setAiImage] = useState(null);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => (await productsAPI.getProduct(id)).data,
-  })
+  });
 
-  // RouteMetadata only matches by path pattern (/products/:id), so it can only
-  // ever set the generic static title — it has no way to know which product
-  // is loaded. Set the real per-product title/OG/Twitter/JSON-LD here once the
-  // product data actually arrives.
-  useEffect(() => {
-    if (!product) return
+  // Real review stats (product_reviews table, migration
+  // 009_marketplace_enhancements.sql) — no rating is shown until this
+  // resolves, and nothing is shown at all if the product has zero reviews.
+  // Same honesty convention as MarketplacePage.jsx's average_rating handling.
+  const { data: reviewStats } = useQuery({
+    queryKey: ['productReviewStats', id],
+    queryFn: async () => (await productReviewsAPI.getStats(id)).data?.data,
+    enabled: Boolean(id),
+  });
 
-    const title = `${product.name} - AFRERA`
-    const description = product.description || product.usp || `Buy ${product.name} on AFRERA marketplace.`
-    const image = product.images?.[0]
-    const url = window.location.href
+  const addToCart = useMutation({
+    mutationFn: (qty) => ordersAPI.addToCart({ product_id: id, quantity: qty }),
+    onSuccess: () => toast.success('Added to cart'),
+    onError: (err) => toast.error(err.response?.data?.error || 'Failed to add to cart'),
+  });
 
-    document.title = title
-    updateMetaDescription(description)
-    updateCanonicalUrl(url)
-    updateOpenGraphTags(title, description, image || '/icons/icon-512.png', url)
-    updateTwitterCardTags(title, description, image || '/icons/icon-512.png')
-
-    const scriptId = 'product-jsonld'
-    let script = document.getElementById(scriptId)
-    if (!script) {
-      script = document.createElement('script')
-      script.id = scriptId
-      script.type = 'application/ld+json'
-      document.head.appendChild(script)
+  const buyNow = async () => {
+    try {
+      await ordersAPI.addToCart({ product_id: id, quantity });
+      navigate('/cart');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to start checkout');
     }
-    script.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'Product',
-      name: product.name,
-      description,
-      image: image ? [image] : undefined,
-      offers: {
-        '@type': 'Offer',
-        price: product.base_price,
-        priceCurrency: 'INR',
-        availability: 'https://schema.org/InStock'
-      }
-    })
+  };
 
-    return () => { script?.remove() }
-  }, [product])
+  const generateAiImage = useMutation({
+    mutationFn: () => {
+      const prompt = searchParams.get('prompt') || buildProductImagePrompt(product?.name, product?.description, product?.state_name);
+      return productMediaAIAPI.generateImage(id, prompt);
+    },
+    onSuccess: (res) => {
+      const payload = res.data?.data || res.data || {};
+      if (payload?.status === 'not_configured') {
+        toast('AI image generation is not configured in this environment yet. The listing remains live.', { icon: 'ℹ️' });
+        return;
+      }
+      if (payload?.imageUrl) {
+        setAiImage(payload.imageUrl);
+        toast.success('AI image generated');
+      }
+    },
+    onError: (err) => toast.error(err.response?.data?.error || 'AI image generation failed'),
+  });
+
+  useEffect(() => {
+    if (product && searchParams.get('autoAI') === '1') {
+      generateAiImage.mutate();
+    }
+  }, [product, searchParams]);
 
   if (isLoading) {
     return (
@@ -68,7 +80,7 @@ function ProductDetailPage() {
           <div className="h-12 bg-v42-paddy2 rounded w-1/4"></div>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -76,7 +88,7 @@ function ProductDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-red-600">Error loading product: {error.message}</div>
       </div>
-    )
+    );
   }
 
   if (!product) {
@@ -84,18 +96,26 @@ function ProductDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-v42-mut">Product not found</div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Link
+        to="/marketplace"
+        className="inline-flex items-center gap-1 text-sm text-v42-mut hover:text-v42-forest mb-6 transition"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        Back to marketplace
+      </Link>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Images */}
         <div>
           <div className="bg-v42-paddy2 rounded-lg overflow-hidden mb-4">
-            {product.images?.[0] ? (
+            {(aiImage || product.images?.[0]) ? (
               <img
-                src={product.images[0]}
+                src={aiImage || product.images[0]}
                 alt={product.name}
                 className="w-full h-96 object-cover"
               />
@@ -105,6 +125,19 @@ function ProductDetailPage() {
               </div>
             )}
           </div>
+
+          <div className="mb-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => generateAiImage.mutate()}
+              disabled={generateAiImage.isPending}
+              className="inline-flex items-center gap-2 rounded-lg bg-v42-forest px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+            >
+              <Sparkles className="h-4 w-4" />
+              {generateAiImage.isPending ? 'Generating…' : 'Generate AI image'}
+            </button>
+          </div>
+
           {product.images && product.images.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
               {product.images.slice(1).map((image, index) => (
@@ -141,10 +174,18 @@ function ProductDetailPage() {
             {product.category_name} • {product.state_name}
           </p>
 
-          <div className="flex items-center mb-4">
-            <Star className="w-5 h-5 text-yellow-400 fill-current" />
-            <span className="ml-1 text-v42-ink2">4.5 (128 reviews)</span>
-          </div>
+          {/* Real rating, not a fixed placeholder — only shown once reviews
+              actually exist, matching MarketplacePage.jsx's convention. */}
+          {reviewStats?.totalReviews > 0 ? (
+            <div className="flex items-center mb-4">
+              <Star className="w-5 h-5 text-yellow-400 fill-current" />
+              <span className="ml-1 text-v42-ink2">
+                {reviewStats.averageRating.toFixed(1)} ({reviewStats.totalReviews} review{reviewStats.totalReviews === 1 ? '' : 's'})
+              </span>
+            </div>
+          ) : (
+            <div className="mb-4 text-sm text-v42-mut">No reviews yet</div>
+          )}
 
           <div className="mb-6">
             <span className="text-3xl font-bold text-v42-ink">
@@ -198,17 +239,28 @@ function ProductDetailPage() {
               Quantity
             </label>
             <div className="flex items-center gap-2">
-              <button className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2">
-                -
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                aria-label="Decrease quantity"
+                className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2 flex items-center justify-center"
+              >
+                <Minus className="w-4 h-4" />
               </button>
               <input
                 type="number"
-                defaultValue="1"
+                value={quantity}
                 min="1"
+                onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
                 className="w-20 text-center border border-v42-line rounded-lg"
               />
-              <button className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2">
-                +
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                aria-label="Increase quantity"
+                className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2 flex items-center justify-center"
+              >
+                <Plus className="w-4 h-4" />
               </button>
               <span className="text-v42-mut">{product.unit_symbol}</span>
             </div>
@@ -216,16 +268,24 @@ function ProductDetailPage() {
 
           {/* Action Buttons */}
           <div className="flex gap-4 mb-6">
-            <button className="flex-1 px-6 py-3 bg-v42-forest text-white rounded-lg font-semibold hover:bg-v42-forestd transition flex items-center justify-center">
+            <button
+              onClick={() => addToCart.mutate(quantity)}
+              disabled={addToCart.isPending}
+              className="flex-1 px-6 py-3 bg-v42-forest text-white rounded-lg font-semibold hover:bg-v42-forestd transition flex items-center justify-center disabled:opacity-60"
+            >
               <ShoppingCart className="w-5 h-5 mr-2" />
-              Add to Cart
+              {addToCart.isPending ? 'Adding…' : 'Add to Cart'}
             </button>
-            <button className="px-6 py-3 border-2 border-v42-forest text-v42-forest rounded-lg font-semibold hover:bg-v42-forest/10 transition">
+            <button
+              onClick={buyNow}
+              className="px-6 py-3 border-2 border-v42-forest text-v42-forest rounded-lg font-semibold hover:bg-v42-forest/10 transition"
+            >
               Buy Now
             </button>
           </div>
 
-          {/* Delivery Info */}
+          {/* Delivery Info — ₹1,500 free-shipping threshold is the real value
+              used by orderService.js's shipping calculation, not invented. */}
           <div className="border-t pt-6">
             <div className="flex items-start gap-3 mb-3">
               <Truck className="w-5 h-5 text-v42-mut flex-shrink-0" />
@@ -240,7 +300,7 @@ function ProductDetailPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ProductDetailPage
+export default ProductDetailPage;

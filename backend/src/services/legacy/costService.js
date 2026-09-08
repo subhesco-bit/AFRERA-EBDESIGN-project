@@ -31,7 +31,7 @@ async function getCostBreakup({ productId, regionId, from, to } = {}) {
       ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
       ORDER BY period_start DESC NULLS LAST
       LIMIT 200`,
-    params
+    params,
   );
 
   return {
@@ -41,9 +41,9 @@ async function getCostBreakup({ productId, regionId, from, to } = {}) {
     count: rows.length,
     totalCost: rows.reduce((s, r) => s + Number(r.total_cost || 0), 0) || null,
     basis: rows.length ? 'recorded_actuals' : 'none',
-    note: rows.length ? null
-      : 'No recorded cost break-ups for this filter. Use getCorridorModel() for the '
-      + 'planned landed-cost model, but do not present that as an actual.',
+    note: rows.length ? null :
+      'No recorded cost break-ups for this filter. Use getCorridorModel() for the ' +
+      'planned landed-cost model, but do not present that as an actual.',
   };
 }
 
@@ -59,7 +59,7 @@ async function getCorridorModel(corridor = 'NE->NCR') {
       `SELECT sequence_no, component, min_inr_per_kg, optimised_inr_per_kg, max_inr_per_kg,
               controllable, subsidy_scheme, notes, data_provenance
          FROM landed_cost_components WHERE corridor = $1 ORDER BY sequence_no`,
-      [corridor]
+      [corridor],
     ),
     pool.query('SELECT * FROM v_landed_cost_total WHERE corridor = $1', [corridor]),
   ]);
@@ -71,9 +71,9 @@ async function getCorridorModel(corridor = 'NE->NCR') {
     corridor,
     components: comps.map((c) => ({
       ...c,
-      pctOfOptimisedTotal: optimisedTotal
-        ? Math.round((Number(c.optimised_inr_per_kg) / optimisedTotal) * 10000) / 100
-        : null,
+      pctOfOptimisedTotal: optimisedTotal ?
+        Math.round((Number(c.optimised_inr_per_kg) / optimisedTotal) * 10000) / 100 :
+        null,
     })),
     totals: {
       min: Number(t.min_total_inr_per_kg || 0),
@@ -81,10 +81,11 @@ async function getCorridorModel(corridor = 'NE->NCR') {
       max: Number(t.max_total_inr_per_kg || 0),
     },
     subsidisedComponents: comps.filter((c) => c.subsidy_scheme).map((c) => c.subsidy_scheme),
-    caveat: 'PLANNING MODEL, not observed cost. Figures are from a business plan and are '
-          + 'flagged estimated/assumed. Compare against getCostBreakup() actuals before '
-          + 'quoting either to a buyer or a farmer.',
+    caveat: 'PLANNING MODEL, not observed cost. Figures are from a business plan and are ' +
+          'flagged estimated/assumed. Compare against getCostBreakup() actuals before ' +
+          'quoting either to a buyer or a farmer.',
   };
 }
 
 module.exports = { getCostBreakup, getCorridorModel };
+

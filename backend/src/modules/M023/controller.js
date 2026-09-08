@@ -75,5 +75,5 @@ module.exports = {
   recordAttendance,
   submitAssessment,
   getRecommendedPrograms,
-  getTrainingAnalytics
+  getTrainingAnalytics,
 };

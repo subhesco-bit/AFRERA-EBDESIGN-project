@@ -36,7 +36,7 @@ async function createHealthProfile(userId, data) {
     allergies,
     dietary_restrictions,
     medications,
-    health_goals
+    health_goals,
   } = data;
 
   try {
@@ -59,8 +59,8 @@ async function createHealthProfile(userId, data) {
         JSON.stringify(allergies),
         JSON.stringify(dietary_restrictions),
         JSON.stringify(medications),
-        JSON.stringify(health_goals)
-      ]
+        JSON.stringify(health_goals),
+      ],
     );
 
     return result.rows[0];
@@ -96,7 +96,7 @@ async function getHealthProfile(userId) {
   try {
     const result = await pool.query(
       'SELECT * FROM health_profiles WHERE user_id = $1',
-      [userId]
+      [userId],
     );
 
     if (result.rows.length === 0) {
@@ -152,7 +152,7 @@ router.get('/health-profiles', authMiddleware, async (req, res) => {
         allergies: [],
         dietary_restrictions: [],
         medications: {},
-        health_goals: []
+        health_goals: [],
       };
       persistTestFallback('health_profiles', req.user.id, fallback, false);
       return res.json(fallback);
@@ -176,7 +176,7 @@ async function createDietaryProfile(userId, data) {
     micronutrient_targets,
     meal_frequency,
     meal_timing,
-    hydration_target_ml
+    hydration_target_ml,
   } = data;
 
   try {
@@ -194,8 +194,8 @@ async function createDietaryProfile(userId, data) {
         JSON.stringify(micronutrient_targets),
         meal_frequency,
         JSON.stringify(meal_timing),
-        hydration_target_ml
-      ]
+        hydration_target_ml,
+      ],
     );
 
     return result.rows[0];
@@ -236,7 +236,7 @@ async function logHealthMetric(userId, data) {
     metric_value,
     unit,
     notes,
-    source
+    source,
   } = data;
 
   try {
@@ -245,7 +245,7 @@ async function logHealthMetric(userId, data) {
        (user_id, metric_type, metric_value, unit, notes, source)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [userId, metric_type, metric_value, unit, notes, source || 'manual']
+      [userId, metric_type, metric_value, unit, notes, source || 'manual'],
     );
 
     return result.rows[0];
@@ -286,7 +286,7 @@ async function getHealthMetrics(userId, metricType = null, limit = 50) {
       params.push(metricType);
     }
 
-    query += ' ORDER BY recorded_at DESC LIMIT $' + (params.length + 1);
+    query += ` ORDER BY recorded_at DESC LIMIT $${ params.length + 1}`;
     params.push(limit);
 
     const result = await pool.query(query, params);
@@ -325,7 +325,7 @@ async function createHealthGoal(userId, data) {
     current_value,
     unit,
     start_date,
-    target_date
+    target_date,
   } = data;
 
   try {
@@ -334,7 +334,7 @@ async function createHealthGoal(userId, data) {
        (user_id, goal_type, target_value, current_value, unit, start_date, target_date, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
        RETURNING *`,
-      [userId, goal_type, target_value, current_value, unit, start_date, target_date]
+      [userId, goal_type, target_value, current_value, unit, start_date, target_date],
     );
 
     return result.rows[0];
@@ -369,7 +369,7 @@ async function getHealthGoals(userId) {
   try {
     const result = await pool.query(
       'SELECT * FROM health_goals WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC',
-      [userId, 'active']
+      [userId, 'active'],
     );
 
     return result.rows;
@@ -405,7 +405,7 @@ async function generateDietaryRecommendation(userId, data) {
     recommendation_text,
     priority,
     category,
-    reasoning
+    reasoning,
   } = data;
 
   try {
@@ -414,7 +414,7 @@ async function generateDietaryRecommendation(userId, data) {
        (user_id, recommendation_type, recommendation_text, priority, category, reasoning, is_personalized)
        VALUES ($1, $2, $3, $4, $5, $6, true)
        RETURNING *`,
-      [userId, recommendation_type, recommendation_text, priority, category, reasoning]
+      [userId, recommendation_type, recommendation_text, priority, category, reasoning],
     );
 
     return result.rows[0];
@@ -452,7 +452,7 @@ async function getDietaryRecommendations(userId) {
        WHERE user_id = $1 AND is_dismissed = false 
        AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
        ORDER BY priority DESC, generated_at DESC`,
-      [userId]
+      [userId],
     );
 
     return result.rows;
@@ -487,7 +487,7 @@ async function createHealthAlert(userId, data) {
     alert_type,
     severity,
     alert_message,
-    trigger_data
+    trigger_data,
   } = data;
 
   try {
@@ -496,7 +496,7 @@ async function createHealthAlert(userId, data) {
        (user_id, alert_type, severity, alert_message, trigger_data)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [userId, alert_type, severity, alert_message, JSON.stringify(trigger_data)]
+      [userId, alert_type, severity, alert_message, JSON.stringify(trigger_data)],
     );
 
     return result.rows[0];
@@ -531,7 +531,7 @@ async function getHealthAlerts(userId) {
   try {
     const result = await pool.query(
       'SELECT * FROM health_alerts WHERE user_id = $1 ORDER BY created_at DESC',
-      [userId]
+      [userId],
     );
 
     return result.rows;
@@ -569,7 +569,7 @@ async function logFoodConsumption(userId, data) {
     quantity_g,
     calories_consumed,
     nutritional_intake,
-    notes
+    notes,
   } = data;
 
   try {
@@ -586,8 +586,8 @@ async function logFoodConsumption(userId, data) {
         quantity_g,
         calories_consumed,
         JSON.stringify(nutritional_intake),
-        notes
-      ]
+        notes,
+      ],
     );
 
     return result.rows[0];
@@ -633,7 +633,7 @@ async function getHealthAnalytics(userId, startDate = null, endDate = null) {
     }
 
     if (endDate) {
-      query += ' AND date <= $' + (params.length + 1);
+      query += ` AND date <= $${ params.length + 1}`;
       params.push(endDate);
     }
 
@@ -686,7 +686,7 @@ async function calculateBMI(userId) {
 
     const result = await pool.query(
       'SELECT calculate_bmi($1, $2) as bmi',
-      [profile.weight_kg, profile.height_cm]
+      [profile.weight_kg, profile.height_cm],
     );
 
     let bmiValue = null;
@@ -702,7 +702,7 @@ async function calculateBMI(userId) {
     return {
       bmi: bmiValue,
       height_cm: profile.height_cm,
-      weight_kg: profile.weight_kg
+      weight_kg: profile.weight_kg,
     };
   } catch (error) {
     logger.error('Calculate BMI error', { error: error.message, stack: error.stack });
@@ -739,7 +739,7 @@ const ACTIVITY_MULTIPLIERS = {
   light: 1.375,
   moderate: 1.55,
   active: 1.725,
-  very_active: 1.9
+  very_active: 1.9,
 };
 
 /**
@@ -811,7 +811,7 @@ function calculateMifflinStJeorBMRTDEE({ ageYears, sex, weightKg, heightCm, acti
     activity_multiplier: multiplier,
     sex_term_used: sexTermUsed,
     formula: 'Mifflin-St Jeor (1990)',
-    estimate_only: true
+    estimate_only: true,
   };
 }
 
@@ -843,9 +843,9 @@ async function calculateBMRTDEE(userId, overrides = {}) {
       age: ageYears != null ? Number(ageYears) : null,
       sex: sex || null,
       weight_kg: weightKg != null ? Number(weightKg) : null,
-      height_cm: heightCm != null ? Number(heightCm) : null
+      height_cm: heightCm != null ? Number(heightCm) : null,
     },
-    disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
   };
 }
 
@@ -862,7 +862,7 @@ router.post('/bmr-tdee', authMiddleware, async (req, res) => {
     logger.error('Calculate BMR/TDEE API error', { error: error.message, stack: error.stack });
     res.status(400).json({
       error: error.message || 'Failed to calculate BMR/TDEE',
-      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
     });
   }
 });
@@ -894,5 +894,6 @@ module.exports = {
   calculateAgeYears,
   calculateMifflinStJeorBMRTDEE,
   calculateBMRTDEE,
-  isHealthy
+  isHealthy,
 };
+

@@ -2,14 +2,7 @@ const express = require('express');
 'use strict';
 
 const { authMiddleware, requireRole } = require('../middleware/auth');
-// Was `require('../middleware/rateLimiter')` (singular) destructuring
-// `apiLimiter`, which that module never exported - router.use(undefined)
-// would throw the moment protectLivestockRouter ran, which is almost
-// certainly why nothing had wired this helper in yet. The real
-// general-API limiter lives in `rateLimit.js` (plural) as
-// `rateLimiters.api`.
-const { rateLimiters } = require('../middleware/rateLimit');
-const apiLimiter = rateLimiters.api;
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { sanitizeObject } = require('../middleware/inputValidation');
 const { logger } = require('../utils/logger');

@@ -59,7 +59,7 @@ class ProjectSystemsService {
         companyId, projectCode, projectName, reuId,
         projectType = 'infrastructure',
         plannedStartDate, plannedEndDate,
-        budgetAmount = 0, currency = 'INR', description
+        budgetAmount = 0, currency = 'INR', description,
       } = data || {};
 
       if (!companyId) throw new Error('companyId is required');
@@ -81,8 +81,8 @@ class ProjectSystemsService {
          RETURNING *`,
         [
           companyId, projectCode, projectName, reuId || null, projectType,
-          plannedStartDate || null, plannedEndDate || null, budgetAmount, currency, description || null
-        ]
+          plannedStartDate || null, plannedEndDate || null, budgetAmount, currency, description || null,
+        ],
       );
 
       logger.info(`Project created: ${result.rows[0].id} (${projectCode})`);
@@ -159,7 +159,7 @@ class ProjectSystemsService {
              updated_at = NOW()
          WHERE id = $4
          RETURNING *`,
-        [status, actualStartDate || null, actualEndDate || null, projectId]
+        [status, actualStartDate || null, actualEndDate || null, projectId],
       );
       if (result.rows.length === 0) throw new Error('Project not found');
 
@@ -181,7 +181,7 @@ class ProjectSystemsService {
 
       const {
         parentId, wbsCode, wbsName, sequenceNumber = 0,
-        plannedStartDate, plannedEndDate, plannedCost = 0
+        plannedStartDate, plannedEndDate, plannedCost = 0,
       } = data || {};
 
       if (!wbsCode) throw new Error('wbsCode is required');
@@ -206,8 +206,8 @@ class ProjectSystemsService {
          RETURNING *`,
         [
           projectId, parentId || null, wbsCode, wbsName, sequenceNumber,
-          plannedStartDate || null, plannedEndDate || null, plannedCost
-        ]
+          plannedStartDate || null, plannedEndDate || null, plannedCost,
+        ],
       );
 
       logger.info(`WBS element created: ${result.rows[0].id} (${wbsCode}) for project ${projectId}`);
@@ -222,7 +222,7 @@ class ProjectSystemsService {
     try {
       const result = await this.pool.query(
         'SELECT * FROM project_wbs WHERE project_id = $1 ORDER BY sequence_number ASC, id ASC',
-        [projectId]
+        [projectId],
       );
       return result.rows;
     } catch (error) {
@@ -256,7 +256,7 @@ class ProjectSystemsService {
              actual_end_date = COALESCE($3, actual_end_date)
          WHERE id = $4
          RETURNING *`,
-        [status, actualStartDate || null, actualEndDate || null, wbsId]
+        [status, actualStartDate || null, actualEndDate || null, wbsId],
       );
       if (result.rows.length === 0) throw new Error('WBS element not found');
 
@@ -287,16 +287,16 @@ class ProjectSystemsService {
    * path, rather than recursing forever.
    */
   buildWbsRollup(wbsRows, actualsByWbsId) {
-    const actuals = actualsByWbsId instanceof Map
-      ? actualsByWbsId
-      : new Map(Object.entries(actualsByWbsId || {}));
+    const actuals = actualsByWbsId instanceof Map ?
+      actualsByWbsId :
+      new Map(Object.entries(actualsByWbsId || {}));
 
     const byId = new Map();
     for (const row of wbsRows) {
       byId.set(row.id, {
         ...row,
         children: [],
-        ownActual: r4(Number(actuals.get(row.id) ?? actuals.get(String(row.id)) ?? 0))
+        ownActual: r4(Number(actuals.get(row.id) ?? actuals.get(String(row.id)) ?? 0)),
       });
     }
 
@@ -352,7 +352,7 @@ class ProjectSystemsService {
          JOIN chart_of_accounts coa ON coa.id = jl.account_id
          WHERE jl.project_id = $1 AND je.status = 'posted' AND jl.wbs_id IS NOT NULL
          GROUP BY jl.wbs_id`,
-        [projectId]
+        [projectId],
       );
       const actualsByWbsId = new Map(actualsResult.rows.map((r) => [r.wbs_id, r.amount]));
 
@@ -386,7 +386,7 @@ class ProjectSystemsService {
         `INSERT INTO project_milestones (project_id, wbs_id, milestone_name, target_date, notes)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
-        [projectId, wbsId || null, milestoneName, targetDate, notes || null]
+        [projectId, wbsId || null, milestoneName, targetDate, notes || null],
       );
 
       logger.info(`Milestone created: ${result.rows[0].id} (${milestoneName}) for project ${projectId}`);
@@ -429,7 +429,7 @@ class ProjectSystemsService {
          SET status = 'completed', actual_completion_date = $1
          WHERE id = $2 AND status NOT IN ('completed', 'cancelled')
          RETURNING *`,
-        [actualCompletionDate, milestoneId]
+        [actualCompletionDate, milestoneId],
       );
       if (result.rows.length === 0) {
         throw new Error(`Milestone ${milestoneId} not found, or already completed/cancelled`);
@@ -477,9 +477,9 @@ class ProjectSystemsService {
           upcoming: buckets.upcoming.length,
           overdue: buckets.overdue.length,
           completed: buckets.completed.length,
-          cancelled: buckets.cancelled.length
+          cancelled: buckets.cancelled.length,
         },
-        buckets
+        buckets,
       };
     } catch (error) {
       logger.error('Error getting milestone status summary', { error: error.message, stack: error.stack });
@@ -506,7 +506,7 @@ class ProjectSystemsService {
          JOIN journal_entries je ON je.id = jl.journal_entry_id
          JOIN chart_of_accounts coa ON coa.id = jl.account_id
          WHERE jl.project_id = $1 AND je.status = 'posted'`,
-        [projectId]
+        [projectId],
       );
 
       const actualAmount = r4(Number(result.rows[0]?.amount || 0));
@@ -523,3 +523,4 @@ class ProjectSystemsService {
 }
 
 module.exports = new ProjectSystemsService();
+

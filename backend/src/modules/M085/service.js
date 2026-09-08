@@ -19,7 +19,7 @@ async function createComparisonGroup(groupData) {
       entity_ids,
       entity_types,
       comparison_dimensions,
-      created_by
+      created_by,
     } = groupData;
 
     const group = {
@@ -32,18 +32,18 @@ async function createComparisonGroup(groupData) {
       comparison_dimensions: comparison_dimensions || {},
       created_by,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered group optimization
     const aiRequest = {
       task: 'comparison_group_optimization',
       parameters: {
-        group_type: group_type,
+        group_type,
         entities: entity_ids,
         comparison_best_practices: await getComparisonBestPractices(group_type),
-        similar_groups: await getSimilarGroups(group_type)
-      }
+        similar_groups: await getSimilarGroups(group_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -65,8 +65,8 @@ async function createComparisonGroup(groupData) {
         JSON.stringify(group.comparison_dimensions),
         group.created_by,
         group.status,
-        group.created_at
-      ]
+        group.created_at,
+      ],
     );
 
     logger.info(`Comparison group created: ${group.group_id}`);
@@ -90,7 +90,7 @@ async function createComparisonConfig(configData) {
       weightings,
       normalization_method,
       aggregation_method,
-      baseline_entity_id
+      baseline_entity_id,
     } = configData;
 
     const result = await pool.query(
@@ -110,8 +110,8 @@ async function createComparisonConfig(configData) {
         aggregation_method,
         baseline_entity_id,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Comparison config created: ${result.rows[0].config_id}`);
@@ -155,10 +155,10 @@ async function runComparison(configId, comparisonDate, periodStart, periodEnd) {
       parameters: {
         entity_scores: entityScores,
         metric_comparisons: metricComparisons,
-        rankings: rankings,
-        gaps: gaps,
-        group_context: await getGroupContext(group.group_id)
-      }
+        rankings,
+        gaps,
+        group_context: await getGroupContext(group.group_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -181,8 +181,8 @@ async function runComparison(configId, comparisonDate, periodStart, periodEnd) {
         JSON.stringify(gaps),
         JSON.stringify(aiResponse.insights),
         JSON.stringify(aiResponse.recommendations),
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Comparison completed: ${result.rows[0].result_id}`);
@@ -206,7 +206,7 @@ async function addBenchmark(benchmarkData) {
       source,
       industry,
       region,
-      period
+      period,
     } = benchmarkData;
 
     const result = await pool.query(
@@ -226,8 +226,8 @@ async function addBenchmark(benchmarkData) {
         region,
         period,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Benchmark added: ${result.rows[0].benchmark_id}`);
@@ -245,7 +245,7 @@ async function getBenchmarks(groupId) {
   try {
     const result = await pool.query(
       'SELECT * FROM comparison_benchmarks WHERE group_id = $1 AND status = $2',
-      [groupId, 'active']
+      [groupId, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -267,7 +267,7 @@ async function createComparisonAlert(alertData) {
       threshold_value,
       current_value,
       severity,
-      message
+      message,
     } = alertData;
 
     const result = await pool.query(
@@ -286,8 +286,8 @@ async function createComparisonAlert(alertData) {
         current_value,
         severity,
         message,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Comparison alert created: ${result.rows[0].alert_id}`);
@@ -343,8 +343,8 @@ async function createSnapshot(configId, snapshotName, comparisonDate, createdBy)
         JSON.stringify(latestResult),
         comparisonDate,
         createdBy,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Snapshot created: ${result.rows[0].snapshot_id}`);
@@ -364,7 +364,7 @@ async function getComparisonBestPractices(groupType) {
   return {
     recommended_metrics: ['revenue', 'profit', 'efficiency'],
     normalization_methods: ['min_max', 'z_score', 'percentile'],
-    weighting_strategies: ['equal', 'manual', 'data_driven']
+    weighting_strategies: ['equal', 'manual', 'data_driven'],
   };
 }
 
@@ -372,7 +372,7 @@ async function getSimilarGroups(groupType) {
   try {
     const result = await pool.query(
       'SELECT * FROM comparison_groups WHERE group_type = $1 LIMIT 5',
-      [groupType]
+      [groupType],
     );
     return result.rows;
   } catch (error) {
@@ -384,7 +384,7 @@ async function getComparisonConfig(configId) {
   try {
     const result = await pool.query(
       'SELECT * FROM comparison_configs WHERE config_id = $1',
-      [configId]
+      [configId],
     );
     return result.rows[0];
   } catch (error) {
@@ -396,7 +396,7 @@ async function getComparisonGroup(groupId) {
   try {
     const result = await pool.query(
       'SELECT * FROM comparison_groups WHERE group_id = $1',
-      [groupId]
+      [groupId],
     );
     return result.rows[0];
   } catch (error) {
@@ -436,7 +436,7 @@ async function getLatestComparisonResult(configId) {
   try {
     const result = await pool.query(
       'SELECT * FROM comparison_results WHERE config_id = $1 ORDER BY generated_at DESC LIMIT 1',
-      [configId]
+      [configId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -452,6 +452,6 @@ module.exports = {
   getBenchmarks,
   createComparisonAlert,
   getComparisonAlerts,
-  createSnapshot
+  createSnapshot,
 };
 

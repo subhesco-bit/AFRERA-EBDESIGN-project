@@ -6,7 +6,7 @@
 
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
-const aiGateway = require('./aiBackboneService');
+const aiGateway = require('./aiGatewayService');
 const analytics = require('./analyticsService');
 
 class AgriculturalIntelligenceService {
@@ -24,17 +24,17 @@ class AgriculturalIntelligenceService {
         location: parameters.location,
         crop_type: parameters.crop_type,
         soil_data: parameters.soil_data,
-        weather_data: parameters.weather_data
+        weather_data: parameters.weather_data,
       });
 
       return {
         crop_type: parameters.crop_type,
         location: parameters.location,
-        prediction: prediction,
+        prediction,
         confidence: prediction.confidence,
         factors: prediction.factors,
         recommendations: this.generateYieldRecommendations(prediction),
-        predicted_at: new Date().toISOString()
+        predicted_at: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error predicting crop yield:', error);
@@ -60,7 +60,7 @@ class AgriculturalIntelligenceService {
         recommendations: analysis.recommendations,
         fertilizer_recommendations: this.generateFertilizerRecommendations(analysis),
         irrigation_recommendations: this.generateIrrigationRecommendations(analysis),
-        analyzed_at: new Date().toISOString()
+        analyzed_at: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error analyzing soil:', error);
@@ -74,18 +74,18 @@ class AgriculturalIntelligenceService {
   async getWeatherIntelligence(location, timeframe = '7d') {
     try {
       const weatherPrediction = await this.aiGateway.predict('weather', { location, timeframe });
-      
+
       const advisory = await this.generateWeatherAdvisory(weatherPrediction);
 
       return {
-        location: location,
-        timeframe: timeframe,
+        location,
+        timeframe,
         current_conditions: weatherPrediction.current_conditions || {},
         forecast: weatherPrediction,
-        advisory: advisory,
+        advisory,
         risk_assessment: this.assessWeatherRisks(weatherPrediction),
         recommendations: this.generateWeatherRecommendations(weatherPrediction),
-        generated_at: new Date().toISOString()
+        generated_at: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error getting weather intelligence:', error);
@@ -102,7 +102,7 @@ class AgriculturalIntelligenceService {
         crop_type: parameters.crop_type,
         location: parameters.location,
         current_conditions: parameters.current_conditions,
-        historical_data: parameters.historical_data
+        historical_data: parameters.historical_data,
       });
 
       return {
@@ -115,7 +115,7 @@ class AgriculturalIntelligenceService {
         preventive_measures: this.generatePestPreventiveMeasures(prediction),
         treatment_recommendations: this.generatePestTreatmentRecommendations(prediction),
         monitoring_protocol: this.generatePestMonitoringProtocol(prediction),
-        predicted_at: new Date().toISOString()
+        predicted_at: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error predicting pest outbreak:', error);
@@ -133,7 +133,7 @@ class AgriculturalIntelligenceService {
         location: parameters.location,
         season: parameters.season,
         market_data: parameters.market_data,
-        resources: parameters.resources
+        resources: parameters.resources,
       });
 
       return {
@@ -147,7 +147,7 @@ class AgriculturalIntelligenceService {
         resource_requirements: recommendations.resource_requirements || {},
         risk_factors: recommendations.risk_factors || [],
         alternatives: recommendations.alternatives || [],
-        generated_at: new Date().toISOString()
+        generated_at: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error recommending crops:', error);
@@ -165,7 +165,7 @@ class AgriculturalIntelligenceService {
         soil_type: parameters.soil_type,
         weather_forecast: parameters.weather_forecast,
         water_availability: parameters.water_availability,
-        field_size: parameters.field_size
+        field_size: parameters.field_size,
       });
 
       return {
@@ -178,7 +178,7 @@ class AgriculturalIntelligenceService {
         cost_savings: optimization.cost_savings,
         implementation_guide: optimization.implementation_guide,
         monitoring_requirements: optimization.monitoring_requirements,
-        optimized_at: new Date().toISOString()
+        optimized_at: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error optimizing irrigation:', error);
@@ -195,7 +195,7 @@ class AgriculturalIntelligenceService {
         crop_type: parameters.crop_type,
         soil_analysis: parameters.soil_analysis,
         growth_stage: parameters.growth_stage,
-        yield_target: parameters.yield_target
+        yield_target: parameters.yield_target,
       });
 
       return {
@@ -209,7 +209,7 @@ class AgriculturalIntelligenceService {
         cost_estimate: recommendations.cost_estimate,
         environmental_impact: recommendations.environmental_impact || {},
         alternatives: recommendations.alternatives || [],
-        generated_at: new Date().toISOString()
+        generated_at: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error recommending fertilizer:', error);
@@ -233,7 +233,7 @@ class AgriculturalIntelligenceService {
         production_trends: report.production_trends,
         regional_breakdown: report.regional_breakdown,
         recommendations: report.recommendations,
-        generated_at: report.generated_at
+        generated_at: report.generated_at,
       };
     } catch (error) {
       logger.error('Error getting agricultural analytics:', error);
@@ -246,19 +246,19 @@ class AgriculturalIntelligenceService {
    */
   generateYieldRecommendations(prediction) {
     const recommendations = [];
-    
+
     if (prediction.predicted_yield < 3) {
       recommendations.push('Consider soil amendment to improve yield potential');
     }
-    
+
     if (prediction.factors?.includes('soil_quality')) {
       recommendations.push('Implement soil testing and targeted fertilization');
     }
-    
+
     if (prediction.factors?.includes('weather')) {
       recommendations.push('Install weather monitoring systems for better predictions');
     }
-    
+
     return recommendations;
   }
 
@@ -267,34 +267,34 @@ class AgriculturalIntelligenceService {
    */
   generateFertilizerRecommendations(analysis) {
     const recommendations = [];
-    
+
     if (analysis.nutrient_levels?.nitrogen < 50) {
       recommendations.push({
         nutrient: 'nitrogen',
         recommendation: 'Apply nitrogen-rich fertilizer',
         type: 'urea',
-        rate: '50kg/ha'
+        rate: '50kg/ha',
       });
     }
-    
+
     if (analysis.nutrient_levels?.phosphorus < 30) {
       recommendations.push({
         nutrient: 'phosphorus',
         recommendation: 'Apply phosphorus-rich fertilizer',
         type: 'DAP',
-        rate: '25kg/ha'
+        rate: '25kg/ha',
       });
     }
-    
+
     if (analysis.nutrient_levels?.potassium < 40) {
       recommendations.push({
         nutrient: 'potassium',
         recommendation: 'Apply potassium-rich fertilizer',
         type: 'MOP',
-        rate: '30kg/ha'
+        rate: '30kg/ha',
       });
     }
-    
+
     return recommendations;
   }
 
@@ -303,15 +303,15 @@ class AgriculturalIntelligenceService {
    */
   generateIrrigationRecommendations(analysis) {
     const recommendations = [];
-    
+
     if (analysis.soil_health_score < 60) {
       recommendations.push('Implement drip irrigation for water conservation');
     }
-    
+
     if (analysis.ph_level < 6 || analysis.ph_level > 7.5) {
       recommendations.push('Monitor soil moisture levels to optimize irrigation schedule');
     }
-    
+
     return recommendations;
   }
 
@@ -322,7 +322,7 @@ class AgriculturalIntelligenceService {
     const advisory = {
       level: 'normal',
       actions: [],
-      alerts: []
+      alerts: [],
     };
 
     if (weatherPrediction.temperature > 35) {
@@ -350,7 +350,7 @@ class AgriculturalIntelligenceService {
   assessWeatherRisks(weatherPrediction) {
     const risks = {
       overall: 'low',
-      factors: []
+      factors: [],
     };
 
     if (weatherPrediction.temperature > 38) {
@@ -400,7 +400,7 @@ class AgriculturalIntelligenceService {
       'Use resistant varieties',
       'Maintain proper field sanitation',
       'Monitor pest populations regularly',
-      'Use biological control methods'
+      'Use biological control methods',
     ];
   }
 
@@ -411,16 +411,16 @@ class AgriculturalIntelligenceService {
     return {
       chemical: {
         recommended: false,
-        alternatives: ['biopesticides', 'organic_methods']
+        alternatives: ['biopesticides', 'organic_methods'],
       },
       biological: {
         recommended: true,
-        methods: ['predatory_insects', 'pathogens', 'parasites']
+        methods: ['predatory_insects', 'pathogens', 'parasites'],
       },
       cultural: {
         recommended: true,
-        methods: ['crop_rotation', 'trap_crops', 'timing_adjustments']
-      }
+        methods: ['crop_rotation', 'trap_crops', 'timing_adjustments'],
+      },
     };
   }
 
@@ -433,9 +433,9 @@ class AgriculturalIntelligenceService {
       methods: ['visual_inspection', 'pheromone_traps', 'scouting'],
       threshold_levels: {
         economic: '5%_damage',
-        action: '10%_infestation'
+        action: '10%_infestation',
       },
-      reporting: 'immediate_for_critical_pests'
+      reporting: 'immediate_for_critical_pests',
     };
   }
 
@@ -451,19 +451,20 @@ class AgriculturalIntelligenceService {
         status: aiHealth.status === 'healthy' && analyticsHealth.status === 'healthy' ? 'healthy' : 'degraded',
         services: {
           ai_gateway: aiHealth,
-          analytics: analyticsHealth
+          analytics: analyticsHealth,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Agricultural intelligence health check failed:', error);
       return {
         status: 'unhealthy',
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
 }
 
 module.exports = new AgriculturalIntelligenceService();
+
