@@ -1,10 +1,11 @@
+import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import ErrorBoundary from '../../components/ErrorBoundary'
 
 // Mock console.error to avoid cluttering test output
 const originalError = console.error
 beforeAll(() => {
-  console.error = jest.fn()
+  console.error = vi.fn()
 })
 
 afterAll(() => {

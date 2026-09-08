@@ -4,8 +4,6 @@
  */
 
 require('dotenv').config();
-const { assertProductionConfiguration } = require('./config/productionConfig');
-assertProductionConfiguration();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -17,88 +15,88 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 
 // Import services
-const authService = require('./services/dual-use/authService');
-const productService = require('./services/legacy/productService');
-const orderService = require('./services/legacy/orderService');
-const financialService = require('./services/legacy/financialService');
-const logisticsService = require('./services/legacy/logisticsService');
-const insuranceService = require('./services/legacy/insuranceService');
-const aiBackboneService = require('./services/legacy/aiBackboneService');
-const erpService = require('./services/legacy/erpService');
-const multilingualService = require('./services/legacy/multilingualService');
-const organicTraceabilityService = require('./services/legacy/organicTraceabilityService');
-const nutritionIntelligenceService = require('./services/legacy/nutritionIntelligenceService');
-const conversationalaiBackboneService = require('./services/legacy/conversationalAIService');
-const laboratoryERPService = require('./services/legacy/laboratoryERPService');
-const giIntelligenceService = require('./services/legacy/giIntelligenceService');
-const foodIntelligenceService = require('./services/legacy/foodIntelligenceService');
-const valueCommerceService = require('./services/legacy/valueCommerceService');
-const consumerHealthService = require('./services/legacy/consumerHealthService');
-const voiceaiBackboneService = require('./services/legacy/voiceAIService');
-const blockchainTraceabilityService = require('./services/legacy/blockchainTraceabilityService');
-const knowledgeGraphService = require('./services/legacy/knowledgeGraphService');
+const authService = require('./services/authService');
+const productService = require('./services/productService');
+const orderService = require('./services/orderService');
+const financialService = require('./services/financialService');
+const logisticsService = require('./services/logisticsService');
+const insuranceService = require('./services/insuranceService');
+const aiService = require('./services/aiService');
+const erpService = require('./services/erpService');
+const multilingualService = require('./services/multilingualService');
+const organicTraceabilityService = require('./services/organicTraceabilityService');
+const nutritionIntelligenceService = require('./services/nutritionIntelligenceService');
+const conversationalAIService = require('./services/conversationalAIService');
+const laboratoryERPService = require('./services/laboratoryERPService');
+const giIntelligenceService = require('./services/giIntelligenceService');
+const foodIntelligenceService = require('./services/foodIntelligenceService');
+const valueCommerceService = require('./services/valueCommerceService');
+const consumerHealthService = require('./services/consumerHealthService');
+const voiceAIService = require('./services/voiceAIService');
+const blockchainTraceabilityService = require('./services/blockchainTraceabilityService');
+const knowledgeGraphService = require('./services/knowledgeGraphService');
 // Enterprise Memory ("Hippocampus" — AFRERA_CLAUDE_BUILD_DIRECTIVE.md §2.3):
 // case/episode log, real full-text retrieval. Was "missing" in
 // core/aiOrchestrator.js before 2026-08-09 — see that file's ENGINES.enterprise_memory
 // entry and migration 9997_enterprise_memory_schema.sql for the full rationale.
-const enterpriseMemoryService = require('./services/legacy/enterpriseMemoryService');
-const predictiveAnalyticsService = require('./services/legacy/predictiveAnalyticsService');
-const iotIntegrationService = require('./services/legacy/iotIntegrationService');
-const arVrService = require('./services/legacy/arVrService');
-const smsAuthService = require('./services/legacy/smsAuthService');
+const enterpriseMemoryService = require('./services/enterpriseMemoryService');
+const predictiveAnalyticsService = require('./services/predictiveAnalyticsService');
+const iotIntegrationService = require('./services/iotIntegrationService');
+const arVrService = require('./services/arVrService');
+const smsAuthService = require('./services/smsAuthService');
 // Real Twilio WhatsApp integration (outbound send + inbound webhook). Mirrors
 // smsAuthService's mock-mode-when-unconfigured pattern. See service header.
-const whatsappService = require('./services/legacy/whatsappService');
+const whatsappService = require('./services/whatsappService');
 const advancedVoiceAI = require('./services/advancedVoiceAI');
 // Escrow service for secure fund holding in transactions
-const escrowService = require('./services/legacy/escrowService');
+const escrowService = require('./services/escrowService');
 // Custody event service - chain tracking and settlement instructions
-const custodyEventRoutes = require('./services/legacy/custodyEventRoutes');
+const custodyEventRoutes = require('./services/custodyEventRoutes');
 // Health check routes for monitoring
 const healthRoutes = require('./routes/healthRoutes');
-const offlinePaymentService = require('./services/legacy/offlinePaymentService');
-const advancedaiBackboneService = require('./services/legacy/advancedAIService');
-const offlineSyncService = require('./services/legacy/offlineSyncService');
-const formService = require('./services/legacy/formService');
-const analyticsService = require('./services/legacy/analyticsService');
-const moduleCatalogService = require('./services/legacy/moduleCatalogService');
+const offlinePaymentService = require('./services/offlinePaymentService');
+const advancedAIService = require('./services/advancedAIService');
+const offlineSyncService = require('./services/offlineSyncService');
+const formService = require('./services/formService');
+const analyticsService = require('./services/analyticsService');
+const moduleCatalogService = require('./services/moduleCatalogService');
 // User management module (M011)
 const userModule = require('./modules/M011');
 // System Administration module (M006)
 const adminModule = require('./modules/M006');
-const indigenousKnowledgeService = require('./services/legacy/indigenousKnowledgeService');
-const biodiversityService = require('./services/legacy/biodiversityService');
-const aiCopilotService = require('./services/legacy/aiCopilotService');
-const omnichannelaiBackboneService = require('./services/legacy/omnichannelAIService');
-const foodSafetyService = require('./services/legacy/foodSafetyService');
-const shelfLifeService = require('./services/legacy/shelfLifeService');
-const institutionalProcurementService = require('./services/legacy/institutionalProcurementService');
-const millCircuitService = require('./services/legacy/millCircuitService');
-const digitalProductPassportService = require('./services/legacy/digitalProductPassportService');
-const recipeIntelligenceService = require('./services/legacy/recipeIntelligenceService');
+const indigenousKnowledgeService = require('./services/indigenousKnowledgeService');
+const biodiversityService = require('./services/biodiversityService');
+const aiCopilotService = require('./services/aiCopilotService');
+const omnichannelAIService = require('./services/omnichannelAIService');
+const foodSafetyService = require('./services/foodSafetyService');
+const shelfLifeService = require('./services/shelfLifeService');
+const institutionalProcurementService = require('./services/institutionalProcurementService');
+const millCircuitService = require('./services/millCircuitService');
+const digitalProductPassportService = require('./services/digitalProductPassportService');
+const recipeIntelligenceService = require('./services/recipeIntelligenceService');
 // Business rules recovered from the v43 prototype (see service header).
-const decisionSupportService = require('./services/legacy/decisionSupportService');
+const decisionSupportService = require('./services/decisionSupportService');
 // Recovered from the pre-v43 ne_harvest lineage (see service header).
-const neProductIntelligenceService = require('./services/legacy/neProductIntelligenceService');
-const commerceRulesService = require('./services/legacy/commerceRulesService');
-const catalogIntelligenceService = require('./services/legacy/catalogIntelligenceService');
-const enterpriseControlService = require('./services/legacy/enterpriseControlService');
-const v42IntelligenceService = require('./services/legacy/v42IntelligenceService');
+const neProductIntelligenceService = require('./services/neProductIntelligenceService');
+const commerceRulesService = require('./services/commerceRulesService');
+const catalogIntelligenceService = require('./services/catalogIntelligenceService');
+const enterpriseControlService = require('./services/enterpriseControlService');
+const v42IntelligenceService = require('./services/v42IntelligenceService');
 // Farmer Value Engine (991): the decision layer above every other module.
-const farmerValueService = require('./services/legacy/farmerValueService');
-const merchandisingService = require('./services/legacy/merchandisingService');
+const farmerValueService = require('./services/farmerValueService');
+const merchandisingService = require('./services/merchandisingService');
 
 // Previously-orphaned services: each of these exports its own setupRoutes(app)
 // function that was never being called anywhere, so none of them had a live route.
-const dynamicPricingService = require('./services/legacy/dynamicPricingService');
-const farmerTrainingService = require('./services/legacy/farmerTrainingService');
-const governmentSchemeService = require('./services/legacy/governmentSchemeService');
-const greenhouseService = require('./services/legacy/greenhouseService');
-const insuranceClaimsService = require('./services/legacy/insuranceClaimsService');
-const preSeasonOrderService = require('./services/legacy/preSeasonOrderService');
-const sharedInfraService = require('./services/legacy/sharedInfraService');
-const soilTestingService = require('./services/legacy/soilTestingService');
-const subsidyService = require('./services/legacy/subsidyService');
+const dynamicPricingService = require('./services/dynamicPricingService');
+const farmerTrainingService = require('./services/farmerTrainingService');
+const governmentSchemeService = require('./services/governmentSchemeService');
+const greenhouseService = require('./services/greenhouseService');
+const insuranceClaimsService = require('./services/insuranceClaimsService');
+const preSeasonOrderService = require('./services/preSeasonOrderService');
+const sharedInfraService = require('./services/sharedInfraService');
+const soilTestingService = require('./services/soilTestingService');
+const subsidyService = require('./services/subsidyService');
 
 // Import enhancement routes
 const marketplaceEnhancements = require('./routes/marketplaceEnhancements');
@@ -121,8 +119,6 @@ const gstRoutes = require('./routes/gstRoutes');
 // REMOVED: logisticsOpsRoutes - was imported from logisticsEnhancementRoutes but route removed to prevent crash
 const farmerRoutes = require('./routes/farmerRoutes');
 const auditRoutes = require('./routes/auditRoutes');
-const auditTrailRoutes = require('./routes/auditTrail');
-const complianceTrackingRoutes = require('./routes/complianceTracking');
 // M121 Dairy Management + M112 Fertilizer Inventory (Livestock / Input
 // Supply, wave 1) — real backends for two pages that were UI-only until now.
 const dairyRoutes = require('./routes/dairyRoutes');
@@ -134,18 +130,6 @@ const goatRoutes = require('./routes/goatRoutes');
 const sheepRoutes = require('./routes/sheepRoutes');
 const pigRoutes = require('./routes/pigRoutes');
 const animalHealthRoutes = require('./routes/animalHealthRoutes');
-// System 10/11/28/29 — Soil/Nutrient/Land, Water/Irrigation, Vendor/
-// Procurement, Machinery/Village Ops. Route + service + migration files
-// existed but were never require()'d/mounted. NOTE: each module's migration
-// (m010/m011/m028/m029) collides with an earlier-sorted migration defining
-// the same table name with different columns (same bug class as the
-// batch-1 schema-gap fixes in .ai/tasks/ACTIVE.md) - the module's own
-// CREATE TABLE is a silent no-op, so live queries will fail against
-// missing columns until that's reconciled in a follow-up migration.
-const soilNutrientLandRoutes = require('./routes/soilNutrientLandRoutes');
-const waterIrrigationRoutes = require('./routes/waterIrrigationRoutes');
-const vendorProcurementRoutes = require('./routes/vendorProcurementRoutes');
-const machineryVillageOpsRoutes = require('./routes/machineryVillageOpsRoutes');
 // Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993).
 // enterpriseControlRoutes.js was deleted 2026-08-24: it imported
 // createWorkflow/createLegalCase/createRisk/etc from
@@ -165,75 +149,65 @@ const machineryVillageOpsRoutes = require('./routes/machineryVillageOpsRoutes');
 // AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C. UnifiedLedgerPage.jsx now points
 // users at the real /ledger page instead of calling this.
 // Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
-const villageProfileService = require('./services/legacy/villageProfileService');
+const villageProfileService = require('./services/villageProfileService');
 // Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)
-const procurementSubscriptionService = require('./services/legacy/procurementSubscriptionService');
+const procurementSubscriptionService = require('./services/procurementSubscriptionService');
 // Buying Club Service (REOS Missing Layer 1.10-1.11 - Group Buying / Community Buying)
-const buyingClubService = require('./services/legacy/buyingClubService');
+const buyingClubService = require('./services/buyingClubService');
 // Rural Enterprise Service (REOS Rural Life OS - rural_enterprises table)
-const ruralEnterpriseService = require('./services/legacy/ruralEnterpriseService');
+const ruralEnterpriseService = require('./services/ruralEnterpriseService');
 // Renewable Energy Service (REOS Rural Life OS - renewable_energy_systems table)
-const renewableEnergyService = require('./services/legacy/renewableEnergyService');
+const renewableEnergyService = require('./services/renewableEnergyService');
 // Household Economy Service (REOS Rural Life OS - household_economy table)
-const householdEconomyService = require('./services/legacy/householdEconomyService');
+const householdEconomyService = require('./services/householdEconomyService');
 // Shared Infrastructure Service (REOS Rural Life OS - shared_infrastructure_access table)
-const sharedInfrastructureService = require('./services/legacy/sharedInfrastructureService');
+const sharedInfrastructureService = require('./services/sharedInfrastructureService');
 // Machinery Access Service (REOS Rural Life OS - machinery_access table)
-const machineryAccessService = require('./services/legacy/machineryAccessService');
+const machineryAccessService = require('./services/machineryAccessService');
 // Rural Finance Service (REOS Rural Life OS - rural_finance table)
-const ruralFinanceService = require('./services/legacy/ruralFinanceService');
+const ruralFinanceService = require('./services/ruralFinanceService');
 // AI Advisory Service (REOS Rural Life OS - ai_advisories table)
-const aiAdvisoryService = require('./services/legacy/aiAdvisoryService');
+const aiAdvisoryService = require('./services/aiAdvisoryService');
 // Market Access Service (REOS Rural Life OS - market_access table)
-const marketAccessService = require('./services/legacy/marketAccessService');
+const marketAccessService = require('./services/marketAccessService');
 // Market Intelligence Service (REOS Rural Life OS - market_intelligence table)
-const marketIntelligenceService = require('./services/legacy/marketIntelligenceService');
+const marketIntelligenceService = require('./services/marketIntelligenceService');
 // Mobility Rides Service (REOS Rural Life OS - mobility_rides table)
-const mobilityRidesService = require('./services/legacy/mobilityRidesService');
+const mobilityRidesService = require('./services/mobilityRidesService');
 // Backup and Disaster Recovery Service
-const backupService = require('./services/legacy/backupService');
+const backupService = require('./services/backupService');
 // Analytics and Monitoring Service
-const analyticsMonitoringService = require('./services/legacy/analyticsMonitoringService');
+const analyticsMonitoringService = require('./services/analyticsMonitoringService');
 // AI Agentic Companion Service
-const aiAgenticCompanionService = require('./services/legacy/aiAgenticCompanionService');
+const aiAgenticCompanionService = require('./services/aiAgenticCompanionService');
 // Digital Twin Service
-const digitalTwinService = require('./services/legacy/digitalTwinService');
-// AI Gateway Service - Real AI Backbone System (see aiBackboneService require
-// above; it also backs the "AI Brain" mount point at /api/v1/ai-brain below)
+const digitalTwinService = require('./services/digitalTwinService');
+// AI Gateway Service - Real AI Backbone System
+const aiGatewayService = require('./services/aiGatewayService');
 // AI Agent Service - Agentic AI Capabilities
 const aiAgentService = require('./services/aiAgentService');
+// AI Brain Service - Cognitive Processing Layer
+const aiBrainService = require('./services/aiBrainService');
 // AI Self-Healing Service - Autonomous Error Recovery Layer
-const aiSelfHealingService = require('./services/legacy/aiSelfHealingService');
+const aiSelfHealingService = require('./services/aiSelfHealingService');
 // AI Operation Intelligence Service - Real-Time Optimization Layer
-const aiOperationIntelligenceService = require('./services/legacy/aiOperationIntelligenceService');
-// API Contract Validator - Frontend-Backend contract validation
-const { validateAPIContracts, generateContractReport } = require('./utils/apiContractValidator');
-// Advanced Medical Coding Service - MS-Level Knowledge Integration
-const advancedMedicalCodingService = require('./services/advancedMedicalCodingService');
-const clinicalNutritionDecisionSupportService = require('./services/clinicalNutritionDecisionSupportService');
-const medicalCodingReferenceService = require('./services/medicalCodingReferenceService');
+const aiOperationIntelligenceService = require('./services/aiOperationIntelligenceService');
 // MFA Service - Multi-Factor Authentication
-const mfaService = require('./services/dual-use/mfaService');
-const mfaRoutes = require('./routes/dual-use/mfaRoutes');
+const mfaService = require('./services/mfaService');
+const mfaRoutes = require('./routes/mfaRoutes');
 // GDPR Compliance Service
-const gdprService = require('./services/dual-use/gdprService');
-const gdprRoutes = require('./routes/dual-use/gdprRoutes');
+const gdprService = require('./services/gdprService');
+const gdprRoutes = require('./routes/gdprRoutes');
 // M001 Platform Core Service
-const platformCoreService = require('./services/dual-use/platformCoreService');
+const platformCoreService = require('./services/platformCoreService');
 const platformCoreRoutes = require('./routes/platformCoreRoutes');
-// Unified Claude AI Coordinator - routes/unifiedAIRoutes.js requires
-// core/claudeAICoordinator.js directly (Node caches the singleton either
-// way), so a second unused require here was dead weight. Removed 2026-08-29.
+// Unified Claude AI Coordinator
+const claudeAICoordinator = require('./core/claudeAICoordinator');
 const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
-const libraryRoutes = require('./routes/libraryRoutes');
-const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes');
-// Generic plug-and-play module discovery/load/execute bridge (backend/src/core/moduleRegistry.js)
-const moduleRegistryRoutes = require('./routes/claude/moduleRegistryRoutes');
-// REST bridge exposing backend/src/modules/M0XX's real functions over HTTP
-// (see routes/claude/backendModuleBridge.js for why this exists)
-const backendModuleBridge = require('./routes/claude/backendModuleBridge');
-// SAP Module Architecture Service - Independent Module Architecture
-const sapModuleArchitectureService = require('./services/legacy/sapModuleArchitectureService');
+// SAP Module Architecture Service require REMOVED 2026-08-24 (route
+// reconciliation) — fake in-memory module registry, never mounted from
+// this require site anyway (dead duplicate require). See
+// docs/registry/ROUTE_RECONCILIATION.md.
 // Advance Rate Pricing — forward curves, basis, commitment advice.
 // Recovered from afrera_platform_v44.html (migration 051).
 const riskPricingRoutes = require('./routes/riskPricingRoutes');
@@ -340,16 +314,6 @@ const {
 // (frontend/src/services/api.js getRoles/createRole/updateRole/deleteRole
 // against /roles), but no backend anywhere until now (2026-08-21).
 const roleManagementRoutes = require('./routes/roleManagementRoutes');
-// Irrigation schedules/water-sources/logs CRUD (2026-08-28) — same gap as
-// the batches above. M075 is actually Pig Management, not Irrigation - see
-// irrigationManagementService.js header.
-const {
-  irrigationSchedulesRoutes, irrigationWaterSourcesRoutes, irrigationLogsRoutes,
-} = require('./routes/irrigationManagementRoutes');
-// realtimeMonitoringService.js had zero callers anywhere in the app
-// (confirmed via repo-wide require() audit, 2026-08-28) despite being a
-// real, self-contained monitoring/alerting engine. Exposed directly.
-const realtimeMonitoringRoutes = require('./routes/realtimeMonitoringRoutes');
 // Domain D14 Climate & Weather (057) — was completely empty before today.
 const weatherRoutes = require('./routes/weatherRoutes');
 // M083 Climate Advisory (Operations wave 2) — CRUD for agromet_advisories,
@@ -386,48 +350,8 @@ const costControlRoutes = require('./routes/costControlRoutes');
 // in migration 9996_project_systems_schema.sql (see that file's header for
 // why it is numbered after 996 rather than in the 060s sequence).
 const projectSystemsRoutes = require('./routes/projectSystemsRoutes');
-// AF-CO activity-based costing/profitability drill-down calculator — found
-// unmounted (routes/erpRoutes.js) during the ERP-domain batch pass on
-// audit/ui-api-fix. Distinct from costControlRoutes.js (DB-backed cost/profit
-// centres against posted GL); this wraps services/erp/CostControlModule.js,
-// a stateless ABC-costing/variance/drill-down calculator. Mounted separately
-// to avoid colliding with /api/v1/erp/controlling.
-const erpCostManagementRoutes = require('./routes/erpRoutes');
 const coldStorageRoutes = require('./routes/coldStorageRoutes');
 const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
-const decisionSupportRoutes = require('./routes/decisionSupportRoutes');
-// Genuinely orphaned services found during the 2026-08-29 gap-index audit -
-// real, substantial code, zero prior route/index.js wiring. See .ai/tasks/ACTIVE.md.
-// (The 3 insurance-* route files originally added here were themselves a
-// duplication mistake, corrected the same day - see the ACTIVE.md
-// "duplicate route correction" note. insuranceEnhancements.js, mounted
-// below at /api/v1/insurance, already covered this - and is what the
-// frontend actually calls.)
-const cropPlanningRoutes = require('./routes/cropPlanningRoutes');
-const landRecordsRoutes = require('./routes/landRecordsRoutes');
-const productReviewRoutes = require('./routes/productReviewRoutes');
-// nutritionIntelligenceService.js (1165 lines, real) already defines and
-// exports its own `router` - nutrition scoring, personalized recommendations
-// by dietary profile, diet-based recipe generation, wellness practices. Zero
-// prior mounting - the AI dietitian/naturopath layer the user asked for
-// (2026-08-29) is mostly this, already built, just never exposed.
-const nutritionIntelligenceRoutes = require('./services/legacy/nutritionIntelligenceService').router;
-// custodyEventService.js is NOT orphaned - it was already wired via
-// services/legacy/custodyEventRoutes.js's setupRoutes(app) pattern (called
-// below), which this session's orphan scan initially missed because it
-// only checked routes/. Confirmed and left alone; see the scan note further
-// down for what WAS actually found orphaned.
-// 6 route files under routes/legacy/ found never mounted during the
-// 2026-08-29 sweep - root cause: all 6 imported from
-// '../../middleware/authMiddleware', a module that does not exist, so
-// mounting them as-is would have crashed the boot. Fixed the import in each
-// file (see their own comments) to the real '../../middleware/auth' module.
-const apicultureRoutes = require('./routes/legacy/apicultureRoutes');
-const legacyFisheriesRoutes = require('./routes/legacy/fisheriesRoutes');
-const forestryRoutes = require('./routes/legacy/forestryRoutes');
-const mushroomRoutes = require('./routes/legacy/mushroomRoutes');
-const sericultureRoutes = require('./routes/legacy/sericultureRoutes');
-const vermicompostRoutes = require('./routes/legacy/vermicompostRoutes');
 const cooperativeShareRoutes = require('./routes/cooperativeShareRoutes');
 const wikipediaRoutes = require('./routes/wikipediaRoutes');
 // Found built but with zero HTTP exposure (2026-08-15 junk/orphan sweep) —
@@ -435,7 +359,7 @@ const wikipediaRoutes = require('./routes/wikipediaRoutes');
 const agriculturalIntelligenceRoutes = require('./routes/agriculturalIntelligenceRoutes');
 const farmerHealthRoutes = require('./routes/farmerHealthRoutes');
 const foodRoutes = require('./routes/foodRoutes');
-const iotSensorService = require('./services/legacy/iotSensorService');
+const iotSensorService = require('./services/iotSensorService');
 const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes');
 const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes');
 const civilDisruptionRoutes = require('./routes/civilDisruptionRoutes');
@@ -462,10 +386,10 @@ const aiBrainRoutes = require('./routes/aiBrainRoutes');
 const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes');
 // AI Operation Intelligence Routes - Real-Time Optimization Layer
 const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes');
-// M400 AI Backbone - complete enterprise coordination surface, admin protected.
-const m400AiBackboneRoutes = require('./routes/m400AiBackboneRoutes');
-// SAP Module Architecture Routes - Independent Module Architecture
-const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes');
+// SAP Module Architecture Routes - REMOVED 2026-08-24 (route reconciliation):
+// fully fake, in-memory-Map-only self-referential module registry
+// (registers fake "AF-FI"/"AF-HR"/"AF-SC" entries, "quantum-enhanced
+// modules"), zero frontend caller anywhere. See docs/registry/ROUTE_RECONCILIATION.md.
 // Research and Development Routes - R&D Management with AI Integration
 const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes');
 // Information Sharing Routes - Document and Knowledge Sharing with AI Integration
@@ -480,13 +404,6 @@ const platformConfigurationRoutes = require('./routes/platformConfigurationRoute
 const tenantManagementRoutes = require('./routes/tenantManagementRoutes');
 const organizationManagementRoutes = require('./routes/organizationManagementRoutes');
 const systemAdministrationRoutes = require('./routes/systemAdministrationRoutes');
-const labourRoutes = require('./routes/labourRoutes');
-const farmerVerificationRoutes = require('./routes/farmerVerificationRoutes');
-const farmerKycRoutes = require('./routes/farmerKycRoutes');
-const contractFarmingRoutes = require('./routes/strategic/contractFarmingRoutes');
-const governmentSubsidyRoutes = require('./routes/strategic/governmentSubsidyRoutes');
-const householdProcurementRoutes = require('./routes/strategic/householdProcurementRoutes');
-const preSeasonPurchaseRoutes = require('./routes/strategic/preSeasonPurchaseRoutes');
 // Poultry/Goat/Sheep/Pig/Animal Health (M123-M127) already required above.
 
 // Cross-module nervous system + decision layer.
@@ -520,7 +437,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
@@ -590,63 +507,14 @@ app.use('/api/v1/', rateLimiters.api);
 app.use(errorLogger);
 
 // API Routes
-const mountedRoutes = new Map(); // Track mounted routes for health monitoring
-const failedMounts = new Map(); // Track failed mounts for debugging
-
 const mountRoute = (pathPrefix, serviceModule) => {
-  try {
-    if (!serviceModule) {
-      const error = `Service module is null/undefined for ${pathPrefix}`;
-      logger.error(`Route mount failed for ${pathPrefix}: ${error}`);
-      failedMounts.set(pathPrefix, { error: 'module_undefined', timestamp: new Date() });
-      return false;
-    }
-
-    if (typeof serviceModule !== 'object') {
-      const error = `Service module is not an object for ${pathPrefix}`;
-      logger.error(`Route mount failed for ${pathPrefix}: ${error}`);
-      failedMounts.set(pathPrefix, { error: 'module_not_object', timestamp: new Date() });
-      return false;
-    }
-
-    if (!serviceModule.router) {
-      const error = `No router property exported by service module for ${pathPrefix}`;
-      logger.warn(`Skipping route mount for ${pathPrefix} because no router was exported.`);
-      failedMounts.set(pathPrefix, { error: 'no_router_export', timestamp: new Date() });
-      return false;
-    }
-
-    // An Express Router is itself a callable function (with .use/.get/etc.
-    // attached), so `typeof` reports 'function', not 'object' — checking for
-    // 'object' here rejected every genuine router. The correct signal that
-    // this is a usable router is that `.use` is a function on it.
-    if (!serviceModule.router || typeof serviceModule.router.use !== 'function') {
-      const error = `Router property is not a valid Express router for ${pathPrefix}`;
-      logger.error(`Route mount failed for ${pathPrefix}: ${error}`);
-      failedMounts.set(pathPrefix, { error: 'invalid_router', timestamp: new Date() });
-      return false;
-    }
-
-    // Valid router - mount it
+  if (serviceModule && serviceModule.router) {
     app.use(pathPrefix, serviceModule.router);
-    mountedRoutes.set(pathPrefix, { 
-      mounted: true, 
-      timestamp: new Date(),
-      serviceModule: serviceModule.constructor?.name || 'unknown'
-    });
-    logger.info(`Successfully mounted route: ${pathPrefix}`);
     return true;
-
-  } catch (error) {
-    const errorDetails = `Exception during route mount for ${pathPrefix}: ${error.message}`;
-    logger.error(errorDetails, { error: error.message, stack: error.stack });
-    failedMounts.set(pathPrefix, { 
-      error: 'mount_exception', 
-      message: error.message, 
-      timestamp: new Date() 
-    });
-    return false;
   }
+
+  logger.warn(`Skipping route mount for ${pathPrefix} because no router was exported.`);
+  return false;
 };
 
 app.use('/api/v1/auth', criticalRouteMonitoring, authService.router);
@@ -657,18 +525,18 @@ app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
 app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
 app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
-mountRoute('/api/v1/ai', aiBackboneService);
+mountRoute('/api/v1/ai', aiService);
 mountRoute('/api/v1/erp', erpService);
 mountRoute('/api/v1/multilingual', multilingualService);
 mountRoute('/api/v1/organic-traceability', organicTraceabilityService);
 mountRoute('/api/v1/nutrition-intelligence', nutritionIntelligenceService);
-mountRoute('/api/v1/conversational-ai', conversationalaiBackboneService);
+mountRoute('/api/v1/conversational-ai', conversationalAIService);
 mountRoute('/api/v1/laboratory-erp', laboratoryERPService);
 mountRoute('/api/v1/gi-intelligence', giIntelligenceService);
 mountRoute('/api/v1/food-intelligence', foodIntelligenceService);
 mountRoute('/api/v1/value-commerce', valueCommerceService);
 mountRoute('/api/v1/consumer-health', consumerHealthService);
-mountRoute('/api/v1/voice-ai', voiceaiBackboneService);
+mountRoute('/api/v1/voice-ai', voiceAIService);
 mountRoute('/api/v1/blockchain-traceability', blockchainTraceabilityService);
 mountRoute('/api/v1/knowledge-graph', knowledgeGraphService);
 mountRoute('/api/v1/enterprise-memory', enterpriseMemoryService);
@@ -679,12 +547,12 @@ mountRoute('/api/v1/sms-auth', smsAuthService);
 mountRoute('/api/v1/whatsapp', whatsappService);
 mountRoute('/api/v1/advanced-voice', advancedVoiceAI);
 mountRoute('/api/v1/offline-payment', offlinePaymentService);
-mountRoute('/api/v1/advanced-ai', advancedaiBackboneService);
+mountRoute('/api/v1/advanced-ai', advancedAIService);
 mountRoute('/api/v1/offline-sync', offlineSyncService);
 mountRoute('/api/v1/indigenous-knowledge', indigenousKnowledgeService);
 mountRoute('/api/v1/biodiversity', biodiversityService);
 mountRoute('/api/v1/ai-copilot', aiCopilotService);
-mountRoute('/api/v1/omnichannel-ai', omnichannelaiBackboneService);
+mountRoute('/api/v1/omnichannel-ai', omnichannelAIService);
 mountRoute('/api/v1/food-safety', foodSafetyService);
 mountRoute('/api/v1/shelf-life', shelfLifeService);
 mountRoute('/api/v1/institutional-procurement', institutionalProcurementService);
@@ -692,17 +560,7 @@ mountRoute('/api/v1/mill-fpo', millCircuitService);
 mountRoute('/api/v1/digital-product-passport', digitalProductPassportService);
 mountRoute('/api/v1/recipe-intelligence', recipeIntelligenceService);
 mountRoute('/api/v1/forms', formService);
-// analyticsService exports plain aggregation functions, not a .router - it's an
-// internal library consumed directly by tenantManagement/systemAdministration/
-// platformConfiguration/organizationManagement/roleManagement/agriculturalIntelligence
-// services, not a REST endpoint. mountRoute() silently no-ops for it, same as
-// farmerService/gstService above.
 mountRoute('/api/v1/analytics', analyticsService);
-// analyticsService.js has real report-generation logic (buildAgriculturalOverview,
-// buildFinancialPerformance, etc.) but no .router, so the mountRoute() call
-// above always no-ops - confirmed still true 2026-08-28 via the boot log's
-// own warning. Give it a real route instead of leaving it silently unreachable.
-app.use('/api/v1/analytics', require('./routes/analyticsReportRoutes'));
 mountRoute('/api/v1/modules', moduleCatalogService);
 // decisionSupportService uses setupRoutes instead of mountRoute
 decisionSupportService.setupRoutes(app);
@@ -715,9 +573,7 @@ mountRoute('/api/v1/control', enterpriseControlService);
 mountRoute('/api/v1/intel', v42IntelligenceService);
 mountRoute('/api/v1/value', farmerValueService);
 mountRoute('/api/v1/merchandising', merchandisingService);
-// engineeringProjectRoutes exports the router directly (not { router }), so it
-// bypasses mountRoute()'s .router check - matches every other *Routes.js mount below.
-app.use('/api/v1/engineering', require('./routes/engineeringProjectRoutes'));
+mountRoute('/api/v1/engineering', require('./routes/engineeringProjectRoutes'));
 // Mount User Management (M011)
 mountRoute('/api/v1/users', userModule);
 // Mount System Administration (M006)
@@ -730,14 +586,7 @@ const generatedModuleNames = fs.readdirSync(generatedModuleRoot)
   .sort(); // Note: Synchronous I/O at module load is acceptable for one-time initialization
 
 for (const moduleName of generatedModuleNames) {
-  let resolvedModule;
-  try {
-    resolvedModule = require(path.join(generatedModuleRoot, moduleName));
-  } catch (error) {
-    logger.error(`Failed to load generated module ${moduleName}: ${error.message}`);
-    failedMounts.set(`/api/v1/modules/${moduleName.toLowerCase()}`, { error: 'module_load_failed', reason: error.message, timestamp: new Date() });
-    continue;
-  }
+  const resolvedModule = require(path.join(generatedModuleRoot, moduleName));
   if (resolvedModule && resolvedModule.router) {
     mountRoute(`/api/v1/modules/${moduleName.toLowerCase()}`, resolvedModule);
   }
@@ -765,14 +614,9 @@ app.use('/api/v1/complete-ai-integration', completeAIIntegrationRoutes);
 // Comprehensive ERP - Oracle/SAP standards complete ERP system
 const comprehensiveERPRoutes = require('./routes/comprehensiveERPRoutes');
 app.use('/api/v1/comprehensive-erp', comprehensiveERPRoutes);
-// AI Backbone - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face, Ollama)
+// AI Backbone - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face)
 const aiBackboneRoutes = require('./routes/aiBackboneRoutes');
 app.use('/api/v1/ai-backbone', aiBackboneRoutes);
-// Devin integration removed 2026-08-29 at explicit user request (real live
-// Cognition Devin API - user did not want this surface reachable). Was
-// routes/devinRoutes.js -> controllers/devinController.js ->
-// services/devinService.js, all deleted together; nothing else depended on
-// any of the three.
 // Product Media AI - AI product-image generation, nutrient-comparison video generation
 const productMediaAIRoutes = require('./routes/productMediaAIRoutes');
 app.use('/api/v1/product-media-ai', productMediaAIRoutes);
@@ -785,13 +629,6 @@ app.use('/api/v1/defense-fitness-prep', defenseFitnessPrepRoutes);
 // Crop Value-Compound Research - AI-assisted, human-reviewed published reference data
 const cropValueResearchRoutes = require('./routes/cropValueResearchRoutes');
 app.use('/api/v1/crop-value-research', cropValueResearchRoutes);
-// Crop AI Advisory (recommendations/guidance/market outlook) - was defined but
-// never mounted (routes/index.js that exported it is never required); the
-// underlying service also used to return hardcoded canned data while
-// claiming to be AI-driven - now routes through claudeAICoordinator
-// (see cropRecommendationService.js), with a labeled fallback on AI failure.
-const cropRecommendationsRoutes = require('./routes/cropRecommendations');
-app.use('/api/v1/crop-ai', cropRecommendationsRoutes);
 // Platform Telemetry - real system/business metrics for admin dashboard
 const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes');
 app.use('/api/v1/platform-telemetry', platformTelemetryRoutes);
@@ -807,10 +644,6 @@ app.use('/api/v1/mfa', mfaRoutes);
 app.use('/api/v1/privacy', gdprRoutes);
 app.use('/api/v1/platform', platformCoreRoutes);
 app.use('/api/v1/ai', unifiedAIRoutes);
-app.use('/api/v1/ai/modules', moduleRegistryRoutes);
-app.use('/api/v1/backend-modules', backendModuleBridge);
-app.use('/api/v1/library', libraryRoutes);
-app.use('/api/v1/ai-collaboration', aiCollaborationRoutes);
 app.use('/api/v1/advanced', advancedFeatures);
 app.use('/api/v1/enterprise-ai', enterpriseAIRoutes);
 
@@ -822,12 +655,6 @@ app.use('/api/v1/gst', gstRoutes);
 // Newly created routes covering previously-orphaned services
 app.use('/api/v1/farmers', farmerRoutes);
 app.use('/api/v1/admin/audit', auditRoutes);
-// auditTrail.js / complianceTracking.js: real, DB-backed (services/auditTrailService.js,
-// services/complianceTrackingService.js via database/dbConnection.js's query builder on
-// top of the shared pool), but their route files were never require()'d/mounted anywhere.
-// Distinct endpoint shapes from auditRoutes/complianceRoutes above, so no collision.
-app.use('/api/v1', auditTrailRoutes);
-app.use('/api/v1', complianceTrackingRoutes);
 // M121 Dairy Management + M112 Fertilizer Inventory — see dairyRoutes.js /
 // fertilizerRoutes.js. Frontend already calls these exact paths
 // (dairyAPI / fertilizerAPI in frontend/src/services/api.js); this is the
@@ -839,11 +666,6 @@ app.use('/api/v1/poultry', poultryRoutes);
 app.use('/api/v1/goat', goatRoutes);
 app.use('/api/v1/sheep', sheepRoutes);
 app.use('/api/v1/pig', pigRoutes);
-// System 10/11/28/29 — see require()s above re: pending schema-collision fix
-app.use('/api/v1/soil-nutrient-land', soilNutrientLandRoutes);
-app.use('/api/v1/water-irrigation', waterIrrigationRoutes);
-app.use('/api/v1/vendor-procurement', vendorProcurementRoutes);
-app.use('/api/v1/machinery-village-ops', machineryVillageOpsRoutes);
 app.use('/api/v1/animal-health', animalHealthRoutes);
 // Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
 villageProfileService.setupRoutes(app);
@@ -966,10 +788,6 @@ app.use('/api/v1/digital-identities', digitalIdentityRoutes);
 app.use('/api/v1/consent-records', consentManagementRoutes);
 app.use('/api/v1/sessions', sessionManagementRoutes);
 app.use('/api/v1/roles', roleManagementRoutes);
-app.use('/api/v1/irrigation/schedules', irrigationSchedulesRoutes);
-app.use('/api/v1/irrigation/water-sources', irrigationWaterSourcesRoutes);
-app.use('/api/v1/irrigation/logs', irrigationLogsRoutes);
-app.use('/api/v1/realtime-monitoring', realtimeMonitoringRoutes);
 app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/climate-advisory', climateAdvisoryRoutes);
 app.use('/api/v1/compliance', complianceRoutes);
@@ -985,21 +803,8 @@ app.use('/api/v1/costs', costRoutes);
 app.use('/api/v1/erp/assets', assetAccountingRoutes);
 app.use('/api/v1/erp/controlling', costControlRoutes);
 app.use('/api/v1/erp/projects', projectSystemsRoutes);
-// See require comment above — previously unmounted.
-app.use('/api/v1/erp/cost-management', erpCostManagementRoutes);
 app.use('/api/v1/cold-storage', coldStorageRoutes);
 app.use('/api/v1/dpr', dprGenerationRoutes);
-app.use('/api/v1/decision-support', decisionSupportRoutes);
-app.use('/api/v1/crop-planning', cropPlanningRoutes);
-app.use('/api/v1/land-records', landRecordsRoutes);
-app.use('/api/v1/nutrition-intelligence', nutritionIntelligenceRoutes);
-app.use('/api/v1/apiculture', apicultureRoutes);
-app.use('/api/v1/fisheries', legacyFisheriesRoutes);
-app.use('/api/v1/forestry', forestryRoutes);
-app.use('/api/v1/mushroom', mushroomRoutes);
-app.use('/api/v1/sericulture', sericultureRoutes);
-app.use('/api/v1/vermicompost', vermicompostRoutes);
-app.use('/api/v1/product-reviews', productReviewRoutes);
 app.use('/api/v1/cooperative-shares', cooperativeShareRoutes);
 // Real Wikimedia REST API reference lookups (see services/wikipediaService.js).
 app.use('/api/v1/wikipedia', wikipediaRoutes);
@@ -1024,14 +829,8 @@ app.use('/api/v1/vision', visionRoutes);
 // AI Gateway - Real AI Backbone System
 app.use('/api/v1/ai-gateway', aiGatewayRoutes);
 // AI Intelligence Fabric Routes (EBD-MOD-00000001)
-// (2026-08-29) These were mounted with no authMiddleware, so req.user was
-// always undefined and handleAIRequest's checkAuthorization(undefined, ...)
-// crashed on `user.role` with a 500 on EVERY call, authenticated or not -
-// this endpoint never worked for anyone. Fixed alongside the executeEngine()
-// placeholder fix (see core/ai/aiOrchestratorCore.js) since both blocked the
-// same route from ever returning a real result.
-app.post('/api/v1/ai/orchestrate', authMiddleware, handleAIRequest);
-app.post('/api/v1/ai/classify', authMiddleware, handleAIRequest);
+app.post('/api/v1/ai/orchestrate', handleAIRequest);
+app.post('/api/v1/ai/classify', handleAIRequest);
 app.get('/api/v1/ai/capabilities', (req, res) => {
   const { getAIStatus } = require('./core/ai/index');
   res.json({ success: true, data: getAIStatus() });
@@ -1042,20 +841,13 @@ app.get('/api/v1/ai/audit', (req, res) => {
 });
 // AI Agent - Agentic AI Capabilities
 app.use('/api/v1/ai-agent', aiAgentRoutes);
-// AI Brain - Cognitive Processing Layer (using service router for health checks)
-mountRoute('/api/v1/ai-brain', aiBackboneService);
-// AI Gateway - AI Backbone System (using service router for health checks)
-mountRoute('/api/v1/ai-gateway', aiBackboneService);
-// AI Self-Healing - Autonomous Error Recovery Layer (using service router for health checks)
-mountRoute('/api/v1/ai-self-healing', aiSelfHealingService);
-// AI Operation Intelligence - Real-Time Optimization Layer (using service router for health checks)
-mountRoute('/api/v1/ai-operation-intelligence', aiOperationIntelligenceService);
-mountRoute('/api/v1/advanced-medical-coding', advancedMedicalCodingService);
-mountRoute('/api/v1/clinical-nutrition', clinicalNutritionDecisionSupportService);
-mountRoute('/api/v1/medical-coding-reference', medicalCodingReferenceService);
-app.use('/api/v1/m400-ai-backbone', m400AiBackboneRoutes);
-// SAP Module Architecture - Independent Module Architecture
-app.use('/api/v1/sap-module-architecture', sapModuleArchitectureRoutes);
+// AI Brain - Cognitive Processing Layer
+app.use('/api/v1/ai-brain', aiBrainRoutes);
+// AI Self-Healing - Autonomous Error Recovery Layer
+app.use('/api/v1/ai-self-healing', aiSelfHealingRoutes);
+// AI Operation Intelligence - Real-Time Optimization Layer
+app.use('/api/v1/ai-operation-intelligence', aiOperationIntelligenceRoutes);
+// SAP Module Architecture mount REMOVED 2026-08-24 (route reconciliation) — see require-site comment above.
 // Research and Development - R&D Management with AI Integration
 app.use('/api/v1/research-and-development', researchAndDevelopmentRoutes);
 // Information Sharing - Document and Knowledge Sharing with AI Integration
@@ -1071,149 +863,12 @@ app.use('/api/v1/platform-configuration', platformConfigurationRoutes);
 app.use('/api/v1/tenant-management', tenantManagementRoutes);
 app.use('/api/v1/organization-management', organizationManagementRoutes);
 app.use('/api/v1/system-administration', systemAdministrationRoutes);
-app.use('/api/v1/labour', labourRoutes);
-app.use('/api/v1/farmer-verification', farmerVerificationRoutes);
-app.use('/api/v1/farmer-kyc', farmerKycRoutes);
-app.use('/api/v1/strategic/contract-farming', contractFarmingRoutes);
-app.use('/api/v1/strategic/government', governmentSubsidyRoutes);
-app.use('/api/v1/strategic/household', householdProcurementRoutes);
-app.use('/api/v1/strategic/pre-season', preSeasonPurchaseRoutes);
 // Escrow service - secure fund holding for transactions
 escrowService.setupRoutes(app);
 // Custody event service - chain tracking and settlement instructions
 custodyEventRoutes.setupRoutes(app);
 // Health check endpoints for monitoring with specialized monitoring
 app.use('/health', healthCheckMonitoring, healthRoutes);
-
-// Enhanced health check with route mounting status
-app.get('/health/routes', (req, res) => {
-  const mountedRoutesList = Array.from(mountedRoutes.entries()).map(([path, info]) => ({
-    path,
-    mounted: info.mounted,
-    timestamp: info.timestamp,
-    service: info.serviceModule
-  }));
-
-  const failedMountsList = Array.from(failedMounts.entries()).map(([path, info]) => ({
-    path,
-    error: info.error,
-    message: info.message,
-    timestamp: info.timestamp
-  }));
-
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    routes: {
-      mounted: mountedRoutesList.length,
-      failed: failedMountsList.length,
-      mounted_routes: mountedRoutesList,
-      failed_mounts: failedMountsList
-    }
-  });
-});
-
-// Comprehensive system health check
-app.get('/health/comprehensive', async (req, res) => {
-  try {
-    const healthChecks = {
-      system: {
-        status: 'healthy',
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        environment: process.env.NODE_ENV || 'development',
-        timestamp: new Date().toISOString()
-      },
-      routes: {
-        mounted: mountedRoutes.size,
-        failed: failedMounts.size,
-        details: {
-          mounted: Array.from(mountedRoutes.keys()),
-          failed: Array.from(failedMounts.entries())
-        }
-      },
-      database: {
-        postgresql: { status: 'unknown', message: 'Database connection not verified' },
-        mongodb: { status: 'unknown', message: 'MongoDB connection not verified' },
-        redis: { status: 'unknown', message: 'Redis connection not verified' }
-      },
-      services: {
-        ai: { status: 'unknown', message: 'AI services not verified' },
-        ai_brain: { status: mountedRoutes.has('/api/v1/ai-brain') ? 'mounted' : 'not_mounted' },
-        ai_gateway: { status: mountedRoutes.has('/api/v1/ai-gateway') ? 'mounted' : 'not_mounted' },
-        ai_self_healing: { status: mountedRoutes.has('/api/v1/ai-self-healing') ? 'mounted' : 'not_mounted' },
-        ai_operation_intelligence: { status: mountedRoutes.has('/api/v1/ai-operation-intelligence') ? 'mounted' : 'not_mounted' },
-        erp: { status: mountedRoutes.has('/api/v1/erp') ? 'mounted' : 'not_mounted' }
-      }
-    };
-
-    // Try to verify database connections
-    try {
-      const { getPostgreSQL } = require('./database/connection');
-      const pg = await getPostgreSQL();
-      await pg.query('SELECT 1');
-      healthChecks.database.postgresql = { status: 'healthy', message: 'PostgreSQL connection successful' };
-    } catch (error) {
-      healthChecks.database.postgresql = { status: 'unhealthy', message: error.message };
-    }
-
-    // Try MongoDB connection
-    try {
-      const { getMongoDatabase } = require('./database/connection');
-      const mongo = await getMongoDatabase();
-      await mongo.admin().ping();
-      healthChecks.database.mongodb = { status: 'healthy', message: 'MongoDB connection successful' };
-    } catch (error) {
-      healthChecks.database.mongodb = { status: 'unhealthy', message: error.message };
-    }
-
-    // Try Redis connection
-    try {
-      const { getRedisClient } = require('./database/connection');
-      const redis = await getRedisClient();
-      await redis.ping();
-      healthChecks.database.redis = { status: 'healthy', message: 'Redis connection successful' };
-    } catch (error) {
-      healthChecks.database.redis = { status: 'unhealthy', message: error.message };
-    }
-
-    // Determine overall system status
-    const hasFailedMounts = failedMounts.size > 0;
-    const hasDatabaseIssues = Object.values(healthChecks.database).some(db => db.status === 'unhealthy');
-    
-    if (hasFailedMounts || hasDatabaseIssues) {
-      healthChecks.system.status = 'degraded';
-      healthChecks.system.issues = [];
-      if (hasFailedMounts) healthChecks.system.issues.push('route_mount_failures');
-      if (hasDatabaseIssues) healthChecks.system.issues.push('database_connection_issues');
-    }
-
-    res.json(healthChecks);
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: 'Health check failed',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
-// API Contract Validation - Validate frontend-backend API contracts
-app.get('/health/api-contracts', (req, res) => {
-  try {
-    const validationResults = validateAPIContracts(app);
-    const report = generateContractReport(validationResults);
-    res.json(report);
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: 'API contract validation failed',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
 // iotSensorService.setupRoutes registers full paths directly on `app`
 // (not a sub-router) — see services/iotSensorService.js line ~600.
 iotSensorService.initialize().catch((error) => logger.warn('iotSensorService initialize failed', { error: error.message }));
@@ -1484,7 +1139,7 @@ async function startServer() {
     logger.warn('Continuing without database enhancements...');
   }
 
-  const PORT = 3003; // Force port 3003 to avoid conflicts
+  const PORT = process.env.PORT || 3001;
   
   // Initialize AI Intelligence Fabric (EBD-MOD-00000001)
   try {
@@ -1568,5 +1223,4 @@ if (require.main === module) {
 }
 
 module.exports = { app, io };
-
 

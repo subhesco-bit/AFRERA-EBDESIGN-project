@@ -1,15 +1,16 @@
+import { vi } from 'vitest'
 import { pushNotificationManager, initializePushNotifications, requestNotificationPermission, getSubscriptionStatus } from '../../utils/pushNotifications'
 
 // Mock navigator and Notification
 const mockNavigator = {
   serviceWorker: {
-    register: jest.fn(() => Promise.resolve({}))
+    register: vi.fn(() => Promise.resolve({}))
   }
 }
 
 const mockNotification = {
   permission: 'default',
-  requestPermission: jest.fn(() => Promise.resolve('granted'))
+  requestPermission: vi.fn(() => Promise.resolve('granted'))
 }
 
 Object.defineProperty(global, 'navigator', {
@@ -22,9 +23,14 @@ Object.defineProperty(global, 'Notification', {
   writable: true
 })
 
+Object.defineProperty(global.window, 'PushManager', {
+  value: function PushManager() {},
+  writable: true
+})
+
 describe('Push Notifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('initializePushNotifications', () => {

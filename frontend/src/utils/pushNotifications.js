@@ -9,8 +9,12 @@ class PushNotificationManager {
   constructor() {
     this.registration = null;
     this.subscription = null;
-    this.isSupported = 'serviceWorker' in navigator && 'PushManager' in window;
     this.permission = 'default';
+  }
+
+  get isSupported() {
+    return typeof navigator !== 'undefined' && 'serviceWorker' in navigator
+      && typeof window !== 'undefined' && 'PushManager' in window;
   }
 
   async initialize() {
