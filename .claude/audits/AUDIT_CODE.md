@@ -1,87 +1,139 @@
 ---
 agent: code-auditor
 status: warn
-findings: 10
+findings: 11
 ---
 
-# Code Quality Audit — AFRERA Platform
+# Code Quality Audit — SVESCO/EBDESIGN Platform (refresh)
 
 ## Summary
 
-Scope: `backend/src` (818 files, ~87,300 LOC) and `frontend/src` (572 files, ~30,500 LOC). Audit is code-quality/complexity/maintainability only — security, dependency, infra, DB, and performance issues are out of lane and left to their respective auditors.
+Scope: `backend/src` (2,691 tracked `.js` files, ~408,000 LOC) and `frontend/src`
+(1,229 tracked `.js`/`.jsx` files, ~88,400 LOC). Code-quality/complexity/
+maintainability only — security, DB, infra, perf, and dependency issues are
+out of lane. This is a **refresh**, not a first pass: the previous
+`AUDIT_CODE.md` (10 findings, scoped to an 818-file/87K-LOC snapshot) is
+superseded — the codebase has grown roughly 3-5x since then via the module
+and duplication work logged in `.ai/tasks/ACTIVE.md`/`FIXES.md`. This pass
+re-ran every metric fresh (`git status`, ESLint on both trees, direct file
+reads) rather than trusting the old numbers, and cross-checked prior findings
+against current code before re-reporting anything.
 
-The codebase runs and is organized into recognizable layers (services, routes, modules, middleware), but shows heavy signs of rapid, tool-assisted accretion: a 150-module code-generation scaffold that is roughly half unimplemented stubs, a single 2,339-line "shared pool" file that embeds an entire in-memory mock database for tests, an 899-line monolithic route-mounting bootstrap with inline commentary documenting its own history of orphaned/recovered routes, and a fragile test-mode pattern (implicit global reassignment of hoisted functions) repeated across at least five service files. ESLint already reports 67 errors and 579 warnings on `backend/src`, but the `lint` npm script has no `--max-warnings` gate, so none of this fails CI today. Automated test coverage is thin, especially on the frontend (1 test file for 572 source files).
+**What has genuinely improved since the last audit** (verified, not assumed):
+- `database/pool.js`'s embedded mock-DB `console.log('TEST-POOL: ...')` debug
+  spam and `isTestMode` branching are both gone (0 hits now, were 20+/dozens).
+  The file is still large (2,281 lines) but the worst symptom is fixed.
+- The M0xx module scaffold stub ratio dropped from 55% (82/150) to ~11%
+  (39/344) — consistent with `.ai/tasks/ACTIVE.md` items 2, 3, 9 turning most
+  "Domain: TBD" scaffolds into real implementations.
+- `services/productReviewService.js` (the duplicate flagged implicitly by the
+  wider pattern in Finding 1 below) has already been collapsed to a one-line
+  re-export of `services/legacy/productReviewService.js`, with a clear
+  dated comment explaining why — this is the correct fix pattern, just not
+  yet applied to the other ~160 pairs.
 
-None of this is a "does not run" blocker, which is why overall status is **warn** rather than **fail** — but the volume and character of the findings (dead scaffolding, stub logic disguised as working endpoints, an unenforced lint gate) mean the repo is not yet at a maintainable "launch level" baseline.
+**What is new or still open** is dominated by one large, previously
+under-reported structural issue (Finding 1: a `services/` vs
+`services/legacy/` — and further, `services/<domain>/` — naming collision
+affecting ~163 file pairs, most of which are real, independently-drifted
+implementations, not stubs) plus a handful of concrete runtime-breaking bugs
+that ESLint's `no-undef`/`no-dupe-keys` rules surfaced directly (Findings
+2-5) and a lint-gate regression (Finding 6, the opposite direction from what
+the last audit recommended). Status remains **warn**: nothing here stops the
+server from booting, but the duplication problem has grown rather than
+shrunk, and several of the newly-found `no-undef` bugs mean specific
+endpoints/functions are currently unreachable-without-crashing in code that
+looks complete from the route table.
 
 ## Findings
 
-### 1. [High] Fragile test-mode pattern: implicit reassignment of hoisted function declarations
-- **Location**: `backend/src/services/iotIntegrationService.js:24-35`, `knowledgeGraphService.js`, `multilingualService.js`, `predictiveAnalyticsService.js`, `valueCommerceService.js` (ESLint `no-func-assign`, 41 occurrences total)
-- **Description**: Inside `if (process.env.NODE_ENV === 'test') { ... }` blocks, these files reassign identifiers such as `registerIoTDevice = async (data) => {...}` with no `let`/`const`/`var`. Because a function declaration with the same name exists later in the same file, this is a direct reassignment of that hoisted binding (flagged by ESLint's `no-func-assign`, which specifically warns because it silently breaks under strict mode / bundling / minification, and makes control flow depend on declaration order rather than explicit test doubles).
-- **Remediation**: Replace with explicit conditional exports or dependency injection (e.g. `const impl = process.env.NODE_ENV === 'test' ? testImpl : realImpl`), or move test doubles into the existing (currently near-empty) `backend/src/test-mocks/` directory and inject them via Jest module mocking instead of runtime reassignment.
+### 1. [High] ~163 same-named service files exist in both `services/` (or `services/<domain>/`) and `services/legacy/`, and most are real, independently-sized implementations, not thin duplicates
+- **Location**: `backend/src/services/*.js` vs `backend/src/services/legacy/*.js` (163 overlapping basenames — full list generated this pass, e.g. `erpService.js`, `farmerService.js`, `aiBackboneService.js`, `dairyService.js`, `analyticsService.js`, `enterpriseAIService.js`); a third copy exists for at least `farmerService.js`/`farmerTrainingService.js` under `services/agriculture/`.
+- **Description**: Spot-checked several pairs directly rather than assuming from filenames alone:
+  - `services/erpService.js` (943 lines) vs `services/legacy/erpService.js` (4,479 lines) — every real caller (`completeERPIntegrationController.js`, `comprehensiveERPController.js`, `index.js`, `M300_ERP_CORE`) requires the `legacy/` copy. The 943-line non-legacy file has **zero live callers** — it's dead weight, not a stub.
+  - `services/farmerService.js` (617 lines) vs `services/legacy/farmerService.js` (693 lines) vs `services/agriculture/farmerService.js` — three parallel copies; `routes/farmerRoutes.js` uses `legacy/`, `routes/agriculture/farmerRoutes.js` uses `agriculture/`. Nothing wires them together, so a fix to farmer logic in one place silently does not apply to callers using another.
+  - `services/aiBackboneService.js` (797 lines) vs `services/legacy/aiBackboneService.js` (7,051 lines) and `services/dairyService.js` (681) vs `services/legacy/dairyService.js` (688) — these are *not* identical-content duplicates (different line counts, different-sized logic), meaning they have drifted independently rather than being a clean copy/rename.
+  - The one file already fixed the right way — `services/productReviewService.js` — is now a 17-line re-export with a dated comment explaining the collapse; that's the target end-state for the rest, not yet applied.
+  - Root cause, confirmed via `services/index.js` (566 lines, header: "Auto-generated index file"): this barrel file `require()`s ~9-160 of the non-legacy top-level copies, but **`services/index.js` itself has zero callers anywhere in the live app** (`index.js` never requires it). For most of the 163 pairs, the non-legacy copy's only reachability path is through this dead barrel — i.e. most of the 163 "duplicates" are effectively unreachable dead code, but a handful (confirmed live: `aiBackboneService` 31 real callers, `aiGatewayService` 14, `analyticsService` 16) are genuinely both alive at once, which is the more dangerous half of this finding (two different live implementations of the same domain logic, not one dead one).
+  - A frontend mirror of the same anti-pattern exists: `frontend/src/services/index.js` is also an "Auto-generated index file" using CommonJS `require()`/`module.exports` in a Vite/ESM-only codebase (flagged by ESLint's `no-undef` on every `require`/`module` token, since neither exists in that parser environment) and has zero importers anywhere in `frontend/src` — same dead-barrel shape, independently generated.
+- **Remediation**: Per the standing project rule ("merge, don't delete duplicates" / "verify usefulness before dead-code calls"), do not bulk-delete. Triage in two passes: (1) confirm-dead pairs (like `erpService.js` non-legacy, and the frontend `services/index.js`) — verify zero live callers with a repo-wide `require()`/`import` grep, then collapse to a re-export exactly like `productReviewService.js` did, or remove if genuinely orphaned; (2) confirm-both-live pairs (`aiBackboneService`, `aiGatewayService`, `analyticsService`, and any others the same grep surfaces) — these need an actual reconciliation decision (which is canonical, merge the drifted logic) before collapsing, since two different real implementations may currently be answering the same domain differently depending on which route a request hits. Delete `services/index.js` and `frontend/src/services/index.js` outright once confirmed to have zero callers (they do as of this pass) — they add no value and actively mislead anyone searching for "who uses this service."
 
-### 2. [High] `database/pool.js` is a 2,339-line "connection proxy" that embeds a full mock database
-- **Location**: `backend/src/database/pool.js`
-- **Description**: The file's own header documents a legitimate motivation (consolidating 42 separate `new Pool()` instances that were oversubscribing `max_connections`), but the implementation goes far beyond a lazy pool proxy: it hard-codes dozens of `Map`-backed in-memory tables (`health_profiles`, `gi_products`, `blockchain_transactions`, `conversation_sessions`, etc.) and hundreds of lines of `if (isTestMode) { ... } else { ... }` branching per query shape, plus ad-hoc `console.log('TEST-POOL: ...')` debug statements left in place (20+ call sites). This makes a piece of core infrastructure code one of the largest and least navigable files in the repo, and couples unrelated domain knowledge (IoT, blockchain certs, conversations, nutrition) into a single module.
-- **Remediation**: Extract the in-memory test-mode store into its own module (or per-domain fixtures under `test-mocks/`), leaving `pool.js` as a thin proxy as the header describes. Remove the leftover `console.log` debug lines or gate them behind a `DEBUG_POOL` flag.
+### 2. [High] `governanceService.js` and `logisticsEnhancementService.js`: every method references a bare, undeclared `pool` instead of `this.pool` — every DB call in both files throws `ReferenceError` at runtime
+- **Location**: `backend/src/services/governanceService.js` (24 call sites, e.g. lines 27, 60, 71, 101, 135...608), `backend/src/services/logisticsEnhancementService.js` (same pattern, lines 27, 60...)
+- **Description**: Both constructors correctly do `this.pool = require('../database/pool')`, but every method's query calls use bare `pool.query(...)` — `pool` is never declared at module or method scope, so this is a guaranteed `ReferenceError: pool is not defined` the instant any method actually runs (caught ESLint `no-undef`, not a false positive — verified by reading the source). These two files appear to share a common template (identical line numbers for the bug: 27, 60, 71...), suggesting a copy-paste origin. Both are real, substantial domain files (village/panchayat/CSR governance; logistics fleet/route enhancement), not stubs — so this silently breaks otherwise-complete functionality.
+- **Remediation**: Mechanical fix — replace bare `pool.` with `this.pool.` throughout both files (or, cleaner, destructure `const { pool } = this;` at the top of each method, or better, hoist a module-level `const pool = require(...)` outside the class the way most other services in this codebase do it). `node -c` both files clean and grep-verify no other `services/*.js` files share this exact bug (this pass found only these two; a full-repo check for "`this.pool = require` in constructor + bare `pool.` in method bodies" would be cheap insurance against a third).
 
-### 3. [Med] 150-module code-generation scaffold is roughly half unimplemented placeholders
-- **Location**: `backend/src/modules/M001` … `M150` (600 files: `controller.js`, `index.js`, `model.sql`, `routes.js`, `service.js`, `README.md` per module)
-- **Description**: `backend/src/index.js:471-482` dynamically `readdirSync`s and auto-mounts every `M0xx` module at `/api/v1/modules/<name>`. Of the 150 module directories, 82 have a `service.js` of 10 lines or fewer — i.e. still the generated stub `// Add business logic here` / `module.exports = { /* functions */ }`. Only two modules (`M011`, `M006`) are explicitly imported by name elsewhere for their "real" mount points (`/api/v1/users`, `/api/v1/admin`); a third (`M029`) is referenced from `farmerHealthRoutes.js`. The remainder are exposed only through the generic auto-mount loop, meaning ~600 files exist in the tree with no clear signal to a reader (short of opening each `service.js`) of which are load-bearing and which are scaffolding.
-- **Remediation**: Either delete/archive modules that are still pure stubs, or mark them clearly (e.g. a `STATUS: stub` line in each `README.md` surfaced in a generated index) so `git grep`/navigation isn't polluted with 68+ dead directories. Consider gating the auto-mount loop to skip stub modules so the route table doesn't advertise non-functional endpoints.
+### 3. [Med] `logisticsEnhancementRoutes.js`: three route handlers reference an undefined identifier, crashing those specific endpoints only
+- **Location**: `backend/src/routes/logistics/logisticsEnhancementRoutes.js:384, 394, 403`
+- **Description**: The file imports the service as `const logisticsService = require('../../services/logistics/logisticsEnhancementService');` (line 9) and correctly uses `logisticsService.xxx()` everywhere else, but three handlers at lines 384/394/403 call `logisticsEnhancementService.xxx()` instead — an identifier that was never imported under that name. Those three endpoints (not the whole file) will throw `ReferenceError` on every request. Caught by ESLint `no-undef`, confirmed by reading the import list.
+- **Remediation**: Rename the three call sites to `logisticsService`. One-line-per-site fix; verify with `node -c` and a live smoke test of those three routes once DB is reachable.
 
-### 4. [Med] `backend/src/index.js` is an 899-line monolithic bootstrap with inline "archaeology" comments
-- **Location**: `backend/src/index.js` (e.g. lines 440-539)
-- **Description**: Route registration is done as ~100+ sequential `mountRoute(...)` / `app.use(...)` calls in one file, interspersed with comments such as `// Routes that existed but were never mounted anywhere`, `// Newly created routes covering previously-orphaned services`, and references to specific migration numbers (`992`, `993`). This is useful historical context, but it is also evidence that route wiring has been managed ad hoc across many separate change sessions with no central registry — which increases the risk of silently duplicated or shadowed route prefixes as the file keeps growing (six separate `ecommerce*` route groups and three separate ERP integration route sets already coexist: `erpService`, `completeERPIntegrationRoutes`, `comprehensiveERPRoutes`).
-- **Remediation**: Introduce a route manifest (array of `{ path, module }` or per-domain sub-routers loaded via a folder convention) so new routes are declarative and diffable, and so overlapping domains (ecommerce, ERP) can be spotted at a glance instead of by reading 900 lines of comments.
+### 4. [Low] `index.js` health-check payload has a duplicate object key (`erp`), silently discarding the static placeholder in favor of the dynamic mount-check
+- **Location**: `backend/src/index.js:1125` and `:1130` (same `services: {...}` object literal inside the `/health` handler)
+- **Description**: `erp: { status: 'unknown', message: 'ERP services not verified' }` is declared, then five lines later `erp: { status: mountedRoutes.has('/api/v1/erp') ? 'mounted' : 'not_mounted' }` overwrites it (caught by ESLint `no-dupe-keys`). The net runtime behavior is probably what was intended (the dynamic check is more useful), but the first key is dead code that misleads a reader into thinking `/health` reports an "unverified" ERP status when it actually reports a mount check — and the same copy-paste pattern (a static `ai: {status:'unknown', ...}` placeholder sitting next to `ai_brain`/`ai_gateway`/etc. dynamic checks) suggests other services in this object may have been intended to get the same dynamic treatment but didn't.
+- **Remediation**: Delete the dead `erp: {status:'unknown', ...}` line (line ~1125) since it's fully shadowed; audit whether `ai: {status: 'unknown', ...}` should similarly become a `mountedRoutes.has(...)` check for consistency with its siblings.
 
-### 5. [Med] 551 `no-unused-vars` warnings, concentrated in a handful of services, often on identifying parameters
-- **Location**: Backend-wide (ESLint), worst offenders: `enterpriseAIService.js` (101), `farmerTrainingService.js` (63), `preSeasonOrderService.js` (63), `governmentSchemeService.js` (36), `insuranceClaimsService.js` (29), `soilTestingService.js` (27), `aiCopilotService.js` (26)
-- **Description**: A large share of these are unused function parameters like `farmerId`, `timeframe`, `regionId` passed into handler functions that never reference them (sample from `enterpriseAIService.js:200,282,287,292,297`). Functionally, these read as endpoints that accept a scoping/identity parameter but return the same data regardless of who or what is asked for — i.e., stub or mock-data implementations sitting behind routes that look complete from the outside. This is a maintainability and correctness-adjacent smell: it's not obvious from the route table which of the 109 services actually implement their contract versus return canned data.
-- **Remediation**: Triage the top-offending files first; for genuinely unused parameters, prefix with `_` (already allowed by the existing `argsIgnorePattern`) or remove them; for parameters that should be used, that's a functional gap to track separately (out of this audit's lane, but worth a follow-up ticket per file).
+### 5. [Med] Real `no-undef` bugs in production API-client and service code (not test-only noise)
+- **Location**: `frontend/src/services/api.js:1792`, `frontend/src/services/componentApi.js:7-18`
+- **Description**: `nutritionIntelligenceAPI.calculateNutritionPricing(productId, basePrice, pricingRuleId)` (api.js:1792) builds its POST body as `{ product_id: productId, base_price, pricing_rule_id }` — but `base_price`/`pricing_rule_id` were never declared anywhere in that scope (the parameters are camelCase `basePrice`/`pricingRuleId`); this is an object-shorthand typo that throws `ReferenceError` the instant this function is called, meaning nutrition-based pricing is currently 100% broken end-to-end despite looking complete in the client. Separately, `componentApi.js` re-exports everything from `./api` (`export * from './api'`) but then defines three more objects (`multilingualAPI`, `conversationalAIAPI`, `voiceAIAPI`, 6 methods total) that call a bare `api.get/post(...)` with no local `api` binding anywhere in the file — same crash-on-call bug, three more times.
+- **Remediation**: `api.js:1792` — change to `{ product_id: productId, base_price: basePrice, pricing_rule_id: pricingRuleId }`. `componentApi.js` — add `import api from './api';` at the top (consistent with how `./api`'s default export is already re-exported one line above it). Both are one-line-per-site fixes; ESLint `no-undef` already pinpoints every call site, so a `--fix`-adjacent manual sweep of the 29 frontend `no-undef` hits (this pass's full JSON output enumerates all of them) would catch anything similar beyond these two files.
 
-### 6. [Med] Backend `lint` script does not enforce a warning budget, unlike frontend's
-- **Location**: `backend/package.json:11` (`"lint": "eslint src/"`) vs `frontend/package.json` (`"lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0 ..."`)
-- **Description**: The frontend fails its lint script on any warning (`--max-warnings 0`); the backend's does not, so the 579 existing warnings (and any new ones) never fail a CI lint step. Findings #1, #5, and #7 below can accumulate indefinitely without being caught.
-- **Remediation**: Add `--max-warnings` (start at current count or 0 after triage) to `backend`'s lint script once the backlog in #5 is addressed, or split into `lint:errors` (CI-gating) and `lint:warnings` (tracked separately) during the interim.
+### 6. [Med] Lint-gate regression: frontend's `--max-warnings 0` gate from the last audit is now gone, and neither tree fails CI on lint issues
+- **Location**: `frontend/package.json:10` — `"lint": "eslint src --ext js,jsx --report-unused-disable-directives --no-error-on-unmatched-pattern --plugin jsx-a11y"` (no `--max-warnings` flag); `backend/package.json` — `"lint": "eslint src/"` (unchanged, still no gate, as flagged last audit)
+- **Description**: The previous audit specifically noted the frontend enforced `--max-warnings 0` while the backend didn't, and recommended backend catch up. Instead, this pass found the frontend script has since lost its own gate — verified live: `npm run lint` inside `frontend/` currently reports **30 errors and 988 warnings** (including the real `no-undef` bugs in Finding 5) yet **exits 0**. So both trees can now accumulate lint errors indefinitely without CI noticing, which is a regression relative to the last audit's baseline, not just a persisting gap.
+- **Remediation**: Restore `--max-warnings 0` (or a tracked non-zero ceiling with a burn-down plan) on the frontend script immediately — this used to exist and its removal looks accidental (e.g. dropped during a merge/rebase) rather than a deliberate decision. Add an equivalent gate to the backend script once Finding 5-class errors are triaged; at minimum, gate on **errors** first (30 on frontend, 329 on backend) even before tackling the much larger warning backlog, since errors are far more likely to be real bugs like Findings 2-5 above.
 
-### 7. [Med] Inconsistent async control-flow patterns flagged by ESLint
-- **Location**: `no-case-declarations` (20 occurrences: `advancedFeaturesService.js`, `advancedVoiceAI.js`, `offlineSyncService.js`) — `const`/`let` declared directly inside `switch` `case` blocks without braces, which is a real TDZ/scope-leak hazard if cases are reordered or a case falls through. `no-return-await` (26 occurrences: `redis.js`, `aiCopilotService.js`, `erpService.js`, `offlineSyncService.js`, `omnichannelAIService.js`) — redundant `return await`, which flattens stack traces and obscures error handling intent.
-- **Remediation**: Wrap `case` bodies with blocks (`case 'x': { const y = ...; break; }`); apply `eslint --fix` for the mechanical parts, review the case-declaration sites by hand for pre-existing fallthrough bugs.
+### 7. [Low] `no-useless-catch` — 97 occurrences of a try/catch that only rethrows
+- **Location**: Backend-wide (ESLint `no-useless-catch`, 97 hits, worst concentration in `modules/M001_PLATFORM_CORE` and sibling generated modules)
+- **Description**: A `catch (error) { throw error; }` (or equivalent) block adds no value over not having the try/catch at all — it's boilerplate left over from a code-generation template (consistent with the M0xx scaffold's generated shape) that obscures where errors are actually being handled versus just passed through.
+- **Remediation**: Either remove the redundant try/catch, or make it earn its place (log before rethrow, wrap in a domain error type, or add cleanup). Mechanical enough to batch-fix per module with a scripted pass plus a `node -c` sanity check.
 
-### 8. [Low] Near-zero frontend automated test coverage
-- **Location**: `frontend/src` — 1 test file across 572 source files, despite `vitest` and a `test:coverage` script being configured in `frontend/package.json`
-- **Description**: Backend has 30 test files for 818 source files (109 services), which is thin but non-trivial; frontend effectively has none, despite tooling being fully wired up. For a codebase this large heading toward "launch level," regressions in `App.jsx` (1,342 lines) or `api.js` (2,947 lines) would only surface manually.
-- **Remediation**: Prioritize test coverage for `frontend/src/services/api.js` interceptor/refresh-token logic and the highest-traffic pages first; wire `test:coverage` into CI once a baseline exists.
+### 8. [Low] Test-file bugs mean at least 3 backend test suites cannot run at all
+- **Location**: `backend/src/routes/__tests__/climateRoutes.test.js:39`, `enterpriseCommerceSafety.test.js:47`, `operationsMachineryRoutes.test.js:21`
+- **Description**: All three call `app.use(expresson())` — `expresson` is not a typo ESLint invented; it's genuinely not defined anywhere in the file (should be `express()`, matching the `const express = require('express')` import each file has). Any test in these three suites fails at setup with `ReferenceError`, not from a real assertion failure — meaning whatever coverage these files were meant to provide is currently zero, silently.
+- **Remediation**: Fix the typo (`expresson()` → `express()`) in all three files; then actually run them to confirm the underlying tests pass now that setup works.
 
-### 9. [Low] Monolithic, low-modularity files on the frontend
-- **Location**: `frontend/src/services/api.js` (2,947 lines, 242 exported functions in one file), `frontend/src/App.jsx` (1,342 lines)
-- **Description**: A single API client file covering every domain (dairy, fertilizer, insurance, logistics, marketplace, etc.) makes it hard to find call sites, increases merge-conflict surface, and mixes concerns (axios setup/interceptors alongside 242 domain functions). `App.jsx` at 1,342 lines is large for a root component/router file.
-- **Remediation**: Split `api.js` into per-domain modules (`services/api/insurance.js`, `services/api/logistics.js`, ...) re-exported from an index, mirroring the backend's service-per-domain layout. Extract route definitions and top-level layout from `App.jsx` into dedicated files.
+### 9. [Low] Largest files remain very large, several have grown since the last audit
+- **Location**: `backend/src/database/pool.js` (2,281 lines, down slightly from 2,339 but still the largest backend file and still mixes 40+ domains' worth of pool/mock logic), `backend/src/services/legacy/aiBackboneService.js` (7,051 lines — did not exist as a named large file in the last audit's top list, now the single largest service file in the repo by a wide margin), `frontend/src/services/api.js` (4,439 lines, up from 2,947 — ~50% growth), `frontend/src/config/routes.js` (1,808 lines).
+- **Description**: Same shape of finding as before (monolithic, low-modularity files), now larger. `aiBackboneService.js` at 7,051 lines in one file/one class is a genuinely new outlier not called out last time, and is one of the "confirmed both live" duplicate pairs from Finding 1, which compounds the risk: any future maintainer editing "the" AI backbone logic has a 1-in-2 chance of editing the file with 31 real callers versus the smaller one with none.
+- **Remediation**: Same recommendation as before, now more urgent for `aiBackboneService.js` specifically given Finding 1 — split into per-capability modules only *after* the duplication in Finding 1 is resolved (no point modularizing a file that has an as-yet-unreconciled sibling).
 
-### 10. [Low] No static typing anywhere on the frontend
-- **Location**: `frontend/src` — 0 `.ts`/`.tsx` files; no PropTypes usage observed
-- **Description**: A 30K-LOC React SPA with no TypeScript and no PropTypes means component contracts (props, API response shapes) are unenforced at build time, which raises the cost of the refactors implied by findings #8-9.
-- **Remediation**: Not a blocking issue for launch; consider incremental adoption (`.tsx` for new files, `checkJs`/JSDoc typedefs for `api.js`) rather than a big-bang migration.
+### 10. [Low] Frontend automated test coverage improved but is still thin relative to codebase size
+- **Location**: `frontend/src` — 16 test files across 1,229 source files (was 1/572 last audit — real, absolute improvement, ~16x more files, but the *ratio* barely moved: ~1.3% of files now vs ~0.2% before)
+- **Description**: Noted as a genuine improvement in absolute terms, not re-flagged as urgent, but the codebase has grown faster than its test suite, so the coverage gap in relative terms hasn't closed.
+- **Remediation**: Same as before — prioritize `api.js`'s interceptor/refresh-token logic and the highest-traffic pages; the growth in file count (16 tests already written) suggests momentum exists, so extending the existing pattern rather than starting from zero.
+
+### 11. [Low] No static typing anywhere on the frontend (unchanged)
+- **Location**: `frontend/src` — 0 `.ts`/`.tsx` files (confirmed again this pass), no PropTypes usage observed.
+- **Description**: Unchanged from the last audit. Repeated here only because it compounds Finding 5 (the `no-undef` API-client bugs) — a typed client would have caught the `base_price`/`pricing_rule_id` typo at compile time.
+- **Remediation**: Unchanged recommendation — incremental adoption, not a big-bang migration. Not blocking.
 
 ## Metrics
 
-| Metric | Value |
-|---|---|
-| Backend source files (`backend/src/**/*.js`) | 818 |
-| Backend LOC (`backend/src`) | ~87,324 |
-| Frontend source files (`.js`/`.jsx`) | 572 |
-| Frontend LOC (`frontend/src`) | ~30,481 |
-| Backend services (`backend/src/services`) | 109 |
-| Backend route files (`backend/src/routes`) | 39 |
-| Backend generated modules (`backend/src/modules/M0xx`) | 150 dirs / 600 files (82 are ≤10-line stubs) |
-| ESLint errors / warnings (backend/src, per existing `eslint-report.json`) | 67 errors / 579 warnings across 157 files |
-| Top ESLint rule violations | `no-unused-vars` 551, `no-func-assign` 41, `no-return-await` 26, `no-case-declarations` 20, `no-prototype-builtins` 4 |
-| Largest backend file | `backend/src/database/pool.js` — 2,339 lines |
-| Largest frontend file | `frontend/src/services/api.js` — 2,947 lines |
-| Backend test files | 30 (for 818 source files) |
-| Frontend test files | 1 (for 572 source files) |
-| `console.*` calls in backend/src | 53 (majority debug logging left in `database/pool.js`) |
-| TODO/FIXME/XXX/HACK markers in backend/src | 1 |
-| TypeScript files in frontend/src | 0 |
+| Metric | This pass | Last audit |
+|---|---|---|
+| Backend tracked `.js` files (`git ls-files backend/src`) | 2,691 | 818 |
+| Backend LOC (`backend/src`) | ~408,220 | ~87,324 |
+| Frontend tracked `.js`/`.jsx` files | 1,229 | 572 |
+| Frontend LOC (`frontend/src`) | ~88,431 | ~30,481 |
+| Backend services (`backend/src/services`, all levels) | 610 | 109 |
+| Backend `services/legacy` files | 183 | n/a (not split out) |
+| Same-basename pairs across `services/` and `services/legacy/` | 163 | not reported |
+| Backend route files (`backend/src/routes`, all levels) | 339 | 39 |
+| Backend module dirs (`backend/src/modules/M0xx`) | 344 | 150 |
+| M0xx modules with a ≤10-line `service.js` (stub ratio) | 39 (~11%) | 82 (~55%) |
+| Backend ESLint: files scanned / with issues | 2,700 / 559 | not reported this granularly |
+| Backend ESLint errors / warnings | 329 / 3,235 | 67 / 579 |
+| Backend top ESLint rules | `no-unused-vars` 2,951, `no-return-await` 150, `prefer-const` 134, `no-useless-catch` 97, `no-undef` 92, `no-func-assign` 84, `no-case-declarations` 35 | `no-unused-vars` 551, `no-func-assign` 41, `no-return-await` 26, `no-case-declarations` 20 |
+| Backend `no-dupe-keys` (real bug, Finding 4) | 1 | 0 reported |
+| Frontend ESLint: `npm run lint` exit code with 30 errors / 988 warnings | 0 (ungated) | not measured directly |
+| Frontend top ESLint rules | `no-unused-vars` 970, `no-undef` 29, `prefer-const` 17 | not reported this granularly |
+| Largest backend file | `services/legacy/aiBackboneService.js` — 7,051 lines | `database/pool.js` — 2,339 lines |
+| `database/pool.js` current size / `console.log`/`isTestMode` hits | 2,281 lines / 0 / 0 (fixed since last audit) | 2,339 lines / 20+ / dozens |
+| Largest frontend file | `services/api.js` — 4,439 lines | `services/api.js` — 2,947 lines |
+| Backend test files (`*.test.js` + `__tests__/`) | 809 (749 under `__tests__/`) | 30 |
+| Frontend test files | 16 | 1 |
+| TODO/FIXME/XXX/HACK markers in backend/src | 25 | 1 |
+| `console.log`/`console.debug` calls in backend/src | 252 | 53 (different counting method — not directly comparable) |
+| TypeScript files in frontend/src | 0 | 0 |
+

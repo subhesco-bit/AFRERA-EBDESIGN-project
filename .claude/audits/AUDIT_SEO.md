@@ -1,78 +1,70 @@
 ---
 agent: seo-auditor
 status: warn
-findings: 7
+findings: 6
 ---
 
-# SEO Audit — AFRERA Platform
+# SEO Audit — AFRERA Platform (Refresh)
 
 ## Summary
 
-This repository is dominated by internal planning/specification documents (dozens of `AFRERA_*.md`, `EVGA_*.md`, `TISMP_*.md` files at the root) and an `afrera/` tree that is mostly stub directories (e.g. `afrera/afrera-web/src` is a single text file containing an ASCII tree diagram, not real source code). The one **real, buildable** frontend is `frontend/` — a Vite + React single-page application (`afrera-frontend`, confirmed via `frontend/package.json`).
+This is a client-rendered Vite + React SPA (`frontend/`) that is **predominantly an authenticated B2B/farmer platform**: of the ~190 routes defined in `frontend/src/config/routes.js`, only 15 sit in the unauthenticated `publicRoutes` array (home, marketplace, marketplace/premium, product detail, login, register, the 5 farmer-entrance doors, forward pricing, climate, corridor economics, land use). Everything else — dashboards, wallet, logistics, insurance, ~150 `/modules/mNNN` admin screens, and a large `farmerRoutes`/`adminRoutes`/`dashboardRoutes` set — sits behind `ProtectedRoute`/`RoleRoute` and is correctly out of scope for SEO. This audit scopes findings to the public surface only, per instruction.
 
-This app is **not purely internal** — it does have genuine public-facing surface area. `frontend/src/App.jsx` explicitly marks a "Public Routes" section and, per in-code comments, was deliberately amended so a first-time visitor could reach some pages "without an account": `/`, `/marketplace`, `/products/:id`, `/login`, `/register`, `/farmer-entrance` (+ 4 sub-doors), `/pricing/forward`, `/climate`, `/corridor-economics`, `/land-use`, `/experience`, `/pricecheck`, `/pricebuild`, `/dynamicpricing`, `/selltiming`, `/compare`, `/discover`. Everything else (dashboards, ledger, insurance, logistics, ~150 numbered `/modules/mNNN` admin routes, etc.) sits behind `ProtectedRoute`.
+**Since the prior audit, most of the previously-flagged gaps have been fixed**: `frontend/index.html` now carries `og:image`/`twitter:image`, a working favicon, a canonical tag, and two `application/ld+json` blocks (`Organization`, `WebSite`); `frontend/public/robots.txt` and `frontend/public/sitemap.xml` now exist; the broken favicon reference is gone; and a real per-route metadata system (`RouteAnalytics.jsx`'s `RouteMetadata` component, driven by `config/routes.js`) now pushes a distinct `<title>`/description/keywords/canonical/OG/Twitter set for each of the ~190 route entries (including `noIndex` support, correctly applied to `/login` and `/register`).
 
-Because this is a client-rendered SPA with a single `frontend/index.html` shell and no server-side rendering, static prerendering, or per-route `<head>` management (no `react-helmet`/`react-helmet-async` or equivalent found in `frontend/package.json` or `frontend/src`), **every route — public or protected — serves the exact same title, meta description, and Open Graph/Twitter tags.** There is no per-page SEO differentiation possible today, and no JSON-LD structured data anywhere in the codebase (`frontend/`, `backend/`, `afrera/`).
-
-Overall status: **warn**. The base tags that exist are reasonable for a single-page manifest but are static/shared across all routes, there is no structured data, no `robots.txt`/`sitemap.xml`, no `og:image`, no canonical tags, and the favicon reference is broken. None of this is launch-blocking in the security sense, but none of the public routes (home, marketplace, product pages, farmer-entrance doors, forward pricing, climate) are optimized for search/social discovery, which matters for a platform whose own comments describe these routes as a "public discovery layer."
+The remaining gaps are narrower but real: (1) `robots.txt` and `sitemap.xml` were written against a route-naming scheme that no longer matches `config/routes.js` — several "public" URLs in both files are either mistyped (missing hyphens) or actually gated behind farmer-role auth; (2) product pages still get a generic, static title/description rather than the real product name/price despite live data being available; (3) the `RouteMetadata` component's own OG/Twitter image fallback points at files that don't exist; and (4) the two PWA manifest files remain duplicated and inconsistent. Overall status remains **warn** — meaningfully improved from the prior audit, but not yet clean.
 
 ## Findings
 
-### 1. No per-page `<title>` / meta description — all routes share one static tag set
+### 1. `robots.txt`/`sitemap.xml` reference stale/mistyped paths, several of which are actually auth-gated
 - **Severity:** High
-- **Location:** `frontend/index.html` (lines 6–31), `frontend/src/App.jsx` (all `<Route>` definitions)
-- **Description:** The SPA has one `index.html` with one `<title>AFRERA Platform</title>` and one static `<meta name="description">`. There is no `react-helmet`/`react-helmet-async`/`<title>` mutation logic in `frontend/src` (confirmed via search — no matches for `Helmet`, `document.title`, or similar). This means the home page, the marketplace, every individual product page (`/products/:id`), the farmer-entrance doors, and the forward-pricing/climate pages all present identically to search engines and to anyone sharing a link — e.g. a shared product URL shows the generic "AFRERA Platform" title and platform-wide description instead of the product name/price.
-- **Remediation:** Add `react-helmet-async` (or React 19's native `<title>`/`<meta>` support if upgrading) and set route-specific title/description in each public page component, especially `ProductDetailPage.jsx` and `MarketplacePage.jsx` where content is dynamic per item/query.
+- **Location:** `frontend/public/robots.txt` (lines 6–19), `frontend/public/sitemap.xml`, cross-referenced against `frontend/src/config/routes.js`
+- **Description:** Both files list `/pricecheck`, `/pricebuild`, `/dynamicpricing`, `/selltiming` as crawlable public URLs. The actual routes in `config/routes.js` are `/price-check`, `/price-build`, `/dynamic-pricing`, `/sell-timing` (hyphenated) — so as written, these sitemap/robots entries point at paths that don't resolve to those pages at all (they'd hit the SPA's catch-all/`NotFoundPage`). Worse, even the correctly-spelled versions of these routes, plus `/discover`, `/compare`, and `/experience` (also listed as `Allow`/sitemap URLs), are defined inside `farmerRoutes` in `config/routes.js` and rendered via `<RoleRoute allowedRoles={['farmer','admin']}>` in `frontend/src/App.jsx` (lines 127–142) — i.e. they require an authenticated farmer/admin session and redirect anonymous visitors (including crawlers) away. Submitting these to Google Search Console will produce "submitted URL not found" or soft-404/redirect-loop reports and wastes crawl budget on pages that were never public. Conversely, genuinely public pages are missing from the sitemap entirely: `/marketplace/premium`, `/pricing/forward`, and all four `/farmer-entrance/*` sub-doors (`sell`, `household`, `field`, `shared`) are in `publicRoutes` but absent from `sitemap.xml`.
+- **Remediation:** Regenerate `robots.txt`/`sitemap.xml` directly from `publicRoutes` in `config/routes.js` (ideally as a small build step so the two can't drift again) rather than hand-maintaining a separate list. Only the 15 entries in `publicRoutes` (minus the two `noIndex: true` ones, `/login` and `/register`, which should stay out of the sitemap though they can remain crawlable-but-not-indexed) belong in either file.
 
-### 2. No JSON-LD structured data anywhere in the codebase
-- **Severity:** High
-- **Location:** repo-wide (`frontend/`, `backend/`) — no `application/ld+json` found
-- **Description:** There is zero structured data. For an e-commerce/marketplace surface (`MarketplacePage.jsx`, `ProductDetailPage.jsx`) this means no `Product`, `Offer`, or `BreadcrumbList` schema; for the org itself, no `Organization`/`WebSite` schema on the home page. Search engines cannot produce rich results (price, availability, ratings) for product pages, and there's no sitelinks-searchbox eligibility for the site.
-- **Remediation:** Add `Organization`/`WebSite` JSON-LD to the home page shell, and `Product`/`Offer` JSON-LD to `ProductDetailPage.jsx` sourced from the same data already fetched for rendering (avoids a second data source to keep in sync).
+### 2. Product/marketplace pages get a static, generic title/description instead of dynamic per-item content
+- **Severity:** Medium (downgraded from High — a real per-route metadata system now exists, this is the one place it doesn't reach)
+- **Location:** `frontend/src/config/routes.js:240-248` (`/products/:id` entry), `frontend/src/pages/ProductDetailPage.jsx`, `frontend/src/components/RouteAnalytics.jsx` (`RouteMetadata`, lines 165-219)
+- **Description:** `RouteMetadata` looks up metadata via `getRouteByPath(location.pathname)`, which matches on the **path pattern**, not the resolved entity. So every product detail page gets the same static `title: 'Product Details'` / `description: 'View detailed information about agricultural products'` regardless of which product is loaded — even though `ProductDetailPage.jsx` clearly has `product.name`, `product.base_price`, `product.category_name` etc. in scope (lines 54-111) and could trivially produce `"${product.name} — AFRERA Marketplace"` and a price-bearing description. Shared product links (WhatsApp/social, which is explicitly the stated use case for OG tags on this rural-market platform) all render identically regardless of which product was shared. The same applies to any query-parameterized marketplace/discovery views if those are ever made indexable.
+- **Remediation:** In `ProductDetailPage.jsx`, once `product` loads, call the same `updateMetaDescription`/OG/Twitter update helpers already exported from `RouteAnalytics.jsx` (or lift them to a shared hook) with the actual product name, description, price, and image. Add `Product`/`Offer` JSON-LD (still zero JSON-LD blocks exist outside `index.html`) sourced from the same fetched data.
 
-### 3. No `og:image` / `twitter:image`
+### 3. `RouteMetadata`'s own OG/Twitter image fallback points at files that don't exist
 - **Severity:** Medium
-- **Location:** `frontend/index.html` (Open Graph block, lines 20–29)
-- **Description:** Open Graph and Twitter Card tags exist for title/description/type/locale, but neither `og:image` nor `twitter:image` is set. Shared links (WhatsApp, Twitter/X, LinkedIn, Facebook) will render with no preview image — significant for reach in the stated "rural India" market where link previews are often the only signal a recipient sees before clicking. `twitter:card` is set to `summary_large_image`, which specifically expects an image; without one, most clients fall back to a degraded card or none at all.
-- **Remediation:** Add a real static `og:image`/`twitter:image` (absolute URL, ≥1200×630px) under `frontend/public/`, referenced with an absolute URL (OG tags require absolute, not relative, URLs — currently no domain is configured anywhere in `index.html`, so even a relative image path would not resolve correctly for crawlers).
+- **Location:** `frontend/src/components/RouteAnalytics.jsx:192,202` (`route.image || '/og-image.png'`, `route.image || '/twitter-image.png'`); `frontend/public/` contains no `og-image.png` or `twitter-image.png`
+- **Description:** None of the 190 entries in `config/routes.js` set an `image` field (confirmed — no `image:` key anywhere in the file), so every client-side route transition falls through to these two hardcoded fallback paths, both of which 404. This silently overwrites the perfectly good `og:image`/`twitter:image` values that ship in `index.html` (pointing at `icon-512.png`) the moment `RouteMetadata` fires on first client-side navigation, meaning any link shared *after* an in-app navigation (e.g. via a "share this page" feature, or a crawler that executes JS) gets a broken image reference instead of the working one from the static HTML.
+- **Remediation:** Either add real `og-image.png`/`twitter-image.png` assets to `frontend/public/`, or change the fallback to reuse the existing `icon-512.png` (matching `index.html`) so client-side navigation never regresses below the SSR/static baseline.
 
-### 4. Favicon reference is broken (`/vite.svg` does not exist)
-- **Severity:** Medium
-- **Location:** `frontend/index.html:5` — `<link rel="icon" type="image/svg+xml" href="/vite.svg" />`
-- **Description:** `frontend/public/vite.svg` does not exist (confirmed via directory listing — `frontend/public` contains only `icons/`, `manifest.json`, `manifest.webmanifest`, `sw.js`). This is the default Vite scaffold favicon reference, left over and never replaced. Every page load will 404 on the favicon request; browsers show a blank/broken tab icon, and it undermines basic polish on a page explicitly built for first-time, low-trust visitors ("public discovery layer" per the code comments).
-- **Remediation:** Point the favicon at one of the existing real assets (`frontend/public/icons/icon-192.png` or similar) or add a proper `favicon.ico`/`favicon.svg` matching the brand.
+### 4. `og:image`/`twitter:image` use a square 512×512 app icon, not a social-preview-shaped image
+- **Severity:** Low (prior "no image at all" finding is fixed; this is a follow-on polish item)
+- **Location:** `frontend/index.html:26,32,45`
+- **Description:** `og:image` and `twitter:image` now resolve to `icons/icon-512.png`, a square PWA app icon. `twitter:card` is `summary_large_image`, which expects a ~1200×630 landscape image; most platforms (X/Twitter, LinkedIn, WhatsApp, Facebook) will letterbox or awkwardly crop a square icon in the large-image card layout rather than rendering a proper preview.
+- **Remediation:** Add a purpose-built 1200×630 share image and point `og:image`/`twitter:image` at it; keep the app icon for `link rel="icon"`/manifest use only.
 
-### 5. No `robots.txt` or `sitemap.xml`
-- **Severity:** Medium
-- **Location:** repo-wide — searched `frontend/public`, `backend/src` (including `index.js`) for `robots.txt`/`sitemap` route or static file; none found
-- **Description:** There is no `robots.txt` to guide crawlers away from the ~150 authenticated `/modules/mNNN` admin routes and other protected paths, and no `sitemap.xml` to help search engines discover the genuinely public routes (`/`, `/marketplace`, `/products/:id`, `/farmer-entrance*`, `/pricing/forward`, `/climate`, `/corridor-economics`, `/land-use`, `/experience`, etc.). Since this is a client-side-routed SPA, crawlers depend entirely on links and sitemap entries to discover deep routes like individual product pages.
-- **Remediation:** Add `frontend/public/robots.txt` (allow the public routes listed in `App.jsx`'s "Public Routes" section; the protected/admin routes are moot for robots.txt since they already 302/redirect unauthenticated crawlers to `/login` via `ProtectedRoute`, but explicit disallow rules avoid wasted crawl budget) and a generated `sitemap.xml` covering the public route list, updated as new public routes are added.
+### 5. Duplicate, drifted PWA manifest files persist (`manifest.json` vs `manifest.webmanifest`)
+- **Severity:** Low (unresolved from prior audit)
+- **Location:** `frontend/public/manifest.json` vs `frontend/public/manifest.webmanifest`
+- **Description:** Still two manifests with different `name` ("AFRERA Platform" vs "AFRERA — Agriculture & Rural Economy Platform"), different `theme_color` (`#10b981` vs `#16a34a`), different `description`, and different `shortcuts` (the orphaned `manifest.json` links a `/farmer-portal` shortcut that isn't in `manifest.webmanifest`'s shortcut set, and vice versa for `/dashboard`). Only `manifest.webmanifest` is linked from `index.html:13`; `manifest.json` remains dead weight and a landmine for the next person who edits the wrong file.
+- **Remediation:** Delete `manifest.json` (confirm nothing references it — no matches found in `frontend/src` or `index.html`) or consolidate to one file.
 
-### 6. Duplicate, drifted PWA manifest files (`manifest.json` vs `manifest.webmanifest`)
-- **Severity:** Low
-- **Location:** `frontend/public/manifest.json` and `frontend/public/manifest.webmanifest`
-- **Description:** Two manifest files exist with different `name` ("AFRERA Platform" vs "AFRERA — Agriculture & Rural Economy Platform"), different `theme_color` (`#10b981` vs `#16a34a`), different `description`, and different shortcut sets. Only `manifest.webmanifest` is linked from `index.html:13`, so `manifest.json` is dead/orphaned — but its presence is a landmine for whoever next "fixes" the manifest and edits the wrong file, and some tooling/crawlers that probe for `manifest.json` by convention could pick up the stale one. Not a strict SEO defect but adjacent to the OG/PWA discoverability surface being audited.
-- **Remediation:** Delete the unused `manifest.json` or explicitly document why both exist; keep a single source of truth for name/theme_color consistent with `index.html`'s `<meta name="theme-color" content="#16a34a">`.
-
-### 7. No canonical URL tags
-- **Severity:** Low
-- **Location:** `frontend/index.html` — no `<link rel="canonical">` anywhere
-- **Description:** No canonical tags exist on any page. Low impact today since there's only one static `index.html` and no query-string-driven duplicate-content routes have been observed, but becomes relevant once per-page titles (Finding #1) are implemented and if `MarketplacePage.jsx`/`DiscoverPage.jsx` filtering ever produces indexable, differently-parameterized URLs for the same underlying content.
-- **Remediation:** Add canonical tags once per-route `<head>` management (Finding #1's fix) is in place; point each canonical at its clean, parameter-free path.
+### 6. Hardcoded placeholder production domain (`https://afrera.platform`) baked into OG/canonical/sitemap
+- **Severity:** Low (informational — flag before launch, not a code defect today)
+- **Location:** `frontend/index.html` (canonical, `og:url`, `og:image`, `twitter:image`, both JSON-LD blocks), `frontend/public/robots.txt` (Sitemap directive), `frontend/public/sitemap.xml` (every `<loc>`)
+- **Description:** All SEO-relevant URLs are consistently hardcoded to `https://afrera.platform`, which does not appear to be a domain this project owns/serves from yet (no matching config in `frontend/.env*` or `vite.config`). Consistency is good (no cross-file drift on the domain itself, unlike Finding #1's path drift), but if the real production domain differs at launch, every canonical tag, OG URL, sitemap entry, and JSON-LD `url`/`logo` field needs a coordinated update in one pass.
+- **Remediation:** Move the base URL to a single env-driven constant (e.g. `VITE_SITE_URL`) consumed by `index.html` (via a build-time replace) and by whatever generates `sitemap.xml`/`robots.txt`, so the real domain only needs to be set in one place before launch.
 
 ## Metrics
 
 | Metric | Value |
 |---|---|
-| Real frontend apps found | 1 (`frontend/` — Vite + React SPA) |
-| Total HTML entry points | 1 (`frontend/index.html` — single shell for all routes) |
-| Public (unauthenticated) routes in `App.jsx` | ~17 top-level paths (home, marketplace, product detail, login, register, 4 farmer-entrance doors, forward pricing, climate, corridor economics, land-use, experience, price check/build, dynamic pricing, sell timing, compare, discover) |
-| Protected/authenticated routes in `App.jsx` | ~180+ (dashboards, ledger, insurance, logistics, ~150 numbered `/modules/mNNN` admin routes, etc.) |
-| Pages with unique `<title>`/meta description | 0 of ~17 public routes (all share the one static `index.html` tag set) |
-| JSON-LD structured data blocks found | 0 |
-| `og:image` / `twitter:image` present | No |
-| `robots.txt` present | No |
-| `sitemap.xml` present | No |
-| Canonical tags present | No |
-| Favicon resolves | No (`/vite.svg` referenced, file does not exist) |
-| PWA manifest files present | 2, mutually inconsistent (`manifest.json`, `manifest.webmanifest`) — only the latter is linked |
+| Total routes defined (`config/routes.js`) | ~190 across `publicRoutes`, `protectedRoutes`, `farmerRoutes`, `adminRoutes`, `dashboardRoutes`, `managementRoutes` |
+| Public (unauthenticated, SEO-relevant) routes | 15 (`publicRoutes` array) |
+| Public routes with unique static title/description/keywords | 15 of 15 (via `RouteMetadata`) |
+| Public routes with dynamic (per-instance) title/OG/schema | 0 of 1 that need it (`/products/:id`) |
+| JSON-LD structured data blocks | 2 (`Organization`, `WebSite` in `index.html`) — 0 `Product`/`Offer`/`BreadcrumbList` |
+| `og:image` / `twitter:image` present | Yes (static HTML) — but image is a square app icon, and client-side nav fallback (`RouteAnalytics.jsx`) points at non-existent files |
+| `robots.txt` present | Yes — but contains 4 mistyped and 6 auth-gated URLs |
+| `sitemap.xml` present | Yes — 14 URLs, 6 invalid/gated, 6 legitimate public routes missing |
+| Canonical tags present | Yes (static + dynamically updated per route via `RouteMetadata`) |
+| Favicon resolves | Yes (`/icons/icon-192.png` exists) |
+| `noIndex` correctly applied | Yes, on `/login` and `/register` |
+| PWA manifest files present | 2, still mutually inconsistent (`manifest.json` orphaned, only `manifest.webmanifest` linked) |

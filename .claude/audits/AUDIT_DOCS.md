@@ -1,194 +1,119 @@
 ---
 agent: doc-auditor
-status: warn
+status: fail
 findings: 11
 ---
 
-# Documentation Audit — AFRERA Platform
+# Doc Auditor Report — EBDESIGN
+
+Audit date: 2026-09-08 (re-verified same day, second pass — see "Re-verification note" below)
+Branch: `audit/ui-api-fix`
+
+## Re-verification note (second pass, same session day)
+
+This report was already refreshed once earlier today. Since the repo has multiple sessions actively committing/uncommitting work concurrently, every headline count was re-run rather than trusted from the prior pass. Findings 1-11 below are unchanged in substance and remain valid; the numbers moved slightly (all upward) between the two passes purely from other sessions' in-flight edits, which is itself evidence supporting Finding 1 (docs frozen at a point-in-time estimate cannot keep pace with a repo this volatile) and Finding 10 (see refinement below — `.vibecheck/` does partially exist now, but `truthpack/` still does not):
+
+| Metric | First pass (this session, earlier) | Second pass (just now) | Delta |
+|---|---|---|---|
+| Frontend `.jsx` pages | 387 | 387 | none |
+| Backend route files | 338 | 338 | none |
+| `app.use(` mounts in `index.js` | 224 | 224 | none |
+| Backend services (`*.js`) | 610 | 613 | +3 (new untracked `clinicalNutritionDecisionSupportService.js`, `medicalCodingReferenceService.js`, `clinicalNutritionDecisionSupportService.test.js`) |
+| DB migrations (`*.sql`) | 415 | 418 | +3 (new untracked `9998_ai_response_feedback.sql` and two `9999_*` files) |
+| Test files (`*.test.js`) | 792 | 809 | +17 |
+| Stub tests (`test0`-`test725`) | 726 | 726 | none |
+| `_EBDESIGN_LIBRARY` files | 11 | 11 | none |
+| `.ai/handoffs/` freshest file | `2026-09-05-ai-platform-hardening.md` | multiple files now stamped `Sep 7 19:06` (`DATABASE_MIGRATION_EXECUTION_PLAN.md`, `DEVIN_FILE_INVENTORY_MAPPING.md`, `GITHUB_PR_TEMPLATE.md`, `INFRASTRUCTURE_UNBLOCKING.md`, `PHASE_4_TO_PHASE_5_HANDOFF.md`, `TWO_PORT_EXECUTION_GUIDE.md`) | handoffs directory is even fresher than first noted — strengthens Finding 9 |
+| `.ai/tasks/ACTIVE.md` | referenced as current | confirmed still the same file, last modified Sep 6 19:23, 1500+ lines | unchanged, still the right pointer |
+
+No finding is retracted. All four core docs (`CLAUDE.md`, `.ai/PROJECT_CONTEXT.md`, `.ai/architecture/CURRENT_IMPLEMENTATION.md`, `.ai/architecture/CODEBASE_MAP.md`) still self-declare `**Last Updated:** 24 August 2026` verbatim, confirmed via direct re-grep this pass, and the latest commit on the branch remains `5e2eb01b` (`git log -1` timestamp `Mon Sep 7 22:40:43 2026`).
 
 ## Summary
 
-The repository has real, current documentation in places (`backend/.env.example` is
-generated from an actual scan of `process.env` usage, `docs/OPEN_ITEMS.md` is dated
-2026-08-04 and honestly tracks known gaps, `backend/scripts/generate-openapi.js`
-derives `openapi.json` from live route definitions). But the top-level docs a new
-developer or stakeholder would read first — root `README.md`, the 150 per-module
-`README.md` files, and the relationship between `afrera/` and the actual
-`backend/`+`frontend/` app — are stale, incomplete, or self-contradictory relative to
-the code and to other docs in the repo. None of the issues found are unrecoverable,
-but several would cause a new developer's first `npm install && npm run dev` to fail
-or mislead, and one causes a real CI-configuration doc to assert something the
-workflow file directly contradicts. No files were modified — this is audit-only.
+The project's canonical "read this first" documents — `CLAUDE.md` and the three core `.ai/architecture/` status docs — are frozen at **24 August 2026** and have not been updated across **78 commits** made since 2026-08-25 (verified via `git log --since="2026-08-25" --oneline | wc -l`). In that window the repo went through several documented boot-blocker and domain-fix passes (finance/insurance, ERP, platform/identity, agriculture core, and a general "resolve all boot/build-blocking bugs" pass). None of that is reflected in the numbers new contributors are told to trust.
 
-Overall status: **warn**. No single finding is launch-blocking on its own, but the
-volume of stale onboarding/setup documentation is inconsistent with "launch level."
+Every headline metric in `CLAUDE.md` / `.ai/PROJECT_CONTEXT.md` / `.ai/architecture/CURRENT_IMPLEMENTATION.md` / `.ai/architecture/CODEBASE_MAP.md` under-counts the current repo, several by 2-4x, and the "0% test coverage" claim is now actively false and actionably misleading in the other direction (hundreds of the "test files" that would fix the number are auto-generated no-ops). `.ai/tasks/ACTIVE.md` and the newer files under `.ai/handoffs/` are meaningfully fresher and should be the pointer new agents are told to trust instead of the frozen architecture docs.
 
 ## Findings
 
-### 1. `docs/OPEN_ITEMS.md` misstates its own CI wiring — HIGH
-- **Location:** `docs/OPEN_ITEMS.md` (lines ~213-219) vs `.github/workflows/ci.yml` (line 166)
-- **Description:** `OPEN_ITEMS.md` documents `tools/validate-resolution-rules.js` as
-  "**KNOWN BROKEN** — do not wire into CI yet" and states it is "deliberately NOT
-  referenced in `.github/workflows/ci.yml`." In fact `ci.yml` runs it directly and
-  unconditionally: `run: node tools/validate-resolution-rules.js` (step "Validate AI
-  resolution rules against live schema", no `|| true` fallback). If the script is
-  actually as broken as documented (miscounts parentheses, finds 4 rules instead of
-  9, emits a false error), this CI step will fail every build — a documentation
-  claim that is not just stale but actively contradicted by the workflow file it
-  describes.
-- **Remediation:** Reconcile the two: either confirm the script was fixed and update
-  `OPEN_ITEMS.md`'s "KNOWN BROKEN" status, or remove/guard the CI step per the
-  doc's original intent (the doc even proposes the fix: query
-  `information_schema` after migrations instead of parsing SQL text).
+### 1. [HIGH] Core status docs are 15 days / 78 commits stale and self-declare as "Last Updated: 24 August 2026"
+**Location:** `CLAUDE.md`, `.ai/PROJECT_CONTEXT.md`, `.ai/architecture/CURRENT_IMPLEMENTATION.md`, `.ai/architecture/CODEBASE_MAP.md`
+**Description:** All four carry the same `Last Updated: 24 August 2026` stamp. `CLAUDE.md` additionally states this stamp at the top of the file the START HERE protocol tells every new agent to read first. Meanwhile `git log --since="2026-08-25"` shows 78 commits, including five with messages naming concrete fixes (`Finance/Insurance domain: fix escrow auth gap...`, `ERP domain: fix duplicate /erp-dashboard route path...`, `FIX: Resolve all boot/build-blocking bugs found during end-to-end verification`, `Platform/Identity: fix org/tenant CRUD, unblock aiBackboneService boot...`, `Agriculture core batch: real AI crop advisory...`). None of these are reflected anywhere in the "Known Problems," "Current Status," or implementation-matrix sections of the four documents above.
+**Remediation:** Update the `Last Updated` stamp and the numeric claims below in all four documents, or add an explicit "documents frozen at commit `2ef9fa06`, see `.ai/tasks/ACTIVE.md` and `.ai/handoffs/` for current state" pointer at the top of each so agents don't silently trust stale numbers.
 
-### 2. Root README documents an env var that doesn't exist in code — MEDIUM/HIGH
-- **Location:** `README.md` lines 166-168 vs `backend/.env.example` and `backend/src/**`
-- **Description:** Root README's setup walkthrough lists `ANTHROPIC_API_KEY=your_anthropic_api_key`
-  under an "# AI" section as a required/example env var. A repo-wide search of
-  `backend/src` and `backend/.env.example` finds zero references to
-  `ANTHROPIC_API_KEY` — it is not read by any code path and not listed in the
-  actual (auto-generated-from-code) `.env.example`. A developer following the
-  README would configure a credential the app never uses.
-- **Remediation:** Remove `ANTHROPIC_API_KEY` from the README env block, or if AI
-  features are intended to use it, wire it into the actual AI service and add it to
-  `backend/.env.example`.
+### 2. [HIGH] Frontend page count is wrong by ~2.5-3x
+**Location:** `CLAUDE.md` ("123/150 pages complete"), `.ai/PROJECT_CONTEXT.md` line 38, `.ai/architecture/CURRENT_IMPLEMENTATION.md` lines 44-57 (per-category table totaling "123/150", "82% complete")
+**Description:** Actual count: `find frontend/src/pages -name "*.jsx"` returns **387** `.jsx` files (227 at the top level alone, before recursing into subdirectories). The docs' own per-category breakdown (Dashboard 15/20, User Management 10/10, Product Management 12/12, etc.) sums to a denominator of 150, which is not remotely close to the actual page inventory today.
+**Remediation:** Regenerate the page inventory (`find frontend/src/pages -name "*.jsx" | wc -l` plus a route-mounted vs. orphaned breakdown) and replace the stale category table.
 
-### 3. Root README's env var walkthrough omits most of the real required/optional vars — MEDIUM
-- **Location:** `README.md` lines 134-176 vs `backend/.env.example` (105 lines, ~40 vars)
-- **Description:** `backend/.env.example` states it was "Generated 2026-08-03 from the
-  59 process.env references found in backend/src" and includes `DATABASE_URL`,
-  `TEST_DATABASE_URL`, `MONGODB_URI`, `ENCRYPTION_KEY`, `OFFLINE_PAYMENT_SECRET`,
-  `SYNC_SECRET`, `TRUSTED_IPS`, `JWT_ISSUER`/`JWT_AUDIENCE`, full Google/Facebook
-  OAuth blocks, Twilio SMS/voice vars, and SAP/Oracle/Custom-ERP blocks. The
-  README's inline `.env` example shows only ~12 vars and mentions none of these.
-  A developer who only reads the README (rather than discovering `.env.example`)
-  will hit silent/confusing failures when OAuth, Twilio, or ERP-enabled code paths
-  are exercised, and will miss the security note that `JWT_SECRET` falls back to an
-  insecure default if unset (documented only in the `.env.example` comment, not the
-  README).
-- **Remediation:** Either point the README setup section directly at
-  `backend/.env.example` ("copy `.env.example` to `.env`") instead of hand-listing a
-  subset, or regenerate the README block from the same source of truth.
+### 3. [HIGH] Route file / route-mount counts are wrong by ~2-3x
+**Location:** `CLAUDE.md` ("107 route files mounted"), `.ai/PROJECT_CONTEXT.md` line 28, `.ai/architecture/CODEBASE_MAP.md` line ~15 ("API route definitions (107 files)")
+**Description:** `find backend/src/routes -name "*.js"` returns **338** route files; `grep -c "app.use(" backend/src/index.js` shows **224** mount calls in the entry point alone. The docs' "107 route files mounted" understates both the file count and the mount count substantially. Note also that current git status shows `backend/src/routes/commerce/sellerRankingRoutes.js` deleted and `backend/src/index.js` modified — the route inventory is actively moving and the doc was never a snapshot of a specific commit to begin with.
+**Remediation:** Regenerate route inventory from `backend/src/index.js` mount calls (source of truth for "actually wired," per CLAUDE.md's own "VERIFY ACTUAL RUNTIME/INTEGRATION STATE" rule) rather than a raw file count, and update both docs together so they don't drift from each other (PROJECT_CONTEXT says 107, CODEBASE_MAP says 107 too, but neither matches reality).
 
-### 4. No `frontend/.env.example` despite a required env var — MEDIUM
-- **Location:** `frontend/` (no `.env*` file present); `frontend/src` uses `import.meta.env.VITE_API_URL`
-- **Description:** The frontend has exactly one env var in use (`VITE_API_URL`,
-  confirmed by searching `frontend/src` for `import.meta.env.*`), and the README
-  tells developers to "Create a `.env` file" with it inline. Unlike the backend,
-  there is no `frontend/.env.example` to copy, so there is nothing in the repo a
-  developer can `cp .env.example .env` from — inconsistent with the backend's
-  setup pattern and easy to typo/miss silently (Vite will just fall back to
-  `undefined` at build time with no error).
-- **Remediation:** Add `frontend/.env.example` with `VITE_API_URL=http://localhost:3001/api/v1`.
+### 4. [MEDIUM] Backend service count is wrong by ~4x
+**Location:** `CLAUDE.md` ("140+ services implemented"), `.ai/PROJECT_CONTEXT.md` line 27 ("140 backend services implemented")
+**Description:** `find backend/src/services -name "*.js"` returns **610** files. Even allowing for some being non-service helpers, this is far past "140+".
+**Remediation:** Recount and update, or scope the claim explicitly (e.g., "140+ services documented in `_EBDESIGN_LIBRARY`" if that's what was actually meant, since the two numbers may have been conflated — see Finding 8).
 
-### 5. README documents a `test:e2e` command that doesn't exist — LOW/MEDIUM
-- **Location:** `README.md` lines 364-371
-- **Description:** The "E2E Tests (planned)" section shows a runnable command block
-  `npm run test:e2e`, but no `test:e2e` script exists in the root, or in
-  `backend/package.json` or `frontend/package.json` (only `test`, `test:watch`,
-  `test:coverage`/`test:ui` are defined). Labeling the section "(planned)" signals
-  intent, but presenting it as a copy-pasteable command is misleading — running it
-  fails with "missing script: test:e2e".
-- **Remediation:** Remove the command block until the script exists, or replace it
-  with plain text noting it's not yet implemented.
+### 5. [MEDIUM] Migration file count is internally inconsistent across docs, and wrong in all three variants
+**Location:** `CLAUDE.md` ("96 migrations", "96 database migrations"), `.ai/PROJECT_CONTEXT.md` line 29 ("200 migration files"), `.ai/architecture/CURRENT_IMPLEMENTATION.md` line 68 ("96+" total migrations), `.ai/architecture/CODEBASE_MAP.md` ("96+ SQL migration files")
+**Description:** The docs don't even agree with each other (96 vs. 96+ vs. 200), and actual count is **415** `.sql` files under `backend/src/database/migrations/` (427 total entries including non-.sql). Whichever number was intended, current reality is roughly 2-4x higher than any of the stated figures.
+**Remediation:** Pick one canonical count generated by `find backend/src/database/migrations -name "*.sql" | wc -l` at doc-update time, and keep the three documents' numbers identical going forward (they describe the same fact and currently don't match each other, which is a red flag that this file gets hand-edited independently in each doc).
 
-### 6. Root README "Project Structure" section is drastically out of date — MEDIUM
-- **Location:** `README.md` lines 76-104
-- **Description:** The documented tree shows only `backend/`, `frontend/`,
-  `afrera_platform_v43.html`, and `README.md`. The actual repo root additionally
-  contains: `docs/` (30+ files including the important `OPEN_ITEMS.md` and
-  `master-module-catalogue.md`), `DOCUMENTATION/` (30+ "Volume_N_*" architecture
-  specs), `afrera/` (an entire second 11-package monorepo — see finding 8),
-  `infra/` (k8s + terraform), `tools/` (10+ CI/audit scripts), `workflows/`,
-  and well over 100 root-level specification markdown files
-  (`AFRERA_*_SPECIFICATION.md`, `TISMP_*`, `EVGA_PHASE*`, etc.). A newcomer using
-  the README as a map of the repository will not discover most of it.
-- **Remediation:** Either update the tree to reflect the real layout, or (better,
-  given the volume of legacy specs) add a short "Documentation Map" section
-  pointing to `docs/`, `DOCUMENTATION/`, and `docs/OPEN_ITEMS.md` explicitly, and
-  note that most root-level `*.md` files are historical/planning artifacts rather
-  than current reference docs.
+### 6. [HIGH] "0% test coverage" / "0/150 modules have test evidence" is now false, but the true state is more nuanced than a simple correction
+**Location:** `CLAUDE.md` ("Test frameworks configured, 0% coverage, no tests written", "0% test coverage"), `.ai/PROJECT_CONTEXT.md` line 153 ("0/150 modules have test evidence"), `.ai/architecture/CURRENT_IMPLEMENTATION.md` lines 70-77 (Testing table: 0% coverage, 0 passing, 0 failing for all rows) and the per-module "Tests: None" lines throughout
+**Description:** This needs correcting in **both directions**, which is why it's flagged HIGH rather than just "update the number":
+- There are now **~792 files** matching `*.test.js` under `backend/src/`, which sounds like a huge coverage jump.
+- But **726 of those** (`backend/src/__tests__/test0.test.js` through `test725.test.js`) are auto-generated placeholder stubs. Every one checked (`test0.test.js` read directly) contains only:
+  ```js
+  describe('Test0', () => {
+    it('should pass', () => { expect(true).toBe(true); });
+  });
+  ```
+  These files inflate any naive "test file count" metric to near-meaningless levels and must not be reported as coverage.
+- Separately, there is a real and growing body of substantive tests: the task's own reference files (`backend/src/__tests__/governanceComplianceAuditDomain.test.js`, 133 lines; `backend/src/tests/unit/aiBackboneFallback.test.js`, 75 lines; `backend/src/tests/unit/coldStorageService.test.js`, 197 lines; `backend/src/tests/unit/logisticsDomain.test.js`, 166 lines; `backend/src/tests/unit/productReviewService.test.js`, 156 lines) plus dozens of pre-existing named tests (`authService.test.js`, `authService.security.test.js`, `cropRecommendationService.test.js`, `marketplace.test.js`, `insurance.test.js`, `decisionEngine.test.js`, `farmerHealthRoutes.test.js`, `e2e/farmer-journey.test.js`, and ~50 more) exercise real service/route logic.
+**Remediation:** Update the "0% coverage" claim to reflect that real, non-trivial test coverage now exists for a growing subset of domains (auth, marketplace, insurance, decision engine, cold storage, logistics, governance/compliance audit, product reviews, AI backbone fallback). Simultaneously, flag the 726 `test0.test.js`...`test725.test.js` stub files as noise that should either be deleted, consolidated, or excluded from any coverage/file-count metric the docs report — as-is they make it impossible to tell real coverage from filler by looking at file counts alone, which is exactly the kind of "verify actual runtime/integration state" trap CLAUDE.md itself warns against.
 
-### 7. All 150 per-module READMEs contain a literal escaped `\n` instead of real newlines — LOW
-- **Location:** `backend/src/modules/M0**/README.md` (150 of 150 files, e.g. `M100/README.md`)
-- **Description:** Confirmed by grepping all module READMEs: every one contains a
-  literal backslash-n string, e.g. `M100/README.md`'s entire content is one line:
-  `# M100 - M100 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles:
-  controller.js, service.js, routes.js, migrations/3000_M100_generated.sql`. This
-  renders as a single unbroken line on GitHub/any Markdown viewer instead of the
-  intended multi-paragraph layout — a generator script wrote `\n` as two literal
-  characters instead of an actual line break.
-- **Remediation:** Fix the generator (likely in `tools/` or a scaffold script) to
-  emit real newlines, then regenerate the 150 files.
+### 7. [MEDIUM] Database table count claim ("523+ tables") cannot currently be verified against a running database, and the doc presents it as fact rather than a static-schema estimate
+**Location:** `CLAUDE.md` ("PostgreSQL (523+ tables, 96 migrations)"), `.ai/PROJECT_CONTEXT.md` line 19 ("PostgreSQL database with 523 tables"), `.ai/architecture/CURRENT_IMPLEMENTATION.md` line 68 ("523+" tables, status "PENDING", "Executed: NO")
+**Description:** `CURRENT_IMPLEMENTATION.md`'s own table marks this row status **PENDING** / Executed **NO**, i.e., the 523 figure is a count of `CREATE TABLE` statements across migration files, not a verified live schema. `CLAUDE.md`'s one-line summary ("523+ tables") drops that caveat entirely, presenting a static estimate as an operational fact. Given migrations count itself is wrong (Finding 5), the derived table count is unverified and likely stale too.
+**Remediation:** Either regenerate the table count from current migration files and re-verify it matches `CREATE TABLE` occurrences, or rephrase `CLAUDE.md`'s summary to make clear this is an un-executed, un-verified static estimate (e.g., "~523 tables defined across migrations, not yet executed against a live database").
 
-### 8. Module READMEs disclose 49 stub modules with no top-level index of which — MEDIUM
-- **Location:** `backend/src/modules/M0**/README.md` (49 of 150 say `Status: ABSENT`, e.g. `M001/README.md`)
-- **Description:** 49 of the 150 module READMEs self-report `Status: ABSENT`
-  ("This folder contains backend scaffolding for the module. Add controllers,
-  services, routes, and SQL models as needed.") — i.e., no real implementation.
-  `docs/OPEN_ITEMS.md` corroborates this at the domain level (item 3: "ERP domains
-  with no module: AF-CO, AF-AA, AF-PS"). However there is no top-level document
-  (README, docs/, or otherwise) that lists which of the 150 modules are real vs.
-  stub — a reader has to open all 150 READMEs individually to find out. For a
-  "launch level" pass this matters because the root README's feature list (GI
-  Marketplace, Financial Services, ERP Integration, etc.) reads as if these are
-  uniformly delivered.
-- **Remediation:** Generate a single status table (module ID, domain, status) from
-  the existing README `Status:` lines — the data already exists, it just isn't
-  aggregated anywhere.
+### 8. [MEDIUM] "_EBDESIGN_LIBRARY: 524 module documentation cards" does not match the actual directory contents
+**Location:** `CLAUDE.md` ("_EBDESIGN_LIBRARY/ # Module documentation (524 cards)"), `.ai/PROJECT_CONTEXT.md` line 105-106 (structure diagram shows `00_CATALOG/`, `01_MODULES/`, `99_AUDIT/` as the library's shape)
+**Description:** The actual `_EBDESIGN_LIBRARY/` tree has ~45 numbered top-level directories (`01_ACQUISITION`, `01_MODULES`, `02_PROCESSING_FLOOR`, `02_SERVICE_CARDS`, `03_ERP`, `05_UI`, `06_SKELETON_CARDS`, `07_DEPENDENCY_CARDS`, `07_TESTS`, `08_DOCUMENTATION`, `08_GAP_CARDS`, `09_DOCUMENTATION_CARDS`, `09_RESEARCH`, `11_COMPONENTS`, `11_DECISIONS`, `13_DATA`, `13_RECONCILIATION`, `15_EXECUTION`, `16_CONNECTION_INTELLIGENCE`, `17_LIFECYCLE`, `18_HISTORY`, `18_RECOVERY_COLLECTION`, `20_GENERATED`, `21_DOCUMENTATION`, `21_EXTERNAL_DEPENDENCIES`, `22_TESTS`, `23_PRESERVATION`, `24_ARCHIVE`, `25_DISCOVERY_INDEX`, `27_READER_SERVICES`, `29_DEACCESSION`, `99_AUDIT`, `_CONTROL`, ...) — none named `00_CATALOG` as `PROJECT_CONTEXT.md`'s diagram claims. More importantly, `find _EBDESIGN_LIBRARY -type f | wc -l` returns only **11 files total** (2 of them `.md`), almost all under `25_DISCOVERY_INDEX/` (audit/inventory JSON and CSV files, not module cards). The "524 cards" figure and the "00_CATALOG/01_MODULES/99_AUDIT" structure appear to describe a taxonomy that was planned or previously existed but is not what's on disk now.
+**Remediation:** Either regenerate the library card inventory and correct the count/structure diagram, or — if the library content lives elsewhere (a prior branch, an external location) — say so explicitly instead of implying 524 populated card files exist in this checkout. This is a "DO NOT ASSUME A MODULE IS A SCAFFOLD" situation in reverse: the doc assumes a populated library that isn't there.
 
-### 9. `afrera/` is an entire second, unrelated-looking "AFRERA platform" doc tree with unfilled placeholders — MEDIUM
-- **Location:** `afrera/README.md` and its 11 sub-package READMEs (`afrera-web`, `afrera-app`, `afrera-desktop`, `afrera-mobile`, `afrera-api`, `afrera-ai`, `afrera-docs`, `afrera-infrastructure`, `afrera-devops`, `afrera-design-system`, `afrera-platform`)
-- **Description:** `afrera/README.md` describes a full separate platform ("public
-  website, enterprise web application, desktop application, and mobile
-  application") with its own getting-started instructions, including an unfilled
-  placeholder clone URL: `git clone https://github.com/yourusername/afrera.git`.
-  The root `README.md` never mentions the `afrera/` directory or explains its
-  relationship to the actual `backend/`+`frontend/` application it documents (same
-  product name, apparently different/aspirational scaffold). This is confusing for
-  onboarding and for anyone assessing what is actually shippable.
-- **Remediation:** Add a note to the root README clarifying whether `afrera/` is
-  legacy, aspirational scaffolding, or a parallel initiative, and fix the
-  placeholder GitHub URL if the sub-tree is kept.
+### 9. [LOW] `.ai/tasks/ACTIVE.md` and `.ai/handoffs/2026-09-05-ai-platform-hardening.md` are meaningfully fresher than the "read first" docs but aren't surfaced by the START HERE order
+**Location:** `CLAUDE.md` START HERE section (steps 1-6)
+**Description:** `.ai/tasks/ACTIVE.md` (1500 lines, entries dated 2026-08-29 onward, tracking real completed work like "Wire the 6 genuinely-orphaned backend services — DONE") and `.ai/handoffs/2026-09-05-ai-platform-hardening.md` (dated 2026-09-05, with concrete verified changes and test evidence) are both more current and more trustworthy than the frozen architecture docs read earlier in the START HERE sequence. As written, an agent following CLAUDE.md's numbered steps builds its mental model from the stale docs (steps 2-5) before ever reaching task/handoff state, and nothing tells it the earlier docs may already be contradicted by the later ones.
+**Remediation:** Add a line to CLAUDE.md's START HERE section: "If `.ai/architecture/*` conflicts with `.ai/tasks/ACTIVE.md` or the most recent file in `.ai/handoffs/`, the more recent one wins — check `Last Updated` / file dates."
 
-### 10. Root README's database section understates the real schema surface — LOW/MEDIUM
-- **Location:** `README.md` line 270 ("See `backend/src/database/schema.sql` for complete schema.")
-- **Description:** `backend/src/database/` actually contains 31 `*.sql` files
-  (`schema.sql` plus 30 domain-specific schema files: `ai_copilot_schema.sql`,
-  `blockchain_traceability_schema.sql`, `gst_schema.sql`,
-  `food_safety_schema.sql`, `engineering_schema.sql`, etc.), applied via
-  `migrate.js`. Calling `schema.sql` alone "the complete schema" understates where
-  most of the domain-specific tables actually live and will send a reader looking
-  in the wrong single file.
-- **Remediation:** Update the line to point at `backend/src/database/*.sql` (or
-  `migrate.js`, which enumerates the real apply order) rather than a single file.
+### 10. [LOW] `.vibecheck/truthpack/` does not exist, but both `CLAUDE.md` files mandate treating it as "the SINGLE Source of ALL Truth"
+**Location:** `CLAUDE.md` and `.claude/CLAUDE.md`, "TRUTHPACK-FIRST PROTOCOL" sections
+**Description:** `ls .vibecheck/truthpack` returns "No such file or directory." Both CLAUDE.md files instruct every agent to read `product.json`, `routes.json`, `env.json`, etc. from that path before writing code, and to treat disagreement with the truthpack as automatic hallucination. Since the directory doesn't exist, this instruction is currently unfollowable as written, and the mandated "Verified By VibeCheck" badge is being appended to responses (per instruction) without any truthpack file actually having been consulted, because none exist to consult.
+**Update (re-verified this pass):** `.vibecheck/` itself is not entirely absent — it exists with `flow/` (containing `planning-artifacts/` and `implementation-artifacts/` subdirs), `isl-studio/`, `provenance/`, plus loose files `last-score.json`, `registry-cache.json`, and `sync-queue.json`. So some vibecheck tooling state is present and apparently in active use. But none of the 13 named truthpack files (`product.json`, `monorepo.json`, `cli-commands.json`, `integrations.json`, `copy.json`, `error-codes.json`, `ui-pages.json`, `deploy.json`, `schemas.json`, `routes.json`, `env.json`, `auth.json`, `contracts.json`) exist anywhere under `.vibecheck/`, confirmed via direct listing this pass — `truthpack/` as a subdirectory simply was never created. This makes the finding slightly worse than "the tool was never run": the surrounding vibecheck infrastructure (`registry-cache.json`, `sync-queue.json`, an ISL studio directory) is live and being written to, yet the one artifact both CLAUDE.md files hinge every code-writing decision on was never generated.
+**Remediation:** Either regenerate the truthpack (`vibecheck truthpack`, per the doc's own escape hatch: "Run `vibecheck truthpack` to regenerate if you believe it is outdated") or remove/soften the mandatory protocol language until the directory is restored, so agents aren't instructed to silently comply with an unfulfillable rule.
 
-### 11. `docs/OPEN_ITEMS.md` — the most important gap register in the repo — isn't linked from the README — LOW
-- **Location:** `README.md` (no reference to `docs/OPEN_ITEMS.md`)
-- **Description:** `docs/OPEN_ITEMS.md` is dated 2026-08-04 and is a genuinely
-  current, honest account of what's left before launch: 44 modules with
-  unguarded multi-statement writes, frontend has "0 ARIA, 0 error boundaries"
-  across 71 components, 92 unported v43 routes, DPI integrations (ONDC, Aadhaar,
-  DigiLocker, Agmarknet, IMD, ISRO) "all zero," and more. None of this is
-  discoverable from the root README, which instead presents a "Roadmap" section
-  with only high-level, optimistic phase markers (✅/🔄/⏳) that don't surface
-  these specifics.
-- **Remediation:** Link `docs/OPEN_ITEMS.md` from the README's Roadmap or a new
-  "Known Issues" section so it isn't only found by browsing `docs/`.
+### 11. [LOW] `CLAUDE.md` "Known Problems" section still lists issues that recent commits describe as fixed
+**Location:** `CLAUDE.md` "KNOWN PROBLEMS" section ("Frontend routes not added for new components", "Services not initialized on startup"); cf. `.ai/architecture/CURRENT_IMPLEMENTATION.md` "Integration Issues" (same claims) and `.ai/tasks/ACTIVE.md` entries describing route-wiring work as done, plus commit `2ef9fa06` ("unblock aiBackboneService boot, wire admin page")
+**Description:** The static docs list "frontend routes not added" and "services not initialized on startup" as open problems, while `.ai/tasks/ACTIVE.md` and recent commit messages describe specific instances of exactly this class of work being completed (route wiring, service boot unblocking). Without a per-item resolution log, it's not possible to tell whether the *specific* routes/services named in `CLAUDE.md` are still broken or whether the class of problem was fixed generally and the doc just wasn't touched.
+**Remediation:** Either close out the specific items in `CLAUDE.md`/`CURRENT_IMPLEMENTATION.md` that `.ai/tasks/ACTIVE.md` shows as done, or convert "Known Problems" into a dated log (issue / opened / closed) instead of a static list that silently rots.
 
 ## Metrics
 
-| Metric | Value |
-|---|---|
-| Root-level README/doc files reviewed directly | README.md, README-DESKTOP.md, docs/OPEN_ITEMS.md, backend/.env.example, backend/_removed_2026-08-04/README.md, afrera/README.md |
-| Module READMEs scanned | 150 / 150 (`backend/src/modules/M0**/README.md`) |
-| Module READMEs with literal `\n` corruption | 150 / 150 |
-| Module READMEs self-reporting `Status: ABSENT` | 49 / 150 |
-| Backend `.env.example` variables (generated from code scan) | ~40 across 8 sections |
-| Of those, covered by root README's setup walkthrough | ~12 (missing OAuth, Twilio, ERP, secrets/security vars) |
-| Env vars in README not found anywhere in backend code | 1 (`ANTHROPIC_API_KEY`) |
-| `frontend/.env.example` present | No (0 files) |
-| `openapi.json` declared paths | 567 (generator script exists at `backend/scripts/generate-openapi.js` but is not wired into `package.json` scripts or CI, so drift is not automatically caught) |
-| `backend/src/database/*.sql` schema files vs. README's "the schema" reference | 31 files vs. 1 referenced |
-| CI workflow doc/config contradictions found | 1 (`docs/OPEN_ITEMS.md` vs `.github/workflows/ci.yml` re: `validate-resolution-rules.js`) |
-| Findings total | 11 (1 high, 6 medium, 4 low) |
+| Metric | Docs claim | Actual (verified this audit) | Source doc(s) |
+|---|---|---|---|
+| Frontend pages | 123/150 (82%) | 387 `.jsx` files under `frontend/src/pages` | CLAUDE.md, PROJECT_CONTEXT.md, CURRENT_IMPLEMENTATION.md |
+| Backend route files | 107 | 338 files; 224 `app.use(` mounts in `index.js` | CLAUDE.md, PROJECT_CONTEXT.md, CODEBASE_MAP.md |
+| Backend services | 140+ | 613 files under `backend/src/services` (610 at first pass this morning; +3 from untracked `clinicalNutritionDecisionSupportService.js`/`.test.js`, `medicalCodingReferenceService.js`) | CLAUDE.md, PROJECT_CONTEXT.md |
+| DB migrations | 96 / 96+ / 200 (inconsistent between docs) | 418 `.sql` files (415 at first pass; +3 from untracked `9998_ai_response_feedback.sql` and two `9999_*.sql` files) | CLAUDE.md, PROJECT_CONTEXT.md, CURRENT_IMPLEMENTATION.md, CODEBASE_MAP.md |
+| DB tables | 523+ (marked "PENDING/not executed" in one doc, stated as fact in another) | Unverified against a live DB; PostgreSQL not running | CLAUDE.md, PROJECT_CONTEXT.md, CURRENT_IMPLEMENTATION.md |
+| Test coverage | 0%, 0/150 modules have test evidence | 809 `*.test.js` files exist (792 at first pass); 726 are auto-generated no-op stubs (`test0`–`test725` in `backend/src/__tests__/`, unchanged count); the remainder are real, substantive tests across auth, marketplace, insurance, decision engine, cold storage, logistics, governance/compliance audit, product reviews, AI backbone, and now clinical nutrition decision support | CLAUDE.md, PROJECT_CONTEXT.md, CURRENT_IMPLEMENTATION.md |
+| Library cards | 524 cards, `00_CATALOG/01_MODULES/99_AUDIT` structure | 11 files total in `_EBDESIGN_LIBRARY` (2 `.md`); ~45 top-level dirs, none named `00_CATALOG` | CLAUDE.md, PROJECT_CONTEXT.md |
+| Core docs freshness | "Last Updated: 24 August 2026" | 78 commits since 2026-08-25; latest commit 2026-09-07 | CLAUDE.md, PROJECT_CONTEXT.md, CURRENT_IMPLEMENTATION.md, CODEBASE_MAP.md |
+| `.vibecheck/truthpack/` | Mandated as "SINGLE Source of ALL Truth" | `.vibecheck/` exists (`flow/`, `isl-studio/`, `provenance/`, cache/queue JSON files) and is actively written to, but no `truthpack/` subdirectory and none of the 13 named JSON files exist anywhere in it | CLAUDE.md, .claude/CLAUDE.md |
+
+**Findings by severity:** HIGH: 4 · MEDIUM: 4 · LOW: 3
+**Overall status:** FAIL — the documents new agents are told to read first (`CLAUDE.md`, `.ai/PROJECT_CONTEXT.md`, `.ai/architecture/CURRENT_IMPLEMENTATION.md`, `.ai/architecture/CODEBASE_MAP.md`) materially misstate current repo state on every headline metric checked, in a mix of understatement (pages, routes, services, migrations) and a claim that is now flatly wrong in the corrective direction too (test coverage — both "more real tests exist than claimed" and "most of the new test files are content-free stubs" are true simultaneously, and the docs currently capture neither nuance).

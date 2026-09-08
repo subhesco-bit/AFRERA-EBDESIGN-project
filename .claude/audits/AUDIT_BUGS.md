@@ -1,427 +1,232 @@
 ---
 agent: bug-auditor
 status: fail
-findings: 14
+findings: 4
 ---
 
-# Bug Audit — Devin's 30 Aug 2026 Tier 1 Batch (M025–M030 + touched files)
+# Bug Audit — 2026-09-08 (current working-tree diff, `audit/ui-api-fix`)
 
 ## Summary
 
-Every one of the six new "Tier 1" backend modules (M025 Advanced Analytics, M026 Predictive
-Intelligence, M027 IoT Integration, M028 Blockchain Verification, M029 Digital Twin, M030
-Enterprise Integration) is non-functional end-to-end, for two independent, compounding reasons:
+Re-ran `git status`/`git diff` fresh at the start of this pass (per instructions — other
+sessions are actively editing this repo). The uncommitted change set at the moment of this
+audit: `backend/src/index.js`, `backend/src/routes/{aiAgentRoutes,coldStorageRoutes,
+healthRoutes}.js`, deletion of `backend/src/routes/commerce/sellerRankingRoutes.js`,
+`backend/src/services/{aiAgentService,aiFeedbackService}.js`,
+`backend/src/services/commerce/productReviewService.js`,
+`backend/src/services/legacy/{aiAgenticCompanionService,aiBackboneService,coldStorageService,
+conversationalAIService,productReviewService}.js`, `backend/src/services/productReviewService.js`,
+and `frontend/src/pages/{AuditReportPage,ColdStorageDashboardPage,PremiumMarketplacePage}.jsx`,
+plus several new untracked test files and `backend/src/config/productionConfig.js`.
 
-1. **Every route in all 9 touched/created route files calls `apiResponseHandler.sendSuccess()` /
-   `apiResponseHandler.sendError()`, but the middleware only exports `success()` / `error()`.**
-   Every single request to any of these endpoints — new or pre-existing — throws
-   `TypeError: apiResponseHandler.sendSuccess is not a function` before the service layer's own
-   error handling ever runs.
-2. **The new services query tables and columns that do not exist anywhere in the 96 migrations**
-   (`digital_twins`, `twin_simulations`, `enterprise_integrations`, `payment_records`,
-   `integration_sync_logs`, `iot_sensor_data`, `analytics_data`, `harvests`, `farms`), or that
-   exist with an incompatible schema (`blockchain_transactions`, `iot_devices`, `products`,
-   `orders`, `crops`). Even if (1) were fixed, every DB-touching method in these six services
-   would throw `relation "..." does not exist` or `column "..." does not exist` at runtime.
+The prior audit (Devin's 30 Aug Tier 1 batch — `sendSuccess`/`sendError`, fabricated schema
+queries, the `routes.js` syntax error, etc.) is fully superseded; none of those files are in
+the current diff and none of those issues remain in what's touched now. This pass covers only
+what's actually uncommitted right now, and does not re-report anything already closed in
+`.ai/tasks/ACTIVE.md`.
 
-On top of that, the same `sendSuccess`/`sendError` rewrite was applied to **previously-working**
-routes (`farmerRoutes.js`, `cropManagementRoutes.js`, `marketplaceEnhancements.js`), turning
-working endpoints into broken ones — a direct regression against CLAUDE.md's "preserve existing
-functionality" rule.
-
-Separately, `frontend/src/config/routes.js` has a malformed object literal (orphaned properties
-not wrapped in `{ }`) left over from a botched edit, which is a JavaScript syntax error that will
-fail to build/parse — this alone is enough to prevent the frontend from booting at all,
-independent of anything above.
-
-The self-reported completion docs (`PRODUCTION_COMPLETION_REPORT.md` etc.) describe these modules
-as "production-level" / "complete" — none of them have ever been exercised against the real
-database or the real response-handler contract; none of the claims hold up.
+Verified: `node -c` clean on every modified backend `.js` file. Most of today's diff is
+legitimate, careful fix work (dedup of two dead `productReviewService.js` copies onto the
+canonical `legacy/productReviewService.js`, a genuine cold-storage service/route expansion with
+schema cross-checked against migration `3104_cold_storage_schema.sql`/`9998_cold_storage_
+temperature_compliance.sql` and matching, `eval()` removed from `aiAgentService.js`'s calculator
+tool, a real SSRF allowlist added to its `api_call` tool, an `AVG`/`AG` typo fix, a genuinely
+restored `router` export in `aiBackboneService.js` that mounting depends on, and honest
+`implemented:false`/`source:'fallback'` labeling replacing several previously-fabricated AI
+outputs). One new code path, however, is live but silently broken end-to-end due to a
+pre-existing migration collision, and one newly-wired frontend page surfaces a pre-existing
+backend filter bug that undermines its whole purpose.
 
 ## Findings
 
-### 1. [CRITICAL] `apiResponseHandler.sendSuccess`/`sendError` don't exist — every touched route 500s on every request
-**Location:** `backend/src/middleware/apiResponseHandler.js` (exports `success`, `error`, not
-`sendSuccess`/`sendError`) vs. every handler in:
-`backend/src/routes/advancedAnalyticsRoutes.js`, `predictiveIntelligenceRoutes.js`,
-`iotIntegrationRoutes.js`, `blockchainVerificationRoutes.js`, `digitalTwinRoutes.js`,
-`enterpriseIntegrationRoutes.js`, and the modified `farmerRoutes.js`, `cropManagementRoutes.js`,
-`marketplaceEnhancements.js`.
+### 1. [CRITICAL] New `generateFarmInsights()` (today's diff) is live at `GET /api/v1/ai-companion/insights/:farmId` but can never return real data — two separate pre-existing migration-collision bugs make every query inside it fail, silently swallowed into a fake "farm not found"
 
-The module exports:
+**Location:** `backend/src/services/legacy/aiAgenticCompanionService.js:635-696` (new
+`generateFarmInsights`), wired live via `setupRoutes()` at
+`backend/src/services/legacy/aiAgenticCompanionService.js:605` (`app.get('/api/v1/ai-companion/insights/:farmId', ...)`),
+itself mounted from `backend/src/index.js:1374` (`aiAgenticCompanionService.setupRoutes(app)`).
+Confirmed this is the only caller of the new method (`grep -rn generateFarmInsights backend/src`
+finds no other reference) and confirmed the route is genuinely reachable, not dead code.
+
+Today's rewrite replaced an honest empty-placeholder with real queries:
 ```js
-module.exports = { success, error, asyncHandler, validationError, notFoundError,
-  unauthorizedError, forbiddenError, paginationMetadata, ERROR_CODES };
+const farmResult = await getPostgreSQL().query(
+  'SELECT id, name, area, soil_type, current_status FROM farms WHERE id = $1', [farmId]);
+farm = farmResult.rows[0] || null;
+const plantingResult = await getPostgreSQL().query(
+  `SELECT cp.growth_stage, ... FROM crop_plantings cp JOIN crops c ON c.id = cp.crop_id
+   WHERE cp.farm_id = $1 AND cp.status = 'active' ...`, [farmId]);
 ```
-No `sendSuccess` or `sendError`. Every route handler in the 9 files above calls
-`apiResponseHandler.sendSuccess(res, data, message)` and
-`apiResponseHandler.sendError(res, message, status, code, details)` — methods that are
-`undefined` on the imported object. Calling `undefined(...)` throws a `TypeError` synchronously
-inside the handler's own `try/catch`, which itself calls `apiResponseHandler.sendError(...)` in
-the `catch` block — which *also* throws, because the same method doesn't exist. The result is an
-unhandled exception on essentially every request to any of these 9 route files (confirmed by
-`grep -rl "apiResponseHandler.sendSuccess\|apiResponseHandler.sendError" backend/src/routes/` →
-9 files, 0 of which the middleware supports).
+wrapped in a single `try { ... } catch (error) { logger.warn(...) }` that, on **any** error,
+silently falls through to `farm` staying `null` and the function returning
+`{ farm_id, found: false, source: 'fallback', message: 'No farm record found for this farmId.' }`
+— i.e. every SQL error here is indistinguishable from "this farmId genuinely doesn't exist."
 
-Also note the real `error(res, errorCode, customMessage, details)` signature expects `errorCode`
-to be a *key* into the `ERROR_CODES` map (e.g. `'VALIDATION_ERROR'`), but every call site passes
-`(res, message, statusNumber, codeString, details)` — a completely different argument shape. Even
-a naive rename to the real function names would still be wrong.
+Both queries are broken by a pre-existing migration collision, not by today's new code:
 
-**Remediation:** Either add `sendSuccess`/`sendError` aliases to `apiResponseHandler.js` matching
-the signature all 9 call sites actually use (`(res, data, message, status?)` /
-`(res, message, status, code, details)`), or revert all 9 route files to call the real
-`success`/`error` exports with the real signature. Add a route-level smoke test that hits every
-new endpoint and asserts it returns 2xx/4xx JSON rather than crashing, so this class of bug can't
-land silently again.
+- **`farms` table**: `backend/src/database/migrations/001_skeleton_complete_schema.sql:225`
+  declares `CREATE TABLE IF NOT EXISTS farms` with columns `farm_code, total_acreage, soil_type,
+  water_source, latitude, longitude, ...` — **no `name`, `area`, or `current_status` column**.
+  A second, later migration,
+  `backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_farms_crop_plantings_schema.sql:20`,
+  also does `CREATE TABLE IF NOT EXISTS farms`, this time *with* `name`, `area`, and
+  `current_status` — but since `migrate.js` runs files in `readdirSync().sort()` order
+  (`backend/src/database/migrate.js:67-69`), `001_...` runs first, creates the real table, and
+  the later `IF NOT EXISTS` on the same name silently no-ops. The columns
+  `generateFarmInsights()`'s first query selects (`name`, `area`, `current_status`) **never
+  exist on the real table**, so `SELECT id, name, area, soil_type, current_status FROM farms
+  WHERE id = $1` throws `column "name" does not exist` on every single call.
 
-### 2. [CRITICAL] Six new services query tables that don't exist anywhere in the 96 migrations
-**Location:** `backend/src/services/digitalTwinService.js`, `enterpriseIntegrationService.js`,
-`iotIntegrationService.js`, `advancedAnalyticsService.js`, `predictiveIntelligenceService.js`
-
-Confirmed via `grep -rli "CREATE TABLE.*<name>" backend/src/database/migrations/*.sql`:
-
-| Table referenced | Used in | Exists in migrations? |
-|---|---|---|
-| `digital_twins` | digitalTwinService (every method) | **No** |
-| `twin_simulations` | digitalTwinService.storeSimulationResults | **No** |
-| `enterprise_integrations` | enterpriseIntegrationService (every method) | **No** |
-| `payment_records` | enterpriseIntegrationService.storePaymentRecord | **No** |
-| `integration_sync_logs` | enterpriseIntegrationService.logSyncActivity/getRecentSyncActivity | **No** |
-| `iot_sensor_data` | iotIntegrationService.processDataBuffer/getRecentDeviceData/getAggregatedData | **No** |
-| `analytics_data` | advancedAnalyticsService.buildCustomQuery (generateCustomReport) | **No** |
-| `harvests` | predictiveIntelligenceService.getSeasonalRecommendations/getFarmerYieldHistory | **No** |
-| `farms` | digitalTwinService.verifyFarm/getFarmRealTimeData | **No** |
-
-Every async method in these five services that touches the DB will throw
-`relation "..." does not exist` the first time it runs against a real Postgres instance. This is
-not a "not yet executed migrations" situation — no migration for any of these tables exists to
-run in the first place.
-
-**Remediation:** Write actual migrations for these tables before wiring the services/routes, or
-mark these modules as scaffolds (they are not currently "production-level" by any definition) and
-gate them out of `index.js` mounting until schema exists.
-
-### 3. [CRITICAL] Existing tables are referenced with columns that don't exist — silent fabricated-schema mismatch
-**Location:** `backend/src/services/iotIntegrationService.js`, `blockchainVerificationService.js`,
-`advancedAnalyticsService.js`, `predictiveIntelligenceService.js`
-
-Cross-checked actual column lists against `backend/src/database/migrations/*.sql`:
-
-- **`iot_devices`** is defined three separate times with three incompatible schemas
-  (`015_advanced_features.sql`: `owner UUID`, `capabilities`, `metadata`; `031_iot_integration_schema.sql`:
-  UUID PK, `device_name`, `device_category`, `location_id`, `device_config`;
-  `3030_m030_farmer_advisory.sql`: `farmer_id INTEGER`, `capabilities`). **None of the three**
-  has a `specifications` column or a `registered_at` column, both of which
-  `iotIntegrationService.registerDevice()` inserts into:
+- **`crop_plantings` table** (second, independent failure, would matter even if the first were
+  fixed): the same `9999_..._farms_crop_plantings_schema.sql` migration declares
   ```sql
-  INSERT INTO iot_devices (device_id, device_type, farmer_id, location,
-    specifications, firmware_version, status, registered_at, last_active)
-  ```
-  This will fail with `column "specifications" does not exist` on every device registration.
-  `digitalTwinService.getIoTDataForEntity()` additionally queries `iot_devices WHERE entity_id = $1`
-  — no definition of `iot_devices` has an `entity_id` column either.
-
-- **`blockchain_transactions`** exists (`019_blockchain_traceability_schema.sql`) but with a
-  completely different, Ethereum-style schema: `transaction_hash`, `block_number`, `from_address`,
-  `to_address`, `gas_used`, `gas_price`, `status`. `blockchainVerificationService.js` reads/writes
-  `transaction_id`, `transaction_type`, `transaction_data` (JSONB), `block_height`, `block_hash` —
-  **none of these columns exist** on the real table. Every insert/select in
-  `storeTransaction`, `getProductTransactionHistory`, `getCurrentCustody`, `getBlockchainStats`
-  will fail.
-
-- **`products`** (`000_base_schema.sql`) has `name`, `base_price`, etc. — no `product_name`,
-  `farmer_id`, or `status` column. `blockchainVerificationService.verifyProduct()` selects
-  `id, product_name, farmer_id, status FROM products` — will fail immediately.
-
-- **`orders`** (`000_base_schema.sql`) has `user_id`, not `farmer_id`, and has no `region` column.
-  `advancedAnalyticsService` joins `orders o ON f.id = o.farmer_id` and filters
-  `o.region = $2` / `o.created_at ... AND o.region`; `predictiveIntelligenceService.getHistoricalDemandData`
-  filters `o.region = $2` too. All will fail with `column o.farmer_id does not exist`.
-
-- **`crops`** (`041_rural_life_os_schema.sql`) has `common_name`, `category`, `duration_days` —
-  no `farmer_id`, `crop_type`, `expected_yield_kg`, `quality_grade`, `growth_stage`,
-  `current_health`, `estimated_yield_kg`, `planting_date`, or `expected_harvest_date`, all of
-  which `advancedAnalyticsService`, `predictiveIntelligenceService`, and `digitalTwinService`
-  reference directly.
-
-**Remediation:** These services were written against an imagined schema, not the real one. Before
-enabling them, either write migrations that add the missing columns/tables, or rewrite the
-queries against the actual `products`/`orders`/`crops`/`iot_devices` schemas that already exist.
-
-### 4. [CRITICAL] `frontend/src/config/routes.js` — malformed object literal breaks the build
-**Location:** `frontend/src/config/routes.js:822-846` (`dashboardRoutes` array)
-
-```js
-  {
-    path: '/payment-processing',
-    component: PaymentProcessingPage,
-    title: 'Payment Processing - AFRERA',
-    description: 'Payment processing and transaction management',
-    keywords: 'payment, transaction, finance',
-    transition: 'fade',
-    role: 'farmer'
-  },
-    description: 'Corporate buyer portal',     // <-- orphaned, no opening `{`, no `path`/`component`
-    keywords: 'corporate, buyer, procurement',
-    transition: 'fade',
-    role: 'corporate'
-  },
-  {
-    path: '/logistics-provider',
+  CREATE TABLE IF NOT EXISTS crop_plantings (
     ...
-```
-Lines 832–836 are leftover properties from what was presumably a duplicate `CorporateBuyerPage`
-entry — the opening `{` and the `path`/`component` fields were deleted but the trailing
-properties and closing `},` were left behind. `description: 'Corporate buyer portal', ...` is not
-a valid array element (it's not wrapped in an object literal), so this is a JavaScript syntax
-error. Vite/esbuild will fail to parse this file, which means **the entire frontend fails to
-build** — this is not scoped to the Tier 1 dashboards, it takes down every route in the app.
+    crop_id UUID NOT NULL REFERENCES crops(id), -- the static catalog (041)
+    variety_id INTEGER REFERENCES regional_variety_directory(id), -- fixed to match 9999's INTEGER id
+    ...
+  ```
+  The comment shows the author was already aware of this exact class of bug and fixed it for
+  `variety_id` — but missed it for `crop_id`. `crops` has the identical `IF NOT EXISTS`
+  collision as `farms`: `001_skeleton_complete_schema.sql:255` declares
+  `CREATE TABLE IF NOT EXISTS crops (id SERIAL PRIMARY KEY, code, name, scientific_name,
+  category, ...)` (runs first, wins), while `041_rural_life_os_schema.sql:29`'s later
+  `CREATE TABLE IF NOT EXISTS crops (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), crop_code,
+  common_name, ...)` no-ops. The real `crops.id` is therefore `SERIAL`/`INTEGER`, not `UUID`.
+  Declaring `crop_id UUID NOT NULL REFERENCES crops(id)` against an `INTEGER` primary key is a
+  type mismatch Postgres rejects outright (`foreign key constraint ... cannot be implemented`),
+  so the `CREATE TABLE crop_plantings` statement itself fails during migration — the table
+  never gets created at all. `generateFarmInsights()`'s second query (`FROM crop_plantings cp
+  JOIN crops c ...`) would then fail with `relation "crop_plantings" does not exist` even on a
+  farm whose `farms` row *did* have the right columns.
 
-**Remediation:** Delete the orphaned fragment (lines 832–836) or wrap it back into a proper
-object if a "Corporate Buyer" duplicate entry was actually intended.
+**Net effect:** this brand-new, real, well-intentioned AI-insights endpoint cannot return real
+insights for any farm, ever, against the current migration set — and because both failure modes
+are caught by the same broad `catch` and mapped to `found: false`, callers get a *misleading*
+"no farm record found" instead of a diagnosable 500, which will make this much harder to notice
+in testing/QA than an outright crash.
 
-### 5. [HIGH] `advancedAnalyticsService.getPlatformAnalytics` — unconditional CROSS JOIN produces a Cartesian product
-**Location:** `backend/src/services/advancedAnalyticsService.js:141-154`
+**Remediation:** Fix the two collisions at the source rather than in this new caller: (a) add
+an idempotent repair migration (`ALTER TABLE farms ADD COLUMN IF NOT EXISTS name ...`, `... area
+...`, `... current_status ...`), following the exact precedent this repo already uses for the
+`roles` and `tender_bids` collisions; (b) resolve the `crops` collision explicitly — either
+change `crop_plantings.crop_id` to `INTEGER REFERENCES crops(id)` to match the table that
+actually wins, or (if a UUID-keyed crop catalog is actually wanted) rename/consolidate the two
+`crops` definitions so only one wins and it matches what `crop_plantings` expects. Also
+consider not swallowing schema errors (`column does not exist` / `relation does not exist`)
+into the same "not found" branch as a genuinely absent row — logging them as `logger.error`
+and returning a distinguishable `source: 'error'` would have caught this immediately instead of
+looking like normal behavior.
 
-```sql
-SELECT COUNT(DISTINCT f.id) as active_farmers, ...
-FROM farmers f
-CROSS JOIN buyers b
-CROSS JOIN orders o
-CROSS JOIN crops c
-WHERE o.created_at >= NOW() - INTERVAL '${timeRange}'
-```
-There is no join condition relating `f`, `b`, `o`, `c` to each other at all — this multiplies
-every farmer row by every buyer row by every order row by every crop row. On any non-trivial
-dataset (e.g. 1,000 farmers × 500 buyers × 50,000 orders × 10,000 crops) this query would attempt
-to materialize hundreds of trillions of rows before the `WHERE`/aggregate even applies, and would
-either hang the database or OOM the connection. Even ignoring performance, the resulting
-`COUNT(DISTINCT ...)` values would be meaningless once any two of these tables have more than one
-matching row, since counts get inflated proportionally to the cross-product size.
+### 2. [HIGH] Newly-wired `PremiumMarketplacePage.jsx` now calls a real endpoint whose filter defaults silently exclude every GI-tagged and organic product — undermining the page's whole premise
 
-**Remediation:** Replace the CROSS JOINs with independent scalar subqueries (or separate
-queries) per metric — there is no natural join key between farmers/buyers/orders/crops for a
-platform-wide summary.
+**Location:** `frontend/src/pages/PremiumMarketplacePage.jsx:467-499` (today's diff, now calls
+`GET /api/v1/ecommerce/listings`) → `backend/src/controllers/ecommerceController.js:52-64`
+(`getListings`) → `backend/src/services/ecommerceService.js:184-195` (`getMarketplaceListings`).
 
-### 6. [HIGH] SQL injection via string-interpolated `timeRange`/filter values
-**Location:** `backend/src/services/advancedAnalyticsService.js` (`getFarmerPerformanceAnalytics`,
-`getMarketTrendAnalytics`, `getPlatformAnalytics`, `buildWhereClause`, `buildCustomQuery`);
-`backend/src/services/predictiveIntelligenceService.js` (`getHistoricalDemandData`,
-`getMarketPricingData`)
-
-`timeRange` (a route query param, e.g. `req.query.timeRange`, default `'30d'`) is interpolated
-directly into SQL rather than parameterized:
+The controller always coerces these two filters to a boolean, never `undefined`:
 ```js
-AND o.created_at >= NOW() - INTERVAL '${timeRange}'
+gi_tagged: req.query.gi_tagged === 'true',
+organic: req.query.organic === 'true',
 ```
-and in `buildWhereClause`:
+When the frontend doesn't send `gi_tagged`/`organic` at all (the default "browse everything"
+view, and also `PremiumMarketplacePage`'s default tab before a user picks "organic" or "gi" from
+`filters.category`), these become `false`, not `undefined`. The service then does:
 ```js
-conditions.push(`${key} = '${value}'`);   // key/value come from req.body.filters
+if (gi_tagged !== undefined) { query += ` AND pl.gi_tagged = $${paramCount}`; params.push(gi_tagged); }
+if (organic !== undefined)  { query += ` AND pl.organic = $${paramCount}`;  params.push(organic); }
 ```
-and `buildCustomQuery`:
+Since `gi_tagged`/`organic` are *always* boolean (never `undefined`) coming out of the
+controller, both conditions are always true, so **every** call to this endpoint — the general
+marketplace listing page and the newly-wired Premium page alike — silently adds
+`AND pl.gi_tagged = false AND pl.organic = false` unless the caller explicitly opts in with
+`?gi_tagged=true`/`?organic=true`. `PremiumMarketplacePage`'s default landing view (no category
+selected) will therefore always return zero GI-tagged and zero organic products from the real
+API — exactly the products a "premium marketplace" should be leading with — silently falling
+back to the 6 hardcoded `mockProducts` only when the real call returns nothing, which will look
+like a config/data issue rather than the actual cause (a filter bug in a shared, otherwise-real
+endpoint).
+
+**Remediation:** In `ecommerceController.js`, only set `gi_tagged`/`organic` on the filters
+object when the query param is actually present (`req.query.gi_tagged !== undefined ? req.query.gi_tagged === 'true' : undefined`),
+so "not requested" round-trips as `undefined` through to the service's existing (correct)
+`!== undefined` check instead of colliding with the "explicitly want non-GI/non-organic" case.
+This is a pre-existing bug in files not touched today, but it's now directly exposed by, and
+undermines the purpose of, today's `PremiumMarketplacePage.jsx` change.
+
+### 3. [MEDIUM] SSRF allowlist for the `api_call` agent tool only applies in production
+
+**Location:** `backend/src/services/aiAgentService.js:150-171` (today's diff).
+
 ```js
-const selectClause = metrics.join(', ');   // metrics comes straight from req.body.metrics
-return { text: `SELECT ${selectClause} FROM analytics_data ${whereClause} ${groupClause}` };
-```
-`metrics`, `filters`, and `groupBy` are taken directly from `req.body` in
-`advancedAnalyticsRoutes.js`'s `POST /reports/custom` handler with no validation beyond "is an
-array" — this is a direct SQL injection vector (e.g. `timeRange: "1 day'; DROP TABLE farmers; --"`,
-or `metrics: ["1) UNION SELECT password FROM users --"]`).
-
-**Remediation:** Whitelist `timeRange` against a small enum (`'7d'|'30d'|'90d'|'1y'`) and convert
-to a parameterized interval, whitelist `groupBy`/`metrics` column names against a known set, and
-never interpolate user-controlled filter values into SQL text — use parameterized `$n` placeholders.
-
-### 7. [HIGH] `predictiveIntelligenceService.getEnvironmentalConditions` returns hardcoded fake weather data fed into yield predictions
-**Location:** `backend/src/services/predictiveIntelligenceService.js:282-291`
-
-```js
-async getEnvironmentalConditions(location) {
-  // In production, this would integrate with weather APIs
-  return {
-    temperature: 25,
-    humidity: 70,
-    rainfall: 120,
-    soilType: 'loam',
-    location
-  };
+const target = new URL(params.url);
+const allowedHosts = (process.env.AI_AGENT_ALLOWED_API_HOSTS || '')
+  .split(',').map(host => host.trim()).filter(Boolean);
+if (!['http:', 'https:'].includes(target.protocol)
+  || (process.env.NODE_ENV === 'production' && !allowedHosts.includes(target.hostname))) {
+  throw new Error('API destination is not allowlisted');
 }
 ```
-This is called from `predictCropYield()` for *every* farmer/crop/location, and its fixed output
-feeds directly into `applyYieldModel()`'s temperature/humidity/rainfall factors, which multiply
-the predicted yield and are then surfaced to the user as `predictedYield`, `yieldRange`,
-`confidence: 0.75` via `POST /api/predictive/yield`. Regardless of the actual farm's real
-location or season, every yield prediction uses the identical fake 25°C/70%/120mm inputs — the
-"confidence" score is not backed by any real variance in the underlying data. This is
-presented to farmers as an AI-powered, location-aware prediction; it is not.
+This is a real improvement over the prior code (which had no destination check at all), but the
+hostname allowlist is only enforced when `NODE_ENV === 'production'`. In any non-production
+environment (dev, staging, a locally-run instance, CI) the AI agent's `api_call` tool can still
+be pointed at an arbitrary URL, including internal/loopback addresses
+(`http://localhost:6379`, `http://169.254.169.254/...` for cloud metadata endpoints, etc.) —
+this is exactly the class of SSRF the allowlist is meant to close, just left open outside prod.
 
-**Remediation:** Either wire this to a real weather data source before exposing
-`/api/predictive/yield` to users, or clearly flag the response as using placeholder
-environmental data until that integration exists.
+**Remediation:** Enforce the allowlist unconditionally (falling back to a small, explicit local
+default such as `localhost`-only for dev if genuinely needed), or at minimum block link-local/
+loopback/private-range hosts regardless of `NODE_ENV`, so staging/dev environments aren't a
+softer target for the same class of bug this change was written to close.
 
-### 8. [MEDIUM] In-memory "blockchain" resets on every server restart, causing block-height collisions with historical DB data
-**Location:** `backend/src/services/blockchainVerificationService.js:12-17, 283-329`
+### 4. [LOW] `evaluateArithmetic()` rejects any expression starting with a unary minus
 
-```js
-constructor() {
-  this.chain = [];       // in-memory only, never loaded from DB
-  ...
-}
-createGenesisBlock() {   // called lazily whenever this.chain is empty
-  const genesisBlock = { height: 0, ... };
-  this.chain.push(genesisBlock);
-  return genesisBlock;
-}
-```
-`this.chain` is a plain in-process array that is never persisted or rehydrated from
-`blockchain_transactions` on startup. Every process restart re-creates a genesis block at
-`height: 0` and starts re-numbering blocks from 1, while `blockchain_transactions` in the DB
-(assuming issue #3's schema mismatch were fixed) still holds rows with the previous run's higher
-`block_height` values. `verifyChainIntegrity()` checks
-`current.blockHeight !== previous.blockHeight + 1` against historical rows spanning a restart —
-this will report chain-integrity failures for perfectly legitimate historical products purely
-because the process restarted. In a multi-instance deployment, each instance also has its own
-independent `this.chain`, so two instances mining "the same chain" concurrently would produce
-diverging block heights/hashes for the same logical ledger. This isn't a distributed ledger; it's
-untracked per-process state masquerading as one.
+**Location:** `backend/src/services/aiAgentService.js:13-57` (today's diff, replacing `eval()`
+in the `calculate` tool).
 
-**Remediation:** Either persist chain height/last-hash in the DB and rehydrate on boot (single
-source of truth), or stop presenting this as chain integrity verification and rely purely on the
-transaction log with sequence numbers assigned by the DB.
+The shunting-yard implementation has no concept of a unary operator — every `-`/`+` token found
+by the tokenizer is treated as binary. For an expression like `"-5+3"`: tokens are
+`['-', '5', '+', '3']`. Processing `'-'` first pushes it onto `operators` with the `values`
+stack still empty; when `'+'` is later reached (same precedence), `apply()` pops the pending
+`'-'` but only finds one value in the `values` stack (`5`), so `left` is `undefined` and the
+function throws `'Invalid arithmetic expression'` — a valid, useful expression is rejected. The
+same happens for a unary minus right after an opening paren, e.g. `"(-5+3)"`.
 
-### 9. [MEDIUM] `digitalTwinService.storeTwinState` silently discards the state it's told to store
-**Location:** `backend/src/services/digitalTwinService.js:739-744`
-
-```js
-storeTwinState(twinId, state) {
-  return db.query(
-    `UPDATE digital_twins SET last_synced = NOW() WHERE twin_id = $1`,
-    [twinId]
-  );
-}
-```
-The `state` parameter is never used — the function only bumps `last_synced`. `syncDigitalTwin()`
-calls this after computing `updatedState` and believes it has persisted the new twin state; in
-reality only the in-memory `this.activeTwins` Map (issue #2 notwithstanding, since `digital_twins`
-doesn't exist yet either) holds the updated state, which is lost on process restart. Any consumer
-reading twin state from the DB (e.g. `getLatestTwinState`) will never see anything beyond
-`specifications` as set at creation time.
-
-**Remediation:** Actually persist `state` (e.g. into a `current_state JSONB` column) or rename
-the method/log to make clear it does not store the computed state.
-
-### 10. [MEDIUM] `digitalTwinService.getLatestTwinState` always reinitializes as a `'farm'` twin, even for crop twins
-**Location:** `backend/src/services/digitalTwinService.js:754-762`
-
-```js
-getLatestTwinState(twinId) {
-  return db.query(`SELECT specifications FROM digital_twins WHERE twin_id = $1`, [twinId])
-    .then(result => {
-      const specs = result.rows[0]?.specifications;
-      return this.initializeTwinState('farm', specs || {});   // hardcoded 'farm'
-    });
-}
-```
-This is called from `runSimulation()` as a fallback when a twin isn't in the in-memory cache
-(e.g. after a restart). For a crop twin, this returns a state shaped like a farm twin (`area`,
-`soilHealth`, `resourceLevels`) instead of a crop twin (`growthStage`, `biomass`,
-`predictedYield`), which then feeds into `executeSimulation()`'s crop-oriented scenario builders
-(`simulateYieldPrediction` reads `state.predictedYield`, which won't exist on a mis-typed farm
-state) — silently producing `NaN`/`undefined`-based "yield" simulation results.
-
-**Remediation:** Read `entity_type` from the fetched row and pass it through instead of the
-hardcoded literal `'farm'`.
-
-### 11. [LOW] `iotIntegrationService.processDataBuffer` logs the buffer size after already clearing it
-**Location:** `backend/src/services/iotIntegrationService.js:255-261`
-
-```js
-this.dataBuffer = [];
-logger.info(`Processed ${this.dataBuffer.length} IoT data entries`);
-```
-`this.dataBuffer` is reset to `[]` on the line immediately before the log statement, so this will
-always log `"Processed 0 IoT data entries"` regardless of how much data was actually processed —
-misleading for anyone debugging buffer throughput from logs.
-
-**Remediation:** Capture `const processedCount = this.dataBuffer.length` before clearing, and log
-that.
-
-### 12. [LOW] `iotIntegrationService.checkThresholds` skips a configured threshold of `0`
-**Location:** `backend/src/services/iotIntegrationService.js:203, 214`
-
-```js
-if (threshold.min && reading.value < threshold.min) { ... }
-if (threshold.max && reading.value > threshold.max) { ... }
-```
-`threshold.min`/`threshold.max` are treated as falsy when they are legitimately `0` (e.g. a
-`ph_level` or `soil_moisture` lower bound of `0`), so a configured "alert if below 0" threshold
-is silently never checked. Minor, but a real logic bug for any sensor type whose valid minimum is
-zero.
-
-**Remediation:** Use `threshold.min !== undefined && threshold.min !== null` instead of a plain
-truthy check.
-
-### 13. [MEDIUM] `frontend/src/components/ui/common.jsx` `DataTable` renamed `column.render` → `column.cell`, silently breaking custom cell rendering on 21 existing pages
-**Location:** `frontend/src/components/ui/common.jsx:399` (was `column.render(...)`, now
-`column.cell(...)`)
-
-```diff
--  {column.render ? column.render(row[column.accessor], row) : row[column.accessor]}
-+  {column.cell ? column.cell(row[column.accessor], row) : row[column.accessor]}
-```
-`git grep -l "render:"` across `frontend/src/pages` shows 21 pre-existing pages
-(`SeedPlanningPage.jsx`, `ProjectSystemsPage.jsx`, `NurseryManagementPage.jsx`,
-`LandUseCarbonPage.jsx`, `LandManagementPage.jsx`, `FarmerVerificationPage.jsx`,
-`FarmerProfilePage.jsx`, `EnterpriseControlPage.jsx`, `CropMonitoringPage.jsx`,
-`CropCalendarPage.jsx`, `CostControlPage.jsx`, `ClimateMonitoringPage.jsx`,
-`AssetAccountingPage.jsx`, `CorridorEconomicsPage.jsx`, `ClimateWeatherPage.jsx`,
-`YieldManagementPage.jsx`, `RfqPage.jsx`, `LedgerPage.jsx`, `ExperienceLayerPage.jsx`,
-`CompliancePage.jsx`, `CompetitivePositionPage.jsx`) that pass `render:` in their column
-definitions to `DataTable`. None of them pass `cell:`. After this change, all custom cell
-renderers on all 21 pages silently stop being invoked — the table falls back to printing the raw
-`row[column.accessor]` value instead of the intended formatted/linked/badge cell. No error is
-thrown; the tables just render worse than before. This directly violates CLAUDE.md's "preserve
-existing functionality" rule for a component none of these pages' owners asked to have changed.
-
-**Remediation:** Support both prop names (`column.cell || column.render`) for backward
-compatibility, or revert the prop rename and update `DataTable` callers deliberately in the same
-change if `cell` is the intended long-term name.
-
-### 14. [MEDIUM] New Tier 1 dashboard pages call the backend with a literal `"current"` string instead of the real farmer ID
-**Location:** `frontend/src/pages/IoTMonitoringDashboard.jsx:20`
-(`fetch('/api/iot/farmers/current/devices')`), `frontend/src/pages/DigitalTwinPage.jsx:23`
-(`fetch('/api/digital-twin/farmers/current')`)
-
-Both pages hit routes shaped `GET /api/iot/farmers/:farmerId/devices` and
-`GET /api/digital-twin/farmers/:farmerId` with the literal path segment `current` rather than
-resolving the authenticated user's actual farmer ID (e.g. from an auth/user context hook). On the
-backend, `farmerId` is used directly in `WHERE farmer_id = $1` — if that column is typed `UUID`
-or `INTEGER` (per the various `iot_devices` schema variants), passing the string `'current'`
-would throw a Postgres type-cast error (`invalid input syntax for type uuid: "current"`); if it's
-a loosely-typed column it would just return zero rows. Either way, "my devices"/"my digital twin"
-never resolves to the signed-in farmer's real data.
-
-**Remediation:** Resolve the authenticated farmer's ID from auth context/store and interpolate
-the real value, the same way other pages in this codebase already do (e.g. see how existing
-farmer-scoped pages source `req.user.id`/context state rather than a placeholder string).
+**Remediation:** Handle unary `+`/`-` explicitly in the tokenizer/parser (e.g. treat a `-`/`+`
+as unary when it's the first token or immediately follows another operator or `(`, by inserting
+an implicit `0` before it, or by tagging it as a distinct unary-minus operator with higher
+precedence). Low severity since the tool is only reachable through the AI agent's own tool-call
+mechanism and the failure mode is a clean error rather than a wrong answer, but it's a real
+functional gap introduced while fixing the `eval()` security issue.
 
 ## Metrics
 
-- Files audited (full read): 13 backend files (6 services, 6 routes, 1 middleware), 2 frontend
-  files read in full (`realTimeService.jsx`, `routes.js` first 1463 lines), 4 additional frontend
-  files spot-checked (`AdvancedAnalyticsDashboard.jsx`, `IoTMonitoringDashboard.jsx`,
-  `BlockchainVerificationPage.jsx`, `DigitalTwinPage.jsx`), imports verified for
-  `EnhancedErrorBoundary.jsx`, `EnhancedFormValidator.jsx`, `AccessibilityEnhancements.jsx`,
-  `AdvancedUIPatterns.jsx`.
-- `git diff` reviewed for: `backend/src/index.js`, `farmerRoutes.js`, `cropManagementRoutes.js`,
-  `marketplaceEnhancements.js`, `frontend/src/services/api.js`, `frontend/src/components/ui/common.jsx`.
-  (`hrService.js`, `enhancedComponents.jsx` had no working-tree diff — nothing to audit there.)
-- Migrations cross-checked: `000_base_schema.sql`, `015_advanced_features.sql`,
-  `019_blockchain_traceability_schema.sql`, `031_iot_integration_schema.sql`,
-  `038_organic_traceability_schema.sql`, `041_rural_life_os_schema.sql`,
-  `3021_m021_farmer_registration.sql`, `3030_m030_farmer_advisory.sql`.
-- Findings: 14 total — 4 Critical, 4 High, 5 Medium, 1 Low.
-- Net effect: as committed, 0 of the 6 new Tier 1 backend modules can serve a single successful
-  request; the frontend cannot build at all due to finding #4; and 3 previously-working route
-  files were regressed by the same broken response-handler rewrite.
+- Files in the current uncommitted diff (`backend/src`, `frontend/src` scope): 17 modified/
+  deleted (`git diff --stat`), plus 8 new untracked backend files.
+- Full diffs read: `backend/src/index.js`, `backend/src/routes/{aiAgentRoutes,
+  coldStorageRoutes,healthRoutes}.js`, `backend/src/routes/commerce/sellerRankingRoutes.js`
+  (deletion), `backend/src/services/{aiAgentService,aiFeedbackService}.js`,
+  `backend/src/services/commerce/productReviewService.js`,
+  `backend/src/services/legacy/{aiAgenticCompanionService,aiBackboneService,coldStorageService,
+  conversationalAIService,productReviewService}.js`, `backend/src/services/productReviewService.js`,
+  `frontend/src/pages/{AuditReportPage,ColdStorageDashboardPage,PremiumMarketplacePage}.jsx`.
+- `node -c` run on every modified backend `.js` file (14 files): all clean.
+- Cross-checked against migrations: `3104_cold_storage_schema.sql`,
+  `9998_cold_storage_temperature_compliance.sql` (cold storage additions — all columns match,
+  no bug found), `001_skeleton_complete_schema.sql`, `041_rural_life_os_schema.sql`,
+  `9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_farms_crop_plantings_schema.sql` (finding #1).
+- Cross-checked frontend↔backend contract for: `coldStorageAPI.*` (7 methods) against
+  `coldStorageRoutes.js`/`coldStorageService.js` — all match, no bug found;
+  `auditComplianceAPI.generateComplianceReport`/`detectAuditAnomalies` against
+  `modules/M008/{routes,controller,service}.js` — response shape matches exactly, no bug found;
+  `PremiumMarketplacePage.jsx` against `ecommerceController.js`/`ecommerceService.js` — bug
+  found (finding #2).
+- Verified deletion of `backend/src/routes/commerce/sellerRankingRoutes.js` is safe: it was a
+  dead duplicate of the still-mounted `backend/src/routes/sellerRankingRoutes.js`
+  (`app.use('/api/v1/seller-ranking', ...)` in `index.js:998`); nothing else required the
+  deleted path.
+- Verified the two collapsed `productReviewService.js` files (root and `commerce/`) now
+  correctly re-export `services/legacy/productReviewService.js`, and that every method name
+  their callers (`routes/marketplaceEnhancements.js`, `routes/commerce/marketplaceEnhancements.js`)
+  invoke actually exists on the canonical implementation — no bug found.
+- Findings: 4 total — 1 Critical, 1 High, 1 Medium, 1 Low.
