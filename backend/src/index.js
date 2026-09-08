@@ -134,6 +134,18 @@ const goatRoutes = require('./routes/goatRoutes');
 const sheepRoutes = require('./routes/sheepRoutes');
 const pigRoutes = require('./routes/pigRoutes');
 const animalHealthRoutes = require('./routes/animalHealthRoutes');
+// System 10/11/28/29 — Soil/Nutrient/Land, Water/Irrigation, Vendor/
+// Procurement, Machinery/Village Ops. Route + service + migration files
+// existed but were never require()'d/mounted. NOTE: each module's migration
+// (m010/m011/m028/m029) collides with an earlier-sorted migration defining
+// the same table name with different columns (same bug class as the
+// batch-1 schema-gap fixes in .ai/tasks/ACTIVE.md) - the module's own
+// CREATE TABLE is a silent no-op, so live queries will fail against
+// missing columns until that's reconciled in a follow-up migration.
+const soilNutrientLandRoutes = require('./routes/soilNutrientLandRoutes');
+const waterIrrigationRoutes = require('./routes/waterIrrigationRoutes');
+const vendorProcurementRoutes = require('./routes/vendorProcurementRoutes');
+const machineryVillageOpsRoutes = require('./routes/machineryVillageOpsRoutes');
 // Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993).
 // enterpriseControlRoutes.js was deleted 2026-08-24: it imported
 // createWorkflow/createLegalCase/createRisk/etc from
@@ -827,6 +839,11 @@ app.use('/api/v1/poultry', poultryRoutes);
 app.use('/api/v1/goat', goatRoutes);
 app.use('/api/v1/sheep', sheepRoutes);
 app.use('/api/v1/pig', pigRoutes);
+// System 10/11/28/29 — see require()s above re: pending schema-collision fix
+app.use('/api/v1/soil-nutrient-land', soilNutrientLandRoutes);
+app.use('/api/v1/water-irrigation', waterIrrigationRoutes);
+app.use('/api/v1/vendor-procurement', vendorProcurementRoutes);
+app.use('/api/v1/machinery-village-ops', machineryVillageOpsRoutes);
 app.use('/api/v1/animal-health', animalHealthRoutes);
 // Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
 villageProfileService.setupRoutes(app);

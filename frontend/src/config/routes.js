@@ -197,6 +197,10 @@ const AIAgentPage = lazy(() => import('../pages/AIAgentPage'))
 const AIBrainPage = lazy(() => import('../pages/AIBrainPage'))
 const AISelfHealingPage = lazy(() => import('../pages/AISelfHealingPage'))
 const AIOperationIntelligencePage = lazy(() => import('../pages/AIOperationIntelligencePage'))
+const SoilNutrientLandPage = lazy(() => import('../pages/SoilNutrientLand/SoilManagement'))
+const WaterIrrigationManagementPage = lazy(() => import('../pages/WaterIrrigation/WaterManagement'))
+const VendorProcurementPage = lazy(() => import('../pages/VendorProcurement/VendorManagement'))
+const MachineryVillageOpsPage = lazy(() => import('../pages/MachineryVillageOps/MachineryManagement'))
 const NervousSystemPage = lazy(() => import('../pages/NervousSystemPage'))
 const LogisticsEnhancementPage = lazy(() => import('../pages/LogisticsEnhancementPage'))
 const EnterpriseAIPage = lazy(() => import('../pages/EnterpriseAIPage'))
@@ -1732,6 +1736,38 @@ export const managementRoutes = [
     title: 'AI Operation Intelligence - AFRERA',
     description: 'Real-time performance monitoring, optimization and anomaly detection',
     keywords: 'ai, operations, performance, optimization, anomaly detection',
+    transition: 'fade'
+  },
+  {
+    path: '/soil-nutrient-land',
+    component: SoilNutrientLandPage,
+    title: 'Soil, Nutrient & Land Mapping - AFRERA',
+    description: 'Soil sampling, analysis, nutrient recommendations, land mapping and soil health cards',
+    keywords: 'soil, nutrient, land mapping, soil health',
+    transition: 'fade'
+  },
+  {
+    path: '/water-irrigation',
+    component: WaterIrrigationManagementPage,
+    title: 'Water & Irrigation Management - AFRERA',
+    description: 'Water budgets, irrigation scheduling, water quality and rainwater harvesting',
+    keywords: 'water, irrigation, water budget, water quality',
+    transition: 'fade'
+  },
+  {
+    path: '/vendor-procurement',
+    component: VendorProcurementPage,
+    title: 'Vendor & Procurement Management - AFRERA',
+    description: 'Vendor onboarding, procurement requests, approvals and supply chain tracking',
+    keywords: 'vendor, procurement, supply chain',
+    transition: 'fade'
+  },
+  {
+    path: '/machinery-village-ops',
+    component: MachineryVillageOpsPage,
+    title: 'Machinery & Village Operations - AFRERA',
+    description: 'Machinery asset registry, maintenance scheduling, village operations and resource pools',
+    keywords: 'machinery, equipment, village operations',
     transition: 'fade'
   }
 ]
