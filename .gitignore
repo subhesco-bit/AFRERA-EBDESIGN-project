@@ -35,3 +35,9 @@ _SQL_INFRA/
 # (Desktop tools, PowerShell scripts) - regenerable, not source.
 FileAuditReport.csv
 FileAuditIndex.csv
+
+# Local scratch/backup content (2026-09-08): nested git worktree, cloned
+# repos, an installer binary, and forensic-audit backup snapshots - none of
+# it is project source, and the nested worktree would break `git add` if
+# ever swept in. ~2.1GB. Ignored, not deleted.
+New folder/
