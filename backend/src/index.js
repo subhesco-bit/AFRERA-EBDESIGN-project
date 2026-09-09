@@ -3,6 +3,7 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.loc
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const index = require('./routes/index.js');
+const devinRoutes = require('./routes/devinRoutes');
 const yieldManagement = require('./routes/yieldManagement.js');
 const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
 const weatherRoutes = require('./routes/weatherRoutes.js');
@@ -706,6 +707,7 @@ async function startup() {
     app.use('/api/aioperationintelligence', aiOperationIntelligenceRoutes);
     app.use('/api/aigateway', aiGatewayRoutes);
     app.use('/api/aicollaboration', aiCollaborationRoutes);
+    app.use('/api/devin', devinRoutes);
     app.use('/api/aibrain', aiBrainRoutes);
     app.use('/api/aibackbone', aiBackboneRoutes);
     app.use('/api/aiapproval', aiApprovalRoutes);
