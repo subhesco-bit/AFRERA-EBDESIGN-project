@@ -1,5 +1,6 @@
 const express = require('express');
 const logger = console; // TODO: use Winston/Pino logger
+const productImageAutoGenerationService = require('../services/productImageAutoGenerationService');
 
 const router = express.Router();
 
@@ -130,9 +131,26 @@ router.post('/', verifyToken, async (req, res) => {
 
     products.push(newProduct);
 
+    // Auto-queue for image generation
+    if (process.env.AUTO_GENERATE_ON_PRODUCT_ADD === 'true') {
+      try {
+        await productImageAutoGenerationService.onProductCreated({
+          id: newProduct.id,
+          name: newProduct.name,
+          category: newProduct.category,
+          description: newProduct.description,
+        });
+        logger.info(`Product ${newProduct.id} queued for auto-image generation`);
+      } catch (error) {
+        logger.error(`Failed to queue product for auto-generation: ${error.message}`);
+        // Don't fail the request if auto-gen fails
+      }
+    }
+
     res.status(201).json({
       success: true,
       data: newProduct,
+      autoImageGenerationQueued: process.env.AUTO_GENERATE_ON_PRODUCT_ADD === 'true',
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

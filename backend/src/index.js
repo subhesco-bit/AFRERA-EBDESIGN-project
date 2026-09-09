@@ -1,3 +1,7 @@
+// Load environment variables FIRST, before any other requires
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+
 const index = require('./routes/index.js');
 const yieldManagement = require('./routes/yieldManagement.js');
 const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
@@ -196,6 +200,10 @@ const aiModelsRoutes = require('./routes/aiModelsRoutes.js');
 const aiTrainingEvaluationRoutes = require('./routes/aiTrainingEvaluationRoutes.js');
 const infrastructureMonitoringRoutes = require('./routes/infrastructureMonitoringRoutes.js');
 const gdprComplianceRoutes = require('./routes/gdprComplianceRoutes.js');
+const productImageAutoGenerationRoutes = require('./routes/productImageAutoGenerationRoutes');
+const aiImageGenerationEnhancedRoutes = require('./routes/aiImageGenerationEnhancedRoutes');
+const ecommerceImageIntegrationRoutes = require('./routes/ecommerceImageIntegrationRoutes');
+const farmerImagePortalRoutes = require('./routes/farmerImagePortalRoutes');
 
 /**
  * EBDESIGN Platform Backend - Main Entry Point
@@ -205,7 +213,6 @@ const gdprComplianceRoutes = require('./routes/gdprComplianceRoutes.js');
  * Enables lazy loading, scales to enterprise requirements
  */
 
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -237,7 +244,9 @@ const {
   contentNegotiation
 } = require('./middleware/apiResponseStandardizer');
 const mfaMiddleware = require('./middleware/dual-use/mfaMiddleware');
+const { autoGenerateOnPageViewMiddleware, triggerAutoGenAfterCreateMiddleware } = require('./middleware/productImageAutoGenerationHooks');
 const loggingService = require('./services/loggingService');
+const productImageAutoGenerationService = require('./services/productImageAutoGenerationService');
 const libraryKnowledgeService = require('./services/libraryKnowledgeService');
 const websocketService = require('./services/websocketService');
 const { initializeAI } = require('./core/ai');
@@ -288,6 +297,13 @@ app.use(routeMonitoring);
 // Security enhancements
 app.use(securityHeaders);
 app.use(rateLimit);
+
+// Auto Image Generation Middleware
+if (process.env.AUTO_IMAGE_GENERATION === 'true') {
+  app.use(autoGenerateOnPageViewMiddleware);
+  app.use(triggerAutoGenAfterCreateMiddleware);
+  logger.info('🎨 Auto-generation middleware enabled');
+}
 
 // ============================================================================
 // STARTUP SEQUENCE
@@ -705,6 +721,13 @@ async function startup() {
 
     app.use('/health', healthRoutes);
     logger.info('✅ Health check routes mounted at /health');
+
+    // Auto Image Generation Routes
+    app.use('/api/auto-generation', productImageAutoGenerationRoutes);
+    app.use('/api/ai/images', aiImageGenerationEnhancedRoutes);
+    app.use('/api/commerce/images', ecommerceImageIntegrationRoutes);
+    app.use('/api/farmer/images', farmerImagePortalRoutes);
+    logger.info('🎨 Auto image generation routes mounted');
 
     // Standardized error handling must follow every route registration.
     app.use(standardizeErrorResponse);
