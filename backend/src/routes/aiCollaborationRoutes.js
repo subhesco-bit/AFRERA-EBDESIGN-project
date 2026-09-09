@@ -1,13 +1,40 @@
 /**
  * Root AI collaboration routes for Devin-Claude handoff state.
+ * SECURITY: All routes require authentication + Claude API verification
  */
 
 'use strict';
 
 const express = require('express');
 const aiCollaborationService = require('../services/claude/aiCollaborationService');
+const { authMiddleware } = require('../middleware/auth');
+const rateLimit = require('express-rate-limit');
 
 const router = express.Router();
+
+// Verify Claude API is configured
+const ensureClaudeConfigured = (req, res, next) => {
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
+  if (!apiKey) {
+    return res.status(503).json({
+      success: false,
+      error: 'Claude API not configured. Set ANTHROPIC_API_KEY in backend/.env',
+      code: 'CLAUDE_API_NOT_CONFIGURED'
+    });
+  }
+  next();
+};
+
+// Rate limiting for handoff operations
+const handoffLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10,
+  message: 'Too many handoff requests, please try again later',
+});
+
+// Apply authentication to all routes
+router.use(authMiddleware);
+router.use(ensureClaudeConfigured);
 
 router.get('/context', async (req, res) => {
   try {
@@ -61,7 +88,8 @@ router.get('/continuable/:currentAI', async (req, res) => {
   }
 });
 
-router.post('/handoff', async (req, res) => {
+// Handoff operations require additional rate limiting
+router.post('/handoff', handoffLimiter, async (req, res) => {
   try {
     const { from_ai: fromAI, to_ai: toAI, work_data: workData } = req.body || {};
     if (!fromAI || !toAI || !workData) {
@@ -74,7 +102,7 @@ router.post('/handoff', async (req, res) => {
   }
 });
 
-router.post('/handoff/:handoffId/accept', async (req, res) => {
+router.post('/handoff/:handoffId/accept', handoffLimiter, async (req, res) => {
   try {
     const acceptingAI = req.body?.accepting_ai;
     if (!acceptingAI) {
