@@ -1,0 +1,50 @@
+# EBDESIGN Code Ownership
+# Automatically request reviews from relevant teams
+
+# Default - everyone
+* @subhesco/admin
+
+# Backend services
+/backend/src/services/**       @subhesco/backend-team
+/backend/src/modules/**        @subhesco/backend-team
+/backend/src/routes/**         @subhesco/backend-team
+
+# Database & migrations
+/backend/src/database/**       @subhesco/dba @subhesco/backend-team
+*.sql                          @subhesco/dba
+
+# AI & core logic
+/backend/src/core/**           @subhesco/ai-team
+/backend/src/middleware/**     @subhesco/security
+
+# Frontend
+/frontend/src/pages/**         @subhesco/frontend-team
+/frontend/src/components/**    @subhesco/frontend-team
+/frontend/src/services/**      @subhesco/frontend-team
+
+# Infrastructure & DevOps
+/.github/**                    @subhesco/devops
+/docker-compose.yml            @subhesco/devops
+Dockerfile*                    @subhesco/devops
+
+# Environment & secrets
+.env*                          @subhesco/admin
+.env.example                   @subhesco/admin
+
+# Documentation
+*.md                           @subhesco/admin
+SECURITY.md                    @subhesco/security
+CONTRIBUTING.md                @subhesco/admin
+
+# Configuration files
+package.json                   @subhesco/backend-team @subhesco/frontend-team
+tsconfig.json                  @subhesco/backend-team @subhesco/frontend-team
+vite.config.js                 @subhesco/frontend-team
+jest.config.js                 @subhesco/backend-team @subhesco/frontend-team
+
+# M047-M099 Tier 1 Modules
+/backend/src/modules/M047/**   @subhesco/irrigation-team @subhesco/backend-team
+/backend/src/modules/M048/**   @subhesco/fertilizer-team @subhesco/backend-team
+/backend/src/modules/M050/**   @subhesco/crop-team @subhesco/backend-team
+/backend/src/modules/M093/**   @subhesco/pest-team @subhesco/backend-team
+/backend/src/modules/M099/**   @subhesco/weather-team @subhesco/backend-team
