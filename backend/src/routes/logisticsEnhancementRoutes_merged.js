@@ -9,7 +9,16 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { LOGISTICS_ROLES } = require('../middleware/roleGroups');
 const logisticsService = require('../services/legacy/logisticsEnhancementService');
 
-const router = express.Router();
+const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
 
 // ============================================================================
 // FLEET MANAGEMENT ROUTES

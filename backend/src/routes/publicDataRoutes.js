@@ -4,7 +4,16 @@ const express = require('express');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const service = require('../services/publicDataExtractorService');
 
-const router = express.Router();
+const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
 router.use(authMiddleware, requireRole('admin', 'organization_admin'));
 
 router.get('/sources', async (req, res, next) => {

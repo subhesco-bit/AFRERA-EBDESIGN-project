@@ -8,7 +8,16 @@ const financialService = require('../services/legacy/financialService');
 const operationsService = require('../services/legacy/operationsManagementService');
 const enterpriseService = require('../services/enterpriseIntegrationService');
 
-const router = express.Router();
+const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
 const developmentSubscriptions = new Map();
 const developmentOnly = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 

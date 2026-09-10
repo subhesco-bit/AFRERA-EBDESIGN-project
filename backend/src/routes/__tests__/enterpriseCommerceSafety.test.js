@@ -42,7 +42,16 @@ jest.mock('../../controllers/bulkOrderController', () => mockBulkController);
 const completeERPRoutes = require('../completeERPIntegrationRoutes');
 const bulkOrderRoutes = require('../bulkOrderRoutes');
 
-function appFor(router, path) {
+function appFor(
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router, path) {
   const app = express();
   app.use(express.json());
   app.use(path, router);

@@ -78,7 +78,16 @@ function requestGuard(req, res, next, mutationSignal = SIGNAL.LIVESTOCK_RECORD_C
   next();
 }
 
-function protectLivestockRouter(router, { requireWriteRole = false, signal = SIGNAL.LIVESTOCK_RECORD_CHANGED } = {}) {
+function protectLivestockRouter(
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router, { requireWriteRole = false, signal = SIGNAL.LIVESTOCK_RECORD_CHANGED } = {}) {
   ['id', 'animalId', 'flockId', 'femaleId', 'sowId'].forEach((name) => router.param(name, validateRouteParam));
   router.use(apiLimiter);
   router.use((req, res, next) => requestGuard(req, res, next, signal));

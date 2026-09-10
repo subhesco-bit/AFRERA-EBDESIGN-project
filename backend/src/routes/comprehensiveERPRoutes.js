@@ -24,7 +24,16 @@ const { authMiddleware } = require('../middleware/auth');
 const { requireRole } = require('../middleware/auth');
 const { protectRouter, requireHumanAuthorization } = require('./enterpriseRouteSupport');
 
-const router = express.Router();
+const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
 
 router.use(authMiddleware);
 protectRouter(router, { signal: 'enterprise.erp.changed' });

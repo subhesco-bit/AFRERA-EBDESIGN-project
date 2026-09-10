@@ -5,11 +5,19 @@
 
 const express = require('express');
 const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
 const analyticsService = require('../services/advancedAnalyticsService');
 const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/authMiddleware' does not exist in this repo - the real module is
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
-const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
+const { authMiddleware: authenticate } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
 const { apiLimiter } = require('../middleware/rateLimiter');
 
