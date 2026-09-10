@@ -14,8 +14,6 @@ const logMismatchFix = (oldEndpoint, newEndpoint) => {
     req.forwardedFrom = oldEndpoint;
     req.forwardedTo = newEndpoint;
     next();
-  };
-};
 
 // ALL 19+ ENDPOINT MISMATCHES FIXED
 

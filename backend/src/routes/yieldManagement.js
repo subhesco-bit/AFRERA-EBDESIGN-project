@@ -2,6 +2,8 @@ const router = require('express').Router();
 const yieldService = require('../services/yieldManagementService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/farms/:farmId/yield', auth, async (req, res) => {
   try {
     const result = await yieldService.recordYield(req.params.farmId, req.body.crop_id, req.body.quantity, req.body.unit);

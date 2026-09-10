@@ -2,13 +2,6 @@
  * Enterprise AI Routes
  *
  * 2026-08-10 audit: this 
-const requireRole = (...allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
-    next();
-  };
-};
 
 router used to call `services/enterpriseaiBackboneService.js`
  * exclusively. That file was 100% fabricated — every method (including every
@@ -36,6 +29,18 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { protectRouter, requireHumanAuthorization } = require('./enterpriseRouteSupport');
 
 const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
 
 router.use(authMiddleware);
 protectRouter(router, { advisory: true, signal: 'enterprise.ai.configuration.changed', params: { nodeId: true } });
@@ -236,11 +241,7 @@ function notImplementedPrediction(code, subject) {
         `${subject} forecasts. The previous implementation fabricated one from stub helpers that all ` +
         'returned empty/zero literals and has been removed.',
       code,
-    });
-  };
-}
-
-router.post('/predict-yield', notImplementedPrediction('ENTERPRISE_AI_PREDICT_YIELD_NOT_IMPLEMENTED', 'crop yield'));
+    });router.post('/predict-yield', notImplementedPrediction('ENTERPRISE_AI_PREDICT_YIELD_NOT_IMPLEMENTED', 'crop yield'));
 router.post('/predict-demand', notImplementedPrediction('ENTERPRISE_AI_PREDICT_DEMAND_NOT_IMPLEMENTED', 'demand'));
 router.post('/predict-price', notImplementedPrediction('ENTERPRISE_AI_PREDICT_PRICE_NOT_IMPLEMENTED', 'price'));
 

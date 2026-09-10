@@ -25,8 +25,6 @@ router.get('/articles', (req, res) => {
       tag: req.query.tag,
       language: req.query.language,
       sortBy: req.query.sortBy,
-    };
-
     const articles = knowledgeService.getArticles(filters);
     res.json({
       success: true,
@@ -124,8 +122,6 @@ router.get('/wiki', (req, res) => {
       status: req.query.status,
       parentId: req.query.parentId,
       authorId: req.query.authorId,
-    };
-
     const pages = knowledgeService.getWikiPages(filters);
     res.json({
       success: true,
@@ -206,8 +202,6 @@ router.get('/taxonomies', (req, res) => {
     const filters = {
       parentId: req.query.parentId,
       level: req.query.level,
-    };
-
     const taxonomies = knowledgeService.getTaxonomies(filters);
     res.json({
       success: true,
@@ -266,8 +260,6 @@ router.get('/search', (req, res) => {
     const query = req.query.q;
     const filters = {
       type: req.query.type,
-    };
-
     if (!query) {
       return res.status(400).json({
         success: false,

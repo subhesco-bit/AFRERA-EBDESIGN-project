@@ -17,6 +17,8 @@ const fin = require('../../services/finance/recoveredFinanceService');
 const { authMiddleware } = require('../../middleware/auth');
 const { resolveFarmerId } = require('../../middleware/resolveFarmerId');
 const { validateBody } = require('../../middleware/inputValidation');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 function fail(res, error) {
   const bad = /required|must|Unknown|No GST rule|differ/i.test(error.message);
@@ -39,10 +41,7 @@ function deprecatedFinance(canonicalPath) {
     canonical: canonicalPath,
     deprecatedOn: '2026-08-15',
     reference: "AFRERA_CLAUDE_BUILD_DIRECTIVE.md, Part 3C",
-  });
-}
-
-router.get('/gst/classify', deprecatedFinance('/api/v1/gst (gstService.resolveGSTRate)'));
+  });router.get('/gst/classify', deprecatedFinance('/api/v1/gst (gstService.resolveGSTRate)'));
 router.post('/gst/invoice', authMiddleware, deprecatedFinance('/api/v1/gst (gstService.generateGSTInvoice)'));
 
 // ---- Ledger (DEPRECATED 2026-08-15 — see AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C) -

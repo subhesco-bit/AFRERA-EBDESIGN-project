@@ -36,10 +36,7 @@ async function trackOneKey(key) {
     return { queriedKey: trimmed, matchType: 'vehicle_registration', vehicle: byVehicle.rows[0], note: 'This schema does not link shipments to a vehicle directly, so no shipment history is attached here.' };
   }
 
-  return { queriedKey: trimmed, matchType: 'not_found', shipment: null };
-}
-
-router.get('/', authMiddleware, async (req, res) => {
+  return { queriedKey: trimmed, matchType: 'not_found', shipment: null };router.get('/', authMiddleware, async (req, res) => {
   try {
     const { keys } = req.query;
     if (!keys) return res.status(400).json({ success: false, error: 'keys query parameter is required (comma-separated for multi-query)' });
@@ -53,5 +50,8 @@ router.get('/', authMiddleware, async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 });
+
+
+}
 
 module.exports = router;

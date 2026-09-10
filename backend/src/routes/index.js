@@ -191,3 +191,5 @@ module.exports.weatherAdvisory = require('./weatherAdvisory');
 module.exports.weatherRoutes = require('./weatherRoutes');
 module.exports.wikipediaRoutes = require('./wikipediaRoutes');
 module.exports.yieldManagement = require('./yieldManagement');
+
+module.exports = router;

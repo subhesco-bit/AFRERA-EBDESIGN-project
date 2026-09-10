@@ -8,16 +8,20 @@ const financialService = require('../services/legacy/financialService');
 const operationsService = require('../services/legacy/operationsManagementService');
 const enterpriseService = require('../services/enterpriseIntegrationService');
 
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const developmentSubscriptions = new Map();
 const developmentOnly = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
@@ -30,18 +34,13 @@ const operationResources = {
   inputs: operationsService.inputConsumption,
   productivity: operationsService.farmProductivity,
   kpis: operationsService.farmOperationsDashboard,
-};
-
 function rejectDurability(res) {
   return res.status(501).json({
     success: false,
     implemented: false,
     error: 'Notifications persistence is not configured',
     message: 'Development-only in-memory notification adapter is disabled outside test/development.',
-  });
-}
-
-router.get('/financial/overview', authMiddleware, resolveFarmerId, async (req, res, next) => {
+  });router.get('/financial/overview', authMiddleware, resolveFarmerId, async (req, res, next) => {
   try {
     const [loans, advances] = await Promise.all([
       financialService.getFarmerLoans(req.farmerId, req.query),

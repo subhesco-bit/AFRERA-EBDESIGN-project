@@ -19,7 +19,6 @@ router.get('/', authenticate, async (req, res) => {
       farmer_id: req.query.farmer_id,
       honey_type: req.query.honey_type,
       status: req.query.status,
-    };
     const apiculture = await apicultureService.getAllApiculture(filters);
     res.json({ success: true, data: apiculture });
   } catch (error) {

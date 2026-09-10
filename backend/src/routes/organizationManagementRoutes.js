@@ -11,16 +11,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const organizationManagementService = require('../services/legacy/organizationManagementService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { rateLimiters } = require('../middleware/rateLimit');
@@ -33,28 +37,22 @@ const requestId = (req) => req.get('x-correlation-id') || `organization-${Date.n
 const fail = (req, res, error, operation) => {
   const id = requestId(req);
   logger.error(`organizationManagementRoutes:${operation}`, { error: error.message, requestId: id });
-  return res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR', requestId: id });
-};
-const validId = (req, res, next) => {
+  return res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR', requestId: id });const validId = (req, res, next) => {
   if (typeof req.params.id !== 'string' || req.params.id.length < 1 || req.params.id.length > 128) return res.status(400).json({ success: false, error: 'Organization id is invalid', code: 'INVALID_INPUT' });
   next();
-};
 const body = (req, res, next) => {
   if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) return res.status(400).json({ success: false, error: 'Request body must be an object', code: 'INVALID_INPUT' });
   next();
-};
 const createBody = (req, res, next) => {
   if (!req.body.name || typeof req.body.name !== 'string' || req.body.name.length > 200 ||
       (req.body.industry !== undefined && (typeof req.body.industry !== 'string' || req.body.industry.length > 100)) ||
       (req.body.size !== undefined && (typeof req.body.size !== 'string' || req.body.size.length > 50))) return res.status(400).json({ success: false, error: 'Organization payload is invalid', code: 'INVALID_INPUT' });
   next();
-};
 const updateBody = (req, res, next) => {
   if (!Object.keys(req.body).length || (req.body.name !== undefined && (typeof req.body.name !== 'string' || req.body.name.length > 200)) ||
       (req.body.structure !== undefined && (typeof req.body.structure !== 'object' || Array.isArray(req.body.structure))) ||
       (req.body.config !== undefined && (typeof req.body.config !== 'object' || Array.isArray(req.body.config)))) return res.status(400).json({ success: false, error: 'Organization update is invalid', code: 'INVALID_INPUT' });
   next();
-};
 const admin = [rateLimiters.api, authMiddleware, requireRole('admin')];
 const writeAdmin = [rateLimiters.write, authMiddleware, requireRole('admin')];
 

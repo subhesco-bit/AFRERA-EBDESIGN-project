@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const videoService = require('../services/videoAnalyticsService');
 
+const router = express.Router();
+
 router.post('/video/:videoId/analyze/:type', async (req, res) => {
   try {
     const result = await videoService.analyzeVideo(req.params.videoId, req.params.type);

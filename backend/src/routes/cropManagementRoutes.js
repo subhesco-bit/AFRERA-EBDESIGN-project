@@ -16,16 +16,20 @@ const {
 } = require('../services/legacy/cropManagementService');
 
 function crudRouter(service) {
-  const 
+  const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
   router.get('/', async (req, res) => {
     try {
       const items = (await service.list(req.query)).items;
@@ -71,10 +75,7 @@ router = express.Router();
       return apiResponseHandler.sendError(res, 'Failed to delete item', 500, 'SERVER_ERROR', e.message);
     }
   });
-  return router;
-}
 
-const router = express.Router();
 const routes = {
   cropRegistrationRoutes: crudRouter(cropRegistration),
   cropVarietyRoutes: crudRouter(cropVariety),
@@ -82,6 +83,4 @@ const routes = {
   nurseryManagementRoutes: crudRouter(nurseryManagement),
   sowingManagementRoutes: crudRouter(sowingManagement),
   cropMonitoringRoutes: crudRouter(cropMonitoring),
-};
-
 module.exports = router;

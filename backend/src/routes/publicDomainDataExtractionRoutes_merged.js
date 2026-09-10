@@ -22,8 +22,6 @@ router.get('/data-sources', (req, res) => {
       country: req.query.country,
       status: req.query.status,
       category: req.query.category
-    };
-    
     const sources = publicDomainDataExtractionService.getDataSources(filters);
     res.json({
       success: true,
@@ -120,8 +118,6 @@ router.get('/extraction-jobs', (req, res) => {
     const filters = {
       status: req.query.status,
       sourceId: req.query.sourceId
-    };
-    
     const jobs = publicDomainDataExtractionService.getExtractionJobs(filters);
     res.json({
       success: true,
@@ -222,8 +218,6 @@ router.get('/processed-data/:jobId', (req, res) => {
       maxAmount: req.query.maxAmount ? parseFloat(req.query.maxAmount) : null,
       year: req.query.year ? parseInt(req.query.year) : null,
       state: req.query.state
-    };
-    
     const data = publicDomainDataExtractionService.getProcessedData(req.params.jobId, filters);
     res.json({
       success: true,
@@ -313,8 +307,6 @@ router.get('/subsidies', (req, res) => {
       state: req.query.state,
       ministry: req.query.ministry,
       verified: req.query.verified === 'true'
-    };
-    
     const subsidies = publicDomainDataExtractionService.getSubsidies(filters);
     res.json({
       success: true,
@@ -511,8 +503,6 @@ router.get('/compliance', (req, res) => {
     const filters = {
       sourceId: req.query.sourceId,
       legalBasis: req.query.legalBasis
-    };
-    
     const records = publicDomainDataExtractionService.getComplianceRecords(filters);
     res.json({
       success: true,

@@ -2,6 +2,8 @@ const router = require('express').Router();
 const iotService = require('../services/iotSensorsService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/iot/sensors/:sensorId/reading', auth, async (req, res) => {
   try {
     const result = await iotService.recordSensorData(req.params.sensorId, req.body.reading);

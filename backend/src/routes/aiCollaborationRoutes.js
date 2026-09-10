@@ -23,8 +23,6 @@ const ensureClaudeConfigured = (req, res, next) => {
     });
   }
   next();
-};
-
 // Rate limiting for handoff operations
 const handoffLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
@@ -141,5 +139,8 @@ router.get('/report', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+
+}
 
 module.exports = router;

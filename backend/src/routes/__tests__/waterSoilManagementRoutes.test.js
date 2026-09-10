@@ -1,4 +1,18 @@
 const express = require('express');
+const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
+
 const request = require('supertest');
 
 const mockWaterService = { list: jest.fn(), get: jest.fn(), create: jest.fn(), update: jest.fn(), remove: jest.fn() };
@@ -86,3 +100,5 @@ test('emits correlated signals for representative water and soil mutations', asy
   expect(emittedSignals[1][0]).toBe('agronomy.soil.record_changed');
   expect(emittedSignals[1][2]).toEqual(expect.objectContaining({ correlationId: 'soil-1' }));
 });
+
+module.exports = router;

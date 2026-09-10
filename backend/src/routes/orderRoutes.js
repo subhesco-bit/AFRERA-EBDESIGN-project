@@ -16,10 +16,7 @@ function verifyToken(req, res, next) {
     return res.status(401).json({ success: false, error: 'Unauthorized' });
   }
   req.userId = token;
-  next();
-}
-
-const orders = [];
+  next();const orders = [];
 
 // GET /orders
 router.get('/', verifyToken, async (req, res) => {
@@ -87,8 +84,6 @@ router.post('/', verifyToken, async (req, res) => {
       status: 'pending',
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
-
     orders.push(newOrder);
 
     res.status(201).json({

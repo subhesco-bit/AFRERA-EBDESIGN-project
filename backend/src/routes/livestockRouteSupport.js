@@ -73,33 +73,29 @@ function requestGuard(req, res, next, mutationSignal = SIGNAL.LIVESTOCK_RECORD_C
       signalBus.emitSignal(mutationSignal, { method: req.method, path: req.path, data: body && body.data }, { severity: SEVERITY.INFO, source: 'livestock_routes', entityId: req.params.id || null, correlationId: requestId(req) });
     }
     return originalJson(body);
-  };
   logger.info('livestockRouteSupport:request', { method: req.method, path: req.path, requestId: requestId(req) });
   next();
 }
 
 function protectLivestockRouter(
-const requireRole = (...allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
-    next();
-  };
-};
 
 router, { requireWriteRole = false, signal = SIGNAL.LIVESTOCK_RECORD_CHANGED } = {}) {
   ['id', 'animalId', 'flockId', 'femaleId', 'sowId'].forEach((name) => router.param(name, validateRouteParam));
   router.use(apiLimiter);
   router.use((req, res, next) => requestGuard(req, res, next, signal));
   if (requireWriteRole) router.use((req, res, next) => req.method === 'GET' ? next() : authMiddleware(req, res, () => requireRole(...FARM_OPERATIONS_ROLES)(req, res, next)));
-  return router;
-}
+  return router;const router = express.Router();
 
-const router = express.Router();
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
 
 module.exports = {
   router,
   protectLivestockRouter,
   requestGuard,
-  fail,
-};
+  fail,module.exports = router;

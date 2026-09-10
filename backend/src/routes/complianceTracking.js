@@ -2,6 +2,8 @@ const router = require('express').Router();
 const complianceService = require('../services/complianceTrackingService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/compliance/track/:entityId/:regulationId', auth, async (req, res) => {
   try {
     const result = await complianceService.trackCompliance(req.params.entityId, req.params.regulationId);

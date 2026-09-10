@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const climateService = require('../services/climateAdvisoryService');
 
+const router = express.Router();
+
 router.get('/farms/:farmId/climate-advisory', async (req, res) => {
   try {
     const result = await climateService.getClimateAdvisory(req.params.farmId);

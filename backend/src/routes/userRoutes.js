@@ -17,10 +17,7 @@ function verifyToken(req, res, next) {
     return res.status(401).json({ success: false, error: 'Unauthorized' });
   }
   req.userId = token;
-  next();
-}
-
-const userProfiles = new Map();
+  next();const userProfiles = new Map();
 
 function getProfile(userId) {
   if (!userProfiles.has(userId)) {
@@ -123,8 +120,6 @@ router.post('/addresses', verifyToken, async (req, res) => {
       zipCode,
       country: country || 'India',
       isDefault: isDefault || profile.addresses.length === 0,
-    };
-
     profile.addresses.push(newAddress);
 
     res.status(201).json({

@@ -90,8 +90,6 @@ router.get('/database/grid-tariffs/:region', async (req, res) => {
         industrial: 7.1,
         lastUpdated: '2026-08-01',
       },
-    };
-
     const regionTariff = tariffs[region];
     if (!regionTariff) {
       return res.status(404).json({ error: `No tariff data for region: ${region}` });
@@ -175,8 +173,6 @@ router.get('/metrics/:village_id', async (req, res) => {
       energy_demand_average_kw: 75,
       population: 5000,
       agricultural_area_hectares: 1200,
-    };
-
     res.status(200).json({
       village_id,
       metrics,

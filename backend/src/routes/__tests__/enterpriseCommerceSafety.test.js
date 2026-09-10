@@ -1,4 +1,18 @@
 const express = require('express');
+const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
+
 const request = require('supertest');
 
 const mockSignals = [];
@@ -15,8 +29,6 @@ const mockBulkController = {
   submitQuotation: jest.fn(),
   acceptQuotation: jest.fn(),
   cancelBulkOrder: jest.fn(),
-};
-
 jest.mock('../../middleware/auth', () => ({
   authMiddleware: (req, res, next) => {
     if (!req.headers.authorization) return res.status(401).json({ success: false, error: 'Unauthorized' });
@@ -43,13 +55,6 @@ const completeERPRoutes = require('../completeERPIntegrationRoutes');
 const bulkOrderRoutes = require('../bulkOrderRoutes');
 
 function appFor(
-const requireRole = (...allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
-    next();
-  };
-};
 
 router, path) {
   const app = express();
@@ -93,3 +98,5 @@ test('rejects unbounded commerce pagination before controller access', async () 
   await request(appFor(bulkOrderRoutes, '/bulk')).get('/bulk?limit=101').set('Authorization', 'Bearer test').expect(400);
   expect(mockBulkController.getBulkOrderAnalytics).not.toHaveBeenCalled();
 });
+
+module.exports = router;

@@ -321,8 +321,6 @@ function getAlternativeEndpoints(requestType) {
     advisory: ['/api/v1/ai/coordinate', '/api/v1/ai/copilot'],
     ecommerce: ['/api/v1/ai/copilot', '/api/v1/ai/coordinate'],
     voice: ['/api/v1/ai/conversational', '/api/v1/ai/coordinate'],
-  };
-
   return alternatives[requestType] || ['/api/v1/ai/coordinate'];
 }
 

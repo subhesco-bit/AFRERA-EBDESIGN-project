@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const p11 = require('../services/phase11');
 const auth = require('../middleware/auth');
+const router = express.Router();
+
 router.post('/sso/:id', auth, async (req, res) => { try { res.json(await p11.sso(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
 router.post('/mfa/:id', auth, async (req, res) => { try { res.json(await p11.mfa(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
 router.post('/ldap/:id', auth, async (req, res) => { try { res.json(await p11.ldap(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });

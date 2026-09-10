@@ -22,10 +22,7 @@ function emitMutation(req, operation, item, signalType, source) {
   logger.info(`${source}:mutation`, { operation, entityId: id, requestId: correlationId });
   signalBus.emitSignal(signalType, { operation, resourceId: id }, {
     severity: SEVERITY.INFO, source, entityId: id, correlationId,
-  });
-}
-
-const router = express.Router();
+  });const router = express.Router();
 
 module.exports = {
   router,
@@ -38,4 +35,5 @@ module.exports = {
   requestId,
   validateOperationsBody,
   emitMutation,
-};
+}
+}module.exports = router;

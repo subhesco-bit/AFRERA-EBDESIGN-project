@@ -2,6 +2,8 @@ const router = require('express').Router();
 const warehouseService = require('../services/warehouseManagementService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/warehouses', auth, async (req, res) => {
   try {
     const result = await warehouseService.createWarehouse(req.body);

@@ -2,6 +2,8 @@ const router = require('express').Router();
 const blockchainService = require('../services/blockchainTraceService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/blockchain/record/:productId', auth, async (req, res) => {
   try {
     const result = await blockchainService.recordTransaction(req.params.productId, req.body.from_address, req.body.to_address);

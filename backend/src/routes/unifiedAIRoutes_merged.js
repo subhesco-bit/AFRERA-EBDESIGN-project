@@ -63,10 +63,7 @@ async function coordinate(req, res, requestType, agentPreference) {
       success: false,
       error: error.message || 'Failed to process AI request',
     });
-  }
-}
-
-router.post('/unified', authMiddleware, (req, res) => {
+  }router.post('/unified', authMiddleware, (req, res) => {
   coordinate(req, res, req.body?.requestType || 'conversational', req.body?.agentPreference);
 });
 
@@ -103,5 +100,8 @@ router.get('/usage', authMiddleware, (req, res) => {
     },
   });
 });
+
+
+}
 
 module.exports = router;

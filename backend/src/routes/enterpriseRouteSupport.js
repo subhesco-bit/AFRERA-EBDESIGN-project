@@ -89,7 +89,6 @@ function requestGuard(req, res, next, { signal, advisory = false } = {}) {
       });
     }
     return originalJson(output);
-  };
   logger.info('enterpriseRouteSupport:request', { method: req.method, path: req.path, requestId: correlationId(req) });
   next();
 }
@@ -104,10 +103,7 @@ function protectRouter(router, options = {}) {
 function requireHumanAuthorization(req, res, next) {
   const authorized = req.get('x-human-authorization') === 'confirmed' || req.body?.humanAuthorized === true;
   if (!authorized) return fail(res, req, 403, 'Explicit human authorization is required', 'HUMAN_AUTHORIZATION_REQUIRED');
-  next();
-}
-
-const router = express.Router();
+  next();const router = express.Router();
 
 module.exports = {
   router,
@@ -115,4 +111,6 @@ module.exports = {
   requireHumanAuthorization,
   correlationId,
   fail,
-};
+}
+}
+}module.exports = router;

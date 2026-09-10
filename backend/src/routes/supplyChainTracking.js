@@ -2,6 +2,8 @@ const router = require('express').Router();
 const supplyChainService = require('../services/supplyChainTrackingService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/shipments', auth, async (req, res) => {
   try {
     const result = await supplyChainService.createShipment(req.body.product_id, req.body.origin, req.body.destination);

@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const supplyChainAnalyticsService = require('../services/supplyChainAnalyticsService');
 
+const router = express.Router();
+
 router.post('/supply-chain/analyze', async (req, res) => {
   try {
     const result = await supplyChainAnalyticsService.analyzeShipments(req.body.origin, req.body.destination);

@@ -12,6 +12,8 @@ const { getFarmerWallet, getWalletTransactions, depositToWallet, withdrawFromWal
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { authLimiter } = require('../middleware/rateLimiter');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 /**
  * FIXED 2026-08-15: every route below previously passed req.user.id (a

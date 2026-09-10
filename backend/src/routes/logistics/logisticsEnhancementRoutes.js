@@ -35,7 +35,6 @@ router.get('/fleet/vehicles', authMiddleware, async (req, res) => {
     const filters = {
       type: req.query.type,
       status: req.query.status
-    };
     const result = await logisticsService.getFleet(filters);
     res.json(result);
   } catch (error) {
@@ -177,7 +176,6 @@ router.get('/temperature/:shipmentId', authMiddleware, async (req, res) => {
       startDate: req.query.startDate,
       endDate: req.query.endDate,
       zone: req.query.zone
-    };
     const result = await logisticsService.getTemperatureData(req.params.shipmentId, filters);
     res.json(result);
   } catch (error) {
@@ -225,7 +223,6 @@ router.get('/warehouse/locations', authMiddleware, async (req, res) => {
       warehouseId: req.query.warehouseId,
       zone: req.query.zone,
       status: req.query.status
-    };
     const result = await logisticsService.getWarehouseLocations(filters);
     res.json(result);
   } catch (error) {
@@ -257,7 +254,6 @@ router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
       locationId: req.query.locationId,
       productId: req.query.productId,
       status: req.query.status
-    };
     const result = await logisticsService.getInventory(filters);
     res.json(result);
   } catch (error) {
@@ -351,7 +347,6 @@ router.get('/deliveries/schedule', authMiddleware, async (req, res) => {
       status: req.query.status,
       startDate: req.query.startDate,
       endDate: req.query.endDate
-    };
     const result = await logisticsService.getDeliverySchedules(filters);
     res.json(result);
   } catch (error) {

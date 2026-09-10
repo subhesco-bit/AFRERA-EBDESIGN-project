@@ -18,16 +18,20 @@ const {
 } = require('../services/legacy/identityManagementService');
 
 function crudRouter(service) {
-  const 
+  const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
   router.get('/', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
     try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { res.status(500).json({ success: false, error: e.message }); }
@@ -88,7 +92,7 @@ sessionRouter.delete('/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES
   } catch (e) { res.status(500).json({ success: false, error: e.message }); }
 });
 
-const router = express.Router();
+
 const routes = {
   permissionManagementRoutes: crudRouter(permissionManagement),
   ssoRoutes: crudRouter(ssoManagement),
@@ -96,6 +100,4 @@ const routes = {
   digitalIdentityRoutes: crudRouter(digitalIdentity),
   consentManagementRoutes: crudRouter(consentManagement),
   sessionManagementRoutes: sessionRouter,
-};
-
 module.exports = router;

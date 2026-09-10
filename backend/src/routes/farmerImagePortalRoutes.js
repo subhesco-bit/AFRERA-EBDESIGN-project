@@ -8,6 +8,7 @@ const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const farmerImagePortalService = require('../services/farmerImagePortalService');
+const { authMiddleware: authenticate } = require('../middleware/auth');
 
 const limiter = rateLimiter({ windowMs: 60000, max: 30 });
 

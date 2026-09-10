@@ -19,16 +19,20 @@ const {
 } = require('../services/legacy/operationsManagementService');
 
 function crudRouter(service, validateCreate) {
-  const 
+  const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
   router.get('/', rateLimiters.read, parsePageQuery, async (req, res) => {
     try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { return fail(req, res, e, 'operations.list'); }
@@ -58,10 +62,7 @@ router = express.Router();
       emitMutation(req, 'delete', { id: req.params.id }, SIGNAL.OPERATIONS_RECORD_CHANGED, 'operations_management_routes'); res.json({ success: true });
     } catch (e) { return fail(req, res, e, 'operations.delete'); }
   });
-  return router;
-}
 
-const router = express.Router();
 const routes = {
   farmActivityRoutes: crudRouter(farmActivities, (body) => validateOperationsBody(body, ['activity_name', 'activity_type'], { dates: ['scheduled_date', 'completed_date'] })),
   farmTaskRoutes: crudRouter(farmTasks, (body) => validateOperationsBody(body, ['task_name'], { dates: ['due_date'], enums: { priority: ['low', 'medium', 'high', 'urgent'], status: ['pending', 'in_progress', 'completed', 'cancelled'] } })),
@@ -71,6 +72,4 @@ const routes = {
   inputConsumptionRoutes: crudRouter(inputConsumption, (body) => validateOperationsBody(body, ['input_name', 'input_type'], { dates: ['consumption_date'], numbers: { quantity_used: { min: 0, max: 100000000 } } })),
   farmProductivityRoutes: crudRouter(farmProductivity, (body) => validateOperationsBody(body, ['metric_name'], { numbers: { value: { min: 0, max: 1000000000 }, benchmark: { min: 0, max: 1000000000 } } })),
   farmOperationsDashboardRoutes: crudRouter(farmOperationsDashboard, (body) => validateOperationsBody(body, ['kpi_name'], { numbers: { value: { min: 0, max: 1000000000 }, target: { min: 0, max: 1000000000 } } })),
-};
-
 module.exports = router;

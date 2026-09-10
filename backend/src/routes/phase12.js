@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const p12 = require('../services/phase12');
 const auth = require('../middleware/auth');
+const router = express.Router();
+
 router.post('/blockchain/:id', auth, async (req, res) => { try { res.json(await p12.blockchain(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
 router.post('/quantum/:id', auth, async (req, res) => { try { res.json(await p12.quantum(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
 router.post('/ai/:id', auth, async (req, res) => { try { res.json(await p12.ai(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });

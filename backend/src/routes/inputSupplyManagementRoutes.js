@@ -16,16 +16,20 @@ const {
 } = require('../services/legacy/inputSupplyManagementService');
 
 function crudRouter(service) {
-  const 
+  const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
   router.get('/', async (req, res) => {
     try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { res.status(500).json({ success: false, error: e.message }); }
@@ -55,10 +59,7 @@ router = express.Router();
       res.json({ success: true });
     } catch (e) { res.status(500).json({ success: false, error: e.message }); }
   });
-  return router;
-}
 
-const router = express.Router();
 const routes = {
   biofertilizerRoutes: crudRouter(biofertilizer),
   pesticideInventoryRoutes: crudRouter(pesticideInventory),
@@ -68,6 +69,4 @@ const routes = {
   inputProcurementRoutes: crudRouter(inputProcurement),
   inputDistributionRoutes: crudRouter(inputDistribution),
   inputTraceabilityRoutes: crudRouter(inputTraceability),
-};
-
 module.exports = router;

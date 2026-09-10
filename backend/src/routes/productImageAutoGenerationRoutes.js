@@ -8,6 +8,7 @@ const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const productImageAutoGenerationService = require('../services/productImageAutoGenerationService');
+const { authMiddleware: authenticate } = require('../middleware/auth');
 
 const limiter = rateLimiter({ windowMs: 60000, max: 30 });
 
@@ -171,7 +172,6 @@ router.post('/on-page-view/:productId', limiter, async (req, res) => {
     const pageContext = {
       region,
       languages,
-    };
 
     await productImageAutoGenerationService.onProductPageView(productId, pageContext);
 

@@ -2,6 +2,8 @@ const router = require('express').Router();
 const freightService = require('../services/freightPoolingService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/freight-pools', auth, async (req, res) => {
   try {
     const result = await freightService.createFreightPool(req.body);

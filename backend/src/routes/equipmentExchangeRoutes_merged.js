@@ -3,16 +3,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const equipmentExchangeService = require('../services/legacy/equipmentExchangeService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
@@ -34,10 +38,7 @@ function validateExchangeQuery(query) {
     const stateId = Number(query.stateId);
     if (!Number.isInteger(stateId) || stateId < 1 || stateId > 100000) throw new Error('stateId is outside the allowed range');
   }
-  if (query.pricingType !== undefined && !['free', 'priced'].includes(query.pricingType)) throw new Error('pricingType must be one of: free, priced');
-}
-
-router.post('/', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateBody(), bodyValidator(validateListing), async (req, res) => {
+  if (query.pricingType !== undefined && !['free', 'priced'].includes(query.pricingType)) throw new Error('pricingType must be one of: free, priced');router.post('/', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateBody(), bodyValidator(validateListing), async (req, res) => {
   try {
     const listing = await equipmentExchangeService.createListing(req.user.id, req.body);
     emitMutation(req, 'create', listing, SIGNAL.EQUIPMENT_EXCHANGE_CHANGED, 'equipment_exchange_routes');
@@ -97,5 +98,8 @@ router.delete('/:listingId', rateLimiters.write, authMiddleware, requireRole(...
     return fail(req, res, error, 'exchange.withdraw', error.status || 500);
   }
 });
+
+
+}
 
 module.exports = router;
