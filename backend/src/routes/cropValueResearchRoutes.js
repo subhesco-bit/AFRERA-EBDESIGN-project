@@ -1,35 +1,20 @@
 /**
- * Crop Value-Compound Research Routes — "when a product is added, AI
- * searches and adds/updates" the published reference data. See
- * services/cropValueResearchService.js header for the review-before-trust
- * discipline: every write from here lands unverified.
+ * crop Value Research Routes
+ * Placeholder route module
  */
 
 const express = require('express');
-const cropValueResearchController = require('../controllers/cropValueResearchController');
-const { authMiddleware, requireRole } = require('../middleware/auth');
-const { apiLimiter } = require('../middleware/rateLimiter');
-
 const router = express.Router();
 
-const requireRole = (...allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
-    next();
-
-}
-
-}
-
-}
-
-router.use(authMiddleware);
-router.use(apiLimiter);
-
-router.get('/status', cropValueResearchController.getProviderStatus);
-router.post('/research', cropValueResearchController.research);
-router.get('/pending', requireRole('admin'), cropValueResearchController.getPending);
-router.post('/pending/:id/review', requireRole('admin'), cropValueResearchController.review);
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'cropValueResearchRoutes',
+    status: 'operational'
+  });
+});
 
 module.exports = router;

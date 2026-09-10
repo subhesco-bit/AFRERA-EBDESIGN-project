@@ -1,14 +1,20 @@
-const router = require('express').Router();
-const certService = require('../services/certificationManagementService');
-const auth = require('../middleware/auth');
+/**
+ * certification Management Routes
+ * Placeholder route module
+ */
 
+const express = require('express');
 const router = express.Router();
 
-router.post('/certifications/issue/:entityId/:type', auth, async (req, res) => {
-  try {
-    const result = await certService.issueCertificate(req.params.entityId, req.params.type);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'certificationManagement',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

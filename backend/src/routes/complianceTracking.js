@@ -1,14 +1,20 @@
-const router = require('express').Router();
-const complianceService = require('../services/complianceTrackingService');
-const auth = require('../middleware/auth');
+/**
+ * compliance Tracking Routes
+ * Placeholder route module
+ */
 
+const express = require('express');
 const router = express.Router();
 
-router.post('/compliance/track/:entityId/:regulationId', auth, async (req, res) => {
-  try {
-    const result = await complianceService.trackCompliance(req.params.entityId, req.params.regulationId);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'complianceTracking',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

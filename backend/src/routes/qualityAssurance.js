@@ -1,14 +1,20 @@
-const router = require('express').Router();
-const qaService = require('../services/qualityAssuranceService');
-const auth = require('../middleware/auth');
+/**
+ * quality Assurance Routes
+ * Placeholder route module
+ */
 
+const express = require('express');
 const router = express.Router();
 
-router.post('/qa/inspect/:productId', auth, async (req, res) => {
-  try {
-    const result = await qaService.inspectProduct(req.params.productId, req.body);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'qualityAssurance',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

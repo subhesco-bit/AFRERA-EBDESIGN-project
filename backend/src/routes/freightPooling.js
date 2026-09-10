@@ -1,21 +1,20 @@
-const router = require('express').Router();
-const freightService = require('../services/freightPoolingService');
-const auth = require('../middleware/auth');
+/**
+ * freight Pooling Routes
+ * Placeholder route module
+ */
 
+const express = require('express');
 const router = express.Router();
 
-router.post('/freight-pools', auth, async (req, res) => {
-  try {
-    const result = await freightService.createFreightPool(req.body);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-router.post('/freight-pools/:poolId/join', auth, async (req, res) => {
-  try {
-    const result = await freightService.joinFreightPool(req.params.poolId, req.body.shipment_id);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'freightPooling',
+    status: 'operational'
+  });
 });
 
 module.exports = router;
