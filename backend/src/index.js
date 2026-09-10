@@ -205,6 +205,9 @@ const productImageAutoGenerationRoutes = require('./routes/productImageAutoGener
 const aiImageGenerationEnhancedRoutes = require('./routes/aiImageGenerationEnhancedRoutes');
 const ecommerceImageIntegrationRoutes = require('./routes/ecommerceImageIntegrationRoutes');
 const farmerImagePortalRoutes = require('./routes/farmerImagePortalRoutes');
+const integrationStatusRoutes = require('./routes/integrationStatusRoutes');
+const endpointMismatchFixer = require('./routes/ENDPOINT_MISMATCH_FIXER');
+const stripeWebhookRoutes = require('./routes/stripeWebhookRoutes');
 
 /**
  * EBDESIGN Platform Backend - Main Entry Point
@@ -730,6 +733,19 @@ async function startup() {
     app.use('/api/commerce/images', ecommerceImageIntegrationRoutes);
     app.use('/api/farmer/images', farmerImagePortalRoutes);
     logger.info('🎨 Auto image generation routes mounted');
+
+    // Integration Status Dashboard - Project Visibility
+    app.use('/api/status', integrationStatusRoutes);
+    logger.info('📊 Integration status routes mounted at /api/status');
+
+    // BLOCKER FIXES
+    // Blocker 3: Endpoint Mismatch Fixer
+    app.use('/api/debug', endpointMismatchFixer);
+    logger.info('🔧 Endpoint mismatch fixer mounted at /api/debug');
+
+    // Blocker 4: Stripe Webhook Handler
+    app.use('/api', stripeWebhookRoutes);
+    logger.info('💳 Stripe webhook handler mounted at /api/stripe-webhook');
 
     // Standardized error handling must follow every route registration.
     app.use(standardizeErrorResponse);
