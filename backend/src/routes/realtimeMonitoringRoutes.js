@@ -12,7 +12,16 @@
 const express = require('express');
 const logger = console; // TODO: use Winston/Pino logger
 
-const router = express.Router();
+const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 const realtimeMonitoringService = require('../services/legacy/realtimeMonitoringService');

@@ -12,7 +12,7 @@ const rateLimiter = require("../middleware/rateLimiter");
 
 // Apply auth and rate limiting to all routes
 router.use(authMiddleware);
-router.use(rateLimiter.create({ windowMs: 60000, max: 100 })); // 100 requests per minute
+router.use(createLimiter({ windowMs: 60000, max: 100 })); // 100 requests per minute
 
 // PREDICTION MODELS
 router.post("/predictions/weather/:farmId", async (req, res) => {

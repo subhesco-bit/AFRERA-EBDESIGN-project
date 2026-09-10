@@ -4,7 +4,16 @@
  */
 
 const express = require('express');
-const router = express.Router();
+const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
 const db = require('../database/connection');
 const digitalTwinService = require('../services/digitalTwinService');
 const apiResponseHandler = require('../middleware/apiResponseHandler');

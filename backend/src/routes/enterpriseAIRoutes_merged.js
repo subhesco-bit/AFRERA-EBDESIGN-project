@@ -1,7 +1,16 @@
 /**
  * Enterprise AI Routes
  *
- * 2026-08-10 audit: this router used to call `services/enterpriseaiBackboneService.js`
+ * 2026-08-10 audit: this 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router used to call `services/enterpriseaiBackboneService.js`
  * exclusively. That file was 100% fabricated — every method (including every
  * "helper" it called) returned a hardcoded constant or a canned literal
  * (`calculateCreditScore()` was commented "Simulated AI credit scoring",

@@ -18,7 +18,16 @@ const { validateId, parsePageQuery, bodyValidator, date, numberValue, fail, requ
 const { soilHealth, nutrientManagement, fertilityManagement } = require('../services/legacy/soilManagementService');
 
 function crudRouter(service, validateCreate) {
-  const router = express.Router();
+  const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
   router.get('/', rateLimiters.read, parsePageQuery, async (req, res) => {
     try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { return fail(req, res, e, 'soil.list'); }

@@ -15,7 +15,16 @@ const {
 } = require('../services/legacy/landManagementService');
 
 function crudRouter(service) {
-  const router = express.Router();
+  const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
   router.get('/', async (req, res) => {
     try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { res.status(500).json({ success: false, error: e.message }); }

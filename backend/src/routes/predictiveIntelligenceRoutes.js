@@ -6,7 +6,16 @@
 const express = require('express');
 const logger = console; // TODO: use Winston/Pino logger
 
-const router = express.Router();
+const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
 const predictiveService = require('../services/predictiveIntelligenceService');
 const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/authMiddleware' does not exist in this repo - the real module is

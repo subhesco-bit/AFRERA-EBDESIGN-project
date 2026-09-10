@@ -1,5 +1,14 @@
 /**
- * Hardened CRUD router factory for the flat, table-backed resources created
+ * Hardened CRUD 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router factory for the flat, table-backed resources created
  * via services/legacy/resourceCrudFactory.js (soil, water, and similar
  * simple domains). Originally these routers (soilManagementRoutes.js,
  * waterManagementRoutes.js) each hand-rolled a bare try/catch per verb with

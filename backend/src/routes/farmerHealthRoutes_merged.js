@@ -1,6 +1,15 @@
 // Routes for M029 - Farmer Health & Welfare
 const express = require('express');
-const router = express.Router();
+const 
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+};
+
+router = express.Router();
 const farmerHealthService = require('../modules/M029/service');
 const pool = require('../database/pool');
 const { authMiddleware, requireRole } = require('../middleware/auth');
