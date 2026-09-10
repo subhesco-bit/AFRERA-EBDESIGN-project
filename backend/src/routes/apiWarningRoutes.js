@@ -8,8 +8,21 @@ const express = require('express');
 const router = express.Router();
 const apiWarningService = require('../services/apiWarningService');
 const { authMiddleware } = require('../middleware/auth');
-const { requireRole } = require('../middleware/roleGroups');
+const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 const { logger } = require('../utils/logger');
+
+// Role-based middleware factory
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    next();
+  };
+};
 
 /**
  * POST /api/v1/warnings/generate
