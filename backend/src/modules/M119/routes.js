@@ -1,13 +1,68 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authenticate } = require('../../middleware/authMiddleware');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
+/**
+ * M119 Routes
+ * Base path: /api/m119
+ */
+
+// Middleware
 router.use(authenticate);
+
+/**
+ * @route   GET /api/m119
+ * @desc    Get all m119 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
 router.get('/', controller.getAll.bind(controller));
-router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   POST /api/m119/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m119/search
+ * @desc    Search m119 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m119
+ * @desc    Create new m119
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
 router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m119/:id
+ * @desc    Get m119 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m119/:id
+ * @desc    Update m119
+ * @access  Private
+ */
 router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m119/:id
+ * @desc    Delete (soft delete) m119
+ * @access  Private
+ */
 router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;
