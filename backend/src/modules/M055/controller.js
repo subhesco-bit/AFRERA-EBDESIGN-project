@@ -1,65 +1,52 @@
-﻿/**
- * Controller for Pricing Management (M055)
- * Handles HTTP requests for pricing operations
- */
+const m055Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const pricingService = require('./service');
-
-const create = async (req, res) => {
-  try {
-    const rule = await pricingService.createPricingRule(req.body);
-    res.status(201).json({ success: true, data: rule });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const list = async (req, res) => {
-  try {
-    const rules = await pricingService.listPricingRules(req.query);
-    res.status(200).json({ success: true, data: rules });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const get = async (req, res) => {
-  try {
-    const price = await pricingService.calculateDynamicPrice(req.params.id, req.body);
-    res.status(200).json({ success: true, data: price });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const update = async (req, res) => {
-  try {
-    const rule = await pricingService.updatePricingRule(req.params.id, req.body);
-    if (!rule) {
-      return res.status(404).json({ success: false, error: 'Pricing rule not found' });
+class M055Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m055Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
     }
-    res.status(200).json({ success: true, data: rule });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const remove = async (req, res) => {
-  try {
-    const deleted = await pricingService.deletePricingRule(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ success: false, error: 'Pricing rule not found' });
+  async getById(req, res) {
+    try {
+      const result = await m055Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
     }
-    res.status(200).json({ success: true, message: 'Pricing rule deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-module.exports = {
-  create,
-  list,
-  get,
-  update,
-  remove,
-};
+  async create(req, res) {
+    try {
+      const result = await m055Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const result = await m055Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const result = await m055Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M055Controller();

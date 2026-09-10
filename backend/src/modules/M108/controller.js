@@ -1,70 +1,52 @@
-﻿/**
- * Controller for Fuel Management (M108)
- * Handles HTTP requests for fuel management operations
- */
+const m108Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const fuelService = require('./service');
-
-const listFuelPurchases = async (req, res) => {
-  try {
-    const result = await fuelService.listFuelPurchases(req.query);
-    res.status(200).json({ success: true, data: result });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M108Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m108Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const getFuelPurchase = async (req, res) => {
-  try {
-    const purchase = await fuelService.getFuelPurchase(req.params.id);
-    if (!purchase) return res.status(404).json({ success: false, error: 'Not found' });
-    res.status(200).json({ success: true, data: purchase });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m108Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const recordFuelPurchase = async (req, res) => {
-  try {
-    const purchase = await fuelService.recordFuelPurchase(req.body);
-    res.status(201).json({ success: true, data: purchase });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m108Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const recordFuelConsumption = async (req, res) => {
-  try {
-    const consumption = await fuelService.recordFuelConsumption(req.body);
-    res.status(201).json({ success: true, data: consumption });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m108Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const trackFuelEfficiency = async (req, res) => {
-  try {
-    const efficiency = await fuelService.trackFuelEfficiency(req.params.id, req.query.period);
-    res.status(200).json({ success: true, data: efficiency });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const result = await m108Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
+}
 
-const generateFuelReport = async (req, res) => {
-  try {
-    const report = await fuelService.generateFuelReport(req.params.farmerId, req.query.reportType);
-    res.status(200).json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  listFuelPurchases,
-  getFuelPurchase,
-  recordFuelPurchase,
-  recordFuelConsumption,
-  trackFuelEfficiency,
-  generateFuelReport,
-};
+module.exports = new M108Controller();

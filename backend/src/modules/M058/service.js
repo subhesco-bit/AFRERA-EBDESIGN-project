@@ -1,75 +1,91 @@
-/**
- * Returns Management Service (M058)
- * Product returns and refunds with AI-powered analytics
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
 
-async function createReturn(returnData) {
-  try {
-    const { order_id, product_id, reason, quantity } = returnData;
-    const returnRequest = {
-      return_id: generateId(),
-      order_id,
-      product_id,
-      reason,
-      quantity,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-    };
+class M058Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-    const aiRequest = {
-      task: 'return_analysis',
-      parameters: { return_data: returnData, product_quality: await assessProductQuality(product_id) },
-    };
-    returnRequest.ai_recommendations = await aiAPI.generateRecommendation(aiRequest);
+      let query = 'SELECT * FROM crop_insurance WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
 
-    const result = await pool.query(
-      `INSERT INTO returns (return_id, order_id, product_id, reason, quantity, status, ai_recommendations, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [returnRequest.return_id, returnRequest.order_id, returnRequest.product_id, returnRequest.reason, returnRequest.quantity, returnRequest.status, JSON.stringify(returnRequest.ai_recommendations), returnRequest.created_at],
-    );
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM crop_insurance WHERE deleted_at IS NULL`);
 
-    logger.info(`Return created: ${returnRequest.return_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating return', { error: error.message });
-    throw new Error('Failed to create return');
+      logger.info(`Retrieved ${result.rows.length} crop_insurance`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching crop_insurance:', error.message);
+      throw new Error(`Failed to fetch crop_insurance: ${error.message}`);
+    }
+  }
+
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM crop_insurance WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`crop_insurance not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching crop_insurance:', error.message);
+      throw error;
+    }
+  }
+
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
+
+      const result = await db.query(
+        `INSERT INTO crop_insurance (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating crop_insurance:', error.message);
+      throw error;
+    }
+  }
+
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE crop_insurance SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating crop_insurance:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE crop_insurance SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`crop_insurance not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting crop_insurance:', error.message);
+      throw error;
+    }
   }
 }
 
-async function getReturn(returnId) {
-  try {
-    const res = await pool.query('SELECT * FROM returns WHERE return_id = $1', [returnId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error getting return', { error: error.message });
-    throw new Error('Failed to get return');
-  }
-}
-
-async function updateReturnStatus(returnId, status, notes = null) {
-  try {
-    const res = await pool.query(
-      'UPDATE returns SET status = $1, notes = COALESCE($2, notes), updated_at = NOW() WHERE return_id = $3 RETURNING *',
-      [status, notes, returnId],
-    );
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating return status', { error: error.message });
-    throw new Error('Failed to update return status');
-  }
-}
-
-function generateId() {
-  return `RET-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function assessProductQuality(productId) {
-  return { quality_score: 85, defect_rate: 0.05 };
-}
-
-module.exports = { createReturn, getReturn, updateReturnStatus };
-
+module.exports = new M058Service();

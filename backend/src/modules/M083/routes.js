@@ -1,27 +1,13 @@
-﻿// Express routes for Performance Analytics (M083)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-// Performance Metrics
-router.post('/metrics', controller.recordPerformanceMetric);
-router.get('/metrics/:entityId/:entityType', controller.getPerformanceMetrics);
-
-// Performance Reports
-router.post('/reports/generate', controller.generatePerformanceReport);
-
-// Performance Trends
-router.post('/trends/analyze', controller.analyzePerformanceTrends);
-
-// Performance Comparisons
-router.post('/comparisons', controller.comparePerformance);
-
-// Performance Targets
-router.post('/targets', controller.setPerformanceTarget);
-router.get('/targets/:entityId/:entityType', controller.getPerformanceTargets);
-
-// Performance Alerts
-router.post('/alerts', controller.createPerformanceAlert);
-router.get('/alerts/:entityId/:entityType', controller.getPerformanceAlerts);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

@@ -1,57 +1,52 @@
-const service = require('./service');
+const m035Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-async function list(req, res) {
-  try {
-    const result = await service.listItems(req.query);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function get(req, res) {
-  try {
-    const result = await service.getItem(req.params.id);
-    if (!result) {
-      return res.status(404).json({ error: 'Item not found' });
+class M035Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m035Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
     }
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
-}
 
-async function create(req, res) {
-  try {
-    const result = await service.createItem(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-}
-
-async function update(req, res) {
-  try {
-    const result = await service.updateItem(req.params.id, req.body);
-    if (!result) {
-      return res.status(404).json({ error: 'Item not found' });
+  async getById(req, res) {
+    try {
+      const result = await m035Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
     }
-    res.json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
   }
-}
 
-async function remove(req, res) {
-  try {
-    const result = await service.deleteItem(req.params.id);
-    if (!result) {
-      return res.status(404).json({ error: 'Item not found' });
+  async create(req, res) {
+    try {
+      const result = await m035Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
     }
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  }
+
+  async update(req, res) {
+    try {
+      const result = await m035Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const result = await m035Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
 }
 
-module.exports = { list, get, create, update, remove };
+module.exports = new M035Controller();

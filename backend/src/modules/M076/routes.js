@@ -1,11 +1,13 @@
-﻿// Express routes for Water Budgeting (M076)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/budgets', controller.createWaterBudget);
-router.get('/budgets/:id/usage', controller.trackWaterUsage);
-router.post('/budgets/:id/optimize', controller.optimizeWaterAllocation);
-router.get('/budgets/:id/report', controller.generateBudgetReport);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

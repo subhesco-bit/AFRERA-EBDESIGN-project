@@ -1,112 +1,52 @@
-﻿/**
- * Controller for Alert Management (M087)
- * Handles HTTP requests for alert management operations
- */
+const m087Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const alertService = require('./service');
-
-const createAlertRule = async (req, res) => {
-  try {
-    const rule = await alertService.createAlertRule(req.body);
-    res.status(201).json({ success: true, data: rule });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M087Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m087Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const addNotification = async (req, res) => {
-  try {
-    const notification = await alertService.addNotification(req.body);
-    res.status(201).json({ success: true, data: notification });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m087Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const createIncident = async (req, res) => {
-  try {
-    const incident = await alertService.createIncident(req.body);
-    res.status(201).json({ success: true, data: incident });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m087Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const acknowledgeIncident = async (req, res) => {
-  try {
-    const { acknowledged_by } = req.body;
-    const incident = await alertService.acknowledgeIncident(req.params.id, acknowledged_by);
-    res.status(200).json({ success: true, data: incident });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m087Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const resolveIncident = async (req, res) => {
-  try {
-    const { resolved_by, resolution_details } = req.body;
-    const incident = await alertService.resolveIncident(req.params.id, resolved_by, resolution_details);
-    res.status(200).json({ success: true, data: incident });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const result = await m087Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
+}
 
-const getIncidents = async (req, res) => {
-  try {
-    const incidents = await alertService.getIncidents(req.query);
-    res.status(200).json({ success: true, data: incidents });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const addEscalation = async (req, res) => {
-  try {
-    const escalation = await alertService.addEscalation(req.body);
-    res.status(201).json({ success: true, data: escalation });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const createSuppression = async (req, res) => {
-  try {
-    const suppression = await alertService.createSuppression(req.body);
-    res.status(201).json({ success: true, data: suppression });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const createMaintenanceWindow = async (req, res) => {
-  try {
-    const window = await alertService.createMaintenanceWindow(req.body);
-    res.status(201).json({ success: true, data: window });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const calculateAlertStatistics = async (req, res) => {
-  try {
-    const { rule_id, period_type, period_start, period_end } = req.body;
-    const stats = await alertService.calculateAlertStatistics(rule_id, period_type, period_start, period_end);
-    res.status(201).json({ success: true, data: stats });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  createAlertRule,
-  addNotification,
-  createIncident,
-  acknowledgeIncident,
-  resolveIncident,
-  getIncidents,
-  addEscalation,
-  createSuppression,
-  createMaintenanceWindow,
-  calculateAlertStatistics,
-};
+module.exports = new M087Controller();

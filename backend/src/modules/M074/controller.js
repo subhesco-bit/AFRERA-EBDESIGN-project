@@ -1,76 +1,52 @@
-﻿// Controller for Sheep Management (M074) - AI Enhanced
-const service = require('./service');
+const m074Service = require('./service');
 const { logger } = require('../../utils/logger');
 
-async function registerSheepFlock(req, res) {
-  try {
-    const flock = await service.registerSheepFlock(req.body);
-    res.status(201).json({ success: true, data: flock });
-  } catch (error) {
-    logger.error('registerSheepFlock error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+class M074Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m074Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const result = await m074Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const result = await m074Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const result = await m074Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const result = await m074Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
 }
 
-async function getSheepFlock(req, res) {
-  try {
-    const flock = await service.getSheepFlock(req.params.flockId);
-    if (!flock) return res.status(404).json({ success: false, error: 'Flock not found' });
-    res.json({ success: true, data: flock });
-  } catch (error) {
-    logger.error('getSheepFlock error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function listSheepFlocks(req, res) {
-  try {
-    const { page, limit, farmId, breed, status } = req.query;
-    const result = await service.listSheepFlocks({ page, limit, farmId, breed, status });
-    res.json({ success: true, data: result });
-  } catch (error) {
-    logger.error('listSheepFlocks error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function updateSheepFlock(req, res) {
-  try {
-    const flock = await service.updateSheepFlock(req.params.flockId, req.body);
-    if (!flock) return res.status(404).json({ success: false, error: 'Flock not found' });
-    res.json({ success: true, data: flock });
-  } catch (error) {
-    logger.error('updateSheepFlock error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function analyzeSheepProduction(req, res) {
-  try {
-    const analysis = await service.analyzeSheepProduction(req.params.flockId);
-    res.json({ success: true, data: analysis });
-  } catch (error) {
-    logger.error('analyzeSheepProduction error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function getSheepAnalytics(req, res) {
-  try {
-    const { startDate, endDate, farmId } = req.query;
-    const analytics = await service.getSheepAnalytics({ startDate, endDate, farmId });
-    res.json({ success: true, data: analytics });
-  } catch (error) {
-    logger.error('getSheepAnalytics error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-module.exports = {
-  registerSheepFlock,
-  getSheepFlock,
-  listSheepFlocks,
-  updateSheepFlock,
-  analyzeSheepProduction,
-  getSheepAnalytics,
-};
+module.exports = new M074Controller();

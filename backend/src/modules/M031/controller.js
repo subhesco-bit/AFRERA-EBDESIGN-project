@@ -1,48 +1,52 @@
-﻿/**
- * Controller for Land Registry (M031)
- */
+const m031Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const landRegistryService = require('./service');
-
-const createLandParcel = async (req, res) => {
-  try {
-    const parcel = await landRegistryService.createLandParcel(req.body);
-    res.status(201).json({ success: true, data: parcel });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M031Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m031Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const transferLandOwnership = async (req, res) => {
-  try {
-    const transfer = await landRegistryService.transferLandOwnership(req.params.parcelId, req.body.from_farmer_id, req.body.to_farmer_id, req.body);
-    res.status(201).json({ success: true, data: transfer });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m031Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const getLandByFarmer = async (req, res) => {
-  try {
-    const land = await landRegistryService.getLandByFarmer(req.params.farmerId);
-    res.status(200).json({ success: true, data: land });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m031Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const getLandAnalytics = async (req, res) => {
-  try {
-    const analytics = await landRegistryService.getLandAnalytics(req.query);
-    res.status(200).json({ success: true, data: analytics });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m031Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-module.exports = {
-  createLandParcel,
-  transferLandOwnership,
-  getLandByFarmer,
-  getLandAnalytics,
-};
+  async delete(req, res) {
+    try {
+      const result = await m031Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M031Controller();

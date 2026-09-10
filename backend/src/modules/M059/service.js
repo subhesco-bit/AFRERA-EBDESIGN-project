@@ -1,90 +1,91 @@
-/**
- * Discount Management Service (M059)
- * Discount and promotion management with AI-powered optimization
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
 
-async function createDiscount(discountData) {
-  try {
-    const { name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products } = discountData;
-    const discount = {
-      discount_id: generateId(),
-      name,
-      discount_type,
-      value,
-      min_purchase,
-      max_discount,
-      start_date,
-      end_date,
-      applicable_products,
-      status: 'active',
-      created_at: new Date().toISOString(),
-    };
+class M059Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-    const aiRequest = {
-      task: 'discount_optimization',
-      parameters: { discount_data: discountData, historical_data: await getHistoricalSalesData() },
-    };
-    discount.ai_recommendations = await aiAPI.generateRecommendation(aiRequest);
+      let query = 'SELECT * FROM agri_finance WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
 
-    const result = await pool.query(
-      `INSERT INTO discounts (discount_id, name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products, status, ai_recommendations, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
-      [discount.discount_id, discount.name, discount.discount_type, discount.value, discount.min_purchase, discount.max_discount, discount.start_date, discount.end_date, JSON.stringify(discount.applicable_products), discount.status, JSON.stringify(discount.ai_recommendations), discount.created_at],
-    );
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM agri_finance WHERE deleted_at IS NULL`);
 
-    logger.info(`Discount created: ${discount.discount_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating discount', { error: error.message });
-    throw new Error('Failed to create discount');
+      logger.info(`Retrieved ${result.rows.length} agri_finance`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching agri_finance:', error.message);
+      throw new Error(`Failed to fetch agri_finance: ${error.message}`);
+    }
+  }
+
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM agri_finance WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`agri_finance not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching agri_finance:', error.message);
+      throw error;
+    }
+  }
+
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
+
+      const result = await db.query(
+        `INSERT INTO agri_finance (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating agri_finance:', error.message);
+      throw error;
+    }
+  }
+
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE agri_finance SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating agri_finance:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE agri_finance SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`agri_finance not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting agri_finance:', error.message);
+      throw error;
+    }
   }
 }
 
-async function getDiscount(discountId) {
-  try {
-    const res = await pool.query('SELECT * FROM discounts WHERE discount_id = $1', [discountId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error getting discount', { error: error.message });
-    throw new Error('Failed to get discount');
-  }
-}
-
-async function updateDiscount(discountId, updates) {
-  try {
-    const { name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products, status } = updates;
-    const res = await pool.query(
-      'UPDATE discounts SET name = COALESCE($1, name), discount_type = COALESCE($2, discount_type), value = COALESCE($3, value), min_purchase = COALESCE($4, min_purchase), max_discount = COALESCE($5, max_discount), start_date = COALESCE($6, start_date), end_date = COALESCE($7, end_date), applicable_products = COALESCE($8, applicable_products::jsonb), status = COALESCE($9, status), updated_at = NOW() WHERE discount_id = $10 RETURNING *',
-      [name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products ? JSON.stringify(applicable_products) : null, status, discountId],
-    );
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating discount', { error: error.message });
-    throw new Error('Failed to update discount');
-  }
-}
-
-async function deleteDiscount(discountId) {
-  try {
-    const res = await pool.query('DELETE FROM discounts WHERE discount_id = $1 RETURNING discount_id', [discountId]);
-    return Boolean(res.rows[0]);
-  } catch (error) {
-    logger.error('Error deleting discount', { error: error.message });
-    throw new Error('Failed to delete discount');
-  }
-}
-
-function generateId() {
-  return `DISC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getHistoricalSalesData() {
-  return { average_order_value: 5000, conversion_rate: 0.05 };
-}
-
-module.exports = { createDiscount, getDiscount, updateDiscount, deleteDiscount };
-
+module.exports = new M059Service();

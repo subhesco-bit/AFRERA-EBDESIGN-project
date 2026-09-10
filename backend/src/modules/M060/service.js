@@ -1,107 +1,91 @@
-/**
- * Review Management Service (M060)
- * Product reviews and ratings with AI-powered sentiment analysis
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
 
-async function createReview(reviewData) {
-  try {
-    const { product_id, user_id, rating, title, comment, images } = reviewData;
-    const review = {
-      review_id: generateId(),
-      product_id,
-      user_id,
-      rating,
-      title,
-      comment,
-      images,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-    };
+class M060Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-    const aiRequest = {
-      task: 'sentiment_analysis',
-      parameters: { review_data: reviewData, product_context: await getProductContext(product_id) },
-    };
-    review.ai_analysis = await aiAPI.generateRecommendation(aiRequest);
+      let query = 'SELECT * FROM input_supply WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
 
-    const result = await pool.query(
-      `INSERT INTO reviews (review_id, product_id, user_id, rating, title, comment, images, status, ai_analysis, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [review.review_id, review.product_id, review.user_id, review.rating, review.title, review.comment, JSON.stringify(review.images), review.status, JSON.stringify(review.ai_analysis), review.created_at],
-    );
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM input_supply WHERE deleted_at IS NULL`);
 
-    logger.info(`Review created: ${review.review_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating review', { error: error.message });
-    throw new Error('Failed to create review');
+      logger.info(`Retrieved ${result.rows.length} input_supply`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching input_supply:', error.message);
+      throw new Error(`Failed to fetch input_supply: ${error.message}`);
+    }
+  }
+
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM input_supply WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`input_supply not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching input_supply:', error.message);
+      throw error;
+    }
+  }
+
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
+
+      const result = await db.query(
+        `INSERT INTO input_supply (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating input_supply:', error.message);
+      throw error;
+    }
+  }
+
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE input_supply SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating input_supply:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE input_supply SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`input_supply not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting input_supply:', error.message);
+      throw error;
+    }
   }
 }
 
-async function getReview(reviewId) {
-  try {
-    const res = await pool.query('SELECT * FROM reviews WHERE review_id = $1', [reviewId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error getting review', { error: error.message });
-    throw new Error('Failed to get review');
-  }
-}
-
-async function getProductReviews(productId, { page = 1, limit = 20 } = {}) {
-  try {
-    const offset = (page - 1) * limit;
-    const res = await pool.query(
-      'SELECT * FROM reviews WHERE product_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4',
-      [productId, 'approved', limit, offset],
-    );
-    return { items: res.rows, pagination: { page, limit, total: res.rows.length, totalPages: Math.ceil(res.rows.length / limit) } };
-  } catch (error) {
-    logger.error('Error getting product reviews', { error: error.message });
-    throw new Error('Failed to get product reviews');
-  }
-}
-
-async function updateReviewStatus(reviewId, status) {
-  try {
-    const res = await pool.query('UPDATE reviews SET status = $1, updated_at = NOW() WHERE review_id = $2 RETURNING *', [status, reviewId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating review status', { error: error.message });
-    throw new Error('Failed to update review status');
-  }
-}
-
-function generateId() {
-  return `REV-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-/**
- * (2026-08-29) Was a hardcoded {category: 'grains', average_rating: 4.2}
- * returned for every product regardless of ID - fed straight into the
- * "AI sentiment analysis" call above as fabricated context. Queries the
- * real products table instead; returns null fields honestly if the
- * product isn't found rather than a fabricated default.
- */
-async function getProductContext(productId) {
-  try {
-    const res = await pool.query(
-      `SELECT c.name AS category, COALESCE(p.average_rating, 0) AS average_rating
-       FROM products p LEFT JOIN categories c ON c.id = p.category_id
-       WHERE p.id = $1`,
-      [productId],
-    );
-    if (res.rows.length === 0) return { category: null, average_rating: null };
-    return res.rows[0];
-  } catch (error) {
-    logger.error('Error getting product context', { error: error.message });
-    return { category: null, average_rating: null };
-  }
-}
-
-module.exports = { createReview, getReview, getProductReviews, updateReviewStatus };
-
+module.exports = new M060Service();

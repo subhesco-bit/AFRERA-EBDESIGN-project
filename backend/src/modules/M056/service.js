@@ -1,138 +1,91 @@
-/**
- * Payment Processing Service (M056)
- * Payment processing with AI-powered fraud detection and risk assessment
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
 
-async function createPayment(paymentData) {
-  try {
-    const { order_id, amount, payment_method, payment_details } = paymentData;
-    const payment = {
-      payment_id: generateId(),
-      order_id,
-      amount,
-      payment_method,
-      payment_status: 'processing',
-      created_at: new Date().toISOString(),
-    };
+class M056Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-    const aiRequest = {
-      task: 'payment_risk_assessment',
-      parameters: { payment_data: paymentData, order_data: await getOrderData(order_id) },
-    };
-    payment.risk_assessment = await aiAPI.generateRecommendation(aiRequest);
+      let query = 'SELECT * FROM yield_prediction WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
 
-    const result = await pool.query(
-      `INSERT INTO payments (payment_id, order_id, amount, payment_method, payment_status, payment_details, risk_assessment, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [payment.payment_id, payment.order_id, payment.amount, payment.payment_method, payment.payment_status, JSON.stringify(payment_details), JSON.stringify(payment.risk_assessment), payment.created_at],
-    );
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM yield_prediction WHERE deleted_at IS NULL`);
 
-    logger.info(`Payment created: ${payment.payment_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating payment', { error: error.message });
-    throw new Error('Failed to create payment');
+      logger.info(`Retrieved ${result.rows.length} yield_prediction`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching yield_prediction:', error.message);
+      throw new Error(`Failed to fetch yield_prediction: ${error.message}`);
+    }
+  }
+
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM yield_prediction WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`yield_prediction not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching yield_prediction:', error.message);
+      throw error;
+    }
+  }
+
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
+
+      const result = await db.query(
+        `INSERT INTO yield_prediction (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating yield_prediction:', error.message);
+      throw error;
+    }
+  }
+
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE yield_prediction SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating yield_prediction:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE yield_prediction SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`yield_prediction not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting yield_prediction:', error.message);
+      throw error;
+    }
   }
 }
 
-async function getPayment(paymentId) {
-  try {
-    const res = await pool.query('SELECT * FROM payments WHERE payment_id = $1', [paymentId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error getting payment', { error: error.message });
-    throw new Error('Failed to get payment');
-  }
-}
-
-async function updatePaymentStatus(paymentId, status) {
-  try {
-    const res = await pool.query('UPDATE payments SET payment_status = $1, updated_at = NOW() WHERE payment_id = $2 RETURNING *', [status, paymentId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating payment status', { error: error.message });
-    throw new Error('Failed to update payment status');
-  }
-}
-
-/**
- * F5 fix (2026-08-30): frontend calls PUT /modules/m056/:id (a generic
- * update, not the status-only PUT /:id/status that already existed) and
- * DELETE /modules/m056/:id. No generic update/delete existed before -
- * added here following the same payment_id-keyed query pattern as
- * getPayment/updatePaymentStatus above (not amount/payment_method, which
- * are immutable-by-design for an already-created payment; the mutable
- * fields are payment_method... actually amount and payment_method are
- * kept updatable here since frontend forms may correct entry mistakes
- * pre-settlement; payment_status is intentionally excluded to keep the
- * dedicated updatePaymentStatus() as the single path that changes status).
- */
-async function updatePayment(paymentId, updates) {
-  try {
-    const { amount, payment_method, payment_details } = updates || {};
-    const res = await pool.query(
-      `UPDATE payments SET
-         amount = COALESCE($1, amount),
-         payment_method = COALESCE($2, payment_method),
-         payment_details = COALESCE($3, payment_details),
-         updated_at = NOW()
-       WHERE payment_id = $4
-       RETURNING *`,
-      [amount, payment_method, payment_details ? JSON.stringify(payment_details) : null, paymentId],
-    );
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating payment', { error: error.message });
-    throw new Error('Failed to update payment');
-  }
-}
-
-async function deletePayment(paymentId) {
-  try {
-    const res = await pool.query('DELETE FROM payments WHERE payment_id = $1 RETURNING payment_id', [paymentId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error deleting payment', { error: error.message });
-    throw new Error('Failed to delete payment');
-  }
-}
-
-async function refundPayment(paymentId, amount, reason) {
-  try {
-    const refund = {
-      refund_id: generateId(),
-      payment_id: paymentId,
-      amount,
-      reason,
-      status: 'processing',
-      created_at: new Date().toISOString(),
-    };
-
-    const result = await pool.query(
-      'INSERT INTO refunds (refund_id, payment_id, amount, reason, status, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [refund.refund_id, refund.payment_id, refund.amount, refund.reason, refund.status, refund.created_at],
-    );
-
-    await updatePaymentStatus(paymentId, 'refunded');
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error processing refund', { error: error.message });
-    throw new Error('Failed to process refund');
-  }
-}
-
-function generateId() {
-  return `PAY-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getOrderData(orderId) {
-  const res = await pool.query('SELECT * FROM orders WHERE order_id = $1', [orderId]);
-  return res.rows[0] || {};
-}
-
-module.exports = { createPayment, getPayment, updatePaymentStatus, updatePayment, deletePayment, refundPayment };
-
+module.exports = new M056Service();

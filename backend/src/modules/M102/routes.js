@@ -1,13 +1,13 @@
-﻿// Express routes for Implement Management (M102)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.get('/', controller.listImplements);
-router.get('/:id', controller.getImplement);
-router.post('/register', controller.registerImplement);
-router.put('/maintenance/:id', controller.updateImplementMaintenance);
-router.get('/usage/:id', controller.trackImplementUsage);
-router.get('/report/:farmerId', controller.generateImplementReport);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

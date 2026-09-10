@@ -1,267 +1,91 @@
-/**
- * Village Registry Service (M041)
- * Comprehensive village and community management with AI-powered development index
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
 
-async function createVillage(villageData) {
-  try {
-    const {
-      village_name,
-      village_code,
-      district,
-      state,
-      block,
-      tehsil,
-      gram_panchayat,
-      population,
-      households,
-      area_sq_km,
-      coordinates,
-      elevation,
-      climate_zone,
-      soil_type,
-      water_sources,
-      infrastructure,
-      agricultural_land_area,
-      major_crops,
-      livestock_count,
-    } = villageData;
+class M041Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-    const village = {
-      village_id: generateId(),
-      village_name,
-      village_code,
-      district,
-      state,
-      block,
-      tehsil,
-      gram_panchayat,
-      population,
-      households,
-      area_sq_km,
-      coordinates: coordinates || {},
-      elevation,
-      climate_zone,
-      soil_type,
-      water_sources: water_sources || [],
-      infrastructure: infrastructure || {},
-      agricultural_land_area,
-      major_crops: major_crops || [],
-      livestock_count: livestock_count || {},
-      status: 'active',
-      created_at: new Date().toISOString(),
-    };
+      let query = 'SELECT * FROM fleet WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
 
-    // AI-powered development index calculation
-    const aiRequest = {
-      task: 'village_development_index',
-      parameters: {
-        village_data: villageData,
-        infrastructure_score: await calculateInfrastructureScore(infrastructure),
-        resource_availability: await assessResourceAvailability(water_sources),
-        agricultural_potential: await assessAgriculturalPotential(agricultural_land_area, major_crops),
-        demographic_indicators: await calculateDemographicIndicators(population, households),
-      },
-    };
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM fleet WHERE deleted_at IS NULL`);
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    village.ai_development_index = aiResponse.development_index;
-
-    const result = await pool.query(
-      `INSERT INTO villages 
-       (village_id, village_name, village_code, district, state, block, tehsil, gram_panchayat, 
-        population, households, area_sq_km, coordinates, elevation, climate_zone, soil_type, 
-        water_sources, infrastructure, agricultural_land_area, major_crops, livestock_count, 
-        ai_development_index, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
-       RETURNING *`,
-      [
-        village.village_id, village.village_name, village.village_code, village.district,
-        village.state, village.block, village.tehsil, village.gram_panchayat, village.population,
-        village.households, village.area_sq_km, JSON.stringify(village.coordinates),
-        village.elevation, village.climate_zone, village.soil_type,
-        JSON.stringify(village.water_sources), JSON.stringify(village.infrastructure),
-        village.agricultural_land_area, JSON.stringify(village.major_crops),
-        JSON.stringify(village.livestock_count), village.ai_development_index,
-        village.status, village.created_at,
-      ],
-    );
-
-    logger.info(`Village created: ${village.village_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating village', { error: error.message, stack: error.stack });
-    throw new Error('Failed to create village');
-  }
-}
-
-async function addVillageResource(villageId, resourceData) {
-  try {
-    const {
-      resource_type,
-      resource_name,
-      capacity,
-      current_utilization,
-      condition,
-      last_maintenance_date,
-      next_maintenance_date,
-      responsible_person,
-    } = resourceData;
-
-    const resource = {
-      resource_id: generateId(),
-      village_id: villageId,
-      resource_type,
-      resource_name,
-      capacity,
-      current_utilization,
-      condition,
-      last_maintenance_date,
-      next_maintenance_date,
-      responsible_person,
-      created_at: new Date().toISOString(),
-    };
-
-    const result = await pool.query(
-      `INSERT INTO village_resources 
-       (resource_id, village_id, resource_type, resource_name, capacity, current_utilization, 
-        condition, last_maintenance_date, next_maintenance_date, responsible_person, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING *`,
-      [
-        resource.resource_id, resource.village_id, resource.resource_type, resource.resource_name,
-        resource.capacity, resource.current_utilization, resource.condition,
-        resource.last_maintenance_date, resource.next_maintenance_date,
-        resource.responsible_person, resource.created_at,
-      ],
-    );
-
-    logger.info(`Village resource added: ${resource.resource_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error adding village resource', { error: error.message, stack: error.stack });
-    throw new Error('Failed to add village resource');
-  }
-}
-
-async function getVillageAnalytics(villageId) {
-  try {
-    const village = await pool.query('SELECT * FROM villages WHERE village_id = $1', [villageId]);
-    if (village.rows.length === 0) {
-      throw new Error('Village not found');
+      logger.info(`Retrieved ${result.rows.length} fleet`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching fleet:', error.message);
+      throw new Error(`Failed to fetch fleet: ${error.message}`);
     }
+  }
 
-    const resources = await pool.query('SELECT * FROM village_resources WHERE village_id = $1', [villageId]);
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM fleet WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`fleet not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching fleet:', error.message);
+      throw error;
+    }
+  }
 
-    const analytics = {
-      village_id: villageId,
-      village_info: village.rows[0],
-      resource_summary: {
-        total_resources: resources.rows.length,
-        by_type: getResourceTypeSummary(resources.rows),
-        utilization_rate: calculateAverageUtilization(resources.rows),
-        maintenance_status: getMaintenanceStatus(resources.rows),
-      },
-      development_metrics: {
-        development_index: village.rows[0].ai_development_index,
-        infrastructure_score: await calculateInfrastructureScore(village.rows[0].infrastructure),
-        agricultural_potential: await assessAgriculturalPotential(
-          village.rows[0].agricultural_land_area,
-          village.rows[0].major_crops,
-        ),
-      },
-      ai_insights: await generateVillageInsights(village.rows[0], resources.rows),
-    };
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
 
-    return analytics;
-  } catch (error) {
-    logger.error('Error getting village analytics', { error: error.message, stack: error.stack });
-    throw new Error('Failed to get village analytics');
+      const result = await db.query(
+        `INSERT INTO fleet (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating fleet:', error.message);
+      throw error;
+    }
+  }
+
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE fleet SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating fleet:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE fleet SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`fleet not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting fleet:', error.message);
+      throw error;
+    }
   }
 }
 
-function generateId() {
-  return `VIL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function calculateInfrastructureScore(infrastructure) {
-  if (!infrastructure) return 50;
-
-  let score = 0;
-  const features = ['roads', 'electricity', 'water_supply', 'healthcare', 'education', 'internet'];
-
-  features.forEach(feature => {
-    if (infrastructure[feature]) score += 16.67;
-  });
-
-  return Math.min(score, 100);
-}
-
-async function assessResourceAvailability(waterSources) {
-  if (!waterSources || waterSources.length === 0) return 30;
-  return waterSources.length * 20;
-}
-
-async function assessAgriculturalPotential(landArea, crops) {
-  if (!landArea) return 0;
-  let score = Math.min(landArea * 10, 50);
-  if (crops && crops.length > 0) score += 20;
-  return Math.min(score, 100);
-}
-
-async function calculateDemographicIndicators(population, households) {
-  return {
-    population_density: households > 0 ? population / households : 0,
-    household_size: households > 0 ? population / households : 0,
-  };
-}
-
-function getResourceTypeSummary(resources) {
-  const summary = {};
-  resources.forEach(resource => {
-    summary[resource.resource_type] = (summary[resource.resource_type] || 0) + 1;
-  });
-  return summary;
-}
-
-function calculateAverageUtilization(resources) {
-  if (resources.length === 0) return 0;
-  const total = resources.reduce((sum, r) => sum + (r.current_utilization || 0), 0);
-  return total / resources.length;
-}
-
-function getMaintenanceStatus(resources) {
-  const needsMaintenance = resources.filter(r => r.condition === 'poor').length;
-  const wellMaintained = resources.filter(r => r.condition === 'good').length;
-
-  return {
-    needs_maintenance: needsMaintenance,
-    well_maintained: wellMaintained,
-    overall_status: needsMaintenance > resources.length / 2 ? 'attention_needed' : 'good',
-  };
-}
-
-async function generateVillageInsights(village, resources) {
-  const aiRequest = {
-    task: 'village_analytics_insights',
-    parameters: {
-      village_data: village,
-      resource_data: resources,
-      development_index: village.ai_development_index,
-    },
-  };
-
-  const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-  return aiResponse;
-}
-
-module.exports = {
-  createVillage,
-  addVillageResource,
-  getVillageAnalytics,
-};
-
+module.exports = new M041Service();

@@ -1,20 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './styles.css';
+import React, { useState, useEffect } from 'react';
 
-// Real implementation lives in WhatGrowPage, not here.
 export default function M061Page() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/m061')
+      .then(r => r.json())
+      .then(d => setData(d.data || []))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <div className='module-M061 p-4'>
-      <h1>Crop Planning (M061)</h1>
-      <p>Domain: Crop — Status: HIDDEN</p>
-      <p className="text-sm text-gray-600 mt-2">
-        This capability is implemented at <code>pages/WhatGrowPage.jsx</code>,
-        not here.
-      </p>
-      <Link to="/what-grow" className="text-blue-600 underline">
-        Go to What To Grow →
-      </Link>
+    <div className="M061-container">
+      <h1>M061</h1>
+      {loading && <p>Loading...</p>}
+      {!loading && data.length === 0 && <p>No data</p>}
+      {!loading && data.length > 0 && (
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>{JSON.stringify(item)}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

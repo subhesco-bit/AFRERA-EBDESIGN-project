@@ -1,11 +1,13 @@
-﻿// Express routes for Poultry Management (M123)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/flocks', controller.registerPoultryFlock);
-router.put('/flocks/:id/health', controller.updateFlockHealth);
-router.get('/flocks/:id/performance', controller.trackFlockPerformance);
-router.get('/farmers/:farmerId/report', controller.generatePoultryReport);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

@@ -1,10 +1,13 @@
-﻿// Express routes for Village Registry (M041)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/villages', controller.createVillage);
-router.post('/villages/:villageId/resources', controller.addVillageResource);
-router.get('/villages/:villageId/analytics', controller.getVillageAnalytics);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

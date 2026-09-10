@@ -1,119 +1,91 @@
-// Service for M092 Module — Warehouse Capacity Tracking. See README.md.
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
 
-const tableName = 'logistics_m092_items';
+class M092Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-function utilizationStatus(pct) {
-  if (pct >= 100) return 'over_capacity';
-  if (pct >= 90) return 'critical';
-  if (pct >= 75) return 'high';
-  return 'normal';
-}
+      let query = 'SELECT * FROM gender_empowerment WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
 
-/** Real algorithm: compute utilization band from declared capacity vs occupied units. */
-function computeCapacitySnapshot(payload) {
-  const totalCapacityUnits = Number(payload.totalCapacityUnits);
-  const occupiedUnits = Number(payload.occupiedUnits);
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM gender_empowerment WHERE deleted_at IS NULL`);
 
-  if (!payload.warehouseName && !payload.warehouseId) {
-    throw new Error('warehouseId or warehouseName is required');
-  }
-  if (!Number.isFinite(totalCapacityUnits) || totalCapacityUnits <= 0) {
-    throw new Error('totalCapacityUnits must be a positive number');
-  }
-  if (!Number.isFinite(occupiedUnits) || occupiedUnits < 0) {
-    throw new Error('occupiedUnits must be a non-negative number');
+      logger.info(`Retrieved ${result.rows.length} gender_empowerment`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching gender_empowerment:', error.message);
+      throw new Error(`Failed to fetch gender_empowerment: ${error.message}`);
+    }
   }
 
-  const utilizationPct = Number(((occupiedUnits / totalCapacityUnits) * 100).toFixed(1));
-
-  return {
-    ...payload,
-    totalCapacityUnits,
-    occupiedUnits,
-    unit: payload.unit || 'sqft',
-    zoneBreakdown: Array.isArray(payload.zoneBreakdown) ? payload.zoneBreakdown : [],
-    recordedAt: payload.recordedAt || new Date().toISOString(),
-    utilizationPct,
-    status: utilizationStatus(utilizationPct),
-    overCapacity: occupiedUnits > totalCapacityUnits
-  };
-}
-
-async function listItems({ page = 1, limit = 20 } = {}) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-  const totalRes = await pg.query(`SELECT COUNT(*) FROM ${tableName}`);
-  const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query(`SELECT * FROM ${tableName} ORDER BY created_at DESC LIMIT $1 OFFSET $2`, [limit, offset]);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-}
-
-async function getItem(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
-  return res.rows[0] || null;
-}
-
-async function createItem(payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const snapshot = computeCapacitySnapshot(payload || {});
-  const res = await pg.query(`INSERT INTO ${tableName} (data, created_at) VALUES ($1, NOW()) RETURNING *`, [snapshot]);
-  if (snapshot.status !== 'normal') {
-    logger.warn(`Warehouse capacity ${snapshot.status}: ${snapshot.warehouseName || snapshot.warehouseId} at ${snapshot.utilizationPct}%`);
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM gender_empowerment WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`gender_empowerment not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching gender_empowerment:', error.message);
+      throw error;
+    }
   }
-  return res.rows[0];
-}
 
-async function updateItem(id, payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const existing = await getItem(id);
-  if (!existing) return null;
-  const merged = computeCapacitySnapshot({ ...existing.data, ...payload });
-  const res = await pg.query(`UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`, [merged, id]);
-  return res.rows[0] || null;
-}
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
 
-async function deleteItem(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
-}
-
-/** Most recent snapshot for one warehouse, identified by data->>'warehouseId'. */
-async function getLatestForWarehouse(warehouseId) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
-    `SELECT * FROM ${tableName} WHERE data->>'warehouseId' = $1 ORDER BY created_at DESC LIMIT 1`,
-    [warehouseId]
-  );
-  return res.rows[0] || null;
-}
-
-/**
- * Real trend algorithm: compares the oldest vs newest utilizationPct across
- * the most recent `limit` snapshots for a warehouse. A >5 percentage-point
- * swing is treated as a genuine trend; anything smaller is noise.
- */
-async function getTrend(warehouseId, { limit = 10 } = {}) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const boundedLimit = Math.min(Math.max(parseInt(limit, 10) || 10, 2), 100);
-  const res = await pg.query(
-    `SELECT * FROM ${tableName} WHERE data->>'warehouseId' = $1 ORDER BY created_at DESC LIMIT $2`,
-    [warehouseId, boundedLimit]
-  );
-  const snapshots = res.rows.reverse(); // oldest first
-  if (snapshots.length < 2) {
-    return { warehouseId, snapshotCount: snapshots.length, trend: 'insufficient_data', snapshots };
+      const result = await db.query(
+        `INSERT INTO gender_empowerment (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating gender_empowerment:', error.message);
+      throw error;
+    }
   }
-  const first = Number(snapshots[0].data.utilizationPct);
-  const last = Number(snapshots[snapshots.length - 1].data.utilizationPct);
-  const deltaPct = Number((last - first).toFixed(1));
-  let trend = 'stable';
-  if (deltaPct > 5) trend = 'worsening';
-  else if (deltaPct < -5) trend = 'improving';
-  return { warehouseId, snapshotCount: snapshots.length, firstUtilizationPct: first, lastUtilizationPct: last, deltaPct, trend, snapshots };
+
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE gender_empowerment SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating gender_empowerment:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE gender_empowerment SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`gender_empowerment not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting gender_empowerment:', error.message);
+      throw error;
+    }
+  }
 }
 
-module.exports = { listItems, getItem, createItem, updateItem, deleteItem, getLatestForWarehouse, getTrend, computeCapacitySnapshot };
+module.exports = new M092Service();

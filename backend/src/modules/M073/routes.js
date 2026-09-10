@@ -1,13 +1,13 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/herds', authMiddleware, requireRole('admin'), controller.registerGoatHerd);
-router.get('/herds', authMiddleware, controller.listGoatHerds);
-router.get('/herds/:herdId', authMiddleware, controller.getGoatHerd);
-router.put('/herds/:herdId', authMiddleware, requireRole('admin'), controller.updateGoatHerd);
-router.get('/herds/:herdId/analysis', authMiddleware, controller.analyzeGoatProduction);
-router.get('/analytics', authMiddleware, requireRole('admin'), controller.getGoatAnalytics);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

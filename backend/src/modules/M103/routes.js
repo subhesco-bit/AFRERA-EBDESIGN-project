@@ -1,13 +1,13 @@
-﻿// Express routes for Equipment Inventory (M103)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.get('/', controller.listEquipment);
-router.get('/:id', controller.getEquipment);
-router.post('/register', controller.registerEquipment);
-router.put('/status/:id', controller.updateEquipmentStatus);
-router.get('/utilization/:id', controller.trackEquipmentUtilization);
-router.get('/report/:farmerId', controller.generateInventoryReport);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

@@ -1,11 +1,13 @@
-﻿// Express routes for Water Analytics (M080)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/analytics', controller.generateWaterUsageAnalytics);
-router.post('/dashboards', controller.createWaterDashboard);
-router.post('/predictions', controller.generatePredictiveAnalysis);
-router.post('/comparisons', controller.compareWaterPerformance);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

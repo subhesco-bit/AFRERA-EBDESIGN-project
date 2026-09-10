@@ -1,49 +1,52 @@
-﻿/**
- * Controller for Water Analytics (M080)
- * Handles HTTP requests for water analytics operations
- */
+const m080Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const waterAnalyticsService = require('./service');
-
-const generateWaterUsageAnalytics = async (req, res) => {
-  try {
-    const analytics = await waterAnalyticsService.generateWaterUsageAnalytics(req.body);
-    res.status(201).json({ success: true, data: analytics });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M080Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m080Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const createWaterDashboard = async (req, res) => {
-  try {
-    const dashboard = await waterAnalyticsService.createWaterDashboard(req.body);
-    res.status(201).json({ success: true, data: dashboard });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m080Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const generatePredictiveAnalysis = async (req, res) => {
-  try {
-    const prediction = await waterAnalyticsService.generatePredictiveAnalysis(req.body);
-    res.status(201).json({ success: true, data: prediction });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m080Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const compareWaterPerformance = async (req, res) => {
-  try {
-    const comparison = await waterAnalyticsService.compareWaterPerformance(req.body);
-    res.status(201).json({ success: true, data: comparison });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m080Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-module.exports = {
-  generateWaterUsageAnalytics,
-  createWaterDashboard,
-  generatePredictiveAnalysis,
-  compareWaterPerformance,
-};
+  async delete(req, res) {
+    try {
+      const result = await m080Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M080Controller();

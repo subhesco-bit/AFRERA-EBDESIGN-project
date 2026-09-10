@@ -1,48 +1,52 @@
-﻿/**
- * Controller for Equipment Inventory (M042)
- */
+const m042Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const equipmentInventoryService = require('./service');
-
-const createEquipment = async (req, res) => {
-  try {
-    const equipment = await equipmentInventoryService.createEquipment(req.body);
-    res.status(201).json({ success: true, data: equipment });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M042Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m042Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const recordEquipmentUsage = async (req, res) => {
-  try {
-    const usage = await equipmentInventoryService.recordEquipmentUsage(req.params.equipmentId, req.body);
-    res.status(201).json({ success: true, data: usage });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m042Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const getEquipmentByOwner = async (req, res) => {
-  try {
-    const equipment = await equipmentInventoryService.getEquipmentByOwner(req.params.ownerId);
-    res.status(200).json({ success: true, data: equipment });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m042Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const getMaintenancePredictions = async (req, res) => {
-  try {
-    const predictions = await equipmentInventoryService.getMaintenancePredictions(req.query.category);
-    res.status(200).json({ success: true, data: predictions });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m042Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-module.exports = {
-  createEquipment,
-  recordEquipmentUsage,
-  getEquipmentByOwner,
-  getMaintenancePredictions,
-};
+  async delete(req, res) {
+    try {
+      const result = await m042Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M042Controller();

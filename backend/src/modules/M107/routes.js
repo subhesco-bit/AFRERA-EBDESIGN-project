@@ -1,13 +1,13 @@
-﻿// Express routes for Breakdown Maintenance (M107)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.get('/', controller.listBreakdowns);
-router.get('/:id', controller.getBreakdown);
-router.post('/report', controller.reportBreakdown);
-router.post('/repair/:id', controller.scheduleEmergencyRepair);
-router.get('/downtime/:id', controller.trackDowntime);
-router.get('/report/:farmerId', controller.generateBreakdownReport);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

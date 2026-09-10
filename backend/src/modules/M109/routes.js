@@ -1,13 +1,13 @@
-﻿// Express routes for Spare Parts Management (M109)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.get('/', controller.listSpareParts);
-router.get('/:id', controller.getSparePart);
-router.post('/register', controller.registerSparePart);
-router.post('/consumption', controller.recordPartConsumption);
-router.get('/status/:id', controller.trackInventoryStatus);
-router.get('/report/:farmerId', controller.generateInventoryReport);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;
