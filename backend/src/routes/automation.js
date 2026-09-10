@@ -1,14 +1,20 @@
-const router = require('express').Router();
-const automationService = require('../services/automationService');
-const auth = require('../middleware/auth');
+/**
+ * automation Routes
+ * Placeholder route module
+ */
 
+const express = require('express');
 const router = express.Router();
 
-router.post('/automation/trigger/:workflowId', auth, async (req, res) => {
-  try {
-    const result = await automationService.triggerWorkflow(req.params.workflowId, req.body);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'automation',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

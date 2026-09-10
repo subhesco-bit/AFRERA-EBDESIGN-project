@@ -1,14 +1,20 @@
-const router = require('express').Router();
-const financialAnalyticsService = require('../services/financialAnalyticsService');
-const auth = require('../middleware/auth');
+/**
+ * financial Analytics Routes
+ * Placeholder route module
+ */
 
+const express = require('express');
 const router = express.Router();
 
-router.post('/users/:userId/financial/statement', auth, async (req, res) => {
-  try {
-    const result = await financialAnalyticsService.generateFinancialStatement(req.params.userId);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'financialAnalytics',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

@@ -1,13 +1,20 @@
-const router = require('express').Router();
-const videoService = require('../services/videoAnalyticsService');
+/**
+ * video Analytics Routes
+ * Placeholder route module
+ */
 
+const express = require('express');
 const router = express.Router();
 
-router.post('/video/:videoId/analyze/:type', async (req, res) => {
-  try {
-    const result = await videoService.analyzeVideo(req.params.videoId, req.params.type);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'videoAnalytics',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

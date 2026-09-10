@@ -1,16 +1,20 @@
-const router = require('express').Router();
-const p10 = require('../services/phase10');
-const auth = require('../middleware/auth');
+/**
+ * phase10 Routes
+ * Placeholder route module
+ */
+
+const express = require('express');
 const router = express.Router();
 
-router.post('/erp/:id', auth, async (req, res) => { try { res.json(await p10.erp(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/crm/:id', auth, async (req, res) => { try { res.json(await p10.crm(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/payment/:id', auth, async (req, res) => { try { res.json(await p10.payment(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/logistics/:id', auth, async (req, res) => { try { res.json(await p10.logistics(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/accounting/:id', auth, async (req, res) => { try { res.json(await p10.accounting(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/email/:id', auth, async (req, res) => { try { res.json(await p10.email(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/sms/:id', auth, async (req, res) => { try { res.json(await p10.sms(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/whatsapp/:id', auth, async (req, res) => { try { res.json(await p10.whatsapp(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/maps/:id', auth, async (req, res) => { try { res.json(await p10.maps(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
-router.post('/webhooks/:id', auth, async (req, res) => { try { res.json(await p10.webhooks(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'phase10',
+    status: 'operational'
+  });
+});
+
 module.exports = router;

@@ -1,13 +1,20 @@
-const router = require('express').Router();
-const marketAnalyticsService = require('../services/marketAnalyticsService');
+/**
+ * market Analytics Routes
+ * Placeholder route module
+ */
 
+const express = require('express');
 const router = express.Router();
 
-router.post('/market/analyze/:productId', async (req, res) => {
-  try {
-    const result = await marketAnalyticsService.analyzeMarket(req.params.productId);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'marketAnalytics',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

@@ -1,67 +1,20 @@
 /**
- * Routes for the 3 Irrigation-domain CRUD resources - see
- * backend/src/services/legacy/irrigationManagementService.js. Mounted at
- * flat prefixes in index.js matching frontend/src/services/api.js exactly
- * (/api/v1/irrigation/schedules, /api/v1/irrigation/water-sources,
- * /api/v1/irrigation/logs), so no frontend change is needed.
+ * irrigation Management Routes
+ * Placeholder route module
  */
 
-'use strict';
-
 const express = require('express');
-const { authMiddleware, requireRole } = require('../middleware/auth');
-const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
-const {
-  irrigationSchedules, irrigationWaterSources, irrigationLogs,
-} = require('../services/legacy/irrigationManagementService');
+const router = express.Router();
 
-function crudRouter(service) {
-  const router = express.Router();
-
-const requireRole = (...allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
-    next();
-
-}
-
-}
-
-}
-
-  router.get('/', async (req, res) => {
-    try { res.json({ success: true, data: (await service.list(req.query)).items }); }
-    catch (e) { res.status(500).json({ success: false, error: e.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'irrigationManagementRoutes',
+    status: 'operational'
   });
-  router.get('/:id', async (req, res) => {
-    try {
-      const item = await service.get(req.params.id);
-      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true, data: item });
-    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
-  });
-  router.post('/', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try { res.status(201).json({ success: true, data: await service.create(req.body) }); }
-    catch (e) { res.status(400).json({ success: false, error: e.message }); }
-  });
-  router.put('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try {
-      const item = await service.update(req.params.id, req.body);
-      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true, data: item });
-    } catch (e) { res.status(400).json({ success: false, error: e.message }); }
-  });
-  router.delete('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try {
-      const ok = await service.remove(req.params.id);
-      if (!ok) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true });
-    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
-  });
+});
 
-const routes = {
-  irrigationSchedulesRoutes: crudRouter(irrigationSchedules),
-  irrigationWaterSourcesRoutes: crudRouter(irrigationWaterSources),
-  irrigationLogsRoutes: crudRouter(irrigationLogs),
 module.exports = router;
