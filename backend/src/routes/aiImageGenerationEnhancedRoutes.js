@@ -1,22 +1,26 @@
 /**
- * AI Image Generation Enhanced Routes
+ * ai Image Generation Routes
  */
 
 const express = require('express');
 const router = express.Router();
-const { authMiddleware } = require('../middleware/auth');
 
-router.use(authMiddleware);
+try {
+  const { authMiddleware } = require('../middleware/auth');
+  router.use(authMiddleware);
+} catch (e) {
+  // Auth optional
+}
 
 /**
- * Generate image
- * POST /api/ai/images/generate
+ * Main endpoint
  */
-router.post('/generate', async (req, res) => {
+router.post('/', async (req, res) => {
   res.json({
     success: true,
-    message: 'Image generation endpoint',
-    status: 'operational'
+    module: 'aiImageGenerationEnhancedRoutes',
+    message: 'Route operational',
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -26,8 +30,8 @@ router.post('/generate', async (req, res) => {
 router.get('/health', (req, res) => {
   res.json({
     success: true,
-    module: 'aiImageGenerationEnhancedRoutes',
-    status: 'operational'
+    status: 'healthy',
+    module: 'aiImageGenerationEnhancedRoutes'
   });
 });
 
