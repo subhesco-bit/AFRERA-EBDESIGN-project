@@ -13,16 +13,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const platformConfigurationService = require('../services/legacy/platformConfigurationService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { rateLimiters } = require('../middleware/rateLimit');
@@ -34,15 +38,12 @@ const correlationId = (req) => req.get('x-correlation-id') || `platform-config-$
 const fail = (req, res, error, operation) => {
   const requestId = correlationId(req);
   logger.error(`platformConfigurationRoutes:${operation}`, { error: error.message, requestId });
-  return res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR', requestId });
-};
-const objectBody = (req, res) => {
+  return res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR', requestId });const objectBody = (req, res) => {
   if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
     res.status(400).json({ success: false, error: 'Request body must be an object', code: 'INVALID_INPUT' });
     return false;
   }
   return true;
-};
 const configurationBody = (req, res) => {
   if (!objectBody(req, res) || !req.body.parameters || typeof req.body.parameters !== 'object' || Array.isArray(req.body.parameters)) {
     if (res.headersSent) return false;
@@ -56,7 +57,6 @@ const configurationBody = (req, res) => {
     return false;
   }
   return true;
-};
 const admin = [rateLimiters.api, authMiddleware, requireRole('admin')];
 const writeAdmin = [rateLimiters.write, authMiddleware, requireRole('admin')];
 

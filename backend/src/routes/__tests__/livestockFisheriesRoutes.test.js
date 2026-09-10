@@ -1,4 +1,18 @@
 const express = require('express');
+const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
+
 const request = require('supertest');
 
 const mockSignals = [];
@@ -68,3 +82,5 @@ test('rejects unbounded fisheries pagination before service access', async () =>
   await request(app).get('/fisheries').expect(401);
   expect(mockFisheriesService.getAllFisheries).not.toHaveBeenCalled();
 });
+
+module.exports = router;

@@ -2,6 +2,8 @@ const router = require('express').Router();
 const automationService = require('../services/automationService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/automation/trigger/:workflowId', auth, async (req, res) => {
   try {
     const result = await automationService.triggerWorkflow(req.params.workflowId, req.body);

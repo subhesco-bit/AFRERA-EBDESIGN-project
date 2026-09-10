@@ -21,8 +21,6 @@ router.get('/modules', (req, res) => {
       status: req.query.status,
       type: req.query.type,
       healthStatus: req.query.healthStatus
-    };
-    
     const modules = moduleSupportInfrastructureService.getModules(filters);
     res.json({
       success: true,
@@ -215,8 +213,6 @@ router.get('/services', (req, res) => {
       status: req.query.status,
       type: req.query.type,
       moduleId: req.query.moduleId
-    };
-    
     const services = moduleSupportInfrastructureService.getServices(filters);
     res.json({
       success: true,
@@ -296,8 +292,6 @@ router.get('/support-tickets', (req, res) => {
       status: req.query.status,
       priority: req.query.priority,
       moduleId: req.query.moduleId
-    };
-    
     const tickets = moduleSupportInfrastructureService.getSupportTickets(filters);
     res.json({
       success: true,

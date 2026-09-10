@@ -25,8 +25,6 @@ router.post('/unified', authMiddleware, async (req, res) => {
       userId,
       sessionId,
       agentPreference,
-    };
-
     const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
@@ -59,8 +57,6 @@ router.post('/conversational', authMiddleware, async (req, res) => {
       userId,
       sessionId,
       agentPreference: 'farmer-advisor',
-    };
-
     const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
@@ -93,8 +89,6 @@ router.post('/analytical', authMiddleware, async (req, res) => {
       userId,
       sessionId,
       agentPreference: 'business-analyst',
-    };
-
     const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
@@ -127,8 +121,6 @@ router.post('/automation', authMiddleware, async (req, res) => {
       userId,
       sessionId,
       agentPreference: 'operations-manager',
-    };
-
     const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
@@ -161,8 +153,6 @@ router.post('/governance', authMiddleware, async (req, res) => {
       userId,
       sessionId,
       agentPreference: 'governance-agent',
-    };
-
     const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
@@ -292,8 +282,6 @@ router.get('/usage', authMiddleware, async (req, res) => {
       totalCost: 0,
       byAgent: {},
       byRequestType: {},
-    };
-
     res.json({
       success: true,
       data: usageStats,

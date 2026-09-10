@@ -134,10 +134,7 @@ router.get('/optimizations', authMiddleware, adminMiddleware, async (req, res) =
  * aiGatewayRoutes.js's notImplemented() helper.
  */
 const notImplemented = (feature) => (req, res) => {
-  res.status(501).json({ success: false, error: `${feature} is not implemented`, code: 'NOT_IMPLEMENTED' });
-};
-
-router.post('/initialize', authMiddleware, adminMiddleware, notImplemented('Platform initialize'));
+  res.status(501).json({ success: false, error: `${feature} is not implemented`, code: 'NOT_IMPLEMENTED' });router.post('/initialize', authMiddleware, adminMiddleware, notImplemented('Platform initialize'));
 router.get('/scaling/recommendations', authMiddleware, adminMiddleware, notImplemented('Platform scaling recommendations'));
 router.get('/capacity/predict', authMiddleware, adminMiddleware, notImplemented('Platform capacity prediction'));
 router.post('/disaster-recovery', authMiddleware, adminMiddleware, notImplemented('Platform disaster recovery trigger'));
@@ -147,5 +144,8 @@ router.get('/configuration/optimized', authMiddleware, adminMiddleware, notImple
 router.post('/configuration/apply', authMiddleware, adminMiddleware, notImplemented('Configuration apply'));
 router.get('/metrics', authMiddleware, adminMiddleware, notImplemented('Platform metrics'));
 router.get('/state', authMiddleware, adminMiddleware, notImplemented('Platform system state'));
+
+
+}
 
 module.exports = router;

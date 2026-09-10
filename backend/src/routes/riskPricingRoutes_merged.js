@@ -147,6 +147,8 @@ router.post('/basis', authMiddleware, async (req, res) => {
 // owns pricing, so two endpoints cannot quote two prices for the same lot.
 // ---------------------------------------------------------------------------
 const dynamicPricing = require('../services/legacy/dynamicPricingService');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 router.get('/lots/:lotCode/price', async (req, res) => {
   try {

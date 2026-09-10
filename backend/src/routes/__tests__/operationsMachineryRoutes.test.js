@@ -1,4 +1,18 @@
 const express = require('express');
+const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
+
 const request = require('supertest');
 
 const mockService = { list: jest.fn(), get: jest.fn(), create: jest.fn(), update: jest.fn(), remove: jest.fn() };
@@ -46,3 +60,5 @@ test('validates exchange listing and preserves ownership call', async () => {
   await request(app).post('/exchange').set('Authorization', 'Bearer test').send({ equipmentName: 'Tractor', conditionGrade: 'A', pricingType: 'priced', priceInr: -1 }).expect(400);
   await request(app).post('/exchange/9/reserve').set('Authorization', 'Bearer test').set('x-role', 'consumer').expect(403);
 });
+
+module.exports = router;

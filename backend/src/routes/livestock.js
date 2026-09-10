@@ -2,6 +2,8 @@ const router = require('express').Router();
 const livestockService = require('../services/livestockService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/farms/:farmId/livestock', auth, async (req, res) => {
   try {
     const result = await livestockService.registerLivestock(req.params.farmId, req.body.type, req.body.count, req.body.breed);

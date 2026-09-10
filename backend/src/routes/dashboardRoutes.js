@@ -46,8 +46,6 @@ router.get('/stats', verifyToken, async (req, res) => {
           date: new Date(Date.now() - 259200000),
         },
       ],
-    };
-
     res.json({
       success: true,
       data: stats,

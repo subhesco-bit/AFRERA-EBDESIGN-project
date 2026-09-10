@@ -57,7 +57,6 @@ const ENDPOINT_MAP = {
   '/api/analytics/sales': '/api/analytics/sales',
   '/api/analytics/products': '/api/analytics/products',
   '/api/analytics/orders': '/api/analytics/orders',
-};
 
 /**
  * Frontend → Backend Route Mapping
@@ -71,7 +70,6 @@ const ROUTE_CORRECTIONS = {
   'GET /api/dashboard': 'GET /api/dashboards/user',
   'GET /api/notifications': 'GET /api/notifications',
   'POST /api/notifications/:id/read': 'PATCH /api/notifications/:id',
-};
 
 /**
  * GET /api/debug/endpoint-mismatches
@@ -142,7 +140,6 @@ router.get('/endpoint-validation', (req, res) => {
     missingRoutes: [],
     extraRoutes: [],
     statusCode: 200,
-  };
 
   res.json({
     ...validation,
@@ -163,7 +160,6 @@ function getImpactedFeatures(endpoint) {
     '/api/inventory': ['Inventory Management', 'Stock Tracking'],
     '/api/farmer': ['Farmer Dashboard', 'Crop Management', 'Sales Tracking'],
     '/api/analytics': ['Analytics Dashboard', 'Reports'],
-  };
 
   for (const [key, features] of Object.entries(featureMap)) {
     if (endpoint.includes(key)) {

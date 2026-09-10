@@ -3,6 +3,8 @@ const router = express.Router();
 const cropRecommendationService = require('../services/cropRecommendationService');
 const { authMiddleware: authenticateToken } = require('../middleware/auth');
 const logger = require('../utils/logger');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 router.post('/recommendations/crops', authenticateToken, async (req, res, next) => {
   try {

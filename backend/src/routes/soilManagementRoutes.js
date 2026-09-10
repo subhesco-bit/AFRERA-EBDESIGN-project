@@ -18,16 +18,20 @@ const { validateId, parsePageQuery, bodyValidator, date, numberValue, fail, requ
 const { soilHealth, nutrientManagement, fertilityManagement } = require('../services/legacy/soilManagementService');
 
 function crudRouter(service, validateCreate) {
-  const 
+  const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
   router.get('/', rateLimiters.read, parsePageQuery, async (req, res) => {
     try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { return fail(req, res, e, 'soil.list'); }
@@ -81,14 +85,9 @@ function emitMutation(req, operation, item) {
   logger.info('soilManagementRoutes:mutation', { operation, entityId: id, requestId: requestId(req, 'soil') });
   signalBus.emitSignal(SIGNAL.SOIL_RECORD_CHANGED, { operation, resourceId: id }, {
     severity: SEVERITY.INFO, source: 'soil_management_routes', entityId: id, correlationId: requestId(req, 'soil'),
-  });
-}
 
-const router = express.Router();
 const routes = {
   soilHealthRoutes: crudRouter(soilHealth, (body) => validateSoilBody(body, ['plot_name'])),
   nutrientManagementRoutes: crudRouter(nutrientManagement, (body) => validateSoilBody(body, ['plot_name'])),
   fertilityManagementRoutes: crudRouter(fertilityManagement, (body) => validateSoilBody(body, ['plot_name'])),
-};
-
 module.exports = router;

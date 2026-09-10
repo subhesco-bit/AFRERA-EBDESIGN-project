@@ -13,16 +13,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const systemAdministrationService = require('../services/legacy/systemAdministrationService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { rateLimiters } = require('../middleware/rateLimit');
@@ -35,16 +39,12 @@ const requestId = (req) => req.get('x-correlation-id') || `system-admin-${Date.n
 const fail = (req, res, error, operation) => {
   const id = requestId(req);
   logger.error(`systemAdministrationRoutes:${operation}`, { error: error.message, requestId: id });
-  return res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR', requestId: id });
-};
-const body = (req, res, next) => {
+  return res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR', requestId: id });const body = (req, res, next) => {
   if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) return res.status(400).json({ success: false, error: 'Request body must be an object', code: 'INVALID_INPUT' });
   next();
-};
 const timeframe = (req, res, next) => {
   if (req.query.timeframe !== undefined && !/^\d{1,4}[hdwmy]$/.test(req.query.timeframe)) return res.status(400).json({ success: false, error: 'timeframe is invalid', code: 'INVALID_INPUT' });
   next();
-};
 const admin = [rateLimiters.api, authMiddleware, requireRole('admin')];
 const writeAdmin = [rateLimiters.write, authMiddleware, requireRole('admin')];
 

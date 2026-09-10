@@ -2,6 +2,8 @@ const router = require('express').Router();
 const biometricService = require('../services/biometricService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/biometric/verify/:userId', auth, async (req, res) => {
   try {
     const result = await biometricService.verifyBiometric(req.params.userId, req.body);

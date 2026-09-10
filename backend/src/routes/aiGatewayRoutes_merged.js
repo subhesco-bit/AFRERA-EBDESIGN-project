@@ -16,10 +16,7 @@ const express = require('express');
 const router = express.Router();
 
 const notImplemented = (feature) => (req, res) => {
-  res.status(501).json({ success: false, error: `${feature} is not implemented`, code: 'NOT_IMPLEMENTED' });
-};
-
-router.post('/chat', notImplemented('Multi-provider AI gateway chat'));
+  res.status(501).json({ success: false, error: `${feature} is not implemented`, code: 'NOT_IMPLEMENTED' });router.post('/chat', notImplemented('Multi-provider AI gateway chat'));
 router.get('/statistics', notImplemented('AI gateway statistics'));
 router.get('/providers', notImplemented('AI provider registry'));
 router.get('/models/:provider', notImplemented('AI provider model listing'));
@@ -27,6 +24,9 @@ router.put('/providers/:provider/enable', notImplemented('AI provider enable/dis
 router.put('/providers/:provider/disable', notImplemented('AI provider enable/disable'));
 
 router.post('/stream', notImplemented('Multi-provider AI gateway streaming'));
+
+
+}
 
 module.exports = router;
 

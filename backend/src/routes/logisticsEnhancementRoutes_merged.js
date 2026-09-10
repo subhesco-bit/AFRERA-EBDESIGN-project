@@ -9,16 +9,19 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { LOGISTICS_ROLES } = require('../middleware/roleGroups');
 const logisticsService = require('../services/legacy/logisticsEnhancementService');
 
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
 
 // ============================================================================
 // FLEET MANAGEMENT ROUTES
@@ -45,7 +48,6 @@ router.get('/fleet/vehicles', authMiddleware, async (req, res) => {
     const filters = {
       type: req.query.type,
       status: req.query.status,
-    };
     const result = await logisticsService.getFleet(filters);
     res.json(result);
   } catch (error) {
@@ -187,7 +189,6 @@ router.get('/temperature/:shipmentId', authMiddleware, async (req, res) => {
       startDate: req.query.startDate,
       endDate: req.query.endDate,
       zone: req.query.zone,
-    };
     const result = await logisticsService.getTemperatureData(req.params.shipmentId, filters);
     res.json(result);
   } catch (error) {
@@ -235,7 +236,6 @@ router.get('/warehouse/locations', authMiddleware, async (req, res) => {
       warehouseId: req.query.warehouseId,
       zone: req.query.zone,
       status: req.query.status,
-    };
     const result = await logisticsService.getWarehouses(filters);
     res.json(result);
   } catch (error) {
@@ -283,10 +283,7 @@ router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
 // runtime. No frontend caller references any of these paths. Returning 501 instead
 // of building the underlying feature, which is new scope beyond this audit pass.
 const notImplemented = (feature) => (req, res) => {
-  res.status(501).json({ error: `${feature} is not implemented`, code: 'NOT_IMPLEMENTED' });
-};
-
-router.post('/warehouse/inventory/movement', authMiddleware, notImplemented('Inventory movement tracking'));
+  res.status(501).json({ error: `${feature} is not implemented`, code: 'NOT_IMPLEMENTED' });router.post('/warehouse/inventory/movement', authMiddleware, notImplemented('Inventory movement tracking'));
 router.get('/warehouse/performance', authMiddleware, notImplemented('Warehouse performance metrics'));
 
 // ============================================================================

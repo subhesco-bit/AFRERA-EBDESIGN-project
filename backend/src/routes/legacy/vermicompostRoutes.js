@@ -17,7 +17,6 @@ router.get('/', authenticate, async (req, res) => {
       farmer_id: req.query.farmer_id,
       worm_type: req.query.worm_type,
       status: req.query.status,
-    };
     const vermicompost = await vermicompostService.getAllVermicompost(filters);
     res.json({ success: true, data: vermicompost });
   } catch (error) {

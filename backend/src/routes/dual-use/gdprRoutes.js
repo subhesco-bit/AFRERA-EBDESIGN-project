@@ -223,8 +223,6 @@ router.get('/policy', async (req, res) => {
         email: 'privacy@afrera.com',
         address: 'AFRERA Privacy Office, Assam, India',
       },
-    };
-
     res.json({
       success: true,
       data: privacyPolicy,

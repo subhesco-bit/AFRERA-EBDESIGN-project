@@ -2,6 +2,8 @@ const router = require('express').Router();
 const riskService = require('../services/riskAssessmentService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/risk/assess/:entityId', auth, async (req, res) => {
   try {
     const result = await riskService.assessRisk(req.params.entityId, req.body.risk_factors);

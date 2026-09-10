@@ -294,8 +294,6 @@ router.get('/batch/:batch_id', async (req, res) => {
           operation: 'RECEIVE',
         },
       ],
-    };
-
     res.status(200).json({
       success: true,
       data: batch,

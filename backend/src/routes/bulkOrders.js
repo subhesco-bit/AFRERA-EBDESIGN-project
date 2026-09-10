@@ -2,6 +2,8 @@ const router = require('express').Router();
 const bulkOrderService = require('../services/bulkOrderService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/bulk-orders', auth, async (req, res) => {
   try {
     const result = await bulkOrderService.createBulkOrder(req.body);

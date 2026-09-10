@@ -27,8 +27,6 @@ router.get('/documents', (req, res) => {
       ownerId: req.query.ownerId,
       folderId: req.query.folderId,
       tag: req.query.tag,
-    };
-
     const documents = informationSharingService.getDocuments(filters);
     res.json({
       success: true,
@@ -54,8 +52,6 @@ router.get('/documents/search', (req, res) => {
       status: req.query.status,
       category: req.query.category,
       type: req.query.type,
-    };
-
     const documents = informationSharingService.searchDocuments(query, filters);
     res.json({
       success: true,
@@ -153,8 +149,6 @@ router.get('/folders', (req, res) => {
       type: req.query.type,
       ownerId: req.query.ownerId,
       parentId: req.query.parentId,
-    };
-
     const folders = informationSharingService.getFolders(filters);
     res.json({
       success: true,
@@ -316,8 +310,6 @@ router.get('/collaboration-sessions', (req, res) => {
     const filters = {
       status: req.query.status,
       resourceId: req.query.resourceId,
-    };
-
     const sessions = informationSharingService.getCollaborationSessions(filters);
     res.json({
       success: true,

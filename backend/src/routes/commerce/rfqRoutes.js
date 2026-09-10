@@ -7,6 +7,8 @@ const express = require('express');
 const router = express.Router();
 const s = require('../../services/commerce/rfqService');
 const { authMiddleware } = require('../../middleware/auth');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 const fail = (res, e) => res.status(/required|must|not found|not open|closed|requires/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });
 

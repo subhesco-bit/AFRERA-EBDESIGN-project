@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const predictiveAnalyticsService = require('../services/predictiveAnalyticsService');
 
+const router = express.Router();
+
 router.post('/predict/demand/:productId', async (req, res) => {
   try {
     const result = await predictiveAnalyticsService.predictDemand(req.params.productId);

@@ -2,6 +2,8 @@ const router = require('express').Router();
 const coldChainService = require('../services/coldChainMonitoringService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/cold-storage/:unitId/temperature', auth, async (req, res) => {
   try {
     const result = await coldChainService.monitorTemperature(req.params.unitId, req.body.temperature);

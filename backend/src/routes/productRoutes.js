@@ -127,8 +127,6 @@ router.post('/', verifyToken, async (req, res) => {
       stock: stock || 0,
       rating: 0,
       reviews: 0,
-    };
-
     products.push(newProduct);
 
     // Auto-queue for image generation

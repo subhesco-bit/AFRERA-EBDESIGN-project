@@ -4,6 +4,8 @@ const router = require('express').Router();
 const { authMiddleware } = require('../middleware/auth');
 const decisionService = require('../services/supplyChainDecisionService');
 
+const router = express.Router();
+
 router.use(authMiddleware);
 
 router.post('/select-farmers', (req, res) => {

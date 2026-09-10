@@ -19,7 +19,6 @@ router.get('/', authenticate, async (req, res) => {
       farmer_id: req.query.farmer_id,
       species: req.query.species,
       status: req.query.status,
-    };
     const fisheries = await fisheriesService.getAllFisheries(filters);
     res.json({ success: true, data: fisheries });
   } catch (error) {

@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const p9 = require('../services/phase9');
 const auth = require('../middleware/auth');
+const router = express.Router();
+
 router.post('/specialization/:type', auth, async (req, res) => { try { res.json(await p9.specialization(req.params.type)); } catch (e) { res.status(500).json({ error: e.message }); } });
 router.post('/integration/:id', auth, async (req, res) => { try { res.json(await p9.integration(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
 router.post('/analytics/:id', auth, async (req, res) => { try { res.json(await p9.analytics(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });

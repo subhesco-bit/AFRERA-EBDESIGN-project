@@ -2,6 +2,8 @@ const router = require('express').Router();
 const farmAnalyticsService = require('../services/farmAnalyticsService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/farms/:farmId/analytics/report', auth, async (req, res) => {
   try {
     const result = await farmAnalyticsService.generateFarmReport(req.params.farmId);

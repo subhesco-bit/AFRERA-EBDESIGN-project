@@ -17,6 +17,8 @@ const router = express.Router();
 const fin = require('../services/legacy/recoveredFinanceService');
 const { authMiddleware } = require('../middleware/auth');
 const { resolveFarmerId } = require('../middleware/resolveFarmerId');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 function fail(res, error) {
   const bad = /required|must|Unknown|No GST rule|differ/i.test(error.message);

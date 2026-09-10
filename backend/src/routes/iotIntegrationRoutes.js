@@ -4,16 +4,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const iotService = require('../services/iotIntegrationService');
 const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/authMiddleware' does not exist in this repo - the real module is
@@ -21,6 +25,8 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
 const { apiLimiter } = require('../middleware/rateLimiter');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 // Apply authentication and rate limiting
 router.use(authenticate);
@@ -219,8 +225,6 @@ router.get('/system/status',
         bufferStatus: iotService.getBufferStatus(),
         systemHealth: 'operational',
         timestamp: new Date().toISOString(),
-      };
-
       return apiResponseHandler.sendSuccess(res, systemStatus, 'IoT system status retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get system status', 500, 'SERVER_ERROR', error.message);

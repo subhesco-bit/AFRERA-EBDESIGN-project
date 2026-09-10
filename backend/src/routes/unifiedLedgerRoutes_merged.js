@@ -146,7 +146,6 @@ router.get('/trial-balance', async (req, res) => {
       startDate: req.query.startDate,
       endDate: req.query.endDate,
       currency: req.query.currency
-    };
     const trialBalance = await unifiedLedgerService.getUnifiedTrialBalance(filters);
     res.json({ success: true, data: trialBalance });
   } catch (error) {

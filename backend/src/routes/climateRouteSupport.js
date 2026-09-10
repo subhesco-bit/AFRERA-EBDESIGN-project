@@ -64,10 +64,7 @@ function bodyValidator(validate) {
 }
 
 function queryValidator(validate) {
-  return (req, res, next) => { try { validate(req.query); next(); } catch (error) { return fail(req, res, error, 'validateQuery', error.status || 400); } };
-}
-
-const router = express.Router();
+  return (req, res, next) => { try { validate(req.query); next(); } catch (error) { return fail(req, res, error, 'validateQuery', error.status || 400); } };const router = express.Router();
 
 module.exports = {
   router,
@@ -82,4 +79,5 @@ module.exports = {
   numberValue,
   bodyValidator,
   queryValidator,
-};
+}
+}module.exports = router;

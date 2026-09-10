@@ -17,7 +17,6 @@ router.get('/', authenticate, async (req, res) => {
       farmer_id: req.query.farmer_id,
       type: req.query.type,
       status: req.query.status,
-    };
     const forestry = await forestryService.getAllForestry(filters);
     res.json({ success: true, data: forestry });
   } catch (error) {

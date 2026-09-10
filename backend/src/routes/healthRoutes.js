@@ -4,16 +4,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
 const redisCacheService = require('../services/redisCacheService');
@@ -55,8 +59,6 @@ router.get('/detailed', authMiddleware, requireRole('admin', 'superadmin'), asyn
       memory: { status: 'unknown', message: 'Not checked' },
       disk: { status: 'unknown', message: 'Not checked' },
     },
-  };
-
   let overallStatus = 'healthy';
 
   try {
@@ -67,12 +69,10 @@ router.get('/detailed', authMiddleware, requireRole('admin', 'superadmin'), asyn
       health.checks.database = {
         status: 'healthy',
         message: 'Database connection successful',
-      };
     } catch (error) {
       health.checks.database = {
         status: 'unhealthy',
         message: error.message,
-      };
       overallStatus = 'degraded';
     }
 
@@ -84,7 +84,6 @@ router.get('/detailed', authMiddleware, requireRole('admin', 'superadmin'), asyn
         message: stats.connected ? 'Redis connection successful' : 'Redis not connected',
         keys: stats.keys,
         memory: stats.memory,
-      };
       if (!stats.connected) {
         overallStatus = 'degraded';
       }
@@ -92,7 +91,6 @@ router.get('/detailed', authMiddleware, requireRole('admin', 'superadmin'), asyn
       health.checks.redis = {
         status: 'unhealthy',
         message: error.message,
-      };
       overallStatus = 'degraded';
     }
 
@@ -103,15 +101,11 @@ router.get('/detailed', authMiddleware, requireRole('admin', 'superadmin'), asyn
       heapTotal: Math.round(memoryUsage.heapTotal / 1024 / 1024),
       heapUsed: Math.round(memoryUsage.heapUsed / 1024 / 1024),
       external: Math.round(memoryUsage.external / 1024 / 1024),
-    };
-
     const memoryPercent = (memoryUsageMB.heapUsed / memoryUsageMB.heapTotal) * 100;
     health.checks.memory = {
       status: memoryPercent > 90 ? 'unhealthy' : memoryPercent > 70 ? 'degraded' : 'healthy',
       message: `Memory usage: ${memoryPercent.toFixed(2)}%`,
       usage: memoryUsageMB,
-    };
-
     if (memoryPercent > 90) {
       overallStatus = 'unhealthy';
     } else if (memoryPercent > 70) {
@@ -125,12 +119,10 @@ router.get('/detailed', authMiddleware, requireRole('admin', 'superadmin'), asyn
       health.checks.disk = {
         status: 'healthy',
         message: 'Disk space check not implemented',
-      };
     } catch (error) {
       health.checks.disk = {
         status: 'unknown',
         message: 'Could not check disk space',
-      };
     }
 
     health.status = overallStatus;
@@ -197,8 +189,6 @@ router.get('/metrics', authMiddleware, requireRole('admin', 'superadmin'), async
       platform: process.platform,
       nodeVersion: process.version,
       environment: process.env.NODE_ENV || 'development',
-    };
-
     // Add custom metrics if available
     if (global.customMetrics) {
       metrics.custom = global.customMetrics;

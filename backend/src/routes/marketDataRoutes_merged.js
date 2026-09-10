@@ -10,6 +10,8 @@ const express = require('express');
 const router = express.Router();
 const md = require('../services/legacy/marketDataService');
 const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 const fail = (res, e) => res.status(/required|must|Unknown/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });
 

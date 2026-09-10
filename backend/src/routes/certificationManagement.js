@@ -2,6 +2,8 @@ const router = require('express').Router();
 const certService = require('../services/certificationManagementService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/certifications/issue/:entityId/:type', auth, async (req, res) => {
   try {
     const result = await certService.issueCertificate(req.params.entityId, req.params.type);

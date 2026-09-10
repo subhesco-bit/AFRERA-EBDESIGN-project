@@ -1,12 +1,24 @@
 const express = require('express');
+const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
+
 const request = require('supertest');
 
 const mockServices = {
   drought: { list: jest.fn(), get: jest.fn(), create: jest.fn(), update: jest.fn(), remove: jest.fn() },
   weather: { coverage: jest.fn(), raiseAlert: jest.fn(), recordForecast: jest.fn() },
-  advisory: { listAdvisories: jest.fn(), getAdvisory: jest.fn(), createAdvisory: jest.fn(), updateAdvisory: jest.fn() },
-};
-const mockSignals = [];
+  advisory: { listAdvisories: jest.fn(), getAdvisory: jest.fn(), createAdvisory: jest.fn(), updateAdvisory: jest.fn() },const mockSignals = [];
 
 jest.mock('../../middleware/auth', () => ({
   authMiddleware: (req, res, next) => {
@@ -73,3 +85,5 @@ test('emits existing weather signal for alert and advisory mutations', async () 
   expect(mockSignals[0][2]).toEqual(expect.objectContaining({ correlationId: 'alert-1' }));
   expect(mockSignals[1][2]).toEqual(expect.objectContaining({ correlationId: 'advisory-1' }));
 });
+
+module.exports = router;

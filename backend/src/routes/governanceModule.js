@@ -4,16 +4,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const governanceService = require('../services/legacy/governanceService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PROCUREMENT_ROLES } = require('../middleware/roleGroups');

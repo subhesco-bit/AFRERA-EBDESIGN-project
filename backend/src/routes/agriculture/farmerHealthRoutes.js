@@ -5,6 +5,8 @@ const farmerHealthService = require('../../modules/M029/service');
 const { authMiddleware } = require('../../middleware/auth');
 const { adminMiddleware } = require('../../middleware/admin');
 const { resolveFarmerId } = require('../../middleware/resolveFarmerId');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 /**
  * SECURITY FIX (H4, 2026-08-16): every route below previously had zero

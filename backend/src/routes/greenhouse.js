@@ -2,6 +2,8 @@ const router = require('express').Router();
 const greenhouseService = require('../services/greenhouseService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/greenhouses', auth, async (req, res) => {
   try {
     const result = await greenhouseService.createGreenhouse(req.body);

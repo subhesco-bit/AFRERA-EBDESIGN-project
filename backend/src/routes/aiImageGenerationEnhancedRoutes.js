@@ -8,6 +8,7 @@ const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const aiImageGenerationEnhancedService = require('../services/aiImageGenerationEnhancedService');
+const { authMiddleware: authenticate } = require('../middleware/auth');
 
 // Rate limiting for image generation (max 10 req/min per user)
 const imageLimiter = rateLimiter({ windowMs: 60000, max: 10 });

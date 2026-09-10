@@ -31,7 +31,6 @@ router.get('/corporate/:buyerId/profile', authMiddleware, async (req, res) => {
       ytd_savings: 8.5,
       turnover_cr: 4,
       vintage_years: 3
-    };
     res.json({ success: true, data: profile });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -48,8 +47,6 @@ router.get('/corporate/:buyerId/credit-status', authMiddleware, async (req, res)
     const profile = {
       turnover_cr: 4,
       vintage_years: 3
-    };
-    
     const creditStatus = decisionSupportService.corpCreditEligible(
       profile.turnover_cr,
       profile.vintage_years
@@ -114,8 +111,6 @@ router.post('/corporate/orders', authMiddleware, async (req, res) => {
       delivery_date,
       status: 'pending',
       created_at: new Date().toISOString()
-    };
-    
     res.json({ success: true, data: order });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -137,7 +132,6 @@ router.get('/logistics/:providerId/profile', authMiddleware, async (req, res) =>
       on_time_rate: 94.5,
       active_shipments: 38,
       fleet_size: 45
-    };
     res.json({ success: true, data: profile });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -247,8 +241,6 @@ router.post('/logistics/bookings', authMiddleware, async (req, res) => {
       pickup_date,
       status: 'confirmed',
       created_at: new Date().toISOString()
-    };
-    
     res.json({ success: true, data: booking });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -268,7 +260,6 @@ router.get('/processor/:processorId/profile', authMiddleware, async (req, res) =
       capacity: 500,
       utilization: 72,
       product_lines: ['Pickles', 'Spices', 'Flours']
-    };
     res.json({ success: true, data: profile });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -288,7 +279,6 @@ router.get('/retailer/:retailerId/profile', authMiddleware, async (req, res) => 
       locations: 8,
       monthly_sales: 1800000,
       top_products: ['Chak-Hao Rice', 'Lakadong Turmeric', 'Mizo Chilli']
-    };
     res.json({ success: true, data: profile });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

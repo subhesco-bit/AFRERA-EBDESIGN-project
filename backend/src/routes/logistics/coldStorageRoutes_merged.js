@@ -18,16 +18,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const pool = require('../../database/pool');
 const { logger } = require('../../utils/logger');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
@@ -126,7 +130,6 @@ router.get('/facilities', async (req, res) => {
         availableUnits: Math.max(capacity - booked, 0),
         utilizationPct,
         utilizationStatus: utilizationPct === null ? 'unknown' : utilizationStatus(utilizationPct)
-      };
     }));
 
     res.json({ success: true, count: withUtilization.length, data: withUtilization });
@@ -315,10 +318,7 @@ const ALLOWED_TRANSITIONS = {
   booked: ['checked_in', 'cancelled'],
   checked_in: ['checked_out', 'cancelled'],
   checked_out: [],
-  cancelled: []
-};
-
-router.patch('/facilities/:id/bookings/:bookingId', authMiddleware, async (req, res) => {
+  cancelled: []router.patch('/facilities/:id/bookings/:bookingId', authMiddleware, async (req, res) => {
   try {
     const { status } = req.body || {};
     if (!status) return res.status(400).json({ success: false, error: 'status is required' });

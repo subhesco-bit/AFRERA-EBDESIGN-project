@@ -2,6 +2,8 @@ const router = require('express').Router();
 const farmCostingService = require('../services/farmCostingService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/farms/:farmId/cost', auth, async (req, res) => {
   try {
     const result = await farmCostingService.calculateFarmCost(req.params.farmId, req.body.crops);

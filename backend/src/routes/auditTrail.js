@@ -2,6 +2,8 @@ const router = require('express').Router();
 const auditService = require('../services/auditTrailService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/audit/log/:userId/:action/:resourceId', auth, async (req, res) => {
   try {
     const result = await auditService.logAuditEvent(req.params.userId, req.params.action, req.params.resourceId);

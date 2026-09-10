@@ -2,6 +2,8 @@ const router = require('express').Router();
 const qaService = require('../services/qualityAssuranceService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/qa/inspect/:productId', auth, async (req, res) => {
   try {
     const result = await qaService.inspectProduct(req.params.productId, req.body);

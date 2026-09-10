@@ -7,13 +7,6 @@
  * reachable: `mountRoute('/api/v1/analytics', analyticsService)` in index.js
  * silently no-ops because the service exports a plain class instance, not
  * `{
-const requireRole = (...allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
-    next();
-  };
-};
 
 router}` — confirmed by the boot log's own warning: "Skipping route
  * mount for /api/v1/analytics because no router was exported." Found via a
@@ -24,6 +17,19 @@ router}` — confirmed by the boot log's own warning: "Skipping route
 
 const express = require('express');
 const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
+
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 const analyticsService = require('../services/legacy/analyticsService');

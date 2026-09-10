@@ -11,16 +11,20 @@
  */
 
 const express = require('express');
-const 
+const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
 const tenantManagementService = require('../services/legacy/tenantManagementService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { rateLimiters } = require('../middleware/rateLimit');
@@ -33,18 +37,14 @@ const requestId = (req) => req.get('x-correlation-id') || `tenant-${Date.now()}`
 const fail = (req, res, error, operation) => {
   const id = requestId(req);
   logger.error(`tenantManagementRoutes:${operation}`, { error: error.message, requestId: id });
-  return res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR', requestId: id });
-};
-const validId = (req, res, next) => {
+  return res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR', requestId: id });const validId = (req, res, next) => {
   if (typeof req.params.id !== 'string' || req.params.id.length < 1 || req.params.id.length > 128) {
     return res.status(400).json({ success: false, error: 'Tenant id is invalid', code: 'INVALID_INPUT' });
   }
   next();
-};
 const body = (req, res, next) => {
   if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) return res.status(400).json({ success: false, error: 'Request body must be an object', code: 'INVALID_INPUT' });
   next();
-};
 const createBody = (req, res, next) => {
   if (!req.body.name || typeof req.body.name !== 'string' || req.body.name.length > 200 ||
       (req.body.domain !== undefined && (typeof req.body.domain !== 'string' || req.body.domain.length > 253)) ||
@@ -54,7 +54,6 @@ const createBody = (req, res, next) => {
     return res.status(400).json({ success: false, error: 'Tenant payload is invalid', code: 'INVALID_INPUT' });
   }
   next();
-};
 const updateBody = (req, res, next) => {
   if (Object.keys(req.body).length === 0 || (req.body.name !== undefined && (typeof req.body.name !== 'string' || req.body.name.length > 200)) ||
       (req.body.tier !== undefined && !['basic', 'standard', 'premium', 'enterprise'].includes(req.body.tier)) ||
@@ -63,7 +62,6 @@ const updateBody = (req, res, next) => {
     return res.status(400).json({ success: false, error: 'Tenant update is invalid', code: 'INVALID_INPUT' });
   }
   next();
-};
 const admin = [rateLimiters.api, authMiddleware, requireRole('admin')];
 const writeAdmin = [rateLimiters.write, authMiddleware, requireRole('admin')];
 

@@ -20,16 +20,20 @@ const {
 } = require('../services/legacy/waterManagementService');
 
 function crudRouter(service, validateCreate) {
-  const 
+  const router = express.Router();
+
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
     next();
-  };
-};
 
-router = express.Router();
+}
+
+}
+
+}
+
   router.get('/', rateLimiters.read, parsePageQuery, async (req, res) => {
     try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { return fail(req, res, e, 'water.list'); }
@@ -82,10 +86,7 @@ function emitMutation(req, operation, item) {
   logger.info('waterManagementRoutes:mutation', { operation, entityId: id, requestId: requestId(req, 'water') });
   signalBus.emitSignal(SIGNAL.WATER_RECORD_CHANGED, { operation, resourceId: id }, {
     severity: SEVERITY.INFO, source: 'water_management_routes', entityId: id, correlationId: requestId(req, 'water'),
-  });
-}
-
-const mainRouter = express.Router();
+  });const mainRouter = express.Router();
 
 // Mount all water management sub-routes
 mainRouter.use('/budgeting', crudRouter(waterBudgeting, (body) => validateWaterBody(body, ['plot_name'])));
@@ -95,3 +96,7 @@ mainRouter.use('/watershed', crudRouter(watershedManagement, (body) => validateW
 mainRouter.use('/analytics', crudRouter(waterAnalytics, (body) => validateWaterBody(body, ['metric', 'period'])));
 
 module.exports = mainRouter;
+
+}
+}
+}module.exports = router;

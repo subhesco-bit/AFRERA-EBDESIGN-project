@@ -4,6 +4,8 @@ const router = require('express').Router();
 const { authMiddleware } = require('../middleware/auth');
 const adapters = require('../services/aiDomainAdapterService');
 
+const router = express.Router();
+
 router.get('/', authMiddleware, (req, res) => {
   res.json({ success: true, data: adapters.listAdapters() });
 });

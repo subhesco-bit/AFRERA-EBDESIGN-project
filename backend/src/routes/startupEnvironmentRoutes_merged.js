@@ -22,8 +22,6 @@ router.get('/startups', (req, res) => {
       sector: req.query.sector,
       stage: req.query.stage,
       incubationProgramId: req.query.incubationProgramId
-    };
-    
     const startups = startupEnvironmentService.getStartups(filters);
     res.json({
       success: true,
@@ -105,8 +103,6 @@ router.get('/incubation-programs', (req, res) => {
       status: req.query.status,
       type: req.query.type,
       sector: req.query.sector
-    };
-    
     const programs = startupEnvironmentService.getIncubationPrograms(filters);
     res.json({
       success: true,
@@ -166,8 +162,6 @@ router.get('/mentors', (req, res) => {
       status: req.query.status,
       expertise: req.query.expertise,
       availability: req.query.availability
-    };
-    
     const mentors = startupEnvironmentService.getMentors(filters);
     res.json({
       success: true,
@@ -228,8 +222,6 @@ router.get('/funding', (req, res) => {
       sector: req.query.sector,
       type: req.query.type,
       stage: req.query.stage
-    };
-    
     const opportunities = startupEnvironmentService.getFundingOpportunities(filters);
     res.json({
       success: true,
@@ -309,8 +301,6 @@ router.get('/networking-events', (req, res) => {
     const filters = {
       status: req.query.status,
       type: req.query.type
-    };
-    
     const events = startupEnvironmentService.getNetworkingEvents(filters);
     res.json({
       success: true,

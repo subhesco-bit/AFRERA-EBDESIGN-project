@@ -2,6 +2,8 @@ const router = require('express').Router();
 const financialAnalyticsService = require('../services/financialAnalyticsService');
 const auth = require('../middleware/auth');
 
+const router = express.Router();
+
 router.post('/users/:userId/financial/statement', auth, async (req, res) => {
   try {
     const result = await financialAnalyticsService.generateFinancialStatement(req.params.userId);

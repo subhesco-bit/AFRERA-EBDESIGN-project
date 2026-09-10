@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const marketAnalyticsService = require('../services/marketAnalyticsService');
 
+const router = express.Router();
+
 router.post('/market/analyze/:productId', async (req, res) => {
   try {
     const result = await marketAnalyticsService.analyzeMarket(req.params.productId);

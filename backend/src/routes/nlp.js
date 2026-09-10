@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const nlpService = require('../services/nlpService');
+const router = express.Router();
+
 router.post('/nlp/analyze', async (req, res) => {
   try { const result = await nlpService.analyzeText(req.body.text); res.json(result); }
   catch (error) { res.status(500).json({ error: error.message }); }

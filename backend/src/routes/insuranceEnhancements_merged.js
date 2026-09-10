@@ -11,6 +11,8 @@ const insuranceFraudDetectionService = require('../services/legacy/insuranceFrau
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { authLimiter } = require('../middleware/rateLimiter');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 // Premium Calculation Routes
 router.post('/quotes', authLimiter, authMiddleware, async (req, res) => {

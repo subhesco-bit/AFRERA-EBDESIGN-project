@@ -78,10 +78,7 @@ async function handle(req, res) {
   } catch (error) {
     await recordBestEffort({ moduleId, operation, eventType: 'failed', actorUserId: req.user?.id, entityId: id, correlationId: req.get('x-correlation-id') || `module-${moduleId}-${Date.now()}`, errorCode: error.code, payload: { method: req.method } });
     res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-router.get('/:moduleId/contract', rateLimiters.api, authMiddleware, (req, res) => {
+  }router.get('/:moduleId/contract', rateLimiters.api, authMiddleware, (req, res) => {
   const mod = loadModule(req.params.moduleId);
   if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${req.params.moduleId}` });
   res.json({ success: true, data: buildModuleContract(req.params.moduleId, mod) });

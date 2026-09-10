@@ -22,8 +22,6 @@ router.get('/members', (req, res) => {
       role: req.query.role,
       badge: req.query.badge,
       sortBy: req.query.sortBy
-    };
-    
     const members = communityService.getMembers(filters);
     res.json({
       success: true,
@@ -104,8 +102,6 @@ router.get('/categories', (req, res) => {
     const filters = {
       status: req.query.status,
       parentId: req.query.parentId
-    };
-    
     const categories = communityService.getCategories(filters);
     res.json({
       success: true,
@@ -150,8 +146,6 @@ router.get('/threads', (req, res) => {
       authorId: req.query.authorId,
       tag: req.query.tag,
       isPinned: req.query.isPinned
-    };
-    
     const threads = communityService.getThreads(filters);
     res.json({
       success: true,
@@ -276,8 +270,6 @@ router.get('/groups', (req, res) => {
       status: req.query.status,
       type: req.query.type,
       memberId: req.query.memberId
-    };
-    
     const groups = communityService.getGroups(filters);
     res.json({
       success: true,
@@ -336,8 +328,6 @@ router.get('/events', (req, res) => {
     const filters = {
       status: req.query.status,
       type: req.query.type
-    };
-    
     const events = communityService.getEvents(filters);
     res.json({
       success: true,
@@ -397,8 +387,6 @@ router.get('/moderation', (req, res) => {
       status: req.query.status,
       priority: req.query.priority,
       assignedTo: req.query.assignedTo
-    };
-    
     const queue = communityService.getModerationQueue(filters);
     res.json({
       success: true,
@@ -507,8 +495,6 @@ router.get('/activity-feed', (req, res) => {
       userId: req.query.userId,
       action: req.query.action,
       limit: req.query.limit ? parseInt(req.query.limit) : 50
-    };
-    
     const activities = communityService.getActivityFeed(filters);
     res.json({
       success: true,

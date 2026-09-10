@@ -24,8 +24,6 @@ router.get('/projects', (req, res) => {
       category: req.query.category,
       priority: req.query.priority,
       aiEnabled: req.query.aiEnabled,
-    };
-
     const projects = researchAndDevelopmentService.getRDProjects(filters);
     res.json({
       success: true,
@@ -161,8 +159,6 @@ router.get('/collaborations', (req, res) => {
       status: req.query.status,
       type: req.query.type,
       projectId: req.query.projectId,
-    };
-
     const collaborations = researchAndDevelopmentService.getCollaborations(filters);
     res.json({
       success: true,
@@ -206,8 +202,6 @@ router.get('/innovations', (req, res) => {
       category: req.query.category,
       projectId: req.query.projectId,
       patentStatus: req.query.patentStatus,
-    };
-
     const innovations = researchAndDevelopmentService.getInnovations(filters);
     res.json({
       success: true,
@@ -250,8 +244,6 @@ router.get('/patents', (req, res) => {
       status: req.query.status,
       jurisdiction: req.query.jurisdiction,
       innovationId: req.query.innovationId,
-    };
-
     const patents = researchAndDevelopmentService.getPatents(filters);
     res.json({
       success: true,
@@ -294,8 +286,6 @@ router.get('/funding', (req, res) => {
       status: req.query.status,
       category: req.query.category,
       provider: req.query.provider,
-    };
-
     const opportunities = researchAndDevelopmentService.getFundingOpportunities(filters);
     res.json({
       success: true,
@@ -355,8 +345,6 @@ router.get('/publications', (req, res) => {
       status: req.query.status,
       type: req.query.type,
       projectId: req.query.projectId,
-    };
-
     const publications = researchAndDevelopmentService.getPublications(filters);
     res.json({
       success: true,
@@ -427,8 +415,6 @@ router.get('/knowledge', (req, res) => {
     const filters = {
       category: req.query.category,
       verified: req.query.verified,
-    };
-
     const knowledge = researchAndDevelopmentService.searchKnowledgeBase(query, filters);
     res.json({
       success: true,

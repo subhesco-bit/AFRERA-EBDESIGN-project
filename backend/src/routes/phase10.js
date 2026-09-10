@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const p10 = require('../services/phase10');
 const auth = require('../middleware/auth');
+const router = express.Router();
+
 router.post('/erp/:id', auth, async (req, res) => { try { res.json(await p10.erp(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
 router.post('/crm/:id', auth, async (req, res) => { try { res.json(await p10.crm(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
 router.post('/payment/:id', auth, async (req, res) => { try { res.json(await p10.payment(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });

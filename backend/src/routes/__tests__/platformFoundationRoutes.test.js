@@ -1,13 +1,25 @@
 const express = require('express');
+const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
+
 const request = require('supertest');
 
 const mockServices = {
   platform: { applyOptimizedConfiguration: jest.fn(), getConfigurationHistory: jest.fn() },
   tenant: { createTenant: jest.fn() },
   organization: { updateOrganization: jest.fn() },
-  system: { predictIncidents: jest.fn() },
-};
-const mockEmittedSignals = [];
+  system: { predictIncidents: jest.fn() },const mockEmittedSignals = [];
 
 jest.mock('../../middleware/auth', () => ({
   authMiddleware: (req, res, next) => {
@@ -73,3 +85,5 @@ test('emits mutation signals with the request correlation ID', async () => {
   await request(app).post('/tenant/tenants').set('x-correlation-id', 'req-tenant').send({ name: 'Tenant' }).expect(200);
   expect(mockEmittedSignals[0][2]).toEqual(expect.objectContaining({ correlationId: 'req-tenant' }));
 });
+
+module.exports = router;

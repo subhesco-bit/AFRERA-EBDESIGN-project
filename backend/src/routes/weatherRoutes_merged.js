@@ -12,6 +12,8 @@ const { authMiddleware } = require('../middleware/auth');
 const { rateLimiters } = require('../middleware/rateLimit');
 const { bodyValidator, queryValidator, date, dateTime, enumValue, numberValue, fail, invalid, requestId } = require('./climateRouteSupport');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 const failWeather = (req, res, error, operation) => fail(req, res, error, operation, error.status || 500);
 const daysQuery = queryValidator((q) => numberValue(q.days === undefined ? undefined : Number(q.days), 'days', { min: 1, max: 120, integer: true }));
 

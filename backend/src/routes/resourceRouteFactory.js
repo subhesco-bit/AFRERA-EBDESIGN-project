@@ -1,12 +1,5 @@
 /**
  * Hardened CRUD 
-const requireRole = (...allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(401).json({ error: 'Unauthorized' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Forbidden' });
-    next();
-  };
-};
 
 router factory for the flat, table-backed resources created
  * via services/legacy/resourceCrudFactory.js (soil, water, and similar
@@ -61,6 +54,18 @@ function fail(res, status, error, req) {
  */
 function createHardenedCrudRouter(service, { signal, source, validate } = {}) {
   const router = express.Router();
+
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) return res.status(401).json({ error: "Unauthorized" });
+    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    next();
+
+}
+
+}
+
+}
 
   router.param('id', (req, res, next, value) => {
     if (!/^\d+$/.test(String(value)) || Number(value) < 1 || Number(value) > MAX_ID) {
@@ -137,3 +142,6 @@ function createHardenedCrudRouter(service, { signal, source, validate } = {}) {
 }
 
 module.exports = { createHardenedCrudRouter, fail, requestId, MAX_LIMIT };
+
+}
+}module.exports = router;

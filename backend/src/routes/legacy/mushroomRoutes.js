@@ -17,7 +17,6 @@ router.get('/', authenticate, async (req, res) => {
       farmer_id: req.query.farmer_id,
       variety: req.query.variety,
       status: req.query.status,
-    };
     const mushroom = await mushroomService.getAllMushroom(filters);
     res.json({ success: true, data: mushroom });
   } catch (error) {
