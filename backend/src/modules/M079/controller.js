@@ -1,49 +1,52 @@
-﻿/**
- * Controller for Watershed Management (M079)
- * Handles HTTP requests for watershed management operations
- */
+const m079Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const watershedService = require('./service');
-
-const createWatershedPlan = async (req, res) => {
-  try {
-    const plan = await watershedService.createWatershedPlan(req.body);
-    res.status(201).json({ success: true, data: plan });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M079Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m079Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const monitorWatershedHealth = async (req, res) => {
-  try {
-    const health = await watershedService.monitorWatershedHealth(req.params.id);
-    res.status(200).json({ success: true, data: health });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m079Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const implementConservationMeasures = async (req, res) => {
-  try {
-    const implementation = await watershedService.implementConservationMeasures(req.params.id, req.body);
-    res.status(201).json({ success: true, data: implementation });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m079Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const generateWatershedReport = async (req, res) => {
-  try {
-    const report = await watershedService.generateWatershedReport(req.params.id, req.query.reportType);
-    res.status(200).json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m079Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-module.exports = {
-  createWatershedPlan,
-  monitorWatershedHealth,
-  implementConservationMeasures,
-  generateWatershedReport,
-};
+  async delete(req, res) {
+    try {
+      const result = await m079Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M079Controller();

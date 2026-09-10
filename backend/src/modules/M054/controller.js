@@ -1,78 +1,52 @@
-﻿/**
- * Controller for Customer Management (M054)
- * Handles HTTP requests for customer operations
- */
+const m054Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const customerService = require('./service');
-
-const create = async (req, res) => {
-  try {
-    const customer = await customerService.createCustomer(req.body);
-    res.status(201).json({ success: true, data: customer });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const list = async (req, res) => {
-  try {
-    const customers = await customerService.listCustomers(req.query);
-    res.status(200).json({ success: true, data: customers });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const get = async (req, res) => {
-  try {
-    const customer = await customerService.getCustomer(req.params.id);
-    if (!customer) {
-      return res.status(404).json({ success: false, error: 'Customer not found' });
+class M054Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m054Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
     }
-    res.status(200).json({ success: true, data: customer });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const update = async (req, res) => {
-  try {
-    const customer = await customerService.updateCustomer(req.params.id, req.body);
-    if (!customer) {
-      return res.status(404).json({ success: false, error: 'Customer not found' });
+  async getById(req, res) {
+    try {
+      const result = await m054Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
     }
-    res.status(200).json({ success: true, data: customer });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const remove = async (req, res) => {
-  try {
-    const deleted = await customerService.deleteCustomer(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ success: false, error: 'Customer not found' });
+  async create(req, res) {
+    try {
+      const result = await m054Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
     }
-    res.status(200).json({ success: true, message: 'Customer deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const getCustomerInsights = async (req, res) => {
-  try {
-    const insights = await customerService.getCustomerInsights(req.params.id);
-    res.status(200).json({ success: true, data: insights });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m054Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-module.exports = {
-  create,
-  list,
-  get,
-  update,
-  remove,
-  getCustomerInsights,
-};
+  async delete(req, res) {
+    try {
+      const result = await m054Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M054Controller();

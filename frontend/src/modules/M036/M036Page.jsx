@@ -1,6 +1,28 @@
-﻿import ContractlessModulePage from '../ContractlessModulePage';
-import './styles.css';
+import React, { useState, useEffect } from 'react';
 
 export default function M036Page() {
-  return <ContractlessModulePage moduleId="M036" />;
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/m036')
+      .then(r => r.json())
+      .then(d => setData(d.data || []))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="M036-container">
+      <h1>M036</h1>
+      {loading && <p>Loading...</p>}
+      {!loading && data.length === 0 && <p>No data</p>}
+      {!loading && data.length > 0 && (
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>{JSON.stringify(item)}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }

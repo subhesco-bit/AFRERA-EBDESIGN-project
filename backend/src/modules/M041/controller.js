@@ -1,38 +1,52 @@
-﻿/**
- * Controller for Village Registry (M041)
- */
+const m041Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const villageRegistryService = require('./service');
-
-const createVillage = async (req, res) => {
-  try {
-    const village = await villageRegistryService.createVillage(req.body);
-    res.status(201).json({ success: true, data: village });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M041Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m041Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const addVillageResource = async (req, res) => {
-  try {
-    const resource = await villageRegistryService.addVillageResource(req.params.villageId, req.body);
-    res.status(201).json({ success: true, data: resource });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m041Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const getVillageAnalytics = async (req, res) => {
-  try {
-    const analytics = await villageRegistryService.getVillageAnalytics(req.params.villageId);
-    res.status(200).json({ success: true, data: analytics });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m041Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-module.exports = {
-  createVillage,
-  addVillageResource,
-  getVillageAnalytics,
-};
+  async update(req, res) {
+    try {
+      const result = await m041Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const result = await m041Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M041Controller();

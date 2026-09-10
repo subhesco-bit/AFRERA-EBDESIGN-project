@@ -1,13 +1,13 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/flocks', authMiddleware, requireRole('admin'), controller.registerSheepFlock);
-router.get('/flocks', authMiddleware, controller.listSheepFlocks);
-router.get('/flocks/:flockId', authMiddleware, controller.getSheepFlock);
-router.put('/flocks/:flockId', authMiddleware, requireRole('admin'), controller.updateSheepFlock);
-router.get('/flocks/:flockId/analysis', authMiddleware, controller.analyzeSheepProduction);
-router.get('/analytics', authMiddleware, requireRole('admin'), controller.getSheepAnalytics);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

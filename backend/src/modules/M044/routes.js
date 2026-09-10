@@ -1,25 +1,13 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-// Crop Variety CRUD
-router.post('/varieties', authMiddleware, requireRole('admin'), controller.createVariety);
-router.get('/varieties', authMiddleware, controller.listVarieties);
-router.get('/varieties/:varietyId', authMiddleware, controller.getVariety);
-router.put('/varieties/:varietyId', authMiddleware, requireRole('admin'), controller.updateVariety);
-router.delete('/varieties/:varietyId', authMiddleware, requireRole('admin'), controller.deleteVariety);
-
-// AI-powered recommendations
-router.post('/crops/:cropName/recommend-varieties', authMiddleware, controller.recommendVarieties);
-
-// Performance tracking
-router.post('/varieties/:varietyId/performance', authMiddleware, controller.recordVarietyPerformance);
-router.get('/varieties/:varietyId/performance', authMiddleware, controller.getVarietyPerformance);
-router.get('/varieties/:varietyId/performance/analysis', authMiddleware, controller.analyzeVarietyPerformance);
-
-// Analytics
-router.get('/varieties/analytics', authMiddleware, requireRole('admin'), controller.getVarietyAnalytics);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;
-

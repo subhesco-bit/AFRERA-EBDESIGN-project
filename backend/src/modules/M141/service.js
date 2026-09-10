@@ -1,131 +1,91 @@
-﻿// Service for M141 - Orchard Management
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
 
-const tableName = 'orchards';
+class M141Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-async function listOrchards({ page = 1, limit = 20, farmerId = null } = {}) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
+      let query = 'SELECT * FROM releases WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
 
-  let query = `SELECT COUNT(*) FROM ${tableName}`;
-  let countParams = [];
-  if (farmerId) {
-    query += ' WHERE farmer_id = $1';
-    countParams = [farmerId];
-  }
-  const totalRes = await pg.query(query, countParams);
-  const total = parseInt(totalRes.rows[0].count || '0');
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM releases WHERE deleted_at IS NULL`);
 
-  let dataQuery = `SELECT * FROM ${tableName}`;
-  let dataParams = [];
-  if (farmerId) {
-    dataQuery += ' WHERE farmer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3';
-    dataParams = [farmerId, limit, offset];
-  } else {
-    dataQuery += ' ORDER BY created_at DESC LIMIT $1 OFFSET $2';
-    dataParams = [limit, offset];
+      logger.info(`Retrieved ${result.rows.length} releases`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching releases:', error.message);
+      throw new Error(`Failed to fetch releases: ${error.message}`);
+    }
   }
 
-  const res = await pg.query(dataQuery, dataParams);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM releases WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`releases not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching releases:', error.message);
+      throw error;
+    }
+  }
+
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
+
+      const result = await db.query(
+        `INSERT INTO releases (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating releases:', error.message);
+      throw error;
+    }
+  }
+
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE releases SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating releases:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE releases SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`releases not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting releases:', error.message);
+      throw error;
+    }
+  }
 }
 
-async function getOrchard(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
-  return res.rows[0] || null;
-}
-
-async function createOrchard(payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const { farmerId, name, location, area, orchardType, treeCount, plantingDate, varieties, soilType, irrigationSystem, metadata } = payload;
-
-  const res = await pg.query(
-    `INSERT INTO ${tableName} (farmer_id, name, location, area, orchard_type, tree_count, planting_date, varieties, soil_type, irrigation_system, metadata, created_at) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW()) RETURNING *`,
-    [farmerId, name, location, area, orchardType, treeCount, plantingDate, JSON.stringify(varieties || []), soilType, irrigationSystem, JSON.stringify(metadata || {})],
-  );
-  return res.rows[0];
-}
-
-async function updateOrchard(id, payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const { name, location, area, orchardType, treeCount, plantingDate, varieties, soilType, irrigationSystem, metadata } = payload;
-
-  const res = await pg.query(
-    `UPDATE ${tableName} 
-     SET name = $1, location = $2, area = $3, orchard_type = $4, tree_count = $5, planting_date = $6, varieties = $7, soil_type = $8, irrigation_system = $9, metadata = $10, updated_at = NOW() 
-     WHERE id = $11 RETURNING *`,
-    [name, location, area, orchardType, treeCount, plantingDate, JSON.stringify(varieties || []), soilType, irrigationSystem, JSON.stringify(metadata || {}), id],
-  );
-  return res.rows[0] || null;
-}
-
-async function deleteOrchard(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return Boolean(res.rows[0]);
-}
-
-async function getOrchardProduction(orchardId, year) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-
-  const res = await pg.query(
-    'SELECT * FROM orchard_production WHERE orchard_id = $1 AND production_year = $2',
-    [orchardId, year],
-  );
-
-  return res.rows[0] || null;
-}
-
-async function recordOrchardProduction(payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const { orchardId, productionYear, variety, quantity, qualityGrade, harvestDate, revenue, metadata } = payload;
-
-  const res = await pg.query(
-    `INSERT INTO orchard_production (orchard_id, production_year, variety, quantity, quality_grade, harvest_date, revenue, metadata, created_at) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) 
-     ON CONFLICT (orchard_id, production_year, variety) 
-     DO UPDATE SET quantity = $4, quality_grade = $5, harvest_date = $6, revenue = $7, metadata = $8, updated_at = NOW()
-     RETURNING *`,
-    [orchardId, productionYear, variety, quantity, qualityGrade, harvestDate, revenue, JSON.stringify(metadata || {})],
-  );
-  return res.rows[0];
-}
-
-async function getOrchardAnalytics(orchardId) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-
-  const res = await pg.query(
-    `SELECT 
-      production_year,
-      variety,
-      SUM(quantity) as total_quantity,
-      AVG(CASE WHEN quality_grade = 'A' THEN 1 WHEN quality_grade = 'B' THEN 0.8 ELSE 0.6 END) as avg_quality,
-      SUM(revenue) as total_revenue
-     FROM orchard_production 
-     WHERE orchard_id = $1 
-     GROUP BY production_year, variety
-     ORDER BY production_year DESC, variety`,
-    [orchardId],
-  );
-
-  return {
-    orchardId,
-    analytics: res.rows,
-    totalProduction: res.rows.reduce((sum, row) => sum + parseFloat(row.total_quantity), 0),
-    totalRevenue: res.rows.reduce((sum, row) => sum + parseFloat(row.total_revenue || 0), 0),
-  };
-}
-
-module.exports = {
-  listOrchards,
-  getOrchard,
-  createOrchard,
-  updateOrchard,
-  deleteOrchard,
-  getOrchardProduction,
-  recordOrchardProduction,
-  getOrchardAnalytics,
-};
+module.exports = new M141Service();

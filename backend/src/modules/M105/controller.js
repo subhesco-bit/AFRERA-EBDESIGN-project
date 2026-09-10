@@ -1,49 +1,52 @@
-﻿/**
- * Controller for Fleet Management (M105)
- * Handles HTTP requests for fleet management operations
- */
+const m105Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const fleetService = require('./service');
-
-const registerFleetVehicle = async (req, res) => {
-  try {
-    const vehicle = await fleetService.registerFleetVehicle(req.body);
-    res.status(201).json({ success: true, data: vehicle });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M105Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m105Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const createDispatchSchedule = async (req, res) => {
-  try {
-    const dispatch = await fleetService.createDispatchSchedule(req.body);
-    res.status(201).json({ success: true, data: dispatch });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m105Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const trackFleetPerformance = async (req, res) => {
-  try {
-    const performance = await fleetService.trackFleetPerformance(req.params.id, req.query.period);
-    res.status(200).json({ success: true, data: performance });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m105Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const generateFleetReport = async (req, res) => {
-  try {
-    const report = await fleetService.generateFleetReport(req.params.farmerId, req.query.reportType);
-    res.status(200).json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m105Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-module.exports = {
-  registerFleetVehicle,
-  createDispatchSchedule,
-  trackFleetPerformance,
-  generateFleetReport,
-};
+  async delete(req, res) {
+    try {
+      const result = await m105Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M105Controller();

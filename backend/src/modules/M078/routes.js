@@ -1,11 +1,13 @@
-﻿// Express routes for Rainwater Harvesting (M078)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/systems', controller.designHarvestingSystem);
-router.get('/systems/:id/collection', controller.monitorCollection);
-router.get('/systems/:id/budget', controller.calculateWaterBudget);
-router.post('/systems/:id/storage', controller.manageStorageCapacity);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

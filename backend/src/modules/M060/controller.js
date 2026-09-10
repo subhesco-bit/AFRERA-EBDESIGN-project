@@ -1,44 +1,52 @@
-﻿/**
- * Controller for Review Management (M060)
- */
-const reviewService = require('./service');
+const m060Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const create = async (req, res) => {
-  try {
-    const review = await reviewService.createReview(req.body);
-    res.status(201).json({ success: true, data: review });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M060Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m060Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const list = async (req, res) => {
-  try {
-    const reviews = await reviewService.getProductReviews(req.params.productId, req.query);
-    res.status(200).json({ success: true, data: reviews });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m060Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const get = async (req, res) => {
-  try {
-    const review = await reviewService.getReview(req.params.id);
-    if (!review) return res.status(404).json({ success: false, error: 'Review not found' });
-    res.status(200).json({ success: true, data: review });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m060Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const update = async (req, res) => {
-  try {
-    const review = await reviewService.updateReviewStatus(req.params.id, req.body.status);
-    if (!review) return res.status(404).json({ success: false, error: 'Review not found' });
-    res.status(200).json({ success: true, data: review });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m060Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-module.exports = { create, list, get, update };
+  async delete(req, res) {
+    try {
+      const result = await m060Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  }
+}
+
+module.exports = new M060Controller();

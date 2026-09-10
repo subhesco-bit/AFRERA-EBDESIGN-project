@@ -1,70 +1,52 @@
-﻿/**
- * Controller for Breakdown Maintenance (M107)
- * Handles HTTP requests for breakdown maintenance operations
- */
+const m107Service = require('./service');
+const { logger } = require('../../utils/logger');
 
-const breakdownService = require('./service');
-
-const listBreakdowns = async (req, res) => {
-  try {
-    const result = await breakdownService.listBreakdowns(req.query);
-    res.status(200).json({ success: true, data: result });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M107Controller {
+  async getAll(req, res) {
+    try {
+      const result = await m107Service.getAll(req.query);
+      return res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('Error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const getBreakdown = async (req, res) => {
-  try {
-    const breakdown = await breakdownService.getBreakdown(req.params.id);
-    if (!breakdown) return res.status(404).json({ success: false, error: 'Not found' });
-    res.status(200).json({ success: true, data: breakdown });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const result = await m107Service.getById(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
 
-const reportBreakdown = async (req, res) => {
-  try {
-    const breakdown = await breakdownService.reportBreakdown(req.body);
-    res.status(201).json({ success: true, data: breakdown });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const result = await m107Service.create(req.body);
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
   }
-};
 
-const scheduleEmergencyRepair = async (req, res) => {
-  try {
-    const repair = await breakdownService.scheduleEmergencyRepair(req.params.id, req.body);
-    res.status(201).json({ success: true, data: repair });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const result = await m107Service.update(req.params.id, req.body);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
   }
-};
 
-const trackDowntime = async (req, res) => {
-  try {
-    const downtime = await breakdownService.trackDowntime(req.params.id, req.query.period);
-    res.status(200).json({ success: true, data: downtime });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const result = await m107Service.delete(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
   }
-};
+}
 
-const generateBreakdownReport = async (req, res) => {
-  try {
-    const report = await breakdownService.generateBreakdownReport(req.params.farmerId, req.query.reportType);
-    res.status(200).json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  listBreakdowns,
-  getBreakdown,
-  reportBreakdown,
-  scheduleEmergencyRepair,
-  trackDowntime,
-  generateBreakdownReport,
-};
+module.exports = new M107Controller();

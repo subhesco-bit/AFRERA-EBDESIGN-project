@@ -1,20 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './styles.css';
+import React, { useState, useEffect } from 'react';
 
-// Real implementation lives in HarvestScorePage, not here.
 export default function M070Page() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/m070')
+      .then(r => r.json())
+      .then(d => setData(d.data || []))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <div className='module-M070 p-4'>
-      <h1>Yield Recording (M070)</h1>
-      <p>Domain: Crop — Status: HIDDEN</p>
-      <p className="text-sm text-gray-600 mt-2">
-        This capability is implemented at <code>pages/HarvestScorePage.jsx</code>,
-        not here.
-      </p>
-      <Link to="/harvest-score" className="text-blue-600 underline">
-        Go to Harvest Score →
-      </Link>
+    <div className="M070-container">
+      <h1>M070</h1>
+      {loading && <p>Loading...</p>}
+      {!loading && data.length === 0 && <p>No data</p>}
+      {!loading && data.length > 0 && (
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>{JSON.stringify(item)}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

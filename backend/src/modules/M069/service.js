@@ -1,57 +1,91 @@
-// Service for Harvest Planning (M069)
-// Real CRUD over the `crop_m069_items` table created in
-// migrations/3000_M069_generated.sql. That table (like every generated
-// scaffold table — see M022/M055/M056) stores the record payload in a
-// generic `data` JSONB column; this service flattens `data` back onto
-// each row before returning it, so callers get a normal
-// { id, crop, field_name, ... } shape instead of a nested `data` object.
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
 
-const tableName = 'crop_m069_items';
+class M069Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-function flatten(row) {
-  if (!row) return row;
-  const { data, ...rest } = row;
-  return { ...rest, ...(data || {}) };
+      let query = 'SELECT * FROM carbon_credits WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
+
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM carbon_credits WHERE deleted_at IS NULL`);
+
+      logger.info(`Retrieved ${result.rows.length} carbon_credits`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching carbon_credits:', error.message);
+      throw new Error(`Failed to fetch carbon_credits: ${error.message}`);
+    }
+  }
+
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM carbon_credits WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`carbon_credits not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching carbon_credits:', error.message);
+      throw error;
+    }
+  }
+
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
+
+      const result = await db.query(
+        `INSERT INTO carbon_credits (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating carbon_credits:', error.message);
+      throw error;
+    }
+  }
+
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE carbon_credits SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating carbon_credits:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE carbon_credits SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`carbon_credits not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting carbon_credits:', error.message);
+      throw error;
+    }
+  }
 }
 
-async function listItems({ page = 1, limit = 20 } = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-  const totalRes = await pg.query(`SELECT COUNT(*) FROM ${tableName}`);
-  const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query(`SELECT * FROM ${tableName} ORDER BY created_at DESC LIMIT $1 OFFSET $2`, [limit, offset]);
-  return { items: res.rows.map(flatten), pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-}
-
-async function getItem(id) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
-  return flatten(res.rows[0]) || null;
-}
-
-async function createItem(payload = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`INSERT INTO ${tableName} (data, created_at) VALUES ($1, NOW()) RETURNING *`, [payload]);
-  return flatten(res.rows[0]);
-}
-
-async function updateItem(id, payload = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`, [payload, id]);
-  return flatten(res.rows[0]) || null;
-}
-
-async function deleteItem(id) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return Boolean(res.rows[0]);
-}
-
-module.exports = { listItems, getItem, createItem, updateItem, deleteItem };
+module.exports = new M069Service();

@@ -1,20 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './styles.css';
+import React, { useState, useEffect } from 'react';
 
-// Real implementation lives in FPODashboardPage's Overview stats tab, not here.
 export default function M060Page() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/m060')
+      .then(r => r.json())
+      .then(d => setData(d.data || []))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <div className='module-M060 p-4'>
-      <h1>FPO Analytics (M060)</h1>
-      <p>Domain: FPO — Status: HIDDEN</p>
-      <p className="text-sm text-gray-600 mt-2">
-        This capability is implemented at <code>pages/FPODashboardPage.jsx</code>
-        {' '}("Overview" stats tab), not here.
-      </p>
-      <Link to="/fpo-dashboard" className="text-blue-600 underline">
-        Go to the FPO Dashboard →
-      </Link>
+    <div className="M060-container">
+      <h1>M060</h1>
+      {loading && <p>Loading...</p>}
+      {!loading && data.length === 0 && <p>No data</p>}
+      {!loading && data.length > 0 && (
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>{JSON.stringify(item)}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

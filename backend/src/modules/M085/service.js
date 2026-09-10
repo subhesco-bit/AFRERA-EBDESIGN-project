@@ -1,457 +1,91 @@
-/**
- * Comparative Analytics Service (M085)
- * Business Intelligence & Analytics - Entity comparison and benchmarking
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
 
-/**
- * Create comparison group
- */
-async function createComparisonGroup(groupData) {
-  try {
-    const {
-      group_name,
-      group_type,
-      description,
-      entity_ids,
-      entity_types,
-      comparison_dimensions,
-      created_by,
-    } = groupData;
+class M085Service {
+  async getAll(filters = {}) {
+    try {
+      const { page = 1, limit = 20, status = null } = filters;
+      const offset = (page - 1) * limit;
 
-    const group = {
-      group_id: generateId(),
-      group_name,
-      group_type,
-      description,
-      entity_ids,
-      entity_types,
-      comparison_dimensions: comparison_dimensions || {},
-      created_by,
-      status: 'active',
-      created_at: new Date().toISOString(),
-    };
+      let query = 'SELECT * FROM health_safety WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2';
+      const result = await db.query(query, [limit, offset]);
 
-    // AI-powered group optimization
-    const aiRequest = {
-      task: 'comparison_group_optimization',
-      parameters: {
-        group_type,
-        entities: entity_ids,
-        comparison_best_practices: await getComparisonBestPractices(group_type),
-        similar_groups: await getSimilarGroups(group_type),
-      },
-    };
+      const countResult = await db.query(`SELECT COUNT(*) as total FROM health_safety WHERE deleted_at IS NULL`);
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    group.ai_recommendations = aiResponse;
-
-    const result = await pool.query(
-      `INSERT INTO comparison_groups 
-       (group_id, group_name, group_type, description, entity_ids, entity_types, 
-        comparison_dimensions, created_by, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-       RETURNING *`,
-      [
-        group.group_id,
-        group.group_name,
-        group.group_type,
-        group.description,
-        group.entity_ids,
-        group.entity_types,
-        JSON.stringify(group.comparison_dimensions),
-        group.created_by,
-        group.status,
-        group.created_at,
-      ],
-    );
-
-    logger.info(`Comparison group created: ${group.group_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating comparison group', { error: error.message, stack: error.stack });
-    throw new Error('Failed to create comparison group');
-  }
-}
-
-/**
- * Create comparison configuration
- */
-async function createComparisonConfig(configData) {
-  try {
-    const {
-      group_id,
-      config_name,
-      metrics_to_compare,
-      dimensions_to_compare,
-      weightings,
-      normalization_method,
-      aggregation_method,
-      baseline_entity_id,
-    } = configData;
-
-    const result = await pool.query(
-      `INSERT INTO comparison_configs 
-       (config_id, group_id, config_name, metrics_to_compare, dimensions_to_compare, 
-        weightings, normalization_method, aggregation_method, baseline_entity_id, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING *`,
-      [
-        generateId(),
-        group_id,
-        config_name,
-        metrics_to_compare,
-        dimensions_to_compare,
-        JSON.stringify(weightings || {}),
-        normalization_method,
-        aggregation_method,
-        baseline_entity_id,
-        'active',
-        new Date().toISOString(),
-      ],
-    );
-
-    logger.info(`Comparison config created: ${result.rows[0].config_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating comparison config', { error: error.message });
-    throw new Error('Failed to create comparison config');
-  }
-}
-
-/**
- * Run comparison
- */
-async function runComparison(configId, comparisonDate, periodStart, periodEnd) {
-  try {
-    const config = await getComparisonConfig(configId);
-    const group = await getComparisonGroup(config.group_id);
-
-    const entityScores = {};
-    const metricComparisons = {};
-    const rankings = {};
-
-    for (const metric of config.metrics_to_compare) {
-      const metricData = await fetchMetricData(metric, group.entity_ids, periodStart, periodEnd);
-      const normalizedData = normalizeData(metricData, config.normalization_method);
-      const weightedData = applyWeights(normalizedData, config.weightings);
-
-      metricComparisons[metric] = weightedData;
-      rankings[metric] = calculateRanking(weightedData);
+      logger.info(`Retrieved ${result.rows.length} health_safety`);
+      return {
+        data: result.rows,
+        pagination: { page, limit, total: parseInt(countResult.rows[0].total) }
+      };
+    } catch (error) {
+      logger.error('Error fetching health_safety:', error.message);
+      throw new Error(`Failed to fetch health_safety: ${error.message}`);
     }
+  }
 
-    for (const entityId of group.entity_ids) {
-      entityScores[entityId] = calculateEntityScore(entityId, metricComparisons, config.weightings);
+  async getById(id) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM health_safety WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`health_safety not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error fetching health_safety:', error.message);
+      throw error;
     }
-
-    const gaps = calculateGaps(entityScores, config.baseline_entity_id);
-
-    // AI-powered insights
-    const aiRequest = {
-      task: 'comparison_insights',
-      parameters: {
-        entity_scores: entityScores,
-        metric_comparisons: metricComparisons,
-        rankings,
-        gaps,
-        group_context: await getGroupContext(group.group_id),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
-    const result = await pool.query(
-      `INSERT INTO comparison_results 
-       (result_id, config_id, comparison_date, period_start, period_end, 
-        entity_scores, metric_comparisons, rankings, gaps, insights, recommendations, generated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-       RETURNING *`,
-      [
-        generateId(),
-        configId,
-        comparisonDate,
-        periodStart,
-        periodEnd,
-        JSON.stringify(entityScores),
-        JSON.stringify(metricComparisons),
-        JSON.stringify(rankings),
-        JSON.stringify(gaps),
-        JSON.stringify(aiResponse.insights),
-        JSON.stringify(aiResponse.recommendations),
-        new Date().toISOString(),
-      ],
-    );
-
-    logger.info(`Comparison completed: ${result.rows[0].result_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error running comparison', { error: error.message });
-    throw new Error('Failed to run comparison');
   }
-}
 
-/**
- * Add benchmark
- */
-async function addBenchmark(benchmarkData) {
-  try {
-    const {
-      group_id,
-      benchmark_name,
-      benchmark_type,
-      benchmark_values,
-      source,
-      industry,
-      region,
-      period,
-    } = benchmarkData;
+  async create(data) {
+    try {
+      const { user_id, ...rest } = data;
+      const columns = Object.keys(rest).join(', ');
+      const placeholders = Object.keys(rest).map((_, i) => `$${i + 1}`).join(', ');
+      const values = Object.values(rest);
 
-    const result = await pool.query(
-      `INSERT INTO comparison_benchmarks 
-       (benchmark_id, group_id, benchmark_name, benchmark_type, benchmark_values, 
-        source, industry, region, period, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING *`,
-      [
-        generateId(),
-        group_id,
-        benchmark_name,
-        benchmark_type,
-        JSON.stringify(benchmark_values),
-        source,
-        industry,
-        region,
-        period,
-        'active',
-        new Date().toISOString(),
-      ],
-    );
-
-    logger.info(`Benchmark added: ${result.rows[0].benchmark_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error adding benchmark', { error: error.message });
-    throw new Error('Failed to add benchmark');
-  }
-}
-
-/**
- * Get benchmarks
- */
-async function getBenchmarks(groupId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM comparison_benchmarks WHERE group_id = $1 AND status = $2',
-      [groupId, 'active'],
-    );
-    return result.rows;
-  } catch (error) {
-    logger.error('Error getting benchmarks', { error: error.message });
-    throw new Error('Failed to get benchmarks');
-  }
-}
-
-/**
- * Create comparison alert
- */
-async function createComparisonAlert(alertData) {
-  try {
-    const {
-      config_id,
-      entity_id,
-      alert_type,
-      alert_condition,
-      threshold_value,
-      current_value,
-      severity,
-      message,
-    } = alertData;
-
-    const result = await pool.query(
-      `INSERT INTO comparison_alerts 
-       (alert_id, config_id, entity_id, alert_type, alert_condition, 
-        threshold_value, current_value, severity, message, triggered_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-       RETURNING *`,
-      [
-        generateId(),
-        config_id,
-        entity_id,
-        alert_type,
-        alert_condition,
-        threshold_value,
-        current_value,
-        severity,
-        message,
-        new Date().toISOString(),
-      ],
-    );
-
-    logger.info(`Comparison alert created: ${result.rows[0].alert_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating comparison alert', { error: error.message });
-    throw new Error('Failed to create comparison alert');
-  }
-}
-
-/**
- * Get comparison alerts
- */
-async function getComparisonAlerts(configId, filters = {}) {
-  try {
-    const { is_active } = filters;
-    let query = 'SELECT * FROM comparison_alerts WHERE config_id = $1';
-    const params = [configId];
-    let paramCount = 1;
-
-    if (is_active !== undefined) {
-      paramCount++;
-      query += ` AND is_active = $${paramCount}`;
-      params.push(is_active);
+      const result = await db.query(
+        `INSERT INTO health_safety (user_id, ${columns}, created_at, updated_at) VALUES ($${Object.keys(rest).length + 1}, ${placeholders}, NOW(), NOW()) RETURNING *`,
+        [user_id, ...values]
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error creating health_safety:', error.message);
+      throw error;
     }
+  }
 
-    query += ' ORDER BY triggered_at DESC';
+  async update(id, data) {
+    try {
+      const existing = await this.getById(id);
+      const updates = { ...existing, ...data };
+      const setClause = Object.keys(data).map((k, i) => `${k} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
 
-    const result = await pool.query(query, params);
-    return result.rows;
-  } catch (error) {
-    logger.error('Error getting comparison alerts', { error: error.message });
-    throw new Error('Failed to get comparison alerts');
+      const result = await db.query(
+        `UPDATE health_safety SET ${setClause}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error updating health_safety:', error.message);
+      throw error;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const result = await db.query(
+        `UPDATE health_safety SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      if (result.rows.length === 0) throw new Error(`health_safety not found`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error deleting health_safety:', error.message);
+      throw error;
+    }
   }
 }
 
-/**
- * Create snapshot
- */
-async function createSnapshot(configId, snapshotName, comparisonDate, createdBy) {
-  try {
-    const latestResult = await getLatestComparisonResult(configId);
-
-    const result = await pool.query(
-      `INSERT INTO comparison_snapshots 
-       (snapshot_id, config_id, snapshot_name, snapshot_data, comparison_date, created_by, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING *`,
-      [
-        generateId(),
-        configId,
-        snapshotName,
-        JSON.stringify(latestResult),
-        comparisonDate,
-        createdBy,
-        new Date().toISOString(),
-      ],
-    );
-
-    logger.info(`Snapshot created: ${result.rows[0].snapshot_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating snapshot', { error: error.message });
-    throw new Error('Failed to create snapshot');
-  }
-}
-
-// Helper functions
-function generateId() {
-  return `COMP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getComparisonBestPractices(groupType) {
-  return {
-    recommended_metrics: ['revenue', 'profit', 'efficiency'],
-    normalization_methods: ['min_max', 'z_score', 'percentile'],
-    weighting_strategies: ['equal', 'manual', 'data_driven'],
-  };
-}
-
-async function getSimilarGroups(groupType) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM comparison_groups WHERE group_type = $1 LIMIT 5',
-      [groupType],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function getComparisonConfig(configId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM comparison_configs WHERE config_id = $1',
-      [configId],
-    );
-    return result.rows[0];
-  } catch (error) {
-    return null;
-  }
-}
-
-async function getComparisonGroup(groupId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM comparison_groups WHERE group_id = $1',
-      [groupId],
-    );
-    return result.rows[0];
-  } catch (error) {
-    return null;
-  }
-}
-
-async function fetchMetricData(metric, entityIds, periodStart, periodEnd) {
-  return {};
-}
-
-function normalizeData(data, method) {
-  return data;
-}
-
-function applyWeights(data, weightings) {
-  return data;
-}
-
-function calculateRanking(data) {
-  return [];
-}
-
-function calculateEntityScore(entityId, metricComparisons, weightings) {
-  return 0;
-}
-
-function calculateGaps(entityScores, baselineEntityId) {
-  return {};
-}
-
-async function getGroupContext(groupId) {
-  return {};
-}
-
-async function getLatestComparisonResult(configId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM comparison_results WHERE config_id = $1 ORDER BY generated_at DESC LIMIT 1',
-      [configId],
-    );
-    return result.rows[0] || {};
-  } catch (error) {
-    return {};
-  }
-}
-
-module.exports = {
-  createComparisonGroup,
-  createComparisonConfig,
-  runComparison,
-  addBenchmark,
-  getBenchmarks,
-  createComparisonAlert,
-  getComparisonAlerts,
-  createSnapshot,
-};
-
+module.exports = new M085Service();

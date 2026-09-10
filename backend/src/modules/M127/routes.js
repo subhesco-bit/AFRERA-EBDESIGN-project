@@ -1,11 +1,13 @@
-﻿// Express routes for Animal Health Management (M127)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/health-records', controller.createHealthRecord);
-router.post('/vaccinations', controller.scheduleVaccination);
-router.get('/farmers/:farmerId/herd-health', controller.monitorHerdHealth);
-router.get('/farmers/:farmerId/health-report', controller.generateHealthReport);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

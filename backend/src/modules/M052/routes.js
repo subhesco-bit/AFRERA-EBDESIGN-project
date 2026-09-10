@@ -1,16 +1,13 @@
-﻿// Express routes for Product Catalog (M052)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware } = require('../../middleware/auth');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/products', authMiddleware, controller.createProduct);
-router.get('/products', controller.listProducts);
-router.get('/products/search', controller.searchProducts);
-router.get('/products/:id', controller.getProduct);
-router.put('/products/:id', authMiddleware, controller.updateProduct);
-router.delete('/products/:id', authMiddleware, controller.deleteProduct);
-router.patch('/products/:id/inventory', authMiddleware, controller.updateInventory);
-router.get('/products/:id/recommendations', controller.getProductRecommendations);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

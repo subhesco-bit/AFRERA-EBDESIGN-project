@@ -1,20 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './styles.css';
+import React, { useState, useEffect } from 'react';
 
-// Real implementation lives in FPODashboardPage's Finance tab, not here.
 export default function M054Page() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/m054')
+      .then(r => r.json())
+      .then(d => setData(d.data || []))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <div className='module-M054 p-4'>
-      <h1>FPO Finance (M054)</h1>
-      <p>Domain: FPO — Status: HIDDEN</p>
-      <p className="text-sm text-gray-600 mt-2">
-        This capability is implemented at <code>pages/FPODashboardPage.jsx</code>
-        {' '}("Finance" tab), not here.
-      </p>
-      <Link to="/fpo-dashboard" className="text-blue-600 underline">
-        Go to the FPO Dashboard →
-      </Link>
+    <div className="M054-container">
+      <h1>M054</h1>
+      {loading && <p>Loading...</p>}
+      {!loading && data.length === 0 && <p>No data</p>}
+      {!loading && data.length > 0 && (
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>{JSON.stringify(item)}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

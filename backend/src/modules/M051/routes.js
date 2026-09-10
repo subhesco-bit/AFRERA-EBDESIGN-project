@@ -1,17 +1,13 @@
-﻿// Express routes for FPO Registration (M051)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate } = require('../../middleware/authMiddleware');
 
-router.post('/fpos', controller.createFPO);
-router.get('/fpos', controller.listFPOs);
-router.get('/fpos/:id', controller.getFPO);
-router.put('/fpos/:id', controller.updateFPO);
-router.delete('/fpos/:id', controller.deleteFPO);
-router.post('/fpos/:id/members', controller.addFPOMember);
-router.get('/fpos/:id/members', controller.getFPOMembers);
-router.get('/fpos/:id/financial-summary', controller.getFPOFinancialSummary);
-router.post('/fpos/:id/transactions', controller.recordFPOTransaction);
-router.get('/fpos/:id/performance-report', controller.generateFPOPerformanceReport);
+router.use(authenticate);
+router.get('/', controller.getAll.bind(controller));
+router.get('/:id', controller.getById.bind(controller));
+router.post('/', controller.create.bind(controller));
+router.put('/:id', controller.update.bind(controller));
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

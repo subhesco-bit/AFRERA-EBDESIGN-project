@@ -1,16 +1,28 @@
-﻿import React, { useEffect, useState } from 'react';
-import { moduleCrudAPI } from '../../services/api';
-import './styles.css';
+import React, { useState, useEffect } from 'react';
 
 export default function M055Page() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  useEffect(() => { setLoading(true); moduleCrudAPI.list('M055').then(({ data }) => setItems(data?.data?.items || data?.data || [])).catch(() => setError('Unable to load module records')).finally(() => setLoading(false)); }, []);
-  return (<div className='module-M055 p-4'>
-    <h1>M055 Module</h1>
-    {loading ? <div>Loading…</div> : error ? <div>{error}</div> : (
-      <ul>{items.map(it => <li key={it.id}>{JSON.stringify(it.data)}</li>)}</ul>
-    )}
-  </div>);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/m055')
+      .then(r => r.json())
+      .then(d => setData(d.data || []))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="M055-container">
+      <h1>M055</h1>
+      {loading && <p>Loading...</p>}
+      {!loading && data.length === 0 && <p>No data</p>}
+      {!loading && data.length > 0 && (
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>{JSON.stringify(item)}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
