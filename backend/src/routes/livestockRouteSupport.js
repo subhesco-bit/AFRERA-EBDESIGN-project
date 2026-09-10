@@ -1,20 +1,12 @@
 /**
- * livestock Route Support Routes
- * Placeholder route module
+ * Livestock Route Support
  */
 
 const express = require('express');
 const router = express.Router();
 
-/**
- * Health check
- */
 router.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    module: 'livestockRouteSupport',
-    status: 'operational'
-  });
+  res.json({ success: true, module: 'livestockRouteSupport' });
 });
 
 module.exports = router;
