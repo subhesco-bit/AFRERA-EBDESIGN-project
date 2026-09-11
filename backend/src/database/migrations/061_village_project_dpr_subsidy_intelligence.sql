@@ -48,7 +48,6 @@ CREATE TABLE IF NOT EXISTS village_project_estimates (
   prepared_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(project_id, version)
 );
-
 CREATE INDEX IF NOT EXISTS idx_village_project_estimates_project ON village_project_estimates(project_id);
 
 CREATE TABLE IF NOT EXISTS village_project_dpr_links (
@@ -65,7 +64,6 @@ CREATE TABLE IF NOT EXISTS village_project_dpr_links (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(project_id, version)
 );
-
 CREATE INDEX IF NOT EXISTS idx_village_project_dpr_project ON village_project_dpr_links(project_id);
 CREATE INDEX IF NOT EXISTS idx_village_project_dpr_document ON village_project_dpr_links(dpr_document_id);
 
@@ -95,7 +93,6 @@ CREATE TABLE IF NOT EXISTS village_scheme_catalogue (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CHECK (government_level <> 'state' OR state IS NOT NULL)
 );
-
 CREATE INDEX IF NOT EXISTS idx_village_scheme_catalogue_level ON village_scheme_catalogue(government_level);
 CREATE INDEX IF NOT EXISTS idx_village_scheme_catalogue_state ON village_scheme_catalogue(state);
 CREATE INDEX IF NOT EXISTS idx_village_scheme_catalogue_sector ON village_scheme_catalogue(sector);
@@ -119,7 +116,6 @@ CREATE TABLE IF NOT EXISTS village_project_subsidy_matches (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(project_id, scheme_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_village_subsidy_matches_project ON village_project_subsidy_matches(project_id);
 CREATE INDEX IF NOT EXISTS idx_village_subsidy_matches_score ON village_project_subsidy_matches(match_score DESC);
 
@@ -137,7 +133,6 @@ CREATE TABLE IF NOT EXISTS village_project_funding_sources (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE INDEX IF NOT EXISTS idx_village_project_funding_project ON village_project_funding_sources(project_id);
 CREATE INDEX IF NOT EXISTS idx_village_project_funding_scheme ON village_project_funding_sources(scheme_id);
 
@@ -155,21 +150,23 @@ CREATE TABLE IF NOT EXISTS village_project_ai_reviews (
   created_by UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE INDEX IF NOT EXISTS idx_village_project_ai_reviews_project ON village_project_ai_reviews(project_id);
 CREATE INDEX IF NOT EXISTS idx_village_project_ai_reviews_type ON village_project_ai_reviews(review_type);
 
 CREATE OR REPLACE FUNCTION village_project_recalculate_financials()
 RETURNS TRIGGER AS $$
+DECLARE
+  affected_project UUID;
 BEGIN
+  affected_project := COALESCE(NEW.project_id, OLD.project_id);
   UPDATE village_projects p
   SET estimated_cost = COALESCE((SELECT total_cost FROM village_project_estimates e WHERE e.project_id = p.id ORDER BY version DESC LIMIT 1), 0),
       funding_gap = GREATEST(
         COALESCE((SELECT COALESCE(approved_cost, estimated_cost, 0) FROM village_projects p2 WHERE p2.id = p.id), 0)
         - COALESCE((SELECT SUM(COALESCE(committed_amount,0)) FROM village_project_funding_sources f WHERE f.project_id = p.id), 0), 0),
       updated_at = NOW()
-  WHERE p.id = NEW.project_id;
-  RETURN NEW;
+  WHERE p.id = affected_project;
+  RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql;
 
