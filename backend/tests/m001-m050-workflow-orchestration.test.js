@@ -1,0 +1,2 @@
+const svc=require('../src/services/m001m050WorkflowOrchestrationService');
+describe('M001-M050 workflow orchestration rules',()=>{test('accepts only adjacent state transitions',()=>{expect(svc.assertTransition('M041','identify','prioritize')).toBe(true);expect(()=>svc.assertTransition('M041','identify','execute')).toThrow();});test('identity flow cannot skip review/approval',()=>{expect(()=>svc.assertTransition('M019','validate','activate')).toThrow();expect(svc.assertTransition('M019','validate','review')).toBe(true);});});
