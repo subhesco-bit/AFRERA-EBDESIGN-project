@@ -12,6 +12,7 @@ const aiCostController = require('./aiCostController');
 const aiGuardrails = require('./aiGuardrails');
 const aiAuditLogger = require('./aiAuditLogger');
 const aiBackboneRuntime = require('./aiBackboneRuntime');
+const integrationRegistry = require('../integration/systemIntegrationRegistry');
 const AI_MODULE_REGISTRY = require('./AI_MODULE_REGISTRY.json');
 
 async function initializeAI(config = {}) {
@@ -21,7 +22,11 @@ async function initializeAI(config = {}) {
       success: true,
       message: 'AI Intelligence Fabric initialized successfully',
       status: orchestrator.getStatus(),
-      backbone: { enabled: true, agents: aiBackboneRuntime.listAgents().length },
+      backbone: {
+        enabled: true,
+        agents: aiBackboneRuntime.listAgents().length,
+        integrationContracts: integrationRegistry.listContracts().length,
+      },
       config: { hasConfig: Object.keys(config).length > 0 },
     };
   } catch (error) {
@@ -40,6 +45,7 @@ function getAIStatus() {
       enabled: true,
       agents: aiBackboneRuntime.listAgents(),
       autonomyLevels: aiBackboneRuntime.AUTONOMY,
+      integrationContracts: integrationRegistry.listContracts(),
     },
   };
 }
@@ -83,6 +89,7 @@ module.exports = {
   aiGuardrails,
   aiAuditLogger,
   aiBackboneRuntime,
+  integrationRegistry,
   AI_MODULE_REGISTRY,
   initializeAI,
   getAIStatus,
