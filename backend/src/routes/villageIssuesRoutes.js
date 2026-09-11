@@ -17,14 +17,24 @@ router.get('/summary/:villageId', async (req, res, next) => {
   catch (error) { next(error); }
 });
 
+router.get('/:issueId/updates', async (req, res, next) => {
+  try { res.json({ success: true, data: await villageIssuesService.getIssueUpdates(req.params.issueId) }); }
+  catch (error) { next(error); }
+});
+
 router.get('/:issueId', async (req, res, next) => {
   try { res.json({ success: true, data: await villageIssuesService.getIssue(req.params.issueId) }); }
   catch (error) { next(error); }
 });
 
 router.post('/', async (req, res, next) => {
-  try { res.status(201).json({ success: true, data: await villageIssuesService.createIssue(req.body) }); }
-  catch (error) { next(error); }
+  try {
+    const input = {
+      ...req.body,
+      reported_by: req.user?.id || req.body.reported_by,
+    };
+    res.status(201).json({ success: true, data: await villageIssuesService.createIssue(input) });
+  } catch (error) { next(error); }
 });
 
 router.patch('/:issueId', async (req, res, next) => {
