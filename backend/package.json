@@ -13,6 +13,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "migrate": "node src/database/migrate.js",
+    "migrate:m001-m050": "node src/database/migrate_m001_m050.js",
     "seed": "node src/database/seed.js",
     "audit:coverage": "node ../tools/route-audit.js",
     "audit:production": "node ../tools/re-audit-production.js",
