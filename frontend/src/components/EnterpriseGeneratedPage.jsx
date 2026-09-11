@@ -1,6 +1,6 @@
 import React,{useEffect,useMemo,useState} from 'react';
 import {useLocation} from 'react-router-dom';
-import api from '../services/api';
+import {getEnterpriseModuleOverview} from '../services/enterpriseModule550Api';
 import {useEnterprisePageEstate} from './EnterprisePageEstateBoundary';
 
 const SURFACES=['operations','workflow','analytics','decisions','integrations','evidence'];
@@ -16,7 +16,7 @@ export default function EnterpriseGeneratedPage(){
  const identity=useMemo(()=>pageIdentity(location.pathname),[location.pathname]);
  const [data,setData]=useState(null);const [error,setError]=useState('');
  useEffect(()=>{let active=true;estate?.setPageState('loading',`Loading ${identity.pageId}…`);setError('');
-  api.get(`/enterprise-module-550-runtime/${identity.moduleCode}/overview`).then(r=>{if(!active)return;setData(r.data?.data||r.data);estate?.setPageState('success',`${identity.pageId} loaded`,{moduleCode:identity.moduleCode,source:'enterprise-module-550-runtime'});}).catch(e=>{if(!active)return;setError(e.response?.data?.error||e.message||'Unable to load page data');estate?.setPageState('error',`Unable to load ${identity.pageId}`);});
+  getEnterpriseModuleOverview(identity.moduleCode).then(result=>{if(!active)return;setData(result);estate?.setPageState('success',`${identity.pageId} loaded`,{moduleCode:identity.moduleCode,source:'enterprise-module550-runtime'});}).catch(e=>{if(!active)return;setError(e.response?.data?.error||e.message||'Unable to load page data');estate?.setPageState('error',`Unable to load ${identity.pageId}`);});
   return()=>{active=false;};
  },[identity.pageId,identity.moduleCode,estate]);
  const def=data?.definition;
