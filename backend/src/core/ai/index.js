@@ -13,6 +13,7 @@ const aiGuardrails = require('./aiGuardrails');
 const aiAuditLogger = require('./aiAuditLogger');
 const aiBackboneRuntime = require('./aiBackboneRuntime');
 const AI_MODULE_REGISTRY = require('./AI_MODULE_REGISTRY.json');
+const systemIntegrationRegistry = require('../integration/systemIntegrationRegistry');
 
 async function initializeAI(config = {}) {
   try {
@@ -40,6 +41,10 @@ function getAIStatus() {
       enabled: true,
       agents: aiBackboneRuntime.listAgents(),
       autonomyLevels: aiBackboneRuntime.AUTONOMY,
+    },
+    integration: {
+      contracts: systemIntegrationRegistry.listContracts(),
+      capabilityIndex: systemIntegrationRegistry.getModuleCapabilityIndex(),
     },
   };
 }
@@ -84,6 +89,7 @@ module.exports = {
   aiAuditLogger,
   aiBackboneRuntime,
   AI_MODULE_REGISTRY,
+  systemIntegrationRegistry,
   initializeAI,
   getAIStatus,
   handleAIRequest,
