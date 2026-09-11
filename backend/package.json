@@ -14,7 +14,8 @@
     "seed": "node src/database/seed.js",
     "audit:coverage": "node ../tools/route-audit.js",
     "audit:production": "node ../tools/re-audit-production.js",
-    "audit:complete": "npm run audit:coverage && npm run audit:production",
+    "audit:system": "node ../tools/system-production-audit.js",
+    "audit:complete": "npm run audit:coverage && npm run audit:production && npm run audit:system",
     "upgrade:all": "node ../tools/upgrade-all.js",
     "verify:production": "npm run lint && npm test -- --runInBand && npm run audit:complete"
   },
@@ -24,7 +25,7 @@
     "amqplib": "^0.10.0",
     "apollo-server-express": "^3.12.1",
     "aws-sdk": "^2.1500.0",
-    "axios": "^1.6.2",
+    "axios": "^1.6.0",
     "bcryptjs": "^2.4.3",
     "bull": "^4.12.0",
     "compression": "^1.7.4",
@@ -42,7 +43,7 @@
     "mongodb": "^6.3.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "node-cron": "^3.0.3",
+    "node-cron": "^3.0.0",
     "nodemailer": "^6.9.7",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -69,7 +70,8 @@
     "nodemon": "^3.0.2",
     "prettier": "^3.1.1",
     "supertest": "^6.3.3",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "supertest": "^6.3.3"
   },
   "engines": {
     "node": ">=20.0.0",
