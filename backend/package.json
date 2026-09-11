@@ -15,12 +15,13 @@
     "audit:coverage": "node ../tools/route-audit.js",
     "audit:production": "node ../tools/re-audit-production.js",
     "audit:complete": "npm run audit:coverage && npm run audit:production",
+    "upgrade:all": "node ../tools/upgrade-all.js",
     "verify:production": "npm run lint && npm test -- --runInBand && npm run audit:complete"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
     "@aws-sdk/client-s3": "^3.1111.0",
-    "amqplib": "^0.10.3",
+    "amqplib": "^0.10.0",
     "apollo-server-express": "^3.12.1",
     "aws-sdk": "^2.1500.0",
     "axios": "^1.6.2",
@@ -74,13 +75,7 @@
     "node": ">=20.0.0",
     "npm": ">=12.0.0"
   },
-  "keywords": [
-    "afrera",
-    "agriculture",
-    "marketplace",
-    "erp",
-    "microservices"
-  ],
+  "keywords": ["afrera", "agriculture", "marketplace", "erp", "microservices"],
   "author": "Ethnoverde Dynamics Pvt. Ltd.",
   "license": "PROPRIETARY"
 }
