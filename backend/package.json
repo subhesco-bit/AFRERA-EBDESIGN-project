@@ -33,7 +33,7 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-slow-down": "^2.0.1",
-    "express-validator": "^7.0.0",
+    "express-validator": "^7.0.1",
     "firebase-admin": "^12.0.0",
     "graphql": "^16.8.1",
     "helmet": "^7.0.0",
@@ -80,6 +80,7 @@
     "afrera",
     "agriculture",
     "marketplace",
+    "erp",
     "microservices"
   ],
   "author": "Ethnoverde Dynamics Pvt. Ltd.",
