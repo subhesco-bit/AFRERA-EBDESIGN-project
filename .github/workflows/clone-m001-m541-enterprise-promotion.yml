@@ -18,7 +18,9 @@ jobs:
         run: npm ci
       - name: Uniform M001-M541 contract tests
         working-directory: backend
-        run: npx jest tests/m001-m541-enterprise-promotion.test.js tests/m051-m150-enterprise-promotion.test.js tests/m001-m550-enterprise-runtime.test.js --runInBand
+        run: npx jest tests/m001-m541-enterprise-promotion.test.js tests/m051-m150-enterprise-promotion.test.js tests/m001-m550-enterprise-runtime.test.js tests/backend-module-live-wiring.test.js --runInBand
+      - name: Live module wiring audit
+        run: node tools/module-live-wiring-audit.js
       - name: Page estate governance audit
         run: node tools/enterprise-page-estate-audit.js
       - name: Frontend install
