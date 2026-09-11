@@ -1,0 +1,11 @@
+services:
+  clone-backend:
+    build:
+      context: ..
+      dockerfile: EBDESIGN-CHATGPT-CLONE/Dockerfile
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+    ports:
+      - "3301:3001"
+    restart: unless-stopped
