@@ -65,4 +65,9 @@ router.post('/projects/:projectId/subsidy-matches', controller.matchSubsidies.bi
 router.get('/projects/:projectId/subsidy-ai-context', controller.buildSubsidyAIContext.bind(controller));
 router.post('/scheme-catalogue', controller.upsertScheme.bind(controller));
 
+// Village completeness / public infrastructure / resilience
+router.get('/villages/:villageId/completeness', controller.getCompleteness.bind(controller));
+router.get('/villages/:villageId/infrastructure-profile', controller.getInfrastructureProfile.bind(controller));
+router.get('/villages/:villageId/readiness', controller.getReadinessSnapshot.bind(controller));
+
 module.exports = router;
