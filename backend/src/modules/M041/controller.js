@@ -1,4 +1,5 @@
 const villageService = require('./service');
+const villageERPService = require('./villageERPService');
 const { logger } = require('../../utils/logger');
 const { sendSuccess, sendError } = require('../../utils/response');
 
@@ -24,6 +25,15 @@ class M041Controller {
   updateTask(req, res) { return execute(res, 'updateTask', () => villageService.updateVillageTask(req.params.taskId, req.body), 404); }
   generateAI(req, res) { return execute(res, 'generateAI', () => villageService.generateVillageAIInsights(req.params.villageId, req.body || {}), 404); }
   districtSummary(req, res) { return execute(res, 'districtSummary', () => villageService.getDistrictEconomicSummary(req.params.district), 404); }
+
+  listHouseholds(req, res) { return execute(res, 'listHouseholds', () => villageERPService.listHouseholds(req.params.villageId, req.query), 404); }
+  createHousehold(req, res) { return execute(res, 'createHousehold', () => villageERPService.createHousehold(req.params.villageId, req.body), 404); }
+  addHouseholdMember(req, res) { return execute(res, 'addHouseholdMember', () => villageERPService.addHouseholdMember(req.params.householdId, req.body), 404); }
+  listEnterprises(req, res) { return execute(res, 'listEnterprises', () => villageERPService.listEnterprises(req.params.villageId), 404); }
+  createEnterprise(req, res) { return execute(res, 'createEnterprise', () => villageERPService.createEnterprise(req.params.villageId, req.body), 404); }
+  createBudget(req, res) { return execute(res, 'createBudget', () => villageERPService.createBudget(req.params.villageId, req.body), 404); }
+  listBudgets(req, res) { return execute(res, 'listBudgets', () => villageERPService.listBudgets(req.params.villageId), 404); }
+  getERPOverview(req, res) { return execute(res, 'getERPOverview', () => villageERPService.getERPOverview(req.params.villageId), 404); }
 }
 
 module.exports = new M041Controller();
