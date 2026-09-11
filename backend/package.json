@@ -29,7 +29,7 @@
     "dotenv": "^16.3.1",
     "elasticsearch": "^16.7.3",
     "exceljs": "^4.4.0",
-    "express": "^4.4.0",
+    "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-slow-down": "^2.0.1",
     "express-validator": "^7.0.1",
@@ -42,7 +42,7 @@
     "mongodb": "^6.3.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "node-cron": "^3.0.0",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.7",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -68,7 +68,6 @@
     "jest": "^29.7.0",
     "nodemon": "^3.0.2",
     "prettier": "^3.1.1",
-    "supertest": "^6.3.3",
     "typescript": "^5.3.3"
   },
   "engines": {
@@ -79,6 +78,7 @@
     "afrera",
     "agriculture",
     "marketplace",
+    "erp",
     "microservices"
   ],
   "author": "Ethnoverde Dynamics Pvt. Ltd.",
