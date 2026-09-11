@@ -4,6 +4,7 @@ const villageProjectService = require('./villageProjectIntelligenceService');
 const villageEconomyGeoService = require('./villageEconomyGeoService');
 const villageProductionPotentialService = require('./villageProductionPotentialService');
 const villageCompletenessService = require('./villageCompletenessService');
+const villageExternalSupplyService = require('./villageExternalSupplyService');
 const { logger } = require('../../utils/logger');
 const { sendSuccess, sendError } = require('../../utils/response');
 
@@ -61,6 +62,16 @@ class M041Controller {
   getCompleteness(req, res) { return execute(res, 'getCompleteness', () => villageCompletenessService.getCompleteness(req.params.villageId), 404); }
   getInfrastructureProfile(req, res) { return execute(res, 'getInfrastructureProfile', () => villageCompletenessService.getInfrastructureProfile(req.params.villageId), 404); }
   getReadinessSnapshot(req, res) { return execute(res, 'getReadinessSnapshot', () => villageCompletenessService.readinessSnapshot(req.params.villageId), 404); }
+
+  upsertSupplyCatalogItem(req, res) { return execute(res, 'upsertSupplyCatalogItem', () => villageExternalSupplyService.upsertCatalogItem(req.body), 400); }
+  listSupplyCatalog(req, res) { return execute(res, 'listSupplyCatalog', () => villageExternalSupplyService.listCatalog(req.query), 400); }
+  createExternalDemand(req, res) { return execute(res, 'createExternalDemand', () => villageExternalSupplyService.createDemand(req.params.villageId, req.body), 400); }
+  getExternalSupplyPlan(req, res) { return execute(res, 'getExternalSupplyPlan', () => villageExternalSupplyService.supplyPlan(req.params.villageId, req.query), 404); }
+  createSupplyOrder(req, res) { return execute(res, 'createSupplyOrder', () => villageExternalSupplyService.createSupplyOrder(req.params.villageId, req.body), 400); }
+  addSupplyOrderLine(req, res) { return execute(res, 'addSupplyOrderLine', () => villageExternalSupplyService.addOrderLine(req.params.orderId, req.body), 400); }
+  listSupplyOrders(req, res) { return execute(res, 'listSupplyOrders', () => villageExternalSupplyService.listOrders(req.params.villageId, req.query), 404); }
+  updateSupplyOrder(req, res) { return execute(res, 'updateSupplyOrder', () => villageExternalSupplyService.updateOrder(req.params.orderId, req.body), 400); }
+  getAISupplyContext(req, res) { return execute(res, 'getAISupplyContext', () => villageExternalSupplyService.aiSupplyContext(req.params.villageId), 404); }
 }
 
 module.exports = new M041Controller();
