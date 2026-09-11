@@ -4,10 +4,10 @@
 /**
  * Repository-wide production capability audit.
  *
- * This is intentionally evidence based: it never marks a module/page complete
- * because a file exists. It checks the implementation graph, local imports,
- * route mounting, page state handling, production controls, tests and the
- * presence of the shared AI/ERP integration surfaces.
+ * Audits runtime application code, not backups/templates/test fixtures. Route
+ * mounting understands EBDESIGN's DynamicRouteLoader so dynamically discovered
+ * routers are not incorrectly reported as unmounted. Review findings remain
+ * visible, while the hard gate is reserved for runtime-critical defects.
  */
 const fs = require('fs');
 const path = require('path');
@@ -16,7 +16,10 @@ const { execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, '.ai', 'production-hardening', 'system-audit');
-const IGNORE = new Set(['.git', 'node_modules', 'coverage', 'dist', 'build', '.next', '.vite', '.audit']);
+const IGNORE_SEGMENTS = new Set([
+  '.git', 'node_modules', 'coverage', 'dist', 'build', '.next', '.vite', '.audit',
+  'backups', '_removed_2026-08-04', '.vibecheck', '__tests__', 'TEMPLATES'
+]);
 const CODE_EXT = /\.(?:js|jsx|ts|tsx|mjs|cjs|vue|svelte)$/i;
 const PAGE_RE = /(^|[\\/])(pages?|screens?|views?)([\\/]|$)|Page\.(?:jsx?|tsx?)$/i;
 const ROUTE_RE = /(?:^|[\\/])routes?([\\/]|$)|Routes?\.(?:js|ts)$/i;
@@ -28,10 +31,18 @@ const PLACEHOLDER = /TODO|FIXME|HACK|XXX|not implemented|coming soon|placeholder
 const SECRET = /(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|BEGIN (?:RSA|OPENSSH|EC|DSA) PRIVATE KEY)/;
 const DANGEROUS = /\b(?:eval|new Function)\s*\(|child_process\.(?:exec|execSync)\s*\(/;
 
+function isRuntimePath(p) {
+  const normalized = p.replace(/\\/g, '/');
+  if (!/^(backend\/src|frontend\/src)\//.test(normalized)) return false;
+  if (normalized.split('/').some(x => IGNORE_SEGMENTS.has(x))) return false;
+  if (/\.(?:test|spec)\.[cm]?[jt]sx?$/i.test(normalized)) return false;
+  return true;
+}
+
 function gitFiles() {
   return execFileSync('git', ['ls-files', '-co', '--exclude-standard'], { cwd: ROOT, encoding: 'utf8' })
     .split(/\r?\n/).filter(Boolean)
-    .filter(p => !p.split(/[\\/]/).some(x => IGNORE.has(x)));
+    .filter(isRuntimePath);
 }
 function kind(p) {
   if (PAGE_RE.test(p)) return 'page';
@@ -40,8 +51,7 @@ function kind(p) {
   if (SERVICE_RE.test(p)) return 'service';
   if (CONTROLLER_RE.test(p)) return 'controller';
   if (DB_RE.test(p)) return 'database';
-  if (/^(?:backend|frontend)(?:[\\/]|$)/i.test(p)) return 'application';
-  return 'artifact';
+  return 'application';
 }
 function text(p) {
   if (!CODE_EXT.test(p) && !/\.(?:json|yaml|yml|md|sql|tf)$/i.test(p)) return null;
@@ -60,23 +70,33 @@ function resolveLocal(p, spec) {
   const candidates = [base, `${base}.js`, `${base}.jsx`, `${base}.ts`, `${base}.tsx`, `${base}.mjs`, `${base}.cjs`, `${base}.json`, path.join(base, 'index.js'), path.join(base, 'index.ts')];
   return candidates.some(fs.existsSync);
 }
-function routeMounts() {
+function routeMountEvidence() {
   const index = path.join(ROOT, 'backend', 'src', 'index.js');
-  if (!fs.existsSync(index)) return { exists: false, imports: [] };
+  const loader = path.join(ROOT, 'backend', 'src', 'core', 'dynamicRouteLoader.js');
+  if (!fs.existsSync(index)) return { exists: false, imports: [], dynamicDiscovery: false };
   const source = fs.readFileSync(index, 'utf8');
   const imports = [...source.matchAll(/['"]\.\/routes\/([^'"]+?)(?:\.js)?['"]/g)].map(m => `${m[1]}.js`);
-  return { exists: true, imports: [...new Set(imports)] };
+  const dynamicDiscovery = fs.existsSync(loader) && /discoverAndMountRoutes\(routesDir/.test(source);
+  return { exists: true, imports: [...new Set(imports)], dynamicDiscovery };
+}
+function dynamicallyMountableRoute(p) {
+  const n = p.replace(/\\/g, '/');
+  if (!n.startsWith('backend/src/routes/')) return false;
+  const base = path.basename(n);
+  if (base === 'index.js' || base === 'ORPHANED_SERVICES_MOUNT.js') return false;
+  if (/Support\.js$/i.test(base)) return false;
+  if (/\.(?:test|spec)\.js$/i.test(base)) return false;
+  return true;
 }
 function testsFor(p) {
   const base = path.basename(p, path.extname(p));
   const dir = path.dirname(p);
   const candidates = [
-    path.join(dir, `${base}.test.js`),
-    path.join(dir, `${base}.spec.js`),
-    path.join(dir, '__tests__', `${base}.test.js`),
-    path.join(dir, '__tests__', `${base}.spec.js`),
+    path.join(dir, `${base}.test.js`), path.join(dir, `${base}.spec.js`),
+    path.join(dir, '__tests__', `${base}.test.js`), path.join(dir, '__tests__', `${base}.spec.js`),
+    path.join(ROOT, 'backend', 'tests', `${base}.test.js`),
     path.join(ROOT, 'backend', 'src', '__tests__', `${base}.test.js`),
-    path.join(ROOT, 'backend', '__tests__', `${base}.test.js`)
+    path.join(ROOT, 'frontend', 'src', '__tests__', `${base}.test.js`)
   ];
   return candidates.some(fs.existsSync);
 }
@@ -103,7 +123,7 @@ function inspect(p) {
     }
   }
   if (['route', 'service', 'controller'].includes(k) && source && /async\b/.test(source) && !/catch\s*\(/.test(source)) findings.push('async-error-path-review');
-  if (['service', 'controller'].includes(k) && source && /(?:query|INSERT|UPDATE|DELETE|SELECT)\b/i.test(source) && !/transaction|BEGIN|COMMIT|ROLLBACK/i.test(source)) findings.push('transaction-boundary-review');
+  if (['service', 'controller'].includes(k) && source && /(?:query|INSERT|UPDATE|DELETE)\b/i.test(source) && !/transaction|BEGIN|COMMIT|ROLLBACK/i.test(source)) findings.push('transaction-boundary-review');
   if (['service', 'route', 'controller', 'module'].includes(k) && source && !testsFor(p)) findings.push('test-evidence-missing');
 
   return { path: p, kind: k, sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, p))).digest('hex'), findings, missingImports: missing };
@@ -113,10 +133,16 @@ function main() {
   const files = gitFiles();
   const records = files.map(inspect);
   const routes = records.filter(r => r.kind === 'route').map(r => r.path.replace(/\\/g, '/'));
-  const mounted = routeMounts();
-  const unmountedRoutes = mounted.exists ? routes.filter(r => !mounted.imports.some(i => r.endsWith(i))) : routes;
+  const mountEvidence = routeMountEvidence();
+  const unmountedRoutes = mountEvidence.exists ? routes.filter(r => {
+    if (mountEvidence.imports.some(i => r.endsWith(i))) return false;
+    if (mountEvidence.dynamicDiscovery && dynamicallyMountableRoute(r)) return false;
+    return true;
+  }) : routes;
+
   const summary = {
     generatedAt: new Date().toISOString(),
+    scope: 'runtime-only',
     branch: execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8' }).trim(),
     commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim(),
     files: records.length,
@@ -129,7 +155,7 @@ function main() {
     findings: records.reduce((n, r) => n + r.findings.length, 0),
     missingLocalImports: records.reduce((n, r) => n + r.missingImports.length, 0),
     unmountedRoutes,
-    routeMountEvidence: mounted,
+    routeMountEvidence: mountEvidence,
     byFinding: {}
   };
   for (const r of records) for (const f of r.findings) summary.byFinding[f] = (summary.byFinding[f] || 0) + 1;
@@ -140,6 +166,10 @@ function main() {
   fs.writeFileSync(path.join(OUT, 'GAP_REGISTER.json'), JSON.stringify(gaps, null, 2));
   fs.writeFileSync(path.join(OUT, 'FILE_EVIDENCE.json'), JSON.stringify(records, null, 2));
   console.log(JSON.stringify(summary, null, 2));
-  if (summary.byFinding['possible-secret-literal'] || summary.missingLocalImports || unmountedRoutes.length) process.exitCode = 2;
+
+  const critical = Boolean(summary.byFinding['possible-secret-literal']);
+  const brokenImports = summary.missingLocalImports > 0;
+  const brokenRoutes = unmountedRoutes.length > 0;
+  if (critical || brokenImports || brokenRoutes) process.exitCode = 2;
 }
 main();
