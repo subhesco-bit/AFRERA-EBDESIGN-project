@@ -1,0 +1,36 @@
+name: Clone M051-M100 E2E Verification
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'backend/src/modules/M05*/**'
+      - 'backend/src/modules/M06*/**'
+      - 'backend/src/modules/M07*/**'
+      - 'backend/src/modules/M08*/**'
+      - 'backend/src/modules/M09*/**'
+      - 'backend/src/modules/M100/**'
+      - 'backend/src/services/m051m100*.js'
+      - 'backend/src/routes/m051m100*.js'
+      - 'backend/tests/m051-m100*.test.js'
+      - 'frontend/src/modules/M05*/*'
+      - 'frontend/src/modules/M06*/*'
+      - 'frontend/src/modules/M07*/*'
+      - 'frontend/src/modules/M08*/*'
+      - 'frontend/src/modules/M09*/*'
+      - 'frontend/src/modules/M100/*'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run test:m051-m100:e2e
+      - run: npm run lint
