@@ -15,6 +15,7 @@ villageClient.interceptors.request.use((config) => {
 });
 
 const moduleURL = (operation, id) => id === undefined ? `/backend-modules/M041/${operation}` : `/backend-modules/M041/${operation}/${id}`;
+const restURL = (path) => `/m041${path}`;
 
 export const villageAPI = {
   getVillages: (params = {}) => villageClient.get(moduleURL('getVillages'), { params }),
@@ -58,6 +59,17 @@ export const villageAPI = {
   matchSubsidies: (projectId) => villageClient.post(moduleURL('matchSubsidies', projectId)),
   getSubsidyAIContext: (projectId) => villageClient.get(moduleURL('buildSubsidyAIContext', projectId)),
   upsertSchemeCatalogue: (data) => villageClient.post(moduleURL('upsertScheme'), data),
+
+  // Village economy: production -> household/village consumption -> surplus -> market
+  getEconomicBalance: (villageId, params = {}) => villageClient.get(restURL(`/villages/${villageId}/economy/balance`), { params }),
+  recordProduction: (villageId, data) => villageClient.post(restURL(`/villages/${villageId}/economy/production`), data),
+  recordEconomicFlow: (villageId, data) => villageClient.post(restURL(`/villages/${villageId}/economy/flows`), data),
+
+  // GIS / geolocation / logistics
+  getVillageGeo: (villageId) => villageClient.get(restURL(`/villages/${villageId}/geolocation`)),
+  updateVillageGeo: (villageId, data) => villageClient.put(restURL(`/villages/${villageId}/geolocation`), data),
+  getNearestFacilities: (villageId, types) => villageClient.get(restURL(`/villages/${villageId}/logistics/nearest`), { params: types ? { types: types.join(',') } : {} }),
+  upsertLogisticsFacility: (data) => villageClient.post(restURL('/logistics/facilities'), data),
 
   // Geographic roll-up
   getDistrictSummary: (district) => villageClient.get(`/backend-modules/M041/districtSummary/${encodeURIComponent(district)}`),
