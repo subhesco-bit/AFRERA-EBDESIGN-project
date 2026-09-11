@@ -1,201 +1,156 @@
 /**
- * Security Middleware Suite
- * OWASP Top 10 compliance and security hardening
+ * Production security middleware suite.
+ *
+ * Design rules:
+ * - Do not mutate business input to "sanitize" it.
+ * - Validate data with route/domain schemas; parameterize database queries.
+ * - Keep rate limiting bounded and fail closed only when configured.
+ * - Never expose stack traces or sensitive request data to clients.
  */
 
-// Rate limiting (prevent brute force attacks)
-const rateLimit = (() => {
+const DEFAULT_WINDOW_MS = 15 * 60 * 1000;
+const DEFAULT_MAX_REQUESTS = 100;
+const MAX_TRACKED_CLIENTS = 10_000;
+
+function rateLimit(maxRequests = DEFAULT_MAX_REQUESTS, windowMs = DEFAULT_WINDOW_MS) {
   const requests = new Map();
-  const maxTrackedClients = 10000;
+  const limit = Number.isInteger(maxRequests) && maxRequests > 0 ? maxRequests : DEFAULT_MAX_REQUESTS;
+  const window = Number.isFinite(windowMs) && windowMs > 0 ? windowMs : DEFAULT_WINDOW_MS;
 
-  return (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
-    return (req, res, next) => {
-      const ip = req.ip || req.connection.remoteAddress;
-      const now = Date.now();
+  return (req, res, next) => {
+    const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+    const now = Date.now();
+    const existing = requests.get(ip) || [];
+    const recent = existing.filter(timestamp => now - timestamp < window);
 
-      if (!requests.has(ip)) {
-        requests.set(ip, []);
-      }
+    if (recent.length >= limit) {
+      res.setHeader('Retry-After', String(Math.ceil(window / 1000)));
+      return res.status(429).json({
+        success: false,
+        error: 'Too many requests. Please try again later.',
+      });
+    }
 
-      const userRequests = requests.get(ip);
-      const recentRequests = userRequests.filter(time => now - time < windowMs);
+    if (recent.length === 0) requests.delete(ip);
 
-      if (recentRequests.length === 0) {
-        requests.delete(ip);
-      }
+    if (!requests.has(ip) && requests.size >= MAX_TRACKED_CLIENTS) {
+      const oldest = requests.keys().next().value;
+      if (oldest !== undefined) requests.delete(oldest);
+    }
 
-      if (requests.size >= maxTrackedClients && !requests.has(ip)) {
-        const oldestClient = requests.keys().next().value;
-        requests.delete(oldestClient);
-      }
-
-      if (recentRequests.length >= maxRequests) {
-        return res.status(429).json({
-          success: false,
-          error: 'Too many requests. Please try again later.',
-        });
-      }
-
-      recentRequests.push(now);
-      requests.set(ip, recentRequests);
-      next();
-    };
+    recent.push(now);
+    requests.set(ip, recent);
+    return next();
   };
-})();
+}
 
-// Input validation (prevent injection attacks)
-const validateInput = (req, res, next) => {
-  const sanitize = (value) => {
-    if (typeof value !== 'string') return value;
-    return value
-      .replace(/[<>]/g, '') // Remove HTML tags
-      .replace(/['";]/g, '') // Remove quotes
-      .trim();
-  };
+/**
+ * Compatibility middleware only. It deliberately does not mutate payloads.
+ * Domain-specific validation belongs to route schemas (Joi/Zod/express-validator).
+ */
+const validateInput = (req, res, next) => next();
 
-  if (req.body) {
-    Object.keys(req.body).forEach(key => {
-      req.body[key] = sanitize(req.body[key]);
-    });
-  }
-
-  if (req.query) {
-    Object.keys(req.query).forEach(key => {
-      req.query[key] = sanitize(req.query[key]);
-    });
-  }
-
-  next();
-};
-
-// CORS security
 const corsMiddleware = (req, res, next) => {
-  const configuredOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3000')
+  const configuredOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || '')
     .split(',')
     .map(origin => origin.trim())
     .filter(Boolean);
   const requestOrigin = req.get('Origin');
 
   if (requestOrigin && configuredOrigins.includes(requestOrigin)) {
-    res.header('Access-Control-Allow-Origin', requestOrigin);
-    res.header('Vary', 'Origin');
-  }
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Max-Age', '3600');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    res.setHeader('Access-Control-Allow-Origin', requestOrigin);
+    res.setHeader('Vary', 'Origin');
   }
 
-  next();
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Request-ID, X-Correlation-ID');
+  res.setHeader('Access-Control-Max-Age', '3600');
+
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  return next();
 };
 
-// Security headers (OWASP + industry standard)
 const securityHeaders = (req, res, next) => {
-  // Prevent clickjacking (X-Frame-Options)
   res.setHeader('X-Frame-Options', 'DENY');
-
-  // Prevent MIME-type sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
-
-  // Enable XSS protection (legacy browsers)
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-
-  // Prevent referrer leakage
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-  // Content Security Policy (strict)
-  res.setHeader(
-    'Content-Security-Policy',
-    'default-src \'self\'; script-src \'self\'; style-src \'self\' \'unsafe-inline\'; img-src \'self\' data: https:; font-src \'self\'; connect-src \'self\'; frame-ancestors \'none\'',
-  );
-
-  // HSTS (HTTPS only, 1 year, include subdomains)
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-
-  // Permissions Policy (Feature-Policy) - disable dangerous features
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
-
-  // Remove server header (don't leak technology stack)
   res.removeHeader('X-Powered-By');
 
-  // Disable caching for sensitive content
-  if (req.path.includes('/auth') || req.path.includes('/admin')) {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+  // HSTS is safe only when the deployment is actually HTTPS.
+  if (req.secure || process.env.TRUST_PROXY === 'true') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
 
-  next();
+  const csp = process.env.CONTENT_SECURITY_POLICY;
+  if (csp) res.setHeader('Content-Security-Policy', csp);
+
+  if (req.path.startsWith('/auth') || req.path.startsWith('/admin')) {
+    res.setHeader('Cache-Control', 'no-store, private');
+  }
+
+  return next();
 };
 
-// Request logging (audit trail)
 const requestLogger = (req, res, next) => {
-  const start = Date.now();
+  const start = process.hrtime.bigint();
 
   res.on('finish', () => {
-    const duration = Date.now() - start;
+    const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
     const log = {
       timestamp: new Date().toISOString(),
       method: req.method,
       path: req.path,
       status: res.statusCode,
-      duration: `${duration}ms`,
-      ip: req.ip,
-      userAgent: req.get('user-agent'),
+      durationMs: Math.round(durationMs * 100) / 100,
+      requestId: req.id || req.requestId,
     };
 
-    // In production: send to logging service
-    if (res.statusCode >= 400) {
-      console.warn('API Error:', log);
+    if (res.statusCode >= 400 && typeof console.warn === 'function') {
+      console.warn('API request failed', log);
     }
   });
 
-  next();
+  return next();
 };
 
-// SQL injection prevention (parameterized queries helper)
-const validateSQLInput = (value) => {
-  const sqlKeywords = /(\bDROP\b|\bDELETE\b|\bUPDATE\b|\bINSERT\b|\bSELECT\b|\bUNION\b)/i;
-  if (sqlKeywords.test(value)) {
-    return false;
-  }
-  return true;
+/**
+ * This helper is intentionally conservative. SQL injection prevention is
+ * achieved by parameterized queries, never by rejecting legitimate words
+ * such as "update" or "select" from user-entered business data.
+ */
+const validateSQLInput = value => typeof value === 'string' && !/[\0]/.test(value);
+
+const validatePassword = password => {
+  if (typeof password !== 'string' || password.length < 12 || password.length > 128) return false;
+  return /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password);
 };
 
-// Password validation
-const validatePassword = (password) => {
-  const minLength = 6;
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasLowerCase = /[a-z]/.test(password);
-  const hasNumbers = /\d/.test(password);
-
-  return (
-    password.length >= minLength &&
-    hasUpperCase &&
-    hasLowerCase &&
-    hasNumbers
-  );
+const validateEmail = email => {
+  if (typeof email !== 'string' || email.length > 254) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
-// Email validation
-const validateEmail = (email) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-// Error handler with sanitized messages
 const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
+  const statusCode = Number.isInteger(err?.statusCode) && err.statusCode >= 400 && err.statusCode < 600
+    ? err.statusCode
+    : 500;
 
-  // Don't leak error details to client
-  const statusCode = err.statusCode || 500;
-  const message = statusCode === 500 ? 'Internal Server Error' : err.message;
+  if (res.headersSent) return next(err);
 
-  res.status(statusCode).json({
+  if (typeof console.error === 'function') {
+    console.error('Unhandled API error', {
+      requestId: req.id || req.requestId,
+      statusCode,
+      name: err?.name,
+      message: err?.message,
+    });
+  }
+
+  return res.status(statusCode).json({
     success: false,
-    error: message,
+    error: statusCode >= 500 ? 'Internal Server Error' : (err.message || 'Request failed'),
+    requestId: req.id || req.requestId,
   });
 };
 

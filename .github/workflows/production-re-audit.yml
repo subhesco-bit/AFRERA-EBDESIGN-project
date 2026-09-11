@@ -1,0 +1,32 @@
+name: Production Re-Audit
+
+on:
+  push:
+    branches: ["chatgpt-clone/foundation"]
+  pull_request:
+    branches: ["chatgpt-clone/foundation"]
+
+permissions:
+  contents: read
+
+jobs:
+  production-re-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Repository production re-audit
+        run: node tools/re-audit-production.js
+      - name: Upload audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-re-audit
+          path: .audit/production-re-audit/

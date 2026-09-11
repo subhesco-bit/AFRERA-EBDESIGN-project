@@ -23,6 +23,7 @@ const {
 const { authMiddleware } = require('../middleware/auth');
 const { requireRole } = require('../middleware/auth');
 const { protectRouter, requireHumanAuthorization } = require('./enterpriseRouteSupport');
+const indiaErpAccountingRoutes = require('./indiaErpAccountingRoutes');
 
 const router = express.Router();
 
@@ -32,6 +33,10 @@ router.use((req, res, next) => {
   if (req.method === 'GET') return next();
   requireRole('admin', 'superadmin')(req, res, () => requireHumanAuthorization(req, res, next));
 });
+
+// India financial-control extension: AP, AR, payments, Indian tax,
+// budgeting, bank reconciliation and period-close controls.
+router.use('/accounting', indiaErpAccountingRoutes);
 
 // ============================================================================
 // FINANCIAL ACCOUNTING (FI) / GENERAL LEDGER (GL) ROUTES

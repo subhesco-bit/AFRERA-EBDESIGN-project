@@ -1,0 +1,32 @@
+name: Production Hardening Gate
+
+on:
+  pull_request:
+    branches:
+      - chatgpt-clone/foundation
+  push:
+    branches:
+      - chatgpt-clone/foundation
+
+permissions:
+  contents: read
+
+jobs:
+  hardening-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Production hardening gate
+        run: node tools/production-hardening-gate-v2.js

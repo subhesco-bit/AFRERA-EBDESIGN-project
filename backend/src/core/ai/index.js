@@ -1,14 +1,9 @@
 /**
  * AI Intelligence Fabric - Main Entry Point
  * Module ID: EBD-MOD-00000001
- *
- * This module exports all AI intelligence fabric components
- * in a structured, professional manner with unique IDs.
  */
-
 'use strict';
 
-// Core AI Components
 const { AIOrchestrator, orchestrator } = require('./aiOrchestratorCore');
 const aiProviderAdapters = require('./aiProviderAdapters');
 const aiEngineRegistry = require('./aiEngineRegistry');
@@ -16,13 +11,10 @@ const aiConfidenceEngine = require('./aiConfidenceEngine');
 const aiCostController = require('./aiCostController');
 const aiGuardrails = require('./aiGuardrails');
 const aiAuditLogger = require('./aiAuditLogger');
-
-// Module Registry
+const aiBackboneRuntime = require('./aiBackboneRuntime');
 const AI_MODULE_REGISTRY = require('./AI_MODULE_REGISTRY.json');
+const systemIntegrationRegistry = require('../integration/systemIntegrationRegistry');
 
-/**
- * Initialize AI Intelligence Fabric
- */
 async function initializeAI(config = {}) {
   try {
     await orchestrator.initialize();
@@ -30,19 +22,14 @@ async function initializeAI(config = {}) {
       success: true,
       message: 'AI Intelligence Fabric initialized successfully',
       status: orchestrator.getStatus(),
+      backbone: { enabled: true, agents: aiBackboneRuntime.listAgents().length },
+      config: { hasConfig: Object.keys(config).length > 0 },
     };
   } catch (error) {
-    return {
-      success: false,
-      message: `Failed to initialize AI Intelligence Fabric: ${error.message}`,
-      error,
-    };
+    return { success: false, message: `Failed to initialize AI Intelligence Fabric: ${error.message}`, error };
   }
 }
 
-/**
- * Get AI Fabric status
- */
 function getAIStatus() {
   return {
     module: AI_MODULE_REGISTRY,
@@ -50,35 +37,48 @@ function getAIStatus() {
     providers: aiProviderAdapters.listConfiguredProviders(),
     engines: aiEngineRegistry.listReadyEngines(),
     cost: aiCostController.getCostState(),
+    backbone: {
+      enabled: true,
+      agents: aiBackboneRuntime.listAgents(),
+      autonomyLevels: aiBackboneRuntime.AUTONOMY,
+    },
+    integration: {
+      contracts: systemIntegrationRegistry.listContracts(),
+      capabilityIndex: systemIntegrationRegistry.getModuleCapabilityIndex(),
+    },
   };
 }
 
-/**
- * Main AI route handler
- */
 async function handleAIRequest(req, res) {
   try {
-    const { taskType, payload, options } = req.body;
+    const { taskType, payload = {}, options = {}, agentId, objective, execute = false, autonomyLevel } = req.body;
 
-    const result = await orchestrator.route(taskType, payload, {
-      user: req.user,
-      ...options,
-    });
+    if (agentId) {
+      const result = await aiBackboneRuntime.runAgent({
+        agentId,
+        taskType,
+        payload,
+        objective,
+        query: payload.query,
+        context: payload.context,
+        execute,
+        autonomyLevel,
+        options,
+        actorId: req.user?.id || req.user?.userId,
+      });
+      return res.json({ success: true, data: result });
+    }
 
-    res.json({
-      success: true,
-      data: result,
-    });
+    if (!taskType) return res.status(400).json({ success: false, error: 'taskType or agentId is required' });
+    const result = await orchestrator.route(taskType, payload, { user: req.user, ...options });
+    return res.json({ success: true, data: result });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    const status = error.code === 'UNKNOWN_AI_AGENT' ? 400 : 500;
+    return res.status(status).json({ success: false, error: error.message });
   }
 }
 
 module.exports = {
-  // Core Components
   AIOrchestrator,
   orchestrator,
   aiProviderAdapters,
@@ -87,14 +87,10 @@ module.exports = {
   aiCostController,
   aiGuardrails,
   aiAuditLogger,
-
-  // Module Registry
+  aiBackboneRuntime,
   AI_MODULE_REGISTRY,
-
-  // Initialization
+  systemIntegrationRegistry,
   initializeAI,
   getAIStatus,
-
-  // Route Handler
   handleAIRequest,
 };
