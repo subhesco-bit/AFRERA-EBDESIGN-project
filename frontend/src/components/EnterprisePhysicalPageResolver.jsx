@@ -6,8 +6,8 @@ function normalize(input){const m=String(input||'').toUpperCase().match(/^P(\d{1
 export default function EnterprisePhysicalPageResolver(){
  const {pageId}=useParams();const normalized=normalize(pageId);
  const loader=useMemo(()=>normalized?Object.entries(physicalPages).find(([path])=>path.endsWith(`/${normalized}Page.jsx`))?.[1]:null,[normalized]);
- if(!normalized||!loader)return <div role="alert" className="p-6">Enterprise page not found.</div>;
- const Page=lazy(loader);
+ const Page=useMemo(()=>loader?lazy(loader):null,[loader]);
+ if(!normalized||!Page)return <div role="alert" className="p-6">Enterprise page not found.</div>;
  return <Page/>;
 }
 export const physicalEnterprisePageCount=Object.keys(physicalPages).length;
