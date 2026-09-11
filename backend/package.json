@@ -17,6 +17,7 @@
     "audit:coverage": "node ../tools/route-audit.js",
     "audit:production": "node ../tools/re-audit-production.js",
     "audit:system": "node ../tools/system-production-audit.js",
+    "audit:m001-m050": "node ../tools/m001-m050-release-audit.js",
     "audit:complete": "npm run audit:coverage && npm run audit:production && npm run audit:system",
     "upgrade:all": "node ../tools/upgrade-all.js",
     "verify:production": "npm run lint && npm test -- --runInBand && npm run audit:complete"
@@ -76,7 +77,7 @@
   },
   "engines": {
     "node": ">=20.0.0",
-    "npm": ">=12.0.0"
+    "npm": ">=10.8.0"
   },
   "keywords": ["afrera", "agriculture", "marketplace", "erp", "microservices"],
   "author": "Ethnoverde Dynamics Pvt. Ltd.",
