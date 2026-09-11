@@ -1,0 +1,22 @@
+name: Clone M001-M050 Enterprise Product Gate
+on:
+  push:
+    branches: [chatgpt-clone/main-reconciliation-phase-1]
+  pull_request:
+    branches: [chatgpt-clone/highest-standard-enhancement]
+jobs:
+  enterprise-product:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npx jest tests/m001-m050-enterprise-product.test.js tests/m001-m050-highest-standard.test.js tests/m001-m050-workflow-orchestration.test.js --runInBand
+      - run: node -e "const s=require('./src/services/m001m050EnterpriseProductService');if(s.portfolio().length!==50)process.exit(1)"

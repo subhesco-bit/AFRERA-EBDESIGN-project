@@ -1,0 +1,8 @@
+const svc=require('../src/services/m001m050EnterpriseProductService');
+describe('M001-M050 enterprise product specifications',()=>{
+ test('all 50 modules have individual product specs',()=>{const p=svc.portfolio();expect(p).toHaveLength(50);for(const m of p){expect(m.focus.length).toBeGreaterThanOrEqual(4);expect(m.pages.length).toBeGreaterThanOrEqual(6);expect(m.workflow.length).toBeGreaterThanOrEqual(7);expect(m.kpis.length).toBeGreaterThanOrEqual(5);expect(m.visualizations.length).toBeGreaterThanOrEqual(4);expect(m.roles.length).toBeGreaterThanOrEqual(4);expect(m.integrations.length).toBeGreaterThanOrEqual(4);expect(m.certification).toContain('e2e');expect(m.ai.authoritative).toBe(false);}});
+ test('farmer registry is farmer/village/FPO operational, not generic CRUD',()=>{const m=svc.spec('M021');expect(m.focus).toEqual(expect.arrayContaining(['duplicate resolution','village/FPO linkage','onboarding']));expect(m.integrations).toEqual(expect.arrayContaining(['village','fpo','land']));});
+ test('village registry contains hierarchy and village-360 concerns',()=>{const m=svc.spec('M041');expect(m.focus).toEqual(expect.arrayContaining(['district/block hierarchy','FPO/farmer linkage','village 360']));expect(m.visualizations).toContain('hierarchy_map');});
+ test('land modules expose mapping/evidence workflows',()=>{const m=svc.spec('M034');expect(m.visualizations).toContain('interactive_map');expect(m.workflow).toContain('georeference');});
+ test('identity modules require privacy/security decision controls',()=>{const m=svc.spec('M019');expect(m.roles).toEqual(expect.arrayContaining(['privacy_officer','checker']));expect(m.middleware).toContain('record_scope');});
+});
