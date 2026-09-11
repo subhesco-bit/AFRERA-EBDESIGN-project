@@ -56,8 +56,10 @@ export default function EnterprisePageEstateBoundary({children}){
   setPageStateInternal(initialState);
   const label=routeLabel(location.pathname);
   setAnnouncement(`${label} page loaded`);
+  if(typeof performance!=='undefined')performance.mark?.(`enterprise-page:${location.pathname}`);
+  window.dispatchEvent(new CustomEvent('enterprise:page-view',{detail:{route:location.pathname,label,online,timestamp:new Date().toISOString()}}));
   requestAnimationFrame(()=>mainRef.current?.focus({preventScroll:true}));
- },[location.pathname]);
+ },[location.pathname,online]);
 
  const value=useMemo(()=>({
   route:location.pathname,
