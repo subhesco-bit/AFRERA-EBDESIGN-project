@@ -1,2 +1,1 @@
-﻿-- SQL model placeholder for Water Resource Mapping (M037)
--- Define tables and indexes here
+CREATE TABLE IF NOT EXISTS m037_water_resources (id UUID PRIMARY KEY,resource_id TEXT NOT NULL UNIQUE,resource_type TEXT NOT NULL,location JSONB NOT NULL,geometry JSONB,village_id TEXT,capacity NUMERIC,capacity_unit TEXT,seasonal_status TEXT,quality_status TEXT,status TEXT NOT NULL DEFAULT 'active',properties JSONB NOT NULL DEFAULT '{}'::jsonb,created_by TEXT,updated_by TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),deleted_at TIMESTAMPTZ); CREATE INDEX IF NOT EXISTS idx_m037_village ON m037_water_resources(village_id) WHERE deleted_at IS NULL;
