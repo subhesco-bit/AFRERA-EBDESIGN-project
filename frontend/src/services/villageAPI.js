@@ -14,14 +14,33 @@ villageClient.interceptors.request.use((config) => {
   return config;
 });
 
+const moduleURL = (operation, id) => id === undefined ? `/backend-modules/M041/${operation}` : `/backend-modules/M041/${operation}/${id}`;
+
 export const villageAPI = {
-  getVillages: (params = {}) => villageClient.get('/backend-modules/M041/getVillages', { params }),
-  getVillage: (id) => villageClient.get(`/backend-modules/M041/getVillage/${id}`),
-  createVillage: (data) => villageClient.post('/backend-modules/M041/createVillage', data),
-  updateVillage: (id, data) => villageClient.put(`/backend-modules/M041/updateVillage/${id}`, data),
-  deleteVillage: (id) => villageClient.delete(`/backend-modules/M041/deleteVillage/${id}`),
-  addVillageResource: (id, data) => villageClient.post('/backend-modules/M041/addVillageResource', { villageId: id, ...data }),
-  getVillageAnalytics: (id) => villageClient.get(`/backend-modules/M041/getVillageAnalytics/${id}`),
+  getVillages: (params = {}) => villageClient.get(moduleURL('getVillages'), { params }),
+  getVillage: (id) => villageClient.get(moduleURL('getVillage', id)),
+  createVillage: (data) => villageClient.post(moduleURL('createVillage'), data),
+  updateVillage: (id, data) => villageClient.put(moduleURL('updateVillage', id), data),
+  deleteVillage: (id) => villageClient.delete(moduleURL('deleteVillage', id)),
+  addVillageResource: (id, data) => villageClient.post(moduleURL('addVillageResource'), { villageId: id, ...data }),
+  getVillageAnalytics: (id) => villageClient.get(moduleURL('getVillageAnalytics', id)),
+
+  // Village ERP / accounting
+  getVillageFinance: (id) => villageClient.get(moduleURL('getVillageFinance', id)),
+  initializeFinance: (id) => villageClient.post(moduleURL('initializeFinance', id)),
+  postVillageJournal: (id, data) => villageClient.post(moduleURL('postVillageJournal', id), data),
+
+  // Operations and workflow
+  getDashboard: (id) => villageClient.get(moduleURL('getDashboard', id)),
+  upsertKPI: (id, data) => villageClient.post(moduleURL('upsertKPI', id), data),
+  createTask: (id, data) => villageClient.post(moduleURL('createTask', id), data),
+  updateTask: (taskId, data) => villageClient.patch(moduleURL('updateTask', taskId), data),
+
+  // AI decision support
+  generateAIInsights: (id, data = {}) => villageClient.post(moduleURL('generateAI', id), data),
+
+  // Geographic roll-up
+  getDistrictSummary: (district) => villageClient.get(`/backend-modules/M041/districtSummary/${encodeURIComponent(district)}`),
 };
 
 export default villageAPI;
