@@ -15,6 +15,7 @@ jest.mock('../middleware/rateLimiter', () => ({
 jest.mock('../controllers/productMediaAIController', () => ({
   getProviderStatus: (_req, res) => res.json({ success: true, data: { imageProviders: [] } }),
   generateProductImage: (req, res) => res.json({ success: true, data: { productId: req.params.productId } }),
+  generateProductCartoon: (req, res) => res.json({ success: true, data: { productId: req.params.productId, mediaType: 'cartoon' } }),
   buildNutrientVideoScript: (req, res) => res.json({ success: true, data: { productId: req.params.productId } }),
   generateProductVideo: (req, res) => res.json({ success: true, data: { productId: req.params.productId } }),
 }));
@@ -43,5 +44,15 @@ describe('product media AI routes', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.productId).toBe('product-123');
+  });
+
+  it('exposes farmer-friendly cartoon generation', async () => {
+    const response = await request(createApp())
+      .post('/media/products/product-123/cartoon')
+      .send({ prompt: 'explain protein and fibre' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.productId).toBe('product-123');
+    expect(response.body.data.mediaType).toBe('cartoon');
   });
 });

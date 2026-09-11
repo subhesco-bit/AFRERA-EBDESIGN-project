@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './AIImageGenerator.module.css';
-import { productMediaAIAPI } from '../services/api';
+import productMediaAIAPI from '../services/productMediaAIAPI';
 
 function AIImageGenerator({ productId, productName, onImageGenerated }) {
   const [loading, setLoading] = useState(false);
