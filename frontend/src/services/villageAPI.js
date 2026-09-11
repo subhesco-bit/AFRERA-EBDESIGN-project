@@ -65,6 +65,10 @@ export const villageAPI = {
   recordProduction: (villageId, data) => villageClient.post(restURL(`/villages/${villageId}/economy/production`), data),
   recordEconomicFlow: (villageId, data) => villageClient.post(restURL(`/villages/${villageId}/economy/flows`), data),
 
+  // Production intensity / per-acre potential
+  getProductionPotential: (villageId, params = {}) => villageClient.get(restURL(`/villages/${villageId}/economy/production-potential`), { params }),
+  upsertProductionPotential: (villageId, data) => villageClient.put(restURL(`/villages/${villageId}/economy/production-potential`), data),
+
   // GIS / geolocation / logistics
   getVillageGeo: (villageId) => villageClient.get(restURL(`/villages/${villageId}/geolocation`)),
   updateVillageGeo: (villageId, data) => villageClient.put(restURL(`/villages/${villageId}/geolocation`), data),
