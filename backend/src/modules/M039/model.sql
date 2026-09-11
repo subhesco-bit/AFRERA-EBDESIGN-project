@@ -1,2 +1,1 @@
-﻿-- SQL model placeholder for Survey Management (M039)
--- Define tables and indexes here
+CREATE TABLE IF NOT EXISTS m039_surveys (id UUID PRIMARY KEY,survey_id TEXT NOT NULL UNIQUE,survey_date DATE NOT NULL,survey_type TEXT,location JSONB NOT NULL,geometry JSONB,enumerator_id TEXT,source_reference TEXT,status TEXT NOT NULL DEFAULT 'captured',findings JSONB NOT NULL DEFAULT '{}'::jsonb,evidence JSONB NOT NULL DEFAULT '{}'::jsonb,created_by TEXT,updated_by TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),deleted_at TIMESTAMPTZ); CREATE INDEX IF NOT EXISTS idx_m039_date ON m039_surveys(survey_date DESC) WHERE deleted_at IS NULL;
