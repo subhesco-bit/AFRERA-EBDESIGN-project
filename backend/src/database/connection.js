@@ -1,223 +1,182 @@
 /**
  * Database Connection Manager
- * Supports PostgreSQL (relational) and MongoDB (document) databases
+ * PostgreSQL is authoritative. MongoDB is optional unless MONGO_REQUIRED=true.
  */
 
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 
-/**
- * The MongoDB driver is loaded on first use, not at import time.
- *
- * WHY THIS IS NOT A MICRO-OPTIMISATION
- *
- * `require('mongodb')` pulls in ~130 files and costs about twelve seconds on
- * this machine. Twenty-two services import this module for `getPostgreSQL`
- * alone; MongoDB is touched by exactly one (`aiBackboneService`, for fraud patterns).
- * So every one of them — and every process that loads any of them — paid the
- * full driver cost to use PostgreSQL.
- *
- * In the test suite that is the dominant cost of the whole run: fifteen suites
- * each `require('../index')`, each boot takes ~29s, and 12s of that is a Mongo
- * driver the tests explicitly mock to `null` and never connect. Roughly three
- * minutes per run spent loading a database nobody is talking to.
- *
- * Deferring the require does not change behaviour. `initMongoDB()` is the only
- * thing that constructs a client, and it now loads the driver immediately
- * before doing so — a connection that used to work still works, and it fails
- * the same way if the driver is genuinely missing. What changes is that a
- * process which never opens a Mongo connection never pays for the driver.
- */
 let MongoClient = null;
+let pgPool = null;
+let mongoClient = null;
+let initializationCompleted = false;
+let postgresError = null;
+let mongoError = null;
+
 function loadMongoDriver() {
-  if (!MongoClient) {
-    // eslint-disable-next-line global-require
-    ({ MongoClient } = require('mongodb'));
-  }
+  if (!MongoClient) ({ MongoClient } = require('mongodb')); // eslint-disable-line global-require
   return MongoClient;
 }
 
-// PostgreSQL connection pool
-let pgPool = null;
-
-// MongoDB client
-let mongoClient = null;
-let initializationError = null;
-let initializationCompleted = false;
-
-/**
- * Initialize PostgreSQL connection
- */
-async function initPostgreSQL() {
-  try {
-    // DATABASE_URL takes precedence when present.
-    //
-    // Managed platforms (Railway, Heroku, Render, Fly, Supabase) inject
-    // DATABASE_URL and nothing else. This file previously read only PG_* vars,
-    // so on any of them it would quietly fall back to
-    // localhost:5432/afrera_db as postgres/password — connect to nothing, and
-    // report "PostgreSQL connection failed" as if the database were down
-    // rather than as if it had never been told where to look.
-    //
-    // PG_* still works and is what CI supplies, so both paths are supported.
-    const pgConfig = process.env.DATABASE_URL ?
-      { connectionString: process.env.DATABASE_URL } :
-      {
+function postgresConfig() {
+  const config = process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
         host: process.env.PG_HOST || 'localhost',
         port: parseInt(process.env.PG_PORT, 10) || 5432,
         database: process.env.PG_DATABASE || 'afrera_db',
         user: process.env.PG_USER || 'postgres',
         password: process.env.PG_PASSWORD || 'password',
       };
-
-    // Managed Postgres almost always requires TLS, and its certificates are
-    // usually not in the container's trust store. Opt in explicitly rather
-    // than defaulting rejectUnauthorized to false everywhere.
-    if (process.env.PG_SSL === 'true') {
-      pgConfig.ssl = { rejectUnauthorized: process.env.PG_SSL_STRICT !== 'false' };
+  if (process.env.PG_SSL === 'true') config.ssl = { rejectUnauthorized: process.env.PG_SSL_STRICT !== 'false' };
+  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+    if (!process.env.PG_PASSWORD || config.password === 'password') {
+      throw new Error('Production requires DATABASE_URL or an explicit non-default PG_PASSWORD');
     }
+  }
+  return config;
+}
 
-    pgPool = new Pool({
-      ...pgConfig,
-      max: 20, // Maximum pool size
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
-
-    // Test connection
-    const client = await pgPool.connect();
-    await client.query('SELECT NOW()');
+async function initPostgreSQL() {
+  const config = postgresConfig();
+  const candidate = new Pool({
+    ...config,
+    max: Number(process.env.PG_POOL_MAX || 20),
+    idleTimeoutMillis: Number(process.env.PG_IDLE_TIMEOUT_MS || 30000),
+    connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 5000),
+  });
+  try {
+    const client = await candidate.connect();
+    await client.query('SELECT 1');
     client.release();
-
+    pgPool = candidate;
+    postgresError = null;
     logger.info('PostgreSQL connection established successfully');
     return pgPool;
   } catch (error) {
-    logger.error('PostgreSQL connection failed', { error: error.message, stack: error.stack });
+    postgresError = error;
+    await candidate.end().catch(() => {});
+    logger.error('PostgreSQL connection failed', { error: error.message });
     throw error;
   }
 }
 
-/**
- * Initialize MongoDB connection
- */
 async function initMongoDB() {
+  const configured = Boolean(process.env.MONGO_URI);
+  const required = process.env.MONGO_REQUIRED === 'true';
+  if (!configured && !required) {
+    mongoClient = null;
+    mongoError = null;
+    logger.info('MongoDB not configured; continuing with PostgreSQL-only runtime');
+    return null;
+  }
+  const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/afrera_mongo';
+  const Client = loadMongoDriver();
+  const candidate = new Client(uri, {
+    maxPoolSize: Number(process.env.MONGO_POOL_MAX || 20),
+    serverSelectionTimeoutMS: Number(process.env.MONGO_SELECTION_TIMEOUT_MS || 5000),
+    socketTimeoutMS: Number(process.env.MONGO_SOCKET_TIMEOUT_MS || 45000),
+  });
   try {
-    const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/afrera_mongo';
-    const Client = loadMongoDriver();
-    mongoClient = new Client(uri, {
-      maxPoolSize: 20,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    });
-
-    await mongoClient.connect();
-    await mongoClient.db('admin').command({ ping: 1 });
-
+    await candidate.connect();
+    await candidate.db('admin').command({ ping: 1 });
+    mongoClient = candidate;
+    mongoError = null;
     logger.info('MongoDB connection established successfully');
     return mongoClient;
   } catch (error) {
-    logger.error('MongoDB connection failed', { error: error.message, stack: error.stack });
-    throw error;
+    mongoError = error;
+    await candidate.close().catch(() => {});
+    mongoClient = null;
+    if (required) throw error;
+    logger.warn('Optional MongoDB unavailable; continuing without MongoDB', { error: error.message });
+    return null;
   }
 }
 
-/**
- * Initialize all database connections
- */
 async function initialize() {
-  if (initializationCompleted) {
-    return { pgPool, mongoClient };
-  }
-
+  if (initializationCompleted) return { pgPool, mongoClient };
   try {
     await initPostgreSQL();
     await initMongoDB();
     initializationCompleted = true;
-    initializationError = null;
-    logger.info('All database connections initialized');
     return { pgPool, mongoClient };
   } catch (error) {
     initializationCompleted = true;
-    initializationError = error;
-    logger.warn('Database initialization failed; continuing in fallback mode', { error: error.message });
+    const strict = process.env.NODE_ENV === 'production' && process.env.ALLOW_DEGRADED_STARTUP !== 'true';
+    if (strict) throw error;
+    logger.warn('Database initialization incomplete; degraded startup allowed', { error: error.message });
     return { pgPool, mongoClient };
   }
 }
 
-/**
- * Get PostgreSQL pool
- */
 function getPostgreSQL() {
-  if (!pgPool) {
-    return null;
-  }
   return pgPool;
 }
 
-/**
- * Get MongoDB client
- */
 function getMongoDB() {
-  if (!mongoClient) {
-    throw new Error('MongoDB not initialized. Call initialize() first.');
-  }
+  if (!mongoClient) throw new Error('MongoDB is not available');
   return mongoClient;
 }
 
-/**
- * Get MongoDB database
- */
 function getMongoDatabase() {
-  const dbName = process.env.MONGO_DATABASE || 'afrera_mongo';
-  return mongoClient.db(dbName);
+  return getMongoDB().db(process.env.MONGO_DATABASE || 'afrera_mongo');
 }
 
-/**
- * Health check for databases
- */
-function isHealthy() {
-  const pgHealthy = pgPool !== null;
-  const mongoHealthy = mongoClient !== null && mongoClient.isConnected();
+async function probePostgreSQL() {
+  if (!pgPool) return false;
+  try { await pgPool.query('SELECT 1'); return true; } catch { return false; }
+}
+
+async function probeMongoDB() {
+  if (!mongoClient) return false;
+  try { await mongoClient.db('admin').command({ ping: 1 }); return true; } catch { return false; }
+}
+
+async function isHealthy() {
+  const postgresql = await probePostgreSQL();
+  const mongodbConfigured = Boolean(process.env.MONGO_URI) || process.env.MONGO_REQUIRED === 'true';
+  const mongodb = mongodbConfigured ? await probeMongoDB() : null;
+  const mongoRequired = process.env.MONGO_REQUIRED === 'true';
   return {
-    postgresql: pgHealthy,
-    mongodb: mongoHealthy,
-    overall: pgHealthy && mongoHealthy,
-    fallback: initializationError !== null,
+    postgresql,
+    mongodb,
+    mongodbConfigured,
+    overall: postgresql && (!mongoRequired || mongodb === true),
+    degraded: !postgresql || (mongodbConfigured && mongodb !== true),
+    errors: {
+      postgresql: postgresError?.message || null,
+      mongodb: mongoError?.message || null,
+    },
   };
 }
 
-/**
- * Close all database connections
- */
 async function close() {
-  try {
-    if (pgPool) {
-      await pgPool.end();
-      logger.info('PostgreSQL connection closed');
-    }
-    if (mongoClient) {
-      await mongoClient.close();
-      logger.info('MongoDB connection closed');
-    }
-  } catch (error) {
-    logger.error('Error closing database connections', { error: error.message, stack: error.stack });
-    throw error;
+  const errors = [];
+  if (pgPool) {
+    try { await pgPool.end(); } catch (error) { errors.push(error); }
+    pgPool = null;
   }
+  if (mongoClient) {
+    try { await mongoClient.close(); } catch (error) { errors.push(error); }
+    mongoClient = null;
+  }
+  initializationCompleted = false;
+  if (errors.length) throw new AggregateError(errors, 'Failed to close one or more database clients');
 }
 
-// Initialize on module load if not in test mode
 if (process.env.NODE_ENV !== 'test') {
-  initialize().catch(error => {
-    logger.warn('Database initialization deferred to fallback mode', { error: error.message });
-  });
+  initialize().catch(error => logger.error('Database initialization failed', { error: error.message }));
 }
 
 module.exports = {
   initialize,
+  initPostgreSQL,
+  initMongoDB,
   getPostgreSQL,
   getMongoDB,
   getMongoDatabase,
   isHealthy,
   close,
+  postgresConfig,
 };
-
