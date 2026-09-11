@@ -1,0 +1,12 @@
+'use strict';
+const express=require('express');
+const router=express.Router();
+const svc=require('../services/m001m050WorkflowOrchestrationService');
+const {authMiddleware}=require('../middleware/auth');
+router.use(authMiddleware);
+router.get('/:moduleCode/summary',async(req,res,next)=>{try{res.json({success:true,summary:await svc.summary(req.params.moduleCode)});}catch(e){next(e);}});
+router.post('/:moduleCode/workflows',async(req,res,next)=>{try{res.status(201).json({success:true,workflow:await svc.create(req.params.moduleCode,req.body,{id:req.user?.id||req.user?.userId})});}catch(e){next(e);}});
+router.post('/:moduleCode/workflows/:workflowId/transition',async(req,res,next)=>{try{res.json({success:true,workflow:await svc.transition(req.params.moduleCode,req.params.workflowId,req.body,{actorId:req.user?.id||req.user?.userId,actorRole:req.user?.role,reason:req.body.reason,evidence:req.body.evidence,correlationId:req.headers['x-correlation-id']})});}catch(e){next(e);}});
+router.post('/:moduleCode/decisions',async(req,res,next)=>{try{res.status(201).json({success:true,decision:await svc.queueDecision(req.params.moduleCode,req.body,{id:req.user?.id||req.user?.userId})});}catch(e){next(e);}});
+router.post('/:moduleCode/decisions/:decisionId/resolve',async(req,res,next)=>{try{res.json({success:true,decision:await svc.decide(req.params.moduleCode,req.params.decisionId,{...req.body,checkerId:req.user?.id||req.user?.userId})});}catch(e){next(e);}});
+module.exports=router;
