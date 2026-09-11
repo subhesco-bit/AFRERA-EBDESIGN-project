@@ -23,6 +23,8 @@ jobs:
         run: node tools/module-live-wiring-audit.js
       - name: Page estate governance audit
         run: node tools/enterprise-page-estate-audit.js
+      - name: Page live wiring audit
+        run: node tools/page-live-wiring-audit.js
       - name: Frontend install
         working-directory: frontend
         run: npm ci
