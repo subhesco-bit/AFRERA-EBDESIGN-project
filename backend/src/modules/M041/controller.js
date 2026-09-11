@@ -1,5 +1,6 @@
 const villageService = require('./service');
 const villageERPService = require('./villageERPService');
+const villageProjectService = require('./villageProjectIntelligenceService');
 const { logger } = require('../../utils/logger');
 const { sendSuccess, sendError } = require('../../utils/response');
 
@@ -34,6 +35,15 @@ class M041Controller {
   createBudget(req, res) { return execute(res, 'createBudget', () => villageERPService.createBudget(req.params.villageId, req.body), 404); }
   listBudgets(req, res) { return execute(res, 'listBudgets', () => villageERPService.listBudgets(req.params.villageId), 404); }
   getERPOverview(req, res) { return execute(res, 'getERPOverview', () => villageERPService.getERPOverview(req.params.villageId), 404); }
+
+  listProjects(req, res) { return execute(res, 'listProjects', () => villageProjectService.listProjects(req.params.villageId, req.query), 404); }
+  getProject(req, res) { return execute(res, 'getProject', () => villageProjectService.getProject(req.params.projectId), 404); }
+  createProject(req, res) { return execute(res, 'createProject', () => villageProjectService.createProject(req.params.villageId, req.body, req.user?.id), 400); }
+  createEstimate(req, res) { return execute(res, 'createEstimate', () => villageProjectService.createEstimate(req.params.projectId, req.body, req.user?.id), 400); }
+  addFundingSource(req, res) { return execute(res, 'addFundingSource', () => villageProjectService.addFundingSource(req.params.projectId, req.body), 400); }
+  matchSubsidies(req, res) { return execute(res, 'matchSubsidies', () => villageProjectService.matchSubsidies(req.params.projectId), 400); }
+  buildSubsidyAIContext(req, res) { return execute(res, 'buildSubsidyAIContext', () => villageProjectService.buildSubsidyAIContext(req.params.projectId), 404); }
+  upsertScheme(req, res) { return execute(res, 'upsertScheme', () => villageProjectService.upsertScheme(req.body), 400); }
 }
 
 module.exports = new M041Controller();
