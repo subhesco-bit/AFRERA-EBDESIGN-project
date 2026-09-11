@@ -31,6 +31,17 @@ router.post('/villages/:villageId/economy/flows', controller.recordEconomicFlow.
 router.get('/villages/:villageId/economy/production-potential', controller.getProductionPotential.bind(controller));
 router.put('/villages/:villageId/economy/production-potential', controller.upsertProductionPotential.bind(controller));
 
+// Village external needs and SUBH supply layer: household / village / Agro OS
+router.get('/supply-catalog', controller.listSupplyCatalog.bind(controller));
+router.post('/supply-catalog', controller.upsertSupplyCatalogItem.bind(controller));
+router.post('/villages/:villageId/external-demand', controller.createExternalDemand.bind(controller));
+router.get('/villages/:villageId/external-supply-plan', controller.getExternalSupplyPlan.bind(controller));
+router.post('/villages/:villageId/supply-orders', controller.createSupplyOrder.bind(controller));
+router.get('/villages/:villageId/supply-orders', controller.listSupplyOrders.bind(controller));
+router.post('/supply-orders/:orderId/lines', controller.addSupplyOrderLine.bind(controller));
+router.patch('/supply-orders/:orderId', controller.updateSupplyOrder.bind(controller));
+router.get('/villages/:villageId/ai/supply-context', controller.getAISupplyContext.bind(controller));
+
 // Village ERP / accounting
 router.get('/villages/:villageId/finance', controller.getVillageFinance.bind(controller));
 router.post('/villages/:villageId/finance/initialize', controller.initializeFinance.bind(controller));
