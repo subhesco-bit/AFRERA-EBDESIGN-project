@@ -2,22 +2,8 @@ name: Clone M051-M100 E2E Verification
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'backend/src/modules/M05*/**'
-      - 'backend/src/modules/M06*/**'
-      - 'backend/src/modules/M07*/**'
-      - 'backend/src/modules/M08*/**'
-      - 'backend/src/modules/M09*/**'
-      - 'backend/src/modules/M100/**'
-      - 'backend/src/services/m051m100*.js'
-      - 'backend/src/routes/m051m100*.js'
-      - 'backend/tests/m051-m100*.test.js'
-      - 'frontend/src/modules/M05*/*'
-      - 'frontend/src/modules/M06*/*'
-      - 'frontend/src/modules/M07*/*'
-      - 'frontend/src/modules/M08*/*'
-      - 'frontend/src/modules/M09*/*'
-      - 'frontend/src/modules/M100/*'
+    branches:
+      - 'chatgpt-clone/main-reconciliation-phase-1'
 jobs:
   verify:
     runs-on: ubuntu-latest
