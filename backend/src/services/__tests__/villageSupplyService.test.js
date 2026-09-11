@@ -42,12 +42,12 @@ describe('villageSupplyService', () => {
     expect(query).toHaveBeenCalledWith(expect.stringContaining('demand_layer = $1'), ['household', 'medicine']);
   });
 
-  test('order creation rolls back when a line is invalid', async () => {
+  test('order creation rolls back when the database rejects a line', async () => {
     const client = {
       query: jest.fn()
         .mockResolvedValueOnce({})
         .mockResolvedValueOnce({ rows: [{ id: 10 }] })
-        .mockRejectedValueOnce(new Error('invalid line')),
+        .mockRejectedValueOnce(new Error('database rejected line')),
       release: jest.fn(),
     };
     getPostgreSQL.mockReturnValue({ connect: jest.fn().mockResolvedValue(client) });
@@ -55,8 +55,8 @@ describe('villageSupplyService', () => {
     await expect(service.createOrder({
       villageId: 1,
       demandLayer: 'village',
-      lines: [{ itemId: 2, quantity: 0 }],
-    })).rejects.toThrow('invalid line');
+      lines: [{ itemId: 2, quantity: 2, unitPrice: 10 }],
+    })).rejects.toThrow('database rejected line');
 
     expect(client.query).toHaveBeenCalledWith('ROLLBACK');
     expect(client.release).toHaveBeenCalled();
