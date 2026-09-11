@@ -22,7 +22,7 @@ router.post('/', asyncHandler(async (req, res) => {
   const entity = await service.createEntity({
     moduleKey: req.body.moduleKey,
     ownerUserId: req.user?.id || req.body.ownerUserId || null,
-    status: req.body.status,
+    status: req.body.status || 'active',
     payload: req.body.payload || {},
   });
   res.status(201).json({ success: true, data: entity });
@@ -48,5 +48,11 @@ router.delete('/:id', asyncHandler(async (req, res) => {
   if (!deleted) return res.status(404).json({ success: false, error: 'Operational entity not found' });
   return res.status(204).send();
 }));
+
+router.__ebdesign = {
+  contract: 'operational-module-v1',
+  scope: 'MAIN-reconciled operational ERP capabilities',
+  transactionalWrites: true,
+};
 
 module.exports = router;
