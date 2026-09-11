@@ -15,13 +15,13 @@ villageClient.interceptors.request.use((config) => {
 });
 
 export const villageAPI = {
-  getVillages: (params = {}) => villageClient.get('/backend-modules/M041/villages', { params }),
-  getVillage: (id) => villageClient.get(`/backend-modules/M041/villages/${id}`),
-  createVillage: (data) => villageClient.post('/backend-modules/M041/villages', data),
-  updateVillage: (id, data) => villageClient.put(`/backend-modules/M041/villages/${id}`, data),
-  deleteVillage: (id) => villageClient.delete(`/backend-modules/M041/villages/${id}`),
-  addVillageResource: (id, data) => villageClient.post(`/backend-modules/M041/villages/${id}/resources`, data),
-  getVillageAnalytics: (id) => villageClient.get(`/backend-modules/M041/villages/${id}/analytics`),
+  getVillages: (params = {}) => villageClient.get('/backend-modules/M041/getVillages', { params }),
+  getVillage: (id) => villageClient.get(`/backend-modules/M041/getVillage/${id}`),
+  createVillage: (data) => villageClient.post('/backend-modules/M041/createVillage', data),
+  updateVillage: (id, data) => villageClient.put(`/backend-modules/M041/updateVillage/${id}`, data),
+  deleteVillage: (id) => villageClient.delete(`/backend-modules/M041/deleteVillage/${id}`),
+  addVillageResource: (id, data) => villageClient.post('/backend-modules/M041/addVillageResource', { villageId: id, ...data }),
+  getVillageAnalytics: (id) => villageClient.get(`/backend-modules/M041/getVillageAnalytics/${id}`),
 };
 
 export default villageAPI;
