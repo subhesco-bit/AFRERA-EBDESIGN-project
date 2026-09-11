@@ -1,0 +1,11 @@
+'use strict';
+const router=require('express').Router();
+const svc=require('../services/enterprisePromotion541Service');
+const runtime=require('../services/enterpriseModule550RuntimeService');
+const {authMiddleware}=require('../middleware/auth');
+router.use(authMiddleware);
+router.get('/summary',(req,res,next)=>{try{res.json({success:true,data:svc.summary()});}catch(e){next(e);}});
+router.get('/portfolio',(req,res,next)=>{try{res.json({success:true,data:svc.portfolio(req.query.start,req.query.end)});}catch(e){next(e);}});
+router.get('/:moduleCode/profile',(req,res,next)=>{try{res.json({success:true,data:svc.profile(req.params.moduleCode)});}catch(e){next(e);}});
+router.get('/:moduleCode/overview',async(req,res,next)=>{try{res.json({success:true,data:{promotion:svc.profile(req.params.moduleCode),runtime:await runtime.overview(req.params.moduleCode)}});}catch(e){next(e);}});
+module.exports=router;
