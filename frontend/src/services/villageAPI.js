@@ -49,6 +49,16 @@ export const villageAPI = {
   // AI decision support
   generateAIInsights: (id, data = {}) => villageClient.post(moduleURL('generateAI', id), data),
 
+  // Village Project Design / DPR / Estimate / Funding / Subsidy Intelligence
+  listProjects: (villageId, params = {}) => villageClient.get(moduleURL('listProjects', villageId), { params }),
+  createProject: (villageId, data) => villageClient.post(moduleURL('createProject', villageId), data),
+  getProject: (projectId) => villageClient.get(moduleURL('getProject', projectId)),
+  createEstimate: (projectId, data) => villageClient.post(moduleURL('createEstimate', projectId), data),
+  addFundingSource: (projectId, data) => villageClient.post(moduleURL('addFundingSource', projectId), data),
+  matchSubsidies: (projectId) => villageClient.post(moduleURL('matchSubsidies', projectId)),
+  getSubsidyAIContext: (projectId) => villageClient.get(moduleURL('buildSubsidyAIContext', projectId)),
+  upsertSchemeCatalogue: (data) => villageClient.post(moduleURL('upsertScheme'), data),
+
   // Geographic roll-up
   getDistrictSummary: (district) => villageClient.get(`/backend-modules/M041/districtSummary/${encodeURIComponent(district)}`),
 };
