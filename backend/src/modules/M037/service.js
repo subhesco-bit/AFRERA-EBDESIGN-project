@@ -1,3 +1,1 @@
-﻿// Service for Water Resource Mapping (M037)
-// Add business logic here
-module.exports = { /* functions */ };
+'use strict'; const make=require('../shared/createRegistryService'); module.exports=make({table:'m037_water_resources',entity:'Water resource',required:['resource_id','resource_type','location'],columns:['resource_id','resource_type','location','geometry','village_id','capacity','capacity_unit','seasonal_status','quality_status','status','properties']});

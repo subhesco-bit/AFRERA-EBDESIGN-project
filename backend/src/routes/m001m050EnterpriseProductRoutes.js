@@ -1,0 +1,10 @@
+'use strict';
+const express=require('express');const router=express.Router();const svc=require('../services/m001m050EnterpriseProductService');const {authMiddleware}=require('../middleware/auth');router.use(authMiddleware);
+router.get('/portfolio',(req,res)=>res.json({success:true,count:50,modules:svc.portfolio()}));
+router.get('/:moduleCode/spec',(req,res,next)=>{try{res.json({success:true,spec:svc.spec(req.params.moduleCode)});}catch(e){next(e);}});
+router.get('/:moduleCode/tasks/summary',async(req,res,next)=>{try{res.json({success:true,summary:await svc.taskSummary(req.params.moduleCode)});}catch(e){next(e);}});
+router.post('/:moduleCode/tasks',async(req,res,next)=>{try{res.status(201).json({success:true,task:await svc.createTask(req.params.moduleCode,req.body,{id:req.user?.id||req.user?.userId})});}catch(e){next(e);}});
+router.patch('/:moduleCode/tasks/:id',async(req,res,next)=>{try{res.json({success:true,task:await svc.updateTask(req.params.moduleCode,req.params.id,req.body,{id:req.user?.id||req.user?.userId})});}catch(e){next(e);}});
+router.get('/:moduleCode/kpis',async(req,res,next)=>{try{res.json({success:true,kpis:await svc.latestKpis(req.params.moduleCode)});}catch(e){next(e);}});
+router.post('/:moduleCode/kpis',async(req,res,next)=>{try{res.status(201).json({success:true,kpi:await svc.recordKpi(req.params.moduleCode,req.body,{id:req.user?.id||req.user?.userId})});}catch(e){next(e);}});
+module.exports=router;

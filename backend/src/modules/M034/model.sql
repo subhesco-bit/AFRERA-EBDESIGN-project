@@ -1,2 +1,1 @@
-﻿-- SQL model placeholder for Parcel Mapping (M034)
--- Define tables and indexes here
+CREATE TABLE IF NOT EXISTS m034_parcels (id UUID PRIMARY KEY,parcel_id TEXT NOT NULL UNIQUE,land_id TEXT,village_id TEXT,geometry JSONB NOT NULL,crs TEXT NOT NULL DEFAULT 'EPSG:4326',area_ha NUMERIC CHECK(area_ha IS NULL OR area_ha>=0),status TEXT NOT NULL DEFAULT 'active',properties JSONB NOT NULL DEFAULT '{}'::jsonb,created_by TEXT,updated_by TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),deleted_at TIMESTAMPTZ); CREATE INDEX IF NOT EXISTS idx_m034_parcels_village ON m034_parcels(village_id) WHERE deleted_at IS NULL; CREATE INDEX IF NOT EXISTS idx_m034_parcels_geometry ON m034_parcels USING GIN(geometry);

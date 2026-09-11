@@ -1,3 +1,1 @@
-﻿// Service for Geo Boundary Management (M038)
-// Add business logic here
-module.exports = { /* functions */ };
+'use strict'; const make=require('../shared/createRegistryService'); module.exports=make({table:'m038_geo_boundaries',entity:'Boundary',required:['boundary_type','geometry'],columns:['boundary_id','boundary_type','name','parent_boundary_id','geometry','crs','effective_from','effective_to','status','properties']});

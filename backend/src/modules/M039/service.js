@@ -1,3 +1,1 @@
-﻿// Service for Survey Management (M039)
-// Add business logic here
-module.exports = { /* functions */ };
+'use strict'; const make=require('../shared/createRegistryService'); module.exports=make({table:'m039_surveys',entity:'Survey',required:['survey_id','survey_date','location'],columns:['survey_id','survey_date','survey_type','location','geometry','enumerator_id','source_reference','status','findings','evidence'],validate(d){if(d.survey_date&&Number.isNaN(new Date(d.survey_date).getTime())){const e=new Error('survey_date must be valid');e.statusCode=400;throw e;}}});

@@ -1,0 +1,11 @@
+'use strict';
+const express=require('express');
+const router=express.Router();
+const service=require('../services/m001m050HighestStandardEnhancementService');
+const {authMiddleware}=require('../middleware/auth');
+router.use(authMiddleware);
+router.get('/portfolio',(req,res)=>res.json({success:true,...service.portfolio()}));
+router.get('/:moduleCode/profile',(req,res,next)=>{try{res.json({success:true,profile:service.profile(req.params.moduleCode)});}catch(e){next(e);}});
+router.post('/:moduleCode/evaluate',async(req,res,next)=>{try{const actorId=req.user?.id||req.user?.userId||null;const result=await service.assessAndRecord(req.params.moduleCode,req.body||{},{actorId,...(req.body?.governance_context||{})});res.json({success:true,result});}catch(e){next(e);}});
+router.post('/:moduleCode/simulate',(req,res,next)=>{try{const profile=service.profile(req.params.moduleCode);const governance=service.governance(req.params.moduleCode,{...req.body,execute:false});res.json({success:true,module:req.params.moduleCode,mode:'decision_support_only',profile,governance,digitalTwin:service.buildDigitalTwin(req.params.moduleCode,req.body?.state||{}),knowledgeGraph:service.buildKnowledgeGraphContract(req.params.moduleCode,req.body?.state||{}),note:'Simulation never commits consequential operational, financial, identity, health or governance actions.'});}catch(e){next(e);}});
+module.exports=router;

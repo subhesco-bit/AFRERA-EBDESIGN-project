@@ -1,0 +1,11 @@
+const express=require('express');
+const crypto=require('crypto');
+const router=express.Router();
+const hardening=require('../services/m051m100ProductionHardeningService');
+const {getPostgreSQL}=require('../database');
+const {authMiddleware}=require('../middleware/auth');
+router.use(authMiddleware);
+router.get('/',(req,res)=>res.json({success:true,modules:hardening.list()}));
+router.get('/:moduleCode',(req,res)=>{const definition=hardening.get(req.params.moduleCode);if(!definition)return res.status(404).json({success:false,error:'Unknown module'});res.json({success:true,module:{code:req.params.moduleCode,...definition}});});
+router.post('/:moduleCode/validate',async(req,res,next)=>{try{const result=hardening.validate(req.params.moduleCode,req.body);const db=getPostgreSQL();const audit=await db.query(`INSERT INTO m051_m100_hardening_audits (id,module_code,entity_id,validation_result,ai_enhancements,actor_id,correlation_id) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id`,[crypto.randomUUID(),req.params.moduleCode,req.body.entityId||null,JSON.stringify(result),JSON.stringify(result.aiEnhancements),req.user?.id||null,req.headers['x-correlation-id']||crypto.randomUUID()]);res.status(result.valid?200:422).json({success:result.valid,result,audit_id:audit.rows[0].id});}catch(e){next(e);}});
+module.exports=router;
