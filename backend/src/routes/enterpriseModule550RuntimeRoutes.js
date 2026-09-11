@@ -1,0 +1,16 @@
+'use strict';
+const router=require('express').Router();
+const svc=require('../services/enterpriseModule550RuntimeService');
+const {authMiddleware}=require('../middleware/auth');
+router.use(authMiddleware);
+const actor=req=>({id:req.user?.id||req.user?.userId,role:req.user?.role});
+router.get('/portfolio',(req,res,next)=>{try{res.json({success:true,data:svc.portfolio(req.query.start,req.query.end)});}catch(e){next(e);}});
+router.get('/:moduleCode/definition',(req,res,next)=>{try{res.json({success:true,data:svc.definition(req.params.moduleCode)});}catch(e){next(e);}});
+router.get('/:moduleCode/overview',async(req,res,next)=>{try{res.json({success:true,data:await svc.overview(req.params.moduleCode)});}catch(e){next(e);}});
+router.post('/:moduleCode/tasks',async(req,res,next)=>{try{res.status(201).json({success:true,data:await svc.createTask(req.params.moduleCode,req.body,actor(req))});}catch(e){next(e);}});
+router.post('/:moduleCode/workflows',async(req,res,next)=>{try{res.status(201).json({success:true,data:await svc.createWorkflow(req.params.moduleCode,req.body,actor(req))});}catch(e){next(e);}});
+router.post('/:moduleCode/workflows/:id/transition',async(req,res,next)=>{try{res.json({success:true,data:await svc.transition(req.params.moduleCode,req.params.id,req.body.to_state,{actorId:actor(req).id,actorRole:actor(req).role,reason:req.body.reason,evidence:req.body.evidence,correlationId:req.headers['x-correlation-id']})});}catch(e){next(e);}});
+router.post('/:moduleCode/decisions',async(req,res,next)=>{try{res.status(201).json({success:true,data:await svc.queueDecision(req.params.moduleCode,req.body,actor(req))});}catch(e){next(e);}});
+router.post('/:moduleCode/decisions/:id/resolve',async(req,res,next)=>{try{res.json({success:true,data:await svc.resolveDecision(req.params.moduleCode,req.params.id,req.body,actor(req))});}catch(e){next(e);}});
+router.post('/:moduleCode/kpis',async(req,res,next)=>{try{res.status(201).json({success:true,data:await svc.recordKpi(req.params.moduleCode,req.body,actor(req))});}catch(e){next(e);}});
+module.exports=router;
