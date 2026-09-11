@@ -3,6 +3,7 @@ const villageERPService = require('./villageERPService');
 const villageProjectService = require('./villageProjectIntelligenceService');
 const villageEconomyGeoService = require('./villageEconomyGeoService');
 const villageProductionPotentialService = require('./villageProductionPotentialService');
+const villageCompletenessService = require('./villageCompletenessService');
 const { logger } = require('../../utils/logger');
 const { sendSuccess, sendError } = require('../../utils/response');
 
@@ -56,6 +57,10 @@ class M041Controller {
   getEconomicBalance(req, res) { return execute(res, 'getEconomicBalance', () => villageEconomyGeoService.economicBalance(req.params.villageId, req.query), 404); }
   getProductionPotential(req, res) { return execute(res, 'getProductionPotential', () => villageProductionPotentialService.productionPotential(req.params.villageId, req.query), 404); }
   upsertProductionPotential(req, res) { return execute(res, 'upsertProductionPotential', () => villageProductionPotentialService.upsertProfile(req.params.villageId, req.body), 400); }
+
+  getCompleteness(req, res) { return execute(res, 'getCompleteness', () => villageCompletenessService.getCompleteness(req.params.villageId), 404); }
+  getInfrastructureProfile(req, res) { return execute(res, 'getInfrastructureProfile', () => villageCompletenessService.getInfrastructureProfile(req.params.villageId), 404); }
+  getReadinessSnapshot(req, res) { return execute(res, 'getReadinessSnapshot', () => villageCompletenessService.readinessSnapshot(req.params.villageId), 404); }
 }
 
 module.exports = new M041Controller();
