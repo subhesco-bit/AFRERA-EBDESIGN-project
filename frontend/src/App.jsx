@@ -18,7 +18,9 @@ import monitoring from './utils/monitoring';
 import analytics from './utils/analytics';
 import { MultilingualProvider } from './components/Multilingual/MultilingualProvider';
 import { AccessibilityProvider } from './components/Accessibility/AccessibilityProvider';
+import M001M050OperationalWorkspace from './components/M001M050OperationalWorkspace';
 import M001M050ProductionWiredPanel from './components/M001M050ProductionWiredPanel';
+import M001M050HighestStandardPanel from './components/M001M050HighestStandardPanel';
 import M051M100ProductionWiredPanel from './components/M051M100ProductionWiredPanel';
 
 const EconomicDashboard = lazy(() => import('./pages/economic/EconomicDashboard'));
@@ -84,14 +86,20 @@ function App() {
                   const ModulePage = lazy(() => import(`./modules/${code}/${code}Page.jsx`));
                   const isM001M050 = moduleNum >= 1 && moduleNum <= 50;
                   const isM051M100 = moduleNum >= 51 && moduleNum <= 100;
+                  const domainSurface = (
+                    <>
+                      <ModulePage />
+                      {isM001M050 && <M001M050ProductionWiredPanel moduleCode={code} />}
+                      {isM001M050 && <M001M050HighestStandardPanel moduleCode={code} />}
+                      {isM051M100 && <M051M100ProductionWiredPanel moduleCode={code} />}
+                    </>
+                  );
                   return (
                     <Route key={`/module/${code}`} path={`/module/${code}`} element={
                       <RoleRoute allowedRoles={['admin']}>
                         <PageTransition transition="fade">
                           <RouteSuspense>
-                            <ModulePage />
-                            {isM001M050 && <M001M050ProductionWiredPanel moduleCode={code} />}
-                            {isM051M100 && <M051M100ProductionWiredPanel moduleCode={code} />}
+                            {isM001M050 ? <M001M050OperationalWorkspace moduleCode={code}>{domainSurface}</M001M050OperationalWorkspace> : domainSurface}
                           </RouteSuspense>
                         </PageTransition>
                       </RoleRoute>
