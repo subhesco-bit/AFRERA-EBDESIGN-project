@@ -1,0 +1,10 @@
+const express=require('express');
+const router=express.Router();
+const service=require('../services/gapClosureOperationalService');
+const {authMiddleware}=require('../middleware/auth');
+router.use(authMiddleware);
+router.post('/villages/:villageId/households',async(req,res,next)=>{try{res.status(201).json({success:true,household:await service.createHousehold(req.params.villageId,req.body)});}catch(e){next(e);}});
+router.get('/villages/:villageId/readiness',async(req,res,next)=>{try{res.json({success:true,readiness:await service.villageReadiness(req.params.villageId)});}catch(e){next(e);}});
+router.post('/inventory/reconciliation',async(req,res,next)=>{try{res.status(201).json({success:true,reconciliation:await service.inventoryReconciliation(req.body)});}catch(e){next(e);}});
+router.post('/logistics/trips',async(req,res,next)=>{try{res.status(201).json({success:true,trip:await service.createTrip(req.body)});}catch(e){next(e);}});
+module.exports=router;
