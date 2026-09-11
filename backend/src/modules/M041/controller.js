@@ -1,6 +1,7 @@
 const villageService = require('./service');
 const villageERPService = require('./villageERPService');
 const villageProjectService = require('./villageProjectIntelligenceService');
+const villageEconomyGeoService = require('./villageEconomyGeoService');
 const { logger } = require('../../utils/logger');
 const { sendSuccess, sendError } = require('../../utils/response');
 
@@ -44,6 +45,14 @@ class M041Controller {
   matchSubsidies(req, res) { return execute(res, 'matchSubsidies', () => villageProjectService.matchSubsidies(req.params.projectId), 400); }
   buildSubsidyAIContext(req, res) { return execute(res, 'buildSubsidyAIContext', () => villageProjectService.buildSubsidyAIContext(req.params.projectId), 404); }
   upsertScheme(req, res) { return execute(res, 'upsertScheme', () => villageProjectService.upsertScheme(req.body), 400); }
+
+  getVillageGeo(req, res) { return execute(res, 'getVillageGeo', () => villageEconomyGeoService.getVillageGeo(req.params.villageId), 404); }
+  updateVillageGeo(req, res) { return execute(res, 'updateVillageGeo', () => villageEconomyGeoService.updateVillageGeo(req.params.villageId, req.body), 400); }
+  upsertLogisticsFacility(req, res) { return execute(res, 'upsertLogisticsFacility', () => villageEconomyGeoService.upsertFacility(req.body), 400); }
+  getNearestFacilities(req, res) { return execute(res, 'getNearestFacilities', () => villageEconomyGeoService.nearestFacilities(req.params.villageId, req.query.types ? String(req.query.types).split(',') : undefined), 404); }
+  recordProduction(req, res) { return execute(res, 'recordProduction', () => villageEconomyGeoService.recordProduction(req.params.villageId, req.body), 400); }
+  recordEconomicFlow(req, res) { return execute(res, 'recordEconomicFlow', () => villageEconomyGeoService.recordFlow(req.params.villageId, req.body), 400); }
+  getEconomicBalance(req, res) { return execute(res, 'getEconomicBalance', () => villageEconomyGeoService.economicBalance(req.params.villageId, req.query), 404); }
 }
 
 module.exports = new M041Controller();
