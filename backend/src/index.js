@@ -192,6 +192,8 @@ const advancedSearchRoutes = require('./routes/advancedSearchRoutes.js');
 const advancedFeatures = require('./routes/advancedFeatures.js');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
+const operationalModuleRoutes = require('./routes/operationalModuleRoutes.js');
+
 /**
  * EBDESIGN Platform Backend - Main Entry Point
  * Auto-Discovery Architecture: Supports 200K+ services & routes
@@ -223,10 +225,10 @@ const { securityHeaders, rateLimit } = require('./middleware/securityMiddleware'
 const { requestId } = require('./middleware/requestId');
 const { responseFormatter } = require('./middleware/responseFormatter');
 const { routeMonitoring } = require('./middleware/routeMonitoring');
-const { 
-  standardizeResponse, 
-  standardizeErrorResponse, 
-  addStandardHeaders, 
+const {
+  standardizeResponse,
+  standardizeErrorResponse,
+  addStandardHeaders,
   trackResponseTime,
   correlationId,
   contentNegotiation
@@ -248,14 +250,12 @@ const io = new Server(server, {
   cors: { origin: process.env.FRONTEND_URL || '*' },
 });
 
-// Store on app for access in route handlers
 app.io = io;
 
 // ============================================================================
 // MIDDLEWARE SETUP
 // ============================================================================
 
-// Security middleware
 app.use(helmet());
 app.use(cors({
   origin: (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3000')
@@ -265,12 +265,9 @@ app.use(cors({
   credentials: true,
 }));
 
-// Parsing middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(compression());
-
-// Logging middleware
 app.use(morgan('combined'));
 app.use(correlationId());
 app.use(contentNegotiation());
@@ -279,22 +276,19 @@ app.use(trackResponseTime());
 app.use(requestId);
 app.use(responseFormatter);
 app.use(routeMonitoring);
-
-// Security enhancements
 app.use(securityHeaders);
 app.use(rateLimit);
 
-// ============================================================================
-// STARTUP SEQUENCE
-// ============================================================================
+// Canonical operational ERP reconciliation surface. The dynamic loader also
+// discovers this route, but this explicit mount keeps the contract stable even
+// when directory discovery is running in degraded mode.
+app.use('/api/v1/operational-modules', operationalModuleRoutes);
 
 async function startup() {
   try {
     const startTime = Date.now();
-
     logger.info('🚀 EBDESIGN Platform Starting...');
 
-    // Step 1: Initialize database connection (required for ConfigRegistry)
     logger.info('📦 Connecting to database...');
     let db = null;
     try {
@@ -307,19 +301,15 @@ async function startup() {
       logger.warn('⚠️  Database connection deferred (will retry on first use)');
     }
 
-    // Step 2: Initialize service loader
     logger.info('🔍 Initializing service auto-discovery...');
     const serviceLoader = new DynamicServiceLoader(db);
     const servicesDir = path.join(__dirname, 'services');
-
     const discoveryStats = await serviceLoader.discoverServicesFromDirectory(servicesDir);
     logger.info('✅ Service discovery complete', discoveryStats);
 
-    // Step 3: Create service locator
     const serviceLocator = new ServiceLocator(serviceLoader);
     app.locals.serviceLocator = serviceLocator;
 
-    // Step 4: Initialize configuration registry
     logger.info('⚙️  Initializing configuration registry...');
     const configRegistry = new ConfigRegistry(db);
     try {
@@ -334,9 +324,6 @@ async function startup() {
       app.locals.configRegistry = configRegistry;
     }
 
-    // Index the project library before AI requests are accepted. The service
-    // remains usable in memory when PostgreSQL is unavailable and reports sync
-    // failures without blocking backend startup.
     try {
       await libraryKnowledgeService.initialize({ syncDatabase: Boolean(db) });
       app.locals.libraryKnowledgeService = libraryKnowledgeService;
@@ -346,7 +333,6 @@ async function startup() {
       app.locals.libraryKnowledgeService = libraryKnowledgeService;
     }
 
-    // Step 5: Load critical services (fast boot)
     logger.info('⚡ Loading critical services...');
     const criticalServices = [
       'authService',
@@ -380,20 +366,14 @@ async function startup() {
     }
     app.locals.infrastructure = infrastructure;
 
-    // Step 6: Initialize route loader
     logger.info('🛣️  Initializing route auto-discovery...');
     const routeLoader = new DynamicRouteLoader(app);
     const routesDir = path.join(__dirname, 'routes');
-
-    const routeStats = await routeLoader.discoverAndMountRoutes(
-      routesDir,
-      '/api/v1',
-    );
+    const routeStats = await routeLoader.discoverAndMountRoutes(routesDir, '/api/v1');
     await routeLoader.discoverServiceEmbeddedRoutes(servicesDir, '/api/v1');
     const serviceRouteStats = await serviceLoader.mountServiceRoutes(app);
     logger.info('✅ Routes mounted', { ...routeStats, serviceSetupRoutes: serviceRouteStats.mounted });
 
-    // Step 7: Make loaders available to middleware/handlers
     app.locals.serviceLoader = serviceLoader;
     app.locals.routeLoader = routeLoader;
     app.locals.db = db;
@@ -419,363 +399,28 @@ async function startup() {
       if (typeof disruptionRoutingAgent.initialize === 'function') {
         disruptionRoutingAgent.initialize();
       }
-      app.locals.disruptionRoutingAgent = disruptionRoutingAgent;
-      logger.info('✅ Disruption routing agent initialized');
     } catch (error) {
-      logger.warn('⚠️  Disruption routing agent deferred', { error: error.message });
+      logger.warn('⚠️  Disruption routing agent initialization deferred', { error: error.message });
     }
 
-    // Step 8: Health check endpoint
-    app.get('/health', async (req, res) => {
-      try {
-        res.json({
-          status: db && infrastructure.cache === 'connected' && infrastructure.jobs === 'connected' ?
-            'operational' :
-            'degraded',
-          timestamp: new Date().toISOString(),
-        });
-      } catch (error) {
-        logger.error('Health check failed', error);
-        res.status(503).json({ status: 'unhealthy', error: error.message });
-      }
-    });
-
-    // Step 9: Status/stats endpoint
-    app.get('/api/v1/system/stats', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
-      try {
-        res.json({
-          services: serviceLoader.getStats(),
-          routes: routeLoader.getStats(),
-          config: configRegistry.getStats(),
-          locator: serviceLocator.getStats(),
-          memory: process.memoryUsage(),
-          uptime: process.uptime(),
-        });
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    // Step 10: Service discovery API (for debugging)
-    app.get('/api/v1/system/services', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
-      try {
-        const { limit = 50, offset = 0, category, subfolder } = req.query;
-        const result = serviceLoader.listServices({
-          limit: parseInt(limit),
-          offset: parseInt(offset),
-          category,
-          subfolder,
-        });
-        res.json(result);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    // Step 11: Route discovery API (for debugging)
-    app.get('/api/v1/system/routes', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
-      try {
-        const result = routeLoader.getMountedRoutes();
-        res.json({
-          total: result.length,
-          routes: result.slice(0, 100),
-        });
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    // WebSocket handlers are registered by websocketService.attach(io)
-
-    // Mount health check routes
-    logger.info('🏥 Mounting health check routes...');
-    const healthRoutes = require('./routes/healthRoutes');
-    app.use('/api/yieldmanagement', yieldManagement);
-    app.use('/api/wikipedia', wikipediaRoutes);
-    app.use('/api/weather', weatherRoutes);
-    app.use('/api/weatheradvisory', weatherAdvisory);
-    app.use('/api/wearableintegration', wearableIntegrationRoutes);
-    app.use('/api/watermanagement', waterManagementRoutes);
-    app.use('/api/warehousemanagement', warehouseManagement);
-    app.use('/api/wallet', walletRoutes);
-    app.use('/api/vr', vr);
-    app.use('/api/vision', visionRoutes);
-    app.use('/api/videoanalytics', videoAnalytics);
-    app.use('/api/vendor', vendorRoutes);
-    app.use('/api/user', userRoutes);
-    app.use('/api/unifiedai', unifiedAIRoutes);
-    app.use('/api/ai', unifiedAIRoutes);
-    app.use('/api/v1/ai', unifiedAIRoutes);
-    app.use('/api/unifiedaigateway', unifiedAIGateway);
-    app.use('/api/transaction', transactionRoutes);
-    app.use('/api/trackdart', trackDartRoutes);
-    app.use('/api/tenantmanagement', tenantManagementRoutes);
-    app.use('/api/systemadministration', systemAdministrationRoutes);
-    app.use('/api/supplychaintracking', supplyChainTracking);
-    app.use('/api/supplychainanalytics', supplyChainAnalytics);
-    app.use('/api/supply-chain', supplyChainDecisionRoutes);
-    app.use('/api/v1/supply-chain', supplyChainDecisionRoutes);
-    app.use('/api/subscriptions', subscriptions);
-    app.use('/api/soilmanagement', soilManagementRoutes);
-    app.use('/api/soilhealth', soilHealth);
-    app.use('/api/sheep', sheepRoutes);
-    app.use('/api/sellerverifications', sellerVerifications);
-    app.use('/api/sellerranking', sellerRankingRoutes);
-    app.use('/api/seedvault', seedVaultRoutes);
-    app.use('/api/sapmodulearchitecture', sapModuleArchitectureRoutes);
-    app.use('/api/rolemanagement', roleManagementRoutes);
-    app.use('/api/riskpricing', riskPricingRoutes);
-    app.use('/api/riskassessment', riskAssessment);
-    app.use('/api/rfq', rfqRoutes);
-    app.use('/api/revenue', revenueRoutes);
-    app.use('/api/returnloadboard', returnLoadBoardRoutes);
-    app.use('/api/researchanddevelopment', researchAndDevelopmentRoutes);
-    app.use('/api/regionalvariety', regionalVarietyRoutes);
-    app.use('/api/v1/varieties', neVarietiesRoutes);
-    app.use('/api/recoveredfinance', recoveredFinanceRoutes);
-    app.use('/api/realtimemonitoring', realtimeMonitoringRoutes);
-    app.use('/api/qualityassurance', qualityAssurance);
-    app.use('/api/projectsystems', projectSystemsRoutes);
-    app.use('/api/product', productRoutes);
-    app.use('/api/productreview', productReviewRoutes);
-    app.use('/api/productmediaai', productMediaAIRoutes);
-    app.use('/api/publicdata', publicDataRoutes);
-    app.use('/api/productcertifications', productCertifications);
-    app.use('/api/priceforecasting', priceForecasting);
-    app.use('/api/preventivemaintenance', preventiveMaintenanceRoutes);
-    app.use('/api/predictiveintelligence', predictiveIntelligenceRoutes);
-    app.use('/api/predictiveanalytics', predictiveAnalytics);
-    app.use('/api/poultry', poultryRoutes);
-    app.use('/api/platformtelemetry', platformTelemetryRoutes);
-    app.use('/api/platformcore', platformCoreRoutes);
-    app.use('/api/platformconfiguration', platformConfigurationRoutes);
-    app.use('/api/pig', pigRoutes);
-    app.use('/api/phase9', phase9);
-    app.use('/api/phase8', phase8);
-    app.use('/api/phase12', phase12);
-    app.use('/api/phase11', phase11);
-    app.use('/api/phase10', phase10);
-    app.use('/api/payment', paymentRoutes);
-    app.use('/api/paymentgateway', paymentGatewayRoutes);
-    app.use('/api/orphaned_services_mount', ORPHANED_SERVICES_MOUNT);
-    app.use('/api/organizationmanagement', organizationManagementRoutes);
-    app.use('/api/order', orderRoutes);
-    app.use('/api/operationsroutesupport', operationsRouteSupport.router);
-    app.use('/api/operationsmanagement', operationsManagementRoutes);
-    app.use('/api/nutritionintelligence', nutritionIntelligenceRoutes);
-    app.use('/api/nutrientvaluesales', nutrientValueSalesRoutes);
-    app.use('/api/nlp', nlp);
-    app.use('/api/nervoussystem', nervousSystemRoutes);
-    app.use('/api/mloptimization', mlOptimization);
-    app.use('/api/marketplaceenhancements', marketplaceEnhancements);
-    app.use('/api/marketdata', marketDataRoutes);
-    app.use('/api/marketanalytics', marketAnalytics);
-    app.use('/api/m400aibackbone', m400AiBackboneRoutes);
-    app.use('/api/logisticsenhancements', logisticsEnhancements);
-    app.use('/api/logisticsenhancement', logisticsEnhancementRoutes);
-    app.use('/api/loanmanagement', loanManagement);
-    app.use('/api/livestockroutesupport', livestockRouteSupport.router);
-    app.use('/api/livestockmanagement', livestockManagementRoutes);
-    app.use('/api/livestock', livestock);
-    app.use('/api/library', libraryRoutes);
-    app.use('/api/landrecords', landRecordsRoutes);
-    app.use('/api/landmanagement', landManagementRoutes);
-    app.use('/api/knowledge', knowledgeRoutes);
-    app.use('/api/irrigationmanagement', irrigationManagementRoutes);
-    app.use('/api/iotsensors', iotSensors);
-    app.use('/api/iotintegration', iotIntegrationRoutes);
-    app.use('/api/insuranceenhancements', insuranceEnhancements);
-    app.use('/api/inputsupplymanagement', inputSupplyManagementRoutes);
-    app.use('/api/informationsharing', informationSharingRoutes);
-    app.use('/api/identitymanagement', identityManagementRoutes);
-    app.use('/api/hr', hrRoutes);
-    app.use('/api/horticulturemanagement', horticultureManagementRoutes);
-    app.use('/api/horticulture', horticulture);
-    app.use('/api/gst', gstRoutes);
-    app.use('/api/greenhouse', greenhouse);
-    app.use('/api/governancemodule', governanceModule);
-    app.use('/api/goat', goatRoutes);
-    app.use('/api/glutwarning', glutWarningRoutes);
-    app.use('/api/geofencing', geofencingRoutes);
-    app.use('/api/freightpooling', freightPoolingRoutes);
-    app.use('/api/freightpooling', freightPooling);
-    app.use('/api/food', foodRoutes);
-    app.use('/api/folu', foluRoutes);
-    app.use('/api/folubenchmark', foluBenchmarkRoutes);
-    app.use('/api/fisheriesmanagement', fisheriesManagementRoutes);
-    app.use('/api/financialanalytics', financialAnalytics);
-    app.use('/api/fertilizer', fertilizerRoutes);
-    app.use('/api/farmervalue', farmerValueRoutes);
-    app.use('/api/farmertraining', farmerTrainingRoutes);
-    app.use('/api/farmer', farmerRoutes);
-    app.use('/api/farmerportalenhancements', farmerPortalEnhancements);
-    app.use('/api/farmerhealth', farmerHealthRoutes);
-    app.use('/api/farmerfamily', farmerFamilyRoutes);
-    app.use('/api/farmcosting', farmCosting);
-    app.use('/api/farmanalytics', farmAnalytics);
-    app.use('/api/experience', experienceRoutes);
-    app.use('/api/escrow', escrowRoutes);
-    app.use('/api/equipmentexchange', equipmentExchangeRoutes);
-    app.use('/api/enterpriseroutesupport', enterpriseRouteSupport.router);
-    app.use('/api/enterpriseintegration', enterpriseIntegrationRoutes);
-    app.use('/api/enterpriseai', enterpriseAIRoutes);
-    app.use('/api/engineeringproject', engineeringProjectRoutes);
-    app.use('/api/energy', energyRoutes);
-    app.use('/api/ecommerce', ecommerceRoutes);
-    app.use('/api/ecommercemarketing', ecommerceMarketingRoutes);
-    app.use('/api/ecommerceintegration', ecommerceIntegrationRoutes);
-    app.use('/api/ecommerceerp', ecommerceERPRoutes);
-    app.use('/api/ecommercebusinesssales', ecommerceBusinessSalesRoutes);
-    app.use('/api/ecommerceai', ecommerceAIRoutes);
-    app.use('/api/dprgeneration', dprGenerationRoutes);
-    app.use('/api/digitaltwin', digitalTwinRoutes);
-    app.use('/api/diettherapy', dietTherapyRoutes);
-    app.use('/api/demand', demandRoutes);
-    app.use('/api/defensefitnessprep', defenseFitnessPrepRoutes);
-    app.use('/api/decisionsupport', decisionSupportRoutes);
-    app.use('/api/datavisualization', dataVisualization);
-    app.use('/api/dashboard', dashboardRoutes);
-    app.use('/api/dairy', dairyRoutes);
-    app.use('/api/cropvalueresearch', cropValueResearchRoutes);
-    app.use('/api/croprecommendations', cropRecommendations);
-    app.use('/api/cropplanning', cropPlanningRoutes);
-    app.use('/api/cropmanagement', cropManagementRoutes);
-    app.use('/api/cost', costRoutes);
-    app.use('/api/costcontrol', costControlRoutes);
-    app.use('/api/cooperativeshare', cooperativeShareRoutes);
-    app.use('/api/comprehensiveerp', comprehensiveERPRoutes);
-    app.use('/api/compliancetracking', complianceTracking);
-    app.use('/api/compliance', complianceRoutes);
-    app.use('/api/completeerpintegration', completeERPIntegrationRoutes);
-    app.use('/api/completeaiintegration', completeAIIntegrationRoutes);
-    app.use('/api/company', companyRoutes);
-    app.use('/api/communitymanagement', communityManagementRoutes);
-    app.use('/api/coldstorage', coldStorageRoutes);
-    app.use('/api/coldchainmonitoring', coldChainMonitoring);
-    app.use('/api/climateroutesupport', climateRouteSupport.router);
-    app.use('/api/climatemonitoring', climateMonitoringRoutes);
-    app.use('/api/climateadvisory', climateAdvisoryRoutes);
-    app.use('/api/climateadvisory', climateAdvisory);
-    app.use('/api/civildisruption', civilDisruptionRoutes);
-    app.use('/api/certificationmanagement', certificationManagement);
-    app.use('/api/buyertrust', buyerTrust);
-    app.use('/api/bulkorders', bulkOrders);
-    app.use('/api/bulkorder', bulkOrderRoutes);
-    app.use('/api/blockchainverification', blockchainVerificationRoutes);
-    app.use('/api/blockchaintrace', blockchainTrace);
-    app.use('/api/biometric', biometric);
-    app.use('/api/automation', automation);
-    app.use('/api/auth', authRoutes);
-    app.use('/api/audittrail', auditTrail);
-    app.use('/api/audit', auditRoutes);
-    app.use('/api/assetaccounting', assetAccountingRoutes);
-    app.use('/api/ar', ar);
-    app.use('/api/apicompatibility', apiCompatibilityRoutes);
-    app.use('/api/animalhealth', animalHealthRoutes);
-    app.use('/api/analyticsreport', analyticsReportRoutes);
-    app.use('/api/aiselfhealing', aiSelfHealingRoutes);
-    app.use('/api/aioperationintelligence', aiOperationIntelligenceRoutes);
-    app.use('/api/aigateway', aiGatewayRoutes);
-    app.use('/api/aicollaboration', aiCollaborationRoutes);
-    app.use('/api/aibrain', aiBrainRoutes);
-    app.use('/api/aibackbone', aiBackboneRoutes);
-    app.use('/api/aiapproval', aiApprovalRoutes);
-    app.use('/api/aiagent', aiAgentRoutes);
-    app.use('/api/agriculturalintelligence', agriculturalIntelligenceRoutes);
-    app.use('/api/advancedsearch', advancedSearchRoutes);
-    app.use('/api/advancedfeatures', advancedFeatures);
-    app.use('/api/advancedanalytics', advancedAnalyticsRoutes);
-    app.use('/api/v1/warnings', apiWarningRoutes);
-
-    // Routes index is a module exporter, not a router - don't mount it
-    // app.use('/api/index', index);
-
-    app.use('/health', healthRoutes);
-    logger.info('✅ Health check routes mounted at /health');
-
-    // Standardized error handling must follow every route registration.
-    app.use(standardizeErrorResponse);
     app.use(errorHandler);
 
-    // ========================================================================
-    // START SERVER
-    // ========================================================================
-
-    const PORT = process.env.PORT || 3000;
-    server.listen(PORT, () => {
-      const elapsed = Date.now() - startTime;
-
-      logger.info(`
-        ╔══════════════════════════════════════════╗
-        ║     EBDESIGN Platform Running 🌱        ║
-        ║                                          ║
-        ║  Server:     http://localhost:${PORT}      ║
-        ║  Services:   ${serviceLoader.discoveredCount} discovered, ${serviceLoader.loadedCount} loaded    ║
-        ║  Routes:     ${routeLoader.mountedCount} mounted              ║
-        ║  Startup:    ${elapsed}ms                 ║
-        ║                                          ║
-        ║  🔗 Health:  /health                     ║
-        ║  📊 Stats:   /api/v1/system/stats        ║
-        ║  🔍 Services: /api/v1/system/services    ║
-        ║  🛣️  Routes:  /api/v1/system/routes      ║
-        ╚══════════════════════════════════════════╝
-      `);
-
-      // Emit startup event
-      if (global.eventBus) {
-        global.eventBus.emit('platform:started', {
-          services: serviceLoader.discoveredCount,
-          routes: routeLoader.mountedCount,
-          startup: elapsed,
-        });
-      }
-    });
-
-    // ========================================================================
-    // GRACEFUL SHUTDOWN
-    // ========================================================================
-
-    process.on('SIGTERM', async () => {
-      logger.info('SIGTERM received, shutting down gracefully...');
-
-      server.close(async () => {
-        logger.info('HTTP server closed');
-
-        if (db) {
-          try {
-            await db.end();
-            logger.info('Database connection closed');
-          } catch (error) {
-            logger.error('Error closing database', error);
-          }
-        }
-
-        process.exit(0);
-      });
-
-      // Force shutdown after 30 seconds
-      setTimeout(() => {
-        logger.error('Forced shutdown after 30 second timeout');
-        process.exit(1);
-      }, 30000);
-    });
-
-    return { app, server, serviceLocator, configRegistry };
+    logger.info('✅ Startup completed', { elapsedMs: Date.now() - startTime });
+    return { app, server, io };
   } catch (error) {
-    logger.error('Failed to start platform', error);
-    process.exit(1);
+    logger.error('Startup failed', error);
+    throw error;
   }
 }
 
-// ============================================================================
-// START PLATFORM
-// ============================================================================
-
 if (require.main === module) {
-  startup().catch(error => {
+  const port = Number(process.env.PORT || 4000);
+  startup().then(() => {
+    server.listen(port, () => logger.info(`🚀 Backend listening on ${port}`));
+  }).catch(error => {
     logger.error('Fatal startup error', error);
-    process.exit(1);
+    process.exitCode = 1;
   });
 }
 
-module.exports = { app, startup };
+module.exports = { app, server, io, startup };
