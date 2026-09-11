@@ -30,6 +30,16 @@ export const villageAPI = {
   initializeFinance: (id) => villageClient.post(moduleURL('initializeFinance', id)),
   postVillageJournal: (id, data) => villageClient.post(moduleURL('postVillageJournal', id), data),
 
+  // Village master entities
+  listHouseholds: (id, params = {}) => villageClient.get(moduleURL('listHouseholds', id), { params }),
+  createHousehold: (id, data) => villageClient.post(moduleURL('createHousehold', id), data),
+  addHouseholdMember: (householdId, data) => villageClient.post(moduleURL('addHouseholdMember', householdId), data),
+  listEnterprises: (id) => villageClient.get(moduleURL('listEnterprises', id)),
+  createEnterprise: (id, data) => villageClient.post(moduleURL('createEnterprise', id), data),
+  listBudgets: (id) => villageClient.get(moduleURL('listBudgets', id)),
+  createBudget: (id, data) => villageClient.post(moduleURL('createBudget', id), data),
+  getERPOverview: (id) => villageClient.get(moduleURL('getERPOverview', id)),
+
   // Operations and workflow
   getDashboard: (id) => villageClient.get(moduleURL('getDashboard', id)),
   upsertKPI: (id, data) => villageClient.post(moduleURL('upsertKPI', id), data),
