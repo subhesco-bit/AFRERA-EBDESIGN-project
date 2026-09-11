@@ -1,0 +1,29 @@
+name: Clone M001-M550 Enterprise Runtime Gate
+on:
+  push:
+    branches: [chatgpt-clone/main-reconciliation-phase-1]
+  workflow_dispatch:
+jobs:
+  enterprise-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Backend install
+        working-directory: backend
+        run: npm ci
+      - name: M001-M550 runtime contract tests
+        working-directory: backend
+        run: npx jest tests/m001-m550-enterprise-runtime.test.js --runInBand
+      - name: Page estate governance audit
+        run: node tools/enterprise-page-estate-audit.js
+      - name: Frontend install
+        working-directory: frontend
+        run: npm ci
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build
