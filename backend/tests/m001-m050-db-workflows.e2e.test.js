@@ -1,6 +1,22 @@
 'use strict';
 
-const pool = require('../src/database/pool');
+const { Pool } = require('pg');
+const sharedPool = require('../src/database/pool');
+
+const realPool = new Pool({
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || 5432),
+  user: process.env.DB_USER || 'ebdesign_user',
+  password: process.env.DB_PASSWORD || 'ebdesign_ci_password',
+  database: process.env.DB_NAME || 'ebdesign',
+  max: 5,
+});
+
+const originalQuery = sharedPool.query;
+const originalConnect = sharedPool.connect;
+sharedPool.query = (...args) => realPool.query(...args);
+sharedPool.connect = (...args) => realPool.connect(...args);
+
 const enterprise = require('../src/services/m001m050EnterpriseProductService');
 const workflow = require('../src/services/m001m050WorkflowOrchestrationService');
 
@@ -22,15 +38,22 @@ function uniquePayload(payload) {
 
 describe('M001-M050 database-backed operational workflows', () => {
   const created = [];
+
+  beforeAll(async () => {
+    await realPool.query('SELECT 1');
+  });
+
   afterAll(async () => {
     for (const item of created.reverse()) {
       try { await item.service.remove(item.id, {id:'ci-cleanup'}); } catch (_) {}
     }
-    try { await pool.query("DELETE FROM m001_m050_decision_queue WHERE maker_id LIKE 'ci-%' OR checker_id LIKE 'ci-%'"); } catch (_) {}
-    try { await pool.query("DELETE FROM m001_m050_workflow_instances WHERE created_by LIKE 'ci-%'"); } catch (_) {}
-    try { await pool.query("DELETE FROM m001_m050_operational_tasks WHERE created_by LIKE 'ci-%'"); } catch (_) {}
-    try { await pool.query("DELETE FROM m001_m050_kpi_snapshots WHERE recorded_by LIKE 'ci-%'"); } catch (_) {}
-    await pool.end();
+    try { await realPool.query("DELETE FROM m001_m050_decision_queue WHERE maker_id LIKE 'ci-%' OR checker_id LIKE 'ci-%'"); } catch (_) {}
+    try { await realPool.query("DELETE FROM m001_m050_workflow_instances WHERE created_by LIKE 'ci-%'"); } catch (_) {}
+    try { await realPool.query("DELETE FROM m001_m050_operational_tasks WHERE created_by LIKE 'ci-%'"); } catch (_) {}
+    try { await realPool.query("DELETE FROM m001_m050_kpi_snapshots WHERE recorded_by LIKE 'ci-%'"); } catch (_) {}
+    sharedPool.query = originalQuery;
+    sharedPool.connect = originalConnect;
+    await realPool.end();
   });
 
   test.each(registryCases)('%s authoritative registry completes create/read/update/retire lifecycle', async (code, service, base) => {
