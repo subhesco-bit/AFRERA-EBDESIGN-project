@@ -1,6 +1,6 @@
 'use strict';
 
-const db = require('../database');
+const { getPostgreSQL } = require('../database/connection');
 
 const ALLOWED_MODULES = new Set([
   'supply_chain','supplier_management','logistics','procurement','inventory','quality_control',
@@ -22,9 +22,16 @@ function assertModule(moduleKey) {
   if (!ALLOWED_MODULES.has(moduleKey)) throw new Error(`Unsupported operational module: ${moduleKey}`);
 }
 
-async function createEntity({ moduleKey, ownerUserId = null, status = 'active', payload = {}, client = db }) {
+function poolOrThrow() {
+  const pool = getPostgreSQL();
+  if (!pool) throw new Error('PostgreSQL is not initialized');
+  return pool;
+}
+
+async function createEntity({ moduleKey, ownerUserId = null, status = 'active', payload = {}, client = null }) {
   assertModule(moduleKey);
-  const result = await client.query(
+  const executor = client || poolOrThrow();
+  const result = await executor.query(
     `INSERT INTO operational_module_entities (module_key, owner_user_id, status, payload)
      VALUES ($1, $2, $3, $4::jsonb)
      RETURNING *`,
@@ -33,16 +40,18 @@ async function createEntity({ moduleKey, ownerUserId = null, status = 'active', 
   return result.rows[0];
 }
 
-async function getEntity(id, client = db) {
-  const result = await client.query(
+async function getEntity(id, client = null) {
+  const executor = client || poolOrThrow();
+  const result = await executor.query(
     `SELECT * FROM operational_module_entities WHERE id = $1 AND deleted_at IS NULL`, [id]
   );
   return result.rows[0] || null;
 }
 
-async function listEntities({ moduleKey, status, ownerUserId, limit = 100, offset = 0 }, client = db) {
+async function listEntities({ moduleKey, status, ownerUserId, limit = 100, offset = 0 }, client = null) {
   if (moduleKey) assertModule(moduleKey);
-  const result = await client.query(
+  const executor = client || poolOrThrow();
+  const result = await executor.query(
     `SELECT * FROM operational_module_entities
      WHERE deleted_at IS NULL
        AND ($1::varchar IS NULL OR module_key = $1)
@@ -55,9 +64,10 @@ async function listEntities({ moduleKey, status, ownerUserId, limit = 100, offse
   return result.rows;
 }
 
-async function updateEntity(id, { status, payload }, client = db) {
+async function updateEntity(id, { status, payload }, client = null) {
   if (status === undefined && payload === undefined) throw new Error('At least one update field is required');
-  const result = await client.query(
+  const executor = client || poolOrThrow();
+  const result = await executor.query(
     `UPDATE operational_module_entities
      SET status = COALESCE($2, status),
          payload = CASE WHEN $3::jsonb IS NULL THEN payload ELSE $3::jsonb END,
@@ -69,8 +79,9 @@ async function updateEntity(id, { status, payload }, client = db) {
   return result.rows[0] || null;
 }
 
-async function softDeleteEntity(id, client = db) {
-  const result = await client.query(
+async function softDeleteEntity(id, client = null) {
+  const executor = client || poolOrThrow();
+  const result = await executor.query(
     `UPDATE operational_module_entities SET deleted_at = NOW(), updated_at = NOW()
      WHERE id = $1 AND deleted_at IS NULL RETURNING id`, [id]
   );
@@ -78,7 +89,8 @@ async function softDeleteEntity(id, client = db) {
 }
 
 async function withTransaction(work) {
-  const client = await db.connect();
+  const pool = poolOrThrow();
+  const client = await pool.connect();
   try {
     await client.query('BEGIN');
     const result = await work(client);
