@@ -1,107 +1,71 @@
-const m041Service = require('./service');
+const villageService = require('./service');
 const { logger } = require('../../utils/logger');
 const { sendSuccess, sendError } = require('../../utils/response');
 
 class M041Controller {
-  async getAll(req, res) {
+  async getVillages(req, res) {
     try {
-      const { page, limit, status, user_id, search, sort, order } = req.query;
-
-      const result = await m041Service.getAll({
-        page: parseInt(page) || 1,
-        limit: parseInt(limit) || 20,
-        status,
-        user_id,
-        search,
-        sort: sort || 'created_at',
-        order: order || 'DESC',
-      });
-
+      const result = await villageService.getVillages(req.query);
       return sendSuccess(res, result.data, result.pagination);
     } catch (error) {
-      logger.error('Error in getAll:', error);
-      return sendError(res, error);
-    }
-  }
-
-  async getById(req, res) {
-    try {
-      const { id } = req.params;
-      const result = await m041Service.getById(id);
-      return sendSuccess(res, result);
-    } catch (error) {
-      logger.error('Error in getById:', error);
+      logger.error('M041 getVillages failed', error);
       return sendError(res, error, error.statusCode || 500);
     }
   }
 
-  async create(req, res) {
+  async getVillage(req, res) {
     try {
-      const { user_id, ...data } = req.body;
-
-      if (!user_id) {
-        return sendError(res, new Error('user_id is required'), 400);
-      }
-
-      const result = await m041Service.create({ user_id, ...data });
-      return sendSuccess(res, result, null, 201);
+      return sendSuccess(res, await villageService.getVillageProfile(req.params.villageId));
     } catch (error) {
-      logger.error('Error in create:', error);
-      return sendError(res, error, error.statusCode || 400);
-    }
-  }
-
-  async update(req, res) {
-    try {
-      const { id } = req.params;
-      const result = await m041Service.update(id, req.body);
-      return sendSuccess(res, result);
-    } catch (error) {
-      logger.error('Error in update:', error);
-      return sendError(res, error, error.statusCode || 400);
-    }
-  }
-
-  async delete(req, res) {
-    try {
-      const { id } = req.params;
-      const result = await m041Service.delete(id);
-      return sendSuccess(res, result);
-    } catch (error) {
-      logger.error('Error in delete:', error);
+      logger.error('M041 getVillage failed', error);
       return sendError(res, error, error.statusCode || 404);
     }
   }
 
-  async createBulk(req, res) {
+  async createVillage(req, res) {
     try {
-      const { records } = req.body;
-
-      if (!Array.isArray(records)) {
-        return sendError(res, new Error('records must be an array'), 400);
-      }
-
-      const result = await m041Service.createBulk(records);
+      const result = await villageService.createVillage(req.body);
       return sendSuccess(res, result, null, 201);
     } catch (error) {
-      logger.error('Error in createBulk:', error);
-      return sendError(res, error, 400);
+      logger.error('M041 createVillage failed', error);
+      return sendError(res, error, error.statusCode || 400);
     }
   }
 
-  async search(req, res) {
+  async updateVillage(req, res) {
     try {
-      const { q, fields } = req.query;
-
-      if (!q) {
-        return sendError(res, new Error('Search query is required'), 400);
-      }
-
-      const result = await m041Service.search(q, fields ? fields.split(',') : undefined);
-      return sendSuccess(res, result);
+      return sendSuccess(res, await villageService.updateVillage(req.params.villageId, req.body));
     } catch (error) {
-      logger.error('Error in search:', error);
-      return sendError(res, error);
+      logger.error('M041 updateVillage failed', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async deleteVillage(req, res) {
+    try {
+      return sendSuccess(res, await villageService.deleteVillage(req.params.villageId));
+    } catch (error) {
+      logger.error('M041 deleteVillage failed', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async addVillageResource(req, res) {
+    try {
+      const result = await villageService.addVillageResource(req.params.villageId, req.body);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('M041 addVillageResource failed', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async getVillageAnalytics(req, res) {
+    try {
+      return sendSuccess(res, await villageService.getVillageAnalytics(req.params.villageId));
+    } catch (error) {
+      logger.error('M041 getVillageAnalytics failed', error);
+      return sendError(res, error, error.statusCode || 404);
     }
   }
 }
