@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS commercial_reconciliation_runs (
 CREATE INDEX IF NOT EXISTS idx_reconciliation_order ON commercial_reconciliation_runs(order_id);
 
 CREATE TABLE IF NOT EXISTS e2e_flow_runs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY,
   flow_name TEXT NOT NULL,
   correlation_id TEXT NOT NULL,
   current_stage TEXT NOT NULL,
