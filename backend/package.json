@@ -11,8 +11,10 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "migrate": "node src/database/migrate.js",
-    "seed": "node src/database/seed.js"
-    ,"audit:coverage": "node ../tools/route-audit.js"
+    "seed": "node src/database/seed.js",
+    "audit:coverage": "node ../tools/route-audit.js",
+    "systems:assemble": "node ../tools/module-system-assembler.js",
+    "systems:assemble:all": "node ../tools/system-assembly-orchestrator.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
@@ -48,14 +50,14 @@
     "passport-oauth2": "^1.8.0",
     "pdfkit": "^0.13.0",
     "pg": "^8.11.3",
-    "qrcode": "^1.5.3",
+    "qrcode": "^1.5.0",
     "rate-limiter-flexible": "^4.0.0",
     "razorpay": "^2.9.8",
     "redis": "^6.2.1",
     "sharp": "^0.33.1",
     "socket.io": "^4.6.1",
     "speakeasy": "^2.0.0",
-    "stripe": "^22.6.1",
+    "stripe": "^22.6.0",
     "tesseract.js": "^5.1.1",
     "twilio": "^5.0.0",
     "winston": "^3.11.0"
