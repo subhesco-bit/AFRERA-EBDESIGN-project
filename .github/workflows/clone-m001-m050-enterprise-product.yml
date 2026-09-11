@@ -17,6 +17,19 @@ jobs:
           node-version: 20
           cache: npm
           cache-dependency-path: backend/package-lock.json
-      - run: npm ci
-      - run: npx jest tests/m001-m050-enterprise-product.test.js tests/m001-m050-highest-standard.test.js tests/m001-m050-workflow-orchestration.test.js --runInBand
-      - run: node -e "const s=require('./src/services/m001m050EnterpriseProductService');if(s.portfolio().length!==50)process.exit(1)"
+      - name: Backend install
+        run: npm ci
+      - name: Batch release reachability audit
+        run: node ../tools/m001-m050-release-audit.js
+      - name: Enterprise product tests
+        run: npx jest tests/m001-m050-enterprise-product.test.js tests/m001-m050-highest-standard.test.js tests/m001-m050-workflow-orchestration.test.js --runInBand
+      - name: Verify exactly 50 enterprise specifications
+        run: node -e "const s=require('./src/services/m001m050EnterpriseProductService');if(s.portfolio().length!==50)process.exit(1)"
+      - name: Backend lint
+        run: npm run lint
+      - name: Frontend install
+        working-directory: frontend
+        run: npm ci
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build
