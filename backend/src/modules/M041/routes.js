@@ -27,6 +27,10 @@ router.get('/villages/:villageId/economy/balance', controller.getEconomicBalance
 router.post('/villages/:villageId/economy/production', controller.recordProduction.bind(controller));
 router.post('/villages/:villageId/economy/flows', controller.recordEconomicFlow.bind(controller));
 
+// Production intensity and potential
+router.get('/villages/:villageId/economy/production-potential', controller.getProductionPotential.bind(controller));
+router.put('/villages/:villageId/economy/production-potential', controller.upsertProductionPotential.bind(controller));
+
 // Village ERP / accounting
 router.get('/villages/:villageId/finance', controller.getVillageFinance.bind(controller));
 router.post('/villages/:villageId/finance/initialize', controller.initializeFinance.bind(controller));
