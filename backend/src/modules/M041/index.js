@@ -16,6 +16,17 @@ router.post('/villages/:villageId/resources', controller.addVillageResource);
 router.get('/villages/:villageId/analytics', controller.getVillageAnalytics);
 router.get('/districts/:district/summary', controller.districtSummary);
 
+// Geography + location intelligence
+router.get('/villages/:villageId/geolocation', controller.getVillageGeo);
+router.put('/villages/:villageId/geolocation', controller.updateVillageGeo);
+router.get('/villages/:villageId/logistics/nearest', controller.getNearestFacilities);
+router.post('/logistics/facilities', controller.upsertLogisticsFacility);
+
+// Village economy / production / consumption / market flows
+router.get('/villages/:villageId/economy/balance', controller.getEconomicBalance);
+router.post('/villages/:villageId/economy/production', controller.recordProduction);
+router.post('/villages/:villageId/economy/flows', controller.recordEconomicFlow);
+
 // Village ERP / accounting
 router.get('/villages/:villageId/finance', controller.getVillageFinance);
 router.post('/villages/:villageId/finance/initialize', controller.initializeFinance);
@@ -48,14 +59,13 @@ router.post('/projects/:projectId/estimates', controller.createEstimate);
 router.post('/projects/:projectId/funding-sources', controller.addFundingSource);
 router.post('/projects/:projectId/subsidy-matches', controller.matchSubsidies);
 router.get('/projects/:projectId/subsidy-ai-context', controller.buildSubsidyAIContext);
-
-// Controlled administration of the Central/State scheme catalogue.
 router.post('/scheme-catalogue', controller.upsertScheme);
 
 module.exports = {
-  controller: require('./controller'),
+  controller,
   service: require('./service'),
   erpService: require('./villageERPService'),
   projectIntelligenceService: require('./villageProjectIntelligenceService'),
+  economyGeoService: require('./villageEconomyGeoService'),
   router,
 };
