@@ -15,7 +15,8 @@
     "audit:coverage": "node ../tools/route-audit.js",
     "library:index:complete": "node ../tools/library-complete-index.js",
     "library:product:audit": "node ../tools/library-product-audit.js",
-    "library:complete": "npm run library:index:complete && npm run library:product:audit"
+    "library:complete": "npm run library:index:complete && npm run library:product:audit",
+    "production:hardening:batch": "node ../tools/production-hardening-batch.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
@@ -25,7 +26,6 @@
     "aws-sdk": "^2.1500.0",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
-    "bull": "^4.12.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -34,7 +34,7 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-slow-down": "^2.0.1",
-    "express-validator": "^7.0.1",
+    "express-validator": "^7.0.0",
     "firebase-admin": "^12.0.0",
     "graphql": "^16.8.1",
     "helmet": "^7.0.0",
@@ -50,7 +50,6 @@
     "passport-jwt": "^4.0.1",
     "passport-oauth2": "^1.8.0",
     "pdfkit": "^0.13.0",
-    "pg": "^8.11.3",
     "qrcode": "^1.5.3",
     "rate-limiter-flexible": "^4.0.0",
     "razorpay": "^2.9.8",
@@ -66,6 +65,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.4",
     "@types/jest": "^29.5.11",
+    "@types/node": "^22.0.0",
     "eslint": "^8.56.0",
     "jest": "^29.7.0",
     "nodemon": "^3.0.2",
@@ -77,13 +77,7 @@
     "node": ">=20.0.0",
     "npm": ">=12.0.0"
   },
-  "keywords": [
-    "afrera",
-    "agriculture",
-    "marketplace",
-    "erp",
-    "microservices"
-  ],
+  "keywords": ["afrera","agriculture","marketplace","erp","microservices"],
   "author": "Ethnoverde Dynamics Pvt. Ltd.",
   "license": "PROPRIETARY"
 }
