@@ -1,0 +1,21 @@
+name: Clone M001-M050 Real Workflows
+on:
+  push:
+    branches: [chatgpt-clone/main-reconciliation-phase-1]
+  workflow_dispatch:
+jobs:
+  real-workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Backend install
+        working-directory: backend
+        run: npm ci
+      - name: M001-M050 real workflow tests
+        working-directory: backend
+        run: npx jest tests/m001-m050-real-workflows.test.js --runInBand
