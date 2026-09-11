@@ -1,2 +1,1 @@
-﻿-- SQL model placeholder for Geo Boundary Management (M038)
--- Define tables and indexes here
+CREATE TABLE IF NOT EXISTS m038_geo_boundaries (id UUID PRIMARY KEY,boundary_id TEXT UNIQUE,boundary_type TEXT NOT NULL,name TEXT,parent_boundary_id TEXT,geometry JSONB NOT NULL,crs TEXT NOT NULL DEFAULT 'EPSG:4326',effective_from DATE,effective_to DATE,status TEXT NOT NULL DEFAULT 'active',properties JSONB NOT NULL DEFAULT '{}'::jsonb,created_by TEXT,updated_by TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),deleted_at TIMESTAMPTZ); CREATE INDEX IF NOT EXISTS idx_m038_type_parent ON m038_geo_boundaries(boundary_type,parent_boundary_id) WHERE deleted_at IS NULL;

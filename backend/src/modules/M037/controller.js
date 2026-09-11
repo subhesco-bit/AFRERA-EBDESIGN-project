@@ -1,3 +1,1 @@
-﻿// Controller for Water Resource Mapping (M037)
-// Add route handlers here
-module.exports = { /* handlers */ };
+'use strict'; module.exports=require('../shared/createCrudController')(require('./service'));

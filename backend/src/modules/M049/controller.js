@@ -1,3 +1,1 @@
-﻿// Controller for Community Asset Management (M049)
-// Add route handlers here
-module.exports = { /* handlers */ };
+'use strict'; module.exports=require('../shared/createCrudController')(require('./service'));

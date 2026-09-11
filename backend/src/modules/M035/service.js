@@ -1,3 +1,1 @@
-﻿// Service for GIS Land Mapping (M035)
-// Add business logic here
-module.exports = { /* functions */ };
+'use strict'; const make=require('../shared/createRegistryService'); module.exports=make({table:'m035_gis_features',entity:'GIS feature',required:['layer','geometry','crs'],columns:['feature_id','layer','geometry','crs','source_reference','status','attributes'],validate(d){if(d.geometry!=null&&typeof d.geometry!=='object'){const e=new Error('geometry must be JSON');e.statusCode=400;throw e;}}});

@@ -1,3 +1,1 @@
-﻿// Service for Community Asset Management (M049)
-// Add business logic here
-module.exports = { /* functions */ };
+'use strict'; const make=require('../shared/createRegistryService'); const conditions=['excellent','good','fair','poor','critical']; module.exports=make({table:'m049_community_assets',entity:'Community asset',required:['asset_id','asset_type','location','condition'],columns:['asset_id','asset_type','name','location','village_id','condition','custodian','utilization_pct','maintenance_state','next_maintenance_at','status','properties'],validate(d){if(d.condition&&!conditions.includes(d.condition)){const e=new Error('Invalid asset condition');e.statusCode=400;throw e;}if(d.utilization_pct!=null&&(Number(d.utilization_pct)<0||Number(d.utilization_pct)>100)){const e=new Error('utilization_pct must be 0..100');e.statusCode=400;throw e;}}});
