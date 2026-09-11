@@ -1,117 +1,109 @@
-﻿// Controller for Seed Planning (M045) - AI Enhanced
-const service = require('./service');
+const m045Service = require('./service');
 const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-// CRUD
-async function createSeedPlan(req, res) {
-  try {
-    const plan = await service.createSeedPlan(req.body);
-    res.status(201).json({ success: true, data: plan });
-  } catch (error) {
-    logger.error('createSeedPlan error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+class M045Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
+
+      const result = await m045Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m045Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m045Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m045Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m045Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m045Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m045Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
 }
 
-async function getSeedPlan(req, res) {
-  try {
-    const plan = await service.getSeedPlan(req.params.planId);
-    if (!plan) return res.status(404).json({ success: false, error: 'Seed plan not found' });
-    res.json({ success: true, data: plan });
-  } catch (error) {
-    logger.error('getSeedPlan error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function listSeedPlans(req, res) {
-  try {
-    const { page, limit, farmerId, cropId, status } = req.query;
-    const result = await service.listSeedPlans({ page, limit, farmerId, cropId, status });
-    res.json({ success: true, data: result });
-  } catch (error) {
-    logger.error('listSeedPlans error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function updateSeedPlan(req, res) {
-  try {
-    const plan = await service.updateSeedPlan(req.params.planId, req.body);
-    if (!plan) return res.status(404).json({ success: false, error: 'Seed plan not found' });
-    res.json({ success: true, data: plan });
-  } catch (error) {
-    logger.error('updateSeedPlan error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function deleteSeedPlan(req, res) {
-  try {
-    const success = await service.deleteSeedPlan(req.params.planId);
-    if (!success) return res.status(404).json({ success: false, error: 'Seed plan not found' });
-    res.json({ success: true });
-  } catch (error) {
-    logger.error('deleteSeedPlan error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// AI-powered calculation
-async function calculateSeedRequirements(req, res) {
-  try {
-    const { cropId, varietyId, area } = req.params;
-    const conditions = req.body;
-    const calculation = await service.calculateSeedRequirements(cropId, varietyId, area, conditions);
-    res.json({ success: true, data: calculation });
-  } catch (error) {
-    logger.error('calculateSeedRequirements error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// Supplier management
-async function addSeedSupplier(req, res) {
-  try {
-    const supplier = await service.addSeedSupplier(req.body);
-    res.status(201).json({ success: true, data: supplier });
-  } catch (error) {
-    logger.error('addSeedSupplier error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function listSeedSuppliers(req, res) {
-  try {
-    const { cropType, minQualityRating } = req.query;
-    const suppliers = await service.listSeedSuppliers({ cropType, minQualityRating });
-    res.json({ success: true, data: suppliers });
-  } catch (error) {
-    logger.error('listSeedSuppliers error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// Analytics
-async function getSeedAnalytics(req, res) {
-  try {
-    const { startDate, endDate, cropId } = req.query;
-    const analytics = await service.getSeedAnalytics({ startDate, endDate, cropId });
-    res.json({ success: true, data: analytics });
-  } catch (error) {
-    logger.error('getSeedAnalytics error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-module.exports = {
-  createSeedPlan,
-  getSeedPlan,
-  listSeedPlans,
-  updateSeedPlan,
-  deleteSeedPlan,
-  calculateSeedRequirements,
-  addSeedSupplier,
-  listSeedSuppliers,
-  getSeedAnalytics,
-};
+module.exports = new M045Controller();

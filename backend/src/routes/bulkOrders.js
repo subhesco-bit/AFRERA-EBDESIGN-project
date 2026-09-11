@@ -1,19 +1,20 @@
-const router = require('express').Router();
-const bulkOrderService = require('../services/bulkOrderService');
-const auth = require('../middleware/auth');
+/**
+ * bulk Orders Routes
+ * Placeholder route module
+ */
 
-router.post('/bulk-orders', auth, async (req, res) => {
-  try {
-    const result = await bulkOrderService.createBulkOrder(req.body);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
+const express = require('express');
+const router = express.Router();
 
-router.get('/bulk-orders/:orderId/quotations', async (req, res) => {
-  try {
-    const result = await bulkOrderService.getQuotations(req.params.orderId);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'bulkOrders',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

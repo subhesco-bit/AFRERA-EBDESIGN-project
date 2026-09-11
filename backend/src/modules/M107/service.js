@@ -1,487 +1,243 @@
-/**
- * Breakdown Maintenance Service (M107)
- * Equipment breakdown management, emergency repairs, and downtime tracking
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Report equipment breakdown
- */
-async function reportBreakdown(breakdownData) {
-  try {
-    const {
-      equipment_id,
-      equipment_type,
-      farmer_id,
-      breakdown_date,
-      breakdown_time,
-      location,
-      state,
-      district,
-      symptoms,
-      severity,
-      reported_by,
-      operator_notes,
-    } = breakdownData;
+class M107Service {
+  constructor() {
+    this.table = 'api_management';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-    const breakdown = {
-      breakdown_id: generateId(),
-      equipment_id,
-      equipment_type,
-      farmer_id,
-      breakdown_date,
-      breakdown_time,
-      location,
-      state,
-      district,
-      symptoms,
-      severity: severity || 'medium',
-      reported_by,
-      operator_notes,
-      status: 'reported',
-      created_at: new Date().toISOString(),
-    };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    // AI-powered breakdown diagnosis
-    const aiRequest = {
-      task: 'breakdown_diagnosis',
-      parameters: {
-        breakdown_data: breakdownData,
-        equipment_history: await getEquipmentHistory(equipment_id),
-        symptom_analysis: await analyzeSymptoms(symptoms, equipment_type),
-        common_failures: await getCommonFailures(equipment_type),
-        repair_estimates: await getRepairEstimates(equipment_type, severity),
-      },
-    };
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    breakdown.ai_diagnosis = aiResponse;
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-    const result = await pool.query(
-      `INSERT INTO equipment_breakdowns 
-       (breakdown_id, equipment_id, equipment_type, farmer_id, breakdown_date, 
-        breakdown_time, location, state, district, symptoms, severity, reported_by, 
-        operator_notes, status, ai_diagnosis, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-       RETURNING *`,
-      [
-        breakdown.breakdown_id,
-        breakdown.equipment_id,
-        breakdown.equipment_type,
-        breakdown.farmer_id,
-        breakdown.breakdown_date,
-        breakdown.breakdown_time,
-        breakdown.location,
-        breakdown.state,
-        breakdown.district,
-        JSON.stringify(breakdown.symptoms),
-        breakdown.severity,
-        breakdown.reported_by,
-        breakdown.operator_notes,
-        breakdown.status,
-        JSON.stringify(breakdown.ai_diagnosis),
-        breakdown.created_at,
-      ],
-    );
+        validated[field] = value;
+      }
+    }
 
-    logger.info(`Breakdown reported: ${breakdown.breakdown_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error reporting breakdown', { error: error.message, stack: error.stack });
-    throw new Error('Failed to report breakdown');
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Schedule emergency repair
- */
-async function scheduleEmergencyRepair(breakdownId, repairData) {
-  try {
-    const {
-      technician_id,
-      estimated_arrival,
-      priority,
-      required_parts,
-      estimated_cost,
-      repair_notes,
-    } = repairData;
-
-    const repair = {
-      repair_id: generateId(),
-      breakdown_id: breakdownId,
-      technician_id,
-      estimated_arrival,
-      priority: priority || 'high',
-      required_parts,
-      estimated_cost,
-      repair_notes,
-      status: 'scheduled',
-      created_at: new Date().toISOString(),
-    };
-
-    // AI-powered repair optimization
-    const aiRequest = {
-      task: 'repair_optimization',
-      parameters: {
-        repair_data: repairData,
-        breakdown_details: await getBreakdownDetails(breakdownId),
-        technician_availability: await getTechnicianAvailability(technician_id),
-        parts_availability: await checkPartsAvailability(required_parts),
-        repair_time_estimate: await estimateRepairTime(breakdownId, required_parts),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    repair.ai_optimization = aiResponse;
-
-    await pool.query(
-      `UPDATE equipment_breakdowns 
-       SET status = 'repair_scheduled', updated_at = CURRENT_TIMESTAMP
-       WHERE breakdown_id = $1`,
-      [breakdownId],
-    );
-
-    const result = await pool.query(
-      `INSERT INTO emergency_repairs 
-       (repair_id, breakdown_id, technician_id, estimated_arrival, priority, 
-        required_parts, estimated_cost, repair_notes, status, ai_optimization, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING *`,
-      [
-        repair.repair_id,
-        repair.breakdown_id,
-        repair.technician_id,
-        repair.estimated_arrival,
-        repair.priority,
-        JSON.stringify(repair.required_parts),
-        repair.estimated_cost,
-        repair.repair_notes,
-        repair.status,
-        JSON.stringify(repair.ai_optimization),
-        repair.created_at,
-      ],
-    );
-
-    logger.info(`Emergency repair scheduled: ${repair.repair_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error scheduling emergency repair', { error: error.message, stack: error.stack });
-    throw new Error('Failed to schedule emergency repair');
-  }
-}
-
-/**
- * Track downtime
- */
-async function trackDowntime(equipmentId, period) {
-  try {
-    const downtime = {
-      tracking_id: generateId(),
-      equipment_id: equipmentId,
-      period,
-      timestamp: new Date().toISOString(),
-      total_downtime: await getTotalDowntime(equipmentId, period),
-      breakdown_count: await getBreakdownCount(equipmentId, period),
-      repair_time: await getRepairTime(equipmentId, period),
-      cost_impact: await calculateCostImpact(equipmentId, period),
-      recommendations: await generateDowntimeRecommendations(equipmentId, period),
-    };
-
-    return downtime;
-  } catch (error) {
-    logger.error('Error tracking downtime', { error: error.message, stack: error.stack });
-    throw new Error('Failed to track downtime');
-  }
-}
-
-/**
- * Generate breakdown report
- */
-async function generateBreakdownReport(farmerId, reportType) {
-  try {
-    const report = {
-      report_id: generateId(),
-      farmer_id: farmerId,
-      report_type: reportType,
-      generated_at: new Date().toISOString(),
-      total_breakdowns: await getTotalBreakdowns(farmerId),
-      breakdown_by_type: await getBreakdownByType(farmerId),
-      downtime_summary: await getDowntimeSummary(farmerId),
-      repair_costs: await getRepairCosts(farmerId),
-      mttr_mtbf: await calculateMTTRMTBF(farmerId),
-      recommendations: await generatePreventiveRecommendations(farmerId),
-    };
-
-    return report;
-  } catch (error) {
-    logger.error('Error generating breakdown report', { error: error.message, stack: error.stack });
-    throw new Error('Failed to generate breakdown report');
-  }
-}
-
-function generateId() {
-  return `BD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getEquipmentHistory(equipmentId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM equipment_breakdowns WHERE equipment_id = $1 ORDER BY breakdown_date DESC LIMIT 5',
-      [equipmentId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-// Honest-degradation pattern (matches services/dual-use/platformCoreService.js):
-// classify against the reported symptoms/equipmentType via keyword rules; only
-// fall back to the generic default when nothing in the input matches a known
-// pattern, and label the source instead of carrying a fabricated confidence.
-const SYMPTOM_RULES = [
-  { keywords: ['overheat', 'temperature', 'hot'], cause: 'cooling_system_failure', components: ['radiator', 'coolant_system', 'engine'] },
-  { keywords: ['noise', 'rattle', 'knock', 'vibrat'], cause: 'mechanical_wear', components: ['engine', 'transmission'] },
-  { keywords: ['leak', 'oil', 'fluid'], cause: 'seal_or_gasket_failure', components: ['engine', 'hydraulic_system'] },
-  { keywords: ['won\'t start', 'not starting', 'no start', 'battery', 'electrical'], cause: 'electrical_failure', components: ['battery', 'starter', 'wiring'] },
-  { keywords: ['hydraulic', 'lift', 'pressure'], cause: 'hydraulic_system_failure', components: ['hydraulic_pump', 'hoses'] },
-  { keywords: ['brake'], cause: 'brake_system_failure', components: ['brakes'] },
-  { keywords: ['tire', 'tyre', 'wheel'], cause: 'tire_or_wheel_damage', components: ['tires', 'wheels'] },
-];
-
-async function analyzeSymptoms(symptoms, equipmentType) {
-  const symptomText = Array.isArray(symptoms) ?
-    symptoms.join(' ').toLowerCase() :
-    String(symptoms || '').toLowerCase();
-
-  if (!symptomText.trim()) {
-    return {
-      likely_cause: 'unknown',
-      source: 'static',
-      affected_components: [],
-      note: 'No symptoms provided to analyze',
-    };
-  }
-
-  const matched = SYMPTOM_RULES.filter(rule => rule.keywords.some(k => symptomText.includes(k)));
-
-  if (matched.length === 0) {
-    return {
-      likely_cause: 'undetermined',
-      source: 'static',
-      affected_components: [],
-      note: `Symptoms did not match a known pattern for equipment type ${equipmentType || 'unknown'}; manual inspection recommended`,
-    };
-  }
-
-  const affected_components = [...new Set(matched.flatMap(r => r.components))];
-  return {
-    likely_cause: matched[0].cause,
-    source: 'rule_based',
-    matched_patterns: matched.length,
-    affected_components,
-  };
-}
-
-async function getCommonFailures(equipmentType) {
-  return [
-    { failure: 'engine_overheating', frequency: 'high' },
-    { failure: 'hydraulic_leak', frequency: 'medium' },
-    { failure: 'electrical_issue', frequency: 'low' },
-  ];
-}
-
-async function getRepairEstimates(equipmentType, severity) {
-  const baseCost = { high: 15000, medium: 8000, low: 3000 };
-  return {
-    estimated_cost: baseCost[severity] || 8000,
-    estimated_time: severity === 'high' ? 48 : 24,
-    parts_required: ['engine_parts', 'filters'],
-  };
-}
-
-async function getBreakdownDetails(breakdownId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM equipment_breakdowns WHERE breakdown_id = $1',
-      [breakdownId],
-    );
-    return result.rows[0] || {};
-  } catch (error) {
-    return {};
-  }
-}
-
-async function getTechnicianAvailability(technicianId) {
-  return {
-    available: true,
-    next_available: '2 hours',
-    skills: ['mechanical', 'electrical'],
-  };
-}
-
-async function checkPartsAvailability(requiredParts) {
-  return {
-    all_available: true,
-    unavailable_parts: [],
-    delivery_time: '24 hours',
-  };
-}
-
-// Real estimate driven by how many parts the repair actually needs (base labor
-// hours + a per-part fitting overhead), rather than a fixed constant. Still a
-// heuristic, not a data-driven model, so it's labeled source: 'rule_based'
-// instead of carrying a fabricated confidence score.
-async function estimateRepairTime(breakdownId, requiredParts) {
-  const partsList = Array.isArray(requiredParts) ? requiredParts : (requiredParts ? [requiredParts] : []);
-  const BASE_HOURS = 4;
-  const HOURS_PER_PART = 1.5;
-  const estimated_hours = partsList.length === 0 ?
-    BASE_HOURS :
-    BASE_HOURS + partsList.length * HOURS_PER_PART;
-
-  return {
-    estimated_hours,
-    source: partsList.length === 0 ? 'static' : 'rule_based',
-    parts_count: partsList.length,
-  };
-}
-
-async function getTotalDowntime(equipmentId, period) {
-  return {
-    total_hours: 48,
-    average_per_breakdown: 12,
-    impact_level: 'medium',
-  };
-}
-
-async function getBreakdownCount(equipmentId, period) {
-  return {
-    total: 4,
-    critical: 1,
-    major: 2,
-    minor: 1,
-  };
-}
-
-async function getRepairTime(equipmentId, period) {
-  return {
-    total_repair_hours: 32,
-    average_repair_time: 8,
-    efficiency_rating: 'good',
-  };
-}
-
-async function calculateCostImpact(equipmentId, period) {
-  return {
-    total_cost: 40000,
-    repair_cost: 32000,
-    lost_productivity: 8000,
-    impact_per_hour: 833,
-  };
-}
-
-async function generateDowntimeRecommendations(equipmentId, period) {
-  return [
-    'Implement preventive maintenance schedule',
-    'Train operators on early failure detection',
-    'Keep critical spare parts in stock',
-  ];
-}
-
-async function getTotalBreakdowns(farmerId) {
-  try {
-    const result = await pool.query(
-      'SELECT COUNT(*) as count FROM equipment_breakdowns WHERE farmer_id = $1',
-      [farmerId],
-    );
-    return result.rows[0]?.count || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-async function getBreakdownByType(farmerId) {
-  try {
-    const result = await pool.query(
-      'SELECT equipment_type, COUNT(*) as count FROM equipment_breakdowns WHERE farmer_id = $1 GROUP BY equipment_type',
-      [farmerId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function getDowntimeSummary(farmerId) {
-  return {
-    total_downtime_hours: 192,
-    average_downtime: 24,
-    downtime_percentage: 5,
-  };
-}
-
-async function getRepairCosts(farmerId) {
-  return {
-    total_repair_cost: 160000,
-    average_repair_cost: 20000,
-    cost_trend: 'increasing',
-  };
-}
-
-async function calculateMTTRMTBF(farmerId) {
-  return {
-    mttr: 24, // Mean Time To Repair
-    mtbf: 480, // Mean Time Between Failures
-    reliability_score: 95,
-  };
-}
-
-async function generatePreventiveRecommendations(farmerId) {
-  return [
-    'Increase preventive maintenance frequency',
-    'Implement condition monitoring',
-    'Review operator training programs',
-  ];
-}
-
-/**
- * List breakdown reports. No list route existed at all before this
- * (2026-08-24).
- */
-async function listBreakdowns({ page = 1, limit = 20, farmer_id = null, status = null } = {}) {
-  const offset = (Number(page) - 1) * Number(limit);
-  const conditions = [];
-  const params = [];
-  if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
-  if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-
-  const totalRes = await pool.query(`SELECT COUNT(*) FROM equipment_breakdowns ${where}`, params);
-  const total = parseInt(totalRes.rows[0].count, 10);
-
-  const listParams = [...params, limit, offset];
-  const res = await pool.query(
-    `SELECT * FROM equipment_breakdowns ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams,
-  );
-  return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
-}
-
-async function getBreakdown(id) {
-  const res = await pool.query('SELECT * FROM equipment_breakdowns WHERE breakdown_id = $1', [id]);
-  return res.rows[0] || null;
-}
-
-module.exports = {
-  listBreakdowns,
-  getBreakdown,
-  reportBreakdown,
-  scheduleEmergencyRepair,
-  trackDowntime,
-  generateBreakdownReport,
-};
-
+module.exports = new M107Service();

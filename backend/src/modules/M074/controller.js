@@ -1,76 +1,109 @@
-﻿// Controller for Sheep Management (M074) - AI Enhanced
-const service = require('./service');
+const m074Service = require('./service');
 const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-async function registerSheepFlock(req, res) {
-  try {
-    const flock = await service.registerSheepFlock(req.body);
-    res.status(201).json({ success: true, data: flock });
-  } catch (error) {
-    logger.error('registerSheepFlock error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+class M074Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
+
+      const result = await m074Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m074Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m074Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m074Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m074Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m074Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m074Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
 }
 
-async function getSheepFlock(req, res) {
-  try {
-    const flock = await service.getSheepFlock(req.params.flockId);
-    if (!flock) return res.status(404).json({ success: false, error: 'Flock not found' });
-    res.json({ success: true, data: flock });
-  } catch (error) {
-    logger.error('getSheepFlock error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function listSheepFlocks(req, res) {
-  try {
-    const { page, limit, farmId, breed, status } = req.query;
-    const result = await service.listSheepFlocks({ page, limit, farmId, breed, status });
-    res.json({ success: true, data: result });
-  } catch (error) {
-    logger.error('listSheepFlocks error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function updateSheepFlock(req, res) {
-  try {
-    const flock = await service.updateSheepFlock(req.params.flockId, req.body);
-    if (!flock) return res.status(404).json({ success: false, error: 'Flock not found' });
-    res.json({ success: true, data: flock });
-  } catch (error) {
-    logger.error('updateSheepFlock error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function analyzeSheepProduction(req, res) {
-  try {
-    const analysis = await service.analyzeSheepProduction(req.params.flockId);
-    res.json({ success: true, data: analysis });
-  } catch (error) {
-    logger.error('analyzeSheepProduction error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function getSheepAnalytics(req, res) {
-  try {
-    const { startDate, endDate, farmId } = req.query;
-    const analytics = await service.getSheepAnalytics({ startDate, endDate, farmId });
-    res.json({ success: true, data: analytics });
-  } catch (error) {
-    logger.error('getSheepAnalytics error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-module.exports = {
-  registerSheepFlock,
-  getSheepFlock,
-  listSheepFlocks,
-  updateSheepFlock,
-  analyzeSheepProduction,
-  getSheepAnalytics,
-};
+module.exports = new M074Controller();

@@ -1,416 +1,243 @@
-/**
- * Fuel Management Service (M108)
- * Fuel inventory tracking, consumption monitoring, and cost optimization
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Record fuel purchase
- */
-async function recordFuelPurchase(purchaseData) {
-  try {
-    const {
-      farmer_id,
-      fuel_type,
-      quantity_liters,
-      cost_per_liter,
-      total_cost,
-      supplier,
-      purchase_date,
-      location,
-      state,
-      district,
-      vehicle_id,
-    } = purchaseData;
+class M108Service {
+  constructor() {
+    this.table = 'workflows';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-    const purchase = {
-      purchase_id: generateId(),
-      farmer_id,
-      fuel_type,
-      quantity_liters,
-      cost_per_liter,
-      total_cost,
-      supplier,
-      purchase_date,
-      location,
-      state,
-      district,
-      vehicle_id,
-      created_at: new Date().toISOString(),
-    };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    // AI-powered fuel price analysis
-    const aiRequest = {
-      task: 'fuel_price_analysis',
-      parameters: {
-        purchase_data: purchaseData,
-        market_prices: await getMarketPrices(fuel_type, state, district),
-        price_trends: await getPriceTrends(fuel_type, state),
-        optimal_purchase_timing: await getOptimalPurchaseTiming(fuel_type, state),
-        supplier_comparison: await compareSuppliers(fuel_type, state),
-      },
-    };
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    purchase.ai_analysis = aiResponse;
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-    const result = await pool.query(
-      `INSERT INTO fuel_purchases 
-       (purchase_id, farmer_id, fuel_type, quantity_liters, cost_per_liter, 
-        total_cost, supplier, purchase_date, location, state, district, vehicle_id, ai_analysis, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-       RETURNING *`,
-      [
-        purchase.purchase_id,
-        purchase.farmer_id,
-        purchase.fuel_type,
-        purchase.quantity_liters,
-        purchase.cost_per_liter,
-        purchase.total_cost,
-        purchase.supplier,
-        purchase.purchase_date,
-        purchase.location,
-        purchase.state,
-        purchase.district,
-        purchase.vehicle_id,
-        JSON.stringify(purchase.ai_analysis),
-        purchase.created_at,
-      ],
-    );
+        validated[field] = value;
+      }
+    }
 
-    logger.info(`Fuel purchase recorded: ${purchase.purchase_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error recording fuel purchase', { error: error.message, stack: error.stack });
-    throw new Error('Failed to record fuel purchase');
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Record fuel consumption
- */
-async function recordFuelConsumption(consumptionData) {
-  try {
-    const {
-      vehicle_id,
-      equipment_id,
-      fuel_type,
-      quantity_liters,
-      odometer_reading,
-      work_hours,
-      operation_type,
-      operator_id,
-      consumption_date,
-    } = consumptionData;
-
-    const consumption = {
-      consumption_id: generateId(),
-      vehicle_id,
-      equipment_id,
-      fuel_type,
-      quantity_liters,
-      odometer_reading,
-      work_hours,
-      operation_type,
-      operator_id,
-      consumption_date,
-      created_at: new Date().toISOString(),
-    };
-
-    // AI-powered consumption analysis
-    const aiRequest = {
-      task: 'fuel_consumption_analysis',
-      parameters: {
-        consumption_data: consumptionData,
-        efficiency_benchmarks: await getEfficiencyBenchmarks(vehicle_id, fuel_type),
-        consumption_patterns: await getConsumptionPatterns(vehicle_id),
-        optimization_recommendations: await getOptimizationRecommendations(vehicle_id, operation_type),
-        abnormal_consumption: await detectAbnormalConsumption(vehicle_id, quantity_liters, work_hours),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    consumption.ai_analysis = aiResponse;
-
-    const result = await pool.query(
-      `INSERT INTO fuel_consumption 
-       (consumption_id, vehicle_id, equipment_id, fuel_type, quantity_liters, 
-        odometer_reading, work_hours, operation_type, operator_id, consumption_date, ai_analysis, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-       RETURNING *`,
-      [
-        consumption.consumption_id,
-        consumption.vehicle_id,
-        consumption.equipment_id,
-        consumption.fuel_type,
-        consumption.quantity_liters,
-        consumption.odometer_reading,
-        consumption.work_hours,
-        consumption.operation_type,
-        consumption.operator_id,
-        consumption.consumption_date,
-        JSON.stringify(consumption.ai_analysis),
-        consumption.created_at,
-      ],
-    );
-
-    logger.info(`Fuel consumption recorded: ${consumption.consumption_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error recording fuel consumption', { error: error.message, stack: error.stack });
-    throw new Error('Failed to record fuel consumption');
-  }
-}
-
-/**
- * Track fuel efficiency
- */
-async function trackFuelEfficiency(vehicleId, period) {
-  try {
-    const efficiency = {
-      tracking_id: generateId(),
-      vehicle_id: vehicleId,
-      period,
-      timestamp: new Date().toISOString(),
-      liters_per_hour: await getLitersPerHour(vehicleId, period),
-      liters_per_km: await getLitersPerKm(vehicleId, period),
-      cost_per_hour: await getCostPerHour(vehicleId, period),
-      efficiency_rating: await getEfficiencyRating(vehicleId, period),
-      recommendations: await generateEfficiencyRecommendations(vehicleId, period),
-    };
-
-    return efficiency;
-  } catch (error) {
-    logger.error('Error tracking fuel efficiency', { error: error.message, stack: error.stack });
-    throw new Error('Failed to track fuel efficiency');
-  }
-}
-
-/**
- * Generate fuel report
- */
-async function generateFuelReport(farmerId, reportType) {
-  try {
-    const report = {
-      report_id: generateId(),
-      farmer_id: farmerId,
-      report_type: reportType,
-      generated_at: new Date().toISOString(),
-      total_purchases: await getTotalPurchases(farmerId),
-      total_consumption: await getTotalConsumption(farmerId),
-      average_efficiency: await getAverageEfficiency(farmerId),
-      fuel_cost_analysis: await getFuelCostAnalysis(farmerId),
-      supplier_performance: await getSupplierPerformance(farmerId),
-      recommendations: await generateFuelRecommendations(farmerId),
-    };
-
-    return report;
-  } catch (error) {
-    logger.error('Error generating fuel report', { error: error.message, stack: error.stack });
-    throw new Error('Failed to generate fuel report');
-  }
-}
-
-function generateId() {
-  return `FUEL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getMarketPrices(fuelType, state, district) {
-  return {
-    current_price: 85,
-    price_range: { min: 82, max: 88 },
-    trend: 'stable',
-  };
-}
-
-async function getPriceTrends(fuelType, state) {
-  return {
-    trend: 'increasing',
-    weekly_change: 2,
-    monthly_change: 5,
-  };
-}
-
-async function getOptimalPurchaseTiming(fuelType, state) {
-  return {
-    best_day: 'Wednesday',
-    best_time: 'morning',
-    expected_savings: 3,
-  };
-}
-
-async function compareSuppliers(fuelType, state) {
-  return [
-    { supplier: 'A', price: 84, quality: 'high' },
-    { supplier: 'B', price: 86, quality: 'medium' },
-    { supplier: 'C', price: 85, quality: 'high' },
-  ];
-}
-
-async function getEfficiencyBenchmarks(vehicleId, fuelType) {
-  return {
-    target_liters_per_hour: 8,
-    target_liters_per_km: 0.5,
-    efficiency_range: { min: 7, max: 9 },
-  };
-}
-
-async function getConsumptionPatterns(vehicleId) {
-  return {
-    average_consumption: 8.5,
-    peak_consumption: 10,
-    off_peak_consumption: 7,
-  };
-}
-
-async function getOptimizationRecommendations(vehicleId, operationType) {
-  return [
-    'Maintain steady speed',
-    'Avoid idling',
-    'Use optimal gear ratios',
-  ];
-}
-
-async function detectAbnormalConsumption(vehicleId, quantity, hours) {
-  const rate = quantity / hours;
-  return {
-    abnormal: rate > 12,
-    rate,
-    possible_causes: rate > 12 ? ['engine_issue', 'heavy_load', 'inefficient_operation'] : [],
-  };
-}
-
-async function getLitersPerHour(vehicleId, period) {
-  return {
-    average: 8.5,
-    minimum: 7,
-    maximum: 10,
-  };
-}
-
-async function getLitersPerKm(vehicleId, period) {
-  return {
-    average: 0.5,
-    minimum: 0.4,
-    maximum: 0.6,
-  };
-}
-
-async function getCostPerHour(vehicleId, period) {
-  return {
-    average: 722.5,
-    minimum: 595,
-    maximum: 850,
-  };
-}
-
-async function getEfficiencyRating(vehicleId, period) {
-  return {
-    rating: 'good',
-    score: 85,
-    benchmark_comparison: '+5%',
-  };
-}
-
-async function generateEfficiencyRecommendations(vehicleId, period) {
-  return [
-    'Implement fuel-saving driving techniques',
-    'Schedule regular engine maintenance',
-    'Monitor tire pressure regularly',
-  ];
-}
-
-async function getTotalPurchases(farmerId) {
-  try {
-    const result = await pool.query(
-      'SELECT SUM(quantity_liters) as total, SUM(total_cost) as cost FROM fuel_purchases WHERE farmer_id = $1',
-      [farmerId],
-    );
-    return result.rows[0] || { total: 0, cost: 0 };
-  } catch (error) {
-    return { total: 0, cost: 0 };
-  }
-}
-
-async function getTotalConsumption(farmerId) {
-  try {
-    const result = await pool.query(
-      'SELECT SUM(quantity_liters) as total FROM fuel_consumption WHERE vehicle_id IN (SELECT vehicle_id FROM fleet_vehicles WHERE farmer_id = $1)',
-      [farmerId],
-    );
-    return result.rows[0]?.total || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-async function getAverageEfficiency(farmerId) {
-  return {
-    liters_per_hour: 8.2,
-    liters_per_km: 0.48,
-    efficiency_score: 82,
-  };
-}
-
-async function getFuelCostAnalysis(farmerId) {
-  return {
-    total_cost: 170000,
-    cost_per_liter: 85,
-    monthly_average: 28333,
-  };
-}
-
-async function getSupplierPerformance(farmerId) {
-  return [
-    { supplier: 'A', rating: 4.5, reliability: 95 },
-    { supplier: 'B', rating: 4.0, reliability: 90 },
-  ];
-}
-
-async function generateFuelRecommendations(farmerId) {
-  return [
-    'Consider bulk purchasing for discounts',
-    'Monitor market prices for optimal timing',
-    'Implement fuel conservation practices',
-  ];
-}
-
-/**
- * List fuel purchases. No list route existed at all before this
- * (2026-08-24).
- */
-async function listFuelPurchases({ page = 1, limit = 20, farmer_id = null } = {}) {
-  const offset = (Number(page) - 1) * Number(limit);
-  const conditions = [];
-  const params = [];
-  if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-
-  const totalRes = await pool.query(`SELECT COUNT(*) FROM fuel_purchases ${where}`, params);
-  const total = parseInt(totalRes.rows[0].count, 10);
-
-  const listParams = [...params, limit, offset];
-  const res = await pool.query(
-    `SELECT * FROM fuel_purchases ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams,
-  );
-  return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
-}
-
-async function getFuelPurchase(id) {
-  const res = await pool.query('SELECT * FROM fuel_purchases WHERE purchase_id = $1', [id]);
-  return res.rows[0] || null;
-}
-
-module.exports = {
-  listFuelPurchases,
-  getFuelPurchase,
-  recordFuelPurchase,
-  recordFuelConsumption,
-  trackFuelEfficiency,
-  generateFuelReport,
-};
-
+module.exports = new M108Service();

@@ -1,101 +1,109 @@
-// Controller for Orchard Management (M141)
-const service = require('./service');
+const m141Service = require('./service');
 const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-async function listOrchards(req, res) {
-  try {
-    const { page, limit, farmerId } = req.query;
-    const result = await service.listOrchards({ page, limit, farmerId });
-    res.json({ success: true, data: result });
-  } catch (error) {
-    logger.error('listOrchards error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+class M141Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
+
+      const result = await m141Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m141Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m141Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m141Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m141Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m141Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m141Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
 }
 
-async function getOrchard(req, res) {
-  try {
-    const orchard = await service.getOrchard(req.params.orchardId);
-    if (!orchard) return res.status(404).json({ success: false, error: 'Orchard not found' });
-    res.json({ success: true, data: orchard });
-  } catch (error) {
-    logger.error('getOrchard error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function createOrchard(req, res) {
-  try {
-    const orchard = await service.createOrchard(req.body);
-    res.status(201).json({ success: true, data: orchard });
-  } catch (error) {
-    logger.error('createOrchard error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function updateOrchard(req, res) {
-  try {
-    const orchard = await service.updateOrchard(req.params.orchardId, req.body);
-    if (!orchard) return res.status(404).json({ success: false, error: 'Orchard not found' });
-    res.json({ success: true, data: orchard });
-  } catch (error) {
-    logger.error('updateOrchard error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function deleteOrchard(req, res) {
-  try {
-    const deleted = await service.deleteOrchard(req.params.orchardId);
-    if (!deleted) return res.status(404).json({ success: false, error: 'Orchard not found' });
-    res.json({ success: true });
-  } catch (error) {
-    logger.error('deleteOrchard error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function getOrchardProduction(req, res) {
-  try {
-    const production = await service.getOrchardProduction(req.params.orchardId, req.query.year);
-    res.json({ success: true, data: production });
-  } catch (error) {
-    logger.error('getOrchardProduction error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function recordOrchardProduction(req, res) {
-  try {
-    // orchardId comes from the route param, but the service destructures it
-    // from the payload body - merge so the URL's :orchardId isn't silently
-    // ignored in favor of (or overwritten by) whatever the body contains.
-    const record = await service.recordOrchardProduction({ ...req.body, orchardId: req.params.orchardId });
-    res.status(201).json({ success: true, data: record });
-  } catch (error) {
-    logger.error('recordOrchardProduction error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function getOrchardAnalytics(req, res) {
-  try {
-    const analytics = await service.getOrchardAnalytics(req.params.orchardId);
-    res.json({ success: true, data: analytics });
-  } catch (error) {
-    logger.error('getOrchardAnalytics error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-module.exports = {
-  listOrchards,
-  getOrchard,
-  createOrchard,
-  updateOrchard,
-  deleteOrchard,
-  getOrchardProduction,
-  recordOrchardProduction,
-  getOrchardAnalytics,
-};
+module.exports = new M141Controller();

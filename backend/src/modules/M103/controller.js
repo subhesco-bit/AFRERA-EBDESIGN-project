@@ -1,70 +1,109 @@
-﻿/**
- * Controller for Equipment Inventory (M103)
- * Handles HTTP requests for equipment inventory operations
- */
+const m103Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const equipmentService = require('./service');
+class M103Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const listEquipment = async (req, res) => {
-  try {
-    const result = await equipmentService.listEquipment(req.query);
-    res.status(200).json({ success: true, data: result });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+      const result = await m103Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
   }
-};
 
-const getEquipment = async (req, res) => {
-  try {
-    const equipment = await equipmentService.getEquipment(req.params.id);
-    if (!equipment) return res.status(404).json({ success: false, error: 'Not found' });
-    res.status(200).json({ success: true, data: equipment });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m103Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
   }
-};
 
-const registerEquipment = async (req, res) => {
-  try {
-    const equipment = await equipmentService.registerEquipment(req.body);
-    res.status(201).json({ success: true, data: equipment });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m103Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const updateEquipmentStatus = async (req, res) => {
-  try {
-    const status = await equipmentService.updateEquipmentStatus(req.params.id, req.body);
-    res.status(200).json({ success: true, data: status });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m103Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const trackEquipmentUtilization = async (req, res) => {
-  try {
-    const utilization = await equipmentService.trackEquipmentUtilization(req.params.id, req.query.period);
-    res.status(200).json({ success: true, data: utilization });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m103Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
   }
-};
 
-const generateInventoryReport = async (req, res) => {
-  try {
-    const report = await equipmentService.generateInventoryReport(req.params.farmerId, req.query.reportType);
-    res.status(200).json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m103Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
   }
-};
 
-module.exports = {
-  listEquipment,
-  getEquipment,
-  registerEquipment,
-  updateEquipmentStatus,
-  trackEquipmentUtilization,
-  generateInventoryReport,
-};
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m103Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
+  }
+}
+
+module.exports = new M103Controller();

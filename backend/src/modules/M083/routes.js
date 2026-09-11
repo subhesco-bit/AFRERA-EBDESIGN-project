@@ -1,27 +1,68 @@
-﻿// Express routes for Performance Analytics (M083)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// Performance Metrics
-router.post('/metrics', controller.recordPerformanceMetric);
-router.get('/metrics/:entityId/:entityType', controller.getPerformanceMetrics);
+/**
+ * M083 Routes
+ * Base path: /api/m083
+ */
 
-// Performance Reports
-router.post('/reports/generate', controller.generatePerformanceReport);
+// Middleware
+router.use(authenticate);
 
-// Performance Trends
-router.post('/trends/analyze', controller.analyzePerformanceTrends);
+/**
+ * @route   GET /api/m083
+ * @desc    Get all m083 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
 
-// Performance Comparisons
-router.post('/comparisons', controller.comparePerformance);
+/**
+ * @route   POST /api/m083/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
 
-// Performance Targets
-router.post('/targets', controller.setPerformanceTarget);
-router.get('/targets/:entityId/:entityType', controller.getPerformanceTargets);
+/**
+ * @route   GET /api/m083/search
+ * @desc    Search m083 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
 
-// Performance Alerts
-router.post('/alerts', controller.createPerformanceAlert);
-router.get('/alerts/:entityId/:entityType', controller.getPerformanceAlerts);
+/**
+ * @route   POST /api/m083
+ * @desc    Create new m083
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m083/:id
+ * @desc    Get m083 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m083/:id
+ * @desc    Update m083
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m083/:id
+ * @desc    Delete (soft delete) m083
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

@@ -1,22 +1,68 @@
-// Express routes for Pig Herd Registration & Analytics (M075).
-// index.js's own header comment said "Irrigation Management" but the real
-// controller/service built here (registerPigHerd/listPigHerds/production
-// analysis) is pig herd-level tracking - a label/content mismatch found while
-// reconciling why this module's routes.js was empty despite 243+76 lines of
-// real code. Distinct from services/pigService.js (mounted at /api/v1/pig),
-// which tracks individual animals (weight/breeding/vaccination records) - this
-// module operates at the herd level (registration, aggregate production
-// analysis). Complementary, not a duplicate; not merged.
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-router.get('/herds', authMiddleware, controller.listPigHerds);
-router.get('/herds/:herdId', authMiddleware, controller.getPigHerd);
-router.post('/herds', authMiddleware, requireRole('farmer', 'admin'), controller.registerPigHerd);
-router.put('/herds/:herdId', authMiddleware, requireRole('farmer', 'admin'), controller.updatePigHerd);
-router.get('/herds/:herdId/production-analysis', authMiddleware, controller.analyzePigProduction);
-router.get('/analytics', authMiddleware, controller.getPigAnalytics);
+/**
+ * M075 Routes
+ * Base path: /api/m075
+ */
+
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m075
+ * @desc    Get all m075 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m075/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m075/search
+ * @desc    Search m075 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m075
+ * @desc    Create new m075
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m075/:id
+ * @desc    Get m075 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m075/:id
+ * @desc    Update m075
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m075/:id
+ * @desc    Delete (soft delete) m075
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

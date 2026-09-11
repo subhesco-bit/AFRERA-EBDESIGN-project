@@ -1,34 +1,68 @@
-﻿// Express routes for Data Visualization Dashboard (M081)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// Dashboard CRUD
-router.post('/dashboards', controller.createDashboard);
-router.get('/dashboards', controller.listDashboards);
-router.get('/dashboards/:id', controller.getDashboard);
-router.put('/dashboards/:id', controller.updateDashboard);
-router.delete('/dashboards/:id', controller.deleteDashboard);
+/**
+ * M081 Routes
+ * Base path: /api/m081
+ */
 
-// Widget management
-router.post('/dashboards/:id/widgets', controller.addWidget);
-router.get('/dashboards/:id/widgets', controller.getDashboardWidgets);
-router.put('/dashboards/:id/widgets/:widgetId', controller.updateWidget);
-router.delete('/dashboards/:id/widgets/:widgetId', controller.deleteWidget);
+// Middleware
+router.use(authenticate);
 
-// Data source management
-router.post('/dashboards/:id/datasources', controller.addDataSource);
-router.get('/dashboards/:id/datasources', controller.getDataSources);
+/**
+ * @route   GET /api/m081
+ * @desc    Get all m081 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
 
-// Filter management
-router.post('/dashboards/:id/filters', controller.addFilter);
-router.get('/dashboards/:id/filters', controller.getDashboardFilters);
+/**
+ * @route   POST /api/m081/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
 
-// Snapshots and sharing
-router.post('/dashboards/:id/snapshots', controller.createSnapshot);
-router.post('/dashboards/:id/share', controller.shareDashboard);
+/**
+ * @route   GET /api/m081/search
+ * @desc    Search m081 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
 
-// Analytics
-router.get('/dashboards/:id/analytics', controller.getDashboardAnalytics);
+/**
+ * @route   POST /api/m081
+ * @desc    Create new m081
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m081/:id
+ * @desc    Get m081 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m081/:id
+ * @desc    Update m081
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m081/:id
+ * @desc    Delete (soft delete) m081
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

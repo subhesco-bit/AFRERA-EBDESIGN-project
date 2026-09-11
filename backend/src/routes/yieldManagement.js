@@ -1,19 +1,20 @@
-const router = require('express').Router();
-const yieldService = require('../services/yieldManagementService');
-const auth = require('../middleware/auth');
+/**
+ * yield Management Routes
+ * Placeholder route module
+ */
 
-router.post('/farms/:farmId/yield', auth, async (req, res) => {
-  try {
-    const result = await yieldService.recordYield(req.params.farmId, req.body.crop_id, req.body.quantity, req.body.unit);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
+const express = require('express');
+const router = express.Router();
 
-router.get('/farms/:farmId/yield-trends', async (req, res) => {
-  try {
-    const result = await yieldService.getYieldTrends(req.params.farmId);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'yieldManagement',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

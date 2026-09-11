@@ -1,445 +1,243 @@
-/**
- * DATA-SOURCE DISCLOSURE (2026-08-29)
- * Same pattern as M122: registration/update/count/distribution functions are
- * real (read/write real tables); breed/vaccination/health-standard lookups
- * are legitimate static reference tables; but the performance, health,
- * mortality, weight-gain and farmer-summary metrics are static placeholders
- * regardless of flock/farmer ID. `frontend/src/pages/PoultryManagementPage.jsx`
- * calls `poultryAPI` (a separate legacy service, not this module) - this
- * module's actual frontend reachability is unconfirmed as of this pass; may
- * be a duplicate of that legacy poultry service, worth reconciling
- * separately. Needs real flock telemetry, not better-looking fake numbers -
- * tracked in .ai/tasks/ACTIVE.md.
- */
-/**
- * Poultry Management Service (M123)
- * Comprehensive poultry farming, health monitoring, and production management
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Register poultry flock
- */
-async function registerPoultryFlock(flockData) {
-  try {
-    const {
-      farmer_id,
-      flock_id,
-      breed,
-      bird_type,
-      bird_count,
-      age_weeks,
-      housing_type,
-      location,
-      state,
-      district,
-      registration_date,
-      purpose,
-      feed_type,
-    } = flockData;
+class M123Service {
+  constructor() {
+    this.table = 'learning';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-    const flock = {
-      flock_registry_id: generateId(),
-      flock_id,
-      farmer_id,
-      breed,
-      bird_type,
-      bird_count,
-      age_weeks,
-      housing_type,
-      location,
-      state,
-      district,
-      registration_date,
-      purpose,
-      feed_type,
-      status: 'registered',
-      created_at: new Date().toISOString(),
-    };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    // AI-powered poultry health assessment
-    const aiRequest = {
-      task: 'poultry_health_assessment',
-      parameters: {
-        flock_data: flockData,
-        breed_characteristics: await getBreedCharacteristics(breed),
-        regional_health_patterns: await getRegionalHealthPatterns(state, district),
-        vaccination_schedule: await getVaccinationSchedule(breed, age_weeks),
-        nutritional_requirements: await getNutritionalRequirements(breed, purpose),
-      },
-    };
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    flock.ai_health_assessment = aiResponse;
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-    const result = await pool.query(
-      `INSERT INTO poultry_registry 
-       (flock_registry_id, flock_id, farmer_id, breed, bird_type, bird_count, 
-        age_weeks, housing_type, location, state, district, registration_date, 
-        purpose, feed_type, status, ai_assessment, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
-       RETURNING *`,
-      [
-        flock.flock_registry_id,
-        flock.flock_id,
-        flock.farmer_id,
-        flock.breed,
-        flock.bird_type,
-        flock.bird_count,
-        flock.age_weeks,
-        flock.housing_type,
-        flock.location,
-        flock.state,
-        flock.district,
-        flock.registration_date,
-        flock.purpose,
-        flock.feed_type,
-        flock.status,
-        JSON.stringify(flock.ai_health_assessment),
-        flock.created_at,
-      ],
-    );
+        validated[field] = value;
+      }
+    }
 
-    logger.info(`Poultry flock registered: ${flock.flock_registry_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error registering poultry flock', { error: error.message, stack: error.stack });
-    throw new Error('Failed to register poultry flock');
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Update flock health record
- */
-async function updateFlockHealth(registryId, healthData) {
-  try {
-    const {
-      health_status,
-      mortality_rate,
-      feed_consumption,
-      water_consumption,
-      vaccination_records,
-      treatment_history,
-      egg_production,
-      weight_gains,
-    } = healthData;
-
-    const healthRecord = {
-      record_id: generateId(),
-      registry_id: registryId,
-      health_status,
-      mortality_rate,
-      feed_consumption,
-      water_consumption,
-      vaccination_records,
-      treatment_history,
-      egg_production,
-      weight_gains,
-      recorded_at: new Date().toISOString(),
-    };
-
-    const aiRequest = {
-      task: 'poultry_health_analysis',
-      parameters: {
-        registry_id: registryId,
-        health_data: healthData,
-        historical_health: await getFlockHealthHistory(registryId),
-        breed_standards: await getBreedHealthStandards(await getFlockBreed(registryId)),
-        environmental_factors: await getEnvironmentalFactors(await getFlockLocation(registryId)),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    healthRecord.ai_analysis = aiResponse;
-
-    await pool.query(
-      `UPDATE poultry_registry 
-       SET health_status = $1, updated_at = CURRENT_TIMESTAMP
-       WHERE flock_registry_id = $2`,
-      [health_status, registryId],
-    );
-
-    await pool.query(
-      `INSERT INTO poultry_health_records 
-       (record_id, registry_id, health_status, mortality_rate, feed_consumption, 
-        water_consumption, vaccination_records, treatment_history, egg_production, 
-        weight_gains, ai_analysis, recorded_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-      [
-        healthRecord.record_id,
-        registryId,
-        health_status,
-        mortality_rate,
-        JSON.stringify(feed_consumption),
-        JSON.stringify(water_consumption),
-        JSON.stringify(vaccination_records),
-        JSON.stringify(treatment_history),
-        JSON.stringify(egg_production),
-        JSON.stringify(weight_gains),
-        JSON.stringify(healthRecord.ai_analysis),
-        healthRecord.recorded_at,
-      ],
-    );
-
-    logger.info(`Poultry flock health updated: ${registryId}`);
-    return healthRecord;
-  } catch (error) {
-    logger.error('Error updating flock health', { error: error.message, stack: error.stack });
-    throw new Error('Failed to update flock health');
-  }
-}
-
-/**
- * Track flock performance
- */
-async function trackFlockPerformance(registryId, period) {
-  try {
-    const performance = {
-      tracking_id: generateId(),
-      registry_id: registryId,
-      period,
-      timestamp: new Date().toISOString(),
-      egg_production_metrics: await getEggProductionMetrics(registryId, period),
-      feed_efficiency: await calculateFeedEfficiency(registryId, period),
-      health_metrics: await getHealthMetrics(registryId, period),
-      mortality_analysis: await getMortalityAnalysis(registryId, period),
-      weight_gains: await getWeightGains(registryId, period),
-      recommendations: await generatePerformanceRecommendations(registryId, period),
-    };
-
-    return performance;
-  } catch (error) {
-    logger.error('Error tracking flock performance', { error: error.message, stack: error.stack });
-    throw new Error('Failed to track flock performance');
-  }
-}
-
-/**
- * Generate poultry management report
- */
-async function generatePoultryReport(farmerId, reportType) {
-  try {
-    const report = {
-      report_id: generateId(),
-      farmer_id: farmerId,
-      report_type: reportType,
-      generated_at: new Date().toISOString(),
-      flock_count: await getFlockCount(farmerId),
-      breed_distribution: await getBreedDistribution(farmerId),
-      health_summary: await getHealthSummary(farmerId),
-      production_metrics: await getProductionMetrics(farmerId),
-      vaccination_status: await getVaccinationStatus(farmerId),
-      recommendations: await generateFarmerRecommendations(farmerId),
-    };
-
-    return report;
-  } catch (error) {
-    logger.error('Error generating poultry report', { error: error.message, stack: error.stack });
-    throw new Error('Failed to generate poultry report');
-  }
-}
-
-function generateId() {
-  return `POU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getBreedCharacteristics(breed) {
-  return {
-    ideal_temperature: 20,
-    humidity_range: '60-70%',
-    space_per_bird: '0.5 sq ft',
-    lifespan_weeks: 72,
-  };
-}
-
-async function getRegionalHealthPatterns(state, district) {
-  return {
-    common_diseases: ['newcastle', 'avian_influenza', 'coccidiosis'],
-    vaccination_requirements: ['ndv', 'ib', 'ibd'],
-  };
-}
-
-async function getVaccinationSchedule(breed, ageWeeks) {
-  return [
-    { vaccine: 'NDV', due_week: 1, status: 'pending' },
-    { vaccine: 'IB', due_week: 2, status: 'pending' },
-    { vaccine: 'IBD', due_week: 3, status: 'pending' },
-  ];
-}
-
-async function getNutritionalRequirements(breed, purpose) {
-  return {
-    protein_percentage: 18,
-    energy_kcal: 2800,
-    calcium_percentage: 1.0,
-    phosphorus_percentage: 0.5,
-  };
-}
-
-async function getFlockHealthHistory(registryId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM poultry_health_records WHERE registry_id = $1 ORDER BY recorded_at DESC LIMIT 10',
-      [registryId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function getBreedHealthStandards(breed) {
-  return {
-    ideal_mortality_rate: 5,
-    target_feed_conversion: 1.8,
-    target_egg_production: 85,
-  };
-}
-
-async function getEnvironmentalFactors(location) {
-  return {
-    climate: 'tropical',
-    altitude: 100,
-    biosecurity_level: 'standard',
-  };
-}
-
-async function getFlockBreed(registryId) {
-  try {
-    const result = await pool.query(
-      'SELECT breed FROM poultry_registry WHERE flock_registry_id = $1',
-      [registryId],
-    );
-    return result.rows[0]?.breed || 'unknown';
-  } catch (error) {
-    return 'unknown';
-  }
-}
-
-async function getFlockLocation(registryId) {
-  try {
-    const result = await pool.query(
-      'SELECT location, state, district FROM poultry_registry WHERE flock_registry_id = $1',
-      [registryId],
-    );
-    return result.rows[0] || {};
-  } catch (error) {
-    return {};
-  }
-}
-
-async function getEggProductionMetrics(registryId, period) {
-  return {
-    total_eggs: 1000,
-    egg_rate: 85,
-    egg_weight: 60,
-    quality_grade: 'A',
-  };
-}
-
-async function calculateFeedEfficiency(registryId, period) {
-  return {
-    feed_conversion_ratio: 1.8,
-    feed_cost_per_kg: 2.5,
-    efficiency_rating: 'good',
-  };
-}
-
-async function getHealthMetrics(registryId, period) {
-  return {
-    overall_health_score: 80,
-    disease_incidence: 3,
-    mortality_rate: 4,
-  };
-}
-
-async function getMortalityAnalysis(registryId, period) {
-  return {
-    total_deaths: 20,
-    mortality_rate: 4,
-    causes: ['disease', 'predation', 'unknown'],
-  };
-}
-
-async function getWeightGains(registryId, period) {
-  return {
-    average_weight: 2.5,
-    weight_gain: 0.5,
-    growth_rate: 'normal',
-  };
-}
-
-async function generatePerformanceRecommendations(registryId, period) {
-  return [
-    'Optimize feed composition for better conversion',
-    'Improve biosecurity measures',
-    'Monitor environmental conditions',
-  ];
-}
-
-async function getFlockCount(farmerId) {
-  try {
-    const result = await pool.query(
-      'SELECT COUNT(*) as count FROM poultry_registry WHERE farmer_id = $1',
-      [farmerId],
-    );
-    return result.rows[0]?.count || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-async function getBreedDistribution(farmerId) {
-  try {
-    const result = await pool.query(
-      'SELECT breed, COUNT(*) as count FROM poultry_registry WHERE farmer_id = $1 GROUP BY breed',
-      [farmerId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function getHealthSummary(farmerId) {
-  return {
-    healthy: 80,
-    needs_attention: 15,
-    critical: 5,
-  };
-}
-
-async function getProductionMetrics(farmerId) {
-  return {
-    total_eggs: 50000,
-    average_egg_rate: 82,
-    total_meat_production: 1000,
-  };
-}
-
-async function getVaccinationStatus(farmerId) {
-  return {
-    fully_vaccinated: 70,
-    partially_vaccinated: 20,
-    not_vaccinated: 10,
-  };
-}
-
-async function generateFarmerRecommendations(farmerId) {
-  return [
-    'Complete vaccination schedule for all flocks',
-    'Implement regular health check-ups',
-    'Optimize feed management',
-  ];
-}
-
-module.exports = {
-  registerPoultryFlock,
-  updateFlockHealth,
-  trackFlockPerformance,
-  generatePoultryReport,
-};
-
+module.exports = new M123Service();

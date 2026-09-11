@@ -1,70 +1,109 @@
-﻿/**
- * Controller for Breakdown Maintenance (M107)
- * Handles HTTP requests for breakdown maintenance operations
- */
+const m107Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const breakdownService = require('./service');
+class M107Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const listBreakdowns = async (req, res) => {
-  try {
-    const result = await breakdownService.listBreakdowns(req.query);
-    res.status(200).json({ success: true, data: result });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+      const result = await m107Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
   }
-};
 
-const getBreakdown = async (req, res) => {
-  try {
-    const breakdown = await breakdownService.getBreakdown(req.params.id);
-    if (!breakdown) return res.status(404).json({ success: false, error: 'Not found' });
-    res.status(200).json({ success: true, data: breakdown });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m107Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
   }
-};
 
-const reportBreakdown = async (req, res) => {
-  try {
-    const breakdown = await breakdownService.reportBreakdown(req.body);
-    res.status(201).json({ success: true, data: breakdown });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m107Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const scheduleEmergencyRepair = async (req, res) => {
-  try {
-    const repair = await breakdownService.scheduleEmergencyRepair(req.params.id, req.body);
-    res.status(201).json({ success: true, data: repair });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m107Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const trackDowntime = async (req, res) => {
-  try {
-    const downtime = await breakdownService.trackDowntime(req.params.id, req.query.period);
-    res.status(200).json({ success: true, data: downtime });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m107Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
   }
-};
 
-const generateBreakdownReport = async (req, res) => {
-  try {
-    const report = await breakdownService.generateBreakdownReport(req.params.farmerId, req.query.reportType);
-    res.status(200).json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m107Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
   }
-};
 
-module.exports = {
-  listBreakdowns,
-  getBreakdown,
-  reportBreakdown,
-  scheduleEmergencyRepair,
-  trackDowntime,
-  generateBreakdownReport,
-};
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m107Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
+  }
+}
+
+module.exports = new M107Controller();

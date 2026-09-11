@@ -1,13 +1,68 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-router.post('/flocks', authMiddleware, requireRole('admin'), controller.registerPoultryFlock);
-router.get('/flocks', authMiddleware, controller.listPoultryFlocks);
-router.get('/flocks/:flockId', authMiddleware, controller.getPoultryFlock);
-router.put('/flocks/:flockId', authMiddleware, requireRole('admin'), controller.updatePoultryFlock);
-router.get('/flocks/:flockId/analysis', authMiddleware, controller.analyzeEggProduction);
-router.get('/analytics', authMiddleware, requireRole('admin'), controller.getPoultryAnalytics);
+/**
+ * M072 Routes
+ * Base path: /api/m072
+ */
+
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m072
+ * @desc    Get all m072 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m072/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m072/search
+ * @desc    Search m072 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m072
+ * @desc    Create new m072
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m072/:id
+ * @desc    Get m072 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m072/:id
+ * @desc    Update m072
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m072/:id
+ * @desc    Delete (soft delete) m072
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

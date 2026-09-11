@@ -1,14 +1,68 @@
-// Express routes for Harvest Planning (M069)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// Public get/list endpoints, protected writes (mirrors M022's convention).
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('farmer', 'admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('farmer', 'admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('farmer', 'admin'), controller.remove);
+/**
+ * M069 Routes
+ * Base path: /api/m069
+ */
+
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m069
+ * @desc    Get all m069 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m069/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m069/search
+ * @desc    Search m069 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m069
+ * @desc    Create new m069
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m069/:id
+ * @desc    Get m069 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m069/:id
+ * @desc    Update m069
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m069/:id
+ * @desc    Delete (soft delete) m069
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

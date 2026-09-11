@@ -1,13 +1,68 @@
-﻿// Express routes for Implement Management (M102)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-router.get('/', controller.listImplements);
-router.get('/:id', controller.getImplement);
-router.post('/register', controller.registerImplement);
-router.put('/maintenance/:id', controller.updateImplementMaintenance);
-router.get('/usage/:id', controller.trackImplementUsage);
-router.get('/report/:farmerId', controller.generateImplementReport);
+/**
+ * M102 Routes
+ * Base path: /api/m102
+ */
+
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m102
+ * @desc    Get all m102 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m102/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m102/search
+ * @desc    Search m102 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m102
+ * @desc    Create new m102
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m102/:id
+ * @desc    Get m102 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m102/:id
+ * @desc    Update m102
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m102/:id
+ * @desc    Delete (soft delete) m102
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

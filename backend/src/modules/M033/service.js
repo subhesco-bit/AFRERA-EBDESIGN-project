@@ -1,111 +1,243 @@
-// Service for M033 Module — Farm Equipment Maintenance Log
-//
-// Tracks usage hours on farm equipment (tractors, pumps, threshers, etc.)
-// and computes whether each piece is due/overdue for service based on a
-// service-interval-hours threshold, plus an estimated calendar due date
-// from the equipment's average daily usage rate.
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-const tableName = 'agronomist_m033_items';
-
-// Standard service intervals (engine hours) by equipment type, used as a
-// fallback when a piece of equipment doesn't specify its own interval.
-const DEFAULT_SERVICE_INTERVAL_HOURS = {
-  tractor: 250,
-  irrigation_pump: 500,
-  thresher: 150,
-  power_tiller: 200,
-  sprayer: 100
-};
-
-/**
- * Compute maintenance status for one equipment record.
- */
-function computeMaintenanceStatus(equipment) {
-  const {
-    equipment_type, usage_hours = 0, last_service_hours = 0,
-    service_interval_hours, purchase_date, daily_usage_hours_avg
-  } = equipment;
-
-  const interval = service_interval_hours || DEFAULT_SERVICE_INTERVAL_HOURS[String(equipment_type || '').toLowerCase()] || 200;
-  const hoursSinceService = Math.max(0, usage_hours - last_service_hours);
-  const hoursRemaining = interval - hoursSinceService;
-  const percentUsed = Math.round((hoursSinceService / interval) * 1000) / 10;
-
-  let status = 'ok';
-  if (hoursRemaining <= 0) status = 'overdue';
-  else if (hoursRemaining <= interval * 0.1) status = 'due_soon';
-
-  // Estimate calendar due date from average daily usage, if known.
-  let estimatedDueDate = null;
-  if (daily_usage_hours_avg && daily_usage_hours_avg > 0 && hoursRemaining > 0) {
-    const daysRemaining = Math.ceil(hoursRemaining / daily_usage_hours_avg);
-    estimatedDueDate = new Date(Date.now() + daysRemaining * 86400000).toISOString().slice(0, 10);
+class M033Service {
+  constructor() {
+    this.table = 'logistics';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
   }
 
-  return {
-    equipment_type,
-    service_interval_hours: interval,
-    hours_since_service: hoursSinceService,
-    hours_remaining: hoursRemaining,
-    percent_of_interval_used: percentUsed,
-    status,
-    estimated_due_date: estimatedDueDate,
-    reasoning: `${hoursSinceService} of ${interval} interval hours used (${percentUsed}%). ` +
-      (status === 'overdue'
-        ? `Overdue by ${Math.abs(hoursRemaining)} hours.`
-        : status === 'due_soon'
-          ? `Due soon — within 10% of the service interval.`
-          : `Within normal service window.`)
-  };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
+
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
+
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
+
+        validated[field] = value;
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
+  }
 }
 
-async function listItems({ page = 1, limit = 20 } = {}) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-  const totalRes = await pg.query(`SELECT COUNT(*) FROM ${tableName}`);
-  const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query(`SELECT * FROM ${tableName} ORDER BY created_at DESC LIMIT $1 OFFSET $2`, [limit, offset]);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-}
-
-async function getItem(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
-  return res.rows[0] || null;
-}
-
-async function createItem(payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`INSERT INTO ${tableName} (data, created_at) VALUES ($1, NOW()) RETURNING *`, [payload]);
-  return res.rows[0];
-}
-
-async function updateItem(id, payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`, [payload, id]);
-  return res.rows[0] || null;
-}
-
-async function deleteItem(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
-}
-
-/**
- * List all equipment items whose computed status is due_soon or overdue.
- */
-async function listDueForService() {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE data->>'record_type' = 'equipment'`);
-  return res.rows
-    .map(row => ({ ...row, maintenance: computeMaintenanceStatus(row.data || {}) }))
-    .filter(row => row.maintenance.status !== 'ok');
-}
-
-module.exports = {
-  listItems, getItem, createItem, updateItem, deleteItem,
-  DEFAULT_SERVICE_INTERVAL_HOURS, computeMaintenanceStatus, listDueForService
-};
+module.exports = new M033Service();

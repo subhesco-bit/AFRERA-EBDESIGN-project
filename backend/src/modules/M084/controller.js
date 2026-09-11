@@ -1,137 +1,109 @@
-﻿/**
- * Controller for Trend Analysis (M084)
- * Handles HTTP requests for trend analysis operations
- */
+const m084Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const trendService = require('./service');
+class M084Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-function sendError(res, error) {
-  const status = error.statusCode || (error.code === 'VALIDATION_ERROR' ? 400 : 500);
-  res.status(status).json({ success: false, error: { code: error.code || 'INTERNAL_ERROR', message: error.message } });
+      const result = await m084Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m084Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m084Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m084Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m084Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m084Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m084Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
+  }
 }
 
-const createTrendDefinition = async (req, res) => {
-  try {
-    const trend = await trendService.createTrendDefinition(req.body);
-    res.status(201).json({ success: true, data: trend });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const addDataPoint = async (req, res) => {
-  try {
-    const dataPoint = await trendService.addDataPoint(req.params.id, req.body);
-    res.status(201).json({ success: true, data: dataPoint });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const getTrendDataPoints = async (req, res) => {
-  try {
-    const dataPoints = await trendService.getTrendDataPoints(req.params.id, req.query);
-    res.status(200).json({ success: true, data: dataPoints });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const analyzeTrend = async (req, res) => {
-  try {
-    const { trend_id, analysis_type, period_start, period_end } = req.body;
-    const analysis = await trendService.analyzeTrend(trend_id, analysis_type, period_start, period_end);
-    res.status(201).json({ success: true, data: analysis });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const generateTrendForecast = async (req, res) => {
-  try {
-    const { trend_id, forecast_type, forecast_horizon } = req.body;
-    const forecast = await trendService.generateTrendForecast(trend_id, forecast_type, forecast_horizon);
-    res.status(201).json({ success: true, data: forecast });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const detectSeasonality = async (req, res) => {
-  try {
-    const seasonality = await trendService.detectSeasonality(req.params.id);
-    res.status(201).json({ success: true, data: seasonality });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const calculateCorrelation = async (req, res) => {
-  try {
-    const { trend_id, correlated_metric } = req.body;
-    const correlation = await trendService.calculateCorrelation(trend_id, correlated_metric);
-    res.status(201).json({ success: true, data: correlation });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const detectBreakpoints = async (req, res) => {
-  try {
-    const breakpoints = await trendService.detectBreakpoints(req.params.id);
-    res.status(201).json({ success: true, data: breakpoints });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const createTrendAlert = async (req, res) => {
-  try {
-    const alert = await trendService.createTrendAlert(req.body);
-    res.status(201).json({ success: true, data: alert });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
-
-const getTrendAlerts = async (req, res) => {
-  try {
-    const alerts = await trendService.getTrendAlerts(req.params.id, req.query);
-    res.status(200).json({ success: true, data: alerts });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  createTrendDefinition,
-  addDataPoint,
-  getTrendDataPoints,
-  analyzeTrend,
-  generateTrendForecast,
-  detectSeasonality,
-  calculateCorrelation,
-  detectBreakpoints,
-  createTrendAlert,
-  getTrendAlerts,
-  createDisasterAlert: async (req, res) => {
-    try { res.status(201).json({ success: true, data: await trendService.createDisasterAlert(req.body) }); }
-    catch (error) { sendError(res, error); }
-  },
-  listDisasterAlerts: async (req, res) => {
-    try { res.json({ success: true, data: await trendService.listDisasterAlerts(req.query) }); }
-    catch (error) { sendError(res, error); }
-  },
-  getDisasterAlert: async (req, res) => {
-    try { const alert = await trendService.getDisasterAlert(req.params.id); if (!alert) return res.status(404).json({ success: false, error: 'Disaster alert not found' }); res.json({ success: true, data: alert }); }
-    catch (error) { sendError(res, error); }
-  },
-  cancelDisasterAlert: async (req, res) => {
-    try { const alert = await trendService.cancelDisasterAlert(req.params.id, req.body); if (!alert) return res.status(404).json({ success: false, error: 'Disaster alert not found or already cancelled' }); res.json({ success: true, data: alert }); }
-    catch (error) { sendError(res, error); }
-  },
-  getDisasterAlertAdvisory: async (req, res) => {
-    try { const advisory = await trendService.getDisasterAlertAdvisory(req.params.id); if (!advisory) return res.status(404).json({ success: false, error: 'Disaster alert not found' }); res.json({ success: true, data: advisory }); }
-    catch (error) { sendError(res, error); }
-  },
-};
+module.exports = new M084Controller();

@@ -1,34 +1,68 @@
-﻿// Express routes for Business Metrics & KPIs Tracking (M082)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// KPI Definitions
-router.post('/kpi-definitions', controller.createKPIDefinition);
-router.get('/kpi-definitions', controller.listKPIDefinitions);
-router.get('/kpi-definitions/:id', controller.getKPIDefinition);
+/**
+ * M082 Routes
+ * Base path: /api/m082
+ */
 
-// KPI Measurements
-router.post('/kpi-measurements', controller.recordKPIMeasurement);
-router.get('/kpi-definitions/:id/measurements', controller.getKPIMeasurements);
+// Middleware
+router.use(authenticate);
 
-// KPI Targets
-router.post('/kpi-targets', controller.setKPITarget);
-router.get('/kpi-definitions/:id/targets', controller.getKPITargets);
+/**
+ * @route   GET /api/m082
+ * @desc    Get all m082 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
 
-// KPI Scores
-router.post('/kpi-scores/calculate', controller.calculateKPIScore);
+/**
+ * @route   POST /api/m082/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
 
-// KPI Alerts
-router.post('/kpi-alerts', controller.createKPIAlert);
-router.get('/kpi-definitions/:id/alerts', controller.getKPIAlerts);
+/**
+ * @route   GET /api/m082/search
+ * @desc    Search m082 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
 
-// Benchmarks
-router.post('/benchmarks', controller.addBenchmark);
-router.get('/kpi-definitions/:id/benchmarks', controller.getBenchmarks);
+/**
+ * @route   POST /api/m082
+ * @desc    Create new m082
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
 
-// Dimensions
-router.post('/dimensions', controller.addDimension);
-router.get('/kpi-definitions/:id/dimensions', controller.getDimensions);
+/**
+ * @route   GET /api/m082/:id
+ * @desc    Get m082 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m082/:id
+ * @desc    Update m082
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m082/:id
+ * @desc    Delete (soft delete) m082
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

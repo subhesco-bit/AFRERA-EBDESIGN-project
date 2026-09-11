@@ -1,25 +1,68 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { FARM_OPERATIONS_ROLES } = require('../../middleware/roleGroups');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// Seed Planning CRUD
-router.post('/plans', authMiddleware, controller.createSeedPlan);
-router.get('/plans', authMiddleware, controller.listSeedPlans);
-router.get('/plans/:planId', authMiddleware, controller.getSeedPlan);
-router.put('/plans/:planId', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), controller.updateSeedPlan);
-router.delete('/plans/:planId', authMiddleware, requireRole('admin'), controller.deleteSeedPlan);
+/**
+ * M045 Routes
+ * Base path: /api/m045
+ */
 
-// AI-powered calculation
-router.post('/calculate-requirements', authMiddleware, controller.calculateSeedRequirements);
+// Middleware
+router.use(authenticate);
 
-// Supplier management
-router.post('/suppliers', authMiddleware, requireRole('admin'), controller.addSeedSupplier);
-router.get('/suppliers', authMiddleware, controller.listSeedSuppliers);
+/**
+ * @route   GET /api/m045
+ * @desc    Get all m045 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
 
-// Analytics
-router.get('/plans/analytics', authMiddleware, requireRole('admin'), controller.getSeedAnalytics);
+/**
+ * @route   POST /api/m045/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m045/search
+ * @desc    Search m045 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m045
+ * @desc    Create new m045
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m045/:id
+ * @desc    Get m045 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m045/:id
+ * @desc    Update m045
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m045/:id
+ * @desc    Delete (soft delete) m045
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;
-

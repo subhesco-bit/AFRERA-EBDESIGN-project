@@ -1,127 +1,109 @@
-﻿// Controller for Crop Variety (M044) - AI Enhanced
-const service = require('./service');
+const m044Service = require('./service');
 const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-// CRUD
-async function createVariety(req, res) {
-  try {
-    const variety = await service.createVariety(req.body);
-    res.status(201).json({ success: true, data: variety });
-  } catch (error) {
-    logger.error('createVariety error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+class M044Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
+
+      const result = await m044Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m044Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m044Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m044Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m044Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m044Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m044Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
 }
 
-async function getVariety(req, res) {
-  try {
-    const variety = await service.getVariety(req.params.varietyId);
-    if (!variety) return res.status(404).json({ success: false, error: 'Crop variety not found' });
-    res.json({ success: true, data: variety });
-  } catch (error) {
-    logger.error('getVariety error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function listVarieties(req, res) {
-  try {
-    const { page, limit, cropName, status } = req.query;
-    const result = await service.listVarieties({ page, limit, cropName, status });
-    res.json({ success: true, data: result });
-  } catch (error) {
-    logger.error('listVarieties error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function updateVariety(req, res) {
-  try {
-    const variety = await service.updateVariety(req.params.varietyId, req.body);
-    if (!variety) return res.status(404).json({ success: false, error: 'Crop variety not found' });
-    res.json({ success: true, data: variety });
-  } catch (error) {
-    logger.error('updateVariety error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function deleteVariety(req, res) {
-  try {
-    const success = await service.deleteVariety(req.params.varietyId);
-    if (!success) return res.status(404).json({ success: false, error: 'Crop variety not found' });
-    res.json({ success: true });
-  } catch (error) {
-    logger.error('deleteVariety error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// AI-powered recommendations
-async function recommendVarieties(req, res) {
-  try {
-    const { cropName } = req.params;
-    const conditions = req.body;
-    const recommendations = await service.recommendVarieties(cropName, conditions);
-    res.json({ success: true, data: recommendations });
-  } catch (error) {
-    logger.error('recommendVarieties error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// Performance tracking
-async function recordVarietyPerformance(req, res) {
-  try {
-    const performance = await service.recordVarietyPerformance(req.body);
-    res.status(201).json({ success: true, data: performance });
-  } catch (error) {
-    logger.error('recordVarietyPerformance error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function getVarietyPerformance(req, res) {
-  try {
-    const performance = await service.getVarietyPerformance(req.params.varietyId);
-    res.json({ success: true, data: performance });
-  } catch (error) {
-    logger.error('getVarietyPerformance error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function analyzeVarietyPerformance(req, res) {
-  try {
-    const analysis = await service.analyzeVarietyPerformance(req.params.varietyId);
-    res.json({ success: true, data: analysis });
-  } catch (error) {
-    logger.error('analyzeVarietyPerformance error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// Analytics
-async function getVarietyAnalytics(req, res) {
-  try {
-    const { cropName, startDate, endDate } = req.query;
-    const analytics = await service.getVarietyAnalytics({ cropName, startDate, endDate });
-    res.json({ success: true, data: analytics });
-  } catch (error) {
-    logger.error('getVarietyAnalytics error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-module.exports = {
-  createVariety,
-  getVariety,
-  listVarieties,
-  updateVariety,
-  deleteVariety,
-  recommendVarieties,
-  recordVarietyPerformance,
-  getVarietyPerformance,
-  analyzeVarietyPerformance,
-  getVarietyAnalytics,
-};
+module.exports = new M044Controller();

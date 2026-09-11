@@ -1,179 +1,243 @@
-/**
- * M119 — Employee Onboarding Checklist
- *
- * Strategy Card: see README.md.
- *
- * One row per employee's onboarding run: a list of required/optional tasks,
- * each with a due offset from the employee's start date. Real logic lives in
- * progress computation (percent complete, next-due item) and overdue
- * detection (dueDate = startDate + dueOffsetDays, past due and incomplete),
- * plus a status state machine (not_started -> in_progress -> completed)
- * driven by the checklist itself rather than set by hand.
- *
- * DATA SHAPE (core_m0nn_items.data JSONB, table fpo_m119_items):
- * {
- *   employeeId:   string
- *   employeeName: string
- *   department:   string
- *   role:         string
- *   startDate:    string (ISO date)
- *   status:       'not_started'|'in_progress'|'completed'
- *   checklistItems: [{
- *     id: string, task: string, category: string,      // 'paperwork'|'access'|'training'|'equipment'|'other'
- *     required: boolean, dueOffsetDays: number,          // relative to startDate
- *     completed: boolean, completedAt: string|null
- *   }]
- * }
- */
+const db = require('../../database/connection');
+const { logger } = require('../../utils/logger');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-const { getPostgreSQL } = require('../../database/connection');
+class M119Service {
+  constructor() {
+    this.table = 'inventory_mgmt';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-const tableName = 'fpo_m119_items';
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-function toRow(row) {
-  if (!row) return null;
-  const data = row.data || {};
-  return { id: row.id, ...data, created_at: row.created_at, updated_at: row.updated_at };
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
+
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
+
+        validated[field] = value;
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
+  }
 }
 
-function dayMs(n) { return n * 24 * 3600 * 1000; }
-
-/**
- * Real algorithm: percent complete (required items only count toward the
- * denominator that gates "completed" — optional items affect the reported
- * percentage but never block status transition), overdue items (dueDate
- * passed, not completed), and the single next-due item to work on.
- */
-function computeProgress(entry) {
-  const items = entry.checklistItems || [];
-  const startDate = entry.startDate ? new Date(entry.startDate) : null;
-  const now = Date.now();
-
-  const required = items.filter((i) => i.required !== false);
-  const requiredDone = required.filter((i) => i.completed).length;
-  const allDone = items.filter((i) => i.completed).length;
-
-  const withDue = items.map((i) => {
-    const dueDate = startDate && i.dueOffsetDays != null
-      ? new Date(startDate.getTime() + dayMs(i.dueOffsetDays)) : null;
-    const overdue = !!dueDate && !i.completed && dueDate.getTime() < now;
-    return { ...i, dueDate: dueDate ? dueDate.toISOString() : null, overdue };
-  });
-
-  const overdueItems = withDue.filter((i) => i.overdue);
-  const pending = withDue.filter((i) => !i.completed).sort((a, b) => {
-    if (!a.dueDate) return 1;
-    if (!b.dueDate) return -1;
-    return new Date(a.dueDate) - new Date(b.dueDate);
-  });
-
-  const percentComplete = items.length > 0 ? Number(((allDone / items.length) * 100).toFixed(1)) : 0;
-  const requiredPercentComplete = required.length > 0 ? Number(((requiredDone / required.length) * 100).toFixed(1)) : 100;
-
-  return {
-    percentComplete,
-    requiredPercentComplete,
-    totalItems: items.length,
-    completedItems: allDone,
-    overdueCount: overdueItems.length,
-    overdueItems,
-    nextDue: pending[0] || null,
-    computedStatus: requiredDone === 0 ? 'not_started' : requiredDone === required.length ? 'completed' : 'in_progress',
-    itemsWithDueDates: withDue,
-  };
-}
-
-async function listItems({ page = 1, limit = 20, status, department } = {}) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-  const where = [];
-  const params = [];
-  if (status) { params.push(status); where.push(`data->>'status' = $${params.length}`); }
-  if (department) { params.push(department); where.push(`data->>'department' = $${params.length}`); }
-  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
-
-  const totalRes = await pg.query(`SELECT COUNT(*) FROM ${tableName} ${whereSql}`, params);
-  const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query(
-    `SELECT * FROM ${tableName} ${whereSql} ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
-    [...params, limit, offset]
-  );
-  const items = res.rows.map(toRow).map((item) => ({ ...item, progress: computeProgress(item) }));
-  return { items, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-}
-
-async function getItem(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
-  const item = toRow(res.rows[0]);
-  return item ? { ...item, progress: computeProgress(item) } : null;
-}
-
-async function createItem(payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const checklistItems = Array.isArray(payload.checklistItems) ? payload.checklistItems : defaultChecklist();
-  const data = {
-    employeeId: payload.employeeId || null,
-    employeeName: payload.employeeName || null,
-    department: payload.department || null,
-    role: payload.role || null,
-    startDate: payload.startDate || new Date().toISOString().slice(0, 10),
-    status: 'not_started',
-    checklistItems: checklistItems.map((i, idx) => ({
-      id: i.id || `item-${idx + 1}`,
-      task: i.task,
-      category: i.category || 'other',
-      required: i.required !== false,
-      dueOffsetDays: i.dueOffsetDays ?? 7,
-      completed: false,
-      completedAt: null,
-    })),
-  };
-  const res = await pg.query(`INSERT INTO ${tableName} (data, created_at) VALUES ($1, NOW()) RETURNING *`, [data]);
-  return { ...toRow(res.rows[0]), progress: computeProgress(data) };
-}
-
-function defaultChecklist() {
-  return [
-    { task: 'Sign offer letter and employment agreement', category: 'paperwork', required: true, dueOffsetDays: 1 },
-    { task: 'Submit ID and bank details', category: 'paperwork', required: true, dueOffsetDays: 3 },
-    { task: 'Provision system access / email', category: 'access', required: true, dueOffsetDays: 1 },
-    { task: 'Issue equipment (laptop/phone)', category: 'equipment', required: true, dueOffsetDays: 2 },
-    { task: 'Complete platform orientation training', category: 'training', required: true, dueOffsetDays: 14 },
-    { task: 'Meet assigned buddy/manager', category: 'other', required: false, dueOffsetDays: 5 },
-  ];
-}
-
-/** Marks a checklist item complete/incomplete, then re-derives `status` from the state machine. */
-async function setChecklistItem(id, itemId, completed) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const existing = await getItem(id);
-  if (!existing) return null;
-  const { id: _drop, created_at, updated_at, progress: _p, ...prev } = existing;
-  const checklistItems = (prev.checklistItems || []).map((i) =>
-    i.id === itemId ? { ...i, completed: !!completed, completedAt: completed ? new Date().toISOString() : null } : i
-  );
-  const merged = { ...prev, checklistItems };
-  merged.status = computeProgress(merged).computedStatus;
-  const res = await pg.query(`UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`, [merged, id]);
-  return { ...toRow(res.rows[0]), progress: computeProgress(merged) };
-}
-
-async function updateItem(id, payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const existing = await getItem(id);
-  if (!existing) return null;
-  const { id: _drop, created_at, updated_at, progress: _p, ...prev } = existing;
-  const merged = { ...prev, ...payload };
-  if (merged.checklistItems) merged.status = computeProgress(merged).computedStatus;
-  const res = await pg.query(`UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`, [merged, id]);
-  return { ...toRow(res.rows[0]), progress: computeProgress(merged) };
-}
-
-async function deleteItem(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
-}
-
-module.exports = { listItems, getItem, createItem, updateItem, deleteItem, setChecklistItem, computeProgress };
+module.exports = new M119Service();

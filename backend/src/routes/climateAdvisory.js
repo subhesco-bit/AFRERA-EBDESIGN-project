@@ -1,11 +1,20 @@
-const router = require('express').Router();
-const climateService = require('../services/climateAdvisoryService');
+/**
+ * climate Advisory Routes
+ * Placeholder route module
+ */
 
-router.get('/farms/:farmId/climate-advisory', async (req, res) => {
-  try {
-    const result = await climateService.getClimateAdvisory(req.params.farmId);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'climateAdvisory',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

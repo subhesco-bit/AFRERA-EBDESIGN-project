@@ -1,32 +1,68 @@
-﻿// Express routes for Real-time Monitoring (M086)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// Monitoring Sources
-router.post('/sources', controller.createMonitoringSource);
+/**
+ * M086 Routes
+ * Base path: /api/m086
+ */
 
-// Monitoring Metrics
-router.post('/metrics', controller.addMonitoringMetric);
+// Middleware
+router.use(authenticate);
 
-// Real-time Data
-router.post('/data/ingest', controller.ingestRealTimeData);
-router.get('/data/:id', controller.getRealTimeData);
+/**
+ * @route   GET /api/m086
+ * @desc    Get all m086 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
 
-// Monitoring Dashboards
-router.post('/dashboards', controller.createMonitoringDashboard);
+/**
+ * @route   POST /api/m086/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
 
-// Dashboard Widgets
-router.post('/widgets', controller.addDashboardWidget);
+/**
+ * @route   GET /api/m086/search
+ * @desc    Search m086 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
 
-// Monitoring Alerts
-router.post('/alerts', controller.createMonitoringAlert);
-router.get('/alerts/:id', controller.getMonitoringAlerts);
+/**
+ * @route   POST /api/m086
+ * @desc    Create new m086
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
 
-// Monitoring Events
-router.post('/events', controller.logMonitoringEvent);
+/**
+ * @route   GET /api/m086/:id
+ * @desc    Get m086 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
 
-// Alert History
-router.get('/alerts/:id/history', controller.getAlertHistory);
+/**
+ * @route   PUT /api/m086/:id
+ * @desc    Update m086
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m086/:id
+ * @desc    Delete (soft delete) m086
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;
