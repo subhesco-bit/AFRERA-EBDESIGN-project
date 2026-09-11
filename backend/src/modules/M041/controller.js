@@ -2,6 +2,7 @@ const villageService = require('./service');
 const villageERPService = require('./villageERPService');
 const villageProjectService = require('./villageProjectIntelligenceService');
 const villageEconomyGeoService = require('./villageEconomyGeoService');
+const villageProductionPotentialService = require('./villageProductionPotentialService');
 const { logger } = require('../../utils/logger');
 const { sendSuccess, sendError } = require('../../utils/response');
 
@@ -53,6 +54,8 @@ class M041Controller {
   recordProduction(req, res) { return execute(res, 'recordProduction', () => villageEconomyGeoService.recordProduction(req.params.villageId, req.body), 400); }
   recordEconomicFlow(req, res) { return execute(res, 'recordEconomicFlow', () => villageEconomyGeoService.recordFlow(req.params.villageId, req.body), 400); }
   getEconomicBalance(req, res) { return execute(res, 'getEconomicBalance', () => villageEconomyGeoService.economicBalance(req.params.villageId, req.query), 404); }
+  getProductionPotential(req, res) { return execute(res, 'getProductionPotential', () => villageProductionPotentialService.productionPotential(req.params.villageId, req.query), 404); }
+  upsertProductionPotential(req, res) { return execute(res, 'upsertProductionPotential', () => villageProductionPotentialService.upsertProfile(req.params.villageId, req.body), 400); }
 }
 
 module.exports = new M041Controller();
