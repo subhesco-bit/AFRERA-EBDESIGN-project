@@ -5,9 +5,16 @@
  * Reconciles the existing repository into complete, self-contained systems
  * without deleting or replacing existing modules/files.
  *
- * Default execution is five modules per batch. Re-run the same command to
- * advance through the remaining inventory. The command reports completion
- * only when every discovered canonical module has been classified.
+ * Execution model:
+ *   - discovers canonical modules under /modules
+ *   - processes exactly five pending modules per batch by default
+ *   - persists after every batch
+ *   - automatically loops until every discovered module is classified
+ *   - never fabricates completion
+ *
+ * The command is intentionally an assembler/reconciliation layer. It records
+ * what is actually present and what remains incomplete; it does not turn a
+ * missing implementation into a false COMPLETE status.
  */
 const fs = require('fs');
 const path = require('path');
@@ -105,6 +112,7 @@ function loadState(modules) {
     cursor: 0,
     completed: false,
     modules: modules.map(name => ({ name, status: 'PENDING', attempts: 0 })),
+    batchHistory: [],
   };
 }
 
@@ -127,7 +135,7 @@ function persist(state) {
     '| Module | System | Status | Missing layers |', '|---|---|---|---|',
     ...rows, '',
     '## Rule', '',
-    'COMPLETE means evidence exists for purpose, requirements, features, backend, API, database, frontend, workflow, security and testing. Runtime correctness still requires verification/tests; the assembler never fabricates completion.', '',
+    'A system is COMPLETE only when evidence exists for purpose, requirements, features, backend, API, database, frontend, workflow, security and testing. Runtime correctness still requires verification/tests. The assembler never fabricates completion.', '',
     `## Overall: ${pending === 0 ? 'ASSEMBLY COMPLETE' : 'ASSEMBLY IN PROGRESS'}`, '',
   ].join('\n'));
 }
@@ -149,7 +157,12 @@ function processBatch(state) {
   state.cursor = state.modules.findIndex(m => m.status === 'PENDING');
   if (state.cursor < 0) state.cursor = state.modules.length;
   state.completed = !state.modules.some(m => m.status === 'PENDING');
-  state.lastBatch = { indexes, size: indexes.length, completedAt: new Date().toISOString() };
+  state.batchHistory.push({
+    batchNumber: state.batchHistory.length + 1,
+    indexes,
+    moduleNames: indexes.map(i => state.modules[i].name),
+    completedAt: new Date().toISOString(),
+  });
   return indexes.length;
 }
 
@@ -157,21 +170,31 @@ function main() {
   if (!Number.isInteger(BATCH_SIZE) || BATCH_SIZE < 1) throw new Error('SYSTEM_BATCH_SIZE must be a positive integer');
   const modules = discover();
   const state = loadState(modules);
-  const processed = processBatch(state);
-  persist(state);
+  let totalProcessedThisRun = 0;
+
+  // Five-at-a-time loop. Persist after every batch so an interrupted run can
+  // resume without repeating already classified modules.
+  while (state.modules.some(m => m.status === 'PENDING')) {
+    const processed = processBatch(state);
+    totalProcessedThisRun += processed;
+    persist(state);
+    if (processed === 0) break;
+  }
+
   const complete = state.modules.filter(m => m.status === 'COMPLETE').length;
   const incomplete = state.modules.filter(m => m.status === 'INCOMPLETE').length;
   const pending = state.modules.filter(m => m.status === 'PENDING').length;
   console.log(JSON.stringify({
-    batchProcessed: processed,
+    processedThisRun: totalProcessedThisRun,
     batchSize: BATCH_SIZE,
+    batchesRunThisInvocation: Math.ceil(totalProcessedThisRun / BATCH_SIZE),
     totalDiscovered: state.modules.length,
     completeSystems: complete,
     incompleteSystems: incomplete,
     pendingSystems: pending,
-    nextBatchStartsAt: state.cursor,
     commandComplete: state.completed,
     report: path.relative(ROOT, REPORT_FILE),
+    state: path.relative(ROOT, STATE_FILE),
   }, null, 2));
 }
 main();
