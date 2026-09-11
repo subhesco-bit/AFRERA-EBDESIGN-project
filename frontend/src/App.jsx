@@ -19,6 +19,7 @@ import analytics from './utils/analytics';
 import { MultilingualProvider } from './components/Multilingual/MultilingualProvider';
 import { AccessibilityProvider } from './components/Accessibility/AccessibilityProvider';
 import EnterpriseModuleResolver from './components/EnterpriseModuleResolver';
+import EnterprisePhysicalPageResolver from './components/EnterprisePhysicalPageResolver';
 import EnterprisePageEstateBoundary from './components/EnterprisePageEstateBoundary';
 
 const EconomicDashboard = lazy(() => import('./pages/economic/EconomicDashboard'));
@@ -78,6 +79,7 @@ function App() {
                     <Route key={route.path} path={route.path} element={<RoleRoute allowedRoles={route.role ? [route.role] : []}><PageTransition transition={route.transition}><RouteSuspense route={route}><route.component /></RouteSuspense></PageTransition></RoleRoute>} />
                   ))}
                   <Route path="/economic" element={<ProtectedRoute requiredRole="admin"><PageTransition transition="fade"><RouteSuspense><EconomicDashboard /></RouteSuspense></PageTransition></ProtectedRoute>} />
+                  <Route path="/enterprise/page/:pageId" element={<ProtectedRoute><PageTransition transition="fade"><RouteSuspense><EnterprisePhysicalPageResolver /></RouteSuspense></PageTransition></ProtectedRoute>} />
 
                   {Array.from({ length: 550 }, (_, i) => {
                     const moduleNum = i + 1;
