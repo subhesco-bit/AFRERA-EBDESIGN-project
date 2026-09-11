@@ -21,6 +21,16 @@ router.get('/villages/:villageId/finance', controller.getVillageFinance);
 router.post('/villages/:villageId/finance/initialize', controller.initializeFinance);
 router.post('/villages/:villageId/finance/journal', controller.postVillageJournal);
 
+// Village master operational entities
+router.get('/villages/:villageId/households', controller.listHouseholds);
+router.post('/villages/:villageId/households', controller.createHousehold);
+router.post('/households/:householdId/members', controller.addHouseholdMember);
+router.get('/villages/:villageId/enterprises', controller.listEnterprises);
+router.post('/villages/:villageId/enterprises', controller.createEnterprise);
+router.get('/villages/:villageId/budgets', controller.listBudgets);
+router.post('/villages/:villageId/budgets', controller.createBudget);
+router.get('/villages/:villageId/erp-overview', controller.getERPOverview);
+
 // Operational KPIs and workflow
 router.get('/villages/:villageId/dashboard', controller.getDashboard);
 router.post('/villages/:villageId/kpis', controller.upsertKPI);
@@ -33,5 +43,6 @@ router.post('/villages/:villageId/ai/insights', controller.generateAI);
 module.exports = {
   controller: require('./controller'),
   service: require('./service'),
+  erpService: require('./villageERPService'),
   router,
 };
