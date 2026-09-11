@@ -7,6 +7,28 @@ on:
 jobs:
   enterprise-product:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ebdesign_user
+          POSTGRES_PASSWORD: ebdesign_ci_password
+          POSTGRES_DB: ebdesign
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U ebdesign_user -d ebdesign"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      NODE_ENV: test
+      JWT_SECRET: m001-m050-ci-only-jwt-secret-not-for-production-2026
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: ebdesign_user
+      DB_PASSWORD: ebdesign_ci_password
+      DB_NAME: ebdesign
     defaults:
       run:
         working-directory: backend
@@ -19,10 +41,12 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - name: Backend install
         run: npm ci
+      - name: Database migration preflight and apply
+        run: npm run migrate
       - name: Batch release reachability audit
-        run: node ../tools/m001-m050-release-audit.js
-      - name: Enterprise product tests
-        run: npx jest tests/m001-m050-enterprise-product.test.js tests/m001-m050-highest-standard.test.js tests/m001-m050-workflow-orchestration.test.js --runInBand
+        run: npm run audit:m001-m050
+      - name: Enterprise product and real workflow tests
+        run: npx jest tests/m001-m050-enterprise-product.test.js tests/m001-m050-highest-standard.test.js tests/m001-m050-workflow-orchestration.test.js tests/m001-m050-db-workflows.e2e.test.js --runInBand
       - name: Verify exactly 50 enterprise specifications
         run: node -e "const s=require('./src/services/m001m050EnterpriseProductService');if(s.portfolio().length!==50)process.exit(1)"
       - name: Backend lint
