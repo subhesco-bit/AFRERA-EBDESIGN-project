@@ -18,6 +18,7 @@ import monitoring from './utils/monitoring';
 import analytics from './utils/analytics';
 import { MultilingualProvider } from './components/Multilingual/MultilingualProvider';
 import { AccessibilityProvider } from './components/Accessibility/AccessibilityProvider';
+import M001M050ProductionWiredPanel from './components/M001M050ProductionWiredPanel';
 import M051M100ProductionWiredPanel from './components/M051M100ProductionWiredPanel';
 
 const EconomicDashboard = lazy(() => import('./pages/economic/EconomicDashboard'));
@@ -81,14 +82,16 @@ function App() {
                   const moduleNum = i + 1;
                   const code = `M${String(moduleNum).padStart(3, '0')}`;
                   const ModulePage = lazy(() => import(`./modules/${code}/${code}Page.jsx`));
-                  const isWired = moduleNum >= 51 && moduleNum <= 100;
+                  const isM001M050 = moduleNum >= 1 && moduleNum <= 50;
+                  const isM051M100 = moduleNum >= 51 && moduleNum <= 100;
                   return (
                     <Route key={`/module/${code}`} path={`/module/${code}`} element={
                       <RoleRoute allowedRoles={['admin']}>
                         <PageTransition transition="fade">
                           <RouteSuspense>
                             <ModulePage />
-                            {isWired && <M051M100ProductionWiredPanel moduleCode={code} />}
+                            {isM001M050 && <M001M050ProductionWiredPanel moduleCode={code} />}
+                            {isM051M100 && <M051M100ProductionWiredPanel moduleCode={code} />}
                           </RouteSuspense>
                         </PageTransition>
                       </RoleRoute>
