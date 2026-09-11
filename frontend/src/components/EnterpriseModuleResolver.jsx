@@ -3,6 +3,7 @@ import M001M050OperationalWorkspace from './M001M050OperationalWorkspace';
 import M001M050ProductionWiredPanel from './M001M050ProductionWiredPanel';
 import M001M050HighestStandardPanel from './M001M050HighestStandardPanel';
 import M051M100ProductionWiredPanel from './M051M100ProductionWiredPanel';
+import M051M150EnterpriseWorkspace from './M051M150EnterpriseWorkspace';
 import UniversalEnterpriseModulePage from './UniversalEnterpriseModulePage';
 
 const pageLoaders=import.meta.glob('../modules/M*/M*Page.jsx');
@@ -12,7 +13,7 @@ export default function EnterpriseModuleResolver({moduleCode}){
  const loader=pageLoaders[`../modules/${moduleCode}/${moduleCode}Page.jsx`];
  const existing=loader?<ExistingPage moduleCode={moduleCode} loader={loader}/>:null;
  if(n<=50){return <M001M050OperationalWorkspace moduleCode={moduleCode}><>{existing||<UniversalEnterpriseModulePage moduleCode={moduleCode}/>}<M001M050ProductionWiredPanel moduleCode={moduleCode}/><M001M050HighestStandardPanel moduleCode={moduleCode}/></></M001M050OperationalWorkspace>;}
- if(n<=100){return <>{existing||<UniversalEnterpriseModulePage moduleCode={moduleCode}/>}<M051M100ProductionWiredPanel moduleCode={moduleCode}/></>;}
+ if(n<=150){return <M051M150EnterpriseWorkspace moduleCode={moduleCode}><>{existing||<UniversalEnterpriseModulePage moduleCode={moduleCode}/>} {n<=100&&<M051M100ProductionWiredPanel moduleCode={moduleCode}/>}</></M051M150EnterpriseWorkspace>;}
  return existing||<UniversalEnterpriseModulePage moduleCode={moduleCode}/>;
 }
 export const discoveredBespokeModulePages=Object.keys(pageLoaders);
