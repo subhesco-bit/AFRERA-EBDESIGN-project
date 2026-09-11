@@ -1,0 +1,33 @@
+{
+  "moduleId": "M445110_VILLAGEISSUES",
+  "version": "1.0.0",
+  "name": "Village Issues & Needs",
+  "description": "Village-level operational issues, unmet needs, lifecycle updates and escalation-ready data integrated with the existing village profile master.",
+  "category": "community",
+  "status": "WIRED",
+  "dependencies": {
+    "modules": ["M445100_VILLAGEPROFILE"],
+    "services": ["postgresql", "authentication"]
+  },
+  "backend": {
+    "service": "backend/src/services/legacy/villageIssuesService.js",
+    "route": "backend/src/routes/villageIssuesRoutes.js",
+    "basePath": "/api/v1/village-issues"
+  },
+  "database": {
+    "migration": "backend/src/database/migrations/061_village_issues_integration.sql",
+    "tables": ["village_issues", "village_issue_updates"],
+    "authority": "village_profiles"
+  },
+  "capabilities": [
+    "issue reporting",
+    "needs tracking",
+    "priority management",
+    "status lifecycle",
+    "assignment",
+    "field updates",
+    "village summary",
+    "district/block/state filtering",
+    "audit-ready history"
+  ]
+}

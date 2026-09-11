@@ -1,8 +1,9 @@
 /**
  * Village Profile Service
  *
- * Implements REOS Missing Layer 5: District/Village/Block Economic Database
- * Wires the existing `village_profiles` table (migration 052) to application logic
+ * Implements REOS Missing Layer 5: District/Village/Block Economic Database.
+ * Uses the existing `village_profiles` table as the single authoritative
+ * village master; schema reconciliation is migration 053.
  */
 
 'use strict';
@@ -10,24 +11,15 @@
 const pool = require('../../database/pool');
 const { logger } = require('../../utils/logger');
 
-const r2 = (n) => Math.round(n * 100) / 100;
+const r2 = (n) => (n == null ? null : Math.round(Number(n) * 100) / 100);
 
-/**
- * Get village profile by ID
- * @param {string} villageId - Village ID
- * @returns {Promise<Object>} Village profile
- */
 async function getVillageProfile(villageId) {
   try {
     const { rows } = await pool.query(
       'SELECT * FROM village_profiles WHERE village_id = $1',
       [villageId],
     );
-
-    if (!rows.length) {
-      throw new Error(`Village profile not found: ${villageId}`);
-    }
-
+    if (!rows.length) throw new Error(`Village profile not found: ${villageId}`);
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get village profile: ${error.message}`);
@@ -35,18 +27,12 @@ async function getVillageProfile(villageId) {
   }
 }
 
-/**
- * Get village profiles by district
- * @param {string} district - District name
- * @returns {Promise<Array>} Village profiles
- */
 async function getVillagesByDistrict(district) {
   try {
     const { rows } = await pool.query(
-      'SELECT * FROM village_profiles WHERE district = $1 ORDER BY village_name',
+      'SELECT * FROM village_profiles WHERE district = $1 ORDER BY village_name NULLS LAST, name',
       [district],
     );
-
     return rows;
   } catch (error) {
     logger.error(`Failed to get villages by district: ${error.message}`);
@@ -54,18 +40,12 @@ async function getVillagesByDistrict(district) {
   }
 }
 
-/**
- * Get village profiles by block
- * @param {string} block - Block name
- * @returns {Promise<Array>} Village profiles
- */
 async function getVillagesByBlock(block) {
   try {
     const { rows } = await pool.query(
-      'SELECT * FROM village_profiles WHERE block = $1 ORDER BY village_name',
+      'SELECT * FROM village_profiles WHERE block = $1 ORDER BY village_name NULLS LAST, name',
       [block],
     );
-
     return rows;
   } catch (error) {
     logger.error(`Failed to get villages by block: ${error.message}`);
@@ -73,45 +53,47 @@ async function getVillagesByBlock(block) {
   }
 }
 
-/**
- * Create or update village profile
- * @param {Object} profile - Village profile data
- * @returns {Promise<Object>} Created/updated profile
- */
 async function upsertVillageProfile(profile) {
   try {
     const {
-      village_id,
-      village_name,
+      village_id: villageId,
+      village_name: villageName,
+      name,
       district,
       block,
       state,
       population,
       households,
-      main_crops,
-      soil_type,
-      irrigation_coverage,
-      avg_income_per_household,
-      literacy_rate,
-      electrified_households,
-      road_access,
-      market_distance_km,
-      financial_institutions_count,
-      schools_count,
-      health_centers_count,
-      cooperative_societies_count,
+      main_crops: mainCrops,
+      soil_type: soilType,
+      irrigation_coverage: irrigationCoverage,
+      avg_income_per_household: avgIncomePerHousehold,
+      avg_income: avgIncome,
+      literacy_rate: literacyRate,
+      electrified_households: electrifiedHouseholds,
+      road_access: roadAccess,
+      market_distance_km: marketDistanceKm,
+      financial_institutions_count: financialInstitutionsCount,
+      schools_count: schoolsCount,
+      health_centers_count: healthCentersCount,
+      cooperative_societies_count: cooperativeSocietiesCount,
     } = profile;
 
+    const canonicalName = villageName || name;
+    if (!villageId) throw new Error('village_id is required');
+    if (!canonicalName) throw new Error('village_name or name is required');
+
     const { rows } = await pool.query(
-      `INSERT INTO village_profiles 
-        (village_id, village_name, district, block, state, population, households,
-         main_crops, soil_type, irrigation_coverage, avg_income_per_household,
+      `INSERT INTO village_profiles
+        (village_id, name, village_name, district, block, state, population, households,
+         main_crops, soil_type, irrigation_coverage, avg_income, avg_income_per_household,
          literacy_rate, electrified_households, road_access, market_distance_km,
          financial_institutions_count, schools_count, health_centers_count,
          cooperative_societies_count, last_updated)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW())
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, NOW())
        ON CONFLICT (village_id)
        DO UPDATE SET
+         name = EXCLUDED.name,
          village_name = EXCLUDED.village_name,
          district = EXCLUDED.district,
          block = EXCLUDED.block,
@@ -121,6 +103,7 @@ async function upsertVillageProfile(profile) {
          main_crops = EXCLUDED.main_crops,
          soil_type = EXCLUDED.soil_type,
          irrigation_coverage = EXCLUDED.irrigation_coverage,
+         avg_income = EXCLUDED.avg_income,
          avg_income_per_household = EXCLUDED.avg_income_per_household,
          literacy_rate = EXCLUDED.literacy_rate,
          electrified_households = EXCLUDED.electrified_households,
@@ -132,14 +115,14 @@ async function upsertVillageProfile(profile) {
          cooperative_societies_count = EXCLUDED.cooperative_societies_count,
          last_updated = NOW()
        RETURNING *`,
-      [village_id, village_name, district, block, state, population, households,
-        main_crops, soil_type, irrigation_coverage, avg_income_per_household,
-        literacy_rate, electrified_households, road_access, market_distance_km,
-        financial_institutions_count, schools_count, health_centers_count,
-        cooperative_societies_count],
+      [villageId, canonicalName, canonicalName, district, block, state, population, households,
+        mainCrops, soilType, irrigationCoverage, avgIncome ?? avgIncomePerHousehold,
+        avgIncomePerHousehold ?? avgIncome, literacyRate, electrifiedHouseholds, roadAccess,
+        marketDistanceKm, financialInstitutionsCount, schoolsCount, healthCentersCount,
+        cooperativeSocietiesCount],
     );
 
-    logger.info(`Village profile upserted: ${village_id}`);
+    logger.info(`Village profile upserted: ${villageId}`);
     return rows[0];
   } catch (error) {
     logger.error(`Failed to upsert village profile: ${error.message}`);
@@ -147,51 +130,43 @@ async function upsertVillageProfile(profile) {
   }
 }
 
-/**
- * Get district-level economic summary
- * @param {string} district - District name
- * @returns {Promise<Object>} District economic summary
- */
 async function getDistrictEconomicSummary(district) {
   try {
     const { rows } = await pool.query(
-      `SELECT 
+      `SELECT
          district,
-         COUNT(*) as total_villages,
-         SUM(population) as total_population,
-         SUM(households) as total_households,
-         AVG(avg_income_per_household) as avg_income_per_household,
-         AVG(literacy_rate) as avg_literacy_rate,
-         SUM(electrified_households) as total_electrified,
-         AVG(irrigation_coverage) as avg_irrigation_coverage,
-         SUM(financial_institutions_count) as total_financial_institutions,
-         SUM(schools_count) as total_schools,
-         SUM(health_centers_count) as total_health_centers,
-         SUM(cooperative_societies_count) as total_cooperatives
+         COUNT(*) AS total_villages,
+         COALESCE(SUM(population), 0) AS total_population,
+         COALESCE(SUM(households), 0) AS total_households,
+         AVG(COALESCE(avg_income_per_household, avg_income)) AS avg_income_per_household,
+         AVG(literacy_rate) AS avg_literacy_rate,
+         COALESCE(SUM(electrified_households), 0) AS total_electrified,
+         AVG(irrigation_coverage) AS avg_irrigation_coverage,
+         COALESCE(SUM(financial_institutions_count), 0) AS total_financial_institutions,
+         COALESCE(SUM(schools_count), 0) AS total_schools,
+         COALESCE(SUM(health_centers_count), 0) AS total_health_centers,
+         COALESCE(SUM(cooperative_societies_count), 0) AS total_cooperatives
        FROM village_profiles
        WHERE district = $1
        GROUP BY district`,
       [district],
     );
 
-    if (!rows.length) {
-      throw new Error(`No villages found in district: ${district}`);
-    }
-
+    if (!rows.length) throw new Error(`No villages found in district: ${district}`);
     const summary = rows[0];
     return {
       district: summary.district,
-      totalVillages: parseInt(summary.total_villages),
-      totalPopulation: parseInt(summary.total_population),
-      totalHouseholds: parseInt(summary.total_households),
+      totalVillages: Number(summary.total_villages),
+      totalPopulation: Number(summary.total_population),
+      totalHouseholds: Number(summary.total_households),
       avgIncomePerHousehold: r2(summary.avg_income_per_household),
       avgLiteracyRate: r2(summary.avg_literacy_rate),
-      totalElectrifiedHouseholds: parseInt(summary.total_electrified),
+      totalElectrifiedHouseholds: Number(summary.total_electrified),
       avgIrrigationCoverage: r2(summary.avg_irrigation_coverage),
-      totalFinancialInstitutions: parseInt(summary.total_financial_institutions),
-      totalSchools: parseInt(summary.total_schools),
-      totalHealthCenters: parseInt(summary.total_health_centers),
-      totalCooperatives: parseInt(summary.total_cooperatives),
+      totalFinancialInstitutions: Number(summary.total_financial_institutions),
+      totalSchools: Number(summary.total_schools),
+      totalHealthCenters: Number(summary.total_health_centers),
+      totalCooperatives: Number(summary.total_cooperatives),
     };
   } catch (error) {
     logger.error(`Failed to get district economic summary: ${error.message}`);
@@ -199,12 +174,7 @@ async function getDistrictEconomicSummary(district) {
   }
 }
 
-/**
- * Search villages by criteria
- * @param {Object} filters - Search filters
- * @returns {Promise<Array>} Matching villages
- */
-async function searchVillages(filters) {
+async function searchVillages(filters = {}) {
   try {
     const {
       district,
@@ -220,50 +190,27 @@ async function searchVillages(filters) {
     const params = [];
     let paramIndex = 1;
 
-    if (district) {
-      query += ` AND district = $${paramIndex}`;
-      params.push(district);
-      paramIndex++;
+    if (district) { query += ` AND district = $${paramIndex++}`; params.push(district); }
+    if (block) { query += ` AND block = $${paramIndex++}`; params.push(block); }
+    if (minPopulation !== undefined && minPopulation !== '') {
+      query += ` AND population >= $${paramIndex++}`; params.push(minPopulation);
     }
-
-    if (block) {
-      query += ` AND block = $${paramIndex}`;
-      params.push(block);
-      paramIndex++;
+    if (maxPopulation !== undefined && maxPopulation !== '') {
+      query += ` AND population <= $${paramIndex++}`; params.push(maxPopulation);
     }
-
-    if (minPopulation) {
-      query += ` AND population >= $${paramIndex}`;
-      params.push(minPopulation);
-      paramIndex++;
+    if (minIrrigationCoverage !== undefined && minIrrigationCoverage !== '') {
+      query += ` AND irrigation_coverage >= $${paramIndex++}`; params.push(minIrrigationCoverage);
     }
-
-    if (maxPopulation) {
-      query += ` AND population <= $${paramIndex}`;
-      params.push(maxPopulation);
-      paramIndex++;
+    if (hasRoadAccess !== undefined && hasRoadAccess !== '') {
+      query += ` AND road_access = $${paramIndex++}`;
+      params.push(hasRoadAccess === true || hasRoadAccess === 'true');
     }
-
-    if (minIrrigationCoverage) {
-      query += ` AND irrigation_coverage >= $${paramIndex}`;
-      params.push(minIrrigationCoverage);
-      paramIndex++;
-    }
-
-    if (hasRoadAccess !== undefined) {
-      query += ` AND road_access = $${paramIndex}`;
-      params.push(hasRoadAccess);
-      paramIndex++;
-    }
-
     if (mainCrop) {
-      query += ` AND main_crops LIKE $${paramIndex}`;
+      query += ` AND main_crops ILIKE $${paramIndex++}`;
       params.push(`%${mainCrop}%`);
-      paramIndex++;
     }
 
-    query += ' ORDER BY village_name LIMIT 100';
-
+    query += ' ORDER BY village_name NULLS LAST, name LIMIT 100';
     const { rows } = await pool.query(query, params);
     return rows;
   } catch (error) {
@@ -278,6 +225,17 @@ function setupRoutes(app) {
   const authMiddleware = require('../../middleware/auth');
 
   router.use(authMiddleware);
+
+  // Search must precede /villages/:villageId so the literal "search"
+  // path is not consumed as a village ID.
+  router.get('/villages/search', async (req, res) => {
+    try {
+      const villages = await searchVillages(req.query);
+      res.json({ success: true, data: villages });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
 
   router.get('/villages/:villageId', async (req, res) => {
     try {
@@ -324,15 +282,6 @@ function setupRoutes(app) {
     }
   });
 
-  router.get('/villages/search', async (req, res) => {
-    try {
-      const villages = await searchVillages(req.query);
-      res.json({ success: true, data: villages });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
-    }
-  });
-
   app.use('/api/v1/village-profiles', router);
   logger.info('Village profile routes mounted at /api/v1/village-profiles');
 }
@@ -347,24 +296,9 @@ module.exports = {
   setupRoutes,
 };
 
-// Merged from backend/src/modules/M019
-{
-  const m019 = require('../../modules/M019/service');
-  const { ...rest } = m019;
-  Object.assign(module.exports, rest);
+// Merged legacy exports retained for compatibility.
+for (const modulePath of ['../../modules/M019/service', '../../modules/M041/service', '../../modules/M054/service']) {
+  try { Object.assign(module.exports, require(modulePath)); } catch (error) {
+    logger.warn(`Optional legacy village service merge skipped: ${modulePath}: ${error.message}`);
+  }
 }
-
-// Merged from backend/src/modules/M041
-{
-  const m041 = require('../../modules/M041/service');
-  const { ...rest } = m041;
-  Object.assign(module.exports, rest);
-}
-
-// Merged from backend/src/modules/M054
-{
-  const m054 = require('../../modules/M054/service');
-  const { ...rest } = m054;
-  Object.assign(module.exports, rest);
-}
-
