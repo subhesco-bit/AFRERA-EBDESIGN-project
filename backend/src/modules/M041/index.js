@@ -2,6 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const authMiddleware = require('../../middleware/auth');
+
+router.use(authMiddleware);
 
 router.get('/villages', controller.getVillages);
 router.get('/villages/:villageId', controller.getVillage);
