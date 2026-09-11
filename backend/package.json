@@ -11,8 +11,9 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "migrate": "node src/database/migrate.js",
-    "seed": "node src/database/seed.js"
-    ,"audit:coverage": "node ../tools/route-audit.js"
+    "seed": "node src/database/seed.js",
+    "audit:coverage": "node ../tools/route-audit.js",
+    "audit:wiring": "node ../tools/production-wiring-audit.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
@@ -78,7 +79,6 @@
     "afrera",
     "agriculture",
     "marketplace",
-    "erp",
     "microservices"
   ],
   "author": "Ethnoverde Dynamics Pvt. Ltd.",
