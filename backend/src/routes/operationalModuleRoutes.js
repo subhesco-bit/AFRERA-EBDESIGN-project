@@ -1,11 +1,15 @@
 'use strict';
 
 const router = require('express').Router();
+const auth = require('../middleware/auth');
 const service = require('../services/operationalModuleService');
 
 function asyncHandler(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 }
+
+// Operational ERP data is tenant/user data, not a public catalogue.
+router.use(auth);
 
 router.get('/', asyncHandler(async (req, res) => {
   const entities = await service.listEntities({
@@ -53,6 +57,7 @@ router.__ebdesign = {
   contract: 'operational-module-v1',
   scope: 'MAIN-reconciled operational ERP capabilities',
   transactionalWrites: true,
+  authenticationRequired: true,
 };
 
 module.exports = router;
