@@ -26,6 +26,19 @@ router.post('/logistics/facilities', controller.upsertLogisticsFacility);
 router.get('/villages/:villageId/economy/balance', controller.getEconomicBalance);
 router.post('/villages/:villageId/economy/production', controller.recordProduction);
 router.post('/villages/:villageId/economy/flows', controller.recordEconomicFlow);
+router.get('/villages/:villageId/economy/production-potential', controller.getProductionPotential);
+router.put('/villages/:villageId/economy/production-potential', controller.upsertProductionPotential);
+
+// Village external needs and SUBH supply layer
+router.get('/supply-catalog', controller.listSupplyCatalog);
+router.post('/supply-catalog', controller.upsertSupplyCatalogItem);
+router.post('/villages/:villageId/external-demand', controller.createExternalDemand);
+router.get('/villages/:villageId/external-supply-plan', controller.getExternalSupplyPlan);
+router.post('/villages/:villageId/supply-orders', controller.createSupplyOrder);
+router.get('/villages/:villageId/supply-orders', controller.listSupplyOrders);
+router.post('/supply-orders/:orderId/lines', controller.addSupplyOrderLine);
+router.patch('/supply-orders/:orderId', controller.updateSupplyOrder);
+router.get('/villages/:villageId/ai/supply-context', controller.getAISupplyContext);
 
 // Village ERP / accounting
 router.get('/villages/:villageId/finance', controller.getVillageFinance);
@@ -47,8 +60,6 @@ router.get('/villages/:villageId/dashboard', controller.getDashboard);
 router.post('/villages/:villageId/kpis', controller.upsertKPI);
 router.post('/villages/:villageId/tasks', controller.createTask);
 router.patch('/village-tasks/:taskId', controller.updateTask);
-
-// AI decision support with persisted audit trail
 router.post('/villages/:villageId/ai/insights', controller.generateAI);
 
 // Village Project Design / DPR / Estimate / Funding / Subsidy Intelligence
@@ -60,6 +71,11 @@ router.post('/projects/:projectId/funding-sources', controller.addFundingSource)
 router.post('/projects/:projectId/subsidy-matches', controller.matchSubsidies);
 router.get('/projects/:projectId/subsidy-ai-context', controller.buildSubsidyAIContext);
 router.post('/scheme-catalogue', controller.upsertScheme);
+
+// Village completeness / public infrastructure / resilience
+router.get('/villages/:villageId/completeness', controller.getCompleteness);
+router.get('/villages/:villageId/infrastructure-profile', controller.getInfrastructureProfile);
+router.get('/villages/:villageId/readiness', controller.getReadinessSnapshot);
 
 module.exports = {
   controller,
