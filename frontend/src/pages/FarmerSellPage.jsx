@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { farmersAPI } from '../services/api';
-import { Package, DollarSign, MapPin, CheckCircle, Loader2 } from 'lucide-react';
+import productMediaAIAPI from '../services/productMediaAIAPI';
+import { Package, DollarSign, MapPin, CheckCircle, Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function FarmerSellPage() {
@@ -16,10 +17,12 @@ function FarmerSellPage() {
     description: '',
     certifications: [],
   });
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [imageGenerationState, setImageGenerationState] = useState('idle');
+  const [imageGenerationMessage, setImageGenerationMessage] = useState('');
 
   const queryClient = useQueryClient();
 
-  // v5 react-query object syntax (see LoginPage.jsx)
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: () => farmersAPI.getCategories().then(r => r.data),
@@ -30,11 +33,64 @@ function FarmerSellPage() {
     queryFn: () => farmersAPI.getFarmer('current-farmer-id').then(r => r.data),
   });
 
+  const buildFarmerImagePrompt = () => [
+    'Create a realistic, clean commercial product image for an e-commerce listing.',
+    `Product: ${formData.product_name || 'agricultural product'}.`,
+    formData.category ? `Category: ${formData.category}.` : '',
+    formData.description ? `Description from seller: ${formData.description}.` : '',
+    formData.location ? `Origin context: ${formData.location}.` : '',
+    'Use a simple studio-style presentation suitable for a marketplace product card.',
+    'Do not invent certification, nutrition, medical, organic, geographic-indication, quality, yield, or other claims.',
+    'Do not add text, logos, watermarks, people, or unsupported packaging claims.',
+  ].filter(Boolean).join(' ');
+
+  const generateListingImage = async (listingId) => {
+    if (!listingId) return;
+    setImageGenerationState('loading');
+    setImageGenerationMessage('Creating a marketplace-ready image from your product information.');
+    try {
+      const response = await productMediaAIAPI.generateImage(listingId, buildFarmerImagePrompt(), {
+        assetPurpose: 'farmer_marketplace_listing',
+        source: 'farmer_product_form',
+      });
+      const result = response.data?.data || response.data;
+      if (result?.ok && result.imageUrl) {
+        setGeneratedImage(result.imageUrl);
+        setImageGenerationState('complete');
+        setImageGenerationMessage('AI product image created. You can use it without taking a professional photograph.');
+        return;
+      }
+      setImageGenerationState('not_configured');
+      setImageGenerationMessage(result?.envVar
+        ? `AI image generation is not configured yet (${result.envVar}). Your listing was still created successfully.`
+        : 'The AI provider did not return an image. Your listing was still created successfully.');
+    } catch (error) {
+      setImageGenerationState('failed');
+      setImageGenerationMessage(error.response?.data?.error || 'AI image generation failed; your listing was still created successfully.');
+    }
+  };
+
   const sellMutation = useMutation({
     mutationFn: (data) => farmersAPI.createListing(data),
-    onSuccess: () => {
+    onSuccess: async (response) => {
       toast.success('Listing created successfully!');
       queryClient.invalidateQueries({ queryKey: ['farmer-listings'] });
+
+      const payload = response?.data ?? response;
+      const listingId = payload?.id
+        || payload?.listing?.id
+        || payload?.data?.id
+        || payload?.data?.listing?.id
+        || payload?.product_id
+        || payload?.data?.product_id;
+
+      if (listingId) {
+        await generateListingImage(listingId);
+      } else {
+        setImageGenerationState('failed');
+        setImageGenerationMessage('Listing created, but the API did not return a listing/product ID for AI media generation.');
+      }
+
       setFormData({
         product_name: '',
         category: '',
@@ -49,6 +105,8 @@ function FarmerSellPage() {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to create listing');
+      setImageGenerationState('idle');
+      setImageGenerationMessage('');
     },
   });
 
@@ -71,7 +129,6 @@ function FarmerSellPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
-          {/* Product Information */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
               <Package className="w-5 h-5 mr-2 text-green-600" />
@@ -80,55 +137,25 @@ function FarmerSellPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="product_name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Product Name *
-                </label>
-                <input id="product_name"
-                  type="text"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="e.g., Assam Tea, Sikkim Cardamom"
-                />
+                <label htmlFor="product_name" className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+                <input id="product_name" type="text" name="product_name" value={formData.product_name} onChange={handleInputChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="e.g., Assam Tea, Sikkim Cardamom" />
               </div>
 
               <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                  Category *
-                </label>
-                <select id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                >
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                <select id="category" name="category" value={formData.category} onChange={handleInputChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                   <option value="">Select category</option>
-                  {categories?.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
+                  {categories?.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                 </select>
               </div>
             </div>
 
             <div className="mt-4">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Describe your product, quality, variety, etc."
-              />
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea id="description" name="description" value={formData.description} onChange={handleInputChange} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Describe your product, quality, variety, etc." />
             </div>
           </div>
 
-          {/* Quantity & Pricing */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
               <DollarSign className="w-5 h-5 mr-2 text-green-600" />
@@ -137,26 +164,10 @@ function FarmerSellPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantity *
-                </label>
+                <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
                 <div className="flex">
-                  <input id="quantity"
-                    type="number"
-                    name="quantity"
-                    value={formData.quantity}
-                    onChange={handleInputChange}
-                    required
-                    min="1"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Amount"
-                  />
-                  <select aria-label="Unit"
-                    name="unit"
-                    value={formData.unit}
-                    onChange={handleInputChange}
-                    className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  >
+                  <input id="quantity" type="number" name="quantity" value={formData.quantity} onChange={handleInputChange} required min="1" className="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Amount" />
+                  <select aria-label="Unit" name="unit" value={formData.unit} onChange={handleInputChange} className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="kg">Kg</option>
                     <option value="quintal">Quintal</option>
                     <option value="tonne">Tonne</option>
@@ -166,134 +177,87 @@ function FarmerSellPage() {
               </div>
 
               <div>
-                <label htmlFor="expected_price" className="block text-sm font-medium text-gray-700 mb-1">
-                  Expected Price (₹) *
-                </label>
-                <input id="expected_price"
-                  type="number"
-                  name="expected_price"
-                  value={formData.expected_price}
-                  onChange={handleInputChange}
-                  required
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="Per unit"
-                />
+                <label htmlFor="expected_price" className="block text-sm font-medium text-gray-700 mb-1">Expected Price (₹) *</label>
+                <input id="expected_price" type="number" name="expected_price" value={formData.expected_price} onChange={handleInputChange} required min="0" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Per unit" />
               </div>
 
               <div>
-                <label htmlFor="harvest_date" className="block text-sm font-medium text-gray-700 mb-1">
-                  Harvest Date *
-                </label>
-                <input id="harvest_date"
-                  type="date"
-                  name="harvest_date"
-                  value={formData.harvest_date}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
+                <label htmlFor="harvest_date" className="block text-sm font-medium text-gray-700 mb-1">Harvest Date *</label>
+                <input id="harvest_date" type="date" name="harvest_date" value={formData.harvest_date} onChange={handleInputChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
               </div>
             </div>
           </div>
 
-          {/* Location */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
               <MapPin className="w-5 h-5 mr-2 text-green-600" />
               Location
             </h2>
-
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                Farm Location *
-              </label>
-              <input id="location"
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Village, District, State"
-              />
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Farm Location *</label>
+              <input id="location" type="text" name="location" value={formData.location} onChange={handleInputChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Village, District, State" />
             </div>
           </div>
 
-          {/* Certifications */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
               <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
               Certifications (Optional)
             </h2>
-
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {[
-                'Organic',
-                'GI Tagged',
-                'FSSAI',
-                'ISO',
-                'HACCP',
-                'Fair Trade',
-              ].map((cert) => (
-                <label htmlFor="type-checkbox" key={cert} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input id="type-checkbox"
-                    type="checkbox"
-                    checked={formData.certifications.includes(cert)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFormData(prev => ({
-                          ...prev,
-                          certifications: [...prev.certifications, cert],
-                        }));
-                      } else {
-                        setFormData(prev => ({
-                          ...prev,
-                          certifications: prev.certifications.filter(c => c !== cert),
-                        }));
-                      }
-                    }}
-                    className="mr-2"
-                  />
+              {['Organic', 'GI Tagged', 'FSSAI', 'ISO', 'HACCP', 'Fair Trade'].map((cert) => (
+                <label htmlFor={`cert-${cert}`} key={cert} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input id={`cert-${cert}`} type="checkbox" checked={formData.certifications.includes(cert)} onChange={(e) => {
+                    if (e.target.checked) {
+                      setFormData(prev => ({ ...prev, certifications: [...prev.certifications, cert] }));
+                    } else {
+                      setFormData(prev => ({ ...prev, certifications: prev.certifications.filter(c => c !== cert) }));
+                    }
+                  }} className="mr-2" />
                   <span className="text-sm text-gray-700">{cert}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* Submit Button */}
+          <div className="mb-6 rounded-xl border border-purple-200 bg-purple-50 p-5">
+            <div className="flex items-start gap-3">
+              <Sparkles className="w-6 h-6 text-purple-600 mt-0.5" />
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">AI Product Image — No Professional Camera Required</h2>
+                <p className="text-sm text-gray-600 mt-1">After your listing is created, the platform can generate a marketplace-ready product image from the information you already entered. You do not need to photograph the product professionally.</p>
+              </div>
+            </div>
+
+            {imageGenerationState !== 'idle' && (
+              <div className="mt-4 rounded-lg bg-white border p-4">
+                {imageGenerationState === 'loading' && (
+                  <div className="flex items-center gap-2 text-purple-700"><Loader2 className="w-5 h-5 animate-spin" />{imageGenerationMessage}</div>
+                )}
+                {imageGenerationState === 'complete' && generatedImage && (
+                  <div>
+                    <div className="flex items-center gap-2 text-green-700 font-medium mb-3"><ImageIcon className="w-5 h-5" />{imageGenerationMessage}</div>
+                    <img src={generatedImage} alt="AI-generated marketplace product" className="w-full max-h-96 object-contain rounded-lg border bg-white" />
+                  </div>
+                )}
+                {(imageGenerationState === 'not_configured' || imageGenerationState === 'failed') && (
+                  <p className="text-sm text-amber-700">{imageGenerationMessage}</p>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={sellMutation.isPending}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              {sellMutation.isPending ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Creating Listing...
-                </>
-              ) : (
-                'Create Listing'
-              )}
+            <button type="submit" disabled={sellMutation.isPending} className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center">
+              {sellMutation.isPending ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Creating Listing...</> : 'Create Listing'}
             </button>
           </div>
         </form>
 
-        {/* Price Guide */}
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-800 mb-2">Price Guide</h3>
-          <p className="text-sm text-blue-700">
-            Check current market prices before setting your expected price.
-            Competitive pricing helps sell your products faster.
-          </p>
-          <button
-            type="button"
-            onClick={() => window.location.href = '/pricecheck'}
-            className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
-          >
-            View Market Prices →
-          </button>
+          <p className="text-sm text-blue-700">Check current market prices before setting your expected price. Competitive pricing helps sell your products faster.</p>
+          <button type="button" onClick={() => window.location.href = '/pricecheck'} className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium">View Market Prices →</button>
         </div>
       </div>
     </div>
