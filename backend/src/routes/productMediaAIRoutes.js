@@ -1,6 +1,6 @@
 /**
- * Product Media AI Routes — AI product-image generation and nutrient-
- * comparison video generation. See services/productMediaAIService.js header.
+ * Product Media AI Routes — AI product-image generation, farmer-friendly
+ * product media, cartoon education assets and nutrient-comparison video scripts.
  */
 
 const express = require('express');
@@ -15,6 +15,7 @@ router.use(apiLimiter);
 
 router.get('/status', productMediaAIController.getProviderStatus);
 router.post('/products/:productId/image', productMediaAIController.generateProductImage);
+router.post('/products/:productId/cartoon', productMediaAIController.generateProductCartoon);
 router.post('/products/:productId/video-script', productMediaAIController.buildNutrientVideoScript);
 router.post('/products/:productId/video', productMediaAIController.generateProductVideo);
 
