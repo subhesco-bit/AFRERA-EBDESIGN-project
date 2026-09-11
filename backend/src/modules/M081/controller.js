@@ -1,184 +1,109 @@
-﻿/**
- * Controller for Data Visualization Dashboard (M081)
- * Handles HTTP requests for dashboard operations
- */
+const m081Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const dashboardService = require('./service');
+class M081Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const createDashboard = async (req, res) => {
-  try {
-    const dashboard = await dashboardService.createDashboard(req.body);
-    res.status(201).json({ success: true, data: dashboard });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
+      const result = await m081Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
 
-const getDashboard = async (req, res) => {
-  try {
-    const dashboard = await dashboardService.getDashboard(req.params.id);
-    if (!dashboard) {
-      return res.status(404).json({ success: false, error: 'Dashboard not found' });
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
     }
-    res.status(200).json({ success: true, data: dashboard });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const listDashboards = async (req, res) => {
-  try {
-    const dashboards = await dashboardService.listDashboards(req.query.user_id, req.query);
-    res.status(200).json({ success: true, data: dashboards });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const updateDashboard = async (req, res) => {
-  try {
-    const dashboard = await dashboardService.updateDashboard(req.params.id, req.body);
-    if (!dashboard) {
-      return res.status(404).json({ success: false, error: 'Dashboard not found' });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m081Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
     }
-    res.status(200).json({ success: true, data: dashboard });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const deleteDashboard = async (req, res) => {
-  try {
-    const dashboard = await dashboardService.deleteDashboard(req.params.id);
-    if (!dashboard) {
-      return res.status(404).json({ success: false, error: 'Dashboard not found' });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m081Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
     }
-    res.status(200).json({ success: true, message: 'Dashboard deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const addWidget = async (req, res) => {
-  try {
-    const widget = await dashboardService.addWidget(req.params.id, req.body);
-    res.status(201).json({ success: true, data: widget });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getDashboardWidgets = async (req, res) => {
-  try {
-    const widgets = await dashboardService.getDashboardWidgets(req.params.id);
-    res.status(200).json({ success: true, data: widgets });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const updateWidget = async (req, res) => {
-  try {
-    const widget = await dashboardService.updateWidget(req.params.widgetId, req.body);
-    if (!widget) {
-      return res.status(404).json({ success: false, error: 'Widget not found' });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m081Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
     }
-    res.status(200).json({ success: true, data: widget });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const deleteWidget = async (req, res) => {
-  try {
-    const widget = await dashboardService.deleteWidget(req.params.widgetId);
-    if (!widget) {
-      return res.status(404).json({ success: false, error: 'Widget not found' });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m081Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
     }
-    res.status(200).json({ success: true, message: 'Widget deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const addDataSource = async (req, res) => {
-  try {
-    const dataSource = await dashboardService.addDataSource(req.params.id, req.body);
-    res.status(201).json({ success: true, data: dataSource });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m081Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
   }
-};
 
-const getDataSources = async (req, res) => {
-  try {
-    const dataSources = await dashboardService.getDataSources(req.params.id);
-    res.status(200).json({ success: true, data: dataSources });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m081Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
-};
+}
 
-const addFilter = async (req, res) => {
-  try {
-    const filter = await dashboardService.addFilter(req.params.id, req.body);
-    res.status(201).json({ success: true, data: filter });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getDashboardFilters = async (req, res) => {
-  try {
-    const filters = await dashboardService.getDashboardFilters(req.params.id);
-    res.status(200).json({ success: true, data: filters });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const createSnapshot = async (req, res) => {
-  try {
-    const snapshot = await dashboardService.createSnapshot(req.params.id, req.body);
-    res.status(201).json({ success: true, data: snapshot });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const shareDashboard = async (req, res) => {
-  try {
-    const share = await dashboardService.shareDashboard(req.params.id, req.body);
-    res.status(201).json({ success: true, data: share });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getDashboardAnalytics = async (req, res) => {
-  try {
-    const analytics = await dashboardService.getDashboardAnalytics(req.params.id);
-    res.status(200).json({ success: true, data: analytics });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  createDashboard,
-  getDashboard,
-  listDashboards,
-  updateDashboard,
-  deleteDashboard,
-  addWidget,
-  getDashboardWidgets,
-  updateWidget,
-  deleteWidget,
-  addDataSource,
-  getDataSources,
-  addFilter,
-  getDashboardFilters,
-  createSnapshot,
-  shareDashboard,
-  getDashboardAnalytics,
-};
+module.exports = new M081Controller();

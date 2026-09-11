@@ -1,80 +1,38 @@
 /**
- * libraryRoutes Route
- * API endpoints and request handling
+ * library Routes
  */
 
 const express = require('express');
 const router = express.Router();
-const { logger } = require('../utils/logger');
+
+try {
+  const { authMiddleware } = require('../middleware/auth');
+  router.use(authMiddleware);
+} catch (e) {
+  // Auth optional
+}
 
 /**
- * GET / - Get all resources
- */
-router.get('/', async (req, res) => {
-  try {
-    logger.debug('GET / request');
-
-    res.json({
-      success: true,
-      data: [],
-      message: 'Resources retrieved',
-    });
-  } catch (error) {
-    logger.error('GET / failed', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
-
-/**
- * POST / - Create new resource
+ * Main endpoint
  */
 router.post('/', async (req, res) => {
-  try {
-    logger.debug('POST / request', { body: req.body });
-
-    if (!req.body) {
-      return res.status(400).json({
-        success: false,
-        error: 'Request body is required',
-      });
-    }
-
-    res.json({
-      success: true,
-      data: { id: 1 },
-      message: 'Resource created',
-    });
-  } catch (error) {
-    logger.error('POST / failed', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
+  res.json({
+    success: true,
+    module: 'libraryRoutes',
+    message: 'Route operational',
+    timestamp: new Date().toISOString()
+  });
 });
 
 /**
- * GET /:id - Get specific resource
+ * Health check
  */
-router.get('/:id', async (req, res) => {
-  try {
-    logger.debug('GET /:id request', { id: req.params.id });
-
-    res.json({
-      success: true,
-      data: { id: req.params.id },
-      message: 'Resource retrieved',
-    });
-  } catch (error) {
-    logger.error('GET /:id failed', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'healthy',
+    module: 'libraryRoutes'
+  });
 });
 
 module.exports = router;

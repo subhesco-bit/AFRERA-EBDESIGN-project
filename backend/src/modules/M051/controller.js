@@ -1,118 +1,109 @@
-﻿/**
- * Controller for FPO Registration (M051)
- * Handles HTTP requests for FPO operations
- */
+const m051Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const fpoService = require('./service');
+class M051Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const createFPO = async (req, res) => {
-  try {
-    const fpo = await fpoService.createFPO(req.body);
-    res.status(201).json({ success: true, data: fpo });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
+      const result = await m051Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
 
-const listFPOs = async (req, res) => {
-  try {
-    const fpos = await fpoService.listFPOs(req.query);
-    res.status(200).json({ success: true, data: fpos });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getFPO = async (req, res) => {
-  try {
-    const fpo = await fpoService.getFPO(req.params.id);
-    if (!fpo) {
-      return res.status(404).json({ success: false, error: 'FPO not found' });
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
     }
-    res.status(200).json({ success: true, data: fpo });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const updateFPO = async (req, res) => {
-  try {
-    const fpo = await fpoService.updateFPO(req.params.id, req.body);
-    if (!fpo) {
-      return res.status(404).json({ success: false, error: 'FPO not found' });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m051Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
     }
-    res.status(200).json({ success: true, data: fpo });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const deleteFPO = async (req, res) => {
-  try {
-    const deleted = await fpoService.deleteFPO(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ success: false, error: 'FPO not found' });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m051Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
     }
-    res.status(200).json({ success: true, message: 'FPO deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const addFPOMember = async (req, res) => {
-  try {
-    const member = await fpoService.addFPOMember(req.params.id, req.body.farmerId, req.body);
-    res.status(201).json({ success: true, data: member });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m051Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const getFPOMembers = async (req, res) => {
-  try {
-    const members = await fpoService.getFPOMembers(req.params.id);
-    res.status(200).json({ success: true, data: members });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m051Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
   }
-};
 
-const getFPOFinancialSummary = async (req, res) => {
-  try {
-    const summary = await fpoService.getFPOFinancialSummary(req.params.id);
-    res.status(200).json({ success: true, data: summary });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m051Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
   }
-};
 
-const recordFPOTransaction = async (req, res) => {
-  try {
-    const transaction = await fpoService.recordFPOTransaction(req.params.id, req.body);
-    res.status(201).json({ success: true, data: transaction });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m051Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
-};
+}
 
-const generateFPOPerformanceReport = async (req, res) => {
-  try {
-    const report = await fpoService.generateFPOPerformanceReport(req.params.id);
-    res.status(200).json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  createFPO,
-  listFPOs,
-  getFPO,
-  updateFPO,
-  deleteFPO,
-  addFPOMember,
-  getFPOMembers,
-  getFPOFinancialSummary,
-  recordFPOTransaction,
-  generateFPOPerformanceReport,
-};
+module.exports = new M051Controller();

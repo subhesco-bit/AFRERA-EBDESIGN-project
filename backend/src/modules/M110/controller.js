@@ -1,59 +1,109 @@
-// Controller for Asset Lifecycle Management (M110)
-const service = require('./service');
+const m110Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-async function listAssets(req, res) {
-  try {
-    const result = await service.listAssets(req.query);
-    res.status(200).json({ success: true, data: result });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M110Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
+
+      const result = await m110Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m110Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m110Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m110Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m110Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m110Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m110Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
 }
 
-async function getAsset(req, res) {
-  try {
-    const asset = await service.getAsset(req.params.id);
-    if (!asset) return res.status(404).json({ success: false, error: 'Not found' });
-    res.status(200).json({ success: true, data: asset });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function registerAsset(req, res) {
-  try {
-    const asset = await service.registerAsset(req.body);
-    res.status(201).json({ success: true, data: asset });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-}
-
-async function updateLifecycleStage(req, res) {
-  try {
-    const stage = await service.updateLifecycleStage(req.params.id, req.body);
-    res.json({ success: true, data: stage });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-}
-
-async function trackAssetDepreciation(req, res) {
-  try {
-    const depreciation = await service.trackAssetDepreciation(req.params.id, req.query.period);
-    res.json({ success: true, data: depreciation });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function generateLifecycleReport(req, res) {
-  try {
-    const report = await service.generateLifecycleReport(req.params.farmerId, req.query.reportType);
-    res.json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-module.exports = { listAssets, getAsset, registerAsset, updateLifecycleStage, trackAssetDepreciation, generateLifecycleReport };
+module.exports = new M110Controller();

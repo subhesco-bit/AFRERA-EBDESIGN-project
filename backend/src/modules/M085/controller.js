@@ -1,91 +1,109 @@
-﻿/**
- * Controller for Comparative Analytics (M085)
- * Handles HTTP requests for comparative analytics operations
- */
+const m085Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const comparisonService = require('./service');
+class M085Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const createComparisonGroup = async (req, res) => {
-  try {
-    const group = await comparisonService.createComparisonGroup(req.body);
-    res.status(201).json({ success: true, data: group });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+      const result = await m085Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
   }
-};
 
-const createComparisonConfig = async (req, res) => {
-  try {
-    const config = await comparisonService.createComparisonConfig(req.body);
-    res.status(201).json({ success: true, data: config });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m085Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
   }
-};
 
-const runComparison = async (req, res) => {
-  try {
-    const { config_id, comparison_date, period_start, period_end } = req.body;
-    const result = await comparisonService.runComparison(config_id, comparison_date, period_start, period_end);
-    res.status(201).json({ success: true, data: result });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m085Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const addBenchmark = async (req, res) => {
-  try {
-    const benchmark = await comparisonService.addBenchmark(req.body);
-    res.status(201).json({ success: true, data: benchmark });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m085Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const getBenchmarks = async (req, res) => {
-  try {
-    const benchmarks = await comparisonService.getBenchmarks(req.params.id);
-    res.status(200).json({ success: true, data: benchmarks });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m085Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
   }
-};
 
-const createComparisonAlert = async (req, res) => {
-  try {
-    const alert = await comparisonService.createComparisonAlert(req.body);
-    res.status(201).json({ success: true, data: alert });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m085Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
   }
-};
 
-const getComparisonAlerts = async (req, res) => {
-  try {
-    const alerts = await comparisonService.getComparisonAlerts(req.params.id, req.query);
-    res.status(200).json({ success: true, data: alerts });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m085Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
-};
+}
 
-const createSnapshot = async (req, res) => {
-  try {
-    const { config_id, snapshot_name, comparison_date, created_by } = req.body;
-    const snapshot = await comparisonService.createSnapshot(config_id, snapshot_name, comparison_date, created_by);
-    res.status(201).json({ success: true, data: snapshot });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  createComparisonGroup,
-  createComparisonConfig,
-  runComparison,
-  addBenchmark,
-  getBenchmarks,
-  createComparisonAlert,
-  getComparisonAlerts,
-  createSnapshot,
-};
+module.exports = new M085Controller();

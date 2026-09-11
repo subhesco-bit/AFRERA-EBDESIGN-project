@@ -9,6 +9,8 @@ const buyerTrustService = require('../services/buyerTrustService');
 const { authMiddleware: authenticateToken } = require('../middleware/auth');
 const { validateBody: validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 /**
  * GET /buyers/:id/trust

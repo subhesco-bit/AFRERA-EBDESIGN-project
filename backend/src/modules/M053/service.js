@@ -1,411 +1,243 @@
-/**
- * Order Management Service (M053)
- * Order processing, fulfillment, and tracking with AI-powered optimization
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Create order with AI-powered validation
- */
-async function createOrder(orderData) {
-  try {
-    const {
-      customer_id,
-      items,
-      shipping_address,
-      billing_address,
-      payment_method,
-      delivery_method,
-      notes,
-      metadata,
-    } = orderData;
-
-    const order = {
-      order_id: generateId(),
-      customer_id,
-      items,
-      shipping_address,
-      billing_address,
-      payment_method,
-      delivery_method,
-      subtotal: calculateSubtotal(items),
-      tax: calculateTax(items),
-      shipping_cost: calculateShippingCost(items, delivery_method),
-      total: 0,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-    };
-
-    order.total = order.subtotal + order.tax + order.shipping_cost;
-
-    // AI-powered order optimization
-    const aiRequest = {
-      task: 'order_optimization',
-      parameters: {
-        order_data: orderData,
-        inventory_check: await checkInventoryAvailability(items),
-        delivery_optimization: await optimizeDeliveryRoute(shipping_address, items),
-        payment_risk: await assessPaymentRisk(customer_id, order.total),
-        fraud_detection: await detectFraud(orderData),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    order.ai_recommendations = aiResponse;
-
-    // Insert into database
-    const result = await pool.query(
-      `INSERT INTO orders 
-       (order_id, customer_id, items, shipping_address, billing_address, 
-        payment_method, delivery_method, subtotal, tax, shipping_cost, total, 
-        status, ai_recommendations, notes, metadata, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-       RETURNING *`,
-      [
-        order.order_id,
-        order.customer_id,
-        JSON.stringify(order.items),
-        JSON.stringify(order.shipping_address),
-        JSON.stringify(order.billing_address),
-        order.payment_method,
-        order.delivery_method,
-        order.subtotal,
-        order.tax,
-        order.shipping_cost,
-        order.total,
-        order.status,
-        JSON.stringify(order.ai_recommendations),
-        notes,
-        JSON.stringify(metadata || {}),
-        order.created_at,
-      ],
-    );
-
-    // Deduct inventory
-    await deductInventory(items);
-
-    logger.info(`Order created: ${order.order_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating order', { error: error.message, stack: error.stack });
-    throw new Error('Failed to create order');
+class M053Service {
+  constructor() {
+    this.table = 'pest_management';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
   }
-}
 
-/**
- * List orders with filtering
- */
-async function listOrders({ page = 1, limit = 20, status = null, customerId = null } = {}) {
-  try {
-    const offset = (page - 1) * limit;
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    let countQuery = 'SELECT COUNT(*) FROM orders';
-    const countParams = [];
-    const conditions = [];
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    if (status) {
-      conditions.push(`status = $${ conditions.length + 1}`);
-      countParams.push(status);
-    }
-    if (customerId) {
-      conditions.push(`customer_id = $${ conditions.length + 1}`);
-      countParams.push(customerId);
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
+
+        validated[field] = value;
+      }
     }
 
-    if (conditions.length > 0) {
-      countQuery += ` WHERE ${ conditions.join(' AND ')}`;
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
     }
 
-    const totalRes = await pool.query(countQuery, countParams);
-    const total = parseInt(totalRes.rows[0].count || '0');
+    return validated;
+  }
 
-    let dataQuery = 'SELECT * FROM orders';
-    const dataParams = [...countParams];
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
 
-    if (conditions.length > 0) {
-      dataQuery += ` WHERE ${ conditions.join(' AND ')}`;
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
     }
-
-    dataQuery += ` ORDER BY created_at DESC LIMIT $${ dataParams.length + 1 } OFFSET $${ dataParams.length + 2}`;
-    dataParams.push(limit, offset);
-
-    const res = await pool.query(dataQuery, dataParams);
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-  } catch (error) {
-    logger.error('Error listing orders', { error: error.message });
-    throw new Error('Failed to list orders');
   }
-}
 
-/**
- * Get order by ID
- */
-async function getOrder(orderId) {
-  try {
-    const res = await pool.query('SELECT * FROM orders WHERE order_id = $1', [orderId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error getting order', { error: error.message });
-    throw new Error('Failed to get order');
-  }
-}
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
 
-/**
- * Update order status
- */
-async function updateOrderStatus(orderId, status, notes = null) {
-  try {
-    const result = await pool.query(
-      `UPDATE orders 
-       SET status = $1, notes = COALESCE($2, notes), updated_at = NOW()
-       WHERE order_id = $3
-       RETURNING *`,
-      [status, notes, orderId],
-    );
-    return result.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating order status', { error: error.message });
-    throw new Error('Failed to update order status');
-  }
-}
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
 
-/**
- * Cancel order
- */
-async function cancelOrder(orderId, reason = null) {
-  try {
-    const order = await getOrder(orderId);
-    if (!order) {
-      throw new Error('Order not found');
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
     }
-
-    // Restore inventory
-    await restoreInventory(order.items);
-
-    const result = await pool.query(
-      `UPDATE orders 
-       SET status = 'cancelled', cancellation_reason = $1, cancelled_at = NOW()
-       WHERE order_id = $2
-       RETURNING *`,
-      [reason, orderId],
-    );
-
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error cancelling order', { error: error.message });
-    throw new Error('Failed to cancel order');
   }
-}
 
-/**
- * Process payment
- */
-async function processPayment(orderId, paymentDetails) {
-  try {
-    const order = await getOrder(orderId);
-    if (!order) {
-      throw new Error('Order not found');
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
     }
+  }
 
-    const payment = {
-      payment_id: generateId(),
-      order_id: orderId,
-      amount: order.total,
-      payment_method: paymentDetails.payment_method,
-      payment_status: 'processing',
-      transaction_id: paymentDetails.transaction_id,
-      payment_details: paymentDetails,
-      created_at: new Date().toISOString(),
-    };
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
 
-    // AI-powered payment risk assessment
-    const aiRequest = {
-      task: 'payment_risk_assessment',
-      parameters: {
-        payment_details: paymentDetails,
-        order_data: order,
-        customer_history: await getCustomerPaymentHistory(order.customer_id),
-        fraud_indicators: await checkFraudIndicators(paymentDetails),
-      },
-    };
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    payment.risk_assessment = aiResponse;
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
 
-    const result = await pool.query(
-      `INSERT INTO payments 
-       (payment_id, order_id, amount, payment_method, payment_status, 
-        transaction_id, payment_details, risk_assessment, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING *`,
-      [
-        payment.payment_id,
-        payment.order_id,
-        payment.amount,
-        payment.payment_method,
-        payment.payment_status,
-        payment.transaction_id,
-        JSON.stringify(payment.payment_details),
-        JSON.stringify(payment.risk_assessment),
-        payment.created_at,
-      ],
-    );
-
-    // Update order status
-    if (payment.risk_assessment.risk_level === 'low') {
-      await updateOrderStatus(orderId, 'processing');
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
     }
+  }
 
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error processing payment', { error: error.message });
-    throw new Error('Failed to process payment');
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Track order
- */
-async function trackOrder(orderId) {
-  try {
-    const order = await getOrder(orderId);
-    const tracking = await getOrderTracking(orderId);
-
-    const trackingInfo = {
-      order_id: orderId,
-      order_status: order.status,
-      tracking_info: tracking,
-      estimated_delivery: await calculateEstimatedDelivery(orderId),
-      current_location: await getCurrentLocation(orderId),
-      milestones: await getOrderMilestones(orderId),
-    };
-
-    return trackingInfo;
-  } catch (error) {
-    logger.error('Error tracking order', { error: error.message });
-    throw new Error('Failed to track order');
-  }
-}
-
-// Helper functions
-function generateId() {
-  return `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function calculateSubtotal(items) {
-  return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-}
-
-function calculateTax(items) {
-  const subtotal = calculateSubtotal(items);
-  return subtotal * 0.18; // 18% GST
-}
-
-function calculateShippingCost(items, deliveryMethod) {
-  const weight = items.reduce((sum, item) => sum + (item.weight || 1), 0);
-  if (deliveryMethod === 'express') {
-    return weight * 50 + 100;
-  }
-  return weight * 30 + 50;
-}
-
-async function checkInventoryAvailability(items) {
-  const availability = [];
-  for (const item of items) {
-    const res = await pool.query('SELECT quantity FROM products WHERE product_id = $1', [item.product_id]);
-    availability.push({
-      product_id: item.product_id,
-      available: res.rows[0]?.quantity || 0,
-      requested: item.quantity,
-      in_stock: (res.rows[0]?.quantity || 0) >= item.quantity,
-    });
-  }
-  return availability;
-}
-
-async function optimizeDeliveryRoute(address, items) {
-  return {
-    estimated_distance: 50,
-    estimated_time: '2-3 days',
-    recommended_carrier: 'local_logistics',
-    cost_optimization: 'standard',
-  };
-}
-
-async function assessPaymentRisk(customerId, amount) {
-  return {
-    risk_level: 'low',
-    confidence: 0.95,
-    factors: ['good_payment_history', 'verified_customer'],
-  };
-}
-
-async function detectFraud(orderData) {
-  return {
-    fraud_score: 0.1,
-    indicators: [],
-    recommendation: 'approve',
-  };
-}
-
-async function deductInventory(items) {
-  for (const item of items) {
-    await pool.query(
-      'UPDATE products SET quantity = quantity - $1 WHERE product_id = $2',
-      [item.quantity, item.product_id],
-    );
-  }
-}
-
-async function restoreInventory(items) {
-  for (const item of items) {
-    await pool.query(
-      'UPDATE products SET quantity = quantity + $1 WHERE product_id = $2',
-      [item.quantity, item.product_id],
-    );
-  }
-}
-
-async function getCustomerPaymentHistory(customerId) {
-  return [];
-}
-
-async function checkFraudIndicators(paymentDetails) {
-  return [];
-}
-
-async function getOrderTracking(orderId) {
-  const res = await pool.query('SELECT * FROM order_tracking WHERE order_id = $1 ORDER BY timestamp DESC', [orderId]);
-  return res.rows;
-}
-
-async function calculateEstimatedDelivery(orderId) {
-  return new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
-}
-
-async function getCurrentLocation(orderId) {
-  return 'warehouse';
-}
-
-async function getOrderMilestones(orderId) {
-  return [
-    { status: 'order_placed', timestamp: new Date().toISOString() },
-    { status: 'processing', timestamp: null },
-    { status: 'shipped', timestamp: null },
-    { status: 'delivered', timestamp: null },
-  ];
-}
-
-module.exports = {
-  createOrder,
-  listOrders,
-  getOrder,
-  updateOrderStatus,
-  cancelOrder,
-  processPayment,
-  trackOrder,
-};
-
+module.exports = new M053Service();

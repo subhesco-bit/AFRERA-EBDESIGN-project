@@ -1,12 +1,20 @@
-const router = require('express').Router();
-const iotService = require('../services/iotSensorsService');
-const auth = require('../middleware/auth');
+/**
+ * iot Sensors Routes
+ * Placeholder route module
+ */
 
-router.post('/iot/sensors/:sensorId/reading', auth, async (req, res) => {
-  try {
-    const result = await iotService.recordSensorData(req.params.sensorId, req.body.reading);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'iotSensors',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

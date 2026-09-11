@@ -1,67 +1,109 @@
-// Controller for Harvest Planning (M069)
-const service = require('./service');
+const m069Service = require('./service');
 const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-// NOTE: `list` responds with `data` as the flat items array (not the
-// {items, pagination} object listItems() returns internally). The
-// frontend's ResourceManager component expects `res.data.data` to be an
-// array it can call .map() on directly — several sibling modules built
-// from this same template (M022, M055, M056, M007's listRoles, ...)
-// instead nest under `data.items`, which breaks ResourceManager's rows
-// rendering. Deviating here deliberately so M069Page.jsx actually works.
-async function list(req, res) {
-  try {
-    const result = await service.listItems({ page: parseInt(req.query.page) || 1, limit: parseInt(req.query.limit) || 20 });
-    res.json({ success: true, data: result.items, pagination: result.pagination });
-  } catch (e) {
-    logger.error('M069 list error', { error: e.message });
-    res.status(500).json({ success: false, error: e.message });
+class M069Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
+
+      const result = await m069Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m069Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m069Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m069Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m069Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m069Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m069Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
 }
 
-async function get(req, res) {
-  try {
-    const item = await service.getItem(req.params.id);
-    if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-    res.json({ success: true, data: item });
-  } catch (e) {
-    logger.error('M069 get error', { error: e.message });
-    res.status(500).json({ success: false, error: e.message });
-  }
-}
-
-async function create(req, res) {
-  try {
-    const payload = req.body || {};
-    const item = await service.createItem(payload);
-    res.status(201).json({ success: true, data: item });
-  } catch (e) {
-    logger.error('M069 create error', { error: e.message });
-    res.status(500).json({ success: false, error: e.message });
-  }
-}
-
-async function update(req, res) {
-  try {
-    const payload = req.body || {};
-    const item = await service.updateItem(req.params.id, payload);
-    if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-    res.json({ success: true, data: item });
-  } catch (e) {
-    logger.error('M069 update error', { error: e.message });
-    res.status(500).json({ success: false, error: e.message });
-  }
-}
-
-async function remove(req, res) {
-  try {
-    const ok = await service.deleteItem(req.params.id);
-    if (!ok) return res.status(404).json({ success: false, error: 'Not found' });
-    res.json({ success: true });
-  } catch (e) {
-    logger.error('M069 delete error', { error: e.message });
-    res.status(500).json({ success: false, error: e.message });
-  }
-}
-
-module.exports = { list, get, create, update, remove };
+module.exports = new M069Controller();

@@ -1,43 +1,68 @@
-﻿// Express routes for Trend Analysis (M084)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { rateLimiters } = require('../../middleware/rateLimit');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-const read = [rateLimiters.read, authMiddleware];
-const write = [rateLimiters.write, authMiddleware, requireRole('admin', 'superadmin')];
+/**
+ * M084 Routes
+ * Base path: /api/m084
+ */
 
-// Trend Definitions
-router.post('/trends', write, controller.createTrendDefinition);
+// Middleware
+router.use(authenticate);
 
-// Trend Data Points
-router.post('/trends/:id/data-points', write, controller.addDataPoint);
-router.get('/trends/:id/data-points', read, controller.getTrendDataPoints);
+/**
+ * @route   GET /api/m084
+ * @desc    Get all m084 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
 
-// Trend Analysis
-router.post('/trends/analyze', write, controller.analyzeTrend);
+/**
+ * @route   POST /api/m084/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
 
-// Trend Forecasting
-router.post('/trends/forecast', write, controller.generateTrendForecast);
+/**
+ * @route   GET /api/m084/search
+ * @desc    Search m084 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
 
-// Seasonality
-router.post('/trends/:id/seasonality', write, controller.detectSeasonality);
+/**
+ * @route   POST /api/m084
+ * @desc    Create new m084
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
 
-// Correlations
-router.post('/trends/correlation', write, controller.calculateCorrelation);
+/**
+ * @route   GET /api/m084/:id
+ * @desc    Get m084 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
 
-// Breakpoints
-router.post('/trends/:id/breakpoints', write, controller.detectBreakpoints);
+/**
+ * @route   PUT /api/m084/:id
+ * @desc    Update m084
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
 
-// Trend Alerts
-router.post('/trends/alerts', write, controller.createTrendAlert);
-router.get('/trends/:id/alerts', read, controller.getTrendAlerts);
-
-router.post('/disaster-alerts', write, controller.createDisasterAlert);
-router.get('/disaster-alerts', read, controller.listDisasterAlerts);
-router.get('/disaster-alerts/:id', read, controller.getDisasterAlert);
-router.post('/disaster-alerts/:id/cancel', write, controller.cancelDisasterAlert);
-router.get('/disaster-alerts/:id/advisory', read, controller.getDisasterAlertAdvisory);
+/**
+ * @route   DELETE /api/m084/:id
+ * @desc    Delete (soft delete) m084
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

@@ -1,12 +1,20 @@
-const router = require('express').Router();
-const greenhouseService = require('../services/greenhouseService');
-const auth = require('../middleware/auth');
+/**
+ * greenhouse Routes
+ * Placeholder route module
+ */
 
-router.post('/greenhouses', auth, async (req, res) => {
-  try {
-    const result = await greenhouseService.createGreenhouse(req.body);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'greenhouse',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

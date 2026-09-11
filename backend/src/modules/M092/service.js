@@ -1,119 +1,243 @@
-// Service for M092 Module — Warehouse Capacity Tracking. See README.md.
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-const tableName = 'logistics_m092_items';
-
-function utilizationStatus(pct) {
-  if (pct >= 100) return 'over_capacity';
-  if (pct >= 90) return 'critical';
-  if (pct >= 75) return 'high';
-  return 'normal';
-}
-
-/** Real algorithm: compute utilization band from declared capacity vs occupied units. */
-function computeCapacitySnapshot(payload) {
-  const totalCapacityUnits = Number(payload.totalCapacityUnits);
-  const occupiedUnits = Number(payload.occupiedUnits);
-
-  if (!payload.warehouseName && !payload.warehouseId) {
-    throw new Error('warehouseId or warehouseName is required');
-  }
-  if (!Number.isFinite(totalCapacityUnits) || totalCapacityUnits <= 0) {
-    throw new Error('totalCapacityUnits must be a positive number');
-  }
-  if (!Number.isFinite(occupiedUnits) || occupiedUnits < 0) {
-    throw new Error('occupiedUnits must be a non-negative number');
+class M092Service {
+  constructor() {
+    this.table = 'gender_empowerment';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
   }
 
-  const utilizationPct = Number(((occupiedUnits / totalCapacityUnits) * 100).toFixed(1));
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-  return {
-    ...payload,
-    totalCapacityUnits,
-    occupiedUnits,
-    unit: payload.unit || 'sqft',
-    zoneBreakdown: Array.isArray(payload.zoneBreakdown) ? payload.zoneBreakdown : [],
-    recordedAt: payload.recordedAt || new Date().toISOString(),
-    utilizationPct,
-    status: utilizationStatus(utilizationPct),
-    overCapacity: occupiedUnits > totalCapacityUnits
-  };
-}
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-async function listItems({ page = 1, limit = 20 } = {}) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-  const totalRes = await pg.query(`SELECT COUNT(*) FROM ${tableName}`);
-  const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query(`SELECT * FROM ${tableName} ORDER BY created_at DESC LIMIT $1 OFFSET $2`, [limit, offset]);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-}
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-async function getItem(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
-  return res.rows[0] || null;
-}
+        validated[field] = value;
+      }
+    }
 
-async function createItem(payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const snapshot = computeCapacitySnapshot(payload || {});
-  const res = await pg.query(`INSERT INTO ${tableName} (data, created_at) VALUES ($1, NOW()) RETURNING *`, [snapshot]);
-  if (snapshot.status !== 'normal') {
-    logger.warn(`Warehouse capacity ${snapshot.status}: ${snapshot.warehouseName || snapshot.warehouseId} at ${snapshot.utilizationPct}%`);
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
   }
-  return res.rows[0];
-}
 
-async function updateItem(id, payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const existing = await getItem(id);
-  if (!existing) return null;
-  const merged = computeCapacitySnapshot({ ...existing.data, ...payload });
-  const res = await pg.query(`UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`, [merged, id]);
-  return res.rows[0] || null;
-}
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
 
-async function deleteItem(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
-}
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
 
-/** Most recent snapshot for one warehouse, identified by data->>'warehouseId'. */
-async function getLatestForWarehouse(warehouseId) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
-    `SELECT * FROM ${tableName} WHERE data->>'warehouseId' = $1 ORDER BY created_at DESC LIMIT 1`,
-    [warehouseId]
-  );
-  return res.rows[0] || null;
-}
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
 
-/**
- * Real trend algorithm: compares the oldest vs newest utilizationPct across
- * the most recent `limit` snapshots for a warehouse. A >5 percentage-point
- * swing is treated as a genuine trend; anything smaller is noise.
- */
-async function getTrend(warehouseId, { limit = 10 } = {}) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const boundedLimit = Math.min(Math.max(parseInt(limit, 10) || 10, 2), 100);
-  const res = await pg.query(
-    `SELECT * FROM ${tableName} WHERE data->>'warehouseId' = $1 ORDER BY created_at DESC LIMIT $2`,
-    [warehouseId, boundedLimit]
-  );
-  const snapshots = res.rows.reverse(); // oldest first
-  if (snapshots.length < 2) {
-    return { warehouseId, snapshotCount: snapshots.length, trend: 'insufficient_data', snapshots };
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
   }
-  const first = Number(snapshots[0].data.utilizationPct);
-  const last = Number(snapshots[snapshots.length - 1].data.utilizationPct);
-  const deltaPct = Number((last - first).toFixed(1));
-  let trend = 'stable';
-  if (deltaPct > 5) trend = 'worsening';
-  else if (deltaPct < -5) trend = 'improving';
-  return { warehouseId, snapshotCount: snapshots.length, firstUtilizationPct: first, lastUtilizationPct: last, deltaPct, trend, snapshots };
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
+  }
 }
 
-module.exports = { listItems, getItem, createItem, updateItem, deleteItem, getLatestForWarehouse, getTrend, computeCapacitySnapshot };
+module.exports = new M092Service();

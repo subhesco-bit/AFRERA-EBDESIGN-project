@@ -1,295 +1,243 @@
-/**
- * Customer Management Service (M054)
- * Customer profile management with AI-powered insights and personalization
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Create customer with AI-powered segmentation
- */
-async function createCustomer(customerData) {
-  try {
-    const {
-      name,
-      email,
-      phone,
-      address,
-      customer_type,
-      business_type,
-      metadata,
-    } = customerData;
-
-    const customer = {
-      customer_id: generateId(),
-      name,
-      email,
-      phone,
-      address,
-      customer_type,
-      business_type,
-      status: 'active',
-      created_at: new Date().toISOString(),
-    };
-
-    // AI-powered customer segmentation
-    const aiRequest = {
-      task: 'customer_segmentation',
-      parameters: {
-        customer_data: customerData,
-        demographics: await getDemographics(address),
-        market_potential: await assessMarketPotential(customer_type, business_type),
-        personalization_opportunities: await getPersonalizationOpportunities(customerData),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    customer.ai_recommendations = aiResponse;
-
-    const result = await pool.query(
-      `INSERT INTO customers 
-       (customer_id, name, email, phone, address, customer_type, 
-        business_type, status, ai_recommendations, metadata, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING *`,
-      [
-        customer.customer_id,
-        customer.name,
-        customer.email,
-        customer.phone,
-        JSON.stringify(customer.address),
-        customer.customer_type,
-        customer.business_type,
-        customer.status,
-        JSON.stringify(customer.ai_recommendations),
-        JSON.stringify(metadata || {}),
-        customer.created_at,
-      ],
-    );
-
-    logger.info(`Customer created: ${customer.customer_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating customer', { error: error.message, stack: error.stack });
-    throw new Error('Failed to create customer');
+class M054Service {
+  constructor() {
+    this.table = 'irrigation';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
   }
-}
 
-/**
- * List customers with filtering
- */
-async function listCustomers({ page = 1, limit = 20, status = null, customerType = null } = {}) {
-  try {
-    const offset = (page - 1) * limit;
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    let countQuery = 'SELECT COUNT(*) FROM customers';
-    const countParams = [];
-    const conditions = [];
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    if (status) {
-      conditions.push(`status = $${ conditions.length + 1}`);
-      countParams.push(status);
-    }
-    if (customerType) {
-      conditions.push(`customer_type = $${ conditions.length + 1}`);
-      countParams.push(customerType);
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
+
+        validated[field] = value;
+      }
     }
 
-    if (conditions.length > 0) {
-      countQuery += ` WHERE ${ conditions.join(' AND ')}`;
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
     }
 
-    const totalRes = await pool.query(countQuery, countParams);
-    const total = parseInt(totalRes.rows[0].count || '0');
+    return validated;
+  }
 
-    let dataQuery = 'SELECT * FROM customers';
-    const dataParams = [...countParams];
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
 
-    if (conditions.length > 0) {
-      dataQuery += ` WHERE ${ conditions.join(' AND ')}`;
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
     }
+  }
 
-    dataQuery += ` ORDER BY created_at DESC LIMIT $${ dataParams.length + 1 } OFFSET $${ dataParams.length + 2}`;
-    dataParams.push(limit, offset);
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
 
-    const res = await pool.query(dataQuery, dataParams);
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-  } catch (error) {
-    logger.error('Error listing customers', { error: error.message });
-    throw new Error('Failed to list customers');
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Get customer by ID
- */
-async function getCustomer(customerId) {
-  try {
-    const res = await pool.query('SELECT * FROM customers WHERE customer_id = $1', [customerId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error getting customer', { error: error.message });
-    throw new Error('Failed to get customer');
-  }
-}
-
-/**
- * Update customer
- */
-async function updateCustomer(customerId, updates) {
-  try {
-    const { name, email, phone, address, customer_type, business_type, status, metadata } = updates;
-
-    const result = await pool.query(
-      `UPDATE customers 
-       SET name = COALESCE($1, name),
-           email = COALESCE($2, email),
-           phone = COALESCE($3, phone),
-           address = COALESCE($4, address::jsonb),
-           customer_type = COALESCE($5, customer_type),
-           business_type = COALESCE($6, business_type),
-           status = COALESCE($7, status),
-           metadata = COALESCE($8, metadata::jsonb),
-           updated_at = NOW()
-       WHERE customer_id = $9
-       RETURNING *`,
-      [
-        name, email, phone,
-        address ? JSON.stringify(address) : null,
-        customer_type, business_type, status,
-        metadata ? JSON.stringify(metadata) : null,
-        customerId,
-      ],
-    );
-    return result.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating customer', { error: error.message });
-    throw new Error('Failed to update customer');
-  }
-}
-
-/**
- * Delete customer
- */
-async function deleteCustomer(customerId) {
-  try {
-    const res = await pool.query('DELETE FROM customers WHERE customer_id = $1 RETURNING customer_id', [customerId]);
-    return Boolean(res.rows[0]);
-  } catch (error) {
-    logger.error('Error deleting customer', { error: error.message });
-    throw new Error('Failed to delete customer');
-  }
-}
-
-/**
- * Get customer insights
- */
-async function getCustomerInsights(customerId) {
-  try {
-    const customer = await getCustomer(customerId);
-    const purchaseHistory = await getCustomerPurchaseHistory(customerId);
-    const preferences = await getCustomerPreferences(customerId);
-
-    const aiRequest = {
-      task: 'customer_insights',
-      parameters: {
-        customer_data: customer,
-        purchase_history: purchaseHistory,
-        preferences,
-        behavior_patterns: await analyzeBehaviorPatterns(customerId),
-        churn_risk: await assessChurnRisk(customerId),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
-    return {
-      customer_id: customerId,
-      generated_at: new Date().toISOString(),
-      customer_profile: customer,
-      purchase_summary: purchaseHistory,
-      preferences,
-      insights: aiResponse.insights,
-      recommendations: aiResponse.recommendations,
-      churn_risk: aiResponse.churn_risk,
-      lifetime_value: aiResponse.lifetime_value,
-    };
-  } catch (error) {
-    logger.error('Error getting customer insights', { error: error.message });
-    throw new Error('Failed to get customer insights');
-  }
-}
-
-// Helper functions
-function generateId() {
-  return `CUST-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getDemographics(address) {
-  return {
-    region: address?.state || 'unknown',
-    urban_rural: 'rural',
-    income_level: 'medium',
-  };
-}
-
-async function assessMarketPotential(customerType, businessType) {
-  return {
-    potential: 'high',
-    estimated_value: 100000,
-    growth_potential: 0.3,
-  };
-}
-
-async function getPersonalizationOpportunities(customerData) {
-  return [
-    'personalized_product_recommendations',
-    'targeted_promotions',
-    'custom_pricing_tiers',
-  ];
-}
-
-async function getCustomerPurchaseHistory(customerId) {
-  const res = await pool.query(
-    'SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 50',
-    [customerId],
-  );
-  return res.rows;
-}
-
-async function getCustomerPreferences(customerId) {
-  const res = await pool.query(
-    'SELECT * FROM customer_preferences WHERE customer_id = $1',
-    [customerId],
-  );
-  return res.rows[0] || {};
-}
-
-async function analyzeBehaviorPatterns(customerId) {
-  return {
-    purchase_frequency: 'monthly',
-    average_order_value: 5000,
-    preferred_categories: ['grains', 'vegetables'],
-    peak_purchase_times: ['morning', 'weekend'],
-  };
-}
-
-async function assessChurnRisk(customerId) {
-  return {
-    risk_level: 'low',
-    probability: 0.15,
-    factors: ['recent_activity', 'positive_feedback'],
-  };
-}
-
-module.exports = {
-  createCustomer,
-  listCustomers,
-  getCustomer,
-  updateCustomer,
-  deleteCustomer,
-  getCustomerInsights,
-};
-
+module.exports = new M054Service();
