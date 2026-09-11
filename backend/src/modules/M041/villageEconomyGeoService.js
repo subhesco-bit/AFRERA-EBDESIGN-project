@@ -72,7 +72,7 @@ async function nearestFacilities(villageId, types = FACILITY_TYPES) {
     nearest_market_distance_km: nearest.market ? Number(nearest.market.distance_km) : null,
     nearest_warehouse_id: nearest.warehouse?.id || null,
     nearest_warehouse_distance_km: nearest.warehouse ? Number(nearest.warehouse.distance_km) : null,
-    nearest_cold_store_id: nearest.cold_store?.id || null,
+    nearest_cold_store_id: nearest.cold_store ? Number(nearest.cold_store.distance_km) : null,
     nearest_cold_store_distance_km: nearest.cold_store ? Number(nearest.cold_store.distance_km) : null,
     nearest_collection_center_id: nearest.collection_center?.id || null,
     nearest_collection_center_distance_km: nearest.collection_center ? Number(nearest.collection_center.distance_km) : null,
@@ -90,7 +90,10 @@ async function recordProduction(villageId, payload) {
   if (!c.rows.length) throw new ValidationError(`Unknown active commodity: ${commodity}`);
   const quantity = Number(payload.quantity);
   if (!Number.isFinite(quantity) || quantity < 0) throw new ValidationError('quantity must be non-negative');
-  const result = await pool.query(`INSERT INTO village_production_records(village_id,commodity_id,producer_type,producer_id,production_period_start,production_period_end,quantity,unit,quality_grade,estimated_value,source,notes,metadata) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`, [village.id,c.rows[0].id,payload.producer_type || 'farmer',payload.producer_id || null,payload.production_period_start,payload.production_period_end || null,quantity,payload.unit || 'kg',payload.quality_grade || null,payload.estimated_value == null ? null : Number(payload.estimated_value),payload.source || 'manual',payload.notes || null,payload.metadata || {}]);
+  const area = payload.production_area_acres == null ? null : Number(payload.production_area_acres);
+  if (area !== null && (!Number.isFinite(area) || area < 0)) throw new ValidationError('production_area_acres must be non-negative');
+  const yieldPerAcre = area && area > 0 ? Number((quantity / area).toFixed(4)) : null;
+  const result = await pool.query(`INSERT INTO village_production_records(village_id,commodity_id,producer_type,producer_id,production_period_start,production_period_end,quantity,unit,quality_grade,estimated_value,source,notes,metadata,production_area_acres,yield_per_acre,potential_production_quantity,potential_production_source,potential_production_confidence,metadata_potential) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING *`, [village.id,c.rows[0].id,payload.producer_type || 'farmer',payload.producer_id || null,payload.production_period_start,payload.production_period_end || null,quantity,payload.unit || 'kg',payload.quality_grade || null,payload.estimated_value == null ? null : Number(payload.estimated_value),payload.source || 'manual',payload.notes || null,payload.metadata || {},area,yieldPerAcre,payload.potential_production_quantity == null ? null : Number(payload.potential_production_quantity),payload.potential_production_source || null,payload.potential_production_confidence == null ? null : Number(payload.potential_production_confidence),payload.metadata_potential || {}]);
   return result.rows[0];
 }
 
@@ -108,12 +111,111 @@ async function recordFlow(villageId, payload) {
 
 async function economicBalance(villageId, period = {}) {
   const village = await getVillageGeo(villageId);
-  const params = [village.id];
-  const conditions = ['village_id=$1'];
-  if (period.start) { params.push(period.start); conditions.push(`production_period_start >= $${params.length}`); }
-  if (period.end) { params.push(period.end); conditions.push(`production_period_start <= $${params.length}`); }
   const result = await pool.query(`SELECT * FROM village_economic_balance WHERE village_id=$1 ORDER BY category,commodity_name`, [village.id]);
   return { village, period, commodities: result.rows };
 }
 
-module.exports = { getVillageGeo, updateVillageGeo, upsertFacility, nearestFacilities, recordProduction, recordFlow, economicBalance };
+/**
+ * Calculate production intensity and growth potential for every commodity
+ * that has production records in a village. Potential is benchmark-driven:
+ * current yield/production is compared with a village-specific potential
+ * area and a verified regional/commodity benchmark. No hard-coded yield
+ * assumptions are used.
+ */
+async function productionPotential(villageId, options = {}) {
+  const village = await getVillageGeo(villageId);
+  const params = [village.id];
+  let commodityFilter = '';
+  if (options.commodity_code) {
+    params.push(String(options.commodity_code));
+    commodityFilter = ` AND c.commodity_code = $${params.length}`;
+  }
+
+  const rows = await pool.query(`
+    WITH production AS (
+      SELECT
+        p.village_id,
+        p.commodity_id,
+        SUM(p.quantity) AS current_production_quantity,
+        SUM(COALESCE(p.production_area_acres,0)) AS reported_area_acres,
+        CASE WHEN SUM(COALESCE(p.production_area_acres,0)) > 0
+          THEN SUM(p.quantity) / SUM(p.production_area_acres)
+          ELSE NULL END AS current_yield_per_acre
+      FROM village_production_records p
+      JOIN village_production_commodities c ON c.id=p.commodity_id
+      WHERE p.village_id=$1${commodityFilter}
+      GROUP BY p.village_id,p.commodity_id
+    ),
+    benchmark AS (
+      SELECT DISTINCT ON (b.commodity_id)
+        b.commodity_id,
+        b.benchmark_yield_per_acre,
+        b.benchmark_unit,
+        b.benchmark_capacity_units,
+        b.capacity_unit,
+        b.source_name,
+        b.source_reference
+      FROM village_production_benchmarks b
+      JOIN production p ON p.commodity_id=b.commodity_id
+      WHERE b.active=true
+        AND (b.state IS NULL OR lower(b.state)=lower($1::text))
+      ORDER BY b.commodity_id,
+        CASE WHEN b.block IS NOT NULL AND lower(b.block)=lower($1::text) THEN 0 ELSE 1 END,
+        CASE WHEN b.district IS NOT NULL AND lower(b.district)=lower($1::text) THEN 0 ELSE 1 END,
+        b.verified_at DESC NULLS LAST
+    )
+    SELECT c.commodity_code,c.commodity_name,c.category,c.default_unit,
+           p.current_production_quantity,p.reported_area_acres,p.current_yield_per_acre,
+           COALESCE(cp.potential_area_acres,p.reported_area_acres) AS potential_area_acres,
+           COALESCE(cp.benchmark_yield_per_acre,b.benchmark_yield_per_acre) AS benchmark_yield_per_acre,
+           COALESCE(cp.benchmark_unit,b.benchmark_unit,c.default_unit) AS benchmark_unit,
+           COALESCE(cp.potential_production_quantity,
+             CASE WHEN COALESCE(cp.potential_area_acres,p.reported_area_acres)>0 AND COALESCE(cp.benchmark_yield_per_acre,b.benchmark_yield_per_acre)>0
+               THEN COALESCE(cp.potential_area_acres,p.reported_area_acres)*COALESCE(cp.benchmark_yield_per_acre,b.benchmark_yield_per_acre)
+               ELSE NULL END) AS potential_production_quantity,
+           COALESCE(cp.production_gap_quantity,
+             GREATEST(0, (COALESCE(cp.potential_area_acres,p.reported_area_acres)*COALESCE(cp.benchmark_yield_per_acre,b.benchmark_yield_per_acre))-p.current_production_quantity)) AS production_gap_quantity,
+           CASE WHEN COALESCE(cp.potential_area_acres,p.reported_area_acres)>0 AND COALESCE(cp.benchmark_yield_per_acre,b.benchmark_yield_per_acre)>0
+             THEN ROUND(LEAST(100,(p.current_production_quantity / NULLIF(COALESCE(cp.potential_area_acres,p.reported_area_acres)*COALESCE(cp.benchmark_yield_per_acre,b.benchmark_yield_per_acre),0))*100)::numeric,2)
+             ELSE NULL END AS production_utilization_pct,
+           COALESCE(cp.opportunity_score,
+             CASE WHEN COALESCE(cp.potential_area_acres,p.reported_area_acres)>0 AND COALESCE(cp.benchmark_yield_per_acre,b.benchmark_yield_per_acre)>0
+               THEN ROUND(LEAST(100,GREATEST(0,100-(p.current_production_quantity / NULLIF(COALESCE(cp.potential_area_acres,p.reported_area_acres)*COALESCE(cp.benchmark_yield_per_acre,b.benchmark_yield_per_acre),0))*100))::numeric,2)
+               ELSE NULL END) AS opportunity_score,
+           COALESCE(cp.calculation_source, CASE WHEN b.id IS NULL THEN 'area_only' ELSE 'benchmark' END) AS calculation_source,
+           b.source_name,b.source_reference
+    FROM production p
+    JOIN village_production_commodities c ON c.id=p.commodity_id
+    LEFT JOIN benchmark b ON b.commodity_id=p.commodity_id
+    LEFT JOIN village_commodity_potential_profiles cp ON cp.village_id=p.village_id AND cp.commodity_id=p.commodity_id
+    ORDER BY opportunity_score DESC NULLS LAST,c.category,c.commodity_name`, params);
+
+  const opportunities = rows.rows.map((r) => ({
+    ...r,
+    current_yield_per_acre: r.current_yield_per_acre == null ? null : Number(Number(r.current_yield_per_acre).toFixed(4)),
+    benchmark_yield_per_acre: r.benchmark_yield_per_acre == null ? null : Number(r.benchmark_yield_per_acre),
+    potential_production_quantity: r.potential_production_quantity == null ? null : Number(r.potential_production_quantity),
+    production_gap_quantity: r.production_gap_quantity == null ? null : Number(r.production_gap_quantity),
+    production_utilization_pct: r.production_utilization_pct == null ? null : Number(r.production_utilization_pct),
+    opportunity_score: r.opportunity_score == null ? null : Number(r.opportunity_score),
+  }));
+  return { village, opportunities, methodology: 'Potential = potential area acres × verified benchmark yield per acre; gap = potential production − current production; opportunity score is the production gap percentage where a benchmark is available.' };
+}
+
+async function upsertPotentialProfile(villageId, payload) {
+  const village = await getVillageGeo(villageId);
+  const commodity = await pool.query(`SELECT id, default_unit FROM village_production_commodities WHERE commodity_code=$1 AND active=true`, [payload.commodity_code]);
+  if (!commodity.rows.length) throw new ValidationError(`Unknown active commodity: ${payload.commodity_code}`);
+  const area = payload.potential_area_acres == null ? null : Number(payload.potential_area_acres);
+  const benchmark = payload.benchmark_yield_per_acre == null ? null : Number(payload.benchmark_yield_per_acre);
+  if (area != null && (!Number.isFinite(area) || area < 0)) throw new ValidationError('potential_area_acres must be non-negative');
+  if (benchmark != null && (!Number.isFinite(benchmark) || benchmark < 0)) throw new ValidationError('benchmark_yield_per_acre must be non-negative');
+  const result = await pool.query(`
+    INSERT INTO village_commodity_potential_profiles(village_id,commodity_id,potential_area_acres,benchmark_yield_per_acre,benchmark_unit,potential_production_quantity,production_gap_quantity,production_utilization_pct,potential_marketable_quantity,current_marketable_quantity,potential_market_value,current_market_value,opportunity_score,calculation_source,calculated_at,metadata)
+    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,NOW(),$15)
+    ON CONFLICT(village_id,commodity_id) DO UPDATE SET potential_area_acres=EXCLUDED.potential_area_acres,benchmark_yield_per_acre=EXCLUDED.benchmark_yield_per_acre,benchmark_unit=EXCLUDED.benchmark_unit,potential_production_quantity=EXCLUDED.potential_production_quantity,production_gap_quantity=EXCLUDED.production_gap_quantity,production_utilization_pct=EXCLUDED.production_utilization_pct,potential_marketable_quantity=EXCLUDED.potential_marketable_quantity,current_marketable_quantity=EXCLUDED.current_marketable_quantity,potential_market_value=EXCLUDED.potential_market_value,current_market_value=EXCLUDED.current_market_value,opportunity_score=EXCLUDED.opportunity_score,calculation_source=EXCLUDED.calculation_source,calculated_at=NOW(),metadata=EXCLUDED.metadata
+    RETURNING *`, [village.id,commodity.rows[0].id,area,benchmark,payload.benchmark_unit || commodity.rows[0].default_unit,payload.potential_production_quantity == null ? (area != null && benchmark != null ? area*benchmark : null) : Number(payload.potential_production_quantity),payload.production_gap_quantity == null ? null : Number(payload.production_gap_quantity),payload.production_utilization_pct == null ? null : Number(payload.production_utilization_pct),payload.potential_marketable_quantity == null ? null : Number(payload.potential_marketable_quantity),payload.current_marketable_quantity == null ? null : Number(payload.current_marketable_quantity),payload.potential_market_value == null ? null : Number(payload.potential_market_value),payload.current_market_value == null ? null : Number(payload.current_market_value),payload.opportunity_score == null ? null : Number(payload.opportunity_score),payload.calculation_source || 'manual',payload.metadata || {}]);
+  return result.rows[0];
+}
+
+module.exports = { getVillageGeo, updateVillageGeo, upsertFacility, nearestFacilities, recordProduction, recordFlow, economicBalance, productionPotential, upsertPotentialProfile };
