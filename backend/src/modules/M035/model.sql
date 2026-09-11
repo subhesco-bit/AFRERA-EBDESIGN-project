@@ -1,2 +1,1 @@
-﻿-- SQL model placeholder for GIS Land Mapping (M035)
--- Define tables and indexes here
+CREATE TABLE IF NOT EXISTS m035_gis_features (id UUID PRIMARY KEY,feature_id TEXT UNIQUE,layer TEXT NOT NULL,geometry JSONB NOT NULL,crs TEXT NOT NULL,source_reference TEXT,status TEXT NOT NULL DEFAULT 'active',attributes JSONB NOT NULL DEFAULT '{}'::jsonb,created_by TEXT,updated_by TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),deleted_at TIMESTAMPTZ); CREATE INDEX IF NOT EXISTS idx_m035_layer ON m035_gis_features(layer) WHERE deleted_at IS NULL; CREATE INDEX IF NOT EXISTS idx_m035_geometry ON m035_gis_features USING GIN(geometry);
