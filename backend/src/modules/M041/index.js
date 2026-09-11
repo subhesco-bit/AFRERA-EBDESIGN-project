@@ -40,9 +40,22 @@ router.patch('/village-tasks/:taskId', controller.updateTask);
 // AI decision support with persisted audit trail
 router.post('/villages/:villageId/ai/insights', controller.generateAI);
 
+// Village Project Design / DPR / Estimate / Funding / Subsidy Intelligence
+router.get('/villages/:villageId/projects', controller.listProjects);
+router.post('/villages/:villageId/projects', controller.createProject);
+router.get('/projects/:projectId', controller.getProject);
+router.post('/projects/:projectId/estimates', controller.createEstimate);
+router.post('/projects/:projectId/funding-sources', controller.addFundingSource);
+router.post('/projects/:projectId/subsidy-matches', controller.matchSubsidies);
+router.get('/projects/:projectId/subsidy-ai-context', controller.buildSubsidyAIContext);
+
+// Controlled administration of the Central/State scheme catalogue.
+router.post('/scheme-catalogue', controller.upsertScheme);
+
 module.exports = {
   controller: require('./controller'),
   service: require('./service'),
   erpService: require('./villageERPService'),
+  projectIntelligenceService: require('./villageProjectIntelligenceService'),
   router,
 };
