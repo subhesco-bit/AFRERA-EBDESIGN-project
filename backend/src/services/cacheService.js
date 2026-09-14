@@ -28,6 +28,13 @@ class CacheService {
         url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
         password: process.env.REDIS_PASSWORD || undefined,
         database: Number.parseInt(process.env.REDIS_DB, 10) || 0,
+        socket: {
+          connectTimeout: 5000,
+          // node-redis v4 retries forever by default, so `connect()` never
+          // rejects when Redis is unreachable - it just hangs. Give up after
+          // a few attempts so startup can fall back to running without cache.
+          reconnectStrategy: (retries) => (retries > 2 ? new Error('Redis unavailable') : Math.min(retries * 100, 500)),
+        },
       });
 
       this.client.on('error', (err) => {

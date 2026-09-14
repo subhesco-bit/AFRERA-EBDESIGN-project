@@ -57,6 +57,12 @@ class ServiceError extends AppError {
   }
 }
 
+class DatabaseError extends AppError {
+  constructor(message) {
+    super(message, 500, 'DATABASE_ERROR');
+  }
+}
+
 module.exports = {
   AppError,
   ValidationError,
@@ -66,4 +72,5 @@ module.exports = {
   ConflictError,
   RateLimitError,
   ServiceError,
+  DatabaseError,
 };

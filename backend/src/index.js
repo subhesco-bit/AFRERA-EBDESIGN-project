@@ -2,6 +2,7 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
+const { authMiddleware, requireRole } = require('./middleware/auth');
 const index = require('./routes/index.js');
 const devinRoutes = require('./routes/devinRoutes');
 const yieldManagement = require('./routes/yieldManagement.js');
@@ -27,13 +28,17 @@ const supplyChainTracking = require('./routes/supplyChainTracking.js');
 const supplyChainAnalytics = require('./routes/supplyChainAnalytics.js');
 const supplyChainDecisionRoutes = require('./routes/supplyChainDecisionRoutes.js');
 const subscriptions = require('./routes/subscriptions.js');
-const soilManagementRoutes = require('./routes/soilManagementRoutes.js');
+const {
+  soilHealthRoutes,
+  nutrientManagementRoutes,
+  fertilityManagementRoutes,
+} = require('./routes/soilManagementRoutes.js');
 const soilHealth = require('./routes/soilHealth.js');
 const sheepRoutes = require('./routes/sheepRoutes.js');
 const sellerVerifications = require('./routes/sellerVerifications.js');
 const sellerRankingRoutes = require('./routes/sellerRankingRoutes.js');
 const seedVaultRoutes = require('./routes/seedVaultRoutes.js');
-const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes.js');
+const sapModuleArchitectureRoutes = require('./routes/platform/sapModuleArchitectureRoutes.js');
 const roleManagementRoutes = require('./routes/roleManagementRoutes.js');
 const riskPricingRoutes = require('./routes/riskPricingRoutes.js');
 const riskAssessment = require('./routes/riskAssessment.js');
@@ -72,7 +77,16 @@ const ORPHANED_SERVICES_MOUNT = require('./routes/ORPHANED_SERVICES_MOUNT.js');
 const organizationManagementRoutes = require('./routes/organizationManagementRoutes.js');
 const orderRoutes = require('./routes/orderRoutes.js');
 const operationsRouteSupport = require('./routes/operationsRouteSupport.js');
-const operationsManagementRoutes = require('./routes/operationsManagementRoutes.js');
+const {
+  farmActivityRoutes,
+  farmTaskRoutes,
+  contractorRoutes,
+  machineryOperationsRoutes,
+  equipmentSchedulingRoutes,
+  inputConsumptionRoutes,
+  farmProductivityRoutes,
+  farmOperationsDashboardRoutes,
+} = require('./routes/operationsManagementRoutes.js');
 const nutritionIntelligenceRoutes = require('./routes/nutritionIntelligenceRoutes.js');
 const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes.js');
 const nlp = require('./routes/nlp.js');
@@ -86,21 +100,61 @@ const logisticsEnhancements = require('./routes/logisticsEnhancements.js');
 const logisticsEnhancementRoutes = require('./routes/logisticsEnhancementRoutes.js');
 const loanManagement = require('./routes/loanManagement.js');
 const livestockRouteSupport = require('./routes/livestockRouteSupport.js');
-const livestockManagementRoutes = require('./routes/livestockManagementRoutes.js');
+const {
+  cattleRegistryRoutes,
+  feedManagementRoutes,
+  livestockAnalyticsRoutes,
+} = require('./routes/livestockManagementRoutes.js');
 const livestock = require('./routes/livestock.js');
 const libraryRoutes = require('./routes/libraryRoutes.js');
 const landRecordsRoutes = require('./routes/landRecordsRoutes.js');
-const landManagementRoutes = require('./routes/landManagementRoutes.js');
+const {
+  landLeaseRoutes,
+  gisLandMappingRoutes,
+  soilMappingRoutes,
+  waterResourceMappingRoutes,
+  geoBoundaryRoutes,
+  surveyManagementRoutes,
+} = require('./routes/landManagementRoutes.js');
 const knowledgeRoutes = require('./routes/knowledgeRoutes.js');
-const irrigationManagementRoutes = require('./routes/irrigationManagementRoutes.js');
+const {
+  irrigationSchedulesRoutes,
+  irrigationWaterSourcesRoutes,
+  irrigationLogsRoutes,
+} = require('./routes/irrigationManagementRoutes.js');
 const iotSensors = require('./routes/iotSensors.js');
 const iotIntegrationRoutes = require('./routes/iotIntegrationRoutes.js');
 const insuranceEnhancements = require('./routes/insuranceEnhancements.js');
-const inputSupplyManagementRoutes = require('./routes/inputSupplyManagementRoutes.js');
+const {
+  biofertilizerRoutes,
+  pesticideInventoryRoutes,
+  bioPesticideRoutes,
+  micronutrientRoutes,
+  organicInputRoutes,
+  inputProcurementRoutes,
+  inputDistributionRoutes,
+  inputTraceabilityRoutes,
+} = require('./routes/inputSupplyManagementRoutes.js');
 const informationSharingRoutes = require('./routes/informationSharingRoutes.js');
-const identityManagementRoutes = require('./routes/identityManagementRoutes.js');
+const {
+  permissionManagementRoutes,
+  ssoRoutes,
+  mfaManagementRoutes,
+  digitalIdentityRoutes,
+  consentManagementRoutes,
+  sessionManagementRoutes,
+} = require('./routes/identityManagementRoutes.js');
 const hrRoutes = require('./routes/hrRoutes.js');
-const horticultureManagementRoutes = require('./routes/horticultureManagementRoutes.js');
+const {
+  vegetableProductionRoutes,
+  floricultureRoutes,
+  polyhouseManagementRoutes,
+  hydroponicsRoutes,
+  aeroponicsRoutes,
+  precisionHorticultureRoutes,
+  protectedCultivationRoutes,
+  horticultureAnalyticsRoutes,
+} = require('./routes/horticultureManagementRoutes.js');
 const horticulture = require('./routes/horticulture.js');
 const gstRoutes = require('./routes/gstRoutes.js');
 const greenhouse = require('./routes/greenhouse.js');
@@ -113,7 +167,17 @@ const freightPooling = require('./routes/freightPooling.js');
 const foodRoutes = require('./routes/foodRoutes.js');
 const foluRoutes = require('./routes/foluRoutes.js');
 const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes.js');
-const fisheriesManagementRoutes = require('./routes/fisheriesManagementRoutes.js');
+const {
+  biofloccFarmRoutes,
+  hatcheryManagementRoutes,
+  fishFeedRoutes,
+  fisheriesWaterQualityRoutes,
+  fishHealthRoutes,
+  fisheriesHarvestRoutes,
+  fishProcessingRoutes,
+  coldFishChainRoutes,
+  aquacultureAnalyticsRoutes,
+} = require('./routes/fisheriesManagementRoutes.js');
 const financialAnalytics = require('./routes/financialAnalytics.js');
 const fertilizerRoutes = require('./routes/fertilizerRoutes.js');
 const farmerValueRoutes = require('./routes/farmerValueRoutes.js');
@@ -150,7 +214,14 @@ const dairyRoutes = require('./routes/dairyRoutes.js');
 const cropValueResearchRoutes = require('./routes/cropValueResearchRoutes.js');
 const cropRecommendations = require('./routes/cropRecommendations.js');
 const cropPlanningRoutes = require('./routes/cropPlanningRoutes.js');
-const cropManagementRoutes = require('./routes/cropManagementRoutes.js');
+const {
+  cropRegistrationRoutes,
+  cropVarietyRoutes,
+  seedPlanningRoutes,
+  nurseryManagementRoutes,
+  sowingManagementRoutes,
+  cropMonitoringRoutes,
+} = require('./routes/cropManagementRoutes.js');
 const costRoutes = require('./routes/costRoutes.js');
 const costControlRoutes = require('./routes/costControlRoutes.js');
 const cooperativeShareRoutes = require('./routes/cooperativeShareRoutes.js');
@@ -160,11 +231,24 @@ const complianceRoutes = require('./routes/complianceRoutes.js');
 const completeERPIntegrationRoutes = require('./routes/completeERPIntegrationRoutes.js');
 const completeAIIntegrationRoutes = require('./routes/completeAIIntegrationRoutes.js');
 const companyRoutes = require('./routes/companyRoutes.js');
-const communityManagementRoutes = require('./routes/communityManagementRoutes.js');
+const {
+  blockManagementRoutes,
+  districtManagementRoutes,
+  stateManagementRoutes,
+  producerGroupRoutes,
+  communityAssetRoutes,
+  ruralDevelopmentRoutes,
+} = require('./routes/communityManagementRoutes.js');
 const coldStorageRoutes = require('./routes/coldStorageRoutes.js');
 const coldChainMonitoring = require('./routes/coldChainMonitoring.js');
 const climateRouteSupport = require('./routes/climateRouteSupport.js');
-const climateMonitoringRoutes = require('./routes/climateMonitoringRoutes.js');
+const {
+  droughtMonitoringRoutes,
+  floodMonitoringRoutes,
+  diseaseForecastingRoutes,
+  climateRiskRoutes,
+  agroMeteorologyRoutes,
+} = require('./routes/climateMonitoringRoutes.js');
 const climateAdvisoryRoutes = require('./routes/climateAdvisoryRoutes.js');
 const climateAdvisory = require('./routes/climateAdvisory.js');
 const civilDisruptionRoutes = require('./routes/civilDisruptionRoutes.js');
@@ -172,6 +256,7 @@ const certificationManagement = require('./routes/certificationManagement.js');
 const buyerTrust = require('./routes/buyerTrust.js');
 const bulkOrders = require('./routes/bulkOrders.js');
 const bulkOrderRoutes = require('./routes/bulkOrderRoutes.js');
+const { setupRoutes: setupCustodyEventRoutes } = require('./services/legacy/custodyEventRoutes.js');
 const blockchainVerificationRoutes = require('./routes/blockchainVerificationRoutes.js');
 const blockchainTrace = require('./routes/blockchainTrace.js');
 const biometric = require('./routes/biometric.js');
@@ -549,7 +634,9 @@ async function startup() {
     app.use('/api/supply-chain', supplyChainDecisionRoutes);
     app.use('/api/v1/supply-chain', supplyChainDecisionRoutes);
     app.use('/api/subscriptions', subscriptions);
-    app.use('/api/soilmanagement', soilManagementRoutes);
+    app.use('/api/v1/soil-health', soilHealthRoutes);
+    app.use('/api/v1/nutrient-management', nutrientManagementRoutes);
+    app.use('/api/v1/fertility-management', fertilityManagementRoutes);
     app.use('/api/soilhealth', soilHealth);
     app.use('/api/sheep', sheepRoutes);
     app.use('/api/sellerverifications', sellerVerifications);
@@ -594,7 +681,14 @@ async function startup() {
     app.use('/api/organizationmanagement', organizationManagementRoutes);
     app.use('/api/order', orderRoutes);
     app.use('/api/operationsroutesupport', operationsRouteSupport.router);
-    app.use('/api/operationsmanagement', operationsManagementRoutes);
+    app.use('/api/v1/farm-activity', farmActivityRoutes);
+    app.use('/api/v1/farm-task', farmTaskRoutes);
+    app.use('/api/v1/contractor', contractorRoutes);
+    app.use('/api/v1/machinery-operations', machineryOperationsRoutes);
+    app.use('/api/v1/equipment-scheduling', equipmentSchedulingRoutes);
+    app.use('/api/v1/input-consumption', inputConsumptionRoutes);
+    app.use('/api/v1/farm-productivity', farmProductivityRoutes);
+    app.use('/api/v1/farm-operations-dashboard', farmOperationsDashboardRoutes);
     app.use('/api/nutritionintelligence', nutritionIntelligenceRoutes);
     app.use('/api/nutrientvaluesales', nutrientValueSalesRoutes);
     app.use('/api/nlp', nlp);
@@ -608,21 +702,49 @@ async function startup() {
     app.use('/api/logisticsenhancement', logisticsEnhancementRoutes);
     app.use('/api/loanmanagement', loanManagement);
     app.use('/api/livestockroutesupport', livestockRouteSupport.router);
-    app.use('/api/livestockmanagement', livestockManagementRoutes);
+    app.use('/api/v1/cattle-registry', cattleRegistryRoutes);
+    app.use('/api/v1/feed-management', feedManagementRoutes);
+    app.use('/api/v1/livestock-analytics', livestockAnalyticsRoutes);
     app.use('/api/livestock', livestock);
     app.use('/api/library', libraryRoutes);
     app.use('/api/landrecords', landRecordsRoutes);
-    app.use('/api/landmanagement', landManagementRoutes);
+    app.use('/api/v1/land-lease', landLeaseRoutes);
+    app.use('/api/v1/gis-land-mapping', gisLandMappingRoutes);
+    app.use('/api/v1/soil-mapping', soilMappingRoutes);
+    app.use('/api/v1/water-resource-mapping', waterResourceMappingRoutes);
+    app.use('/api/v1/geo-boundary', geoBoundaryRoutes);
+    app.use('/api/v1/survey-management', surveyManagementRoutes);
     app.use('/api/knowledge', knowledgeRoutes);
-    app.use('/api/irrigationmanagement', irrigationManagementRoutes);
+    app.use('/api/v1/irrigation/schedules', irrigationSchedulesRoutes);
+    app.use('/api/v1/irrigation/water-sources', irrigationWaterSourcesRoutes);
+    app.use('/api/v1/irrigation/logs', irrigationLogsRoutes);
     app.use('/api/iotsensors', iotSensors);
     app.use('/api/iotintegration', iotIntegrationRoutes);
     app.use('/api/insuranceenhancements', insuranceEnhancements);
-    app.use('/api/inputsupplymanagement', inputSupplyManagementRoutes);
+    app.use('/api/v1/biofertilizer', biofertilizerRoutes);
+    app.use('/api/v1/pesticide-inventory', pesticideInventoryRoutes);
+    app.use('/api/v1/bio-pesticide', bioPesticideRoutes);
+    app.use('/api/v1/micronutrient', micronutrientRoutes);
+    app.use('/api/v1/organic-input', organicInputRoutes);
+    app.use('/api/v1/input-procurement', inputProcurementRoutes);
+    app.use('/api/v1/input-distribution', inputDistributionRoutes);
+    app.use('/api/v1/input-traceability', inputTraceabilityRoutes);
     app.use('/api/informationsharing', informationSharingRoutes);
-    app.use('/api/identitymanagement', identityManagementRoutes);
+    app.use('/api/v1/permission-management', permissionManagementRoutes);
+    app.use('/api/v1/sso', ssoRoutes);
+    app.use('/api/v1/mfa-management', mfaManagementRoutes);
+    app.use('/api/v1/digital-identity', digitalIdentityRoutes);
+    app.use('/api/v1/consent-management', consentManagementRoutes);
+    app.use('/api/v1/session-management', sessionManagementRoutes);
     app.use('/api/hr', hrRoutes);
-    app.use('/api/horticulturemanagement', horticultureManagementRoutes);
+    app.use('/api/v1/vegetable-production', vegetableProductionRoutes);
+    app.use('/api/v1/floriculture', floricultureRoutes);
+    app.use('/api/v1/polyhouse-management', polyhouseManagementRoutes);
+    app.use('/api/v1/hydroponics', hydroponicsRoutes);
+    app.use('/api/v1/aeroponics', aeroponicsRoutes);
+    app.use('/api/v1/precision-horticulture', precisionHorticultureRoutes);
+    app.use('/api/v1/protected-cultivation', protectedCultivationRoutes);
+    app.use('/api/v1/horticulture-analytics', horticultureAnalyticsRoutes);
     app.use('/api/horticulture', horticulture);
     app.use('/api/gst', gstRoutes);
     app.use('/api/greenhouse', greenhouse);
@@ -635,7 +757,15 @@ async function startup() {
     app.use('/api/food', foodRoutes);
     app.use('/api/folu', foluRoutes);
     app.use('/api/folubenchmark', foluBenchmarkRoutes);
-    app.use('/api/fisheriesmanagement', fisheriesManagementRoutes);
+    app.use('/api/v1/bioflocc-farm', biofloccFarmRoutes);
+    app.use('/api/v1/hatchery-management', hatcheryManagementRoutes);
+    app.use('/api/v1/fish-feed', fishFeedRoutes);
+    app.use('/api/v1/fisheries-water-quality', fisheriesWaterQualityRoutes);
+    app.use('/api/v1/fish-health', fishHealthRoutes);
+    app.use('/api/v1/fisheries-harvest', fisheriesHarvestRoutes);
+    app.use('/api/v1/fish-processing', fishProcessingRoutes);
+    app.use('/api/v1/cold-fish-chain', coldFishChainRoutes);
+    app.use('/api/v1/aquaculture-analytics', aquacultureAnalyticsRoutes);
     app.use('/api/financialanalytics', financialAnalytics);
     app.use('/api/fertilizer', fertilizerRoutes);
     app.use('/api/farmervalue', farmerValueRoutes);
@@ -672,7 +802,12 @@ async function startup() {
     app.use('/api/cropvalueresearch', cropValueResearchRoutes);
     app.use('/api/croprecommendations', cropRecommendations);
     app.use('/api/cropplanning', cropPlanningRoutes);
-    app.use('/api/cropmanagement', cropManagementRoutes);
+    app.use('/api/v1/crop-registration', cropRegistrationRoutes);
+    app.use('/api/v1/crop-variety', cropVarietyRoutes);
+    app.use('/api/v1/seed-planning', seedPlanningRoutes);
+    app.use('/api/v1/nursery-management', nurseryManagementRoutes);
+    app.use('/api/v1/sowing-management', sowingManagementRoutes);
+    app.use('/api/v1/crop-monitoring', cropMonitoringRoutes);
     app.use('/api/cost', costRoutes);
     app.use('/api/costcontrol', costControlRoutes);
     app.use('/api/cooperativeshare', cooperativeShareRoutes);
@@ -682,11 +817,24 @@ async function startup() {
     app.use('/api/completeerpintegration', completeERPIntegrationRoutes);
     app.use('/api/completeaiintegration', completeAIIntegrationRoutes);
     app.use('/api/company', companyRoutes);
-    app.use('/api/communitymanagement', communityManagementRoutes);
+    app.use('/api/v1/block-management', blockManagementRoutes);
+    app.use('/api/v1/district-management', districtManagementRoutes);
+    app.use('/api/v1/state-management', stateManagementRoutes);
+    app.use('/api/v1/producer-group', producerGroupRoutes);
+    app.use('/api/v1/community-asset', communityAssetRoutes);
+    app.use('/api/v1/rural-development', ruralDevelopmentRoutes);
     app.use('/api/coldstorage', coldStorageRoutes);
     app.use('/api/coldchainmonitoring', coldChainMonitoring);
     app.use('/api/climateroutesupport', climateRouteSupport.router);
-    app.use('/api/climatemonitoring', climateMonitoringRoutes);
+    app.use('/api/v1/drought-monitoring', droughtMonitoringRoutes);
+    app.use('/api/v1/flood-monitoring', floodMonitoringRoutes);
+    app.use('/api/v1/disease-forecasting', diseaseForecastingRoutes);
+    app.use('/api/v1/climate-risk', climateRiskRoutes);
+    app.use('/api/v1/agro-meteorology', agroMeteorologyRoutes);
+    // Registers at /api/v1/custody itself - never reached via auto-discovery
+    // because the module also exports `router`, so DynamicRouteLoader mounts
+    // that instead of calling setupRoutes (see custodyEventRoutes.js header).
+    setupCustodyEventRoutes(app);
     app.use('/api/climateadvisory', climateAdvisoryRoutes);
     app.use('/api/climateadvisory', climateAdvisory);
     app.use('/api/civildisruption', civilDisruptionRoutes);

@@ -6,7 +6,10 @@
 
 const express = require('express');
 const router = express.Router();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// The Stripe SDK throws at construction time if no key is configured
+// (unlike this codebase's other SDK clients), which would otherwise crash
+// the whole server on boot whenever STRIPE_SECRET_KEY is unset.
+const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 
 const { logger } = require('../utils/logger');
 
@@ -20,6 +23,10 @@ const express_raw = require('body-parser').raw({ type: 'application/json' });
  * Stripe webhook endpoint - MUST use raw body for signature verification
  */
 router.post('/stripe-webhook', express_raw, async (req, res) => {
+  if (!stripe) {
+    return res.status(503).json({ success: false, error: 'Stripe is not configured' });
+  }
+
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

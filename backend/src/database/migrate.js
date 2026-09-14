@@ -18,10 +18,40 @@ function getMigrationFiles() {
     .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
 }
 
+/**
+ * Strip bare top-level BEGIN/COMMIT/END/ROLLBACK statements (some migration
+ * files wrap their own DDL in an explicit transaction, which conflicts with
+ * this runner executing each file inside its own transaction).
+ *
+ * Must never touch a BEGIN/END that's part of a PL/pgSQL function body -
+ * `CREATE FUNCTION ... AS $$ BEGIN ... END; $$ LANGUAGE plpgsql;` is a
+ * standard idiom, and a naive line-anchored regex strips that closing
+ * `END;` too, corrupting the function and breaking the whole file with a
+ * "syntax error at end of input". Track dollar-quoted ($$ / $tag$) block
+ * state line by line and only strip markers outside of one.
+ */
 function stripTransactionMarkers(sql) {
-  return sql
-    .replace(/^\s*(BEGIN|START\s+TRANSACTION)\s*;\s*$/gim, '')
-    .replace(/^\s*(COMMIT|END|ROLLBACK)\s*;\s*$/gim, '');
+  const dollarTagRe = /\$([A-Za-z_][A-Za-z0-9_]*)?\$/;
+  let openTag = null;
+
+  return sql.split('\n').map((line) => {
+    if (openTag !== null) {
+      if (line.includes(`$${openTag}$`)) openTag = null;
+      return line;
+    }
+
+    const opener = line.match(dollarTagRe);
+    if (opener) {
+      const token = `$${opener[1] || ''}$`;
+      const closesOnSameLine = line.indexOf(token, line.indexOf(token) + token.length) !== -1;
+      if (!closesOnSameLine) openTag = opener[1] || '';
+      return line;
+    }
+
+    if (/^\s*(BEGIN|START\s+TRANSACTION)\s*;\s*$/i.test(line)) return '';
+    if (/^\s*(COMMIT|END|ROLLBACK)\s*;\s*$/i.test(line)) return '';
+    return line;
+  }).join('\n');
 }
 
 function runPreflight() {

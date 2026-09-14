@@ -155,6 +155,19 @@ function getPostgreSQL() {
 }
 
 /**
+ * Run a query against the PostgreSQL pool. Convenience wrapper over
+ * getPostgreSQL().query(...) - the M0XX module services call `db.query(...)`
+ * directly on this module rather than fetching the pool first.
+ */
+function query(sql, params) {
+  const pool = getPostgreSQL();
+  if (!pool) {
+    throw new Error('PostgreSQL not initialized. Call initialize() first.');
+  }
+  return pool.query(sql, params);
+}
+
+/**
  * Get MongoDB client
  */
 function getMongoDB() {
@@ -215,6 +228,7 @@ if (process.env.NODE_ENV !== 'test') {
 module.exports = {
   initialize,
   getPostgreSQL,
+  query,
   getMongoDB,
   getMongoDatabase,
   isHealthy,

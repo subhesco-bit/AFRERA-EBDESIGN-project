@@ -7,7 +7,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { getPostgreSQL } = require('../database/connection');
 const libraryKnowledgeService = require('../services/libraryKnowledgeService');
 const unifiedConfigService = require('../services/unifiedConfigService');
-const aiCollaborationService = require('../services/aiCollaborationService');
+const aiCollaborationService = require('../services/claude/aiCollaborationService');
 const aiFeedbackService = require('../services/aiFeedbackService');
 
 class ClaudeAICoordinator {

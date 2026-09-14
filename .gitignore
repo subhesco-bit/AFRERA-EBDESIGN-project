@@ -1,4 +1,6 @@
 node_modules/
+.scratch/
+.ai/library-manifest.json
 dist/
 build/
 coverage/

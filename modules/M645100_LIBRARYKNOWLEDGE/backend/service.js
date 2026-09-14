@@ -91,10 +91,16 @@ class LibraryKnowledgeService {
     this.libraryRoot = options.libraryRoot || path.join(this.projectRoot, '_EBDESIGN_LIBRARY');
     this.modulesRoot = options.modulesRoot || path.join(this.projectRoot, 'modules');
     this.backendModulesRoot = options.backendModulesRoot || path.join(this.projectRoot, 'backend', 'src', 'modules');
+    this.manifestPath = options.manifestPath || path.join(this.projectRoot, '.ai', 'library-manifest.json');
     this.index = new Map();
     this.contentHashes = new Map();
     this.indexingWarnings = [];
     this.initialized = false;
+    this._watchers = [];
+    this._reindexTimer = null;
+    this._reindexDebounceMs = options.reindexDebounceMs || 500;
+    this._lastAutoReindexAt = null;
+    this._watching = false;
   }
 
   async initialize(options = {}) {
@@ -106,6 +112,7 @@ class LibraryKnowledgeService {
     }
 
     this.initialized = true;
+    this.startWatching();
     return {
       success: true,
       moduleId: MODULE_ID,
@@ -119,6 +126,80 @@ class LibraryKnowledgeService {
     if (!this.initialized) {
       await this.initialize({ syncDatabase: false });
     }
+  }
+
+  /**
+   * Watch modulesRoot/libraryRoot for changes and auto-reindex, debounced,
+   * so the index stays live without anyone having to call reindex()
+   * manually. Node's recursive fs.watch is best-effort (inotify limits,
+   * doesn't cross filesystem boundaries) - a failure here degrades to the
+   * pre-existing manual reindex()/POST /meta/reindex path, it never blocks
+   * startup or throws.
+   */
+  startWatching() {
+    if (this._watching) return;
+    this._watching = true;
+
+    const scheduleReindex = (eventType, filename) => {
+      if (filename && /(^|[/\\])(node_modules|\.git)([/\\]|$)/.test(filename)) return;
+      clearTimeout(this._reindexTimer);
+      this._reindexTimer = setTimeout(() => {
+        this.reindex().then(() => {
+          this._lastAutoReindexAt = new Date().toISOString();
+        }).catch((error) => {
+          this.indexingWarnings.push({ warning: 'auto_reindex_failed', message: error.message });
+        });
+      }, this._reindexDebounceMs);
+      if (typeof this._reindexTimer.unref === 'function') this._reindexTimer.unref();
+    };
+
+    for (const root of [this.modulesRoot, this.libraryRoot]) {
+      if (!fs.existsSync(root)) continue;
+      try {
+        const watcher = fs.watch(root, { recursive: true }, scheduleReindex);
+        watcher.on('error', (error) => {
+          this.indexingWarnings.push({ warning: 'watch_failed', path: root, message: error.message });
+        });
+        if (typeof watcher.unref === 'function') watcher.unref();
+        this._watchers.push(watcher);
+      } catch (error) {
+        this.indexingWarnings.push({ warning: 'watch_unavailable', path: root, message: error.message });
+      }
+    }
+  }
+
+  stopWatching() {
+    for (const watcher of this._watchers) {
+      try { watcher.close(); } catch { /* already closed */ }
+    }
+    this._watchers = [];
+    this._watching = false;
+    clearTimeout(this._reindexTimer);
+  }
+
+  /**
+   * Force a full rebuild of the in-memory index from disk. `initialize()`
+   * only runs once per process (gated by `this.initialized`), so this is
+   * the only way to pick up files added/removed/edited after startup
+   * without restarting the server.
+   */
+  async reindex(options = {}) {
+    await this.buildIndex();
+    await this.computeContentHashes();
+
+    if (options.syncDatabase === true) {
+      await this.syncToDatabase();
+    }
+
+    this.initialized = true;
+    return {
+      success: true,
+      moduleId: MODULE_ID,
+      indexedItems: this.index.size,
+      contentHashes: this.contentHashes.size,
+      indexingWarnings: this.indexingWarnings.length,
+      reindexedAt: new Date().toISOString()
+    };
   }
 
   async buildIndex() {
@@ -271,18 +352,226 @@ class LibraryKnowledgeService {
     if (!fs.existsSync(this.backendModulesRoot)) return;
 
     for (const dir of fs.readdirSync(this.backendModulesRoot, { withFileTypes: true })) {
-      if (!dir.isDirectory() || !/^M\d{3}$/.test(dir.name)) continue;
+      if (!dir.isDirectory()) continue;
       const modulePath = path.join(this.backendModulesRoot, dir.name);
+      // Two conventions coexist under backend/src/modules/: bare M### dirs
+      // (e.g. M001) lay service.js/routes.js/controller.js/model.sql/
+      // README.md flat; extended M######_NAME dirs (e.g. M645100_LIBRARY
+      // KNOWLEDGE) nest them under backend/, api/, frontend/ and add a
+      // module.json. Both were meant to be indexed; only the flat layout's
+      // markers were ever actually checked, so every extended-name folder
+      // (196 of them) was invisible. Check both without assuming which is
+      // "the real one" - that's a duplicate-content question, not an
+      // indexing one.
+      const hasBackend = fs.existsSync(path.join(modulePath, 'service.js')) ||
+        fs.existsSync(path.join(modulePath, 'backend', 'service.js'));
+      const hasRoutes = fs.existsSync(path.join(modulePath, 'routes.js')) ||
+        fs.existsSync(path.join(modulePath, 'backend', 'routes.js')) ||
+        fs.existsSync(path.join(modulePath, 'api', 'routes.js'));
+      const hasController = fs.existsSync(path.join(modulePath, 'controller.js')) ||
+        fs.existsSync(path.join(modulePath, 'backend', 'controller.js'));
+      const hasModel = fs.existsSync(path.join(modulePath, 'model.sql')) ||
+        fs.existsSync(path.join(modulePath, 'backend', 'model.sql'));
+      const hasDocs = fs.existsSync(path.join(modulePath, 'README.md'));
+      const hasManifest = fs.existsSync(path.join(modulePath, 'module.json'));
+      const hasFrontend = fs.existsSync(path.join(modulePath, 'frontend'));
+      // Only the strict M### three-digit folders were indexed before; every
+      // other module-shaped folder here was invisible to the library.
+      // Index anything that looks like a real module - map everything,
+      // merge/dedupe nothing. This tree and modulesRoot below use
+      // different key prefixes ('BACKEND:' vs bare moduleId), so a folder
+      // present in both places (e.g. M645100_LIBRARYKNOWLEDGE) gets two
+      // distinct, clearly separately-branched index entries rather than
+      // colliding.
+      if (!hasBackend && !hasRoutes && !hasController && !hasModel && !hasDocs && !hasManifest) continue;
       this.indexFile(`BACKEND:${dir.name}`, 'backend-module', modulePath, {
         moduleId: dir.name,
         name: this.inferBackendModuleName(dir.name),
-        hasBackend: fs.existsSync(path.join(modulePath, 'service.js')),
-        hasRoutes: fs.existsSync(path.join(modulePath, 'routes.js')),
-        hasController: fs.existsSync(path.join(modulePath, 'controller.js')),
-        hasModel: fs.existsSync(path.join(modulePath, 'model.sql')),
-        hasDocs: fs.existsSync(path.join(modulePath, 'README.md')),
+        hasBackend,
+        hasRoutes,
+        hasController,
+        hasModel,
+        hasDocs,
+        hasManifest,
+        hasFrontend,
         apiBase: `/api/v1/modules/${dir.name.toLowerCase()}`
       });
+    }
+  }
+
+  /**
+   * Duplicate-filename detector ("org chart" view: same designation, but
+   * only unique once you know which branch/system it lives under).
+   *
+   * Scans backend/src/{routes,services,controllers} (where every duplicate
+   * found by hand this session lived - e.g. two custodyEventRoutes.js,
+   * two iotIntegrationService.js) for files sharing a basename, and
+   * content-hashes each group so a caller can tell "identical copy, safe
+   * to collapse" from "same name, diverged content - needs a real merge
+   * decision" without opening every file. Never deletes or merges
+   * anything itself - this only reports.
+   */
+  async findDuplicateFilenames(options = {}) {
+    const backendRoot = options.backendRoot || path.join(this.projectRoot, 'backend', 'src');
+    // Deliberately excludes modulesRoot/backendModulesRoot: every module
+    // legitimately has its own service.js/module.json/README.md, so
+    // basename-matching across the whole modules tree flags hundreds of
+    // unrelated files as "duplicates" of each other. Same-module-ID-under-
+    // different-directory-naming (e.g. M001 vs M001_PLATFORM_CORE) is a
+    // real duplicate signal but a different question - see
+    // findDuplicateModuleIds().
+    const roots = options.roots || ['routes', 'services', 'controllers'].map((d) => path.join(backendRoot, d));
+
+    const byBasename = new Map(); // basename -> [{ path, relativePath }]
+    let totalFilesScanned = 0;
+
+    const visit = (dir) => {
+      if (!fs.existsSync(dir)) return;
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (entry.name === '__tests__') continue;
+          visit(fullPath);
+          continue;
+        }
+        if (!entry.name.endsWith('.js')) continue;
+        totalFilesScanned += 1;
+        if (!byBasename.has(entry.name)) byBasename.set(entry.name, []);
+        byBasename.get(entry.name).push(fullPath);
+      }
+    };
+
+    for (const root of roots) visit(root);
+
+    const duplicateGroups = [];
+    for (const [filename, paths] of byBasename) {
+      if (paths.length < 2) continue;
+      const withHashes = paths.map((p) => {
+        let hash = null;
+        try { hash = crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'); } catch { /* unreadable, skip hash */ }
+        const relativePath = path.relative(this.projectRoot, p);
+        // The "system" a duplicate belongs to, e.g. "backend/src/routes" or
+        // "modules/M001_PLATFORM_CORE/backend" - everything but the
+        // filename itself, so two files of the same name are told apart by
+        // where they actually live rather than treated as one thing.
+        const branch = path.dirname(relativePath);
+        return { path: p, relativePath, branch, hash };
+      });
+      const uniqueHashes = new Set(withHashes.map((w) => w.hash).filter(Boolean));
+      duplicateGroups.push({
+        filename,
+        count: withHashes.length,
+        identical: uniqueHashes.size === 1,
+        files: withHashes,
+      });
+    }
+
+    duplicateGroups.sort((a, b) => b.count - a.count || a.filename.localeCompare(b.filename));
+
+    return {
+      scannedAt: new Date().toISOString(),
+      roots: roots.map((r) => path.relative(this.projectRoot, r)),
+      totalFilesScanned,
+      duplicateFilenameCount: duplicateGroups.length,
+      identicalCount: duplicateGroups.filter((g) => g.identical).length,
+      divergedCount: duplicateGroups.filter((g) => !g.identical).length,
+      duplicateGroups,
+    };
+  }
+
+  /**
+   * Org-chart view of the whole indexed library: Project -> System (top
+   * path segment, e.g. "modules" or "backend") -> Branch (the rest of the
+   * directory path) -> Files. Built from the already-computed index, so it
+   * reflects exactly what searchLibrary/listModules/etc. see - never a
+   * second, separately-drifting source of truth. Read-only: builds a tree,
+   * renames or moves nothing.
+   */
+  async buildOrgChart() {
+    await this.ensureInitialized();
+    const root = { name: 'project', type: 'root', children: new Map(), itemCount: 0 };
+
+    for (const item of this.index.values()) {
+      const relativePath = path.relative(this.projectRoot, item.path);
+      const segments = relativePath.split(path.sep).filter(Boolean);
+      let node = root;
+      node.itemCount += 1;
+      for (let i = 0; i < segments.length - 1; i += 1) {
+        const segment = segments[i];
+        if (!node.children.has(segment)) {
+          node.children.set(segment, { name: segment, type: 'directory', children: new Map(), itemCount: 0 });
+        }
+        node = node.children.get(segment);
+        node.itemCount += 1;
+      }
+      const fileName = segments[segments.length - 1] || path.basename(item.path);
+      if (!node.children.has(fileName)) {
+        node.children.set(fileName, { name: fileName, type: 'file', entries: [] });
+      }
+      const fileNode = node.children.get(fileName);
+      fileNode.entries.push({ key: item.key, type: item.type, path: item.path });
+    }
+
+    const toPlain = (node) => {
+      if (node.type === 'file') {
+        return { name: node.name, type: 'file', entries: node.entries, duplicate: node.entries.length > 1 };
+      }
+      return {
+        name: node.name,
+        type: node.type,
+        itemCount: node.itemCount,
+        children: [...node.children.values()].map(toPlain).sort((a, b) => a.name.localeCompare(b.name)),
+      };
+    };
+
+    return toPlain(root);
+  }
+
+  /**
+   * Write the org-chart tree, duplicate report, and index stats to a
+   * persistent manifest file - the durable "brain" that tracks every
+   * file's position and linkage, rather than only existing as an
+   * in-memory/API-response structure that disappears on restart.
+   * Read-only over the source tree: writes only to manifestPath, never
+   * renames or moves a project file.
+   */
+  async generateManifest() {
+    await this.ensureInitialized();
+    const [orgChart, duplicates] = await Promise.all([
+      this.buildOrgChart(),
+      this.findDuplicateFilenames(),
+    ]);
+    const manifest = {
+      generatedAt: new Date().toISOString(),
+      moduleId: MODULE_ID,
+      stats: this.getStatistics(),
+      duplicateSummary: {
+        totalFilesScanned: duplicates.totalFilesScanned,
+        duplicateFilenameCount: duplicates.duplicateFilenameCount,
+        identicalCount: duplicates.identicalCount,
+        divergedCount: duplicates.divergedCount,
+      },
+      duplicateGroups: duplicates.duplicateGroups,
+      orgChart,
+    };
+
+    fs.mkdirSync(path.dirname(this.manifestPath), { recursive: true });
+    fs.writeFileSync(this.manifestPath, JSON.stringify(manifest, null, 2));
+    return { success: true, manifestPath: this.manifestPath, generatedAt: manifest.generatedAt, ...manifest.duplicateSummary };
+  }
+
+  /**
+   * Read the last-generated manifest from disk, if one exists.
+   */
+  getManifest() {
+    if (!fs.existsSync(this.manifestPath)) {
+      return { success: false, error: 'No manifest generated yet - call generateManifest() / POST /api/library/meta/manifest first' };
+    }
+    try {
+      return { success: true, data: JSON.parse(fs.readFileSync(this.manifestPath, 'utf8')) };
+    } catch (error) {
+      return { success: false, error: `Manifest file is corrupt: ${error.message}` };
     }
   }
 
@@ -553,7 +842,9 @@ class LibraryKnowledgeService {
       byType,
       libraryRoot: this.libraryRoot,
       modulesRoot: this.modulesRoot,
-      lastIndexed: new Date().toISOString()
+      lastIndexed: new Date().toISOString(),
+      live: this._watching,
+      lastAutoReindexAt: this._lastAutoReindexAt
     };
   }
 
@@ -565,7 +856,9 @@ class LibraryKnowledgeService {
       moduleName: MODULE_NAME,
       indexedItems: this.index.size,
       indexingWarnings: this.indexingWarnings.length,
-      claudeCompatible: true
+      claudeCompatible: true,
+      live: this._watching,
+      lastAutoReindexAt: this._lastAutoReindexAt
     };
   }
 
