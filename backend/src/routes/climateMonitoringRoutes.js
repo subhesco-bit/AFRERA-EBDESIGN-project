@@ -60,7 +60,6 @@ function crudRouter(service) {
   return router;
 }
 
-const router = express.Router();
 const routes = {
   droughtMonitoringRoutes: crudRouter(droughtMonitoring),
   floodMonitoringRoutes: crudRouter(floodMonitoring),
@@ -69,4 +68,4 @@ const routes = {
   agroMeteorologyRoutes: crudRouter(agroMeteorology),
 };
 
-module.exports = router;
+module.exports = routes;

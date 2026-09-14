@@ -53,7 +53,6 @@ function crudRouter(service) {
   return router;
 }
 
-const router = express.Router();
 const routes = {
   biofloccFarmRoutes: crudRouter(biofloccFarm),
   hatcheryManagementRoutes: crudRouter(hatcheryManagement),
@@ -66,4 +65,4 @@ const routes = {
   aquacultureAnalyticsRoutes: crudRouter(aquacultureAnalytics),
 };
 
-module.exports = router;
+module.exports = routes;

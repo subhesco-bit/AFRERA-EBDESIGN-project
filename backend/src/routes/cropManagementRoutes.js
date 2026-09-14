@@ -65,7 +65,6 @@ function crudRouter(service) {
   return router;
 }
 
-const router = express.Router();
 const routes = {
   cropRegistrationRoutes: crudRouter(cropRegistration),
   cropVarietyRoutes: crudRouter(cropVariety),
@@ -75,4 +74,4 @@ const routes = {
   cropMonitoringRoutes: crudRouter(cropMonitoring),
 };
 
-module.exports = router;
+module.exports = routes;

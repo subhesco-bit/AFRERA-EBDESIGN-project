@@ -95,6 +95,11 @@ class LibraryKnowledgeService {
     this.contentHashes = new Map();
     this.indexingWarnings = [];
     this.initialized = false;
+    this._watchers = [];
+    this._reindexTimer = null;
+    this._reindexDebounceMs = options.reindexDebounceMs || 500;
+    this._lastAutoReindexAt = null;
+    this._watching = false;
   }
 
   async initialize(options = {}) {
@@ -106,6 +111,7 @@ class LibraryKnowledgeService {
     }
 
     this.initialized = true;
+    this.startWatching();
     return {
       success: true,
       moduleId: MODULE_ID,
@@ -119,6 +125,80 @@ class LibraryKnowledgeService {
     if (!this.initialized) {
       await this.initialize({ syncDatabase: false });
     }
+  }
+
+  /**
+   * Watch modulesRoot/libraryRoot for changes and auto-reindex, debounced,
+   * so the index stays live without anyone having to call reindex()
+   * manually. Node's recursive fs.watch is best-effort (inotify limits,
+   * doesn't cross filesystem boundaries) - a failure here degrades to the
+   * pre-existing manual reindex()/POST /meta/reindex path, it never blocks
+   * startup or throws.
+   */
+  startWatching() {
+    if (this._watching) return;
+    this._watching = true;
+
+    const scheduleReindex = (eventType, filename) => {
+      if (filename && /(^|[/\\])(node_modules|\.git)([/\\]|$)/.test(filename)) return;
+      clearTimeout(this._reindexTimer);
+      this._reindexTimer = setTimeout(() => {
+        this.reindex().then(() => {
+          this._lastAutoReindexAt = new Date().toISOString();
+        }).catch((error) => {
+          this.indexingWarnings.push({ warning: 'auto_reindex_failed', message: error.message });
+        });
+      }, this._reindexDebounceMs);
+      if (typeof this._reindexTimer.unref === 'function') this._reindexTimer.unref();
+    };
+
+    for (const root of [this.modulesRoot, this.libraryRoot]) {
+      if (!fs.existsSync(root)) continue;
+      try {
+        const watcher = fs.watch(root, { recursive: true }, scheduleReindex);
+        watcher.on('error', (error) => {
+          this.indexingWarnings.push({ warning: 'watch_failed', path: root, message: error.message });
+        });
+        if (typeof watcher.unref === 'function') watcher.unref();
+        this._watchers.push(watcher);
+      } catch (error) {
+        this.indexingWarnings.push({ warning: 'watch_unavailable', path: root, message: error.message });
+      }
+    }
+  }
+
+  stopWatching() {
+    for (const watcher of this._watchers) {
+      try { watcher.close(); } catch { /* already closed */ }
+    }
+    this._watchers = [];
+    this._watching = false;
+    clearTimeout(this._reindexTimer);
+  }
+
+  /**
+   * Force a full rebuild of the in-memory index from disk. `initialize()`
+   * only runs once per process (gated by `this.initialized`), so this is
+   * the only way to pick up files added/removed/edited after startup
+   * without restarting the server.
+   */
+  async reindex(options = {}) {
+    await this.buildIndex();
+    await this.computeContentHashes();
+
+    if (options.syncDatabase === true) {
+      await this.syncToDatabase();
+    }
+
+    this.initialized = true;
+    return {
+      success: true,
+      moduleId: MODULE_ID,
+      indexedItems: this.index.size,
+      contentHashes: this.contentHashes.size,
+      indexingWarnings: this.indexingWarnings.length,
+      reindexedAt: new Date().toISOString()
+    };
   }
 
   async buildIndex() {
@@ -284,6 +364,74 @@ class LibraryKnowledgeService {
         apiBase: `/api/v1/modules/${dir.name.toLowerCase()}`
       });
     }
+  }
+
+  /**
+   * Duplicate-filename detector ("org chart" view: same designation, but
+   * only unique once you know which branch/system it lives under).
+   *
+   * Scans backend/src/{routes,services,controllers} (where every duplicate
+   * found by hand this session lived - e.g. two custodyEventRoutes.js,
+   * two iotIntegrationService.js) for files sharing a basename, and
+   * content-hashes each group so a caller can tell "identical copy, safe
+   * to collapse" from "same name, diverged content - needs a real merge
+   * decision" without opening every file. Never deletes or merges
+   * anything itself - this only reports.
+   */
+  async findDuplicateFilenames(options = {}) {
+    const backendRoot = options.backendRoot || path.join(this.projectRoot, 'backend', 'src');
+    const roots = options.roots || ['routes', 'services', 'controllers'].map((d) => path.join(backendRoot, d));
+
+    const byBasename = new Map(); // basename -> [{ path, relativePath }]
+    let totalFilesScanned = 0;
+
+    const visit = (dir) => {
+      if (!fs.existsSync(dir)) return;
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (entry.name === '__tests__') continue;
+          visit(fullPath);
+          continue;
+        }
+        if (!entry.name.endsWith('.js')) continue;
+        totalFilesScanned += 1;
+        if (!byBasename.has(entry.name)) byBasename.set(entry.name, []);
+        byBasename.get(entry.name).push(fullPath);
+      }
+    };
+
+    for (const root of roots) visit(root);
+
+    const duplicateGroups = [];
+    for (const [filename, paths] of byBasename) {
+      if (paths.length < 2) continue;
+      const withHashes = paths.map((p) => {
+        let hash = null;
+        try { hash = crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'); } catch { /* unreadable, skip hash */ }
+        return { path: p, relativePath: path.relative(this.projectRoot, p), hash };
+      });
+      const uniqueHashes = new Set(withHashes.map((w) => w.hash).filter(Boolean));
+      duplicateGroups.push({
+        filename,
+        count: withHashes.length,
+        identical: uniqueHashes.size === 1,
+        files: withHashes,
+      });
+    }
+
+    duplicateGroups.sort((a, b) => b.count - a.count || a.filename.localeCompare(b.filename));
+
+    return {
+      scannedAt: new Date().toISOString(),
+      roots: roots.map((r) => path.relative(this.projectRoot, r)),
+      totalFilesScanned,
+      duplicateFilenameCount: duplicateGroups.length,
+      identicalCount: duplicateGroups.filter((g) => g.identical).length,
+      divergedCount: duplicateGroups.filter((g) => !g.identical).length,
+      duplicateGroups,
+    };
   }
 
   inferBackendModuleName(moduleId) {
@@ -553,7 +701,9 @@ class LibraryKnowledgeService {
       byType,
       libraryRoot: this.libraryRoot,
       modulesRoot: this.modulesRoot,
-      lastIndexed: new Date().toISOString()
+      lastIndexed: new Date().toISOString(),
+      live: this._watching,
+      lastAutoReindexAt: this._lastAutoReindexAt
     };
   }
 
@@ -565,7 +715,9 @@ class LibraryKnowledgeService {
       moduleName: MODULE_NAME,
       indexedItems: this.index.size,
       indexingWarnings: this.indexingWarnings.length,
-      claudeCompatible: true
+      claudeCompatible: true,
+      live: this._watching,
+      lastAutoReindexAt: this._lastAutoReindexAt
     };
   }
 

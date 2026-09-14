@@ -75,11 +75,10 @@ function emitMutation(req, operation, item) {
   });
 }
 
-const router = express.Router();
 const routes = {
   soilHealthRoutes: crudRouter(soilHealth, (body) => validateSoilBody(body, ['plot_name'])),
   nutrientManagementRoutes: crudRouter(nutrientManagement, (body) => validateSoilBody(body, ['plot_name'])),
   fertilityManagementRoutes: crudRouter(fertilityManagement, (body) => validateSoilBody(body, ['plot_name'])),
 };
 
-module.exports = router;
+module.exports = routes;

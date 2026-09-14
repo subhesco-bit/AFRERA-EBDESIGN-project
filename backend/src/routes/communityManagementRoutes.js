@@ -49,7 +49,6 @@ function crudRouter(service) {
   return router;
 }
 
-const router = express.Router();
 const routes = {
   blockManagementRoutes: crudRouter(blockManagement),
   districtManagementRoutes: crudRouter(districtManagement),
@@ -59,4 +58,4 @@ const routes = {
   ruralDevelopmentRoutes: crudRouter(ruralDevelopment),
 };
 
-module.exports = router;
+module.exports = routes;

@@ -52,7 +52,6 @@ function crudRouter(service, validateCreate) {
   return router;
 }
 
-const router = express.Router();
 const routes = {
   farmActivityRoutes: crudRouter(farmActivities, (body) => validateOperationsBody(body, ['activity_name', 'activity_type'], { dates: ['scheduled_date', 'completed_date'] })),
   farmTaskRoutes: crudRouter(farmTasks, (body) => validateOperationsBody(body, ['task_name'], { dates: ['due_date'], enums: { priority: ['low', 'medium', 'high', 'urgent'], status: ['pending', 'in_progress', 'completed', 'cancelled'] } })),
@@ -64,4 +63,4 @@ const routes = {
   farmOperationsDashboardRoutes: crudRouter(farmOperationsDashboard, (body) => validateOperationsBody(body, ['kpi_name'], { numbers: { value: { min: 0, max: 1000000000 }, target: { min: 0, max: 1000000000 } } })),
 };
 
-module.exports = router;
+module.exports = routes;
