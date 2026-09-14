@@ -134,6 +134,37 @@ router.get('/meta/duplicates', async (req, res) => {
 });
 
 /**
+ * GET /meta/org-chart - Project -> System -> Branch -> Files tree of the
+ * whole indexed library, with same-name files under different branches
+ * flagged as duplicate:true. Read-only - never renames or moves anything.
+ */
+router.get('/meta/org-chart', async (req, res) => {
+  try {
+    res.json({ success: true, data: await libraryKnowledgeService.buildOrgChart() });
+  } catch (error) {
+    fail(res, error);
+  }
+});
+
+/**
+ * GET /meta/manifest - read the last-generated manifest (org chart +
+ * duplicate report + stats) from disk.
+ * POST /meta/manifest - regenerate it now and persist to .ai/library-manifest.json.
+ */
+router.get('/meta/manifest', async (req, res) => {
+  const result = libraryKnowledgeService.getManifest();
+  res.status(result.success ? 200 : 404).json(result);
+});
+
+router.post('/meta/manifest', async (req, res) => {
+  try {
+    res.json(await libraryKnowledgeService.generateManifest());
+  } catch (error) {
+    fail(res, error);
+  }
+});
+
+/**
  * GET /:id/dependencies - dependency resolution order for one module
  * (must be registered before GET /:id so it doesn't get swallowed by it)
  */
