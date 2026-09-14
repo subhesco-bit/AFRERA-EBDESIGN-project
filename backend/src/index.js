@@ -2,6 +2,7 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
+const { authMiddleware, requireRole } = require('./middleware/auth');
 const index = require('./routes/index.js');
 const devinRoutes = require('./routes/devinRoutes');
 const yieldManagement = require('./routes/yieldManagement.js');

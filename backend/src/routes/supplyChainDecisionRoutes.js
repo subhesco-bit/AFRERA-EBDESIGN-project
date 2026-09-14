@@ -1,38 +1,30 @@
-/**
- * supply Chain Decision Routes
- */
+'use strict';
 
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
+const { authMiddleware } = require('../middleware/auth');
+const decisionService = require('../services/supplyChainDecisionService');
 
-try {
-  const { authMiddleware } = require('../middleware/auth');
-  router.use(authMiddleware);
-} catch (e) {
-  // Auth optional
-}
+router.use(authMiddleware);
 
-/**
- * Main endpoint
- */
-router.post('/', async (req, res) => {
-  res.json({
-    success: true,
-    module: 'supplyChainDecisionRoutes',
-    message: 'Route operational',
-    timestamp: new Date().toISOString()
-  });
+router.post('/select-farmers', (req, res) => {
+  res.json({ success: true, data: decisionService.selectFarmers(req.body.candidates, req.body.requirements) });
 });
 
-/**
- * Health check
- */
-router.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    status: 'healthy',
-    module: 'supplyChainDecisionRoutes'
-  });
+router.post('/plan-delivery', (req, res) => {
+  try {
+    res.json({ success: true, data: decisionService.planDelivery(req.body) });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+router.post('/explain', async (req, res) => {
+  try {
+    const result = await decisionService.explainDecision(req.body.decision, req.body.context);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
 });
 
 module.exports = router;
