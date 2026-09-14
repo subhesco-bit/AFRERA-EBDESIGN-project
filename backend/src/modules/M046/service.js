@@ -1,322 +1,243 @@
-﻿// Service for Nursery Management (M046) - AI Enhanced
-// Comprehensive nursery management with AI-powered monitoring and optimization
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-// Nursery CRUD
-async function createNursery(nurseryData) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const { farmerId, name, location, area, type, capacity, irrigationType, notes } = nurseryData;
-
-  const res = await pg.query(
-    `INSERT INTO nurseries (farmer_id, nursery_name, village, location, area, nursery_type, capacity, irrigation_type, notes, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active', NOW(), NOW())
-     RETURNING *`,
-    [farmerId, name, location?.village || location?.district || 'Unknown', JSON.stringify(location || null), area, type, capacity, irrigationType, notes],
-  );
-
-  // Emit signal for nursery creation
-  signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
-    entityType: 'nursery',
-    nurseryId: res.rows[0].id,
-    farmerId,
-    name,
-  }, {
-    severity: SEVERITY.INFO,
-    source: 'nursery_service',
-    entityId: res.rows[0].id,
-  });
-
-  return res.rows[0];
-}
-
-async function getNursery(nurseryId) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const res = await pg.query('SELECT * FROM nurseries WHERE id = $1', [nurseryId]);
-  return res.rows[0] || null;
-}
-
-async function listNurseries({ page = 1, limit = 20, farmerId, type, status } = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const offset = (page - 1) * limit;
-  let query = 'SELECT * FROM nurseries WHERE 1=1';
-  const params = [];
-  let paramIndex = 1;
-
-  if (farmerId) {
-    query += ` AND farmer_id = $${paramIndex++}`;
-    params.push(farmerId);
-  }
-  if (type) {
-    query += ` AND nursery_type = $${paramIndex++}`;
-    params.push(type);
-  }
-  if (status) {
-    query += ` AND status = $${paramIndex++}`;
-    params.push(status);
+class M046Service {
+  constructor() {
+    this.table = 'visibility';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
   }
 
-  query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
-  params.push(limit, offset);
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-  const res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace('SELECT * FROM nurseries', 'SELECT COUNT(*) FROM nurseries').split('LIMIT')[0], params.slice(0, -2));
-  const total = parseInt(totalRes.rows[0].count || '0');
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-}
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-async function updateNursery(nurseryId, updates) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
+        validated[field] = value;
+      }
+    }
 
-  const { name, location, area, type, capacity, irrigationType, notes, status } = updates;
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
 
-  const res = await pg.query(
-    `UPDATE nurseries
-     SET nursery_name = COALESCE($1, nursery_name),
-         village = COALESCE($2, village),
-         location = COALESCE($3, location),
-         area = COALESCE($4, area),
-         nursery_type = COALESCE($5, nursery_type),
-         capacity = COALESCE($6, capacity),
-         irrigation_type = COALESCE($7, irrigation_type),
-         notes = COALESCE($8, notes),
-         status = COALESCE($9, status),
-         updated_at = NOW()
-     WHERE id = $10
-     RETURNING *`,
-    [name, location?.village || location?.district || null, location ? JSON.stringify(location) : null,
-      area, type, capacity, irrigationType, notes, status, nurseryId],
-  );
-
-  // Emit signal for nursery update
-  signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
-    entityType: 'nursery',
-    nurseryId,
-    action: 'updated',
-  }, {
-    severity: SEVERITY.INFO,
-    source: 'nursery_service',
-    entityId: nurseryId,
-  });
-
-  return res.rows[0] || null;
-}
-
-async function deleteNursery(nurseryId) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const res = await pg.query('DELETE FROM nurseries WHERE id = $1 RETURNING id', [nurseryId]);
-
-  if (res.rows[0]) {
-    signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED, {
-      entityType: 'nursery',
-      nurseryId,
-    }, {
-      severity: SEVERITY.INFO,
-      source: 'nursery_service',
-      entityId: nurseryId,
-    });
+    return validated;
   }
 
-  return Boolean(res.rows[0]);
-}
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
 
-// Seedling batch management
-async function createSeedlingBatch(batchData) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
 
-  const { nurseryId, cropId, varietyId, quantity, sowingDate, expectedTransplantDate, notes } = batchData;
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
 
-  const res = await pg.query(
-    `INSERT INTO seedling_batches (nursery_id, crop_id, variety_id, quantity, sowing_date, expected_transplant_date, notes, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW(), NOW())
-     RETURNING *`,
-    [nurseryId, cropId, varietyId, quantity, sowingDate, expectedTransplantDate, notes],
-  );
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
 
-  // Emit signal for batch creation
-  signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
-    entityType: 'seedling_batch',
-    batchId: res.rows[0].id,
-    nurseryId,
-    cropId,
-  }, {
-    severity: SEVERITY.INFO,
-    source: 'nursery_service',
-    entityId: res.rows[0].id,
-  });
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
 
-  return res.rows[0];
-}
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
 
-async function updateSeedlingHealth(batchId, healthData) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
 
-  const { healthScore, growthStage, issues, observations } = healthData;
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
 
-  const res = await pg.query(
-    `INSERT INTO seedling_health_records (batch_id, health_score, growth_stage, issues, observations, recorded_at)
-     VALUES ($1, $2, $3, $4, $5, NOW())
-     RETURNING *`,
-    [batchId, healthScore, growthStage, JSON.stringify(issues || []), observations],
-  );
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
 
-  // Emit alert for poor health
-  if (healthScore < 60) {
-    signalBus.emitSignal(SIGNAL.EMERGENCY_RAISED, {
-      entityType: 'seedling_health',
-      batchId,
-      healthScore,
-      issues,
-    }, {
-      severity: SEVERITY.WARNING,
-      source: 'nursery_service',
-      entityId: batchId,
-    });
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
   }
 
-  return res.rows[0];
-}
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
 
-// AI-powered nursery optimization
-async function optimizeNurseryEnvironment(nurseryId) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
 
-  const nursery = await getNursery(nurseryId);
-  if (!nursery) {
-    return { success: false, error: 'Nursery not found' };
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
   }
 
-  const optimization = {
-    nurseryId,
-    recommendedTemperature: 25,
-    recommendedHumidity: 70,
-    recommendedLight: 'medium',
-    irrigationSchedule: generateIrrigationSchedule(nursery),
-    nutrientSchedule: generateNutrientSchedule(nursery),
-    riskFactors: assessNurseryRisks(nursery),
-  };
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
 
-  return { success: true, data: optimization };
-}
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
 
-function generateIrrigationSchedule(nursery) {
-  return {
-    frequency: 'daily',
-    time: 'morning',
-    duration: '30_minutes',
-    method: nursery.irrigation_type || 'sprinkler',
-  };
-}
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
 
-function generateNutrientSchedule(nursery) {
-  return [
-    { week: 1, nutrients: ['NPK_balanced'], frequency: 'twice_weekly' },
-    { week: 2, nutrients: ['NPK_balanced', 'micronutrients'], frequency: 'twice_weekly' },
-    { week: 3, nutrients: ['phosphorus_boost'], frequency: 'weekly' },
-  ];
-}
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
 
-function assessNurseryRisks(nursery) {
-  const risks = [];
-
-  if (nursery.irrigation_type === 'manual') {
-    risks.push({
-      type: 'water_stress',
-      severity: 'medium',
-      description: 'Manual irrigation may lead to inconsistent watering',
-      mitigation: 'Consider automated irrigation system',
-    });
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
   }
 
-  return risks;
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
+  }
 }
 
-// Nursery analytics
-async function getNurseryAnalytics({ startDate, endDate, nurseryId } = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  let query = `
-    SELECT
-      nursery_type AS type,
-      COUNT(*) as count,
-      SUM(capacity) as total_capacity,
-      AVG(capacity) as avg_capacity
-    FROM nurseries
-    WHERE 1=1
-  `;
-  const params = [];
-  let paramIndex = 1;
-
-  if (startDate) {
-    query += ` AND created_at >= $${paramIndex++}`;
-    params.push(startDate);
-  }
-  if (endDate) {
-    query += ` AND created_at <= $${paramIndex++}`;
-    params.push(endDate);
-  }
-  if (nurseryId) {
-    query += ` AND id = $${paramIndex++}`;
-    params.push(nurseryId);
-  }
-
-  query += ' GROUP BY type ORDER BY count DESC';
-
-  const res = await pg.query(query, params);
-
-  return {
-    byType: res.rows,
-    totalNurseries: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
-    totalCapacity: res.rows.reduce((sum, row) => sum + (parseFloat(row.total_capacity) || 0), 0),
-    recommendations: generateNurseryAnalyticsRecommendations(res.rows),
-  };
-}
-
-function generateNurseryAnalyticsRecommendations(nurseryData) {
-  const recommendations = [];
-
-  const lowCapacity = nurseryData.filter(row => parseFloat(row.avg_capacity) < 1000);
-  if (lowCapacity.length > 0) {
-    recommendations.push({
-      type: 'capacity_expansion',
-      message: `Nurseries of type ${lowCapacity.map(n => n.type).join(', ')} have low capacity. Consider expansion.`,
-      priority: 'medium',
-    });
-  }
-
-  return recommendations;
-}
-
-module.exports = {
-  // Nursery CRUD
-  createNursery,
-  getNursery,
-  listNurseries,
-  updateNursery,
-  deleteNursery,
-
-  // Seedling batch management
-  createSeedlingBatch,
-  updateSeedlingHealth,
-
-  // AI-powered optimization
-  optimizeNurseryEnvironment,
-
-  // Analytics
-  getNurseryAnalytics,
-};
+module.exports = new M046Service();

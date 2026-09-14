@@ -1,19 +1,20 @@
-const router = require('express').Router();
-const farmAnalyticsService = require('../services/farmAnalyticsService');
-const auth = require('../middleware/auth');
+/**
+ * farm Analytics Routes
+ * Placeholder route module
+ */
 
-router.post('/farms/:farmId/analytics/report', auth, async (req, res) => {
-  try {
-    const result = await farmAnalyticsService.generateFarmReport(req.params.farmId);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
+const express = require('express');
+const router = express.Router();
 
-router.get('/farms/:farmId/analytics/dashboard', async (req, res) => {
-  try {
-    const result = await farmAnalyticsService.getDashboard(req.params.farmId);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'farmAnalytics',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

@@ -1,35 +1,109 @@
-﻿/**
- * Controller for Shipping Management (M057)
- */
-const shippingService = require('./service');
+const m057Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const create = async (req, res) => {
-  try {
-    const shipment = await shippingService.createShipment(req.body);
-    res.status(201).json({ success: true, data: shipment });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+class M057Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
+
+      const result = await m057Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
   }
-};
 
-const track = async (req, res) => {
-  try {
-    const shipment = await shippingService.trackShipment(req.params.id);
-    if (!shipment) return res.status(404).json({ success: false, error: 'Shipment not found' });
-    res.status(200).json({ success: true, data: shipment });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m057Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
   }
-};
 
-const updateStatus = async (req, res) => {
-  try {
-    const shipment = await shippingService.updateShipmentStatus(req.params.id, req.body.status, req.body.location);
-    if (!shipment) return res.status(404).json({ success: false, error: 'Shipment not found' });
-    res.status(200).json({ success: true, data: shipment });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m057Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-module.exports = { create, track, updateStatus };
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m057Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m057Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m057Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m057Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
+  }
+}
+
+module.exports = new M057Controller();

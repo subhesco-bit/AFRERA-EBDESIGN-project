@@ -1,329 +1,243 @@
-﻿// Service for Seed Planning (M045) - AI Enhanced
-// Comprehensive seed planning with AI-powered calculation and optimization
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-// Seed planning CRUD
-async function createSeedPlan(planData) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const { farmerId, cropId, varietyId, area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes } = planData;
-
-  const res = await pg.query(
-    `INSERT INTO seed_plans (farmer_id, crop_id, variety_id, area, seed_rate, total_seed_required, planting_date, supplier_id, estimated_cost, notes, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending', NOW(), NOW())
-     RETURNING *`,
-    [farmerId, cropId, varietyId, area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes],
-  );
-
-  // Emit signal for seed plan creation
-  signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
-    entityType: 'seed_plan',
-    planId: res.rows[0].id,
-    farmerId,
-    cropId,
-  }, {
-    severity: SEVERITY.INFO,
-    source: 'seed_planning_service',
-    entityId: res.rows[0].id,
-  });
-
-  return res.rows[0];
-}
-
-async function getSeedPlan(planId) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const res = await pg.query('SELECT * FROM seed_plans WHERE id = $1', [planId]);
-  return res.rows[0] || null;
-}
-
-async function listSeedPlans({ page = 1, limit = 20, farmerId, cropId, status } = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const offset = (page - 1) * limit;
-  let query = 'SELECT * FROM seed_plans WHERE 1=1';
-  const params = [];
-  let paramIndex = 1;
-
-  if (farmerId) {
-    query += ` AND farmer_id = $${paramIndex++}`;
-    params.push(farmerId);
-  }
-  if (cropId) {
-    query += ` AND crop_id = $${paramIndex++}`;
-    params.push(cropId);
-  }
-  if (status) {
-    query += ` AND status = $${paramIndex++}`;
-    params.push(status);
+class M045Service {
+  constructor() {
+    this.table = 'last_mile';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
   }
 
-  query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
-  params.push(limit, offset);
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-  const res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace('SELECT * FROM seed_plans', 'SELECT COUNT(*) FROM seed_plans').split('LIMIT')[0], params.slice(0, -2));
-  const total = parseInt(totalRes.rows[0].count || '0');
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-}
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-async function updateSeedPlan(planId, updates) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
+        validated[field] = value;
+      }
+    }
 
-  const { area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes, status } = updates;
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
 
-  const res = await pg.query(
-    `UPDATE seed_plans
-     SET area = COALESCE($1, area),
-         seed_rate = COALESCE($2, seed_rate),
-         total_seed_required = COALESCE($3, total_seed_required),
-         planting_date = COALESCE($4, planting_date),
-         supplier_id = COALESCE($5, supplier_id),
-         estimated_cost = COALESCE($6, estimated_cost),
-         notes = COALESCE($7, notes),
-         status = COALESCE($8, status),
-         updated_at = NOW()
-     WHERE id = $9
-     RETURNING *`,
-    [area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes, status, planId],
-  );
-
-  // Emit signal for seed plan update
-  signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
-    entityType: 'seed_plan',
-    planId,
-    action: 'updated',
-  }, {
-    severity: SEVERITY.INFO,
-    source: 'seed_planning_service',
-    entityId: planId,
-  });
-
-  return res.rows[0] || null;
-}
-
-async function deleteSeedPlan(planId) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const res = await pg.query('DELETE FROM seed_plans WHERE id = $1 RETURNING id', [planId]);
-
-  if (res.rows[0]) {
-    signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED, {
-      entityType: 'seed_plan',
-      planId,
-    }, {
-      severity: SEVERITY.INFO,
-      source: 'seed_planning_service',
-      entityId: planId,
-    });
+    return validated;
   }
 
-  return Boolean(res.rows[0]);
-}
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
 
-// AI-powered seed requirement calculation
-async function calculateSeedRequirements(cropId, varietyId, area, conditions = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
 
-  // Get crop and variety information
-  const cropRes = await pg.query('SELECT * FROM crop_registrations WHERE id = $1', [cropId]);
-  const varietyRes = await pg.query('SELECT * FROM crop_varieties WHERE id = $1', [varietyId]);
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
 
-  const crop = cropRes.rows[0];
-  const variety = varietyRes.rows[0];
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
 
-  // Calculate seed requirements
-  const calculation = {
-    cropId,
-    varietyId,
-    area,
-    seedRate: calculateSeedRate(crop, variety, conditions),
-    totalSeedRequired: 0,
-    estimatedCost: 0,
-    plantingWindow: identifyPlantingWindow(crop, conditions),
-    alternatives: generateSeedAlternatives(crop, variety, area),
-  };
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
 
-  calculation.totalSeedRequired = calculation.seedRate * area;
-  calculation.estimatedCost = calculation.totalSeedRequired * 50; // Base rate
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
 
-  return { success: true, data: calculation };
-}
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
 
-function calculateSeedRate(crop, variety, conditions) {
-  let baseRate = 2; // kg per hectare default
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
 
-  if (variety && variety.characteristics) {
-    if (variety.characteristics.seedRate) {
-      baseRate = variety.characteristics.seedRate;
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
     }
   }
 
-  // Adjust for conditions
-  if (conditions.soilType === 'sandy') baseRate *= 1.1;
-  if (conditions.irrigation === 'drip') baseRate *= 0.9;
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
 
-  return baseRate;
-}
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
 
-function identifyPlantingWindow(crop, conditions) {
-  return {
-    startMonth: 'June',
-    endMonth: 'July',
-    optimalSeason: 'kharif',
-    bufferDays: 15,
-  };
-}
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
 
-function generateSeedAlternatives(crop, variety, area) {
-  return [
-    {
-      type: 'hybrid',
-      seedRate: 2.5,
-      costMultiplier: 1.5,
-      yieldPotential: 'high',
-    },
-    {
-      type: 'traditional',
-      seedRate: 2.0,
-      costMultiplier: 1.0,
-      yieldPotential: 'medium',
-    },
-  ];
-}
-
-// Seed supplier management
-async function addSeedSupplier(supplierData) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  const { name, contact, location, cropsAvailable, qualityRating, notes } = supplierData;
-
-  const res = await pg.query(
-    `INSERT INTO seed_suppliers (name, contact, location, crops_available, quality_rating, notes, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, 'active', NOW(), NOW())
-     RETURNING *`,
-    [name, JSON.stringify(contact), location, JSON.stringify(cropsAvailable || []), qualityRating, notes],
-  );
-
-  // Emit signal for supplier addition
-  signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
-    entityType: 'seed_supplier',
-    supplierId: res.rows[0].id,
-    name,
-  }, {
-    severity: SEVERITY.INFO,
-    source: 'seed_planning_service',
-    entityId: res.rows[0].id,
-  });
-
-  return res.rows[0];
-}
-
-async function listSeedSuppliers({ cropType, minQualityRating } = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  let query = 'SELECT * FROM seed_suppliers WHERE status = $1';
-  const params = ['active'];
-  let paramIndex = 2;
-
-  if (cropType) {
-    query += ` AND crops_available @> $${paramIndex++}`;
-    params.push(JSON.stringify([cropType]));
-  }
-  if (minQualityRating) {
-    query += ` AND quality_rating >= $${paramIndex++}`;
-    params.push(minQualityRating);
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
   }
 
-  query += ' ORDER BY quality_rating DESC';
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
 
-  const res = await pg.query(query, params);
-  return res.rows;
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
+  }
 }
 
-// Seed analytics
-async function getSeedAnalytics({ startDate, endDate, cropId } = {}) {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-
-  let query = `
-    SELECT
-      crop_id,
-      COUNT(*) as count,
-      SUM(total_seed_required) as total_seed,
-      AVG(estimated_cost) as avg_cost
-    FROM seed_plans
-    WHERE 1=1
-  `;
-  const params = [];
-  let paramIndex = 1;
-
-  if (startDate) {
-    query += ` AND created_at >= $${paramIndex++}`;
-    params.push(startDate);
-  }
-  if (endDate) {
-    query += ` AND created_at <= $${paramIndex++}`;
-    params.push(endDate);
-  }
-  if (cropId) {
-    query += ` AND crop_id = $${paramIndex++}`;
-    params.push(cropId);
-  }
-
-  query += ' GROUP BY crop_id ORDER BY count DESC';
-
-  const res = await pg.query(query, params);
-
-  return {
-    byCrop: res.rows,
-    totalPlans: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
-    totalSeed: res.rows.reduce((sum, row) => sum + (parseFloat(row.total_seed) || 0), 0),
-    recommendations: generateSeedAnalyticsRecommendations(res.rows),
-  };
-}
-
-function generateSeedAnalyticsRecommendations(seedData) {
-  const recommendations = [];
-
-  const highSeedCrops = seedData.filter(row => parseFloat(row.total_seed) > 1000);
-  if (highSeedCrops.length > 0) {
-    recommendations.push({
-      type: 'bulk_procurement',
-      message: `High seed volume for ${highSeedCrops.map(c => c.crop_id).join(', ')}. Consider bulk procurement discounts.`,
-      priority: 'high',
-    });
-  }
-
-  return recommendations;
-}
-
-module.exports = {
-  // CRUD
-  createSeedPlan,
-  getSeedPlan,
-  listSeedPlans,
-  updateSeedPlan,
-  deleteSeedPlan,
-
-  // AI-powered calculation
-  calculateSeedRequirements,
-
-  // Supplier management
-  addSeedSupplier,
-  listSeedSuppliers,
-
-  // Analytics
-  getSeedAnalytics,
-};
+module.exports = new M045Service();

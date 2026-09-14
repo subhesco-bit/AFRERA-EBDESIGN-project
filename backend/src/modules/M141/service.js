@@ -1,131 +1,243 @@
-﻿// Service for M141 - Orchard Management
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-const tableName = 'orchards';
-
-async function listOrchards({ page = 1, limit = 20, farmerId = null } = {}) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-
-  let query = `SELECT COUNT(*) FROM ${tableName}`;
-  let countParams = [];
-  if (farmerId) {
-    query += ' WHERE farmer_id = $1';
-    countParams = [farmerId];
-  }
-  const totalRes = await pg.query(query, countParams);
-  const total = parseInt(totalRes.rows[0].count || '0');
-
-  let dataQuery = `SELECT * FROM ${tableName}`;
-  let dataParams = [];
-  if (farmerId) {
-    dataQuery += ' WHERE farmer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3';
-    dataParams = [farmerId, limit, offset];
-  } else {
-    dataQuery += ' ORDER BY created_at DESC LIMIT $1 OFFSET $2';
-    dataParams = [limit, offset];
+class M141Service {
+  constructor() {
+    this.table = 'releases';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
   }
 
-  const res = await pg.query(dataQuery, dataParams);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
+
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
+
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
+
+        validated[field] = value;
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
+  }
 }
 
-async function getOrchard(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
-  return res.rows[0] || null;
-}
-
-async function createOrchard(payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const { farmerId, name, location, area, orchardType, treeCount, plantingDate, varieties, soilType, irrigationSystem, metadata } = payload;
-
-  const res = await pg.query(
-    `INSERT INTO ${tableName} (farmer_id, name, location, area, orchard_type, tree_count, planting_date, varieties, soil_type, irrigation_system, metadata, created_at) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW()) RETURNING *`,
-    [farmerId, name, location, area, orchardType, treeCount, plantingDate, JSON.stringify(varieties || []), soilType, irrigationSystem, JSON.stringify(metadata || {})],
-  );
-  return res.rows[0];
-}
-
-async function updateOrchard(id, payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const { name, location, area, orchardType, treeCount, plantingDate, varieties, soilType, irrigationSystem, metadata } = payload;
-
-  const res = await pg.query(
-    `UPDATE ${tableName} 
-     SET name = $1, location = $2, area = $3, orchard_type = $4, tree_count = $5, planting_date = $6, varieties = $7, soil_type = $8, irrigation_system = $9, metadata = $10, updated_at = NOW() 
-     WHERE id = $11 RETURNING *`,
-    [name, location, area, orchardType, treeCount, plantingDate, JSON.stringify(varieties || []), soilType, irrigationSystem, JSON.stringify(metadata || {}), id],
-  );
-  return res.rows[0] || null;
-}
-
-async function deleteOrchard(id) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return Boolean(res.rows[0]);
-}
-
-async function getOrchardProduction(orchardId, year) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-
-  const res = await pg.query(
-    'SELECT * FROM orchard_production WHERE orchard_id = $1 AND production_year = $2',
-    [orchardId, year],
-  );
-
-  return res.rows[0] || null;
-}
-
-async function recordOrchardProduction(payload) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-  const { orchardId, productionYear, variety, quantity, qualityGrade, harvestDate, revenue, metadata } = payload;
-
-  const res = await pg.query(
-    `INSERT INTO orchard_production (orchard_id, production_year, variety, quantity, quality_grade, harvest_date, revenue, metadata, created_at) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) 
-     ON CONFLICT (orchard_id, production_year, variety) 
-     DO UPDATE SET quantity = $4, quality_grade = $5, harvest_date = $6, revenue = $7, metadata = $8, updated_at = NOW()
-     RETURNING *`,
-    [orchardId, productionYear, variety, quantity, qualityGrade, harvestDate, revenue, JSON.stringify(metadata || {})],
-  );
-  return res.rows[0];
-}
-
-async function getOrchardAnalytics(orchardId) {
-  const pg = getPostgreSQL(); if (!pg) throw new Error('Database not initialized');
-
-  const res = await pg.query(
-    `SELECT 
-      production_year,
-      variety,
-      SUM(quantity) as total_quantity,
-      AVG(CASE WHEN quality_grade = 'A' THEN 1 WHEN quality_grade = 'B' THEN 0.8 ELSE 0.6 END) as avg_quality,
-      SUM(revenue) as total_revenue
-     FROM orchard_production 
-     WHERE orchard_id = $1 
-     GROUP BY production_year, variety
-     ORDER BY production_year DESC, variety`,
-    [orchardId],
-  );
-
-  return {
-    orchardId,
-    analytics: res.rows,
-    totalProduction: res.rows.reduce((sum, row) => sum + parseFloat(row.total_quantity), 0),
-    totalRevenue: res.rows.reduce((sum, row) => sum + parseFloat(row.total_revenue || 0), 0),
-  };
-}
-
-module.exports = {
-  listOrchards,
-  getOrchard,
-  createOrchard,
-  updateOrchard,
-  deleteOrchard,
-  getOrchardProduction,
-  recordOrchardProduction,
-  getOrchardAnalytics,
-};
+module.exports = new M141Service();

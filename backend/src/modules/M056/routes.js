@@ -1,17 +1,68 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('fpo', 'admin'), controller.create);
-router.put('/:id/status', authMiddleware, requireRole('fpo', 'admin'), controller.updateStatus);
-router.post('/:id/refund', authMiddleware, requireRole('fpo', 'admin'), controller.refund);
-// F5 fix (2026-08-30): frontend calls bare PUT/DELETE /:id (updateOrder/
-// deleteOrder-style generic CRUD) - only the status/refund sub-routes
-// existed before. See controller.js update()/remove() and service.js
-// updatePayment()/deletePayment().
-router.put('/:id', authMiddleware, requireRole('fpo', 'admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('fpo', 'admin'), controller.remove);
+/**
+ * M056 Routes
+ * Base path: /api/m056
+ */
+
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m056
+ * @desc    Get all m056 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m056/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m056/search
+ * @desc    Search m056 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m056
+ * @desc    Create new m056
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m056/:id
+ * @desc    Get m056 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m056/:id
+ * @desc    Update m056
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m056/:id
+ * @desc    Delete (soft delete) m056
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

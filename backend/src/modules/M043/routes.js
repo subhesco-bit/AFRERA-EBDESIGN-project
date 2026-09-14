@@ -1,24 +1,68 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { FARM_OPERATIONS_ROLES } = require('../../middleware/roleGroups');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// Crop Registration CRUD
-router.post('/registrations', authMiddleware, controller.registerCrop);
-router.get('/registrations', authMiddleware, controller.listCropRegistrations);
-router.get('/registrations/:registrationId', authMiddleware, controller.getCropRegistration);
-router.put('/registrations/:registrationId', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), controller.updateCropRegistration);
-router.delete('/registrations/:registrationId', authMiddleware, requireRole('admin'), controller.deleteCropRegistration);
+/**
+ * M043 Routes
+ * Base path: /api/m043
+ */
 
-// AI-powered recommendations
-router.get('/farmers/:farmerId/recommend', authMiddleware, controller.recommendCrops);
+// Middleware
+router.use(authenticate);
 
-// Yield estimation
-router.post('/registrations/:registrationId/estimate-yield', authMiddleware, controller.estimateYield);
+/**
+ * @route   GET /api/m043
+ * @desc    Get all m043 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
 
-// Analytics
-router.get('/registrations/analytics', authMiddleware, requireRole('admin'), controller.getCropAnalytics);
+/**
+ * @route   POST /api/m043/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m043/search
+ * @desc    Search m043 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m043
+ * @desc    Create new m043
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m043/:id
+ * @desc    Get m043 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m043/:id
+ * @desc    Update m043
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m043/:id
+ * @desc    Delete (soft delete) m043
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;
-

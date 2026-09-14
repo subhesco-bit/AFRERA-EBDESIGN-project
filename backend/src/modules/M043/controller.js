@@ -1,106 +1,109 @@
-﻿// Controller for Crop Registration (M043) - AI Enhanced
-const service = require('./service');
+const m043Service = require('./service');
 const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-// CRUD
-async function registerCrop(req, res) {
-  try {
-    const crop = await service.registerCrop(req.body);
-    res.status(201).json({ success: true, data: crop });
-  } catch (error) {
-    logger.error('registerCrop error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+class M043Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
+
+      const result = await m043Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m043Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
+  }
+
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m043Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m043Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m043Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m043Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m043Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
 }
 
-async function getCropRegistration(req, res) {
-  try {
-    const registration = await service.getCropRegistration(req.params.registrationId);
-    if (!registration) return res.status(404).json({ success: false, error: 'Crop registration not found' });
-    res.json({ success: true, data: registration });
-  } catch (error) {
-    logger.error('getCropRegistration error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function listCropRegistrations(req, res) {
-  try {
-    const { page, limit, farmerId, cropName, villageId, status } = req.query;
-    const result = await service.listCropRegistrations({ page, limit, farmerId, cropName, villageId, status });
-    res.json({ success: true, data: result });
-  } catch (error) {
-    logger.error('listCropRegistrations error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function updateCropRegistration(req, res) {
-  try {
-    const registration = await service.updateCropRegistration(req.params.registrationId, req.body);
-    if (!registration) return res.status(404).json({ success: false, error: 'Crop registration not found' });
-    res.json({ success: true, data: registration });
-  } catch (error) {
-    logger.error('updateCropRegistration error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function deleteCropRegistration(req, res) {
-  try {
-    const success = await service.deleteCropRegistration(req.params.registrationId);
-    if (!success) return res.status(404).json({ success: false, error: 'Crop registration not found' });
-    res.json({ success: true });
-  } catch (error) {
-    logger.error('deleteCropRegistration error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// AI-powered recommendations
-async function recommendCrops(req, res) {
-  try {
-    const { farmerId } = req.params;
-    const constraints = req.body;
-    const recommendations = await service.recommendCrops(farmerId, constraints);
-    res.json({ success: true, data: recommendations });
-  } catch (error) {
-    logger.error('recommendCrops error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// Yield estimation
-async function estimateYield(req, res) {
-  try {
-    const factors = req.body;
-    const estimation = await service.estimateYield(req.params.registrationId, factors);
-    res.json({ success: true, data: estimation });
-  } catch (error) {
-    logger.error('estimateYield error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// Analytics
-async function getCropAnalytics(req, res) {
-  try {
-    const { startDate, endDate, villageId, cropName } = req.query;
-    const analytics = await service.getCropAnalytics({ startDate, endDate, villageId, cropName });
-    res.json({ success: true, data: analytics });
-  } catch (error) {
-    logger.error('getCropAnalytics error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-module.exports = {
-  registerCrop,
-  getCropRegistration,
-  listCropRegistrations,
-  updateCropRegistration,
-  deleteCropRegistration,
-  recommendCrops,
-  estimateYield,
-  getCropAnalytics,
-};
+module.exports = new M043Controller();
