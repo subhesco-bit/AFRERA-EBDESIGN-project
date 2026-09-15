@@ -1172,3 +1172,13 @@ Added `services/legacy/__tests__/productService.test.js` (7 tests): the
 - this would have caught the shadowing bug before it shipped, and
 catches a regression if someone re-adds a route in the wrong order later.
 All passing, `node -c`/eslint clean.
+
+Given a fresh, cheap pattern to check for, swept all 42 newly-mounted
+routers' route path lists for the same shape (a static single-segment
+path registered after a `/:id`-style dynamic one). 2 candidates
+(`formService.js`'s `/templates`, `moduleCatalogService.js`'s
+`/assistant`) - both checked by hand and confirmed false positives:
+`/templates` is actually registered *before* `/:id` in that file, and
+`/assistant` is `POST` while the colliding `/:id` is `GET` (different
+HTTP methods don't collide regardless of path order). No further
+instances of this bug found in this batch.
