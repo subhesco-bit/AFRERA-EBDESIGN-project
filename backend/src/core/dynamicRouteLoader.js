@@ -554,6 +554,20 @@ class DynamicRouteLoader {
     if (base.startsWith('ai') && base.includes('Routes.js')) return false;
     // Exclude claude directory routes (manually mounted)
     if (filePath.includes(`${path.sep }claude${ path.sep}`)) return false;
+    // 2026-09-15: these scaffold route files were swapped out in index.js's
+    // static mounts for their real services/legacy/*.js implementations
+    // (order/product/iotIntegration real routers now mounted at
+    // /api/order, /api/product, /api/iotintegration). The scaffold files
+    // themselves are kept only because their own pre-existing test files
+    // still require them directly. Without this exclusion, this
+    // *dynamic* loader would independently rediscover and auto-mount
+    // these same scaffold files a second time at a different path
+    // (/api/v1/<name>), serving their fake "Route operational" response
+    // alongside the real one - explicitly excluded to remove any
+    // ambiguity about which mount is real.
+    if (['orderRoutes.js', 'productRoutes.js', 'iotIntegrationRoutes.js', 'predictiveAnalytics.js'].includes(base)) {
+      return false;
+    }
     return true;
   }
 

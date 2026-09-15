@@ -1182,3 +1182,70 @@ path registered after a `/:id`-style dynamic one). 2 candidates
 `/assistant` is `POST` while the colliding `/:id` is `GET` (different
 HTTP methods don't collide regardless of path order). No further
 instances of this bug found in this batch.
+
+## Update — 2026-09-15, seventeenth follow-up: closed a latent double-mount risk, found real evidence commerceApi.js is the missing link
+
+**Safety fix, precautionary**: `index.js` also runs a completely separate
+auto-discovery mechanism (`DynamicRouteLoader.discoverAndMountRoutes`,
+`core/dynamicRouteLoader.js`) that independently walks `routes/` and
+auto-mounts anything it finds at `/api/v1/<name>`, unaware of what
+`index.js`'s own static `app.use()` calls already did. The 4 scaffold
+files swapped out in the thirteenth/sixteenth updates
+(`orderRoutes.js`/`productRoutes.js`/`iotIntegrationRoutes.js`/
+`predictiveAnalytics.js`) still exist on disk (kept for their own
+pre-existing test files) and still export a valid, mountable Express
+router - meaning this loader could independently rediscover and mount
+the *fake* "Route operational" scaffold a second time, at a different
+path, alongside the real one. Attempted to verify empirically whether
+this actually happens; the loader hangs/times out scanning 400+ real
+route files in this sandbox (unrelated pre-existing issue, same root
+cause suspected as the full-boot hang documented in the thirteenth
+update) so this couldn't be proven either way in reasonable time. Given
+the ambiguity, took the safe path regardless: added these 4 filenames to
+`_isMountableRouteFile()`'s existing explicit-exclusion list (it already
+hard-excludes several other known files by name) - minimal, matches an
+established pattern in the same function, and removes the risk whether
+or not it was real.
+
+**Investigating a stale comment surfaced the real missing piece**:
+`pages/SellerProductFormPage.jsx` carries an 11-day-old comment (commit
+`8c8d06c2`, 2026-09-04 - well before this session, not a live/concurrent
+edit) claiming "the real endpoint (POST /api/v1/products,
+productService.createProduct) has existed all along." Checked this
+claim directly: `_toMountSegment()` in the dynamic loader strips
+`Routes` and does not pluralize, so even if the loader *had* auto-mounted
+the old scaffold, it would land at `/api/v1/product` (singular), not
+`/api/v1/products` (plural) as the comment claims - the claim doesn't
+match anything real found anywhere in this repo. Given this session's
+running theme (confident-sounding comments describing code that was
+never actually verified), treating it as unverified, not as evidence of
+a real, currently-existing `/api/v1/products` mount to preserve.
+
+**What the investigation did confirm, and is still open**: `services/commerceApi.js`
+(real, complete, correct-shaped `productsAPI`/`ordersAPI`/`farmersAPI`/
+`seedVaultAPI`/`blockchainVerificationAPI`/`enterpriseIntegrationAPI`/
+`productReviewsAPI`) is only imported by the already-documented-dead
+`services/index.js` barrel. Meanwhile **22 real, live pages** (`CartPage`,
+`CheckoutPage`, `OrderDetailPage`, `PaymentProcessingPage`,
+`ProductDetailPage`, `SellerProductFormPage`, `SeedVaultPage`,
+`BlockchainVerificationPage`, `EnterpriseIntegrationPage`, and ~13 more
+using `farmersAPI`) all import these same-named objects from
+`services/api.js` instead - which either doesn't define them at all
+(`productsAPI`, `farmersAPI`, `productReviewsAPI` - the literal
+MISSING_EXPORT build errors already tracked) or defines a thinner,
+wrong-shaped version that doesn't match what the real pages call
+(confirmed directly against `CartPage.jsx`/`EnterpriseIntegrationPage.jsx`/
+`SeedVaultPage.jsx`/`BlockchainVerificationPage.jsx`'s actual method
+calls vs. `api.js`'s actual exports - real, reachable, would-crash
+mismatches, not a hypothesis). `commerceApi.js`'s method shapes for
+`productsAPI`/`ordersAPI` already match the real, now-mounted
+`productService.js`/`orderService.js` routers from the thirteenth/
+sixteenth updates almost exactly (`getCategories`→`/categories/list`,
+`addToCart`→`POST /cart`, etc.) - `commerceApi.js`'s own path prefixes
+still need the same `_BASE`-absolute-URL fix already used for
+`multilingualAPI`/`conversationalAIAPI` (it currently assumes `/products`/
+`/orders` resolve under the generic `/api/v1` base, which doesn't match
+the real `/api/product`/`/api/order` mounts). **Not fixed in this
+update** - scoped as its own follow-up given the number of pages and API
+objects involved (this is the concrete, now-well-understood shape of the
+"~140 missing exports" item tracked since early in this backlog).
