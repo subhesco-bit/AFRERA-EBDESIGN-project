@@ -28,7 +28,6 @@ const recommendationBuilders = {
       price_elasticity: -1.15,
       competitor_analysis: { average_competitor_price: Math.round(base * 1.02), positioning: 'competitive' },
       recommendations: ['Price is well-positioned relative to competitors', 'Monitor inventory pressure over the next 3 days'],
-      confidence: 0.85
     };
   },
 
@@ -50,7 +49,6 @@ const recommendationBuilders = {
       premium_percentage: 18,
       value_proposition: 'Nutrient density supports premium pricing over market average',
       recommendations: ['List with lab certificate to justify premium', 'Highlight nutrient content in marketing'],
-      confidence: 0.81
     };
   },
 
@@ -76,11 +74,9 @@ const recommendationBuilders = {
     optimization_potential: '5% additional margin possible with split delivery',
     risk_factors: ['Single-region concentration risk'],
     recommendations: ['Split order across top 2 farmers to balance risk and margin'],
-    confidence: 0.86
   }),
 
   insurance_claim_validation: () => ({
-    confidence_score: 0.87,
     fraud_probability: 0.08,
     coverage_eligibility: true,
     estimated_payout: 42000,
@@ -106,7 +102,6 @@ const recommendationBuilders = {
     evidence_strength: 0.84,
     risk_factors: ['Localized flooding event confirmed by satellite imagery'],
     recommendations: ['Proceed to payout', 'Schedule farmer advisory follow-up'],
-    confidence: 0.88
   }),
 
   settlement_follow_up_recommendation: () => ({
@@ -115,7 +110,6 @@ const recommendationBuilders = {
     escalation_reason: null,
     recommended_actions: ['Send reminder to insurer', 'Update farmer on expected timeline'],
     expected_response_days: 5,
-    confidence: 0.79
   }),
 
   fraud_detection: () => ({
@@ -125,7 +119,6 @@ const recommendationBuilders = {
     indicators: [],
     recommendations: ['No manual review required at this time'],
     requires_manual_review: false,
-    confidence: 0.9
   }),
 
   payout_calculation: () => ({
@@ -140,7 +133,6 @@ const recommendationBuilders = {
     age_adjustment: -0.03,
     location_adjustment: 0.01,
     payment_schedule: [{ installment: 1, amount: 25000, due_date: null }, { installment: 2, amount: 12050, due_date: null }],
-    confidence: 0.83
   }),
 
   greenhouse_design: (p) => ({
@@ -174,7 +166,6 @@ const recommendationBuilders = {
     installation_cost: 250000,
     total_cost: 2700000,
     roi_estimate: '3.2 years',
-    confidence: 0.84,
     recommendations: ['Phase automation rollout to control upfront cost', 'Prioritize drip irrigation to reduce water usage by 40%']
   }),
 
@@ -188,7 +179,6 @@ const recommendationBuilders = {
     predicted_outcome: 'Conditions expected to reach target range within 2 hours',
     energy_impact: { additional_kwh_per_day: 3.2 },
     cost_impact: { additional_cost_per_day: 45 },
-    confidence: 0.83
   }),
 
   greenhouse_monitoring_analysis: () => ({
@@ -197,7 +187,6 @@ const recommendationBuilders = {
     alerts: [],
     trend_summary: 'All parameters within target range over the last 24 hours',
     recommendations: ['Increase CO2 enrichment slightly during peak photosynthesis hours'],
-    confidence: 0.88
   }),
 
   yield_prediction: () => ({
@@ -209,7 +198,6 @@ const recommendationBuilders = {
     risk_factors: ['Potential pest pressure in week 6'],
     opportunities: ['Early harvest premium window'],
     recommendations: ['Schedule pest scouting for week 5-6'],
-    confidence: 0.79
   }),
 
   dpr_generation: (p) => ({
@@ -271,7 +259,7 @@ const recommendationBuilders = {
       eligibility_score: 0.86, subsidy_percentage: 40, max_amount: 5000000,
       deadline: '2027-03-31', documents: ['Land records', 'Bank account details', 'Aadhaar'],
       process: 'Apply online via state agriculture portal', contact: { phone: '+91-9876543210', email: 'support@agri.gov.in' },
-      recommendation: 'Strongly recommended based on profile match', confidence: 0.86
+      recommendation: 'Strongly recommended based on profile match'
     });
     return {
       eligible_schemes: [
@@ -305,14 +293,13 @@ const recommendationBuilders = {
     priority_level: 'medium-high',
     impact_projection: { beneficiaries: 1000, region_coverage: 'district-wide' },
     recommendations: ['Add measurable impact KPIs to strengthen proposal'],
-    confidence: 0.8
   }),
 
   subsidy_eligibility_check: (p) => {
     const scheme = {
       name: 'Mission for Integrated Development of Horticulture', code: 'MIDH', ministry: 'Ministry of Agriculture',
       subsidy_percentage: 40, max_amount: 5000000, max_per_unit: 150000, max_quantity: 10,
-      eligibility_score: 0.85, confidence: 0.85, requirements: ['Minimum 0.5 hectare land holding'],
+      eligibility_score: 0.85, requirements: ['Minimum 0.5 hectare land holding'],
       documents: ['Land ownership proof', 'Bank passbook copy'], deadline: '2027-03-31',
       processing_time: '45-60 days', brand_restrictions: 'BIS-certified equipment only',
       subsidy_type: 'per_ton', rate: 25
@@ -320,7 +307,7 @@ const recommendationBuilders = {
     const scheme2 = {
       name: 'Agriculture Infrastructure Fund', code: 'AIF', ministry: 'Ministry of Agriculture',
       subsidy_percentage: 33, max_amount: 20000000, max_per_unit: 200000, max_quantity: 5,
-      eligibility_score: 0.78, confidence: 0.78, requirements: ['Registered FPO or individual farmer'],
+      eligibility_score: 0.78, requirements: ['Registered FPO or individual farmer'],
       documents: ['Project proposal', 'DPR'], deadline: '2029-03-31',
       processing_time: '60-90 days', brand_restrictions: null,
       subsidy_type: 'flat_rate', rate: null
@@ -337,7 +324,6 @@ const recommendationBuilders = {
       gst_applicability: { applicable: true, rate: 18 },
       alternative_routes: [],
       estimated_private_cost: Math.round((p.estimated_cost || p.total_cost || 1000000) * 1.18),
-      confidence: 0.82
     };
   },
 
@@ -363,7 +349,6 @@ const recommendationBuilders = {
     ph_optimal: { min: 6.0, max: 7.0 }, ph_amendment_needed: true, ph_amendment: 'Apply agricultural lime at 500 kg/ha',
     organic_matter_optimal: { min: 2.5, max: 5.0 }, organic_improvement_needed: true, organic_improvement: 'Incorporate 5 tons/ha farmyard manure',
     texture_class: 'sandy_loam', water_holding_capacity: 'moderate', drainage: 'good',
-    confidence: 0.85
   }),
 
   fertilizer_recommendation: (p) => ({
@@ -400,7 +385,6 @@ const recommendationBuilders = {
     expected_yield_impact: '+12% over unfertilized baseline',
     cost_benefit_analysis: { cost: 2140, expected_additional_revenue: 9500, benefit_cost_ratio: 4.4 },
     alternatives: p.farming_method === 'organic' ? ['Vermicompost', 'Neem cake'] : ['Slow-release NPK blend'],
-    confidence: 0.83
   }),
 
   shared_infrastructure_search: () => ({
@@ -425,7 +409,6 @@ const recommendationBuilders = {
     price_range: { min: 160000, max: 210000 },
     market_comparison: 'priced 10% below comparable listings',
     depreciation_applied: 0.35,
-    confidence: 0.77
   }),
 
   battery_agricultural_applicability: () => ({
@@ -433,18 +416,17 @@ const recommendationBuilders = {
     recommended_use_cases: ['solar_pumping', 'cold_storage'],
     safety_rating: 'pass',
     remaining_useful_life_years: 4,
-    confidence: 0.78
   }),
 
   renewable_power_recommendation: () => ({
     solutions: [
       {
         type: 'solar_pv', capacity: '10 kW', cost: 650000, subsidy_eligible: true, subsidy_amount: 260000,
-        payback_period: '4.2 years', annual_savings: 95000, co2_reduction: '8 tons/year', timeline: '6-8 weeks', confidence: 0.87
+        payback_period: '4.2 years', annual_savings: 95000, co2_reduction: '8 tons/year', timeline: '6-8 weeks'
       },
       {
         type: 'solar_hybrid_with_battery', capacity: '10 kW + 15 kWh', cost: 950000, subsidy_eligible: true, subsidy_amount: 300000,
-        payback_period: '5.1 years', annual_savings: 115000, co2_reduction: '8 tons/year', timeline: '8-10 weeks', confidence: 0.8
+        payback_period: '5.1 years', annual_savings: 115000, co2_reduction: '8 tons/year', timeline: '8-10 weeks'
       }
     ],
     comparison: 'Hybrid system offers better resilience but longer payback than solar-only',
@@ -458,7 +440,6 @@ const recommendationBuilders = {
     risk_level: 'low',
     demand_supply_match: 'favorable',
     recommendations: ['Proceed with order posting', 'Consider locking price for 30 days'],
-    confidence: 0.84
   }),
 
   bid_evaluation: () => ({
@@ -467,7 +448,6 @@ const recommendationBuilders = {
     price_competitiveness: 'competitive',
     risk_level: 'low',
     recommendations: ['Bid is well-aligned with order requirements'],
-    confidence: 0.85
   }),
 
   bid_selection: () => ({
@@ -481,7 +461,6 @@ const recommendationBuilders = {
     rationale: 'Selected bids optimize for lowest weighted cost while meeting quality and delivery requirements',
     risk_factors: ['Two-farmer concentration for full order'],
     recommendations: ['Confirm delivery schedule with both farmers before finalizing'],
-    confidence: 0.85
   }),
 
   contract_optimization: () => ({
@@ -489,7 +468,6 @@ const recommendationBuilders = {
     risk_mitigations: ['Add weather-indexed force majeure clause'],
     compliance_notes: 'Terms comply with model contract farming act guidelines',
     recommendations: ['Include third-party quality inspection clause'],
-    confidence: 0.82
   }),
 
   milestone_validation: () => ({
@@ -498,7 +476,6 @@ const recommendationBuilders = {
     quality_score: 0.88,
     evidence_strength: 0.85,
     notes: 'Satellite imagery and submitted evidence confirm milestone completion',
-    confidence: 0.86
   }),
 
   training_curriculum_optimization: () => ({
@@ -506,7 +483,6 @@ const recommendationBuilders = {
     duration_recommendation: '4 weeks, 2 sessions/week',
     delivery_mode: 'blended',
     recommendations: ['Add a hands-on field demonstration module'],
-    confidence: 0.8
   }),
 
   training_eligibility_assessment: () => ({
@@ -514,7 +490,6 @@ const recommendationBuilders = {
     fit_score: 0.83,
     recommended_alternative: null,
     prerequisites_met: true,
-    confidence: 0.83
   }),
 
   folu_compliance_assessment: () => ({
@@ -531,7 +506,6 @@ const recommendationBuilders = {
     improvement_areas: ['nature_restoration', 'circular_economy'],
     best_practices: ['Cover cropping', 'Reduced tillage'],
     recommendations: ['Introduce agroforestry on field margins to boost nature restoration score'],
-    confidence: 0.81
   }),
 
   training_recommendation: () => ({
@@ -541,7 +515,6 @@ const recommendationBuilders = {
     time_commitment: '6 weeks total',
     cost_estimate: 4500,
     subsidy_opportunities: ['MIDH training subsidy covers up to 75% of fee'],
-    confidence: 0.79
   }),
 
   // Used by modules/M106 (last-mile delivery partner performance scoring).
@@ -566,7 +539,7 @@ const recommendationBuilders = {
       recommended_actions: weakFactors.length
         ? weakFactors.map((f) => `Improve ${factorLabel(f)}: currently ${f.value !== undefined ? (Number(f.value) * 100).toFixed(1) + '%' : 'out of range'} against a target of ${f.threshold !== undefined ? (Number(f.threshold) * 100).toFixed(0) + '%' : 'the standard threshold'}`)
         : ['Maintain current performance level'],
-      confidence: 0.72
+      source: 'derived_from_input',
     };
   }
 };
@@ -580,7 +553,17 @@ async function generateRecommendation(request) {
     throw new Error(`Unknown AI recommendation task: ${task}`);
   }
 
-  return builder(parameters);
+  const result = builder(parameters);
+  // Every builder above except logistics_partner_improvement_plan returns
+  // fixed domain-knowledge content (reasonable illustrative values, but not
+  // computed from this request's actual data, a real model, or any live
+  // source) rather than a genuine per-request recommendation - this used to
+  // ship with fabricated confidence scores implying real measurement, which
+  // have been removed. `source` makes the distinction explicit for any
+  // caller, instead of leaving them to guess: a builder that already sets
+  // its own `source` (only logistics_partner_improvement_plan today) is
+  // trusted over this default.
+  return { source: 'static_template', ...result };
 }
 
 module.exports = { nutrientEntry, recommendationBuilders, generateRecommendation };
