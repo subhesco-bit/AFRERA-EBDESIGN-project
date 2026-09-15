@@ -598,6 +598,40 @@ export const marketIntelligenceAPI = {
   createIntelligence: (data) => api.post('/market-intelligence/intelligence', data),
 };
 
+// 2026-09-15: didn't exist - services/legacy/predictiveAnalyticsService.js
+// is already mounted at /api/predictiveanalytics (swapped in from a
+// scaffold earlier this session). Of the 5 methods the 2 importing pages
+// call, only 3 match this backend's real, generic entity/forecast_type
+// model (getForecasts, getPredictions, getUnacknowledgedAlerts) -
+// getDemandForecast(cropType, {region, forecastDays}) and
+// getPricingPrediction(cropType, {region}) assume a crop-and-region-
+// specific forecast endpoint that doesn't exist here (the real
+// GET /forecasts only filters by entity_id/entity_type/forecast_type,
+// nothing crop- or region-shaped) - not fabricated, left undefined same
+// as farmersAPI's unverified methods in the twenty-fourth update.
+const PREDICTIVE_ANALYTICS_BASE = `${UNVERSIONED_BASE}/api/predictiveanalytics`;
+
+export const predictiveAnalyticsAPI = {
+  getForecasts: (params) => api.get(`${PREDICTIVE_ANALYTICS_BASE}/forecasts`, { params }),
+  getPredictions: (entityId, entityType, predictionType) =>
+    api.get(`${PREDICTIVE_ANALYTICS_BASE}/predictions/${entityId}/${entityType}`, { params: { prediction_type: predictionType } }),
+  getUnacknowledgedAlerts: () => api.get(`${PREDICTIVE_ANALYTICS_BASE}/prediction-alerts/unacknowledged`),
+};
+
+// 2026-09-15: didn't exist - services/legacy/blockchainTraceabilityService.js
+// is already mounted at /api/blockchaintraceability (mounted earlier this
+// session as one of the 40 real-but-unmounted services). Both methods
+// confirmed directly against the route file's req.params/req.query
+// destructuring.
+const BLOCKCHAIN_TRACEABILITY_BASE = `${UNVERSIONED_BASE}/api/blockchaintraceability`;
+
+export const blockchainTraceabilityAPI = {
+  getTraceabilityEvents: (productId, batchNumber) =>
+    api.get(`${BLOCKCHAIN_TRACEABILITY_BASE}/traceability-events/${productId}`, { params: { batch_number: batchNumber } }),
+  verifyChainOfCustody: (productId, batchNumber) =>
+    api.get(`${BLOCKCHAIN_TRACEABILITY_BASE}/chain-of-custody/verify/${productId}`, { params: { batch_number: batchNumber } }),
+};
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
