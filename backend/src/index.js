@@ -17,7 +17,9 @@ const serverManagementRoutes = require('./routes/serverManagementRoutes_merged.j
 const index = require('./routes/index.js');
 const devinRoutes = require('./routes/devinRoutes');
 const yieldManagement = require('./routes/yieldManagement.js');
-const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. wikipediaRoutes_merged.js
+// is a real Wikipedia lookup/summary implementation with its own router.
+const wikipediaRoutes = require('./routes/wikipediaRoutes_merged.js');
 const weatherRoutes = require('./routes/weatherRoutes.js');
 const weatherAdvisory = require('./routes/weatherAdvisory.js');
 const wearableIntegrationRoutes = require('./routes/wearableIntegrationRoutes.js');
@@ -219,13 +221,21 @@ const greenhouse = require('./routes/greenhouse.js');
 // see that file's own header comment) - now fixed.
 const governanceModule = require('./routes/platform/governanceModule_merged.js');
 const goatRoutes = require('./routes/goatRoutes.js');
-const glutWarningRoutes = require('./routes/glutWarningRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. glutWarningRoutes_merged.js
+// is a real glut-risk check/scan implementation with its own router.
+const glutWarningRoutes = require('./routes/glutWarningRoutes_merged.js');
 const geofencingRoutes = require('./routes/geofencingRoutes.js');
 const freightPoolingRoutes = require('./routes/freightPoolingRoutes.js');
 const freightPooling = require('./routes/freightPooling.js');
 const foodRoutes = require('./routes/foodRoutes.js');
-const foluRoutes = require('./routes/foluRoutes.js');
-const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. foluRoutes_merged.js
+// is a real FOLU land-use/carbon/scheme-status implementation (built on
+// organicTraceabilityService.js) with its own router.
+const foluRoutes = require('./routes/foluRoutes_merged.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. foluBenchmarkRoutes_merged.js
+// is a real FOLU (forest/land-use) transitions/benchmark-report implementation
+// with its own router.
+const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes_merged.js');
 const fisheriesManagementRoutes = require('./routes/fisheriesManagementRoutes.js');
 const financialAnalytics = require('./routes/financialAnalytics.js');
 const fertilizerRoutes = require('./routes/fertilizerRoutes.js');

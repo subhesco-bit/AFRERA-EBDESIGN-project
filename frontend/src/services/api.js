@@ -524,6 +524,51 @@ export const projectSystemsAPI = {
   getProjectBudgetVsActual: (projectId) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/budget-vs-actual`),
 };
 
+// 2026-09-15: didn't exist - glutWarningRoutes_merged.js/
+// foluBenchmarkRoutes_merged.js/wikipediaRoutes_merged.js/
+// foluRoutes_merged.js were all 38-line 'Route operational' scaffolds
+// swapped for their real implementations in index.js this same session;
+// logistics/freightPoolingRoutes_merged.js's flat sibling
+// (routes/freightPoolingRoutes.js) was already the real implementation
+// and already mounted. Every method/param name confirmed directly
+// against each route file's own req.query/req.params/req.body
+// destructuring.
+const GLUT_WARNING_BASE = `${UNVERSIONED_BASE}/api/glutwarning`;
+const FOLU_BENCHMARK_BASE = `${UNVERSIONED_BASE}/api/folubenchmark`;
+const WIKIPEDIA_BASE = `${UNVERSIONED_BASE}/api/wikipedia`;
+const FOLU_BASE = `${UNVERSIONED_BASE}/api/folu`;
+const FREIGHT_POOLING_BASE = `${UNVERSIONED_BASE}/api/freightpooling`;
+
+export const glutWarningAPI = {
+  checkGlutRisk: (categoryId, stateId) => api.get(`${GLUT_WARNING_BASE}/check`, { params: { categoryId, stateId } }),
+  scanAllCategories: (stateId) => api.get(`${GLUT_WARNING_BASE}/scan`, { params: { stateId } }),
+};
+
+export const foluBenchmarkAPI = {
+  listTransitions: () => api.get(`${FOLU_BENCHMARK_BASE}/transitions`),
+  getBenchmarkReport: () => api.get(`${FOLU_BENCHMARK_BASE}/report`),
+};
+
+export const wikipediaAPI = {
+  lookup: (q) => api.get(`${WIKIPEDIA_BASE}/lookup`, { params: { q } }),
+  getSummaryByTitle: (title) => api.get(`${WIKIPEDIA_BASE}/summary/${encodeURIComponent(title)}`),
+};
+
+export const foluAPI = {
+  landUseSummary: (params) => api.get(`${FOLU_BASE}/land-use/summary`, { params }),
+  schemeStatus: (farmerId) => api.get(`${FOLU_BASE}/schemes/${farmerId}`),
+};
+
+export const freightPoolingAPI = {
+  findPoolableShipments: (originAddress, destinationAddress) =>
+    api.get(`${FREIGHT_POOLING_BASE}/poolable-shipments`, { params: { originAddress, destinationAddress } }),
+  createPoolWindow: (data) => api.post(`${FREIGHT_POOLING_BASE}/windows`, data),
+  listOpenWindows: () => api.get(`${FREIGHT_POOLING_BASE}/windows`),
+  getPoolWindow: (windowId) => api.get(`${FREIGHT_POOLING_BASE}/windows/${windowId}`),
+  joinPoolWindow: (windowId, shipmentId) => api.post(`${FREIGHT_POOLING_BASE}/windows/${windowId}/join`, { shipmentId }),
+  closeAndDispatch: (windowId) => api.post(`${FREIGHT_POOLING_BASE}/windows/${windowId}/dispatch`),
+};
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),

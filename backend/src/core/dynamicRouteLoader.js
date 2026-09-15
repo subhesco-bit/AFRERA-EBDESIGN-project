@@ -586,6 +586,12 @@ class DynamicRouteLoader {
     if (['trackDartRoutes.js', 'governanceModule.js'].includes(base)) {
       return false;
     }
+    // 2026-09-15: same reasoning again - glutWarningRoutes.js,
+    // foluBenchmarkRoutes.js and wikipediaRoutes.js scaffolds were swapped
+    // out in index.js for their real _merged.js implementations.
+    if (['glutWarningRoutes.js', 'foluBenchmarkRoutes.js', 'wikipediaRoutes.js', 'foluRoutes.js'].includes(base)) {
+      return false;
+    }
     return true;
   }
 
