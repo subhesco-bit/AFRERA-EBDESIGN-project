@@ -334,6 +334,105 @@ export const nutritionAPI = {
   analyzeNutrition: (data) => api.post('/nutrition/analyze', data),
 };
 
+// 2026-09-15: pigAPI/goatAPI/pigAIAPI/goatAIAPI/sheepAIAPI/poultryAIAPI
+// didn't exist - these are the frontend clients for the real
+// pig/sheep/poultry/goat backends mounted or fixed this same session
+// (pigRoutes_merged.js, sheepRoutes_merged.js, poultryRoutes_merged.js
+// all had a "protect...Router is not a function" load-time bug fixed
+// earlier today; goatRoutes.js was already live). Endpoint shapes
+// verified directly against each route file rather than guessed -
+// goat has an extra milk-production sub-resource pig/sheep/poultry
+// don't (real domain difference, not an oversight).
+//
+// IMPORTANT, found while wiring this: the real backend's weight/feed/
+// breeding "record" endpoints and its performance/fcr "read" endpoints
+// all take the animal id as a URL path segment
+// (`/herd/:animalId/weight-records`, `/herd/:animalId/performance`,
+// etc). PigFarmingPage.jsx's mutations already pass a single payload
+// object containing `animal_id` (weightForm/feedForm) or `sow_id`
+// (breedingForm) - handled below by pulling the id out of that payload
+// rather than requiring a second argument no call site provides. But
+// its performance/weight-records/fcr *queries* call with zero
+// arguments at all (`pigAPI.getHerdPerformance()`, no id) - there is no
+// fleet-wide equivalent of those three on the real backend, only
+// per-animal ones, so those three calls will 404 (or hit
+// `/herd/undefined/...`) until the page itself is fixed to pass a
+// selected animal id. Not fixed here - that's a page-logic bug, not a
+// missing export - documented rather than silently worked around.
+// breeding-alerts and vaccination-alerts, by contrast, really are
+// fleet-wide on the real backend and are correctly called with zero
+// arguments.
+const PIG_BASE = `${UNVERSIONED_BASE}/api/pig`;
+const SHEEP_BASE = `${UNVERSIONED_BASE}/api/sheep`;
+const POULTRY_BASE = `${UNVERSIONED_BASE}/api/poultry`;
+const GOAT_BASE = `${UNVERSIONED_BASE}/api/goat`;
+
+export const pigAPI = {
+  listHerd: (params) => api.get(`${PIG_BASE}/herd`, { params }),
+  createAnimal: (data) => api.post(`${PIG_BASE}/herd`, data),
+  updateAnimal: (id, data) => api.put(`${PIG_BASE}/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${PIG_BASE}/herd/${id}`),
+  // animalId is optional here only because PigFarmingPage.jsx's query
+  // calls it with none - see the file-level comment above.
+  listWeightRecords: (animalId, params) => api.get(`${PIG_BASE}/herd/${animalId}/weight-records`, { params }),
+  recordWeight: (payload) => api.post(`${PIG_BASE}/herd/${payload.animal_id}/weight-records`, payload),
+  recordFeedConsumption: (payload) => api.post(`${PIG_BASE}/herd/${payload.animal_id}/feed-consumption`, payload),
+  recordBreeding: (payload) => api.post(`${PIG_BASE}/herd/${payload.sow_id}/breeding`, payload),
+  getHerdPerformance: (animalId) => api.get(`${PIG_BASE}/herd/${animalId}/performance`),
+  getFeedConversionRatio: (animalId) => api.get(`${PIG_BASE}/herd/${animalId}/fcr`),
+  getBreedingAlerts: () => api.get(`${PIG_BASE}/breeding-alerts`),
+  getVaccinationAlerts: () => api.get(`${PIG_BASE}/vaccination-alerts`),
+};
+
+export const pigAIAPI = {
+  optimizeMeatProduction: (animalId) => api.post(`${PIG_BASE}/ai/optimize-meat/${animalId}`),
+  monitorPigHealth: (animalId) => api.post(`${PIG_BASE}/ai/monitor-health/${animalId}`),
+  optimizePigFeed: (animalId, productionGoal) => api.post(`${PIG_BASE}/ai/optimize-feed/${animalId}`, { productionGoal }),
+  recommendPigBreeding: (animalId) => api.post(`${PIG_BASE}/ai/recommend-breeding/${animalId}`),
+};
+
+export const sheepAIAPI = {
+  optimizeWoolProduction: (animalId) => api.post(`${SHEEP_BASE}/ai/optimize-wool/${animalId}`),
+  monitorSheepHealth: (animalId) => api.post(`${SHEEP_BASE}/ai/monitor-health/${animalId}`),
+  optimizeSheepFeed: (animalId, productionGoal) => api.post(`${SHEEP_BASE}/ai/optimize-feed/${animalId}`, { productionGoal }),
+  recommendSheepBreeding: (animalId) => api.post(`${SHEEP_BASE}/ai/recommend-breeding/${animalId}`),
+};
+
+export const poultryAIAPI = {
+  optimizeEggProduction: (flockId) => api.post(`${POULTRY_BASE}/ai/optimize-production/${flockId}`),
+  monitorFlockHealth: (flockId) => api.post(`${POULTRY_BASE}/ai/monitor-health/${flockId}`),
+  optimizePoultryFeed: (flockId, productionGoal) => api.post(`${POULTRY_BASE}/ai/optimize-feed/${flockId}`, { productionGoal }),
+  predictMortalityRisk: (flockId) => api.post(`${POULTRY_BASE}/ai/predict-mortality/${flockId}`),
+};
+
+// Same shape as pigAPI above, verified against goatRoutes.js directly:
+// GoatFarmingPage.jsx's record mutations pass a single payload
+// (milkForm/feedForm use `animal_id`, breedingForm uses `female_id`,
+// matching the real /herd/:animalId/milk-production and
+// /herd/:femaleId/breeding path params respectively), but its
+// performance query calls getHerdPerformance() with no id - same
+// page-logic gap as pig, not fixed here.
+export const goatAPI = {
+  listHerd: (params) => api.get(`${GOAT_BASE}/herd`, { params }),
+  createAnimal: (data) => api.post(`${GOAT_BASE}/herd`, data),
+  updateAnimal: (id, data) => api.put(`${GOAT_BASE}/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${GOAT_BASE}/herd/${id}`),
+  listMilkProduction: (animalId, params) => api.get(`${GOAT_BASE}/herd/${animalId}/milk-production`, { params }),
+  recordMilkProduction: (payload) => api.post(`${GOAT_BASE}/herd/${payload.animal_id}/milk-production`, payload),
+  recordFeedConsumption: (payload) => api.post(`${GOAT_BASE}/herd/${payload.animal_id}/feed-consumption`, payload),
+  recordBreeding: (payload) => api.post(`${GOAT_BASE}/herd/${payload.female_id}/breeding`, payload),
+  getHerdPerformance: (animalId) => api.get(`${GOAT_BASE}/herd/${animalId}/performance`),
+  getBreedingAlerts: () => api.get(`${GOAT_BASE}/breeding-alerts`),
+  getVaccinationAlerts: () => api.get(`${GOAT_BASE}/vaccination-alerts`),
+};
+
+export const goatAIAPI = {
+  optimizeGoatMilkProduction: (animalId) => api.post(`${GOAT_BASE}/ai/optimize-milk/${animalId}`),
+  monitorGoatHealth: (animalId) => api.post(`${GOAT_BASE}/ai/monitor-health/${animalId}`),
+  optimizeGoatFeed: (animalId, productionGoal) => api.post(`${GOAT_BASE}/ai/optimize-feed/${animalId}`, { productionGoal }),
+  recommendGoatBreeding: (animalId) => api.post(`${GOAT_BASE}/ai/recommend-breeding/${animalId}`),
+};
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
