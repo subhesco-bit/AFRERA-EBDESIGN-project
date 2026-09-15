@@ -1,19 +1,22 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 class WeatherAdvisoryService {
   async getWeatherAdvisory(lat, lng) {
     try {
-      const advisory = {
+      // No real weather data source (OpenWeatherMap, IMD, etc.) is
+      // configured anywhere in this codebase - this used to return
+      // Math.random()-generated temperature/humidity/rainfall/wind_speed
+      // and a hardcoded '5-day clear skies' forecast string, presented as
+      // a real weather advisory regardless of location. Honest
+      // not-configured response instead, matching the pattern used
+      // elsewhere in this codebase (e.g.
+      // landRecordsService.fetchGovernmentLandRecords).
+      logger.info(`Weather advisory requested for ${lat},${lng} - no weather data source configured`);
+      return {
         location: { lat, lng },
-        temperature: 25 + Math.random() * 15,
-        humidity: 40 + Math.random() * 50,
-        rainfall: Math.random() * 50,
-        wind_speed: Math.random() * 30,
-        forecast: '5-day clear skies, optimal for farming',
+        configured: false,
+        reason: 'No weather data source is configured for this deployment',
       };
-      logger.info(`Advisory generated: ${lat},${lng}`);
-      return advisory;
     } catch (error) { logger.error(`Advisory failed: ${error.message}`); throw error; }
   }
 
@@ -30,6 +33,9 @@ class WeatherAdvisoryService {
 
   async checkAlerts(forecast) {
     try {
+      if (!forecast || forecast.configured === false) {
+        return { alerts: [], status: 'unknown', reason: 'No forecast data available to check' };
+      }
       const alerts = [];
       if (forecast.rainfall > 30) alerts.push('Heavy rainfall warning');
       if (forecast.temperature > 40) alerts.push('Heat stress alert');
