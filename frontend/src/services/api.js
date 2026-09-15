@@ -5340,5 +5340,4 @@ export const aiApprovalAPI = {
   decideProposal: (proposalId, data) => api.post(`/aiapproval/proposals/${proposalId}/decision`, data),
   executeProposal: proposalId => api.post(`/aiapproval/proposals/${proposalId}/execute`),
 };
-
 export default api;

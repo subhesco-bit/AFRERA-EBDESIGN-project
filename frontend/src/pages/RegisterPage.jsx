@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { authAPI } from '../services/api';
+// See LoginPage.jsx: services/api.js never defines authAPI; the real
+// implementation is services/coreApi.js.
+import { authAPI } from '../services/coreApi';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 import { UserPlus, Eye, EyeOff } from 'lucide-react';
