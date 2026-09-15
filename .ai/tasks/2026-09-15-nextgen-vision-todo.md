@@ -1878,3 +1878,48 @@ need real backend work): `decisionEngineAPI`, `erpDashboardAPI`,
 `informationSharingAPI`, `logisticsEnhancementAPI`, plus the ~24
 field-management/harvest-scoring/most-of-pricing `farmersAPI` methods
 from the twenty-fourth update.
+
+## Update — 2026-09-15, twenty-eighth follow-up: a 4th instance of the silent route-registration bug, found by checking `labourAPI`
+
+Investigated 3 more `MISSING_EXPORT` candidates (`irrigationAPI`,
+`yieldAPI`, `labourAPI`). `irrigationAPI` and `yieldAPI` don't have a
+matching real backend (checked `irrigationManagementRoutes.js` -
+scaffold; `waterIrrigationRoutes.js` - real but only 2 of 5 needed
+methods match; `yieldManagement.js` - scaffold) - not fixed, added to
+the missing-feature list below.
+
+`labourAPI` turned into a real find: `routes/labourRoutes.js` was never
+mounted anywhere in `index.js` at all, and independently had the exact
+same silent route-registration bug already found 3 times this session
+(`seedVaultRoutes_merged.js`, `unifiedAIRoutes_merged.js`,
+`trackDartRoutes_merged.js`) - a lone CR where the `handle()` factory
+function's closing brace and the `;` ending its `const` declaration
+should have been, so all 7 `router.*()` calls ran as dead code inside
+`handle()`'s own `catch` block instead of at module scope. This is now
+the 4th confirmed instance of this exact bug shape in this codebase,
+reinforcing the standing lesson: `node -c`/`require()` succeeding proves
+nothing about whether a file's routes are actually reachable, and this
+one had gone undetected the longest of the four precisely *because* it
+was never mounted - nothing had ever made a live request against it to
+notice. Fixed the same way, mounted for the first time at `/api/labour`,
+added `labourAPI` to the frontend client (5 methods, all confirmed
+against the real service's `req.body`/route shape). 2 new tests lock in
+real route registration (7 routes) and real auth enforcement.
+
+Confirmed via `vite build`: error count drops from 127 to 126.
+
+Given a 4th instance turned up by accident while checking an unrelated
+frontend export, ran the wider sweep the twenty-second update's own
+lesson called for but never did - `grep -RPl '\}\r[a-zA-Z]' src` across
+the *entire* backend `src/` tree (not just `_merged.js` route files,
+which is all that sweep covered): zero further matches. The 4 found
+across this session (`seedVaultRoutes_merged.js`,
+`unifiedAIRoutes_merged.js`, `trackDartRoutes_merged.js`,
+`labourRoutes.js`) are confirmed to be the complete set of this exact
+byte-signature bug in this codebase - closing the loop on this
+particular standing lesson.
+
+**Running total this session**: 161 → 126 MISSING_EXPORT errors (35
+closed). Confirmed missing-feature gaps (not wiring bugs) now also
+include `irrigationAPI` and `yieldAPI` alongside the list from the
+twenty-seventh update.
