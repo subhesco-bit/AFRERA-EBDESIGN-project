@@ -664,6 +664,12 @@ async function startup() {
     logger.info('🏥 Mounting health check routes...');
     const healthRoutes = require('./routes/healthRoutes');
     app.use('/api/yieldmanagement', yieldManagement);
+    // 2026-09-15: never mounted anywhere. Unlike most services/legacy/*.js
+    // files, this one doesn't export a plain router - it exports a
+    // setupRoutes(app) function that mounts itself at the hardcoded path
+    // /api/v1/market-intelligence, so it's called directly here rather
+    // than via app.use() like the others.
+    require('./services/legacy/marketIntelligenceService.js').setupRoutes(app);
     app.use('/api/wikipedia', wikipediaRoutes);
     app.use('/api/weather', weatherRoutes);
     app.use('/api/weatheradvisory', weatherAdvisory);

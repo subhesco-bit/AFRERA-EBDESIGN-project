@@ -585,6 +585,19 @@ export const labourAPI = {
   getPayments: () => api.get(`${LABOUR_BASE}/payments`),
 };
 
+// 2026-09-15: didn't exist. services/legacy/marketIntelligenceService.js
+// was never mounted anywhere - unlike most services/legacy/*.js files it
+// doesn't export a plain router, it exports a setupRoutes(app) function
+// that mounts itself directly at /api/v1/market-intelligence (called
+// from index.js this same session). Since that's already under the
+// versioned prefix the `api` instance's baseURL provides, these use a
+// relative path rather than the UNVERSIONED_BASE pattern every other
+// export on this page uses.
+export const marketIntelligenceAPI = {
+  getLatestIntelligence: (villageId) => api.get(`/market-intelligence/intelligence/village/${villageId}/latest`),
+  createIntelligence: (data) => api.post('/market-intelligence/intelligence', data),
+};
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
