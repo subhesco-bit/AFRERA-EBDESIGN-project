@@ -1,11 +1,68 @@
-﻿// Express routes for Water Quality Monitoring (M077)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-router.post('/measurements', controller.recordWaterQualityMeasurement);
-router.get('/locations/:id/compliance', controller.getComplianceReport);
-router.get('/locations/:id/monitor', controller.monitorWaterQuality);
-router.post('/locations/:id/treatment', controller.generateTreatmentRecommendations);
+/**
+ * M077 Routes
+ * Base path: /api/m077
+ */
+
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m077
+ * @desc    Get all m077 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m077/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m077/search
+ * @desc    Search m077 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m077
+ * @desc    Create new m077
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m077/:id
+ * @desc    Get m077 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m077/:id
+ * @desc    Update m077
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m077/:id
+ * @desc    Delete (soft delete) m077
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

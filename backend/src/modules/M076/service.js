@@ -1,419 +1,243 @@
-/**
- * Water Budgeting Service (M076)
- * Comprehensive water resource management, budgeting, and allocation
- *
- * DATA-SOURCE DISCLOSURE (2026-08-29)
- * createWaterBudget/getBudgetLimits/getActualWaterUsage/getHistoricalWaterUsage/
- * getCropPatterns/getGroundwaterLevels/calculateVariance are real: they read and
- * write real tables. Everything else in this file - weather forecast, efficiency
- * metrics, demand forecast, supply constraints, priority matrix, environmental
- * requirements, usage analysis, water forecast, risk assessment - is a static
- * placeholder returning the same fixed numbers for every location/budget,
- * pending real integration (a weather API, metering telemetry, a groundwater
- * survey feed). Reachable live from `frontend/src/pages/WaterManagementPage.jsx`,
- * so a user calling trackWaterUsage/optimizeWaterAllocation/generateBudgetReport
- * today sees these placeholders as if computed. Not fixed in this pass because
- * the real fix is wiring actual data sources, not inventing better-looking
- * fake numbers - tracked in .ai/tasks/ACTIVE.md.
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Create water budget for a location
- */
-async function createWaterBudget(budgetData) {
-  try {
-    const {
-      location_id,
-      location_name,
-      state,
-      district,
-      budget_period,
-      total_water_allocation,
-      agricultural_allocation,
-      domestic_allocation,
-      industrial_allocation,
-      environmental_allocation,
-      irrigation_efficiency_target,
-      water_source_type,
-    } = budgetData;
+class M076Service {
+  constructor() {
+    this.table = 'cooperatives';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-    const budget = {
-      budget_id: generateId(),
-      location_id,
-      location_name,
-      state,
-      district,
-      budget_period,
-      total_water_allocation,
-      allocations: {
-        agricultural: agricultural_allocation,
-        domestic: domestic_allocation,
-        industrial: industrial_allocation,
-        environmental: environmental_allocation,
-      },
-      irrigation_efficiency_target,
-      water_source_type,
-      status: 'active',
-      created_at: new Date().toISOString(),
-    };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    // AI-powered water budget optimization
-    const aiRequest = {
-      task: 'water_budget_optimization',
-      parameters: {
-        location_data: budgetData,
-        historical_usage: await getHistoricalWaterUsage(location_id),
-        weather_forecast: await getWeatherForecast(state, district),
-        crop_patterns: await getCropPatterns(location_id),
-        groundwater_levels: await getGroundwaterLevels(location_id),
-        efficiency_improvements: await getEfficiencyRecommendations(location_id),
-      },
-    };
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    budget.ai_recommendations = aiResponse;
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-    // Insert into database
-    const result = await pool.query(
-      `INSERT INTO water_budgets 
-       (budget_id, location_id, location_name, state, district, budget_period, 
-        total_allocation, agricultural_allocation, domestic_allocation, 
-        industrial_allocation, environmental_allocation, efficiency_target, 
-        water_source_type, status, ai_recommendations, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-       RETURNING *`,
-      [
-        budget.budget_id,
-        budget.location_id,
-        budget.location_name,
-        budget.state,
-        budget.district,
-        budget.budget_period,
-        budget.total_water_allocation,
-        budget.agricultural_allocation,
-        budget.domestic_allocation,
-        budget.industrial_allocation,
-        budget.environmental_allocation,
-        budget.irrigation_efficiency_target,
-        budget.water_source_type,
-        budget.status,
-        JSON.stringify(budget.ai_recommendations),
-        budget.created_at,
-      ],
-    );
+        validated[field] = value;
+      }
+    }
 
-    logger.info(`Water budget created: ${budget.budget_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating water budget', { error: error.message, stack: error.stack });
-    throw new Error('Failed to create water budget');
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Track water usage against budget
- */
-async function trackWaterUsage(budgetId, period) {
-  try {
-    const usage = {
-      tracking_id: generateId(),
-      budget_id: budgetId,
-      period,
-      timestamp: new Date().toISOString(),
-      actual_usage: await getActualWaterUsage(budgetId, period),
-      budget_limits: await getBudgetLimits(budgetId),
-      variance: await calculateVariance(budgetId, period),
-      efficiency_metrics: await calculateEfficiencyMetrics(budgetId, period),
-      recommendations: await generateUsageRecommendations(budgetId, period),
-    };
-
-    return usage;
-  } catch (error) {
-    logger.error('Error tracking water usage', { error: error.message, stack: error.stack });
-    throw new Error('Failed to track water usage');
-  }
-}
-
-/**
- * Optimize water allocation
- */
-async function optimizeWaterAllocation(budgetId, constraints) {
-  try {
-    const aiRequest = {
-      task: 'water_allocation_optimization',
-      parameters: {
-        budget_id: budgetId,
-        constraints,
-        current_allocation: await getCurrentAllocation(budgetId),
-        demand_forecast: await getWaterDemandForecast(budgetId),
-        supply_constraints: await getSupplyConstraints(budgetId),
-        priority_matrix: await getPriorityMatrix(budgetId),
-        environmental_requirements: await getEnvironmentalRequirements(budgetId),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
-    const optimization = {
-      optimization_id: generateId(),
-      budget_id: budgetId,
-      timestamp: new Date().toISOString(),
-      current_allocation: await getCurrentAllocation(budgetId),
-      optimized_allocation: aiResponse.optimized_allocation,
-      expected_savings: aiResponse.expected_savings,
-      efficiency_improvement: aiResponse.efficiency_improvement,
-      implementation_plan: aiResponse.implementation_plan,
-      confidence: aiResponse.confidence,
-    };
-
-    return optimization;
-  } catch (error) {
-    logger.error('Error optimizing water allocation', { error: error.message, stack: error.stack });
-    throw new Error('Failed to optimize water allocation');
-  }
-}
-
-/**
- * Generate water budget report
- */
-async function generateBudgetReport(budgetId, reportType) {
-  try {
-    const report = {
-      report_id: generateId(),
-      budget_id: budgetId,
-      report_type: reportType,
-      generated_at: new Date().toISOString(),
-      budget_summary: await getBudgetSummary(budgetId),
-      usage_analysis: await getUsageAnalysis(budgetId),
-      efficiency_metrics: await getEfficiencyMetrics(budgetId),
-      recommendations: await getBudgetRecommendations(budgetId),
-      forecast: await getWaterForecast(budgetId),
-      risk_assessment: await assessWaterRisks(budgetId),
-    };
-
-    return report;
-  } catch (error) {
-    logger.error('Error generating budget report', { error: error.message, stack: error.stack });
-    throw new Error('Failed to generate budget report');
-  }
-}
-
-// Helper functions
-function generateId() {
-  return `WB-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getHistoricalWaterUsage(locationId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM water_usage_history WHERE location_id = $1 ORDER BY date DESC LIMIT 365',
-      [locationId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function getWeatherForecast(state, district) {
-  // In production, integrate with weather API
-  return {
-    temperature: { min: 20, max: 35 },
-    rainfall: { expected: 100, probability: 0.7 },
-    humidity: { min: 60, max: 85 },
-  };
-}
-
-async function getCropPatterns(locationId) {
-  try {
-    const result = await pool.query(
-      'SELECT crop_type, area, water_requirement FROM crop_patterns WHERE location_id = $1',
-      [locationId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function getGroundwaterLevels(locationId) {
-  try {
-    const result = await pool.query(
-      'SELECT level, date FROM groundwater_levels WHERE location_id = $1 ORDER BY date DESC LIMIT 12',
-      [locationId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function getEfficiencyRecommendations(locationId) {
-  return [
-    'Implement drip irrigation for water-intensive crops',
-    'Use soil moisture sensors for precise irrigation',
-    'Schedule irrigation during cooler hours to reduce evaporation',
-    'Consider rainwater harvesting systems',
-  ];
-}
-
-async function getActualWaterUsage(budgetId, period) {
-  try {
-    const result = await pool.query(
-      'SELECT SUM(usage_amount) as total FROM water_usage_records WHERE budget_id = $1 AND period = $2',
-      [budgetId, period],
-    );
-    return result.rows[0]?.total || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-async function getBudgetLimits(budgetId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM water_budgets WHERE budget_id = $1',
-      [budgetId],
-    );
-    return result.rows[0] || {};
-  } catch (error) {
-    return {};
-  }
-}
-
-async function calculateVariance(budgetId, period) {
-  const actual = await getActualWaterUsage(budgetId, period);
-  const budget = await getBudgetLimits(budgetId);
-  const variance = actual - (budget.total_allocation || 0);
-  const variance_percentage = budget.total_allocation > 0 ? (variance / budget.total_allocation) * 100 : 0;
-
-  return {
-    absolute: variance,
-    percentage: variance_percentage,
-    status: variance > 0 ? 'over_budget' : variance < 0 ? 'under_budget' : 'on_target',
-  };
-}
-
-async function calculateEfficiencyMetrics(budgetId, period) {
-  return {
-    irrigation_efficiency: 75,
-    water_productivity: 2.5,
-    distribution_efficiency: 85,
-    overall_efficiency: 78,
-  };
-}
-
-async function generateUsageRecommendations(budgetId, period) {
-  const variance = await calculateVariance(budgetId, period);
-
-  if (variance.status === 'over_budget') {
-    return [
-      'Reduce irrigation frequency during non-critical growth stages',
-      'Implement deficit irrigation strategies for drought-tolerant crops',
-      'Consider crop varieties with lower water requirements',
-    ];
-  } else if (variance.status === 'under_budget') {
-    return [
-      'Consider expanding cultivated area within water limits',
-      'Optimize crop rotation for better water utilization',
-      'Implement precision irrigation to maximize yield per unit water',
-    ];
-  }
-
-  return ['Maintain current irrigation practices'];
-}
-
-async function getCurrentAllocation(budgetId) {
-  const budget = await getBudgetLimits(budgetId);
-  return budget.allocations || {};
-}
-
-async function getWaterDemandForecast(budgetId) {
-  return {
-    agricultural_demand: 1000,
-    domestic_demand: 200,
-    industrial_demand: 150,
-    environmental_demand: 100,
-    total_demand: 1450,
-  };
-}
-
-async function getSupplyConstraints(budgetId) {
-  return {
-    ground_water_capacity: 500,
-    surface_water_capacity: 800,
-    recycled_water_capacity: 100,
-    total_capacity: 1400,
-  };
-}
-
-async function getPriorityMatrix(budgetId) {
-  return {
-    domestic: { priority: 1, weight: 0.4 },
-    agricultural: { priority: 2, weight: 0.3 },
-    environmental: { priority: 3, weight: 0.2 },
-    industrial: { priority: 4, weight: 0.1 },
-  };
-}
-
-async function getEnvironmentalRequirements(budgetId) {
-  return {
-    minimum_environmental_flow: 50,
-    groundwater_recharge_requirement: 30,
-    quality_standards: 'drinking_water',
-  };
-}
-
-async function getBudgetSummary(budgetId) {
-  return await getBudgetLimits(budgetId);
-}
-
-async function getUsageAnalysis(budgetId) {
-  return {
-    trend: 'increasing',
-    seasonality: 'peak_monsoon',
-    major_consumers: ['agriculture', 'domestic'],
-    efficiency_trend: 'improving',
-  };
-}
-
-async function getEfficiencyMetrics(budgetId) {
-  return await calculateEfficiencyMetrics(budgetId, 'current');
-}
-
-async function getBudgetRecommendations(budgetId) {
-  return [
-    'Increase irrigation efficiency to 80%',
-    'Implement water recycling for industrial use',
-    'Expand rainwater harvesting infrastructure',
-  ];
-}
-
-async function getWaterForecast(budgetId) {
-  return {
-    demand_forecast: 'increasing',
-    supply_forecast: 'stable',
-    risk_level: 'moderate',
-  };
-}
-
-async function assessWaterRisks(budgetId) {
-  return {
-    scarcity_risk: 'moderate',
-    quality_risk: 'low',
-    infrastructure_risk: 'medium',
-    climate_change_impact: 'high',
-  };
-}
-
-module.exports = {
-  createWaterBudget,
-  trackWaterUsage,
-  optimizeWaterAllocation,
-  generateBudgetReport,
-};
-
+module.exports = new M076Service();

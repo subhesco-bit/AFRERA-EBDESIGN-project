@@ -1,12 +1,20 @@
-const router = require('express').Router();
-const riskService = require('../services/riskAssessmentService');
-const auth = require('../middleware/auth');
+/**
+ * risk Assessment Routes
+ * Placeholder route module
+ */
 
-router.post('/risk/assess/:entityId', auth, async (req, res) => {
-  try {
-    const result = await riskService.assessRisk(req.params.entityId, req.body.risk_factors);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'riskAssessment',
+    status: 'operational'
+  });
 });
 
 module.exports = router;
