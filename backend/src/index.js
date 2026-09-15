@@ -4,12 +4,7 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 
 // routes/index.js is a module exporter, not a router (see the "don't mount
 // it" comment near the old `app.use('/api/index', index)` line below) - the
-// `index` binding here is unused. It used to crash the whole server at boot
-// (MODULE_NOT_FOUND on services/legacy/completeAIIntegrationService.js,
-// eagerly required through this chain before any route mounting ran); that
-// file has been restored from backups/CONSOLIDATION_BACKUP_20260907_170201/
-// (see the completeAIIntegrationService.js merge resolution), so the require
-// below is harmless again, just still dead code.
+// `index` binding here is unused, just still-present dead code.
 const index = require('./routes/index.js');
 const devinRoutes = require('./routes/devinRoutes');
 const yieldManagement = require('./routes/yieldManagement.js');
