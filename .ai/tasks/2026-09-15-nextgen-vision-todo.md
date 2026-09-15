@@ -1586,3 +1586,48 @@ gap. Left unmounted, flagged as a distinct follow-up: someone needs to
 either write `climateRouteSupport.js` for real (a proper scoped task) or
 confirm weather's real logic already exists reachable some other way
 before spending effort on it.
+
+## Update — 2026-09-15, twenty-fourth follow-up: confirmed - most of `farmersAPI`'s remaining ~24 methods have no backend to wire to
+
+Followed up on the twenty-first-update finding that the 12 farmer-related
+frontend pages call ~22 `farmersAPI` methods beyond the 6 already wired
+(`getFarmer`, `getFarmers`, `calculateFDI`, `addCertification`,
+`getCertifications`, `getFPOs`). Re-enumerated every call site directly
+(`grep -rn "farmersAPI\."` across `frontend/src`) rather than trusting
+the earlier estimate: 30 distinct method names total, 24 still
+undefined - `getFields`, `deleteField`, `getHarvestScore`,
+`getHarvestPlans`, `getScoreHistory`, `getMarketPrices`,
+`getBenchmarkPrices`, `getBenchmarks`, `getDemandForecast`,
+`getPriceTrends`, `getPriceSeasonality`, `getPriceDynamics`,
+`getPriceSignals`, `getMarketConditions`, `getMarketEvents`,
+`getMarketComparisonData`, `getPriceCategories`, `savePricingModel`,
+`getProductsForCompare`, `getQuickQuestions`, `getCropSuggestions`,
+`getAdvisoryContext`, `getNotifications`, `getPreOrders`,
+`createListing`, `getFarmerDashboard`.
+
+Searched for a real backend implementation of any of them before writing
+anything: `find`/`grep` across every `services/` and `routes/` file for
+field-management or harvest-scoring code returned **zero matches** -
+neither `getHarvestScore` nor `getFields` nor any synonym exists
+anywhere in the backend, mounted or not. The market/pricing-shaped ones
+(`getMarketPrices`, `getBenchmarks`, `getPriceTrends`, etc.) do have
+several plausibly-named backend files (`marketDataRoutes.js`,
+`marketAnalytics.js`, `priceForecasting.js`, `riskPricingRoutes_merged.js`,
+`marketplaceEnhancements_merged.js`) - all already mounted - but checked
+each one's actual registered endpoints directly: `marketDataRoutes.js`
+and `marketAnalytics.js` are themselves scaffold stubs (health-check
+only, `POST /` for the former), and `priceForecasting.js` exposes exactly
+two endpoints (`GET /products/:id/price-forecast`,
+`GET /products/:id/price-history`) that don't match any of the 13
+price/market method names by shape or path.
+
+**Conclusion, confirmed rather than assumed**: this isn't a wiring gap
+like every other `farmersAPI`/`productsAPI`/etc. fix this session (real
+backend, just not imported) - it's a genuine missing-feature gap. Field
+management, harvest scoring, and most of farmer-facing market/pricing
+analytics were never implemented on the backend at all. Writing frontend
+client methods for them would point at nothing (silent 404s) or worse,
+invite guessing at response shapes for endpoints that don't exist -
+explicitly not done. This needs to go back to product/architecture as
+real backend feature work, not another pass of this backlog's
+mount-the-existing-thing pattern.
