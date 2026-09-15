@@ -584,21 +584,95 @@ fabrication files flagged in the sixth update - both
 `recommendationBuilders.js` and `aiAgenticCompanionService.js` are now
 fixed.
 
+## Update — 2026-09-15, eighth follow-up: M060 README was itself fabricated, plus a real dead-code bug it led to
+
+Picked up the `M060 review system vs legacy/productReviewService.js
+duplication` item flagged in the sixth update (itself quoting a claim
+attributed to `ACTIVE.md`). First surprise: `ACTIVE.md` as it exists in
+this checkout (92 lines) contains no such note - the claim traces back to
+`backend/src/modules/M060/README.md` instead, which turned out to be the
+real problem.
+
+**The README itself was fabricated, not just stale.** It described M060 as
+"Product review/rating service with AI sentiment-analysis hook," claimed a
+specific dated fabrication fix ("Fixed a real fabrication bug 2026-08-29:
+`getProductContext()` returned a hardcoded `{category:'grains',
+average_rating:4.2}`..."), and claimed it was reachable via
+`/api/v1/backend-modules/M060/:operation`. Verified all three false:
+- `getProductContext` doesn't exist anywhere in the repo (`grep -rl` finds
+  only the README mentioning it) - the claimed fix describes code that was
+  never real.
+- `git log` on `service.js` shows exactly two versions ever: both generic
+  auto-generated CRUD templates (`this.table = 'input_supply'`), neither
+  containing review/rating/sentiment logic. `MODULES_REGISTRY.js`
+  independently confirms M060 as `"Input Supply Chain", status: "❌
+  SKELETON", progress: 0` - consistent with the real code, not the README.
+- `/api/v1/backend-modules/...` appears in ~15 module READMEs but in zero
+  actual route-mounting code (`index.js`, `routes/`) - `modules/M060/routes.js`
+  is not required anywhere. M060 is genuinely unreachable at runtime.
+
+**This fabricated README produced a real, live bug.**
+`services/legacy/productReviewService.js` (the actual, mounted, working
+review service at `/api/v1/product-reviews`) had a merge block at its tail
+that `require('../../modules/M060/service')` and destructured
+`createReview`/`getProductReviews` off it, with a comment claiming these
+"collided with different signatures" with the real review methods. Since
+M060 never had those methods (only generic CRUD), the destructuring
+silently produced `createReviewSimple`/`getProductReviewsSimple` as
+`undefined` - and `Object.assign` pollution added 21 unrelated, unrelated-
+domain method names (`getAll`/`getById`/`create`/`update`/`delete`/
+`createBulk`/`search`, merged three times over from M060 + M052
+`crop_diseases` + M058 `crop_insurance`, all equally generic) onto the
+real review service's exports. Confirmed via repo-wide grep that nothing
+anywhere calls any of these 21 polluted names or the two `undefined`
+aliases - dead, but actively misleading about what this service does.
+
+**Fixed**: removed the entire dead merge block, replaced with a comment
+documenting what was verified and why it's gone. Updated the two
+re-export wrapper files' (`services/productReviewService.js`,
+`services/commerce/productReviewService.js`) comments that referenced the
+now-removed merge. Rewrote `modules/M060/README.md` to describe the real
+module (Input Supply Chain skeleton, unmounted) instead of the fabricated
+one, with the verification trail so a future session doesn't have to
+redo it.
+
+**Verified**: `node -c` and eslint clean on all three JS files;
+`productReviewService.test.js` still 9/9 (including "exposes the full
+real API surface, not a stub," unaffected since it doesn't test the
+removed pollution); confirmed real methods (`createReview`,
+`getProductReviews`, etc.) still present via the prototype after the
+edit, confirmed `createReviewSimple`/`getAll`/etc. are now genuinely gone
+from the exports.
+
+**Found but not fixed** (separate, pre-existing, genuinely out of scope
+here): `M060`'s own test suite (`modules/M060/__tests__/M060.test.js`) has
+9 failing tests unrelated to this fix - `TypeError: DatabaseError is not a
+constructor` in `service.js`'s own error handling. Confirmed via
+`git diff` that this session touched none of `service.js`/`controller.js`/
+its test file, so this is pre-existing breakage in a module the registry
+already marks 0%-complete and that has no live callers. Not worth chasing
+given it's unreachable at runtime either way - flagging for whoever
+eventually works Stage 0 or decides to build out Input Supply Chain for
+real.
+
+**Implication worth flagging for Stage 0**: this is a second confirmed
+instance (after the `aiAgenticCompanionService.js`/`recommendationBuilders.js`
+work) of a README/doc claim that doesn't just overstate completeness but
+describes code that never existed. Worth treating per-module READMEs with
+the same skepticism as the ~150 `.ai/*COMPLETE*` reports once Stage 0
+starts, not just the top-level docs.
+
 ## Immediate next action
 
-Two independent, high-value threads are now open:
-1. **Stage 0** (concept-runtime matrix) - still the most durable investment,
-   for the reasons already stated below.
-2. **The `ui/button.jsx` / `ui/card.jsx` component-API gap** - blocks a
-   production build entirely and now has a clear, scoped starting point
-   (two files, a known list of expected named exports) rather than being
-   an undifferentiated part of "509 errors."
-
-Stage 0 (concept-runtime matrix) is also still valuable independent of the
-above: this session's spot-audits keep finding the same pattern
-(undercounted-but-real surface area, real code sitting unmounted next to
-fabricated placeholders or missing entirely, solving the same crash) faster
-than any full manual mapping would, but a real matrix is what turns "this
-session happened to sample this file" into something durable other
+**Stage 0** (concept-runtime matrix) remains the most durable investment:
+this session's spot-audits (UI components, 7 AI-fabrication files, and now
+M060's README) keep finding the same pattern - undercounted-but-real
+surface area, real code sitting unmounted next to fabricated placeholders,
+and now fabricated documentation describing code that was never written -
+faster than a full manual mapping would, but a real matrix is what turns
+"this session happened to sample this file" into something durable other
 sessions (Claude or otherwise) can trust instead of re-auditing from
 scratch each time.
+
+The `ui/button.jsx`/`ui/card.jsx` component-API gap (previously listed
+here as the second open thread) is done - see the third follow-up above.

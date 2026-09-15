@@ -7,9 +7,11 @@
  * and backend/src/routes/marketplaceEnhancements.js). This copy is only
  * referenced by backend/src/routes/commerce/marketplaceEnhancements.js,
  * which is not mounted in index.js (dead route file). Legacy already
- * carries a superset of this file's logic (plus merged M060/M052/M058
- * operations), so this is collapsed to a re-export rather than kept as a
- * second, drifting copy. See merge policy in .ai/ for rationale.
+ * carries a superset of this file's logic, so this is collapsed to a
+ * re-export rather than kept as a second, drifting copy. See merge policy
+ * in .ai/ for rationale. (2026-09-15: legacy used to also merge in
+ * M060/M052/M058 operations here - removed as dead, misleading pollution;
+ * see legacy's own history for detail.)
  */
 
 'use strict';
