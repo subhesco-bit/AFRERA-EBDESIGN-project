@@ -790,3 +790,63 @@ out to be real and high-value. Worth treating as a standing hypothesis
 for Stage 0: for every route mounted from `routes/*.js`, check whether a
 same-domain, more complete implementation exists under `services/` (or
 `services/legacy/`) that isn't the one actually wired in.
+
+## Update — 2026-09-15, eleventh follow-up: the live frontend was rendering a blank page - two real crashes fixed
+
+User asked to see the current app running. Booted the real Vite dev
+server (`npm run dev`) and loaded it in headless Chromium - **it rendered
+completely blank** (a 4KB body, nothing visible). Not a hypothesis, a
+directly observed failure. Two distinct, real, application-breaking bugs
+found and fixed via that same browser session, verifying each one before
+moving to the next:
+
+**Bug 1 - one static import crashed the entire module graph.**
+`App.jsx` lazy-loads every page except one: `import ModuleRuntimePage from
+'./pages/ModuleRuntimePage'` (static, not `lazy()`). `ModuleRuntimePage.jsx`
+imports the still-missing `modulesAPI` named export from `services/api.js`
+(part of the already-documented 161-error gap). Because it was a *static*
+import, that one broken module took down the entire app's module graph on
+load - every route, not just `/module/:moduleId` - confirmed via the
+browser's own `pageerror` event:
+`"The requested module '/src/services/api.js' does not provide an export
+named 'modulesAPI'"`. Fixed by making it `lazy()` like every other page in
+the file (already wrapped in `<RouteSuspense>` at its one usage site, so
+no further change needed there) - contains the still-real, still-open
+`modulesAPI` gap to its own route instead of crashing the whole app for
+every user on every page.
+
+**Bug 2 - the app has never had a Router.** With bug 1 fixed, a second,
+separate crash appeared immediately: `"useLocation() may be used only in
+the context of a <Router> component."` `App.jsx` calls `useLocation()`
+and renders `<Routes>`/`<Route>` (react-router-dom), but `main.jsx` -
+confirmed as the real entry point via `index.html`'s `<script
+src="/src/main.jsx">` - never wrapped `<App />` in a `<BrowserRouter>` (or
+any Router) at all. `git log` on `main.jsx` shows only 2 commits, neither
+about routing - this isn't a lost regression, the wrapper appears to have
+never existed. Fixed by adding `<BrowserRouter>` around the existing
+provider tree in `main.jsx`.
+
+**Result, verified in the same browser session**: title changed from
+generic to `"Home - AFRERA Agriculture Platform"`, rendered body grew
+from ~4KB to ~173KB, and a real header (nav menu: Marketplace, Farmer
+Portal, Pricing, Finance/ERP, Stakeholders, Logistics, Insurance...),
+sidebar, and footer (contact info, quick links, social icons) now render
+- screenshot sent to the user directly. One remaining non-fatal console
+error (`multilingualAPI.getLanguages is not a function`) is already
+caught internally by `MultilingualProvider` and doesn't crash anything -
+not fixed here, flagged as a smaller follow-up. Confirmed no regression:
+`npm run build` still fails with exactly 161 errors (the same pre-existing
+missing-API-export count, not increased) - these two fixes are dev-time
+*runtime* crashes, unrelated to and not fixed by the production build gap,
+and vice versa.
+
+**Why this matters more than the abstract "161 build errors" framing
+elsewhere in this doc**: those errors block a *production build* from
+being produced at all, which sounds severe but is also somewhat abstract
+without a running instance to check against. This finding is different in
+kind - it's proof that even *if* a build had succeeded, or in `npm run
+dev` as actually used during development, the deployed app would have
+shown every single visitor a blank white page. This was probably the
+single highest-severity issue found this entire session, and it was
+invisible to every prior audit (including this session's own) because
+none of them actually loaded the page in a browser until asked to.
