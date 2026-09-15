@@ -35,7 +35,7 @@ async function detectFraud(transactionData) {
 
     // Check location anomalies
     const locationRisk = await checkLocationAnomaly(transactionData);
-    if (locationRisk > 0.5) {
+    if (locationRisk !== null && locationRisk > 0.5) {
       riskFactors.push({ factor: 'location_anomaly', risk: locationRisk });
       totalRiskScore += locationRisk * 50;
     }
@@ -79,7 +79,6 @@ async function detectFraud(transactionData) {
       risk_score: normalizedRisk,
       decision: decision,
       action: action,
-      confidence: 0.91,
       risk_factors: riskFactors,
       recommendations: generateFraudRecommendations(decision, riskFactors)
     };
@@ -90,13 +89,20 @@ async function detectFraud(transactionData) {
 }
 
 function checkLocationAnomaly(transactionData) {
-  // Simplified location anomaly check
-  // In production, use geospatial analysis
-  return 0.2;
+  // No geospatial analysis is wired in - this used to hardcode 0.2
+  // regardless of input, which (since the caller only acts on a risk
+  // above 0.5) silently never contributed to the score while looking
+  // like a real, evaluated signal. Honestly report "not evaluated"
+  // instead so the caller can skip it explicitly.
+  return null;
 }
 
 function matchesPattern(transactionData, pattern) {
-  // Check if transaction matches known fraud pattern
+  // Not implemented: no defined schema/matching rule for what makes a
+  // transaction match a stored fraud_patterns document beyond the
+  // .name/.risk_score fields already read by the caller. Real matching
+  // logic needs that schema, not a guess. Returns false (never matches)
+  // rather than fabricating a match rule.
   return false;
 }
 

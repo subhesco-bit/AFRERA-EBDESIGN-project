@@ -70,7 +70,6 @@ async function assessCreditRisk(farmerId) {
       farmer_id: farmerId,
       credit_score: creditScore,
       risk_level: riskLevel,
-      confidence: 0.89,
       fdi_score: fdiScore.score,
       repayment_history: {
         total_loans: repayment.total_loans,
@@ -104,8 +103,15 @@ async function assessCreditRisk(farmerId) {
 }
 
 function calculateFDI(farmerId) {
-  // This would call the FDI calculation service
-  // For now, return a mock response
+  // FIXME: not wired to a real FDI calculation service - returns the
+  // identical {score: 72, grade: 'B+'} for every farmer regardless of
+  // farmerId, and that fabricated 72 then becomes 40% of every real
+  // farmer's credit_score below (fdiContribution = fdiScore.score * 0.4),
+  // directly setting their real interest_rate and max_advance_percentage.
+  // Not fixed here: doing so needs either the real FDI service's actual
+  // contract or removing this 40% weighting from calculateCreditScore,
+  // both of which change the credit decision itself and need a domain
+  // decision, not a guess.
   return {
     score: 72,
     grade: 'B+',
