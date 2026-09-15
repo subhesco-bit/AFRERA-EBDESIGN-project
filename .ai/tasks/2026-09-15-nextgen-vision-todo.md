@@ -1140,3 +1140,35 @@ now: `legacy/` and root-level `services/*.js` are fully swept (thirteenth
 and fourteenth updates), and the domain-subfolder duplicates are
 confirmed stale and correctly left alone. Nothing further to mount along
 this specific line of investigation.
+
+## Update — 2026-09-15, sixteenth follow-up: productService.js's real gaps closed, plus a route-shadowing bug
+
+Followed up on the thirteenth update's own flagged item: `productService.js`
+had the same missing-DB-null-guard gap as `orderService.js`, found via its
+batch smoke test. Checked all 8 exported functions; `getProducts()` and
+`getProductById()` already had the guard, the other 6
+(`createProduct`/`updateProduct`/`deleteProduct`/`getCategories`/
+`getStates`/`searchProducts`) didn't. Added it, mechanical and consistent
+with the file's own existing pattern.
+
+**Writing the regression test surfaced a second, more interesting bug**:
+manually exercising `GET /search` showed it hitting `getProductById()`
+instead of `searchProducts()`. Root cause: `router.get('/:id', ...)` was
+registered at line 524, `router.get('/search', ...)` at line 599 - Express
+matches routes in registration order, and `/search` is a single path
+segment, so `/:id` (with `id='search'`) caught every request before the
+real `/search` handler was ever reached. (`/categories/list` and
+`/states/list` were unaffected - two path segments, don't match the
+single-segment `/:id` pattern - confirmed by testing all three.)
+`searchProducts()` itself was real and correct; it was simply
+unreachable through the live API. Fixed by moving the `/search` route
+registration above `/:id`, with a comment explaining why order matters
+here specifically (most of this router's other routes don't care about
+order, so the fix is deliberately narrow, not a general reordering).
+
+Added `services/legacy/__tests__/productService.test.js` (7 tests): the
+6 DB-unavailable-guard cases, plus a route-ordering test that inspects
+`router.stack` directly to assert `/search` is registered before `/:id`
+- this would have caught the shadowing bug before it shipped, and
+catches a regression if someone re-adds a route in the wrong order later.
+All passing, `node -c`/eslint clean.
