@@ -87,6 +87,12 @@ const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes.js')
 const nlp = require('./routes/nlp.js');
 const nervousSystemRoutes = require('./routes/nervousSystemRoutes.js');
 const mlOptimization = require('./routes/mlOptimization.js');
+// 2026-09-15: was never mounted anywhere. services/legacy/multilingualService.js
+// is a real, 821-line, Postgres-backed service (language detection,
+// translation, content translations, user language preferences,
+// pronunciation guides) with its own router that nothing ever wired in -
+// found investigating why MultilingualProvider.jsx's calls all failed.
+const { router: multilingualRoutes } = require('./services/legacy/multilingualService.js');
 const marketplaceEnhancements = require('./routes/marketplaceEnhancements.js');
 const marketDataRoutes = require('./routes/marketDataRoutes.js');
 const marketAnalytics = require('./routes/marketAnalytics.js');
@@ -619,6 +625,7 @@ async function startup() {
     app.use('/api/nlp', nlp);
     app.use('/api/nervoussystem', nervousSystemRoutes);
     app.use('/api/mloptimization', mlOptimization);
+    app.use('/api/multilingual', multilingualRoutes);
     app.use('/api/marketplaceenhancements', marketplaceEnhancements);
     app.use('/api/marketdata', marketDataRoutes);
     app.use('/api/marketanalytics', marketAnalytics);

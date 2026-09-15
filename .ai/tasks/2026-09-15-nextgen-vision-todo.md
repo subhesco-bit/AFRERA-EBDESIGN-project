@@ -850,3 +850,59 @@ shown every single visitor a blank white page. This was probably the
 single highest-severity issue found this entire session, and it was
 invisible to every prior audit (including this session's own) because
 none of them actually loaded the page in a browser until asked to.
+
+## Update — 2026-09-15, twelfth follow-up: third instance of the "real service, never mounted" pattern - multilingual
+
+While the browser session from the eleventh update was still open, the
+remaining non-fatal console error (`multilingualAPI.getLanguages is not a
+function`) turned out to be the same class of bug as the order-system fix
+(tenth update), a third confirmed instance:
+
+- `frontend/src/components/Multilingual/MultilingualProvider.jsx` calls
+  `multilingualAPI.getLanguages/getPreferences/getContent/
+  updatePreferences/translate/detect` from `services/componentApi.js`.
+- That file's actual `multilingualAPI` had only two unrelated methods
+  (`getTranslations`/`updateTranslations`, called by nothing) pointed at
+  `/i18n/:lang`, an endpoint that doesn't exist anywhere on the backend -
+  **and** every method referenced a bare `api` identifier that was never
+  imported in this file, a guaranteed `ReferenceError` on first real use
+  (same bug shape as the `modulesAPI` crash, just not yet fatal to the
+  page since `MultilingualProvider` already catches its own init errors).
+- Meanwhile `backend/src/services/legacy/multilingualService.js` - 821
+  real lines, Postgres-backed, with real language detection, translation,
+  content-translation storage, user preferences, and pronunciation guides
+  - already implements exactly the six methods needed
+  (`/languages`, `/preferences` GET+PUT, `/content`, `/translate`,
+  `/detect`), with `/translate`'s body shape (`text`, `source_language`,
+  `target_language`) matching the frontend caller exactly. Never mounted
+  in `index.js`.
+
+**Fixed**: mounted `multilingualService.js`'s router at `/api/multilingual`
+in `index.js` (same pattern as the order fix). Rewrote `componentApi.js`'s
+`multilingualAPI` against the real endpoints, using the same
+`AUTH_BASE`-style absolute-URL pattern `coreApi.js` established for the
+`/api/v1`-vs-bare-`/api` mismatch (`MULTILINGUAL_BASE`). Also fixed the
+identical missing-`api`-import bug in the same file's `conversationalAIAPI`/
+`voiceAIAPI` (their endpoint paths are unverified against a real mount -
+not part of this fix - but they no longer throw `ReferenceError` on first
+use).
+
+**Verified**: `node -c`/`@babel/parser` clean on all touched files, eslint
+clean. The real backend router loads cleanly and was smoke-tested
+standalone (mirroring the order-fix method, since a full `npm run dev`
+boot of the 400+-route server hung indefinitely past "Critical services
+loaded" in this sandbox - a separate, pre-existing, unrelated environment
+issue not investigated further here): public `GET /languages` reachable
+without auth, protected endpoints correctly return 401 without a token
+and reach real logic with one, and all failure paths (DB unavailable)
+return clean HTTP error responses rather than crashing.
+
+**Implication, sharpened further**: this is now three for three
+(`dual-use/authService.js`, `legacy/orderService.js`,
+`legacy/multilingualService.js`) - every time this session checked whether
+a "missing" frontend API integration had a real, substantial backend
+implementation sitting unmounted nearby, it did. Stage 0 should treat this
+as close to a certainty rather than a hypothesis to spot-check: for the
+remaining ~140 missing exports, check `services/legacy/*.js` (and
+`services/<domain>/*.js`) for a same-domain file with its own `router`
+export before assuming real backend work is needed from scratch.
