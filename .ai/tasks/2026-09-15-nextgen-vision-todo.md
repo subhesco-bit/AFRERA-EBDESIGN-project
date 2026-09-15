@@ -1307,3 +1307,38 @@ the seventeenth update to have no matching real backend
 (`routes/farmerRoutes.js` is a 38-line scaffold with nothing real behind
 it in `services/legacy/`). Worth picking up incrementally, one verified
 export at a time, rather than batching further guesses.
+
+## Update — 2026-09-15, nineteenth follow-up: one more verified export, two more checked and correctly left alone
+
+Continued the incremental approach from the eighteenth update.
+
+- **`modulesAPI`** added: `ModuleRuntimePage.jsx`'s one call,
+  `getModules()`, reads `response.data.modules` - matches
+  `services/legacy/moduleCatalogService.js`'s real `GET /` handler
+  (`{success, modules, generatedAt}`) exactly, already mounted at
+  `/api/modulecatalog` in the thirteenth update. Also added
+  `getModule(id)`/`getOverview()` from the same real router's
+  `GET /:id`/`GET /overview`, not yet called by any page but real and
+  free to expose alongside `getModules`. Build errors: 157 → 155.
+
+- **`climateMonitoringAPI`** checked, not fixed:
+  `services/legacy/climateMonitoringService.js` exists and is real
+  (`droughtMonitoring`/`floodMonitoring`/`diseaseForecasting`/
+  `climateRisk`/`agroMeteorology`) but exports plain functions, not an
+  Express router - it was correctly absent from the thirteenth update's
+  sweep (which only found files exporting `router`). The mounted
+  `routes/climateMonitoringRoutes.js` is the usual 38-line scaffold.
+  Fixing this means *writing new route handlers* that call these
+  functions and match what `ClimateMonitoringDashboardPage.jsx` expects
+  (`getStatus`/`getAlerts`/`getDroughtData`/`getFloodData`/
+  `generateReport` - none of which map obviously 1:1 to the five real
+  function names), not remounting an existing complete router. That's a
+  different, riskier class of change than every fix in this backlog so
+  far (writing glue/business logic vs. wiring up something already
+  complete) - flagged for real design attention, not rushed.
+
+- **`competitorAPI`** checked, not fixed: no real backend found under
+  any name (`competitor`, `competitive`) in `services/legacy/`, root, or
+  domain subfolders. Genuinely needs backend work from scratch.
+
+Build error count now at 155 (started this backlog thread at 161).

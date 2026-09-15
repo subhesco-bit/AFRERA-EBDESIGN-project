@@ -286,6 +286,21 @@ export const productReviewsAPI = {
   createReview: (productId, data) => api.post(`${PRODUCT_REVIEW_BASE}/products/${productId}`, data),
 };
 
+// 2026-09-15: didn't exist at all - the MISSING_EXPORT build error for
+// ModuleRuntimePage.jsx (which was itself made lazy in the eleventh
+// backlog update, since this crash used to take the whole app down with
+// it). Its one call, getModules(), reads response.data.modules - matches
+// services/legacy/moduleCatalogService.js's real GET / handler
+// ({success, modules, generatedAt}) exactly, mounted at
+// /api/modulecatalog in the thirteenth update.
+const MODULE_CATALOG_BASE = `${UNVERSIONED_BASE}/api/modulecatalog`;
+
+export const modulesAPI = {
+  getModules: () => api.get(MODULE_CATALOG_BASE),
+  getModule: (id) => api.get(`${MODULE_CATALOG_BASE}/${id}`),
+  getOverview: () => api.get(`${MODULE_CATALOG_BASE}/overview`),
+};
+
 export const nutritionAPI = {
   getNutritionData: () => api.get('/nutrition'),
   analyzeNutrition: (data) => api.post('/nutrition/analyze', data),
