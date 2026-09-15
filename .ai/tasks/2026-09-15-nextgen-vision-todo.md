@@ -430,6 +430,23 @@ surface of the app in one file.
       determinations for real insurance claims and should be treated as
       the highest-priority functions in this file once someone picks it up.
 
+### Same pattern, another file: `services/legacy/aiAgenticCompanionService.js` (861 lines)
+`getPestsBySymptoms(symptoms, crop)` ignores both its own parameters and
+always returns the identical `[{aphids, 0.75}, {armyworm, 0.60}]`
+regardless of input, feeding `identifyPest()`. Several sibling helpers in
+the same file follow the exact same shape: `getIrrigationRecommendations`,
+`getImmediatePestMeasures`, `generateTreatmentSchedule`,
+`getSafetyPrecautions`, `assessEnvironmentalImpact` all return fixed
+generic strings/objects regardless of their arguments;
+`calculateSeasonalityAdjustment` applies a flat hardcoded 0.05 multiplier
+to every crop. Reachability is less certain than `recommendationBuilders.js`
+(no direct route import found by name; may only be reachable through
+`services/claude/aiAgentService.js`'s wrapper or the generic module
+bridge) - worth confirming before prioritizing, but the fabrication
+itself is confirmed by direct reading. Not fixed here for the same reason
+as `recommendationBuilders.js`: needs real pest/crop domain data, not a
+guess.
+
 ## Immediate next action
 
 Two independent, high-value threads are now open:
