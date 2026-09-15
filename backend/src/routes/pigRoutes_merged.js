@@ -35,7 +35,17 @@ const { logger } = require('../utils/logger');
 const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
-protectLivestockRouter(router);
+// 2026-09-15: livestockRouteSupport.js only ever exports a plain health-check
+// router, never a protectLivestockRouter() function - it's a scaffold stub,
+// same as enterpriseRouteSupport.js/climateRouteSupport.js/
+// operationsRouteSupport.js. Calling it here threw "protectLivestockRouter is
+// not a function" at module load, which was why this file was never mounted.
+// goatRoutes.js and animalHealthRoutes.js hit the identical bug and already
+// disabled this same call (both are live at /api/goat and /api/animalhealth
+// today with no auth gap) - authMiddleware right below is the real
+// protection either way. Matching that already-proven fix rather than
+// guessing at what protectLivestockRouter was meant to do.
+// protectLivestockRouter(router);
 
 router.use(authMiddleware);
 router.use(apiLimiter);

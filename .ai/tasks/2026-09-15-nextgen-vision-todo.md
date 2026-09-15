@@ -1509,3 +1509,80 @@ request (or, cheaper, counting `router.stack` entries) is the only check
 that would have caught either of these two bugs, and should be the
 standard for any future `_merged.js` file mounted from this backlog's
 remaining candidates, not just a `require()` check.
+
+## Update — 2026-09-15, twenty-third follow-up: the 4 flagged livestock/weather "middleware bugs" fixed for 5 of 6 files - the 6th is a different, deeper gap
+
+Went back to the 4 files flagged as broken across the twenty-first and
+twenty-second updates (`pigRoutes_merged.js`, `sheepRoutes_merged.js`,
+`poultryRoutes_merged.js` - "protectLivestockRouter is not a function" -
+and `decisionSupportRoutes_merged.js` - "protectRouter is not a
+function") plus `rfqRoutes_merged.js`, which has the identical
+`protectRouter` call and was never individually flagged before now.
+`weatherRoutes_merged.js` ("queryValidator is not a function") turned
+out to be a different, unrelated bug - see below.
+
+**Root cause, all 5**: `routes/livestockRouteSupport.js` and
+`routes/enterpriseRouteSupport.js` (imported for `protectLivestockRouter`
+and `protectRouter` respectively) are themselves auto-generated scaffold
+stubs - each just exports a plain Express router with a single
+`GET /health` handler, the same "Route operational" pattern found
+throughout this backlog, never a real function. Calling
+`protectLivestockRouter(router)` / `protectRouter(router, {...})` threw
+`TypeError: ... is not a function` at module load, which is why none of
+these 5 files were ever mountable.
+
+**Not a guess - the fix was already proven twice in the live app**:
+`goatRoutes.js` and `animalHealthRoutes.js` (429 and 407 real lines,
+already mounted today at `/api/goat` and `/api/animalhealth`) hit this
+exact bug already and both have the `protectLivestockRouter(router)` call
+commented out (`/* DISABLED: protect */`) with `authMiddleware` doing the
+real protection right below it. `bulkOrderRoutes.js` (already mounted at
+`/api/bulkorder`) shows the third variant - it imports `protectRouter`
+but never calls it at all. All three currently serve real traffic with no
+auth gap. Rather than invent what the scaffold's missing function was
+*meant* to do (real risk here: this is auth-adjacent code, and getting it
+wrong could silently leave a route unprotected or double-protected),
+applied the exact same already-shipped fix to the 5 broken files: comment
+out the dead call, keep the `authMiddleware` that's already applied
+either as `router.use(authMiddleware)` or per-route. Verified every one
+of the 5 still has real auth coverage independent of the disabled call.
+
+Mounted all 5 in `index.js` in place of their scaffold counterparts
+(`sheepRoutes.js`, `rfqRoutes.js`, `poultryRoutes.js`, `pigRoutes.js`,
+`decisionSupportRoutes.js` - all confirmed to be the same 38-line
+"Route operational" stub shape, just with slightly different wording
+than the others already swapped this session) and added the same 5
+scaffold filenames to `dynamicRouteLoader.js`'s exclusion list so the
+auto-discovery mechanism can't re-mount the dead stubs a second time.
+
+**Verified live, not just `require()`-clean**: standalone Express +
+supertest smoke test against all 5 confirms real route registration
+(22, 22, 19, 9, 9 routes respectively via `router.stack` introspection)
+and real `authMiddleware` enforcement (401 without a token, past-401 with
+a valid one - never a 404, which would mean the route was never actually
+registered, the exact failure mode this backlog already found once in
+`seedVaultRoutes_merged.js`/`unifiedAIRoutes_merged.js`). Added
+`src/routes/__tests__/livestockAndEnterpriseRouteSupport.test.js` (15
+tests) locking this in for all 5 files. Full backend Jest run still shows
+the same pre-existing ~354 failing suites this sandbox has always had
+(confirmed identical before/after this change via `git stash`) - all
+`Neither apiKey nor config.authenticator provided` from
+`stripeWebhookRoutes.js` requiring `STRIPE_SECRET_KEY`, which isn't set
+in this sandbox and is unrelated to this fix; CI's `Backend Tests` job
+(which does have real config) has been green on every push this session.
+
+**`weatherRoutes_merged.js` is a different, deeper problem - correctly
+still not fixed.** It imports `bodyValidator`, `queryValidator`, `date`,
+`dateTime`, `enumValue`, `numberValue`, `fail`, `invalid`, `requestId`
+from `routes/climateRouteSupport.js` - also a scaffold stub - but unlike
+`protectLivestockRouter`/`protectRouter` (a single setup call, safely
+disabled), these validator functions are used throughout the route
+handlers' bodies as an entire request-validation library. There's no
+already-shipped sibling file to copy a proven fix from here, and writing
+9 validation-combinator functions from scratch to match undocumented
+exact-match call sites would be fabricating real logic this project's
+rules explicitly warn against - wrong validation is worse than an honest
+gap. Left unmounted, flagged as a distinct follow-up: someone needs to
+either write `climateRouteSupport.js` for real (a proper scoped task) or
+confirm weather's real logic already exists reachable some other way
+before spending effort on it.

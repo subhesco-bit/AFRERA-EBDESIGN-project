@@ -36,7 +36,11 @@ const router = express.Router();
 
 router.use(authMiddleware);
 router.use(apiLimiter);
-protectLivestockRouter(router);
+// 2026-09-15: see pigRoutes_merged.js for the full explanation - this is the
+// same "protectLivestockRouter is not a function" bug, fixed the same
+// already-proven way goatRoutes.js/animalHealthRoutes.js fixed it: skip the
+// call, keep authMiddleware.
+// protectLivestockRouter(router);
 
 /**
  * GET /api/v1/poultry/flocks

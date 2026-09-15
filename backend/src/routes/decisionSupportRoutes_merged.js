@@ -12,7 +12,12 @@ const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { protectRouter } = require('./enterpriseRouteSupport');
 
-protectRouter(router, { signal: 'enterprise.decision_support.changed' });
+// 2026-09-15: enterpriseRouteSupport.js is a scaffold stub (a plain
+// health-check router, no protectRouter() export) - same bug shape as
+// livestockRouteSupport.js, see pigRoutes_merged.js for the full writeup.
+// Every route below already gets authMiddleware directly, so skip this
+// rather than guess at what the signal-broadcast enhancement was meant to do.
+// protectRouter(router, { signal: 'enterprise.decision_support.changed' });
 
 /**
  * 1. Corporate Credit Eligibility Check

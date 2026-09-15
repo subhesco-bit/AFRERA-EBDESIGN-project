@@ -32,7 +32,12 @@ const supplyChainDecisionRoutes = require('./routes/supplyChainDecisionRoutes.js
 const subscriptions = require('./routes/subscriptions.js');
 const soilManagementRoutes = require('./routes/soilManagementRoutes.js');
 const soilHealth = require('./routes/soilHealth.js');
-const sheepRoutes = require('./routes/sheepRoutes.js');
+// 2026-09-15: was a 38-line scaffold. sheepRoutes_merged.js is the real,
+// Postgres-backed herd/milk/feed/breeding/vaccination implementation - it
+// used to throw "protectLivestockRouter is not a function" at load time
+// (see the file itself for the full writeup), now fixed the same way
+// goatRoutes.js/animalHealthRoutes.js already fixed the identical bug.
+const sheepRoutes = require('./routes/sheepRoutes_merged.js');
 const sellerVerifications = require('./routes/sellerVerifications.js');
 const sellerRankingRoutes = require('./routes/sellerRankingRoutes.js');
 const seedVaultRoutes = require('./routes/seedVaultRoutes_merged.js');
@@ -40,7 +45,10 @@ const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoute
 const roleManagementRoutes = require('./routes/roleManagementRoutes.js');
 const riskPricingRoutes = require('./routes/riskPricingRoutes_merged.js');
 const riskAssessment = require('./routes/riskAssessment.js');
-const rfqRoutes = require('./routes/rfqRoutes.js');
+// 2026-09-15: was a 38-line scaffold. rfqRoutes_merged.js is the real
+// RFQ/quote/QC-hold/FPO-cost-centre implementation - same
+// protectRouter()-is-not-a-function bug as sheepRoutes_merged.js, now fixed.
+const rfqRoutes = require('./routes/rfqRoutes_merged.js');
 const revenueRoutes = require('./routes/revenueRoutes.js');
 const returnLoadBoardRoutes = require('./routes/returnLoadBoardRoutes.js');
 const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes.js');
@@ -64,11 +72,17 @@ const predictiveIntelligenceRoutes = require('./routes/predictiveIntelligenceRou
 // services/legacy/predictiveAnalyticsService.js is a real predictive-models/
 // forecasts/alerts implementation with its own router.
 const { router: predictiveAnalytics } = require('./services/legacy/predictiveAnalyticsService.js');
-const poultryRoutes = require('./routes/poultryRoutes.js');
+// 2026-09-15: was a 38-line scaffold. poultryRoutes_merged.js is the real
+// implementation - same protectLivestockRouter()-is-not-a-function bug as
+// sheepRoutes_merged.js, now fixed.
+const poultryRoutes = require('./routes/poultryRoutes_merged.js');
 const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes.js');
 const platformCoreRoutes = require('./routes/platformCoreRoutes_merged.js');
 const platformConfigurationRoutes = require('./routes/platformConfigurationRoutes.js');
-const pigRoutes = require('./routes/pigRoutes.js');
+// 2026-09-15: was a 38-line scaffold. pigRoutes_merged.js is the real
+// implementation - same protectLivestockRouter()-is-not-a-function bug as
+// sheepRoutes_merged.js, now fixed.
+const pigRoutes = require('./routes/pigRoutes_merged.js');
 const phase9 = require('./routes/phase9.js');
 const phase8 = require('./routes/phase8.js');
 const phase12 = require('./routes/phase12.js');
@@ -230,7 +244,10 @@ const digitalTwinRoutes = require('./routes/digitalTwinRoutes.js');
 const dietTherapyRoutes = require('./routes/dietTherapyRoutes.js');
 const demandRoutes = require('./routes/demandRoutes.js');
 const defenseFitnessPrepRoutes = require('./routes/defenseFitnessPrepRoutes.js');
-const decisionSupportRoutes = require('./routes/decisionSupportRoutes.js');
+// 2026-09-15: was a 38-line scaffold. decisionSupportRoutes_merged.js exposes
+// 8 real pricing/logistics/finance/governance decision functions - same
+// protectRouter()-is-not-a-function bug as rfqRoutes_merged.js, now fixed.
+const decisionSupportRoutes = require('./routes/decisionSupportRoutes_merged.js');
 const dataVisualization = require('./routes/dataVisualization.js');
 const dashboardRoutes = require('./routes/dashboardRoutes.js');
 const dairyRoutes = require('./routes/dairyRoutes.js');

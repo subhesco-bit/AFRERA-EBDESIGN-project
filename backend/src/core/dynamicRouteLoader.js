@@ -568,6 +568,16 @@ class DynamicRouteLoader {
     if (['orderRoutes.js', 'productRoutes.js', 'iotIntegrationRoutes.js', 'predictiveAnalytics.js'].includes(base)) {
       return false;
     }
+    // 2026-09-15: same reasoning as above - sheep/rfq/poultry/pig/
+    // decisionSupport scaffolds were swapped out in index.js for their real
+    // _merged.js implementations (fixed today: they used to throw
+    // "protect{Livestock}Router is not a function" at load time, see
+    // pigRoutes_merged.js for the full writeup). Excluded here so this
+    // dynamic loader can't independently rediscover and auto-mount the dead
+    // scaffolds a second time.
+    if (['sheepRoutes.js', 'rfqRoutes.js', 'poultryRoutes.js', 'pigRoutes.js', 'decisionSupportRoutes.js'].includes(base)) {
+      return false;
+    }
     return true;
   }
 
