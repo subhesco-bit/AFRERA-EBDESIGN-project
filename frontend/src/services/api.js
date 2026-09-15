@@ -14,6 +14,14 @@ const api = axios.create({
   }
 });
 
+// 2026-09-15: the backend mounts most non-AI routes unversioned (e.g.
+// /api/order, /api/product), not under /api/v1 like this file's own
+// baseURL - same mismatch already documented and fixed for auth
+// (coreApi.js's AUTH_BASE) and multilingual/conversational-ai/voice-ai
+// (componentApi.js). Reused here for the product/order/review/media
+// endpoints below.
+const UNVERSIONED_BASE = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
@@ -233,9 +241,49 @@ export const aiOperationIntelligenceAPI = {
   analyzeOperations: (data) => api.post('/ai/operation-intelligence/analyze', data),
 };
 
+// 2026-09-15: analyzeProductMedia/generateProductMedia were never called
+// anywhere in the frontend, and pointed at /ai/product-media/... which
+// doesn't exist on the backend under any mount. ProductDetailPage.jsx
+// actually calls productMediaAIAPI.generateImage(id, prompt) - added to
+// match the real, already-implemented routes/productMediaAIRoutes.js
+// (routes/controllers, not a scaffold) mounted at /api/productmediaai.
+const PRODUCT_MEDIA_AI_BASE = `${UNVERSIONED_BASE}/api/productmediaai`;
+
 export const productMediaAIAPI = {
-  analyzeProductMedia: (data) => api.post('/ai/product-media/analyze', data),
-  generateProductMedia: (data) => api.post('/ai/product-media/generate', data),
+  getStatus: () => api.get(`${PRODUCT_MEDIA_AI_BASE}/status`),
+  generateImage: (productId, prompt) =>
+    api.post(`${PRODUCT_MEDIA_AI_BASE}/products/${productId}/image`, { prompt }),
+  buildVideoScript: (productId) =>
+    api.post(`${PRODUCT_MEDIA_AI_BASE}/products/${productId}/video-script`),
+  generateVideo: (productId) =>
+    api.post(`${PRODUCT_MEDIA_AI_BASE}/products/${productId}/video`),
+};
+
+// 2026-09-15: productsAPI and productReviewsAPI didn't exist in this file
+// at all - the literal MISSING_EXPORT build errors for SellerProductFormPage.jsx/
+// ProductDetailPage.jsx/ComparePage.jsx and others (509 -> 161 remaining
+// vite build errors tracked in the TODO backlog). Added against the
+// real, now-mounted services/legacy/productService.js router
+// (/api/product) and routes/productReviewRoutes.js (/api/productreview,
+// already real - not a scaffold, predates this session).
+const PRODUCT_BASE = `${UNVERSIONED_BASE}/api/product`;
+const PRODUCT_REVIEW_BASE = `${UNVERSIONED_BASE}/api/productreview`;
+
+export const productsAPI = {
+  getProducts: (filters, pagination) => api.get(PRODUCT_BASE, { params: { ...filters, ...pagination } }),
+  getProduct: (id) => api.get(`${PRODUCT_BASE}/${id}`),
+  createProduct: (data) => api.post(PRODUCT_BASE, data),
+  updateProduct: (id, data) => api.put(`${PRODUCT_BASE}/${id}`, data),
+  deleteProduct: (id) => api.delete(`${PRODUCT_BASE}/${id}`),
+  getCategories: () => api.get(`${PRODUCT_BASE}/categories/list`),
+  getStates: () => api.get(`${PRODUCT_BASE}/states/list`),
+  searchProducts: (query) => api.get(`${PRODUCT_BASE}/search`, { params: { q: query } }),
+};
+
+export const productReviewsAPI = {
+  getReviews: (productId, params) => api.get(`${PRODUCT_REVIEW_BASE}/products/${productId}`, { params }),
+  getStats: (productId) => api.get(`${PRODUCT_REVIEW_BASE}/products/${productId}/stats`),
+  createReview: (productId, data) => api.post(`${PRODUCT_REVIEW_BASE}/products/${productId}`, data),
 };
 
 export const nutritionAPI = {
@@ -4867,9 +4915,29 @@ export const caAPI = {
   manageCA: (data) => api.post('/ca/manage', data),
 };
 
+// 2026-09-15: this only had getOrders()/createOrder(), pointed at /orders
+// (resolves under the /api/v1 base, which doesn't exist on the backend
+// under that path). Real, live pages (CartPage, CheckoutPage,
+// OrderDetailPage, PaymentProcessingPage, ProductDetailPage) call
+// getCart/addToCart/updateCartItem/removeFromCart/getOrder/processPayment
+// too - none of which existed here, all of which crash on first use.
+// Rewritten against the real, now-mounted services/legacy/orderService.js
+// router (/api/order) - every method below matches its real handler and
+// body shape exactly. No DELETE /:id (cancel) exists on the real
+// backend; not fabricated here.
+const ORDER_BASE = `${UNVERSIONED_BASE}/api/order`;
+
 export const ordersAPI = {
-  getOrders: () => api.get('/orders'),
-  createOrder: (data) => api.post('/orders', data),
+  getCart: () => api.get(`${ORDER_BASE}/cart`),
+  addToCart: (data) => api.post(`${ORDER_BASE}/cart`, data),
+  updateCartItem: (id, data) => api.put(`${ORDER_BASE}/cart/${id}`, data),
+  removeFromCart: (id) => api.delete(`${ORDER_BASE}/cart/${id}`),
+  clearCart: () => api.delete(`${ORDER_BASE}/cart`),
+  createOrder: (data) => api.post(ORDER_BASE, data),
+  getOrder: (id) => api.get(`${ORDER_BASE}/${id}`),
+  getOrders: (filters, pagination) => api.get(ORDER_BASE, { params: { ...filters, ...pagination } }),
+  updateOrderStatus: (id, data) => api.put(`${ORDER_BASE}/${id}/status`, data),
+  processPayment: (id, data) => api.post(`${ORDER_BASE}/${id}/payment`, data),
 };
 
 export const cartAPI = {
@@ -5316,5 +5384,15 @@ export const warningAPI = {
   resetWarningMetrics: () => api.post('/warnings/metrics/reset'),
   getWarningHealth: () => api.get('/warnings/health'),
 };
+
+// 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and
+// calls it directly with relative paths (api.get('/advanced-medical-coding/...'))
+// rather than through a dedicated *API object - only a default export
+// existed. Its relative paths already resolve correctly under this
+// file's own /api/v1 baseURL against the real, now-mounted
+// services/advancedMedicalCodingService.js (mounted at
+// /api/v1/advanced-medical-coding in index.js specifically to match this
+// page - see the fourteenth TODO backlog update).
+export { api };
 
 export default api;

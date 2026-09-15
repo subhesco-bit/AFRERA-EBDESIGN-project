@@ -1249,3 +1249,61 @@ the real `/api/product`/`/api/order` mounts). **Not fixed in this
 update** - scoped as its own follow-up given the number of pages and API
 objects involved (this is the concrete, now-well-understood shape of the
 "~140 missing exports" item tracked since early in this backlog).
+
+## Update — 2026-09-15, eighteenth follow-up: started closing the missing-exports gap for real, 161 → 157 build errors
+
+Picked up the follow-up flagged at the end of the seventeenth update.
+Fixed the pieces with a confirmed real backend, verified end-to-end
+against actual route handlers rather than guessed:
+
+- **`productsAPI`** (didn't exist in `api.js` at all): added, matching
+  `services/legacy/productService.js`'s real routes exactly -
+  `getProducts`/`getProduct`/`createProduct`/`updateProduct`/
+  `deleteProduct`/`getCategories`/`getStates`/`searchProducts`.
+- **`productReviewsAPI`** (didn't exist): added, matching the real (not a
+  scaffold, predates this session) `routes/productReviewRoutes.js` -
+  `getReviews`/`getStats`/`createReview`.
+- **`ordersAPI`** (existed, but only `getOrders()`/`createOrder()` against
+  a nonexistent `/orders` path): rewritten to the full real
+  `orderService.js` contract - `getCart`/`addToCart`/`updateCartItem`/
+  `removeFromCart`/`clearCart`/`createOrder`/`getOrder`/`getOrders`/
+  `updateOrderStatus`/`processPayment`. Confirmed via grep that no
+  existing caller relied on the old thin signature in an incompatible
+  way (`Generated/Page2.jsx`'s `getOrders(filter)` call is compatible).
+  No `cancelOrder` - the real backend has no cancel endpoint; not
+  fabricated.
+- **`productMediaAIAPI`** (existed, but only two methods nothing called,
+  pointed at a path that doesn't exist): rewritten to match the real,
+  already-implemented (not a scaffold) `routes/productMediaAIRoutes.js` -
+  added `generateImage()`, the method `ProductDetailPage.jsx` actually
+  calls.
+- **Named `{ api }` export** added alongside the existing default export:
+  `AdvancedMedicalCodingPage.jsx` imports it directly and calls relative
+  paths against it, which already resolve correctly against the real
+  `advancedMedicalCodingService.js` mounted specifically at
+  `/api/v1/advanced-medical-coding` in the fourteenth update - this was
+  a one-line fix once that backend existed.
+
+All five use the same `UNVERSIONED_BASE` (`API_BASE_URL` with `/api/v1`
+stripped) absolute-path pattern already established for
+`multilingualAPI`/`conversationalAIAPI`/`voiceAIAPI`, since the backend
+mounts these routes unversioned.
+
+**Verified**: `@babel/parser`/eslint clean; `npm run build` error count
+dropped from 161 to 157 (the 3 previously-missing named exports plus the
+`api` named export, each counted once per importing file); a live
+headless-browser pass over `/products/:id`, `/cart`, `/sell/new-product`
+(redirects to Login as a protected route, correctly) showed zero
+JS errors from any of the rewritten API objects - only the
+already-documented, unrelated multilingual network-error noise from no
+backend running in this sandbox.
+
+**Remaining missing exports** (`farmersAPI`, `modulesAPI`,
+`climateMonitoringAPI`, `competitorAPI`, and the rest of the ~140) were
+not attempted here - each needs the same per-export verification just
+done for products/orders (real backend check, real caller check, path
+verification), and `farmersAPI` specifically was already confirmed in
+the seventeenth update to have no matching real backend
+(`routes/farmerRoutes.js` is a 38-line scaffold with nothing real behind
+it in `services/legacy/`). Worth picking up incrementally, one verified
+export at a time, rather than batching further guesses.
