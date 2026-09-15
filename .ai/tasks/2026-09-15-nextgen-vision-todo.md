@@ -127,8 +127,77 @@ national knowledge graph, etc.)
 
 ---
 
+## Update — 2026-09-15, same-day follow-up
+
+Ran a 4-way parallel audit (backend wiring, frontend wiring, AI-service
+authenticity, database/duplication) against the actual code instead of
+against any prior status doc. Corrected real counts, all confirmed by direct
+inspection — every one of them understated relative to the CLAUDE.md
+narrative, not inflated: **217 route files** (not 107), **286 services**
+(not 140+), **409 migration files** (not 96, plus a `failed/` and `repairs/`
+subfolder of already-known-broken ones), **203 module folders** (not ~198,
+and 184 of ~192 sampled `service.js` files are 13-line re-export wrappers
+around `backend/src/services/`, not independent implementations), **393
+frontend page files** with **≥157 confirmed orphaned/unrouted** (~40%, not
+the "123/150 complete" framing).
+
+### 1a done: auth fix shipped and verified
+Mounted the real `services/dual-use/authService.js` router (bcrypt, real
+`jsonwebtoken`, rate limiting, JSON-file fallback store, 2FA, OAuth) at
+`/api/auth` in place of `routes/authRoutes.js`'s in-memory/plaintext/fake-token
+mock. Confirmed the severity was worse than assumed: the mock's fabricated
+`jwt_<id>_<timestamp>` tokens were being **rejected** by the real
+`jsonwebtoken`-based verifier in `middleware/auth.js`, which every protected
+route already used — so authentication was broken end-to-end for anyone who
+actually logged in through the live endpoint, not just insecure.
+
+While verifying, found and fixed two more bugs blocking that same path:
+- `database/connection.js`'s `initPostgreSQL()` never reset the module-level
+  `pgPool` to `null` on a failed connection test, so `getPostgreSQL()` always
+  returned a truthy-but-broken pool — every `if (!pg) fall back` check in the
+  codebase (including the one the real auth router needs) silently never
+  fired. Fixed.
+- `backend/src/index.js` eagerly `require()`d `routes/index.js` at the top
+  of the file for no reason (its only mount point was already commented out
+  as dead), and that chain required a since-deleted
+  `services/legacy/completeAIIntegrationService.js`, crashing the *entire*
+  server at boot before any route mounted. A real 1355-line implementation
+  of that file was found intact in a backup folder and initially restored,
+  but **`origin/main` already carries its own (132-line, placeholder,
+  fabricated-confidence-score) version of the same file** — per instruction,
+  not overwriting work already on `main`; kept main's version as-is.
+
+Verified end-to-end outside this sandbox's missing-Postgres/no-node_modules
+constraints: installed backend deps, booted the real auth router standalone,
+confirmed register → login → a protected route round-trips with real
+bcrypt+JWT, a wrong password is rejected, and an old-format fake token is
+correctly rejected. Existing `authRoutes.test.js` (9 tests, exercises the
+now-unmounted mock directly) still passes unchanged.
+
+### CI is red on `main` independent of any of this
+All 5 checks (Lint, Frontend Tests, Build Verification, Security Audit,
+Claude AI Integration Test) fail before running anything: `actions/setup-node@v4`
+uses `cache: npm` but there's no lockfile at the repo root (`backend/` and
+`frontend/` have their own). Confirmed pre-existing on `main` itself, not
+introduced by this branch. Fix is understood (point `cache-dependency-path`
+at both lockfiles, or run installs per-directory) but not applied here —
+tracked as a follow-up, separate from this auth fix.
+
+### Boundary going forward
+`main` has moved 121 commits ahead of where this branch started, from
+another AI session's work (placeholder-stub fixes, `.ai/` doc churn, a
+4-agent coordination framework, etc.) — merged that in rather than working
+from a stale base. Per explicit instruction: don't overwrite or "fix" files
+another session already touched on `main` just because this audit disagrees
+with the approach taken (e.g. the placeholder `completeAIIntegrationService.js`
+above) — flag it here instead and work on gaps *not* already claimed.
+
 ## Immediate next action
 
-Stage 0 and Stage 1a (auth) are the only items above that are concrete,
-unblocked by missing infrastructure/credentials, and match what the source
-document itself calls the prerequisite step. Recommend starting there.
+Stage 0 (concept-runtime matrix) is now the most valuable next step: this
+session's spot-audits keep finding the same pattern (undercounted-but-real
+surface area, real code sitting unmounted next to fabricated placeholders
+solving the same crash) faster than any full manual mapping would, but a
+real matrix is what turns "this session happened to sample this file" into
+something durable other sessions (Claude or otherwise) can trust instead of
+re-auditing from scratch each time.
