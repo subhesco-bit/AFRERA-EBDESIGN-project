@@ -1450,3 +1450,62 @@ substantial candidates; and a fresh `npm run build` error count (frontend
 API client wiring for any of these 15 newly-real backends wasn't checked
 in this update - that's its own investigation per file, same as
 `farmersAPI`/`productsAPI` before it).
+
+## Update — 2026-09-15, twenty-second follow-up: 11 more `_merged.js` mounted, and a real bug that `node -c`/`require()` can't see
+
+Picked up the remaining substantial `_merged.js` candidates from the
+twenty-first update's own follow-up list. Individually `require()`-tested
+the 12 not yet checked: 11 loaded cleanly and were mounted the same way
+as before (`aiOperationIntelligenceRoutes`, `nervousSystemRoutes`,
+`riskPricingRoutes`, `platformCoreRoutes`, `completeAIIntegrationRoutes`,
+`ecommerceIntegrationRoutes`, `ecommerceRoutes`, `ecommerceAIRoutes`,
+`seedVaultRoutes`, `libraryRoutes`, `ecommerceERPRoutes`).
+`poultryRoutes_merged.js` failed the same way `pigRoutes_merged.js`/
+`sheepRoutes_merged.js` already had ("protectLivestockRouter is not a
+function") - not mounted, same flagged livestock-middleware bug.
+
+**A live smoke test on the newly-mounted `seedVaultRoutes_merged.js`
+returned 404 on every route** - not the "database unavailable" pattern
+every other real router in this backlog has shown, an honest 404 as if
+no route existed at all. Investigation found a real, subtle bug that
+neither `node -c` nor a plain `require()` can detect: the file's closing
+brace for `resolveFarmerId()` was missing a real newline before the next
+line - only a bare CR character sat between `}` and
+`router.get('/', ...)`. ECMAScript treats a lone CR as a valid line
+terminator, so the file is syntactically valid either way - but the
+brace itself was still missing, so every `router.*()` call below ended
+up **inside** `resolveFarmerId`'s function body instead of at module
+scope. Since `resolveFarmerId` is only ever invoked as route middleware,
+and no route existed yet to invoke it, none of the six routes in the
+file were ever actually registered - a `require()` succeeds and the
+module exports a real Express router either way, it's just an empty one.
+
+**Swept every one of the 97 `_merged.js` files (not just the ones
+mounted) for the same signature** (`grep -P '\}\r[a-zA-Z]'`) rather than
+assuming this was isolated: found exactly one more instance,
+`unifiedAIRoutes_merged.js` - already mounted in the twenty-first
+update, same bug shape (missing brace after `coordinate()`, six
+`router.post`/`router.get` calls stranded inside it). Fixed both the
+same way: inserted the missing closing brace, removed the now-redundant
+stray `}` each file had near its end (the original, misplaced attempt at
+this same closing brace), verified with `node -c` and eslint.
+
+**Verified with route-count introspection, not just requiring the
+module**: `require()`-succeeding was exactly what let both of these bugs
+through undetected so far, so checked `router.stack.filter(l =>
+l.route).length` for all 27 currently-mounted `_merged.js` routers (not
+just the 2 fixed ones) - all 27 now show real route counts (3 to 23
+each), confirming both fixes work and no third instance is hiding among
+what's currently mounted. A live smoke test on the fixed
+`seedVaultRoutes_merged.js` and `unifiedAIRoutes_merged.js` confirms real
+auth enforcement (401 without a token) and real handler logic reached
+with one (a genuine 200 with real agent data for `unifiedAIRoutes`'s
+`/agents` endpoint - no database dependency for that one).
+
+**Standing lesson for whoever continues this**: `node -c` and `require()`
+succeeding only prove a file is syntactically valid and doesn't throw at
+import time - neither proves its routes are actually reachable. A live
+request (or, cheaper, counting `router.stack` entries) is the only check
+that would have caught either of these two bugs, and should be the
+standard for any future `_merged.js` file mounted from this backlog's
+remaining candidates, not just a `require()` check.

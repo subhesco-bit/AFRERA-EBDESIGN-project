@@ -1997,9 +1997,21 @@ export const sellerRankingAPI = {
   rankSeller: (id, data) => api.post(`/seller-ranking/${id}`, data),
 };
 
+// 2026-09-15: pointed at /seed-vault, which doesn't exist under the
+// /api/v1 base this file uses, and was missing getCategories()/
+// deleteSeed() that SeedVaultPage.jsx actually calls.
+// routes/seedVaultRoutes_merged.js is real (not the usual scaffold -
+// mounted in the twenty-first backlog update) and matches these 4
+// methods exactly; it also has recordUsage(seedId, amountUsed), not yet
+// called by any page but real and free to expose alongside the rest.
+const SEED_VAULT_BASE = `${UNVERSIONED_BASE}/api/seedvault`;
+
 export const seedVaultAPI = {
-  getSeeds: () => api.get('/seed-vault'),
-  addSeed: (data) => api.post('/seed-vault', data),
+  getSeeds: () => api.get(SEED_VAULT_BASE),
+  getCategories: () => api.get(`${SEED_VAULT_BASE}/categories`),
+  addSeed: (data) => api.post(SEED_VAULT_BASE, data),
+  deleteSeed: (seedId) => api.delete(`${SEED_VAULT_BASE}/${seedId}`),
+  recordUsage: (seedId, amountUsed) => api.post(`${SEED_VAULT_BASE}/${seedId}/record-usage`, { amountUsed }),
 };
 
 export const sapModuleArchitectureAPI = {

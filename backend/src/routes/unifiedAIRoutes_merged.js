@@ -63,7 +63,17 @@ async function coordinate(req, res, requestType, agentPreference) {
       success: false,
       error: error.message || 'Failed to process AI request',
     });
-  }router.post('/unified', authMiddleware, (req, res) => {
+  }
+}
+
+// 2026-09-15: same lone-CR merge corruption as seedVaultRoutes_merged.js -
+// the closing brace for coordinate() was missing a real newline before
+// router.post('/unified', ...), so every router.*() call below used to
+// sit inside coordinate()'s body instead of module scope. Since
+// coordinate() is only ever called from inside these same route
+// handlers, none of them were ever actually registered - every request
+// to this router 404'd. node -c and require() both stayed silent.
+router.post('/unified', authMiddleware, (req, res) => {
   coordinate(req, res, req.body?.requestType || 'conversational', req.body?.agentPreference);
 });
 
@@ -100,8 +110,5 @@ router.get('/usage', authMiddleware, (req, res) => {
     },
   });
 });
-
-
-}
 
 module.exports = router;
