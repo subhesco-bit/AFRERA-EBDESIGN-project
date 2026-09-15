@@ -1741,3 +1741,82 @@ missing-validation-library gap from the twenty-third update) and the
 `governanceModule_merged.js` (none of them currently crash, since none
 of the other 15 actually invoke it as middleware - a real but
 lower-priority cleanup for whoever picks this up next, not a live bug).
+
+## Update — 2026-09-15, twenty-sixth follow-up: closed 10 more frontend MISSING_EXPORT gaps (143 → 133), all verified against real mounted backends
+
+CI's Build Verification job only ever prints the first 5 of the (now)
+133 `[MISSING_EXPORT]` errors before summarizing a count, so pulled a
+complete list a different way: statically extracted every name any
+frontend file actually imports from `services/api` (263 unique names,
+across all three import-path spellings used in this codebase -
+`../services/api`, `../../services/api`, `@/services/api`) and diffed
+against what `api.js` currently exports (137 missing at the time,
+matching the CI-reported 143 closely enough - the gap is a handful of
+files my static regex missed, not a wrong method).
+
+Picked the highest-confidence subset first: names whose real backend was
+mounted or fixed *earlier in this same session*, so the endpoint shapes
+were already fresh and verified rather than needing a fresh investigation
+each time:
+
+- **`pigAPI`/`goatAPI`/`pigAIAPI`/`goatAIAPI`/`sheepAIAPI`/`poultryAIAPI`**
+  (26 methods) - matched directly against `pigRoutes_merged.js`/
+  `goatRoutes.js`/`sheepRoutes_merged.js`/`poultryRoutes_merged.js`,
+  fixed for real mounting earlier today. Found a real, separate bug while
+  wiring these: `PigFarmingPage.jsx`/`GoatFarmingPage.jsx`'s weight/feed/
+  milk/breeding mutations already pass a single payload object containing
+  the animal id (`animal_id`, `sow_id` or `female_id` depending on which
+  form), not a second argument - the client methods pull the id out of
+  the payload instead of requiring an argument no call site provides.
+  Their performance/weight-records/fcr *queries*, though, call with zero
+  arguments even though the real backend only has per-animal endpoints
+  for those three - documented in a code comment as a distinct page-logic
+  gap (not fixed - would need picking or exposing a selected animal id in
+  the page itself, out of scope for "add the missing export") rather than
+  silently papered over.
+- **`nervousSystemAPI`** (22 methods) - matched 1:1 against
+  `nervousSystemRoutes_merged.js`'s `nervousSystemController` calls,
+  mounted earlier today at `/api/nervoussystem`.
+- **`organicTraceabilityAPI`** (3 methods) - matched against
+  `organicTraceabilityService.js`, mounted earlier today at
+  `/api/organictraceability`.
+- **`nutrientValueSalesAPI`** (3 methods) - matched against
+  `nutrientValueSalesRoutes_merged.js`, mounted earlier today at
+  `/api/nutrientvaluesales`. Checked the controller's own
+  `req.body` destructuring directly (not just the route file) to get
+  `submitNutrientContent`'s and `issueNutrientCertificate`'s exact body
+  shapes right (`{productId, contentData, verificationData}` and
+  `{productId, certificationData}` respectively - both wrap the frontend's
+  positional arguments into the field names the backend actually reads).
+- **`projectSystemsAPI`** (12 methods) - matched against
+  `projectSystemsRoutes_merged.js`, mounted earlier today at
+  `/api/projectsystems`. Same rigor: `updateProjectStatus`/
+  `updateWbsStatus` send only `{status}` even though the backend also
+  accepts optional `actualStartDate`/`actualEndDate`, because no call
+  site in this codebase currently provides those - not fabricating extra
+  fields nothing sends.
+
+Verified each batch with a real `vite build` (not just a syntax check):
+143 → 137 after the first 6 exports, 137 → 133 after the next 4 - exact
+1-for-1 confirmation, no silent breakage elsewhere in the file.
+
+**Remaining**: ~133 MISSING_EXPORT errors, ~120+ names still to
+triage from the same `/tmp/missing_exports.txt`-style diff (not saved to
+the repo - regenerate with the static import-vs-export diff described
+above rather than relying on CI's truncated error list). Promising
+next candidates whose backend is already known-mounted from earlier
+updates: `platformTelemetryAPI`, `freightPoolingAPI` (real,
+`logistics/freightPoolingRoutes_merged.js`, 6 routes, confirmed loadable
+in the twenty-fifth update but never actually mounted since nothing
+requests it there - would need mounting first), `glutWarningAPI`,
+`logisticsEnhancementAPI`, `foluAPI`/`foluBenchmarkAPI`,
+`informationSharingAPI`, `mfaManagementAPI`, `platformConfigurationAPI`,
+`wikipediaAPI` - all correspond to real but still-scaffold-sized (<55
+line) `_merged.js` files skipped in the twenty-fifth update's triage, so
+each needs its own real-vs-scaffold check before wiring, the same as
+every other fix this session. A larger remaining chunk (aquaculture/
+livestock-analytics/machinery/irrigation/water-management/rural-finance-
+shaped names) hasn't been checked against the backend at all yet and may
+turn out to be genuine missing-feature gaps like the farmersAPI methods
+in the twenty-fourth update, not simple wiring fixes - each needs the
+same verify-before-wire treatment, not a bulk guess.
