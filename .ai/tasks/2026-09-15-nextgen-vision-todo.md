@@ -373,6 +373,34 @@ next: double-check relative paths in cleanup commands, and commit
 promptly after verifying a fix rather than leaving it uncommitted through
 more exploratory commands.
 
+## Update — 2026-09-15, fifth follow-up: fabricated confidence removed from fraud/credit risk
+
+`fraudDetection.detectFraud()` and `creditRisk.assessCreditRisk()` compute
+real, deterministic scores from real data (transaction thresholds; farmer/
+loan Postgres queries) but each attached a hardcoded `confidence: 0.91` /
+`0.89` as if there were genuine measured uncertainty. Removed both.
+`checkLocationAnomaly()` hardcoded `0.2` regardless of input (silently
+never crossing its own 0.5 trigger threshold) - now honestly returns
+`null` and the caller skips it explicitly.
+
+Two related, real gaps were found but **not fixed**, flagged with
+comments instead of guessed at:
+- [ ] `fraudDetection.matchesPattern()` always returns `false` - no known
+      schema for what makes a transaction match a stored `fraud_patterns`
+      document beyond `.name`/`.risk_score`. Needs the real schema.
+- [ ] `creditRisk.calculateFDI()` returns an identical `{score: 72, grade:
+      'B+'}` for every farmer, which becomes 40% of every real farmer's
+      credit score and directly sets their real interest rate / max
+      advance percentage. Needs either a real FDI service contract or a
+      domain decision on reweighting the credit formula - a business
+      decision, not an engineering guess.
+
+Same pattern almost certainly repeats in `services/aiService/recommendationBuilders.js`
+(~30 hardcoded `confidence:` literals per the AI-authenticity audit
+earlier in this file) and other `services/aiService/`, `services/legacy/`,
+`services/platform/` files that audit flagged - not yet worked through
+one by one.
+
 ## Immediate next action
 
 Two independent, high-value threads are now open:
