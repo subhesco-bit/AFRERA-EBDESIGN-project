@@ -50,7 +50,9 @@ const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes.js');
 const realtimeMonitoringRoutes = require('./routes/realtimeMonitoringRoutes.js');
 const qualityAssurance = require('./routes/qualityAssurance.js');
 const projectSystemsRoutes = require('./routes/projectSystemsRoutes.js');
-const productRoutes = require('./routes/productRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. services/legacy/productService.js
+// is a real, Postgres-backed product CRUD + search implementation with its own router.
+const { router: productRoutes } = require('./services/legacy/productService.js');
 const productReviewRoutes = require('./routes/productReviewRoutes.js');
 const productMediaAIRoutes = require('./routes/productMediaAIRoutes.js');
 const publicDataRoutes = require('./routes/publicDataRoutes.js');
@@ -58,7 +60,10 @@ const productCertifications = require('./routes/productCertifications.js');
 const priceForecasting = require('./routes/priceForecasting.js');
 const preventiveMaintenanceRoutes = require('./routes/preventiveMaintenanceRoutes.js');
 const predictiveIntelligenceRoutes = require('./routes/predictiveIntelligenceRoutes.js');
-const predictiveAnalytics = require('./routes/predictiveAnalytics.js');
+// 2026-09-15: was an explicit 'Placeholder route module' (health check only).
+// services/legacy/predictiveAnalyticsService.js is a real predictive-models/
+// forecasts/alerts implementation with its own router.
+const { router: predictiveAnalytics } = require('./services/legacy/predictiveAnalyticsService.js');
 const poultryRoutes = require('./routes/poultryRoutes.js');
 const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes.js');
 const platformCoreRoutes = require('./routes/platformCoreRoutes.js');
@@ -93,6 +98,54 @@ const mlOptimization = require('./routes/mlOptimization.js');
 // pronunciation guides) with its own router that nothing ever wired in -
 // found investigating why MultilingualProvider.jsx's calls all failed.
 const { router: multilingualRoutes } = require('./services/legacy/multilingualService.js');
+// 2026-09-15: batch-mounted 38 real, previously-unmounted services/legacy/*.js
+// implementations discovered via a systematic sweep (each confirmed to load
+// cleanly and export a real router before being added here) - see
+// .ai/tasks/2026-09-15-nextgen-vision-todo.md for the full investigation.
+const { router: advancedAIRoutesNewlyMounted } = require('./services/legacy/advancedAIService.js');
+const { router: aiCopilotRoutesNewlyMounted } = require('./services/legacy/aiCopilotService.js');
+const { router: arVrRoutesNewlyMounted } = require('./services/legacy/arVrService.js');
+const { router: biodiversityRoutesNewlyMounted } = require('./services/legacy/biodiversityService.js');
+const { router: blockchainTraceabilityRoutesNewlyMounted } = require('./services/legacy/blockchainTraceabilityService.js');
+const { router: catalogIntelligenceRoutesNewlyMounted } = require('./services/legacy/catalogIntelligenceService.js');
+const { router: commerceRulesRoutesNewlyMounted } = require('./services/legacy/commerceRulesService.js');
+const { router: consumerHealthRoutesNewlyMounted } = require('./services/legacy/consumerHealthService.js');
+const { router: conversationalAIRoutesNewlyMounted } = require('./services/legacy/conversationalAIService.js');
+// custodyEventRoutes.js deliberately NOT added here: unlike the other 40
+// services below, its filename matches /Routes\.js$/i, so it's already
+// auto-discovered and mounted at runtime by index.js's own
+// discoverServiceEmbeddedRoutes() (core/dynamicRouteLoader.js) - adding
+// it again here would just create a second, redundant mount.
+const { router: digitalProductPassportRoutesNewlyMounted } = require('./services/legacy/digitalProductPassportService.js');
+const { router: enterpriseControlRoutesNewlyMounted } = require('./services/legacy/enterpriseControlService.js');
+const { router: enterpriseMemoryRoutesNewlyMounted } = require('./services/legacy/enterpriseMemoryService.js');
+const { router: erpRoutesNewlyMounted } = require('./services/legacy/erpService.js');
+const { router: financialRoutesNewlyMounted } = require('./services/legacy/financialService.js');
+const { router: foodIntelligenceRoutesNewlyMounted } = require('./services/legacy/foodIntelligenceService.js');
+const { router: foodSafetyRoutesNewlyMounted } = require('./services/legacy/foodSafetyService.js');
+const { router: formRoutesNewlyMounted } = require('./services/legacy/formService.js');
+const { router: giIntelligenceRoutesNewlyMounted } = require('./services/legacy/giIntelligenceService.js');
+const { router: indigenousKnowledgeRoutesNewlyMounted } = require('./services/legacy/indigenousKnowledgeService.js');
+const { router: institutionalProcurementRoutesNewlyMounted } = require('./services/legacy/institutionalProcurementService.js');
+const { router: insuranceRoutesNewlyMounted } = require('./services/legacy/insuranceService.js');
+const { router: knowledgeGraphRoutesNewlyMounted } = require('./services/legacy/knowledgeGraphService.js');
+const { router: laboratoryERPRoutesNewlyMounted } = require('./services/legacy/laboratoryERPService.js');
+const { router: logisticsRoutesNewlyMounted } = require('./services/legacy/logisticsService.js');
+const { router: merchandisingRoutesNewlyMounted } = require('./services/legacy/merchandisingService.js');
+const { router: millCircuitRoutesNewlyMounted } = require('./services/legacy/millCircuitService.js');
+const { router: moduleCatalogRoutesNewlyMounted } = require('./services/legacy/moduleCatalogService.js');
+const { router: neProductIntelligenceRoutesNewlyMounted } = require('./services/legacy/neProductIntelligenceService.js');
+const { router: offlinePaymentRoutesNewlyMounted } = require('./services/legacy/offlinePaymentService.js');
+const { router: offlineSyncRoutesNewlyMounted } = require('./services/legacy/offlineSyncService.js');
+const { router: omnichannelAIRoutesNewlyMounted } = require('./services/legacy/omnichannelAIService.js');
+const { router: organicTraceabilityRoutesNewlyMounted } = require('./services/legacy/organicTraceabilityService.js');
+const { router: recipeIntelligenceRoutesNewlyMounted } = require('./services/legacy/recipeIntelligenceService.js');
+const { router: shelfLifeRoutesNewlyMounted } = require('./services/legacy/shelfLifeService.js');
+const { router: smsAuthRoutesNewlyMounted } = require('./services/legacy/smsAuthService.js');
+const { router: v42IntelligenceRoutesNewlyMounted } = require('./services/legacy/v42IntelligenceService.js');
+const { router: valueCommerceRoutesNewlyMounted } = require('./services/legacy/valueCommerceService.js');
+const { router: voiceAIRoutesNewlyMounted } = require('./services/legacy/voiceAIService.js');
+const { router: whatsappRoutesNewlyMounted } = require('./services/legacy/whatsappService.js');
 const marketplaceEnhancements = require('./routes/marketplaceEnhancements.js');
 const marketDataRoutes = require('./routes/marketDataRoutes.js');
 const marketAnalytics = require('./routes/marketAnalytics.js');
@@ -109,7 +162,9 @@ const landManagementRoutes = require('./routes/landManagementRoutes.js');
 const knowledgeRoutes = require('./routes/knowledgeRoutes.js');
 const irrigationManagementRoutes = require('./routes/irrigationManagementRoutes.js');
 const iotSensors = require('./routes/iotSensors.js');
-const iotIntegrationRoutes = require('./routes/iotIntegrationRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. services/legacy/iotIntegrationService.js
+// is a real device/sensor/alert implementation with its own router.
+const { router: iotIntegrationRoutes } = require('./services/legacy/iotIntegrationService.js');
 const insuranceEnhancements = require('./routes/insuranceEnhancements.js');
 const inputSupplyManagementRoutes = require('./routes/inputSupplyManagementRoutes.js');
 const informationSharingRoutes = require('./routes/informationSharingRoutes.js');
@@ -772,6 +827,47 @@ async function startup() {
     // Blocker 4: Stripe Webhook Handler
     app.use('/api', stripeWebhookRoutes);
     logger.info('💳 Stripe webhook handler mounted at /api/stripe-webhook');
+
+    // Batch-mounted previously-unmounted real services (2026-09-15)
+    app.use('/api/advancedai', advancedAIRoutesNewlyMounted);
+    app.use('/api/aicopilot', aiCopilotRoutesNewlyMounted);
+    app.use('/api/arvr', arVrRoutesNewlyMounted);
+    app.use('/api/biodiversity', biodiversityRoutesNewlyMounted);
+    app.use('/api/blockchaintraceability', blockchainTraceabilityRoutesNewlyMounted);
+    app.use('/api/catalogintelligence', catalogIntelligenceRoutesNewlyMounted);
+    app.use('/api/commercerules', commerceRulesRoutesNewlyMounted);
+    app.use('/api/consumerhealth', consumerHealthRoutesNewlyMounted);
+    app.use('/api/conversationalai', conversationalAIRoutesNewlyMounted);
+    app.use('/api/digitalproductpassport', digitalProductPassportRoutesNewlyMounted);
+    app.use('/api/enterprisecontrol', enterpriseControlRoutesNewlyMounted);
+    app.use('/api/enterprisememory', enterpriseMemoryRoutesNewlyMounted);
+    app.use('/api/erp', erpRoutesNewlyMounted);
+    app.use('/api/financial', financialRoutesNewlyMounted);
+    app.use('/api/foodintelligence', foodIntelligenceRoutesNewlyMounted);
+    app.use('/api/foodsafety', foodSafetyRoutesNewlyMounted);
+    app.use('/api/form', formRoutesNewlyMounted);
+    app.use('/api/giintelligence', giIntelligenceRoutesNewlyMounted);
+    app.use('/api/indigenousknowledge', indigenousKnowledgeRoutesNewlyMounted);
+    app.use('/api/institutionalprocurement', institutionalProcurementRoutesNewlyMounted);
+    app.use('/api/insurance', insuranceRoutesNewlyMounted);
+    app.use('/api/knowledgegraph', knowledgeGraphRoutesNewlyMounted);
+    app.use('/api/laboratoryerp', laboratoryERPRoutesNewlyMounted);
+    app.use('/api/logistics', logisticsRoutesNewlyMounted);
+    app.use('/api/merchandising', merchandisingRoutesNewlyMounted);
+    app.use('/api/millcircuit', millCircuitRoutesNewlyMounted);
+    app.use('/api/modulecatalog', moduleCatalogRoutesNewlyMounted);
+    app.use('/api/neproductintelligence', neProductIntelligenceRoutesNewlyMounted);
+    app.use('/api/offlinepayment', offlinePaymentRoutesNewlyMounted);
+    app.use('/api/offlinesync', offlineSyncRoutesNewlyMounted);
+    app.use('/api/omnichannelai', omnichannelAIRoutesNewlyMounted);
+    app.use('/api/organictraceability', organicTraceabilityRoutesNewlyMounted);
+    app.use('/api/recipeintelligence', recipeIntelligenceRoutesNewlyMounted);
+    app.use('/api/shelflife', shelfLifeRoutesNewlyMounted);
+    app.use('/api/smsauth', smsAuthRoutesNewlyMounted);
+    app.use('/api/v42intelligence', v42IntelligenceRoutesNewlyMounted);
+    app.use('/api/valuecommerce', valueCommerceRoutesNewlyMounted);
+    app.use('/api/voiceai', voiceAIRoutesNewlyMounted);
+    app.use('/api/whatsapp', whatsappRoutesNewlyMounted);
 
     // Standardized error handling must follow every route registration.
     app.use(standardizeErrorResponse);

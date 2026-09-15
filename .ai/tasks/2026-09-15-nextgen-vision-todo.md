@@ -906,3 +906,113 @@ as close to a certainty rather than a hypothesis to spot-check: for the
 remaining ~140 missing exports, check `services/legacy/*.js` (and
 `services/<domain>/*.js`) for a same-domain file with its own `router`
 export before assuming real backend work is needed from scratch.
+
+## Update — 2026-09-15, thirteenth follow-up: systematic sweep - 42 real services mounted in one batch
+
+Turned the "three for three" hypothesis from the twelfth update into a
+full sweep instead of finding a fourth instance by accident. Ran:
+`grep -rl "module.exports = {" services/legacy/*.js | xargs grep -l
+"router,"` to find every `services/legacy/*.js` file exporting a real
+`router` (45 files), then cross-referenced each against `index.js` by
+name. **All 45 were unmounted.**
+
+Investigated each before touching anything, not just mounted blindly:
+- **2 excluded, legitimately real elsewhere**: `farmerValueService.js`
+  and `nutritionIntelligenceService.js` both already have a dedicated,
+  real `routes/*.js` file that calls their exported functions directly
+  with a different integration style (not "mount the whole router") -
+  confirmed by reading both route files in full. Not touched.
+- **3 were scaffold swaps**, same shape as the order fix: `routes/productRoutes.js`,
+  `routes/iotIntegrationRoutes.js` (both the identical 38-line "Route
+  operational" template) and `routes/predictiveAnalytics.js` (explicit
+  "Placeholder route module" comment) were mounted at `/api/product`,
+  `/api/iotintegration`, `/api/predictiveanalytics` instead of the real
+  `productService.js`/`iotIntegrationService.js`/`predictiveAnalyticsService.js`
+  routers sitting unused right next to them. Swapped, same pattern as
+  `index.js`'s order-router fix (require the real file, destructure
+  `.router`, keep the existing variable name so the `app.use` line
+  doesn't need to change).
+- **1 excluded as already covered**: `custodyEventRoutes.js` matches
+  `/Routes\.js$/i`, so it's already auto-discovered and mounted at
+  runtime by `index.js`'s own `discoverServiceEmbeddedRoutes()`
+  (`core/dynamicRouteLoader.js`) - confirmed by reading that loader's
+  filter regex. Adding it manually too would've been a genuine duplicate
+  mount, so it was deliberately left out (this also explains why the
+  other 44 weren't already covered by that same mechanism: it only
+  matches filenames ending in `Routes.js`, and every other one of these
+  is named `*Service.js`).
+- **39 were pure new mounts**: real, verified-loadable services with no
+  existing route at any checked path, mounted fresh at `/api/<name>`
+  (lowercase, no separators, matching the existing `/api/order`,
+  `/api/multilingual` convention) - see `index.js`'s batch-mount block
+  for the full list (advancedAI, aiCopilot, arVr, biodiversity,
+  blockchainTraceability, catalogIntelligence, commerceRules,
+  consumerHealth, conversationalAI, digitalProductPassport,
+  enterpriseControl, enterpriseMemory, erp, financial, foodIntelligence,
+  foodSafety, form, giIntelligence, indigenousKnowledge,
+  institutionalProcurement, insurance, knowledgeGraph, laboratoryERP,
+  logistics, merchandising, millCircuit, moduleCatalog,
+  neProductIntelligence, offlinePayment, offlineSync, omnichannelAI,
+  organicTraceability, recipeIntelligence, shelfLife, smsAuth,
+  v42Intelligence, valueCommerce, voiceAI, whatsapp).
+
+**Verification, since a full `npm run dev` boot hangs in this sandbox**
+(see below): (1) every one of the 42 confirmed to `require()` cleanly in
+isolation before being added: 41 individually + custodyEvent's exclusion
+reasoned separately. (2) `node -c` clean on the full `index.js` after the
+batch edit - this also catches duplicate `const` identifiers, which a
+naive batch edit could easily have introduced. (3) A synchronous
+`require('./src/index.js')` (which runs every top-level `require` in the
+file, including all 42) completed without throwing. (4) A standalone
+Express app mounting all 42 routers together (bypassing the full
+`index.js` boot) confirmed: no Express-level mount errors, real JWT auth
+enforcement on protected endpoints (401 without a token on
+`/api/iotintegration/iot-devices`), a real public endpoint reachable
+without auth, real webhook payload validation on `/api/whatsapp/webhook`,
+and clean (non-crashing) error responses when the database is
+unavailable - with one exception noted below. (5) `git diff` confirms
+nothing outside `index.js` (plus the earlier README/comment corrections)
+was touched to make this work - no fabricated glue code, just wiring.
+
+**One collision-check false-negative worth recording for whoever does
+this again**: the initial pass checked candidate mount paths only against
+`index.js`'s exact string-literal `app.use('/api/...')` calls. Before
+committing to the 3 swaps, each of the 5 raw path collisions found this
+way was individually read and classified (2 real/legitimate, 3 scaffolds)
+- a purely mechanical path-collision check would have missed that
+distinction and either skipped 3 real fixes or, worse, proposed
+overwriting 2 legitimate implementations.
+
+**Found via the batch smoke test, not fixed here**: `productService.js`'s
+`getCategories()` (and likely other of its functions - not individually
+audited) lacks the `if (!pg) throw new Error('Database connection not
+available')` guard that `getProducts()` in the same file already has,
+producing a raw `TypeError: Cannot read properties of null (reading
+'query')` instead of a clean error when the database is down - the exact
+same gap already found and fixed across all of `orderService.js` in the
+tenth update. Flagged here rather than fixed, since a full sweep of all
+42 newly-reachable services for this same gap is its own bounded task,
+not a natural extension of a mounting fix.
+
+**Separate, pre-existing, NOT fixed here**: a full `npm run dev` /
+`node src/index.js` boot in this sandbox hangs indefinitely right after
+logging `✅ Critical services loaded`, never reaching `server.listen()`.
+Confirmed via `git diff` that none of this session's changes touch the
+code between those two points (`cacheService.init()`, `jobService.init()`,
+`routeLoader.discoverAndMountRoutes()`,
+`routeLoader.discoverServiceEmbeddedRoutes()`,
+`serviceLoader.mountServiceRoutes()`) - most likely `cacheService.init()`
+attempting a Redis connection with no timeout, since Redis isn't running
+in this sandbox either (matching Postgres). This is why verification here
+used isolated Express apps instead of a real server boot + `curl`, same
+as the order and multilingual fixes' standalone smoke tests. Worth a
+real fix (a connect timeout) for whoever next needs a full local boot in
+an environment without Redis.
+
+**Updated implication for Stage 0**: "real service, never mounted" is
+not a hypothesis anymore - it was the actual state of every single
+`services/legacy/*.js` file with its own router (45 of 45; 3 swaps + 39
+new mounts + 2 legitimately-already-real + 1 already-covered by the
+dynamic loader = 45). The natural next sweep is the same check against
+`services/<domain>/*.js` (non-legacy) and `services/*.js` (root level),
+which weren't covered by this pass.
