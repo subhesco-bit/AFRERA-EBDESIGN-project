@@ -254,19 +254,24 @@ named-export API - `{ Button }` with variant/size props, and a compound
 exists today, as a default export, with no sub-components at all. This is
 a real component-API design gap, not a mechanical typo like the ones
 above - **not fixed in this session**, flagged here instead:
-- [ ] Design the actual `Button`/`Card`/(likely other `ui/*` primitives -
+- [x] Design the actual `Button`/`Card`/(likely other `ui/*` primitives -
       not yet enumerated) component API by reading a representative sample
       of call sites first, then implement it once and let all ~500 error
       sites resolve together, rather than special-casing importers.
-- [ ] Get a full, categorized error list (509 errors truncated in terminal
+      **Done, see third follow-up below** - 6 primitives restored, error
+      count dropped 509 → 161.
+- [x] Get a full, categorized error list (509 errors truncated in terminal
       output after the first handful) to check whether other root causes
       exist beyond `ui/button.jsx` and `ui/card.jsx` before committing to
-      "fix these two files and the count drops to ~0."
-- [ ] Until this is fixed, **`npm run build` has likely never produced a
-      working production bundle in this environment** - worth confirming
-      whether it ever succeeded elsewhere (a different Node/Vite version?)
-      or whether this is net-new breakage from an unpinned Vite major
-      version bump, before assuming it's long-standing.
+      "fix these two files and the count drops to ~0." **Done** - the
+      remaining 161 are a single distinct root cause (missing frontend API
+      client exports), documented separately below, confirmed by a fresh
+      local `npm run build` as of the seventh follow-up (still 161, all
+      `MISSING_EXPORT` from `services/api.js`).
+- [x] Until this is fixed, **`npm run build` has likely never produced a
+      working production bundle in this environment** - **confirmed still
+      true**: current `npm run build` still fails (161 `MISSING_EXPORT`
+      errors), just past the point this session's fixes got it to.
 
 ### On the earlier ChatGPT-coordination question
 User asked whether `.ai/CHECKPOINT.md` / `.ai/README.md` (added by the
