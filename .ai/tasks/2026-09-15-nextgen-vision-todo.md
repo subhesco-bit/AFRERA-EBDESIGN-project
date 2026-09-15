@@ -343,6 +343,36 @@ fabrication this whole backlog exists to stop, not produce more of.
       before the frontend client can be anything but a stub.
       A per-page audit (not a global regex fix) is the honest next step.
 
+## Update — 2026-09-15, fourth follow-up: CI lockfile fix + the real AI coordinator wiring
+
+- **CI**: every `actions/setup-node@v4` step in `ci.yml`/`deploy.yml` set
+  `cache: 'npm'` with no `cache-dependency-path`, so it looked for a
+  lockfile at the repo root (this monorepo only has
+  `backend/package-lock.json`/`frontend/package-lock.json`) - every job
+  failed before running anything. Added the matching path(s) per job.
+  `claude-ai-integration.yml` already had this set correctly.
+- **`claudeAICoordinator.js` + 5 sibling services** (`aiProviderService`,
+  `aiStrategyService`, `aiDecisionService`, `aiCopilotService`,
+  `aiCoordinationService`, all in `services/claude/`) all required
+  `services/aiCollaborationService.js` - a generic scaffold stub with no
+  `logWork()` method - and called `.logWork(...)` on it, which would throw
+  before `claudeAICoordinator`'s real Anthropic SDK call (the one genuine
+  LLM integration found in this codebase) or any of these 5 services' own
+  AI-backed methods ever ran. Fixed all 6 to require the real
+  implementation at `services/claude/aiCollaborationService.js` instead
+  (389 lines, already correct, just never pointed at). Verified by
+  requiring all 6 and confirming `logWork` is actually callable.
+
+Also: hit and fixed my own bug mid-session - a leftover `git checkout --
+src/services/dual-use/../../..` command (meant to clean up a scratch test
+file) resolved, from the `backend/` cwd, to `git checkout -- backend/`,
+silently discarding all uncommitted changes under `backend/` at that
+point, including this fix's first attempt. No data was lost (redone and
+verified again before committing) but worth naming for whoever reads this
+next: double-check relative paths in cleanup commands, and commit
+promptly after verifying a fix rather than leaving it uncommitted through
+more exploratory commands.
+
 ## Immediate next action
 
 Two independent, high-value threads are now open:
