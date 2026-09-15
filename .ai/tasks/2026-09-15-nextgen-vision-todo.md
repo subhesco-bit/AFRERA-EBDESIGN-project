@@ -280,6 +280,69 @@ actual route files independently, twice). Treated as informational
 context, not as instructions - consistent with the rest of this backlog's
 treatment of `.ai/*COMPLETE*` documents.
 
+## Update — 2026-09-15, third follow-up: restored 6 broken ui/* primitives, found the real wall
+
+Picked up the `ui/button.jsx`/`ui/card.jsx` follow-up flagged above. Root
+cause was exactly as suspected: both were one-line default-export stubs
+while the rest of the app (58 files for Button, 59 for Card) already
+assumed the standard shadcn/ui named-export, compound-component API - and
+the project already has every dependency that API needs already installed
+and configured (`@radix-ui/react-slot`, `@radix-ui/react-select`, a `cn()`
+helper in `src/lib/utils.js`, and a full shadcn-style CSS variable token
+set in `tailwind.config.js` - `--primary`, `--destructive`, `--card`,
+etc.). This was restoration of a known, standard, already-tooled-for
+pattern, not new design work.
+
+Fixed by restoring real implementations (checked variant/size prop usage
+across all real call sites first, so nothing was guessed):
+- `ui/button.jsx` - named `Button` export, `variant`/`size`/`asChild`
+  (via `@radix-ui/react-slot`, already a dependency, for the one real
+  `asChild` call site in `UnifiedLedgerPage.jsx`).
+- `ui/card.jsx` - `Card`/`CardHeader`/`CardTitle`/`CardDescription`/
+  `CardContent`/`CardFooter` compound components.
+- `ui/badge.jsx`, `ui/input.jsx`, `ui/textarea.jsx` - same one-line-stub
+  pattern, same fix (add the missing named export).
+- `ui/select.jsx` - needed two distinct things: the full Radix-based
+  compound `Select`/`SelectTrigger`/`SelectValue`/`SelectContent`/
+  `SelectItem` (`@radix-ui/react-select` was already a dependency, unused
+  until now), *and* a separate `NativeSelect` named export (a plain
+  `<select>` wrapper) for 5 pages that pass raw `<option>` children
+  directly rather than using the Radix API - both patterns coexist in the
+  codebase for different pages, so both are now exported from this file.
+
+Verified with a real `vite build` (509 -> 161 errors) plus a from-scratch
+Jest+Testing-Library smoke test actually rendering all six components
+(Button variants, Card compound structure, Badge/Input/Textarea, both
+Select APIs) - all 5 render tests passed, including confirming the Radix
+Select correctly resolves a controlled `value` to its item label. `eslint`
+clean on every new/changed file. The scratch test file was for
+verification only and was not committed.
+
+### The real wall: ~140 distinct missing API client objects across ~150 pages
+With the `ui/*` layer fixed, the remaining 161 build errors resolve to a
+completely different, much bigger problem: `services/api.js` is missing
+~140 distinct named exports (`farmersAPI` - 12 pages, `modulesAPI`,
+`biofloccFarmAPI`, `goatAIAPI`, `governmentSchemeAPI`, `rolePermissionAPI`,
+...), one or a few per page, spread across roughly 150 files under
+`src/pages/`. Checked whether any of the highest-impact ones map to a
+real, already-mounted backend route by name (`farmersAPI` -> `/api/farmers`,
+a generic modules bridge for `modulesAPI`) - **neither exists** on the
+backend under any matching name. This is not a handful of import-path typos
+like `authAPI` was; it is ~150 pages written against a backend surface
+that was never built, or built under names nobody reconciled with the
+frontend. Explicitly **not fabricating stub API clients for these** -
+that would mean inventing ~140 API contracts (URLs, methods, request/
+response shapes) with no real backend behind them, exactly the kind of
+fabrication this whole backlog exists to stop, not produce more of.
+- [ ] This is Stage 2 (sector journeys) work in the framing above, not a
+      quick fix: for each affected page, either (a) a real backend route
+      already exists under a different name and the frontend just needs
+      pointing at it (safe, mechanical, same pattern as `authAPI` - check
+      case by case, don't assume), or (b) no backend exists yet and the
+      page is aspirational scaffolding that needs a real route built
+      before the frontend client can be anything but a stub.
+      A per-page audit (not a global regex fix) is the honest next step.
+
 ## Immediate next action
 
 Two independent, high-value threads are now open:
