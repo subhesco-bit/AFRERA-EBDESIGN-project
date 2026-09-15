@@ -578,6 +578,14 @@ class DynamicRouteLoader {
     if (['sheepRoutes.js', 'rfqRoutes.js', 'poultryRoutes.js', 'pigRoutes.js', 'decisionSupportRoutes.js'].includes(base)) {
       return false;
     }
+    // 2026-09-15: same reasoning again - trackDartRoutes.js and
+    // governanceModule.js scaffolds were swapped out in index.js for their
+    // real _merged.js implementations (both had genuine load-time bugs,
+    // now fixed - see trackDartRoutes_merged.js and
+    // platform/governanceModule_merged.js for the details).
+    if (['trackDartRoutes.js', 'governanceModule.js'].includes(base)) {
+      return false;
+    }
     return true;
   }
 

@@ -6,7 +6,14 @@
 
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
-const aiGateway = require('../ai/aiGatewayService');
+// 2026-09-15: was '../ai/aiGatewayService', which doesn't exist (no
+// services/ai/ directory) - threw "Cannot find module" the moment
+// anything required this file. services/legacy/aiGatewayService.js
+// exports the predict()/analyze()/recommend()/optimize()/healthCheck()
+// instance this file actually calls (services/aiGatewayService.js, the
+// other same-named file, exports a completely different {run,
+// buildGovernedPrompt, ...} API and doesn't have any of those methods).
+const aiGateway = require('../legacy/aiGatewayService');
 const analytics = require('../platform/analyticsService');
 
 class AgriculturalIntelligenceService {

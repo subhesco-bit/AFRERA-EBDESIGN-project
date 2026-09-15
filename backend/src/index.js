@@ -2,6 +2,15 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
+// 2026-09-15: real, 566-line, 23-route server provisioning/monitoring/
+// scaling/backup implementation, never mounted anywhere (the only other
+// file with this name, routes/platform/serverManagementRoutes.js, is a
+// 39-line generic CRUD placeholder, also unmounted). Had no auth middleware
+// at all - added authMiddleware + adminMiddleware inside the file itself,
+// matching every other admin-infrastructure route in this codebase, before
+// mounting it (see that file's own header comment for the full reasoning).
+const serverManagementRoutes = require('./routes/serverManagementRoutes_merged.js');
+
 // routes/index.js is a module exporter, not a router (see the "don't mount
 // it" comment near the old `app.use('/api/index', index)` line below) - the
 // `index` binding here is unused, just still-present dead code.
@@ -23,7 +32,10 @@ const userRoutes = require('./routes/userRoutes.js');
 const unifiedAIRoutes = require('./routes/unifiedAIRoutes_merged.js');
 const unifiedAIGateway = require('./routes/unifiedAIGateway.js');
 const transactionRoutes = require('./routes/transactionRoutes.js');
-const trackDartRoutes = require('./routes/trackDartRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. trackDartRoutes_merged.js
+// is a real multi-key shipment-tracking implementation that used to throw a
+// missing-brace bug (see that file's own header comment) - now fixed.
+const trackDartRoutes = require('./routes/trackDartRoutes_merged.js');
 const tenantManagementRoutes = require('./routes/tenantManagementRoutes.js');
 const systemAdministrationRoutes = require('./routes/systemAdministrationRoutes.js');
 const supplyChainTracking = require('./routes/supplyChainTracking.js');
@@ -199,7 +211,13 @@ const horticultureManagementRoutes = require('./routes/horticultureManagementRou
 const horticulture = require('./routes/horticulture.js');
 const gstRoutes = require('./routes/gstRoutes.js');
 const greenhouse = require('./routes/greenhouse.js');
-const governanceModule = require('./routes/governanceModule.js');
+// 2026-09-15: was a 20-line 'Placeholder route module' scaffold.
+// platform/governanceModule_merged.js is a real 245-line, 24-route village/
+// panchayat/CSR/compliance/cooperative implementation that used to throw
+// "Route.post() requires a callback function but got a [object Undefined]"
+// (an authRateLimit import that middleware/rateLimiter.js never exported -
+// see that file's own header comment) - now fixed.
+const governanceModule = require('./routes/platform/governanceModule_merged.js');
 const goatRoutes = require('./routes/goatRoutes.js');
 const glutWarningRoutes = require('./routes/glutWarningRoutes.js');
 const geofencingRoutes = require('./routes/geofencingRoutes.js');
@@ -658,6 +676,7 @@ async function startup() {
     app.use('/api/trackdart', trackDartRoutes);
     app.use('/api/tenantmanagement', tenantManagementRoutes);
     app.use('/api/systemadministration', systemAdministrationRoutes);
+    app.use('/api/servermanagement', serverManagementRoutes);
     app.use('/api/supplychaintracking', supplyChainTracking);
     app.use('/api/supplychainanalytics', supplyChainAnalytics);
     app.use('/api/supply-chain', supplyChainDecisionRoutes);
