@@ -1631,3 +1631,113 @@ invite guessing at response shapes for endpoints that don't exist -
 explicitly not done. This needs to go back to product/architecture as
 real backend feature work, not another pass of this backlog's
 mount-the-existing-thing pattern.
+
+## Update — 2026-09-15, twenty-fifth follow-up: swept the remaining 65 unmounted `_merged.js` files - 2 real scaffold swaps, 3 duplicate-file fixes, 1 unmounted file made safe to mount
+
+Recomputed the unmounted-`_merged.js` list from scratch (comparing every
+file under `routes/` including 7 previously-unnoticed subdirectories -
+`agriculture/`, `claude/`, `commerce/`, `finance/`, `livestock/`,
+`logistics/`, `platform/` - against what index.js actually requires by
+basename, not just a flat-file assumption) rather than trusting the
+twenty-first update's "8 not yet checked" estimate: 65 were still
+unmounted, not 8. 56 were scaffold-sized (<55 lines, skipped, same
+heuristic as every earlier pass); individually `require()`-tested the 9
+substantial ones.
+
+**5 threw real, distinct errors - none of them the livestock-style
+"protect...Router" bug already fixed this session:**
+- `agriculture/agriculturalIntelligenceRoutes_merged.js`'s dependency,
+  `services/agriculture/agriculturalIntelligenceService.js`, required
+  `../ai/aiGatewayService` - no `services/ai/` directory exists anywhere.
+  Fixed to `../legacy/aiGatewayService`, confirmed by checking which of
+  the two same-named files (`services/aiGatewayService.js` vs
+  `services/legacy/aiGatewayService.js`) actually exports the
+  `predict()`/`analyze()`/`recommend()`/`optimize()`/`healthCheck()` API
+  this service calls - only the legacy one does; the other exports an
+  unrelated `{run, buildGovernedPrompt, ...}` shape.
+- `platform/civilDisruptionRoutes_merged.js` required
+  `../../services/platform/civilDisruptionService` - no such path (no
+  `services/platform/` prefix on this particular service). Fixed to
+  `../../services/civilDisruptionService`, matching the file's own header
+  comment, and confirmed the target has every method the route calls.
+- `platform/experienceRoutes_merged.js` had a second, dead
+  `authenticate` import one directory level too shallow
+  (`../middleware/auth` instead of `../../middleware/auth`) - confirmed
+  it's never referenced anywhere else in the file (the correctly-pathed
+  `authMiddleware` import right above it is what's actually used) and
+  removed it rather than fix a path to an already-unused binding.
+- `platform/governanceModule_merged.js` imported `authRateLimit` from
+  `middleware/rateLimiter.js` - which has **never** exported anything by
+  that name (checked: only `authLimiter`, a 5-requests-per-15-minutes
+  brute-force-login limiter, and `apiLimiter`, the general one). This
+  threw `Route.post() requires a callback function but got a
+  [object Undefined]` the instant Express tried to register a route with
+  it. Grepped for the same dead import elsewhere: **15 other files**
+  (`services/platform/smsAuthService.js`, several `digitalProductPassportService`
+  files, multiple other route files) import the same nonexistent name -
+  all but this one only as dead/unused imports, so only this file
+  actually crashed. Rather than guess at a single codebase-wide rename
+  (which of `authLimiter`'s brute-force semantics or `apiLimiter`'s
+  general semantics was "meant" for those other 15 call sites isn't
+  knowable without reading each one), fixed only this file narrowly by
+  aliasing `apiLimiter` to the `authRateLimit` name it imports - the same
+  general-purpose limiter every other authenticated route in this
+  codebase already uses for exactly this kind of endpoint (e.g.
+  `pigRoutes_merged.js`'s `router.use(apiLimiter)`). The other 15 files'
+  dead imports are a separate, lower-priority cleanup, not a crash.
+- `trackDartRoutes_merged.js` had the exact same lone-CR-instead-of-brace
+  bug already found twice this session in `seedVaultRoutes_merged.js`/
+  `unifiedAIRoutes_merged.js` - `trackOneKey()`'s closing return statement
+  ran straight into `router.get('/', ...)` with no real line break,
+  stranding the router's only route inside that helper function's body.
+  Fixed the same way (real newline + brace inserted, stray leftover brace
+  near the file's end removed).
+
+**3 of the 5 fixed files turned out to be exact-duplicate route files**
+(`agriculturalIntelligenceRoutes_merged.js`, `civilDisruptionRoutes_merged.js`,
+`experienceRoutes_merged.js`) - diffed their endpoint lists against the
+already-mounted flat-named sibling files (`agriculturalIntelligenceRoutes.js`,
+`civilDisruptionRoutes.js`, `experienceRoutes.js`) and found identical
+paths/handlers in all three cases, confirmed the flat versions already
+load and work fine independently. The service/import-path fixes
+themselves are kept (real bugs in real files, worth fixing regardless),
+but none of these three route files were mounted a second time - would
+have been pure redundant duplication, not a real fix.
+
+**2 were genuine scaffold swaps**, confirmed by checking their flat
+siblings really are placeholders (`routes/trackDartRoutes.js`, 38 lines,
+`'Route operational'`; `routes/governanceModule.js`, 20 lines,
+`'Placeholder route module'`) - mounted `trackDartRoutes_merged.js` at
+`/api/trackdart` and `platform/governanceModule_merged.js` at
+`/api/governancemodule` in place of them, with both scaffolds added to
+`dynamicRouteLoader.js`'s exclusion list.
+
+**`serverManagementRoutes_merged.js` was a different kind of find**: 566
+lines, 23 routes, loaded cleanly with no bug at all - but had **zero auth
+middleware anywhere in the file**, for real server
+provisioning/scaling/backup/deletion endpoints (`POST /servers`,
+`DELETE /servers/:id`, etc.). This one was never mounted anywhere before
+(its only same-named file, `platform/serverManagementRoutes.js`, is a
+39-line generic-CRUD placeholder, also unmounted), so there was no
+existing behavior to regress - but mounting it as-is would have been
+introducing a real, live security hole, not fixing one. Added
+`authMiddleware` + `adminMiddleware` inside the file itself before
+mounting, matching every other admin-infrastructure route in this
+codebase (`auditRoutes.js`, `systemAdministrationRoutes.js`,
+`tenantManagementRoutes.js` all require both for admin-only operations).
+Mounted at `/api/servermanagement`.
+
+**Verified live for all 3 newly-mounted routers** (`governanceModule_merged`
+24 routes, `trackDartRoutes_merged` 1 route, `serverManagementRoutes_merged`
+23 routes): standalone Express + supertest smoke test confirms real route
+registration and real auth enforcement (401 without a token, never 404).
+9 new tests in `src/routes/__tests__/moduleNotFoundAndBraceBugs.test.js`
+lock this in, plus the 3 previously-throwing duplicate files no longer
+throwing.
+
+**Remaining flagged-but-not-fixed**: `weatherRoutes_merged.js` (still the
+missing-validation-library gap from the twenty-third update) and the
+~15 other files with the same dead `authRateLimit` import as
+`governanceModule_merged.js` (none of them currently crash, since none
+of the other 15 actually invoke it as middleware - a real but
+lower-priority cleanup for whoever picks this up next, not a live bug).
