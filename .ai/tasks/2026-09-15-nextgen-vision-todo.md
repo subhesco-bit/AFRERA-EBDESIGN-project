@@ -1965,3 +1965,49 @@ plus the ~24 field-management/harvest-scoring/most-of-pricing
 follow-up task to group these by likely domain owner and scope real
 backend work, rather than continuing to check them one at a time from
 this backlog.
+
+## Update — 2026-09-15, thirtieth follow-up: 8 more checked, a clear pattern emerging in what's left
+
+Checked 8 more security/platform-shaped candidates
+(`consentManagementAPI`, `digitalIdentityAPI`, `sessionManagementAPI`,
+`ssoAPI`, `securityAccessControlAPI`, `userManagementAPI`,
+`rolePermissionAPI`, `permissionManagementAPI`). None wired - a clear
+pattern by now across ~30 checked names: most either (a) call generic
+`createX`/`getXs`/`updateX`/`deleteX` methods matching only the
+5-endpoint CRUD-placeholder shape (`platform/informationSharingRoutes_merged.js`'s
+pattern, ruled out in the twenty-seventh update) with no real backend
+behind that specific domain, or (b) call specifically-named methods
+(`getRoleHierarchy`, `getPermissionMatrix`, `recommendRoleForUser`,
+`detectAnomalies`, `getPredictiveMaintenance`) that don't match any real
+route file's actual endpoints even when a plausibly-named service exists
+(`roleManagementRoutes.js` is real but only implements basic role CRUD +
+permission assign/remove, no hierarchy/matrix/recommend concept;
+`userManagementService.js` exists but exports a plain class instance,
+never wrapped in a router). `securityAccessControlAPI` has no backend
+trace anywhere. Also rechecked `platformTelemetryAPI` from a different
+angle (its *service* file rather than route file, in case the router
+lived somewhere else) - confirms the twenty-seventh update's finding:
+`services/platformTelemetryService.js` exports plain functions
+(`getSystemMetrics`, `getPlatformAnalytics`, `getServiceHealth`), never
+wrapped in an Express router anywhere.
+
+**Assessment for whoever continues this**: roughly 30 of the ~124
+remaining names have now been individually checked, and the real-backend
+hit rate has dropped sharply since the twenty-sixth/twenty-seventh
+updates (which mostly found "already mounted this session" freebies).
+What's left skews heavily toward genuine missing-feature gaps rather
+than wiring bugs. Before spending more individual-name effort, it's
+worth first re-running the static import-vs-export diff (described in
+the twenty-sixth update) to get a fresh, complete list of the ~124 names,
+then doing one more `find`/`grep` pass across `services/` and `routes/`
+for any router-exporting file matching each domain *before* checking
+call-site shapes - that ordering wastes less time on names with no
+backend at all.
+
+**Running total this session**: 161 → 124 MISSING_EXPORT errors (37
+closed, unchanged this update - no new fixes, all 8 checked were
+confirmed gaps). CI on every push through this update's commit has
+stayed green on every job except the known Build Verification/Check
+Status gap - Backend Tests in particular has passed on every single
+push, confirming none of this session's ~15 backend fixes/mounts this
+session have introduced a regression.
