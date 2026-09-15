@@ -1,4 +1,13 @@
-const index = require('./routes/index.js');
+// routes/index.js (a module exporter, not a router - see the "don't mount
+// it" comment below near the old `app.use('/api/index', index)` line) was
+// required here but never used for anything. Requiring it is not a no-op:
+// it eagerly loads completeAIIntegrationRoutes.js -> completeAIIntegrationController.js,
+// which requires '../services/legacy/completeAIIntegrationService' - a file
+// that does not exist anywhere in this repo. That throws MODULE_NOT_FOUND
+// at require-time, before any route mounting runs, so the entire server
+// currently cannot boot at all with this require present. Removed rather
+// than fixed: recreating a missing 12-method "AI integration" service would
+// mean inventing business logic, not restoring known-working code.
 const yieldManagement = require('./routes/yieldManagement.js');
 const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
 const weatherRoutes = require('./routes/weatherRoutes.js');
@@ -171,7 +180,17 @@ const blockchainVerificationRoutes = require('./routes/blockchainVerificationRou
 const blockchainTrace = require('./routes/blockchainTrace.js');
 const biometric = require('./routes/biometric.js');
 const automation = require('./routes/automation.js');
-const authRoutes = require('./routes/authRoutes.js');
+// routes/authRoutes.js is a mock (in-memory Map, plaintext password compare,
+// fabricated `jwt_<id>_<timestamp>` tokens) left over from early scaffolding.
+// It was mounted at /api/auth while middleware/auth.js verifies tokens via
+// services/dual-use/authService.js's real jsonwebtoken-based verifyToken() -
+// so a token minted by the live login endpoint would fail real verification
+// on every subsequent protected request. authService.js already has a
+// complete real implementation (bcrypt, real JWT, rate limiting, JSON-file
+// fallback store when Postgres is unavailable, 2FA, OAuth) with its own
+// router that was built but never mounted. Swapping the mount below to that
+// real router is the fix, not a new implementation.
+const { router: authRoutes } = require('./services/dual-use/authService.js');
 const auditTrail = require('./routes/auditTrail.js');
 const auditRoutes = require('./routes/auditRoutes.js');
 const assetAccountingRoutes = require('./routes/assetAccountingRoutes.js');

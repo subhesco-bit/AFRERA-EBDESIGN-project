@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 /**
+ * NOT MOUNTED. This is an early scaffold: in-memory user Map, plaintext
+ * password comparison, and a fabricated `jwt_<id>_<timestamp>` token that
+ * is not a real JWT. middleware/auth.js verifies tokens with the real
+ * jsonwebtoken-based verifyToken() from services/dual-use/authService.js,
+ * so a token minted here would fail verification on every protected route.
+ * index.js now mounts services/dual-use/authService.js's real router at
+ * /api/auth instead. Kept only because backend/src/__tests__/authRoutes.test.js
+ * exercises this file directly; not wired into the running app.
+ *
  * Authentication Routes
  * POST /auth/login - User login
  * POST /auth/register - User registration
