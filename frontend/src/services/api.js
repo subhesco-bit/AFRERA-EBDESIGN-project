@@ -433,6 +433,97 @@ export const goatAIAPI = {
   recommendGoatBreeding: (animalId) => api.post(`${GOAT_BASE}/ai/recommend-breeding/${animalId}`),
 };
 
+// 2026-09-15: didn't exist - nervousSystemRoutes_merged.js (mounted at
+// /api/nervoussystem earlier this session) exposes all 22 of these
+// brain/heart/neural/reflex/sensor/motor/route endpoints directly via
+// nervousSystemController, one method each, matched 1:1 here rather
+// than guessed - every call site checked directly for its actual
+// argument shape (most pass a single payload/params object already
+// built by the calling page; strengthenNeuralPathway, getSensorData and
+// deactivateEnterpriseRoute take a single id string, matching their
+// :pathwayId/:sensorId/:routeId path params).
+const NERVOUS_SYSTEM_BASE = `${UNVERSIONED_BASE}/api/nervoussystem`;
+
+export const nervousSystemAPI = {
+  processEventThroughBrain: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/brain/process-event`, payload),
+  getBrainDecisionHistory: (params) => api.get(`${NERVOUS_SYSTEM_BASE}/brain/decision-history`, { params }),
+  getBrainFocus: () => api.get(`${NERVOUS_SYSTEM_BASE}/brain/focus`),
+  startHeartBeat: () => api.post(`${NERVOUS_SYSTEM_BASE}/heart/start`),
+  stopHeartBeat: () => api.post(`${NERVOUS_SYSTEM_BASE}/heart/stop`),
+  getHeartBeatStatus: () => api.get(`${NERVOUS_SYSTEM_BASE}/heart/status`),
+  createNeuralPathway: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/neural/create-pathway`, payload),
+  getNeuralPathways: () => api.get(`${NERVOUS_SYSTEM_BASE}/neural/pathways`),
+  strengthenNeuralPathway: (pathwayId) => api.post(`${NERVOUS_SYSTEM_BASE}/neural/strengthen/${pathwayId}`),
+  createReflexArc: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/reflex/create-arc`, payload),
+  getReflexArcs: () => api.get(`${NERVOUS_SYSTEM_BASE}/reflex/arcs`),
+  triggerReflex: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/reflex/trigger`, payload),
+  registerSensor: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/sensor/register`, payload),
+  getSensorData: (sensorId) => api.get(`${NERVOUS_SYSTEM_BASE}/sensor/data/${sensorId}`),
+  getSensorsStatus: () => api.get(`${NERVOUS_SYSTEM_BASE}/sensor/status`),
+  executeMotorFunction: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/motor/execute`, payload),
+  getActiveMotorFunctions: () => api.get(`${NERVOUS_SYSTEM_BASE}/motor/active`),
+  registerEnterpriseRoute: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/route/register`, payload),
+  routeRequest: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/route/request`, payload),
+  getOptimalRoute: () => api.get(`${NERVOUS_SYSTEM_BASE}/route/optimal`),
+  deactivateEnterpriseRoute: (routeId) => api.post(`${NERVOUS_SYSTEM_BASE}/route/deactivate/${routeId}`),
+  getNervousSystemHealth: () => api.get(`${NERVOUS_SYSTEM_BASE}/health`),
+};
+
+// 2026-09-15: didn't exist - organicTraceabilityService.js (mounted at
+// /api/organictraceability earlier this session) exposes real
+// POST /farms, GET /standards and GET /consumer-transparency/qr/:qrCode
+// endpoints matching all 3 call sites checked directly.
+const ORGANIC_TRACEABILITY_BASE = `${UNVERSIONED_BASE}/api/organictraceability`;
+
+export const organicTraceabilityAPI = {
+  registerFarm: (data) => api.post(`${ORGANIC_TRACEABILITY_BASE}/farms`, data),
+  getStandards: () => api.get(`${ORGANIC_TRACEABILITY_BASE}/standards`),
+  getConsumerTransparency: (qrCode) => api.get(`${ORGANIC_TRACEABILITY_BASE}/consumer-transparency/qr/${qrCode}`),
+};
+
+// 2026-09-15: didn't exist - nutrientValueSalesRoutes_merged.js (mounted
+// at /api/nutrientvaluesales earlier this session) via
+// nutrientValueSalesController. Body shapes for submitNutrientContent
+// (`{productId, contentData, verificationData}`) and
+// issueNutrientCertificate (`{productId, certificationData}`) confirmed
+// directly against the controller's own req.body destructuring, not
+// guessed from the route alone.
+const NUTRIENT_VALUE_SALES_BASE = `${UNVERSIONED_BASE}/api/nutrientvaluesales`;
+
+export const nutrientValueSalesAPI = {
+  submitNutrientContent: (productId, contentData, verificationData) =>
+    api.post(`${NUTRIENT_VALUE_SALES_BASE}/submit-verification`, { productId, contentData, verificationData }),
+  issueNutrientCertificate: (productId, certificationData) =>
+    api.post(`${NUTRIENT_VALUE_SALES_BASE}/issue-certificate`, { productId, certificationData }),
+  searchByNutrientCriteria: (params) => api.get(`${NUTRIENT_VALUE_SALES_BASE}/search`, { params }),
+};
+
+// 2026-09-15: didn't exist - projectSystemsRoutes_merged.js (mounted at
+// /api/projectsystems earlier this session). Every method's body/params
+// shape confirmed against the route file's own req.body/req.query
+// destructuring rather than guessed (updateProjectStatus/updateWbsStatus
+// only send `{status}` even though the backend also accepts
+// actualStartDate/actualEndDate - no call site here provides those;
+// completeMilestone sends `{actualCompletionDate}`).
+const PROJECT_SYSTEMS_BASE = `${UNVERSIONED_BASE}/api/projectsystems`;
+
+export const projectSystemsAPI = {
+  createProject: (data) => api.post(PROJECT_SYSTEMS_BASE, data),
+  getProjects: (companyId, filters) => api.get(PROJECT_SYSTEMS_BASE, { params: { companyId, ...filters } }),
+  updateProjectStatus: (projectId, status) => api.post(`${PROJECT_SYSTEMS_BASE}/${projectId}/status`, { status }),
+  createWbsElement: (projectId, data) => api.post(`${PROJECT_SYSTEMS_BASE}/${projectId}/wbs`, data),
+  getProjectWbs: (projectId) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/wbs`),
+  getWbsCostRollup: (projectId) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/wbs/rollup`),
+  updateWbsStatus: (wbsId, status) => api.post(`${PROJECT_SYSTEMS_BASE}/wbs/${wbsId}/status`, { status }),
+  createMilestone: (projectId, data) => api.post(`${PROJECT_SYSTEMS_BASE}/${projectId}/milestones`, data),
+  getProjectMilestones: (projectId, params) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/milestones`, { params }),
+  getMilestoneStatusSummary: (projectId, asOfDate) =>
+    api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/milestones/summary`, { params: { asOfDate } }),
+  completeMilestone: (milestoneId, actualCompletionDate) =>
+    api.post(`${PROJECT_SYSTEMS_BASE}/milestones/${milestoneId}/complete`, { actualCompletionDate }),
+  getProjectBudgetVsActual: (projectId) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/budget-vs-actual`),
+};
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
