@@ -199,7 +199,13 @@ const financialAnalytics = require('./routes/financialAnalytics.js');
 const fertilizerRoutes = require('./routes/fertilizerRoutes.js');
 const farmerValueRoutes = require('./routes/farmerValueRoutes.js');
 const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes.js');
-const farmerRoutes = require('./routes/farmerRoutes.js');
+// 2026-09-15: was routes/farmerRoutes.js, a 38-line "Route operational"
+// scaffold. routes/farmerRoutes_merged.js is a real, complete,
+// already-debugged (own "FIXED 2026-08-15" comments) implementation of
+// the exact same directory/profile/FDI/certification/FPO endpoints,
+// calling the real services/legacy/farmerService.js - was sitting next
+// to the scaffold, never mounted anywhere.
+const farmerRoutes = require('./routes/farmerRoutes_merged.js');
 const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements.js');
 const farmerHealthRoutes = require('./routes/farmerHealthRoutes.js');
 const farmerFamilyRoutes = require('./routes/farmerFamilyRoutes.js');

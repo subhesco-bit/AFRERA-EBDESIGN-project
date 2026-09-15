@@ -301,6 +301,34 @@ export const modulesAPI = {
   getOverview: () => api.get(`${MODULE_CATALOG_BASE}/overview`),
 };
 
+// 2026-09-15: didn't exist at all - the highest-frequency remaining
+// MISSING_EXPORT (12+ importing pages). routes/farmerRoutes_merged.js
+// was a real, complete, already-debugged implementation (its own "FIXED
+// 2026-08-15" comments) sitting unmounted next to the usual 38-line
+// scaffold - swapped in at /api/farmer in index.js.
+//
+// IMPORTANT: the 12 pages that import `farmersAPI` call ~28 distinct
+// methods between them, and only the 6 below actually match this real
+// farmer-directory/FDI/certification/FPO backend - the rest
+// (getFields/getHarvestScore/getMarketPrices/getBenchmarks/
+// getDemandForecast/savePricingModel and ~16 more) belong to entirely
+// different domains (field management, harvest scoring, market pricing)
+// that were never investigated here and have no confirmed backend yet.
+// Adding only the verified 6 fixes the build (the export now exists) and
+// makes calculateFDI/getFarmer/etc. actually work; pages calling the
+// other, unverified methods will still fail at runtime until those are
+// each checked the same way - not fabricated here.
+const FARMER_BASE = `${UNVERSIONED_BASE}/api/farmer`;
+
+export const farmersAPI = {
+  getFarmer: (id) => api.get(`${FARMER_BASE}/${id}`),
+  getFarmers: (filters, pagination) => api.get(FARMER_BASE, { params: { ...filters, ...pagination } }),
+  calculateFDI: (id) => api.post(`${FARMER_BASE}/${id}/fdi`),
+  addCertification: (id, data) => api.post(`${FARMER_BASE}/${id}/certifications`, data),
+  getCertifications: (id) => api.get(`${FARMER_BASE}/${id}/certifications`),
+  getFPOs: (filters) => api.get(`${FARMER_BASE}/fpos/list`, { params: filters }),
+};
+
 export const nutritionAPI = {
   getNutritionData: () => api.get('/nutrition'),
   analyzeNutrition: (data) => api.post('/nutrition/analyze', data),

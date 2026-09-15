@@ -1342,3 +1342,49 @@ Continued the incremental approach from the eighteenth update.
   domain subfolders. Genuinely needs backend work from scratch.
 
 Build error count now at 155 (started this backlog thread at 161).
+
+## Update — 2026-09-15, twentieth follow-up: farmersAPI - the biggest single win in this thread, plus a fifth "real but unmounted" file
+
+Went looking for `farmersAPI`'s real backend the same way as every prior
+fix - and found it, in the same shape as `farmerValueRoutes.js`
+(twelfth update): a real, standalone route file, `routes/farmerRoutes_merged.js`
+(116 lines), calling the real `services/legacy/farmerService.js`
+directly (not mounting its own router-in-a-router), complete with its
+own dated bug-fix comments ("FIXED 2026-08-15: ... has always returned
+'Farmer not found' for every real farmer", "FIXED 2026-08-15: ... 401'd
+on every call") - sitting unmounted next to the usual 38-line
+`routes/farmerRoutes.js` scaffold that was live instead. Swapped in
+`index.js`.
+
+`getFarmerById`/`getFarmers`/`calculateFDI`/`addFarmerCertification`/
+`getFarmerCertifications`/`getFPOs` match `commerceApi.js`'s
+`farmersAPI` shape exactly. Added `farmersAPI` to `api.js` with these 6
+methods. **Important scope note, not glossed over**: the 12 real pages
+that import `farmersAPI` call ~28 distinct methods between them: the
+other ~22 (`getFields`, `getHarvestScore`, `getMarketPrices`,
+`getBenchmarks`, `getDemandForecast`, `savePricingModel`, etc.) belong
+to entirely different domains (field management, harvest scoring,
+market pricing/analytics) that this investigation didn't touch and have
+no confirmed backend yet - adding only the 6 verified ones fixes the
+*build* (the export now exists) and makes the farmer-directory calls
+actually work, but pages calling the other methods will still fail at
+runtime until each is checked the same way. Not fabricated to make the
+number look bigger.
+
+Also found and fixed the same missing-DB-null-guard gap as
+`orderService.js`/`productService.js`: all 13 of `farmerService.js`'s
+exported functions fetched `getPostgreSQL()` without checking it,
+including the farmer wallet subsystem (deposit/withdraw/transfer/
+balance/bank-linking) this same file implements. Added the guard to the
+8 that needed it directly; the other 5 wallet functions call
+`getFarmerWallet()` (now guarded) before touching `pg` themselves, so
+they're covered transitively - verified this by reading each function's
+body, not assumed. Added 13 tests.
+
+**Verified**: `node -c`/eslint clean on all touched files; 13/13 new
+tests passing; standalone smoke test confirms the real router - auth
+enforcement (401 without a token), and clean `"Database connection not
+available"` errors (not raw TypeErrors) on every endpoint checked.
+`npm run build` error count: 155 → 143, the single largest drop from one
+fix in this whole backlog thread (farmersAPI was imported by more pages
+than any other single missing export).
