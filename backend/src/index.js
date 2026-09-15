@@ -73,7 +73,13 @@ const paymentRoutes = require('./routes/paymentRoutes.js');
 const paymentGatewayRoutes = require('./routes/paymentGatewayRoutes.js');
 const ORPHANED_SERVICES_MOUNT = require('./routes/ORPHANED_SERVICES_MOUNT.js');
 const organizationManagementRoutes = require('./routes/organizationManagementRoutes.js');
-const orderRoutes = require('./routes/orderRoutes.js');
+// 2026-09-15: was require('./routes/orderRoutes.js'), a 38-line scaffold
+// whose POST / just returned {message: 'Route operational'} with no real
+// order ever created. services/legacy/orderService.js is a real,
+// Postgres-backed cart/order/payment implementation (real stock checks,
+// real per-item GST via gstService) with its own router that was never
+// wired to a live mount - swapped to use the real one.
+const { router: orderRoutes } = require('./services/legacy/orderService.js');
 const operationsRouteSupport = require('./routes/operationsRouteSupport.js');
 const operationsManagementRoutes = require('./routes/operationsManagementRoutes.js');
 const nutritionIntelligenceRoutes = require('./routes/nutritionIntelligenceRoutes.js');

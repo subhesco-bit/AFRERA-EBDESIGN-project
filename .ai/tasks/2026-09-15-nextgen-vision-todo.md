@@ -721,3 +721,72 @@ the ~10 minority-shape files are not touched here - noted so a future
 session building the missing frontend API clients checks each target
 route's actual shape rather than assuming the majority envelope, instead
 of rediscovering this list file-by-file at integration time.
+
+## Update — 2026-09-15, tenth follow-up: the entire live order/cart/payment system was disconnected
+
+While investigating Stage 1d ("an order/payment path" as one of the 3
+highest-risk flows to test), found `backend/src/__tests__/orderRoutes.test.js`
+failing 8/8 and traced it to the same class of bug as the original auth
+fix, but on a much more consequential system.
+
+**The bug**: `index.js` mounted `routes/orderRoutes.js` at `/api/order` -
+a 38-line auto-generated scaffold whose `POST /` just returns
+`{message: 'Route operational'}` with no order ever created. Meanwhile
+`services/legacy/orderService.js` - 881 real lines, Postgres-backed, with
+real stock checks, real per-item GST via `gstService`, a real cart, and a
+real payment flow - already had its own complete, working Express router
+(`router` in its exports) that was **never mounted anywhere**. Confirmed
+via `git log` this wasn't a recent regression and via grep that nothing
+else requires the scaffold except the one stale test file. The entire
+live order/cart/payment system - arguably the most business-critical
+single piece of this platform - has been unreachable at runtime.
+
+**Fixed**: `index.js` now requires `{ router } = require('./services/legacy/orderService.js')`
+instead of the scaffold. Verified safe before touching: no frontend code
+currently calls `/api/order` under any path (nothing to break), the real
+router loads cleanly and its own error handling means a crash inside a
+handler becomes an HTTP error response, not a process crash. Smoke-tested
+standalone (real `authMiddleware`/JWT verification, not a stub): no auth
+→ 401 `NO_TOKEN`, bad token → 401 `INVALID_TOKEN`, valid token → reaches
+real business logic.
+
+**Second bug found via that same smoke test**: with a valid token but no
+live Postgres, 10 of `orderService.js`'s 11 exported functions threw a
+raw `TypeError: Cannot read properties of null (reading 'query')` instead
+of a clean error - only `getCart()` had the `if (!pg) throw new
+Error('Database connection not available')` guard the file's own pattern
+established. Added the identical guard to the other 10
+(`addToCart`/`updateCartItem`/`removeFromCart`/`clearCart`/`createOrder`/
+`getOrderById`/`getUserOrders`/`updateOrderStatus`/`processPayment`/
+`calculateDiscount`), mechanical and consistent with existing code, not a
+new pattern invented for this fix.
+
+**Added real test coverage**: `services/legacy/__tests__/orderService.test.js`
+(12 tests) - the 10 DB-unavailable-guard cases, plus two real business-
+logic paths with a mocked Postgres (`createOrder` rejects an empty cart;
+`createOrder` rejects a quantity exceeding real stock). All passing,
+eslint clean, `node -c` clean on every touched file.
+
+**Left alone, documented rather than fixed**: `routes/orderRoutes.js`
+itself (now truly dead - unreachable except by its own stale test) got
+a deprecation comment mirroring the one already on `routes/authRoutes.js`
+from the original auth fix, rather than deletion, per this session's
+established conservative-deletion practice. `__tests__/orderRoutes.test.js`
+(8/8 failing, pre-existing, untouched) was not rewritten or deleted: it
+encodes a response contract (`PUT /:id` for status, `DELETE /:id` to
+cancel, a `{success, data}` envelope) that was never real for *either*
+the scaffold or the actual `orderService.js` router (which uses
+`PUT /:id/status`, has no cancel-via-DELETE, and returns the bare order
+object per the Stage 1c minority-shape finding above) - fixing it
+properly means either rewriting the test against the real contract or
+adding real `DELETE`/generic-`PUT` endpoints to `orderService.js`, both
+real design decisions outside a bug-fix's scope. Flagged here instead of
+left as a silent mystery.
+
+**Implication**: this is the second time this session (after
+`services/authService.js` vs `dual-use/authService.js`) that "index.js
+mounts a scaffold instead of the real implementation next to it" turned
+out to be real and high-value. Worth treating as a standing hypothesis
+for Stage 0: for every route mounted from `routes/*.js`, check whether a
+same-domain, more complete implementation exists under `services/` (or
+`services/legacy/`) that isn't the one actually wired in.
