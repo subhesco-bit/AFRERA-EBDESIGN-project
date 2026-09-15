@@ -2,6 +2,12 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
+// 2026-09-15: never mounted anywhere, and had the same silent
+// route-registration bug as seedVaultRoutes_merged.js/etc (a lone CR
+// where handle()'s closing brace should have been - see that file's own
+// header comment) - fixed, and mounted for the first time.
+const labourRoutes = require('./routes/labourRoutes.js');
+
 // 2026-09-15: real, 566-line, 23-route server provisioning/monitoring/
 // scaling/backup implementation, never mounted anywhere (the only other
 // file with this name, routes/platform/serverManagementRoutes.js, is a
@@ -753,6 +759,7 @@ async function startup() {
     app.use('/api/loanmanagement', loanManagement);
     app.use('/api/livestockroutesupport', livestockRouteSupport.router);
     app.use('/api/livestockmanagement', livestockManagementRoutes);
+    app.use('/api/labour', labourRoutes);
     app.use('/api/livestock', livestock);
     app.use('/api/library', libraryRoutes);
     app.use('/api/landrecords', landRecordsRoutes);

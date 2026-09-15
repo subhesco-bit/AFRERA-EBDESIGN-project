@@ -569,6 +569,22 @@ export const freightPoolingAPI = {
   closeAndDispatch: (windowId) => api.post(`${FREIGHT_POOLING_BASE}/windows/${windowId}/dispatch`),
 };
 
+// 2026-09-15: didn't exist. routes/labourRoutes.js was never mounted
+// anywhere AND had the same silent route-registration bug found 3 times
+// already this session (a lone CR where handle()'s closing brace should
+// have been, stranding every route inside it - see that file's own
+// header comment) - fixed and mounted for the first time at
+// /api/labour.
+const LABOUR_BASE = `${UNVERSIONED_BASE}/api/labour`;
+
+export const labourAPI = {
+  getWorkers: () => api.get(`${LABOUR_BASE}/workers`),
+  createWorker: (data) => api.post(`${LABOUR_BASE}/workers`, data),
+  getAttendance: () => api.get(`${LABOUR_BASE}/attendance`),
+  recordAttendance: (data) => api.post(`${LABOUR_BASE}/attendance`, data),
+  getPayments: () => api.get(`${LABOUR_BASE}/payments`),
+};
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
