@@ -447,6 +447,27 @@ itself is confirmed by direct reading. Not fixed here for the same reason
 as `recommendationBuilders.js`: needs real pest/crop domain data, not a
 guess.
 
+### Checked one path through the ~140-missing-API-exports problem - it's real, not a rewire
+Tested the hopeful theory that some of the ~140 missing frontend API
+exports are the same "correct file, wrong import path" shape as `authAPI`
+was. Found `farmersAPI`, `productsAPI`, `productReviewsAPI`, `ordersAPI`,
+`blockchainVerificationAPI`, `enterpriseIntegrationAPI`, `seedVaultAPI`
+all fully implemented in `services/commerceApi.js` - another file only
+imported by the same dead `services/index.js` barrel `coreApi.js` was
+stuck behind. But unlike `authAPI`, rewiring the import here would not
+fix anything: `commerceApi.js`'s URL paths don't match the real mounted
+routes either way (`/farmers` vs the real `/api/farmer`, `/products` vs
+`/api/product`, etc. - inconsistent pluralization/hyphenation throughout),
+**and**, more fundamentally, the real route files themselves
+(`farmerRoutes.js`, `productRoutes.js`, `orderRoutes.js`, all checked
+directly) are 38-line scaffolds defining only `POST /` and `GET /health` -
+none of the CRUD endpoints `commerceApi.js` calls (`getFarmer`,
+`getProducts`, `getOrders`, `calculateFDI`, etc.) exist on the backend at
+all. This confirms case (b) from the per-page audit note above for at
+least this cluster: real backend work needed, not a frontend rewire.
+Worth checking whether `commerceApi.js`'s callers overlap with any of the
+other ~140 missing names before repeating this per-name.
+
 ## Immediate next action
 
 Two independent, high-value threads are now open:
