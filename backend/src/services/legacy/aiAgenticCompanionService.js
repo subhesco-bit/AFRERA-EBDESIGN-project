@@ -276,11 +276,15 @@ class AIAgenticCompanionService {
 
     // Analyze soil type
     const soilGuideline = this.knowledgeBase.get(`soil_${fieldData.soil_type}`);
+    // NOTE: these recommendations used to carry a hardcoded confidence
+    // (0.85 / 0.90 / 0.75) attached to every response regardless of the
+    // actual soil/season/market data matched - a fixed literal presented
+    // as a measured confidence. Removed rather than left misleading;
+    // reintroduce only as a real per-category weight if one gets defined.
     if (soilGuideline) {
       recommendations.push({
         category: 'soil_compatibility',
         crops: soilGuideline.recommended_crops,
-        confidence: 0.85,
       });
     }
 
@@ -290,7 +294,6 @@ class AIAgenticCompanionService {
       recommendations.push({
         category: 'seasonal_suitability',
         crops: seasonalCrops,
-        confidence: 0.90,
       });
     }
 
@@ -299,7 +302,6 @@ class AIAgenticCompanionService {
     recommendations.push({
       category: 'market_demand',
       crops: marketTrends.high_demand_crops,
-      confidence: 0.75,
     });
 
     return {
@@ -355,7 +357,8 @@ class AIAgenticCompanionService {
       crop,
       predicted_yield: predictedYield,
       unit: 'kg/hectare',
-      confidence: 0.78,
+      // confidence: 0.78 removed - was a fixed literal on every prediction,
+      // not derived from soilFactor/weatherFactor/managementFactor below.
       factors: {
         soil: soilFactor,
         weather: weatherFactor,
@@ -463,6 +466,12 @@ class AIAgenticCompanionService {
   }
 
   async optimizeCosts(financialData, cropData) {
+    // FIXME: the 0.85 / 0.90 / 0.88 reduction factors below are guessed
+    // placeholders, not derived from real input-cost, labor-market, or
+    // equipment-efficiency data. They're applied to the farmer's real
+    // currentCosts, so the savings figures look precise but aren't
+    // measured. Needs a real cost-optimization model or documented
+    // domain assumptions, not a silent guess.
     const currentCosts = financialData.costs || {};
     const revenue = financialData.revenue || 0;
 
@@ -530,7 +539,8 @@ class AIAgenticCompanionService {
     return {
       crop,
       forecasted_revenue: forecastedRevenue,
-      confidence: 0.72,
+      // confidence: 0.72 removed - was a fixed literal on every forecast,
+      // not derived from the trend/seasonality adjustments below.
       factors: {
         base_revenue: baseRevenue,
         trend_adjustment: trendAdjustment,
@@ -749,11 +759,12 @@ class AIAgenticCompanionService {
   }
 
   async getPestsBySymptoms(symptoms, crop) {
-    // Simplified pest matching
-    return [
-      { name: 'aphids', confidence: 0.75, severity: 'medium' },
-      { name: 'armyworm', confidence: 0.60, severity: 'high' },
-    ];
+    // No real symptom-to-pest matching is implemented - this used to
+    // ignore both params and always return the same two pests with fake
+    // confidence scores, which would have looked like a real diagnosis.
+    // Honestly report no match until real matching against the
+    // pest_management_strategies knowledge base is implemented.
+    return [];
   }
 
   getImmediatePestMeasures(potentialPests) {
@@ -786,7 +797,10 @@ class AIAgenticCompanionService {
   }
 
   calculateSeasonalityAdjustment(crop, baseRevenue) {
-    return baseRevenue * 0.05; // Simplified seasonality factor
+    // FIXME: fixed 5% adjustment ignores the crop param entirely - every
+    // crop gets the identical seasonality bump. Needs real per-crop
+    // seasonality data, not a guessed constant.
+    return baseRevenue * 0.05;
   }
 
   identifyRevenueRisks(marketData) {
@@ -842,9 +856,16 @@ class AIAgenticCompanionService {
   }
 
   async predictDroughtRisk(weatherForecast, soilMoisture) {
+    // Used to ignore both params and always claim risk_level: 'low' /
+    // probability: 0.2 - a fabricated reassurance regardless of actual
+    // forecast or soil moisture data. No real drought-risk model is
+    // implemented yet, so this now honestly reports that instead of a
+    // fixed "low risk" that could mislead a farmer into inaction.
     return {
-      risk_level: 'low',
-      probability: 0.2,
+      risk_level: 'unknown',
+      probability: null,
+      configured: false,
+      reason: 'Drought-risk prediction is not yet implemented',
       recommendations: [],
     };
   }

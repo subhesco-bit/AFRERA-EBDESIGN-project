@@ -431,21 +431,17 @@ surface of the app in one file.
       the highest-priority functions in this file once someone picks it up.
 
 ### Same pattern, another file: `services/legacy/aiAgenticCompanionService.js` (861 lines)
-`getPestsBySymptoms(symptoms, crop)` ignores both its own parameters and
-always returns the identical `[{aphids, 0.75}, {armyworm, 0.60}]`
-regardless of input, feeding `identifyPest()`. Several sibling helpers in
-the same file follow the exact same shape: `getIrrigationRecommendations`,
-`getImmediatePestMeasures`, `generateTreatmentSchedule`,
-`getSafetyPrecautions`, `assessEnvironmentalImpact` all return fixed
-generic strings/objects regardless of their arguments;
-`calculateSeasonalityAdjustment` applies a flat hardcoded 0.05 multiplier
-to every crop. Reachability is less certain than `recommendationBuilders.js`
-(no direct route import found by name; may only be reachable through
-`services/claude/aiAgentService.js`'s wrapper or the generic module
-bridge) - worth confirming before prioritizing, but the fabrication
-itself is confirmed by direct reading. Not fixed here for the same reason
-as `recommendationBuilders.js`: needs real pest/crop domain data, not a
-guess.
+**Update (seventh follow-up, below): fixed.** `getPestsBySymptoms()` and
+`predictDroughtRisk()` were the genuinely dangerous fabrications (both
+ignored their real inputs and returned fixed fake results); the
+`confidence` literals in `getCropSelectionAdvice`/`predictYield`/
+`forecastRevenue` were removed; the generic-advice helper methods
+(`getSafetyPrecautions`, `assessEnvironmentalImpact`, etc.) were reviewed
+and left as-is (static best-practice text, not false numeric precision);
+`optimizeCosts`/`calculateSeasonalityAdjustment` got strengthened FIXME
+comments rather than being gutted, since their guessed constants feed
+real formulas with no honest substitute available yet. See the seventh
+update below for full detail.
 
 ### Checked one path through the ~140-missing-API-exports problem - it's real, not a rewire
 Tested the hopeful theory that some of the ~140 missing frontend API
@@ -524,6 +520,64 @@ Test` all pass. `Build Verification`/frontend build still fails on the
 already-documented, pre-existing, much larger `services/api.js`
 missing-export gap (161 remaining errors, not caused by anything in this
 backlog's fixes) - tracked above, not re-documented here.
+
+## Update — 2026-09-15, seventh follow-up: `aiAgenticCompanionService.js` fabrication fixed
+
+Reconsidered the "too large, skip" call on this file from the previous
+update, after successfully proving the same honest-marking pattern scales
+to `recommendationBuilders.js`'s 34 functions. Read the full 861-line file
+method-by-method (constructor through the final helper) and found the
+fabrication is much narrower than it first looked - most of the ~30 small
+helper methods (`getSafetyPrecautions`, `getWaterEfficiencyTips`,
+`getImmediatePestMeasures`, etc.) return generic-but-true agricultural
+best-practice text, not false numeric precision, so they were left alone
+(same treatment given to static-template content elsewhere in this
+backlog). The genuinely dangerous/misleading pieces were narrower and
+fixable without domain data:
+
+- `getCropSelectionAdvice()`: removed three hardcoded `confidence` literals
+  (0.85 / 0.90 / 0.75) attached to every response's soil/seasonal/market
+  recommendations regardless of the actual data matched.
+- `predictYield()`: removed a hardcoded `confidence: 0.78` on every
+  prediction, unrelated to the real soil/weather/management factors
+  computed just above it.
+- `forecastRevenue()`: removed a hardcoded `confidence: 0.72` on every
+  forecast, same pattern.
+- `getPestsBySymptoms()`: used to ignore both its `symptoms` and `crop`
+  parameters and always return the identical `[{aphids, 0.75},
+  {armyworm, 0.60}]`, feeding directly into `identifyPest()`'s response.
+  Now honestly returns `[]` (no real symptom-matching implemented) -
+  verified `identifyPest()`'s `.map()` over the result degrades safely to
+  an empty `potential_pests` array rather than crashing.
+- `predictDroughtRisk()`: the most actively harmful case found - it
+  ignored both `weatherForecast` and `soilMoisture` and always returned
+  `risk_level: 'low', probability: 0.2`, i.e. a fabricated reassurance
+  that could tell a farmer their real drought risk is low regardless of
+  the real forecast. Now honestly returns
+  `{risk_level: 'unknown', probability: null, configured: false, reason}`.
+- `optimizeCosts()` (fixed 0.85/0.90/0.88 cost-reduction factors applied
+  to real farmer cost data) and `calculateSeasonalityAdjustment()` (fixed
+  5% bump ignoring the `crop` param) were left functional with
+  strengthened FIXME comments, same treatment as
+  `priceOptimization.js`'s `calculatePriceElasticity`/
+  `calculateMarginImpact` - removing them would break the real formulas
+  they feed into, and there's no honest constant to substitute without
+  real cost/seasonality data this session doesn't have.
+
+Traced all real consumers first: three re-export aliases
+(`services/aiAgenticCompanionService.js`, `services/ai/...`,
+`modules/M675100_AIAGENTICCOMPANION/backend/service.js`) just point at
+this same file, and `services/claude/aiAgentService.js`'s
+`ai_confidence` field reads from `claudeAICoordinator`'s response, not
+from anything touched here - confirmed unaffected. Added
+`src/services/legacy/__tests__/aiAgenticCompanionService.test.js` (6
+tests, all passing) locking in the new honest behavior. `node -c` and
+eslint both clean.
+
+This closes the second (and last) of the two large confirmed-live
+fabrication files flagged in the sixth update - both
+`recommendationBuilders.js` and `aiAgenticCompanionService.js` are now
+fixed.
 
 ## Immediate next action
 
