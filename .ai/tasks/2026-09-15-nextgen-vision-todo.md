@@ -1016,3 +1016,81 @@ new mounts + 2 legitimately-already-real + 1 already-covered by the
 dynamic loader = 45). The natural next sweep is the same check against
 `services/<domain>/*.js` (non-legacy) and `services/*.js` (root level),
 which weren't covered by this pass.
+
+## Update — 2026-09-15, fourteenth follow-up: extended the sweep to root-level services, found and fixed a real path+method mismatch too
+
+Ran the same "real router, never mounted" check against root-level
+`services/*.js` (not `services/legacy/`): 7 files matched
+(`advancedMedicalCodingService.js`, `advancedVoiceAI.js`, `authService.js`,
+`clinicalNutritionDecisionSupportService.js`, `formService.js`,
+`offlineSyncService.js`, `productService.js`).
+
+**4 excluded**: `authService.js` is the already-known-deprecated one (not
+the real mounted `dual-use/authService.js` - see the very first fix this
+session). `formService.js`/`offlineSyncService.js`/`productService.js`
+at root level are near-byte-identical duplicates of the
+`services/legacy/` versions already mounted (or, for `productService.js`,
+swapped in) in the thirteenth update - confirmed via `diff`, differing
+only in `require('../..')` vs `require('../')` path depth. Same
+duplication pattern already handled for `productReviewService.js`
+earlier this session; not touched (mounting the root copy too would
+create genuine duplicate/conflicting routes, not a fix).
+
+**3 genuinely new, non-duplicate, real services, mounted**:
+`advancedMedicalCodingService.js`, `advancedVoiceAI.js`,
+`clinicalNutritionDecisionSupportService.js` - none exist under
+`legacy/` under any name. `advancedMedicalCodingService.js` has a
+confirmed real frontend consumer, `pages/AdvancedMedicalCodingPage.jsx`
+(`api.get('/advanced-medical-coding/code-systems')` etc. against the
+`/api/v1`-based `api` instance) - mounted at the exact matching path,
+`/api/v1/advanced-medical-coding`. The other two have no confirmed
+frontend caller yet; mounted at `/api/advanced-voice-ai` and
+`/api/clinical-nutrition` (same "real and safe to expose, even without a
+confirmed caller yet" reasoning as the 39 services in the thirteenth
+update).
+
+**A second, more interesting bug found investigating consumers**:
+`components/Layout.jsx` carries a comment from a prior investigation -
+"ChatInterface and VoiceAssistant were fully built (real
+conversational-ai/voice-ai API calls) but had no parent page rendering
+them... authMiddleware on /conversational-ai/sessions and
+/voice-ai/voice-sessions" - and it's right on both counts, worse than
+just "unmounted":
+- The real backends (`services/legacy/conversationalAIService.js`,
+  `services/legacy/voiceAIService.js` - both already mounted in the
+  thirteenth update, but at `/api/conversationalai`/`/api/voiceai`, no
+  hyphen) needed the hyphenated paths `Layout.jsx` already documented -
+  **changed** to `/api/conversational-ai`/`/api/voice-ai` to match.
+- `frontend/src/services/componentApi.js`'s `conversationalAIAPI`/
+  `voiceAIAPI` (only partially fixed in the twelfth update - the
+  undefined-`api` bug was fixed, but the methods themselves were never
+  checked against real callers) called entirely fictional methods
+  (`sendMessage`/`getConversationHistory`,
+  `transcribeAudio`/`generateSpeech`) that don't exist in either real
+  component. The real callers - `ChatInterface.jsx`:
+  `getDomains()`/`createSession(data)`/`respond(sessionId, message)`/
+  `endSession(sessionId, data)`; `VoiceAssistant.jsx`:
+  `createSession(language)`/`getPreferences()`/`sendCommand(data)`/
+  `endSession(sessionId)` - were checked directly against both real
+  components' source and the real backends' route handlers (exact body
+  shapes: `{domain_id, language}`, `{message, context}`,
+  `{resolution_status, ...}`, `{language}`,
+  `{session_id, transcript, command_type, parameters}`). Rewrote both
+  API objects to match on both ends exactly.
+
+**Verified**: `node -c`/`@babel/parser` clean, eslint clean on all
+touched files (backend and frontend). Backend: all 3 new services
+confirmed to `require()` cleanly; a standalone Express app mounting the
+real `conversationalAIService.js`/`voiceAIService.js` routers at the
+corrected hyphenated paths confirmed the exact frontend call shapes
+reach real backend logic - `GET /domains` public and reachable without
+auth, `POST /sessions` and `POST /voice-sessions` enforce real JWT auth
+(401 without a token, reach real logic with one) and return clean
+(non-crashing) errors when the database is down.
+
+This closes the loop `Layout.jsx`'s own comment opened: two fully-built
+UI features (a floating chat widget and a floating voice assistant,
+mounted globally for every logged-in user) that were completely
+non-functional end-to-end - wrong frontend methods calling paths that
+didn't exist, backed by services that weren't mounted even if they had -
+are now wired correctly on both ends.

@@ -29,16 +29,31 @@ export const multilingualAPI = {
   detect: (text) => api.post(`${MULTILINGUAL_BASE}/detect`, { text }),
 };
 
-// conversationalAIAPI/voiceAIAPI had the same undefined-`api` bug; fixed
-// by the import above. Their /ai/... paths are unchanged (unverified
-// against a real backend mount - not part of this fix) but at least no
-// longer throw ReferenceError on first use.
+// 2026-09-15: components/Layout.jsx already documented that ChatInterface.jsx
+// and VoiceAssistant.jsx were "fully built (real conversational-ai/voice-ai
+// API calls) but had no parent page rendering them" - true on both ends:
+// their real callers (getDomains/createSession/respond/endSession and
+// createSession/getPreferences/sendCommand/endSession) didn't match what
+// used to be here (sendMessage/getConversationHistory,
+// transcribeAudio/generateSpeech - both also had the undefined-`api` bug),
+// AND the real backends (services/legacy/conversationalAIService.js,
+// services/legacy/voiceAIService.js) were never mounted at all. Backend
+// now mounted at /api/conversational-ai and /api/voice-ai (index.js);
+// rewritten here to match both real callers and real endpoints exactly.
+const CONVERSATIONAL_AI_BASE = `${config.API_URL.replace(/\/api\/v1\/?$/, '')}/api/conversational-ai`;
+const VOICE_AI_BASE = `${config.API_URL.replace(/\/api\/v1\/?$/, '')}/api/voice-ai`;
+
 export const conversationalAIAPI = {
-  sendMessage: (message) => api.post('/ai/conversational/send', { message }),
-  getConversationHistory: () => api.get('/ai/conversational/history'),
+  getDomains: () => api.get(`${CONVERSATIONAL_AI_BASE}/domains`),
+  createSession: (data) => api.post(`${CONVERSATIONAL_AI_BASE}/sessions`, data),
+  respond: (sessionId, message, context) =>
+    api.post(`${CONVERSATIONAL_AI_BASE}/sessions/${sessionId}/respond`, { message, context }),
+  endSession: (sessionId, data) => api.post(`${CONVERSATIONAL_AI_BASE}/sessions/${sessionId}/end`, data),
 };
 
 export const voiceAIAPI = {
-  transcribeAudio: (audio) => api.post('/ai/voice/transcribe', { audio }),
-  generateSpeech: (text) => api.post('/ai/voice/speak', { text }),
+  createSession: (language) => api.post(`${VOICE_AI_BASE}/voice-sessions`, { language }),
+  getPreferences: () => api.get(`${VOICE_AI_BASE}/voice-preferences`),
+  sendCommand: (data) => api.post(`${VOICE_AI_BASE}/voice-commands`, data),
+  endSession: (sessionId) => api.post(`${VOICE_AI_BASE}/voice-sessions/${sessionId}/end`),
 };

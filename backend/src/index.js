@@ -111,6 +111,17 @@ const { router: catalogIntelligenceRoutesNewlyMounted } = require('./services/le
 const { router: commerceRulesRoutesNewlyMounted } = require('./services/legacy/commerceRulesService.js');
 const { router: consumerHealthRoutesNewlyMounted } = require('./services/legacy/consumerHealthService.js');
 const { router: conversationalAIRoutesNewlyMounted } = require('./services/legacy/conversationalAIService.js');
+// Three more real, unmounted, non-duplicate services found at services/
+// root level (not services/legacy/) via the same sweep - none exist under
+// legacy/ under any name, so these are genuinely unique, not the
+// root/legacy duplication pattern seen elsewhere (e.g. productService.js
+// at both levels, where the root copy is a stale duplicate - NOT mounted).
+// advancedMedicalCodingService.js has a confirmed real frontend consumer:
+// pages/AdvancedMedicalCodingPage.jsx calls api.get('/advanced-medical-coding/...')
+// against the /api/v1-based `api` instance.
+const { router: advancedMedicalCodingRoutesNewlyMounted } = require('./services/advancedMedicalCodingService.js');
+const { router: advancedVoiceAIRoutesNewlyMounted } = require('./services/advancedVoiceAI.js');
+const { router: clinicalNutritionRoutesNewlyMounted } = require('./services/clinicalNutritionDecisionSupportService.js');
 // custodyEventRoutes.js deliberately NOT added here: unlike the other 40
 // services below, its filename matches /Routes\.js$/i, so it's already
 // auto-discovered and mounted at runtime by index.js's own
@@ -837,7 +848,17 @@ async function startup() {
     app.use('/api/catalogintelligence', catalogIntelligenceRoutesNewlyMounted);
     app.use('/api/commercerules', commerceRulesRoutesNewlyMounted);
     app.use('/api/consumerhealth', consumerHealthRoutesNewlyMounted);
-    app.use('/api/conversationalai', conversationalAIRoutesNewlyMounted);
+    // Hyphenated path (not /api/conversationalai like the rest of this batch):
+    // components/Layout.jsx already documented this exact path from a prior
+    // investigation ("authMiddleware on /conversational-ai/sessions"), and
+    // ChatInterface.jsx's real calls (getDomains/createSession/respond/
+    // endSession) match this service's real routes exactly - matching that
+    // existing expectation instead of introducing a third path convention.
+    app.use('/api/conversational-ai', conversationalAIRoutesNewlyMounted);
+    // Matches the real frontend consumer exactly (see require comment above).
+    app.use('/api/v1/advanced-medical-coding', advancedMedicalCodingRoutesNewlyMounted);
+    app.use('/api/advanced-voice-ai', advancedVoiceAIRoutesNewlyMounted);
+    app.use('/api/clinical-nutrition', clinicalNutritionRoutesNewlyMounted);
     app.use('/api/digitalproductpassport', digitalProductPassportRoutesNewlyMounted);
     app.use('/api/enterprisecontrol', enterpriseControlRoutesNewlyMounted);
     app.use('/api/enterprisememory', enterpriseMemoryRoutesNewlyMounted);
@@ -866,7 +887,10 @@ async function startup() {
     app.use('/api/smsauth', smsAuthRoutesNewlyMounted);
     app.use('/api/v42intelligence', v42IntelligenceRoutesNewlyMounted);
     app.use('/api/valuecommerce', valueCommerceRoutesNewlyMounted);
-    app.use('/api/voiceai', voiceAIRoutesNewlyMounted);
+    // Hyphenated path, same reasoning as /api/conversational-ai above:
+    // Layout.jsx documents "/voice-ai/voice-sessions", and VoiceAssistant.jsx's
+    // real calls match this service's real routes exactly.
+    app.use('/api/voice-ai', voiceAIRoutesNewlyMounted);
     app.use('/api/whatsapp', whatsappRoutesNewlyMounted);
 
     // Standardized error handling must follow every route registration.
