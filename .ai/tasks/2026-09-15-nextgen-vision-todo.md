@@ -401,6 +401,35 @@ earlier in this file) and other `services/aiService/`, `services/legacy/`,
 `services/platform/` files that audit flagged - not yet worked through
 one by one.
 
+### Major finding, not fixed: `recommendationBuilders.js` is ~34 functions of pure fabrication, and it's live
+Opened it to apply the same confidence-score fix and found something much
+larger. This is not "real logic plus a fake confidence label" like
+fraudDetection/creditRisk - it is wholesale fabrication. Example:
+`farmer_selection_optimization` returns the same two hardcoded farmers
+("Anil Bora", "Sunita Devi", fixed IDs/scores/margins) regardless of any
+input; `insurance_claim_validation` takes **no parameters at all** and
+returns a fixed fraud_probability/payout every time. Confirmed **live**,
+not dead code: reached via `aiAPI.generateRecommendation()` from
+`routes/nutritionIntelligenceRoutes.js`, `routes/ai/enterpriseAIRoutes.js`,
+and `routes/claude/aiDecisionRoutes.js`. 34 builder functions total,
+spanning pricing, farmer matching, insurance claims/fraud/payouts,
+greenhouse design, yield prediction, project cost estimation, scheme/CSR/
+subsidy matching, soil/fertilizer recommendations, bid evaluation,
+contract optimization, training - essentially the whole "AI recommendation"
+surface of the app in one file.
+- [ ] **Not attempted here** - too large and too domain-dependent for a
+      guess-based fix (586 lines, ~34 distinct fabricated generators, no
+      test coverage found). Each function needs one of: (a) routing
+      through the real AI coordinator like `cropRecommendationService`
+      was fixed to do, if the task is genuinely advisory/qualitative, or
+      (b) real deterministic logic against real data, if it's meant to be
+      a calculation (pricing formulas, farmer matching, insurance rules) -
+      and (b) needs real schemas/business rules this session doesn't have,
+      not invented ones. `insurance_claim_validation` and
+      `insurance_claim_assessment` in particular return fake fraud/payout
+      determinations for real insurance claims and should be treated as
+      the highest-priority functions in this file once someone picks it up.
+
 ## Immediate next action
 
 Two independent, high-value threads are now open:
