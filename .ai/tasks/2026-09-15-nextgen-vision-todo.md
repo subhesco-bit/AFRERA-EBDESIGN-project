@@ -468,6 +468,63 @@ least this cluster: real backend work needed, not a frontend rewire.
 Worth checking whether `commerceApi.js`'s callers overlap with any of the
 other ~140 missing names before repeating this per-name.
 
+## Update — 2026-09-15, sixth follow-up: finished the confidence-fabrication sweep, CI mostly green
+
+Fixed two more real fabrication instances, found the sweep's natural end,
+and fixed a second, separate CI break.
+
+- `priceOptimization.js`: removed hardcoded `confidence: 0.82`; made
+  `getCompetitorPrices()` honestly return `[]` instead of an identical
+  hardcoded price list for every product (verified the caller already
+  falls back gracefully to `currentPrice` when empty, so this is a safe
+  drop-in fix, not a guess); left `calculatePriceElasticity()` (-1.2 for
+  every product) and `calculateMarginImpact()` (fixed 0.25/0.28 margins,
+  ignoring its own arguments) with strengthened FIXME comments rather
+  than restructured - both need real historical price/demand and cost
+  data this session doesn't have.
+- `recommendationEngine.js`: the three recommendation-source functions
+  were already honest (return `[]`, genuinely unimplemented, not
+  fabricated) - but the result still attached a fake `confidence: 0.78`
+  and an explanation string that unconditionally claimed to have used
+  "purchase history, similar users, and current market conditions" even
+  though those sources never contribute anything. Removed the fake
+  confidence; the explanation now says so honestly when the list is empty.
+
+**Checked and found NOT fabricated** (worth recording so this isn't
+re-audited from scratch): `core/decisionEngine.js` and `core/erpAgents.js`,
+both flagged in the original AI-authenticity audit for hardcoded
+`confidence` values, turned out on inspection to be a real, hand-authored
+rule engine where `confidence: 0.8`/`0.85`/`0.9` are declared per-rule
+weights on real computed proposals (real cash-flow shortfalls, real
+peaking-product counts from real context data) - a legitimate design
+choice, not a fake ML score. `decisionEngine.js` even has its own comment
+recording that a *previous* session already fixed a real instance of this
+exact fabrication pattern there (a hardcoded 0.94 replaced with a real
+accuracy statistic). No change made to either file.
+
+This closes out the specific list of hardcoded-confidence files named in
+the original AI-authenticity audit earlier in this document. The two
+large, confirmed-live fabrication files (`recommendationBuilders.js`,
+`aiAgenticCompanionService.js`) remain open, flagged above, needing real
+domain data rather than a guess.
+
+**Second CI break found and fixed**: once the workflow `cache-dependency-path`
+fix (above) let jobs actually reach `npm ci`, `frontend/package-lock.json`
+turned out to be out of sync with `package.json` (missing
+`@testing-library/dom@10.4.2`, a peer dep of `@testing-library/react`) -
+`npm ci` requires exact sync and was failing every frontend-touching job.
+Reproduced locally (`rm -rf node_modules && npm ci` failed the same way),
+regenerated the lockfile with `npm install`, confirmed `npm ci` then
+succeeds from a clean `node_modules`. Backend's lockfile had no
+equivalent drift.
+
+As of this update, real CI runs on the PR: `Security Audit`, `Test GitHub
+Integration`, `Validate Claude AI Integration`, and `Claude AI Integration
+Test` all pass. `Build Verification`/frontend build still fails on the
+already-documented, pre-existing, much larger `services/api.js`
+missing-export gap (161 remaining errors, not caused by anything in this
+backlog's fixes) - tracked above, not re-documented here.
+
 ## Immediate next action
 
 Two independent, high-value threads are now open:
