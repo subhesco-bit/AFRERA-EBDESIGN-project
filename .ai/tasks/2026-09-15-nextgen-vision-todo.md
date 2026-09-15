@@ -1923,3 +1923,45 @@ particular standing lesson.
 closed). Confirmed missing-feature gaps (not wiring bugs) now also
 include `irrigationAPI` and `yieldAPI` alongside the list from the
 twenty-seventh update.
+
+## Update — 2026-09-15, twenty-ninth follow-up: marketIntelligenceAPI mounted via a different pattern, 9 more confirmed missing-feature gaps
+
+Checked 9 more candidates
+(`waterQualityAPI`/`soilTestingOpsAPI`/`fleetManagementAPI`/
+`equipmentRentalAPI`/`machineryOperationsAPI`/`implementManagementAPI`/
+`landLeaseAPI`/`shgAPI`/`publicDataAPI`): none have a real backend
+implementing their needed methods. `soilTestingService.js` (3 variants)
+exists but none export an Express router, only plain functions;
+`publicDomainDataExtractionRoutes_merged.js` is a 20-line scaffold; the
+rest (`waterQuality`, `fleet`, `equipmentRental`, `machineryOperations`,
+`implement`, `landLease`, `shg`) have no backend trace anywhere in the
+codebase under any name. Not fabricated - added to the missing-feature
+list below.
+
+`marketIntelligenceAPI` (2 methods) was a real find, but a structurally
+different one: `services/legacy/marketIntelligenceService.js` was never
+mounted anywhere, and unlike every other `services/legacy/*.js` file
+fixed this session, it doesn't export a plain Express router for
+`require(...).router` - it exports a `setupRoutes(app)` function that
+takes the whole Express `app` and mounts itself directly at the
+hardcoded `/api/v1/market-intelligence`. Called it directly from
+`index.js` (`require('./services/legacy/marketIntelligenceService.js').setupRoutes(app)`)
+rather than forcing it into the usual `require` + `app.use()` shape.
+Verified live (401 without a token, not 404) and locked in with a new
+test.
+
+Confirmed via `vite build`: error count drops from 126 to 124.
+
+**Running total this session**: 161 → 124 MISSING_EXPORT errors (37
+closed). Confirmed missing-feature gaps so far: `decisionEngineAPI`,
+`erpDashboardAPI`, `enterpriseMemoryAPI`, `climateMonitoringAPI`,
+`competitorAPI`, `platformTelemetryAPI`, `platformConfigurationAPI`,
+`mfaManagementAPI`, `informationSharingAPI`, `logisticsEnhancementAPI`,
+`irrigationAPI`, `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`,
+`fleetManagementAPI`, `equipmentRentalAPI`, `machineryOperationsAPI`,
+`implementManagementAPI`, `landLeaseAPI`, `shgAPI`, `publicDataAPI`,
+plus the ~24 field-management/harvest-scoring/most-of-pricing
+`farmersAPI` methods from the twenty-fourth update. Worth a dedicated
+follow-up task to group these by likely domain owner and scope real
+backend work, rather than continuing to check them one at a time from
+this backlog.
