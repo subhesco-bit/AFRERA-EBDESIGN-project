@@ -4,7 +4,7 @@
  */
 
 const serviceLocator = require("../core/serviceLocator");
-const logger = require("../utils/logger");
+const { logger } = require("../utils/logger");
 
 async function bootstrap() {
   try {

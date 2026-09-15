@@ -9,7 +9,7 @@
  * - Quality thresholds
  * - State-specific overrides
  */
-const logger = require('../../utils/logger');
+const { logger } = require('../../utils/logger');
 
 class RulesEngine {
   constructor() {
