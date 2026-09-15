@@ -1820,3 +1820,61 @@ shaped names) hasn't been checked against the backend at all yet and may
 turn out to be genuine missing-feature gaps like the farmersAPI methods
 in the twenty-fourth update, not simple wiring fixes - each needs the
 same verify-before-wire treatment, not a bulk guess.
+
+## Update — 2026-09-15, twenty-seventh follow-up: 5 more scaffold swaps + API exports (133 → 127), 2 more confirmed missing-feature gaps
+
+Continued down the "remaining next candidates" list from the twenty-sixth
+update. Confirmed real, matching backends and wired all 5:
+`glutWarningAPI`, `foluBenchmarkAPI`, `wikipediaAPI`, `foluAPI`,
+`freightPoolingAPI`. Four of the five needed a backend scaffold swap
+first (`glutWarningRoutes.js`, `foluBenchmarkRoutes.js`,
+`wikipediaRoutes.js`, `foluRoutes.js` - all confirmed 38-line
+`'Route operational'` placeholders with real `_merged.js` implementations
+sitting unmounted next to them, same pattern as every earlier swap this
+session); `freightPoolingRoutes.js` (the flat, already-mounted file)
+turned out to already be the real implementation, identical to its own
+unmounted `logistics/freightPoolingRoutes_merged.js` sibling - only the
+frontend export was missing for that one. Every method and parameter
+name checked directly against each route file's own
+`req.query`/`req.params`/`req.body` destructuring (glutWarningAPI's
+`categoryId`/`stateId` query params, freightPoolingAPI.joinPoolWindow's
+`shipmentId` body field, etc), not guessed.
+
+Checked 3 more candidates and ruled all out as real, not simple, gaps:
+- `platformTelemetryAPI` (needs `getAnalytics`/`getStatus`) - real
+  backend (`platformTelemetryRoutes.js`) is itself a scaffold, `POST /`
+  and `GET /health` only.
+- `platformConfigurationAPI` (needs `applyConfiguration`/
+  `getRecommendations`) - same, `platformConfigurationRoutes_merged.js`
+  is a 20-line scaffold, health-check only.
+- `mfaManagementAPI` (needs `getDevices`/`createDevice`/`updateDevice`/
+  `deleteDevice` - device CRUD) - real backend (`mfaRoutes_merged.js`)
+  exists and is real, but implements a completely different MFA
+  lifecycle (`/status`, `/setup`, `/verify`, `/disable`) with no device
+  concept at all.
+- `informationSharingAPI` (22 methods - documents, folders, permissions,
+  collaboration sessions) - real backend
+  (`platform/informationSharingRoutes_merged.js`) is a generic 5-endpoint
+  CRUD placeholder (`GET /`, `GET /:id`, `POST /`, `PUT /:id`,
+  `DELETE /:id`), nothing resembling documents/folders/permissions/
+  collaboration at all.
+- `logisticsEnhancementAPI` (19 methods - fleet/vehicle/warehouse/
+  temperature/geofence tracking) - both `logisticsEnhancementRoutes.js`
+  and `logisticsEnhancementRoutes_merged.js` are scaffolds; searched the
+  whole backend for a fleet/vehicle-tracking service under any name and
+  found none (only `warehouseManagementService.js`, which covers warehouses
+  but none of the fleet/vehicle/temperature/geofence surface this API
+  needs).
+
+Confirmed via `vite build`: error count drops from 133 to 127.
+
+**Running total this session**: 161 → 127 MISSING_EXPORT errors (34
+closed across the twenty-sixth and twenty-seventh updates), plus the
+backend-side scaffold-swap and route-registration-bug count from earlier
+updates. Confirmed missing-feature gaps found so far (not wiring bugs,
+need real backend work): `decisionEngineAPI`, `erpDashboardAPI`,
+`enterpriseMemoryAPI`, `climateMonitoringAPI`, `competitorAPI`,
+`platformTelemetryAPI`, `platformConfigurationAPI`, `mfaManagementAPI`,
+`informationSharingAPI`, `logisticsEnhancementAPI`, plus the ~24
+field-management/harvest-scoring/most-of-pricing `farmersAPI` methods
+from the twenty-fourth update.
