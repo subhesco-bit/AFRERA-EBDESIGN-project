@@ -1,14 +1,25 @@
 import { api } from './apiClient';
+import config from '../config/env';
+
+// apiClient's `api` instance is based at config.API_URL (".../api/v1"), but
+// the backend mounts the real auth router unversioned at /api/auth (see
+// backend/src/index.js - app.use('/api/auth', authRoutes) - along with the
+// large majority of routes; only a handful use /api/v1/*). A relative
+// '/auth/login' here would resolve to ".../api/v1/auth/login", which
+// doesn't exist. axios ignores baseURL when the request url is itself
+// absolute, so auth calls build their own absolute URL against the same
+// origin instead.
+const AUTH_BASE = `${config.API_URL.replace(/\/api\/v1\/?$/, '')}/api/auth`;
 
 export const authAPI = {
-  register: (data) => api.post('/auth/register', data),
-  login: (data) => api.post('/auth/login', data),
-  logout: (data) => api.post('/auth/logout', data),
-  refresh: (data) => api.post('/auth/refresh', data),
-  getMe: () => api.get('/auth/me'),
-  setup2FA: (userId) => api.post('/auth/2fa/setup', { user_id: userId }),
-  verify2FA: (userId, code) => api.post('/auth/2fa/verify', { user_id: userId, code }),
-  disable2FA: (userId, password) => api.post('/auth/2fa/disable', { user_id: userId, password }),
+  register: (data) => api.post(`${AUTH_BASE}/register`, data),
+  login: (data) => api.post(`${AUTH_BASE}/login`, data),
+  logout: (data) => api.post(`${AUTH_BASE}/logout`, data),
+  refresh: (data) => api.post(`${AUTH_BASE}/refresh`, data),
+  getMe: () => api.get(`${AUTH_BASE}/me`),
+  setup2FA: (userId) => api.post(`${AUTH_BASE}/2fa/setup`, { user_id: userId }),
+  verify2FA: (userId, code) => api.post(`${AUTH_BASE}/2fa/verify`, { user_id: userId, code }),
+  disable2FA: (userId, password) => api.post(`${AUTH_BASE}/2fa/disable`, { user_id: userId, password }),
 };
 
 export const dashboardAPI = {

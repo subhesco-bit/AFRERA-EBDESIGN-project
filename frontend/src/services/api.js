@@ -4121,7 +4121,7 @@ export const visionAPI = {
   manageVision: (data) => api.post('/vision/manage', data),
 };
 
-export void visualizationAPI = {
+export const visualizationAPI = {
   getVisualization: () => api.get('/visualization'),
   manageVisualization: (data) => api.post('/visualization/manage', data),
 };
@@ -4131,7 +4131,7 @@ export const viticultureAPI = {
   manageViticulture: (data) => api.post('/viticulture/manage', data),
 };
 
-export const void warehouseAPI2 = {
+export const warehouseAPI2 = {
   getWarehouse: () => api.get('/warehouse'),
   manageWarehouse: (data) => api.post('/warehouse/manage', data),
 };
@@ -4211,7 +4211,7 @@ export const zooAPI = {
   manageZoo: (data) => api.post('/zoo/manage', data),
 };
 
-export default api;
+export const jurisdictionAPI = {
   getJurisdictions: () => api.get('/jurisdictions'),
   getJurisdiction: (id) => api.get(`/jurisdictions/${id}`),
 };
@@ -5316,3 +5316,5 @@ export const warningAPI = {
   resetWarningMetrics: () => api.post('/warnings/metrics/reset'),
   getWarningHealth: () => api.get('/warnings/health'),
 };
+
+export default api;
