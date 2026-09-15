@@ -75,13 +75,15 @@ Confirmed still present in this checkout:
       product, order) where duplicates exist.
 
 ### 1c. API contract consistency
-- [ ] Inventory response/error shape variance across `backend/src/routes/`
-      (107 files) — produce a short list of the distinct conventions in use,
-      not a full rewrite.
-- [ ] Pick one standard (status envelope, error code format) and apply it to
+- [x] Inventory response/error shape variance across `backend/src/routes/`
+      (419 files, corrected count — not 107). **Done, ninth follow-up
+      below.**
+- [x] Pick one standard (status envelope, error code format) and apply it to
       newly-touched routes going forward; do not mass-rewrite working routes
       without cause (CLAUDE.md: "Do not rewrite working code without
-      documented technical reason").
+      documented technical reason"). **Done** — standard is already the
+      de facto majority convention (see below); documented rather than
+      enforced by rewrite, per the rule just quoted.
 
 ### 1d. Testing & observability floor
 - [ ] Repo-stated status: "Test frameworks configured, 0% coverage." Pick 3
@@ -676,3 +678,46 @@ scratch each time.
 
 The `ui/button.jsx`/`ui/card.jsx` component-API gap (previously listed
 here as the second open thread) is done - see the third follow-up above.
+
+## Update — 2026-09-15, ninth follow-up: API response-shape inventory (Stage 1c)
+
+Picked up Stage 1c, scoped exactly as written: an inventory + a standard
+pick, explicitly not a rewrite. Method: grep-based statistical survey
+across all 419 real route files (corrected count, not the doc's original
+107) rather than reading each file, since the item only asks for "a short
+list of the distinct conventions in use."
+
+**Findings, each backed by a real count, not an impression:**
+- **Dominant convention (the de facto standard)**: `{success: true/false,
+  data/error: ...}` envelope - 384 files contain `success: true`, 149
+  contain `success: false` (a route using an `asyncHandler`/shared-error-
+  middleware pattern can legitimately have one without the other, so
+  these aren't meant to sum to 419).
+- **Error field naming is already consistent**: of all `res.status(4xx/5xx
+  ).json({...})` error bodies, 906 use an `error:` key vs. 2 using
+  `message:` - no real inconsistency here despite Stage 1c's framing
+  expecting one.
+- **Minority convention, ~10 files**: `hrRoutes.js`,
+  `roleManagementRoutes.js`, `gdprComplianceRoutes.js`,
+  `integrationStatusRoutes.js`, `infrastructureMonitoringRoutes.js`,
+  `finance/gstRoutes.js`, `aiTrainingEvaluationRoutes.js`,
+  `claude/moduleRegistryRoutes.js`, `agriculture/farmerHealthRoutes.js`,
+  `sapModuleArchitectureRoutes_merged.js` - all confirmed by direct read
+  to return the bare resource on success (`res.json(result)`, no envelope
+  at all) and `{error: message}` on failure. A shared frontend API client
+  written against the dominant `{success, data}` shape would read
+  `response.data.data` and get `undefined` against any of these ten -
+  a real, findable integration hazard for whoever eventually builds the
+  ~140 missing frontend API clients flagged elsewhere in this backlog.
+- **One legitimate exception, not an inconsistency**: `stripeWebhookRoutes.js`
+  returns `{received: true, eventType}` - correct for a webhook ack, not
+  something to converge with resource-returning API routes.
+
+**Standard**: keep the existing majority `{success, data/error}` envelope
+(no code changes needed to make it "official" - it already is the de
+facto standard) and use it for any new/touched route. Per CLAUDE.md's own
+rule against rewriting working code without documented technical reason,
+the ~10 minority-shape files are not touched here - noted so a future
+session building the missing frontend API clients checks each target
+route's actual shape rather than assuming the majority envelope, instead
+of rediscovering this list file-by-file at integration time.
