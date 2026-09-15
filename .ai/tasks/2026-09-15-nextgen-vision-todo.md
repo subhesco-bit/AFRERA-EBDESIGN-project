@@ -1094,3 +1094,49 @@ mounted globally for every logged-in user) that were completely
 non-functional end-to-end - wrong frontend methods calling paths that
 didn't exist, backed by services that weren't mounted even if they had -
 are now wired correctly on both ends.
+
+## Update — 2026-09-15, fifteenth follow-up: closed out the services-sweep - domain subfolders are stale duplicates, deliberately untouched
+
+Finished the "natural next sweep" flagged at the end of the thirteenth
+update: `services/<domain>/*.js` (non-legacy subfolders - `agriculture/`,
+`ai/`, `commerce/`, `finance/`, `food/`, `logistics/`, `platform/`, plus
+a few `<name>Service>/index.js` package-style folders). Found ~50 more
+files exporting a real `router`.
+
+**Checked every one against `legacy/` and root before considering
+mounting any of them** (same discipline as the thirteenth/fourteenth
+updates) - and every single one had a same-named duplicate already in
+`services/legacy/` or root `services/`. Diffed a representative sample
+across domains to confirm this wasn't a coincidence of naming:
+- `commerce/orderService.js` vs the already-mounted `legacy/orderService.js`:
+  missing the `if (!pg) throw new Error('Database connection not
+  available')` guard added in the tenth update - the domain-folder copy
+  predates that real fix.
+- `agriculture/biodiversityService.js` vs `legacy/biodiversityService.js`:
+  missing `requireRole`/`PLATFORM_STAFF_ROLES` role-based access control
+  present in the legacy version - a real security difference, not just
+  formatting.
+- `platform/multilingualService.js` vs the already-mounted
+  `legacy/multilingualService.js`: carries extra test-mock-reassignment
+  code not in the canonical version.
+
+**Conclusion: these domain subfolders are an older, frozen snapshot**,
+not independent implementations and not currently-active work - `git log`
+on all three sampled files shows only one shared commit
+(`c39316fe`, "RECOVER: Extract 2,699 genuinely-new files from old
+branches/worktrees"), a batch archival/recovery commit, not recent or
+ongoing edits. The `legacy/` copies are demonstrably the ones that have
+kept receiving real fixes since. **Deliberately not mounted or modified**:
+mounting a domain-folder duplicate would serve a strictly worse (missing
+security controls, missing bug fixes) version of something already
+correctly mounted from `legacy/` in the thirteenth/fourteenth updates,
+and this repo already carries real, separate work from another AI
+session (documented earlier in this backlog) that these older snapshots
+could plausibly intersect with - reorganizing or touching them isn't this
+sweep's call to make.
+
+This closes the "real service, never mounted" investigation thread for
+now: `legacy/` and root-level `services/*.js` are fully swept (thirteenth
+and fourteenth updates), and the domain-subfolder duplicates are
+confirmed stale and correctly left alone. Nothing further to mount along
+this specific line of investigation.
