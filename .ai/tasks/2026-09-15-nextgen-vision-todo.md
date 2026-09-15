@@ -1388,3 +1388,65 @@ available"` errors (not raw TypeErrors) on every endpoint checked.
 `npm run build` error count: 155 → 143, the single largest drop from one
 fix in this whole backlog thread (farmersAPI was imported by more pages
 than any other single missing export).
+
+## Update — 2026-09-15, twenty-first follow-up: `_merged.js` is a whole naming convention, not a one-off - 15 more real routers mounted
+
+`routes/farmerRoutes_merged.js` (twentieth update) and
+`routes/marketplaceEnhancements_merged.js` (already known-real from
+earlier this session) turned out not to be isolated cases:
+`find routes -iname "*_merged.js"` found **97 files** using this exact
+naming convention, 96 of them unmounted anywhere.
+
+**Filtered before touching anything**, since the pattern isn't uniform:
+- ~35 of the 96 are themselves auto-generated placeholders with `_merged`
+  just appended to the module name (confirmed by reading a sample,
+  e.g. `climateAdvisoryRoutes_merged.js` - 20 lines, "Placeholder route
+  module", identical shape to the scaffold it would "replace"). Filtered
+  out mechanically: kept only candidates at least 20 lines larger than
+  the scaffold currently mounted under the same name.
+- Of the ~24 that passed that filter, checked each with an isolated
+  `require()`: 4 threw real errors (`decisionSupportRoutes_merged.js`,
+  `pigRoutes_merged.js`, `sheepRoutes_merged.js`: "protect(Livestock)Router
+  is not a function"; `weatherRoutes_merged.js`: "queryValidator is not a
+  function") - genuine bugs in those specific files (likely a missing or
+  renamed middleware import), **not mounted, not fixed here** - a
+  different, real bug to chase separately, not something to paper over.
+- The remaining candidates not yet individually re-verified after the
+  script timeout (`seedVaultRoutes_merged.js`,
+  `libraryRoutes_merged.js`, `platformCoreRoutes_merged.js`,
+  `riskPricingRoutes_merged.js`, `poultryRoutes_merged.js`,
+  `aiOperationIntelligenceRoutes_merged.js`,
+  `completeAIIntegrationRoutes_merged.js`, and several smaller ones)
+  are flagged for the next pass, not assumed either way.
+
+**Mounted 15 confirmed-clean, confirmed-substantial swaps** (same
+require-path-only pattern as every prior scaffold swap):
+`logisticsEnhancements`, `projectSystemsRoutes`,
+`ecommerceMarketingRoutes`, `aiBrainRoutes`, `farmerPortalEnhancements`
+(land records, crop plans, government-data sync - a large real farmer
+subsystem), `aiSelfHealingRoutes`, `insuranceEnhancements`,
+`recoveredFinanceRoutes`, `nutrientValueSalesRoutes`, `unifiedAIRoutes`,
+`visionRoutes`, `marketplaceEnhancements`, `regionalVarietyRoutes`,
+`dprGenerationRoutes`, `ecommerceBusinessSalesRoutes`.
+
+**Verified**: `node -c` clean; eslint clean; a synchronous
+`require('./src/index.js')` (running every one of these swapped
+requires as part of the full app) printed "LOAD ATTEMPT COMPLETED"
+without throwing - the process not exiting afterward is the same
+pre-existing Redis-connection hang already documented in the thirteenth
+update, confirmed unrelated by isolating and individually
+require()-testing all 15 files first (each completes in well under a
+second on its own). A combined standalone smoke test across 4 of the 15
+(`farmerPortalEnhancements`, `marketplaceEnhancements`, `aiBrainRoutes`,
+`insuranceEnhancements`) confirmed real auth enforcement (401 without a
+token) and clean error handling with no database connected - one even
+surfaced a clearer error message than this session's own pattern
+("PostgreSQL pool is not initialised. Call database/connection.initialize()
+during boot before serving requests.").
+
+**Not done in this update, flagged for next time**: the 4 confirmed-broken
+merged files (real bugs, not mounted); the ~8 not-yet-individually-verified
+substantial candidates; and a fresh `npm run build` error count (frontend
+API client wiring for any of these 15 newly-real backends wasn't checked
+in this update - that's its own investigation per file, same as
+`farmersAPI`/`productsAPI` before it).
