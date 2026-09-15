@@ -7,7 +7,14 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { getPostgreSQL } = require('../database/connection');
 const libraryKnowledgeService = require('../services/libraryKnowledgeService');
 const unifiedConfigService = require('../services/unifiedConfigService');
-const aiCollaborationService = require('../services/aiCollaborationService');
+// services/aiCollaborationService.js (note the path) is a generic scaffold
+// stub (`// TODO: Implement main business logic`, no logWork method) - the
+// real, complete implementation logWork() etc. rely on is a sibling file
+// at services/claude/aiCollaborationService.js. Every call this class makes
+// to this.aiCollaboration.logWork(...) would throw TypeError: logWork is
+// not a function with the old path, before this.anthropic.messages.create()
+// (the actual LLM call) is ever reached.
+const aiCollaborationService = require('../services/claude/aiCollaborationService');
 const aiFeedbackService = require('../services/aiFeedbackService');
 
 class ClaudeAICoordinator {

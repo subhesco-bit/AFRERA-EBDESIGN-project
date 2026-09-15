@@ -28,7 +28,11 @@ const { logger } = require('../../utils/logger');
 const fetch = require('node-fetch');
 const claudeAICoordinator = require('../../core/claudeAICoordinator');
 const libraryKnowledgeService = require('../../services/libraryKnowledgeService');
-const aiCollaborationService = require('../../services/aiCollaborationService');
+// See claudeAICoordinator.js: '../../services/aiCollaborationService' is a
+// generic scaffold stub with no logWork() method; the real implementation
+// this file's aiCollaborationService.logWork(...) calls need is the
+// sibling file in this same directory.
+const aiCollaborationService = require('./aiCollaborationService');
 
 // Import original service for compatibility
 const originalAIBackboneService = require('../legacy/aiBackboneService');
