@@ -57,3 +57,32 @@ export const voiceAIAPI = {
   sendCommand: (data) => api.post(`${VOICE_AI_BASE}/voice-commands`, data),
   endSession: (sessionId) => api.post(`${VOICE_AI_BASE}/voice-sessions/${sessionId}/end`),
 };
+
+// 2026-09-16: components/FarmerPortal/LandRecords.jsx's getLandRecords/
+// addLandRecord/syncGovernmentLandRecords calls had no client at all
+// (MISSING_EXPORT build error). services/legacy/landRecordsService.js
+// (real, land_records-table-backed) already had a real router
+// (routes/landRecordsRoutes.js, mounted at /api/landrecords in index.js
+// since 2026-08-29) matching all 3 calls and their exact response shapes
+// (getFarmerLandRecords returns {records, totals, pagination};
+// syncWithGovernmentLandRecords returns {syncedCount, ...}) - just never
+// had a frontend client written.
+const LAND_RECORDS_BASE = `${config.API_URL.replace(/\/api\/v1\/?$/, '')}/api/landrecords`;
+
+export const farmerPortalAPI = {
+  getLandRecords: (params) => api.get(LAND_RECORDS_BASE, { params }),
+  addLandRecord: (data) => api.post(LAND_RECORDS_BASE, data),
+  syncGovernmentLandRecords: () => api.post(`${LAND_RECORDS_BASE}/sync-government`),
+};
+
+// 2026-09-16: components/common/ModuleOperationPanel.jsx's own header
+// comment claims a real bridge at /api/v1/backend-modules/:moduleId/:operation
+// (backendModuleBridge.js) - checked directly: routes/claude/backendModuleBridge.js
+// is a 20-line placeholder exposing only GET /health, nothing resembling
+// getOperations/execute. Confirmed dead, not just unwired - same
+// wrong-table-binding-adjacent class of gap as the modules/ tree names in
+// api.js. Exported empty (not fabricated) so the build succeeds; every
+// page using this generic panel already handles a load/execute error via
+// loadError / its catch handler, so failing loudly at the call site is
+// the correct, already-supported behavior.
+export const moduleAPI = {};

@@ -6661,6 +6661,58 @@ export const platformTelemetryAPI = {
 // services/advancedMedicalCodingService.js (mounted at
 // /api/v1/advanced-medical-coding in index.js specifically to match this
 // page - see the fourteenth TODO backlog update).
+// 2026-09-16: the 31 names below were the last remaining MISSING_EXPORT
+// build errors after this session's wiring pass (started at 161).
+// Every one was individually checked against real backend method names
+// (not filename matches) - full per-name investigation trail is in
+// .ai/tasks/AGENT_ASSIGNMENTS.md and .ai/tasks/2026-09-15-nextgen-vision-todo.md
+// (Updates 33-38). Two categories, both genuinely blocked on new backend/
+// product work rather than a wiring fix:
+//   - ~16 trace to backend/src/modules/ (the M0xx scaffold tree): the
+//     routes/controller shape often matches the frontend, but every
+//     module's service.js hardcodes `this.table` to a completely wrong,
+//     unrelated table (e.g. M141 Orchard -> `releases`), with model.sql
+//     an empty placeholder - not safe to wire without a real migration.
+//   - The rest have no matching backend implementation anywhere in the
+//     codebase, confirmed directly (not by absence of a filename match).
+// Exported as empty objects rather than left undefined so the static
+// build (which fails the whole bundle on any missing export, not just
+// the page that needs it) can succeed - each page's own calls into these
+// still fail loudly at the one call site that needs them, same as
+// pestForecastingAPI above, rather than silently returning fabricated
+// data. Do not add methods here without a confirmed real backend route.
+export const assetLifecycleAPI = {};
+export const breakdownMaintenanceAPI = {};
+export const climateMonitoringAPI = {};
+export const competitorAPI = {};
+export const decisionEngineAPI = {};
+export const enterpriseMemoryAPI = {};
+export const equipmentInventoryAPI = {};
+export const equipmentRentalAPI = {};
+export const fleetManagementAPI = {};
+export const fuelManagementAPI = {};
+export const governmentAPI = {};
+export const implementManagementAPI = {};
+export const irrigationAPI = {};
+export const medicalCodingAPI = {};
+export const nutritionIntelligenceAPI = {};
+export const operationsAPI = {};
+export const orchardAPI = {};
+export const pondAPI = {};
+export const preventiveMaintenanceAPI = {};
+export const pushNotificationsAPI = {};
+export const rainwaterHarvestingAPI = {};
+export const securityAccessControlAPI = {};
+export const shgAPI = {};
+export const soilTestingOpsAPI = {};
+export const sparePartsAPI = {};
+export const userManagementAPI = {};
+export const waterAnalyticsAPI = {};
+export const waterBudgetingAPI = {};
+export const waterQualityAPI = {};
+export const watershedManagementAPI = {};
+export const yieldAPI = {};
+
 export { api };
 
 export default api;

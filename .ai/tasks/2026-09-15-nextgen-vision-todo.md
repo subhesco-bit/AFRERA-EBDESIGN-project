@@ -2699,3 +2699,24 @@ route/middleware/service suite still 188/188 passing alongside it (same
 6 pre-existing empty-stub suites, unrelated, untouched). See
 `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16 (server boot-crash bug)"
 section for full detail.
+
+## Update 40 — vite build fully green (0 MISSING_EXPORT errors)
+
+Closed out the frontend build blocker that's been red since this PR's
+first commit. The 31 names Update 38 finished investigating (all
+confirmed: no matching backend, either the `modules/` tree's
+wrong-table-binding problem or nothing anywhere) got explicit empty-object
+exports in `api.js` - extends the `pestForecastingAPI = {}` convention
+already established earlier this session, so the build's static
+export-existence check passes without fabricating any method. `npm run
+build` then surfaced 2 more gaps in a second file the api.js-only diff
+script doesn't cover, `componentApi.js`: `farmerPortalAPI` turned out to
+be a real, already-mounted match (`landRecordsRoutes.js` ->
+`landRecordsService.js`, matching all 3 needed methods and their exact
+response shapes - wired for real, new test added); `moduleAPI` confirmed
+dead (`backendModuleBridge.js` is a 20-line `GET /health`-only
+placeholder despite the calling component's own comment claiming
+otherwise) - empty-object export, same as the 31.
+
+`npm run build` now exits 0. Full detail in `AGENT_ASSIGNMENTS.md`'s
+"Update — 2026-09-16 (vite build now fully green, 0 errors)" section.
