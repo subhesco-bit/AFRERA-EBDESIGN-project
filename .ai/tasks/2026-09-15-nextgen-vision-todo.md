@@ -2700,6 +2700,19 @@ route/middleware/service suite still 188/188 passing alongside it (same
 `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16 (server boot-crash bug)"
 section for full detail.
 
+## Update 46 — removed the 6 "pre-existing empty-stub" junk files for good
+
+Finally investigated the "6 pre-existing empty-stub test suites,
+unrelated" caveat repeated in nearly every test-run note this session
+instead of continuing to work around it. They weren't test files at
+all - 6 misplaced 12-line "Route operational" scaffold routers sitting
+in `__tests__/` with a `.test.js` extension (confirmed via
+`git log --follow`: all from commit `441c87e4`, 2026-09-10, predating
+this PR). Jest correctly errored on each for having zero actual tests.
+Confirmed nothing references them, deleted all 6. Backend suite is now
+**33/33 passing, 247/247 tests, zero failures** for the first time this
+whole session.
+
 ## Update 45 — severe real bug: the entire AI collaboration API was unreachable
 
 Generalized the masking-bug hunt into a general-purpose check: compared

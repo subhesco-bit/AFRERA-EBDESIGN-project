@@ -1337,6 +1337,31 @@ known instances of "route registrations silently swallowed" (missing
 brace/semicolon, and the stray-CR variant of the same root problem) as
 fully investigated and fixed wherever they exist in this codebase today.
 
+## Update — 2026-09-16 (removed 6 junk files that weren't tests at all)
+
+The "6 pre-existing empty-stub test suites, unrelated" caveat has been
+repeated in nearly every test-run note across this whole session's work
+- finally investigated what they actually were instead of continuing to
+work around them. `src/routes/__tests__/{waterSoilManagementRoutes,
+platformFoundationRoutes,operationsMachineryRoutes,livestockFisheriesRoutes,
+enterpriseCommerceSafety,climateRoutes}.test.js` are not test files at
+all - each is the exact same 12-line "Route operational" Express-router
+scaffold seen throughout this codebase's `modules/`/`routes/` trees,
+just misplaced inside a `__tests__/` directory with a `.test.js`
+extension (`git log --follow` confirms all 6 are from commit `441c87e4`,
+2026-09-10, an earlier automated batch-fix commit - predates this PR
+entirely). Jest picks them up as test suites (matching `*.test.js`) and
+correctly errors "Your test suite must contain at least one test" since
+they contain zero `describe`/`test`/`it` blocks - the exact 6 failures
+that have shown up in every single test run this whole PR.
+
+Confirmed via `grep -rl` that nothing anywhere requires or imports any
+of these 6 files by name, and via `git log --follow` that they predate
+this session. Deleted (test files are explicitly "SAFE TO MODIFY" per
+CLAUDE.md, and these were never real tests to begin with). Backend test
+suite is now **33/33 suites passing, 247/247 tests, zero failures** -
+the first fully clean run this whole session.
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a
