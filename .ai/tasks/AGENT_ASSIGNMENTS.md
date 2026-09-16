@@ -1042,6 +1042,78 @@ against `TEST_DATABASE_URL`/`DATABASE_URL` - no PostgreSQL running in
 this sandbox, a pre-existing environment limitation unrelated to this
 diff, not a regression from this change.
 
+## Update — 2026-09-16 (weatherRoutes_merged.js wired - the last documented follow-up)
+
+Closed out the one remaining item this PR's own description had flagged
+as a distinct, deeper follow-up (not more wiring): `weatherRoutes_merged.js`
+imports 9 named request-validation helpers
+(`bodyValidator`/`queryValidator`/`date`/`dateTime`/`enumValue`/
+`numberValue`/`fail`/`invalid`/`requestId`) from `climateRouteSupport.js`,
+which was a 12-line placeholder (just `GET /health`) - so requiring
+`weatherRoutes_merged.js` always threw and it was never mounted.
+
+This is generic request-validation plumbing, not business logic - each
+function's exact contract was derived directly from how
+`weatherRoutes_merged.js` already calls it (e.g. `numberValue`/
+`enumValue` must tolerate `undefined` and skip validation, confirmed by
+checking `weatherService.recordForecast` itself: it defaults a missing
+`provider` to `'imd'` server-side rather than requiring one). Wrote the
+real implementations in `climateRouteSupport.js` - `invalid()`/`fail()`
+for consistent 400/500 JSON error responses, `numberValue`/`enumValue`/
+`date`/`dateTime` for field validation (all optional-by-default,
+matching every real call site), `bodyValidator`/`queryValidator` to wrap
+a validator function as Express middleware, `requestId()` to build a
+signalBus correlation ID from the request's own `req.id` (already set
+globally by `middleware/requestId.js`, a *different*, pre-existing file
+of the same common name - no collision, just wired together for the
+first time). Preserved the original `GET /health` router as `.router` on
+the same module, since `index.js` already did
+`app.use('/api/climateroutesupport', climateRouteSupport.router)` -
+missing this would have broken an existing, working mount.
+
+`weatherRoutes_merged.js` itself was already fully real - all 9 handlers
+call genuine, already-exported `services/legacy/weatherService.js`
+methods (`coverage`, `weatherForArp`, `recordObservation`,
+`recordForecast`, `scoreForecasts`, `forecastAccuracy`, `raiseAlert`,
+`activeDispatchBlocks`, `dispatchCheck`, `pestForecast`,
+`getAdvisoryTriggers` - all confirmed present in that file's own
+`module.exports`), and its `rateLimiters`/`signalBus` imports were
+already real too. Swapped `index.js`'s `weatherRoutes` require from
+`./routes/weatherRoutes.js` (a 38-line "Route operational" scaffold) to
+`./routes/weatherRoutes_merged.js`, same `/api/weather` mount - the same
+scaffold-swap pattern used repeatedly earlier this session. Added a
+`dynamicRouteLoader.js` exclusion for the now-orphaned flat
+`weatherRoutes.js` (same reasoning/pattern as the `organizationManagementRoutes.js`/
+`farmerTrainingRoutes.js` exclusions above) so the dead scaffold can't
+get auto-rediscovered at a different path;
+`routes/agriculture/weatherRoutes.js` is a different, unrelated file and
+stays discoverable, same distinction `farmerTrainingRoutes.js`'s
+exclusion already draws for its own `agriculture/` sibling.
+
+Verified: `node -c` clean on all 4 touched files; eslint clean; a
+standalone Express smoke test of `weatherRoutes_merged.js` confirms real
+validation behavior end-to-end (missing required query params -> 400
+with the real message; `days=abc` -> "days must be a number"; `days=500`
+-> "days must be <= 120"; unauthenticated writes -> 401, never reaching
+body validation or the DB); a direct check that
+`require('./climateRouteSupport.js').router` is a real Express router
+and `app.use('/api/climateroutesupport', that)` doesn't throw (the exact
+pattern `index.js` uses). New test file `climateRouteSupport.test.js`
+(25 tests, all passing) unit-tests every exported function directly -
+caught one real bug before commit: `fail()`'s `statusCode = 500` default
+parameter silently overrode the documented fall-back-to-`error.status`
+behavior whenever a caller omitted the 5th argument (no real call site
+in this codebase currently does, but the function's own doc comment
+promised that fallback) - fixed by dropping the default so
+`statusCode || error.status || 500` behaves as documented. A full
+`node src/index.js` boot smoke test still can't reach the mounting phase
+within a usable timeout in this sandbox (no PostgreSQL running - a
+pre-existing, already-documented limitation, not something this change
+introduces), so the `.router`-property check above is the closest
+available substitute for confirming the real mount line doesn't throw.
+217/217 real backend tests pass (same 6 pre-existing empty-stub suites,
+unrelated).
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a

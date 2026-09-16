@@ -603,6 +603,14 @@ class DynamicRouteLoader {
     if (filePath.endsWith(`${path.sep}farmerTrainingRoutes.js`) && !filePath.includes(`${path.sep}agriculture${path.sep}`)) {
       return false;
     }
+    // 2026-09-16: same reasoning again - weatherRoutes.js (flat) was a dead
+    // 'Route operational' scaffold, swapped out in index.js for the real
+    // weatherRoutes_merged.js (same pattern as wikipediaRoutes.js above -
+    // routes/agriculture/weatherRoutes.js is a different, unrelated file
+    // and stays discoverable).
+    if (filePath.endsWith(`${path.sep}weatherRoutes.js`) && !filePath.includes(`${path.sep}agriculture${path.sep}`)) {
+      return false;
+    }
     return true;
   }
 

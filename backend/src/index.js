@@ -26,7 +26,15 @@ const yieldManagement = require('./routes/yieldManagement.js');
 // 2026-09-15: was a 38-line 'Route operational' scaffold. wikipediaRoutes_merged.js
 // is a real Wikipedia lookup/summary implementation with its own router.
 const wikipediaRoutes = require('./routes/wikipediaRoutes_merged.js');
-const weatherRoutes = require('./routes/weatherRoutes.js');
+// 2026-09-16: was require('./routes/weatherRoutes.js'), a 38-line
+// 'Route operational' scaffold. weatherRoutes_merged.js is the real
+// implementation over services/legacy/weatherService.js (real
+// Postgres-backed observations/forecasts/alerts) - it existed all along
+// but couldn't be require()'d: it depends on 9 request-validation
+// helpers from climateRouteSupport.js that never existed until now
+// (that file was itself a 12-line placeholder). Both fixed together;
+// swapped to the real router at the same /api/weather mount.
+const weatherRoutes = require('./routes/weatherRoutes_merged.js');
 const weatherAdvisory = require('./routes/weatherAdvisory.js');
 const wearableIntegrationRoutes = require('./routes/wearableIntegrationRoutes.js');
 const waterManagementRoutes = require('./routes/waterManagementRoutes.js');

@@ -2720,3 +2720,32 @@ otherwise) - empty-object export, same as the 31.
 
 `npm run build` now exits 0. Full detail in `AGENT_ASSIGNMENTS.md`'s
 "Update — 2026-09-16 (vite build now fully green, 0 errors)" section.
+
+## Update 41 — weatherRoutes_merged.js wired (the last flagged follow-up)
+
+Closed the one remaining item this PR's own description had called out
+as a distinct, deeper gap (not more wiring): `climateRouteSupport.js`
+was a 12-line placeholder, but `weatherRoutes_merged.js` (itself already
+fully real, calling genuine `weatherService.js` methods throughout)
+imports 9 named request-validation helpers from it, so it always threw
+at require time and stayed unmounted. Wrote the real validators -
+generic request-validation plumbing (date/enum/number field checks, a
+uniform error responder, Express middleware wrappers), not business
+logic - with each function's contract derived directly from how
+`weatherRoutes_merged.js` already calls it. Preserved the file's
+original `GET /health` router as `.router` since `index.js` already
+depended on `climateRouteSupport.router` for an existing mount. Swapped
+`index.js`'s `weatherRoutes` require to the real `_merged.js` file (same
+`/api/weather` path, same scaffold-swap pattern used repeatedly this
+session) and excluded the now-orphaned flat scaffold from
+`dynamicRouteLoader.js`'s auto-discovery.
+
+New test file `climateRouteSupport.test.js` (25 unit tests) caught one
+real bug before commit - `fail()`'s default parameter silently
+overrode its own documented fallback-to-`error.status` behavior - fixed.
+A standalone Express smoke test confirms real end-to-end validation
+behavior (bad params -> 400 with the real message, unauthenticated
+writes -> 401 before ever reaching the DB). 217/217 real backend tests
+pass. Full detail in `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16
+(weatherRoutes_merged.js wired - the last documented follow-up)"
+section.
