@@ -57,6 +57,19 @@ class ServiceError extends AppError {
   }
 }
 
+// 2026-09-16: 313 files under backend/src/modules/ destructure this class
+// from this file and throw it (`new DatabaseError(message)`) on a query
+// failure, but it was never defined or exported here - every one of
+// those catch blocks threw `TypeError: DatabaseError is not a
+// constructor` instead of the intended error, masking the real
+// underlying failure. Confirmed via a full local jest run: this single
+// missing export accounted for 3130 of that run's failing assertions.
+class DatabaseError extends AppError {
+  constructor(message) {
+    super(message, 500, 'DATABASE_ERROR');
+  }
+}
+
 module.exports = {
   AppError,
   ValidationError,
@@ -66,4 +79,5 @@ module.exports = {
   ConflictError,
   RateLimitError,
   ServiceError,
+  DatabaseError,
 };
