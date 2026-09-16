@@ -11,6 +11,14 @@ const { authMiddleware } = require('../../middleware/auth');
 const router = express.Router();
 
 // Test-mode lightweight stubs to avoid DB dependency during unit tests
+// These deliberately reassign the hoisted `function name() {}` declarations
+// further down in this file. That relies on function-declaration hoisting
+// (the real implementation exists before this block runs), so converting
+// these to `let name = function () {}` in place would break: this block
+// executes before that declaration point in file order and would hit the
+// `let` temporal dead zone. Suppressing no-func-assign here instead of
+// restructuring keeps the existing hoisting-dependent behavior intact.
+/* eslint-disable no-func-assign */
 if (process.env.NODE_ENV === 'test') {
   const now = new Date();
   getNutrients = async () => ([{ id: 'NUT-1', symbol: 'PRO', name: 'Protein', unit: 'g' }]);
@@ -70,6 +78,7 @@ if (process.env.NODE_ENV === 'test') {
 
   getDietaryProfiles = async () => ([{ id: 'dp-1', name: 'Vegan' }]);
 }
+/* eslint-enable no-func-assign */
 
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
