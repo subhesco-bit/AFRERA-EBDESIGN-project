@@ -2531,3 +2531,86 @@ wiring fix: (a) 16 `modules/`-tree gaps needing a real data-layer fix per
 module, and (b) ~29 genuinely new backend features with no matching code
 anywhere, several security/auth-sensitive (SSO, RBAC, MFA device
 registry, session/identity management) and correctly not fabricated.
+
+## Update 37 (2026-09-16): found and wired 4 more pre-existing unrouted services + 2 orphaned-real-service fixes (45 -> 33)
+
+Continuing past Update 36's modules/ investigation: went looking for
+more pre-existing (predating this session) service files matching the
+remaining gap names directly by filename, the same technique that found
+`identityManagementService.js`. Found a total of 4 more real, substantial,
+never-routed service files plus 2 cases of a real route file simply
+missing a few endpoints for methods its own service already implemented:
+
+1. **`identityManagementService.js`** (commit `8c8d06c2`, 2026-09-04) -
+   6 resources (permissions, SSO providers, MFA devices, digital
+   identities, consent records, plus a hand-written session-admin view
+   over the real M012 `sessions` table). Closes `permissionManagementAPI`,
+   `ssoAPI`, `mfaManagementAPI`, `digitalIdentityAPI`,
+   `consentManagementAPI`, `sessionManagementAPI` - 6 names in one file.
+   Separately fixed `rolePermissionAPI` (2 of 6 methods - the real
+   backend, `roleManagementRoutes.js`, was already mounted but had no
+   frontend export; the page's own comment claiming the path was
+   `/api/v1/roles` was stale/wrong, real path is `/api/rolemanagement`).
+2. **`climateMonitoringService.js`** - 5 resources (drought, flood,
+   disease forecasts, climate risk, agro-meteorology). Fixed 5
+   pre-existing fabricated placeholder exports in the same move
+   (`droughtMonitoringAPI` etc - wrong method names, same class of bug
+   as the fisheries/horticulture/crop/soil batches from Updates 33-34).
+   `pestForecastingAPI` (a 6th tab on the same page) and
+   `climateMonitoringAPI` (a different page entirely,
+   `ClimateMonitoringDashboardPage.jsx`, needs dashboard-aggregate
+   methods) remain genuine gaps.
+3. **`informationSharingService.js`** - the richest find, ~20 real
+   methods (documents, folders, permissions, sharing links,
+   collaboration sessions, AI recommendations, activity logs, analytics,
+   health) in one in-memory service class, matching
+   `InformationSharingPage.jsx`'s ActionCard calls almost exactly.
+   Needed a custom router (not a generic CRUD wrap) since the service
+   uses named domain methods.
+4. **`platformConfigurationService.js`** - 20+ methods total, only 2
+   (`getOptimizedRecommendations`/`applyOptimizedConfiguration`) needed
+   by the frontend; wired just those, leaving the rest (auto-tuning,
+   security scans, compliance, rollback) unexposed since nothing calls
+   them. Found and documented (not fixed) a real page-level bug while
+   wiring: the frontend reads `configRecommendations.optimizedConfig`
+   but the real response field is `recommendedConfig`.
+5. **`logisticsEnhancementRoutes_merged.js`** - a different shape of fix:
+   this router was *already real and already mounted* (fleet/tracking/
+   temperature/warehouse), but 3 of its page's ActionCards
+   (`recordDriverLocation`/`getActiveDrivers`/`getShipmentTrail`) had no
+   route even though the service already implemented all 3 real,
+   DB-backed methods. Added the 3 missing routes to the existing file
+   rather than writing a new one.
+6. **`platformTelemetryController.js`** and
+   **`organizationManagementRoutes_merged.js`** (from the same
+   investigation pass, see AGENT_ASSIGNMENTS.md's "cheap fixes" update)
+   - both previously-flagged orphaned-real-code gaps, now closed the
+   same way: swap a dead stub's mount, or rewrite a stub file to
+   actually call the real, already-working controller/service
+   underneath.
+
+Also *ruled out* several promising-looking filenames as false positives
+after checking their real method names directly, not just their
+existence - the running lesson of this whole session, worth restating:
+`enterpriseMemoryService.js` (3 duplicate copies, all implement a
+signal-recall system, not the case/knowledge-graph API the frontend
+needs), `userManagementService.js` (a real but unrelated user CRUD, not
+the system-settings/analytics API `SystemAdministrationPage.jsx` needs),
+`cooperativeShareService.js` (FPO capital-share distribution, not the
+SHG group/savings API `shgAPI` needs), and direct searches for
+`decisionEngineAPI`/`erpDashboardAPI`/`competitorAPI`/`governmentAPI`
+that turned up nothing at all anywhere in the codebase.
+
+Every fix in this update was migration-verified (real Postgres table or,
+for the 2 genuinely in-memory services, an explicit, deliberate
+in-memory design choice already documented in the source) and
+test-verified (401-not-404 under auth) before wiring any frontend
+export. 179/179 real backend tests pass after all 6 (same 6
+pre-existing empty-stub suites unrelated).
+
+**Running total this session**: 161 → 33 MISSING_EXPORT errors (128
+closed). The remaining 33 are the ones actually checked and ruled out
+above, plus the previously-documented modules/-tree gaps (16) and
+genuinely new security/auth features - every single one now backed by a
+real, direct check of its actual method names against the frontend's
+actual calls, not a filename guess either way.
