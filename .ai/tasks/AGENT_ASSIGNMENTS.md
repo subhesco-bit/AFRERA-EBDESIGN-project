@@ -22,6 +22,7 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
+| Claude (PR #21) | `backend/src/index.js` (append 1 mount, same block as the escrow fix); `frontend/src/pages/DigitalTwinPage.jsx` | 2026-09-16 | Mounting real, unmounted `services/legacy/digitalTwinService.js` (found during the duplicate-service audit) and wiring `DigitalTwinPage.jsx` to it - `digitalTwinAPI` in api.js already matches the real routes exactly, no frontend client changes needed. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
