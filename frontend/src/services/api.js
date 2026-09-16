@@ -6564,6 +6564,23 @@ export const logisticsEnhancementAPI = {
   getShipmentTrail: (id) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${id}/trail`),
 };
 
+// 2026-09-16: services/legacy/platformConfigurationService.js's
+// getOptimizedRecommendations/applyOptimizedConfiguration were real and
+// DB-backed but had zero route - routes/platformConfigurationRoutes.js
+// used to be an unrelated dead stub. Rewrote that file to route to the
+// real service; wired here. Note: PlatformFoundationPage.jsx reads
+// `configRecommendations.optimizedConfig` when calling
+// applyConfiguration, but the real getRecommendations() response field
+// is `recommendedConfig` (not `optimizedConfig`) - a pre-existing
+// page-level field-name mismatch, not something this client fix can
+// paper over; same class of known page-logic gap as pigAPI/goatAPI's
+// getHerdPerformance() id mismatch documented earlier this session, not
+// fixed here.
+export const platformConfigurationAPI = {
+  getRecommendations: () => api.get(`${UNVERSIONED_BASE}/api/platformconfiguration/recommendations`),
+  applyConfiguration: (config) => api.post(`${UNVERSIONED_BASE}/api/platformconfiguration/apply`, config),
+};
+
 export const informationSharingAPI = {
   getDocuments: (params) => api.get(`${INFORMATION_SHARING_BASE}/documents`, { params }),
   getDocument: (documentId) => api.get(`${INFORMATION_SHARING_BASE}/documents/${documentId}`),

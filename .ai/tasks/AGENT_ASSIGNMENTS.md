@@ -611,6 +611,41 @@ unrelated).
 
 MISSING_EXPORT count: 35 -> 34.
 
+## Update — 2026-09-16 (platform configuration): closed another orphaned-real-service gap — 34 -> 33
+
+`services/legacy/platformConfigurationService.js` (20+ methods, real,
+DB-backed via a `platform_configurations` table) had
+`getOptimizedRecommendations()`/`applyOptimizedConfiguration(config)`
+matching `PlatformFoundationPage.jsx`'s `platformConfigurationAPI.getRecommendations()`/
+`.applyConfiguration()` calls (allowing for the naming difference -
+mapped at the route layer, same as `informationSharingService.js`'s
+`getSharingLinkByToken`/`accessSharingLink` earlier) - but had zero
+route. Of the 3 candidate route files
+(`routes/platformConfigurationRoutes.js` mounted as a dead stub,
+`routes/platform/platformConfigurationRoutes.js` a generic CRUD never
+mounted, `routes/platformConfigurationRoutes_merged.js` a near-empty
+`/health`-only file never mounted), none connects to this service.
+Rewrote the mounted dead stub (same pattern as `platformTelemetryRoutes.js`
+earlier) to expose just the 2 methods the frontend actually calls - the
+service has 20+ methods total (auto-tuning, security scans, compliance,
+rollback, etc.) that nothing calls, not wired to avoid exposing unused
+surface. Tested (3 tests).
+
+Also found and documented (not fixed) a pre-existing page-level bug
+while wiring: `PlatformFoundationPage.jsx` reads
+`configRecommendations.optimizedConfig` before calling
+`applyConfiguration`, but the real `getOptimizedRecommendations()`
+response field is `recommendedConfig`, not `optimizedConfig` - so the
+call will currently pass `undefined`. Documented in `api.js` as a known
+page-logic gap (same class as the already-documented `pigAPI`/`goatAPI`
+`getHerdPerformance()` id mismatch), not fixed - out of scope for a
+wiring pass to rewrite page business logic.
+
+179/179 real backend tests pass (same 6 pre-existing empty-stub suites
+unrelated).
+
+MISSING_EXPORT count: 34 -> 33.
+
 ## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
 
 Found that ~24 backend services exist as multiple files sharing the
@@ -662,7 +697,7 @@ matches the frontend's `getCases`/`getLearningInsights`/
 different concept, not the same feature under different names),
 `climateMonitoringAPI` (distinct page from the now-wired
 `droughtMonitoringAPI`/etc, needs dashboard-aggregate methods no backend
-implements), `competitorAPI`, `platformConfigurationAPI`,
+implements), `competitorAPI`,
 `irrigationAPI`,
 `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`, `fleetManagementAPI`,
 `equipmentRentalAPI`, `implementManagementAPI`,
