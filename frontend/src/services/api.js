@@ -3027,29 +3027,85 @@ export const microFarmAPI = {
   manageMicroFarm: (data) => api.post('/micro-farms/manage', data),
 };
 
+// 2026-09-16: hatcheryManagementAPI/fishFeedAPI/fisheriesWaterQualityAPI/
+// fisheriesHarvestAPI were pre-existing fabricated placeholders (generic
+// getX()/manageX() hitting made-up paths like /hatchery-management/manage
+// that never matched any backend route, and didn't match the real method
+// names - getBatches/createBatch/etc - FisheriesManagementPage.jsx
+// actually calls). Replaced with real endpoints against the new
+// backend/src/routes/fisheriesRegistryRoutes.js (wraps 9
+// createCrudService(...) objects in services/legacy/
+// fisheriesManagementService.js that had real DB logic but no router).
+const FISHERIES_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/fisheries-registry`;
+
 export const hatcheryManagementAPI = {
-  getHatcheries: () => api.get('/hatchery-management'),
-  manageHatchery: (data) => api.post('/hatchery-management/manage', data),
+  getBatches: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/hatcheries`, { params }),
+  createBatch: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/hatcheries`, data),
+  updateBatch: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/hatcheries/${id}`, data),
+  deleteBatch: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/hatcheries/${id}`),
 };
 
 export const fishFeedAPI = {
-  getFishFeeds: () => api.get('/fish-feed'),
-  manageFishFeed: (data) => api.post('/fish-feed/manage', data),
+  getLogs: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/feed-logs`, { params }),
+  createLog: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/feed-logs`, data),
+  updateLog: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/feed-logs/${id}`, data),
+  deleteLog: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/feed-logs/${id}`),
 };
 
 export const fisheriesWaterQualityAPI = {
-  getWaterQuality: () => api.get('/fisheries-water-quality'),
-  monitorWaterQuality: (data) => api.post('/fisheries-water-quality/monitor', data),
+  getReadings: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/water-quality`, { params }),
+  createReading: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/water-quality`, data),
+  updateReading: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/water-quality/${id}`, data),
+  deleteReading: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/water-quality/${id}`),
 };
 
+// Distinct from fishHealthAPI below (a different, unused, pre-existing
+// fabricated export - left alone since nothing imports it).
 export const fisheriesHealthAPI = {
   getFisheriesHealth: () => api.get('/fisheries-health'),
   monitorFisheriesHealth: (data) => api.post('/fisheries-health/monitor', data),
 };
 
 export const fisheriesHarvestAPI = {
-  getFisheriesHarvest: () => api.get('/fisheries-harvest'),
-  manageHarvest: (data) => api.post('/fisheries-harvest/manage', data),
+  getHarvests: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/harvests`, { params }),
+  createHarvest: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/harvests`, data),
+  updateHarvest: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/harvests/${id}`, data),
+  deleteHarvest: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/harvests/${id}`),
+};
+
+export const biofloccFarmAPI = {
+  getTanks: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/biofloc-tanks`, { params }),
+  createTank: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/biofloc-tanks`, data),
+  updateTank: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/biofloc-tanks/${id}`, data),
+  deleteTank: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/biofloc-tanks/${id}`),
+};
+
+export const fishHealthAPI = {
+  getRecords: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/health-records`, { params }),
+  createRecord: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/health-records`, data),
+  updateRecord: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/health-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/health-records/${id}`),
+};
+
+export const fishProcessingAPI = {
+  getBatches: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/processing-batches`, { params }),
+  createBatch: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/processing-batches`, data),
+  updateBatch: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/processing-batches/${id}`, data),
+  deleteBatch: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/processing-batches/${id}`),
+};
+
+export const coldFishChainAPI = {
+  getShipments: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/cold-chain-shipments`, { params }),
+  createShipment: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/cold-chain-shipments`, data),
+  updateShipment: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/cold-chain-shipments/${id}`, data),
+  deleteShipment: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/cold-chain-shipments/${id}`),
+};
+
+export const aquacultureAnalyticsAPI = {
+  getMetrics: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/analytics`, { params }),
+  createMetric: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/analytics`, data),
+  updateMetric: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/analytics/${id}`, data),
+  deleteMetric: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/analytics/${id}`),
 };
 
 export const fisheriesPCRManagementAPI = {
