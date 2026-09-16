@@ -2918,3 +2918,20 @@ writes -> 401 before ever reaching the DB). 217/217 real backend tests
 pass. Full detail in `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16
 (weatherRoutes_merged.js wired - the last documented follow-up)"
 section.
+
+## Update 50 — full lint sweep: both frontend/ and backend/ now 100% clean
+
+Ran `npm run lint` (not just individually-touched files) on both trees.
+Frontend: 2 unused eslint-disable directives removed. Backend: 1
+unnecessary-escape regex fix, 1 dead rule reference removed from a
+disable comment, and 6 services' test-mode mock blocks (which
+reassign hoisted function declarations to swap in lightweight mocks
+under NODE_ENV=test - confirmed valid via hoisting, just discouraged by
+no-func-assign) given scoped disable/enable comments rather than a `let`
+conversion (verified unsafe - would hit the temporal dead zone at
+runtime in every one of the 6 files, since the override block runs
+before the real declaration's source position). Delegated the 6-file
+investigation to a subagent to conserve context; verified its work
+directly (syntax + eslint clean, full-tree lint clean, no test
+regressions) before committing. Both `npm run lint` invocations now
+exit with zero output.
