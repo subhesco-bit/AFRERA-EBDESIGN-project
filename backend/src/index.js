@@ -674,6 +674,12 @@ async function startup() {
     // /api/v1/market-intelligence, so it's called directly here rather
     // than via app.use() like the others.
     require('./services/legacy/marketIntelligenceService.js').setupRoutes(app);
+    // 2026-09-15: same setupRoutes(app) pattern, also never mounted.
+    // Also found and fixed a real route-shadowing bug in this file: GET
+    // /villages/search was registered after GET /villages/:villageId, so
+    // every search request was swallowed by the param route instead
+    // (villageId literally "search") - see the file's own comment.
+    require('./services/legacy/villageProfileService.js').setupRoutes(app);
     app.use('/api/wikipedia', wikipediaRoutes);
     app.use('/api/weather', weatherRoutes);
     app.use('/api/weatheradvisory', weatherAdvisory);

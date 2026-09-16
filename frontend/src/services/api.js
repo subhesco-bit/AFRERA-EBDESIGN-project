@@ -684,6 +684,31 @@ export const pricingAPI = {
   advise: (data) => api.post(`${PRICING_BASE}/advise`, data),
 };
 
+// 2026-09-15: didn't exist - wearableIntegrationRoutes.js is already
+// mounted at /api/wearableintegration. All 6 methods matched 1:1 against
+// wearableIntegrationController.js directly.
+const WEARABLE_BASE = `${UNVERSIONED_BASE}/api/wearableintegration`;
+
+export const wearableAPI = {
+  getStatus: () => api.get(`${WEARABLE_BASE}/status`),
+  getFitbitAuthUrl: () => api.get(`${WEARABLE_BASE}/fitbit/auth-url`),
+  handleFitbitCallback: (code) => api.post(`${WEARABLE_BASE}/fitbit/callback`, { code }),
+  syncFitbit: () => api.post(`${WEARABLE_BASE}/fitbit/sync`),
+  getRecentActivity: (days) => api.get(`${WEARABLE_BASE}/activity/recent`, { params: { days } }),
+  disconnect: (provider) => api.delete(`${WEARABLE_BASE}/${provider}`),
+};
+
+// 2026-09-15: didn't exist - services/legacy/villageProfileService.js was
+// never mounted anywhere. Like marketIntelligenceService.js, it exports a
+// setupRoutes(app) function rather than a plain router, mounting itself
+// at /api/v1/village-profiles (called from index.js this same session).
+// Also found and fixed a real route-shadowing bug while wiring this: GET
+// /villages/search was registered after GET /villages/:villageId, making
+// search unreachable (same shape as productService.js's earlier fix).
+export const villageProfileAPI = {
+  searchVillages: (params) => api.get('/village-profiles/villages/search', { params }),
+};
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
