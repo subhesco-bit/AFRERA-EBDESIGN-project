@@ -541,6 +541,50 @@ file's shape - checked, remains a genuine, unfixed gap.
 148/148 real backend tests pass (same 6 pre-existing empty-stub suites
 unrelated).
 
+## Update — 2026-09-16 (information sharing registry): a 12th pre-existing unrouted service, ~20 methods, closes informationSharingAPI — 36 -> 35
+
+Also checked `enterpriseMemoryAPI`, `userManagementAPI`,
+`platformConfigurationAPI`, `logisticsEnhancementAPI` while investigating
+this batch (all had promising-looking filenames) - none matched:
+`enterpriseMemoryAPI` needs `getCases`/`getLearningInsights`/
+`getKnowledgeGraph`/`searchCases`/`createCase`/`updateCase`, but all 3
+duplicate `enterpriseMemoryService.js` copies implement a different
+concept (`recordMemory`/`recallSimilar`/`recordCase`/`listRecent` - a
+signal-recall system, not a case/knowledge-graph one). `userManagementAPI`
+needs system-settings/analytics/anomaly-detection methods, but
+`services/userManagementService.js` is a genuine but unrelated user CRUD.
+Both confirmed gaps, not fabricated around - checked directly rather
+than assumed from filename match alone (the lesson from this whole
+session: a promising filename is a lead, not proof).
+
+`informationSharingService.js` (`services/legacy/`) was the real find:
+a complete, in-memory service (7 `Map`-backed collections: documents,
+folders, permissions, sharing links, collaboration sessions, AI
+recommendations, activity logs) implementing ~20 methods that match
+`InformationSharingPage.jsx`'s ActionCard calls almost exactly (only
+naming difference: the service's `getSharingLinkByToken` vs the page's
+`accessSharingLink` - same behavior, mapped at the route layer). Neither
+of the 2 already-mounted-elsewhere-or-not route files touch it: the
+mounted `routes/informationSharingRoutes.js` is the usual dead
+"Route operational" stub, and the separate, never-mounted
+`routes/platform/informationSharingRoutes_merged.js` is a much thinner
+generic 5-endpoint CRUD scaffold that doesn't match this page's real
+(much richer) needs either - left untouched.
+
+Wrote `backend/src/routes/informationSharingRegistryRoutes.js` (22
+routes covering all ~20 frontend-facing operations, mounted at
+`/api/information-sharing-registry`) - this one isn't a generic
+`createCrudService` wrap like the other `*RegistryRoutes.js` files, it's
+a custom router calling each of the service's real named methods
+directly, since the service itself uses named domain methods rather than
+uniform CRUD. Tested (23 tests: exact route count + 401-not-404 per
+endpoint). Wired `informationSharingAPI` (all ~20 methods) in `api.js`.
+
+171/171 real backend tests pass (same 6 pre-existing empty-stub suites
+unrelated).
+
+MISSING_EXPORT count: 36 -> 35.
+
 ## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
 
 Found that ~24 backend services exist as multiple files sharing the
@@ -584,13 +628,26 @@ exact fabrication problem this whole PR has been removing. If real
 backend work gets built for any of these, wire the frontend client then
 — not before:
 
-`decisionEngineAPI`, `erpDashboardAPI`, `enterpriseMemoryAPI`,
-`climateMonitoringAPI`, `competitorAPI`, `platformConfigurationAPI`,
-`informationSharingAPI`, `logisticsEnhancementAPI`, `irrigationAPI`,
+`decisionEngineAPI`, `erpDashboardAPI`, `enterpriseMemoryAPI`
+(checked directly against all 3 duplicate copies' real method names -
+`recordMemory`/`recallSimilar`/`recordCase`/`listRecent`/etc, none
+matches the frontend's `getCases`/`getLearningInsights`/
+`getKnowledgeGraph`/`searchCases`/`createCase`/`updateCase` - a
+different concept, not the same feature under different names),
+`climateMonitoringAPI` (distinct page from the now-wired
+`droughtMonitoringAPI`/etc, needs dashboard-aggregate methods no backend
+implements), `competitorAPI`, `platformConfigurationAPI`,
+`logisticsEnhancementAPI`, `irrigationAPI`,
 `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`, `fleetManagementAPI`,
 `equipmentRentalAPI`, `implementManagementAPI`,
 `shgAPI`, `publicDataAPI`,
-`securityAccessControlAPI`, `userManagementAPI`,
+`securityAccessControlAPI`, `userManagementAPI` (the real
+`services/userManagementService.js` is a genuine user CRUD, but
+`SystemAdministrationPage.jsx`'s `userManagementAPI` needs
+`getSettings`/`getSystemAnalytics`/`detectAnomalies`/
+`getPredictiveMaintenance`/`upsertSetting` - a completely different,
+system-settings concept that doesn't match; checked directly, not
+assumed),
 plus ~24 of `farmersAPI`'s methods (field
 management, harvest scoring, most market/pricing analytics — see the
 twenty-fourth update for the full list).

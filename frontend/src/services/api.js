@@ -6530,6 +6530,36 @@ export const rolePermissionAPI = {
   createRole: (data) => api.post(ROLE_MANAGEMENT_BASE, data),
 };
 
+// 2026-09-16: services/legacy/informationSharingService.js is a real,
+// complete in-memory service matching InformationSharingPage.jsx's
+// ActionCard calls almost exactly - wired against the new
+// backend/src/routes/informationSharingRegistryRoutes.js.
+const INFORMATION_SHARING_BASE = `${UNVERSIONED_BASE}/api/information-sharing-registry`;
+export const informationSharingAPI = {
+  getDocuments: (params) => api.get(`${INFORMATION_SHARING_BASE}/documents`, { params }),
+  getDocument: (documentId) => api.get(`${INFORMATION_SHARING_BASE}/documents/${documentId}`),
+  searchDocuments: (q, filters) => api.get(`${INFORMATION_SHARING_BASE}/documents/search`, { params: { q, ...filters } }),
+  createDocument: (data) => api.post(`${INFORMATION_SHARING_BASE}/documents`, data),
+  updateDocument: (documentId, data) => api.put(`${INFORMATION_SHARING_BASE}/documents/${documentId}`, data),
+  deleteDocument: (documentId) => api.delete(`${INFORMATION_SHARING_BASE}/documents/${documentId}`),
+  getFolders: (params) => api.get(`${INFORMATION_SHARING_BASE}/folders`, { params }),
+  getFolderTree: (rootId) => api.get(`${INFORMATION_SHARING_BASE}/folders/tree`, { params: { rootId } }),
+  createFolder: (data) => api.post(`${INFORMATION_SHARING_BASE}/folders`, data),
+  getPermissions: (resourceId, resourceType) => api.get(`${INFORMATION_SHARING_BASE}/permissions`, { params: { resourceId, resourceType } }),
+  setPermission: (data) => api.post(`${INFORMATION_SHARING_BASE}/permissions`, data),
+  checkPermission: (resourceId, userId, permission) => api.get(`${INFORMATION_SHARING_BASE}/permissions/check`, { params: { resourceId, userId, permission } }),
+  createSharingLink: (data) => api.post(`${INFORMATION_SHARING_BASE}/sharing-links`, data),
+  accessSharingLink: (token) => api.get(`${INFORMATION_SHARING_BASE}/sharing-links/access`, { params: { token } }),
+  getCollaborationSessions: (params) => api.get(`${INFORMATION_SHARING_BASE}/collaboration-sessions`, { params }),
+  createCollaborationSession: (data) => api.post(`${INFORMATION_SHARING_BASE}/collaboration-sessions`, data),
+  joinCollaborationSession: (sessionId, userId) => api.post(`${INFORMATION_SHARING_BASE}/collaboration-sessions/${sessionId}/join`, { userId }),
+  endCollaborationSession: (sessionId) => api.post(`${INFORMATION_SHARING_BASE}/collaboration-sessions/${sessionId}/end`),
+  generateAIRecommendations: (userId, context) => api.post(`${INFORMATION_SHARING_BASE}/ai-recommendations`, { userId, context }),
+  getActivityLogs: (resourceId) => api.get(`${INFORMATION_SHARING_BASE}/activity-logs`, { params: { resourceId } }),
+  getAnalytics: () => api.get(`${INFORMATION_SHARING_BASE}/analytics`),
+  getHealthStatus: () => api.get(`${INFORMATION_SHARING_BASE}/health-status`),
+};
+
 // 2026-09-16: routes/platform/organizationManagementRoutes_merged.js is
 // a real, in-memory CRUD implementation that was never require()'d
 // anywhere - the mounted route at /api/organizationmanagement used to be

@@ -266,6 +266,13 @@ const identityRegistryRoutes = require('./routes/identityRegistryRoutes.js');
 // 2026-09-16: same pattern - services/legacy/climateMonitoringService.js
 // had 5 real createCrudService(...) objects with no router at all.
 const climateRegistryRoutes = require('./routes/climateRegistryRoutes.js');
+// 2026-09-16: services/legacy/informationSharingService.js is a real,
+// complete in-memory service (documents/folders/permissions/sharing-links/
+// collaboration/AI-recommendations/activity-logs/analytics/health) that
+// was never routed at all - neither routes/informationSharingRoutes.js
+// (dead stub) nor routes/platform/informationSharingRoutes_merged.js
+// (generic CRUD, doesn't match this page's real needs) connect to it.
+const informationSharingRegistryRoutes = require('./routes/informationSharingRegistryRoutes.js');
 // 2026-09-16: same pattern - services/legacy/waterManagementService.js
 // had 5 real createCrudService(...) objects. Confirmed regression (not a
 // fresh gap): waterManagementRoutes.js used to require() this service
@@ -869,6 +876,7 @@ async function startup() {
     app.use('/api/soil-registry', soilRegistryRoutes);
     app.use('/api/identity-registry', identityRegistryRoutes);
     app.use('/api/climate-registry', climateRegistryRoutes);
+    app.use('/api/information-sharing-registry', informationSharingRegistryRoutes);
     app.use('/api/water-records-registry', waterRecordsRegistryRoutes);
     app.use('/api/glutwarning', glutWarningRoutes);
     app.use('/api/geofencing', geofencingRoutes);
