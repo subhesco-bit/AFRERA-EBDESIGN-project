@@ -2381,3 +2381,79 @@ backend work next, not something to guess at.
 closed across the whole session; 56 of those in this update alone via 9
 new route files, 44 new REST resources, and 12 fabricated-placeholder
 fixes).
+
+## Update 35 (2026-09-16): resolved the duplicate-service-filename shadowing bug for all 6 known cases (97 -> 45)
+
+Continuing the same session: after Update 34 exhausted every
+createCrudService-wrapping opportunity, went back to the
+duplicate-service-filename shadowing bug documented since Update 32
+(`aiAdvisoryService`, `buyingClubService`, `procurementSubscriptionService`,
+`renewableEnergyService`, `ruralEnterpriseService`, `governmentSchemeService`
+each have a real, statistics/registry-bearing implementation in
+`services/legacy/*.js` that loses to a thinner same-named file
+elsewhere in `core/dynamicServiceLoader.js`'s discovery Map).
+
+Considered and rejected re-keying the loader's whole discovery mechanism
+by full path instead of basename - it would change which file wins for
+all 313 discovered services at once, an unpredictable and much riskier
+blast radius than fixing 6 known, individually-verified cases. Instead:
+
+- **`buyingClubService.js`**: root cause was narrower than "wrong file
+  wins" - it's a one-line re-export shim
+  (`module.exports = require('./legacy/buyingClubService.js')`) whose
+  own raw source text has no literal "setupRoutes" substring, so
+  `mountServiceRoutes`'s naive `source.includes('setupRoutes')`
+  text-scan skipped the file before ever requiring it - even though
+  requiring it resolves correctly to the real legacy module. Fixed by
+  adding a comment mentioning "setupRoutes" to the shim - the text-scan
+  now recognizes it, and since the actual `module.exports` delegation
+  was already correct, this is a discovery fix with zero behavior change
+  to what gets served.
+- **The other 5**: verified via direct file reads that each losing
+  `services/legacy/*.js` file's own `app.use(...)` (or, for
+  governmentSchemeService, its direct `app.get/post(...)` registrations)
+  uses either a completely distinct URL prefix from the Map-winning file
+  (`/ai-advisories` vs the winner's `/ai-advisory`, `/rural-enterprises`
+  vs `/rural-enterprise`, `/procurement-subscriptions` vs
+  `/procurement-subscription`) or the exact same prefix with
+  non-overlapping sub-paths (`renewableEnergyService`: both winner and
+  loser mount at `/api/v1/renewable-energy`, but the winner only has
+  bare `GET/POST /` while the loser's routes are all under
+  `/systems/...` - Express correctly falls through to the second
+  `app.use()` router when the first doesn't match a sub-path). Given
+  that, called each losing file's `setupRoutes(app)` directly in
+  `index.js`, additively, right next to the already-established direct-
+  call precedent for `marketIntelligenceService.js`/
+  `villageProfileService.js` from Update 13's investigation. Verified via
+  a scratch script combining `DynamicServiceLoader.mountServiceRoutes(app)`
+  with the 5 direct calls, hitting every target endpoint, before ever
+  touching `index.js` for real - all confirmed non-404 (401 where auth
+  applies, 500 for 2 DB-dependent endpoints with no live Postgres in this
+  sandbox, exactly the same "reaches a real handler" bar used throughout
+  this whole session).
+
+Updated `backend/src/services/__tests__/orphanedServiceRoutes.test.js`
+to mirror the real production mounting sequence (the loader's
+`mountServiceRoutes` plus the 5 new additive direct calls) and flipped
+its 2 tests that used to deliberately lock in
+`government/schemes/registry(/expiring)` as a confirmed-404 gap - they
+now assert the opposite, plus 5 new test cases for the other formerly-
+shadowed endpoints and 1 confirming the Map-winning `renewable-energy`
+route still works unchanged. 115/115 real backend tests pass (same 6
+pre-existing empty-stub suites unrelated).
+
+Wired `schemeRegistryAPI` (`list`/`getExpiring`), `aiAdvisoryAPI`,
+`buyingClubAPI`, `procurementSubscriptionAPI`, `renewableEnergyAPI`,
+`ruralEnterpriseAPI` (all `getStatistics`) in `api.js` against the real,
+now-reachable endpoints - removing the last of the "duplicate-filename
+shadowing" category from the confirmed-gap list entirely.
+
+**Running total this session**: 161 → 45 MISSING_EXPORT errors (116
+closed across the whole session). What's left (45 names) is now
+exclusively: (a) the unscanned `backend/src/modules/` tree (~150+
+modules, would need wiring into a loader or individual `require()`s),
+and (b) genuinely new backend work with no matching code anywhere,
+several of which are security/auth-sensitive (SSO, RBAC, MFA device
+registry, session management, digital identity) and correctly not
+fabricated. Every one of the 45 is individually documented in
+`.ai/tasks/AGENT_ASSIGNMENTS.md`.
