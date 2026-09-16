@@ -22,6 +22,7 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
+| Claude (PR #21) | `backend/src/routes/claude/` (investigation + selective mounting); `backend/src/index.js` (append mounts only); frontend pages only if a specific real, non-fabricating match is found | 2026-09-16 | Auditing the remaining 15 unmounted files in `routes/claude/` the same way `aiDecisionRoutes.js` was (see the "aiDecisionRoutes.js mounted" update below for the method and the fabrication trap found in `calculateFDI`). |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
