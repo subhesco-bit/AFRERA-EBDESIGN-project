@@ -140,6 +140,21 @@ exports for the previously-missing `fishHealthAPI`/`fishProcessingAPI`/
 
 MISSING_EXPORT count: 94 -> 89.
 
+**Third new route file**: `backend/src/routes/operationsRegistryRoutes.js`
+wraps all 8 `createCrudService(...)` objects in
+`services/legacy/operationsManagementService.js` (farm activities, tasks,
+contractors, machinery operations, equipment schedules, input
+consumption, productivity metrics, dashboard KPIs), mounted at
+`/api/operations-registry` (distinct from the still-dead
+`operationsManagementRoutes.js` stub at `/api/operationsmanagement` -
+not touched). Tested (9 tests). Wired `farmActivityAPI`, `farmTaskAPI`,
+`contractorManagementAPI`, `machineryOperationsAPI`,
+`equipmentSchedulingAPI`, `inputConsumptionAPI`, `farmProductivityAPI`,
+`farmOperationsDashboardAPI` against it - all 8 of that page's tabs now
+have a real backend.
+
+MISSING_EXPORT count: 89 -> 81.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -204,7 +219,7 @@ backend work gets built for any of these, wire the frontend client then
 `climateMonitoringAPI`, `competitorAPI`, `platformConfigurationAPI`,
 `informationSharingAPI`, `logisticsEnhancementAPI`, `irrigationAPI`,
 `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`, `fleetManagementAPI`,
-`equipmentRentalAPI`, `machineryOperationsAPI`, `implementManagementAPI`,
+`equipmentRentalAPI`, `implementManagementAPI`,
 `landLeaseAPI`, `shgAPI`, `publicDataAPI`, `consentManagementAPI`,
 `digitalIdentityAPI`, `sessionManagementAPI`, `ssoAPI`,
 `securityAccessControlAPI`, `userManagementAPI`, `rolePermissionAPI`,
@@ -236,7 +251,7 @@ still CONFIRMED GAP, but neither is the duplicate-filename bug**:
 Batch-verified 2026-09-16 (18 livestock/farm-ops + 10 REOS/platform names,
 via two research passes) — added to this gap list, do not re-investigate:
 
-`farmActivityAPI`, `farmTaskAPI`, `fertilityManagementAPI`,
+`fertilityManagementAPI`,
 `pondAPI`,
 `medicalCodingAPI`, `nutritionIntelligenceAPI` — all trace to real
 `createCrudService(...)` DB-backed objects (`services/legacy/*.js`:
@@ -311,8 +326,8 @@ M645100_LIBRARYKNOWLEDGE). `waterIrrigationRoutes.js` covers only a
 "create" endpoint for each (no `trackUsage`/`monitorHealth`/etc.), so
 these stay classified as gaps rather than partial matches.
 
-`assetLifecycleAPI`, `breakdownMaintenanceAPI`, `contractorManagementAPI`,
-`equipmentInventoryAPI`, `equipmentSchedulingAPI`, `fuelManagementAPI`,
+`assetLifecycleAPI`, `breakdownMaintenanceAPI`,
+`equipmentInventoryAPI`, `fuelManagementAPI`,
 `preventiveMaintenanceAPI`, `sparePartsAPI` — real M10x modules exist
 (same unscanned-`modules/`-directory problem) and some of their *service*
 logic (not routes) gets merged into unrelated legacy services by an
@@ -338,12 +353,12 @@ Batch-verified 2026-09-16 (25 crop/horticulture/agronomy names) — 24 of
 25 CONFIRMED GAP, added here, do not re-investigate:
 
 `aeroponicsAPI`, `bioPesticideAPI`, `biofertilizerAPI`, `floricultureAPI`,
-`horticultureAnalyticsAPI`, `inputConsumptionAPI`, `inputDistributionAPI`,
+`horticultureAnalyticsAPI`, `inputDistributionAPI`,
 `inputProcurementAPI`, `inputTraceabilityAPI`, `micronutrientAPI`,
 `nurseryAPI`, `organicInputAPI`, `pesticideInventoryAPI`, `polyhouseAPI`,
 `precisionHorticultureAPI`, `protectedCultivationAPI`, `seedPlanningAPI`,
 `sowingAPI`, `vegetableProductionAPI`, `surveyManagementAPI`,
-`farmProductivityAPI`, `farmOperationsDashboardAPI`, `operationsAPI` —
+`operationsAPI` —
 same pattern as the livestock batch above: real `createCrudService(...)`
 DB-backed objects in `services/legacy/{horticultureManagementService,
 inputSupplyManagementService,cropManagementService,landManagementService,

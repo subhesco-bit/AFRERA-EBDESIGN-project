@@ -6090,6 +6090,69 @@ export const livestockAnalyticsAPI = {
   deleteRecord: (id) => api.delete(`${LIVESTOCK_REGISTRY_BASE}/analytics/${id}`),
 };
 
+// 2026-09-16: services/legacy/operationsManagementService.js had real,
+// working createCrudService(...) logic for these 8 OperationsManagementPage.jsx
+// tabs but no Express router at all - wrote backend/src/routes/
+// operationsRegistryRoutes.js to wrap them (mounted at
+// /api/operations-registry, unversioned, same convention as the
+// livestock/fisheries registries above).
+const OPERATIONS_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/operations-registry`;
+export const farmActivityAPI = {
+  getActivities: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/activities`, { params }),
+  createActivity: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/activities`, data),
+  updateActivity: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/activities/${id}`, data),
+  deleteActivity: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/activities/${id}`),
+};
+
+export const farmTaskAPI = {
+  getTasks: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/tasks`, { params }),
+  createTask: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/tasks`, data),
+  updateTask: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/tasks/${id}`, data),
+  deleteTask: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/tasks/${id}`),
+};
+
+export const contractorManagementAPI = {
+  getContractors: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/contractors`, { params }),
+  createContractor: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/contractors`, data),
+  updateContractor: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/contractors/${id}`, data),
+  deleteContractor: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/contractors/${id}`),
+};
+
+export const machineryOperationsAPI = {
+  getOperations: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/machinery-operations`, { params }),
+  createOperation: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/machinery-operations`, data),
+  updateOperation: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/machinery-operations/${id}`, data),
+  deleteOperation: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/machinery-operations/${id}`),
+};
+
+export const equipmentSchedulingAPI = {
+  getSchedules: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/equipment-schedules`, { params }),
+  createSchedule: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/equipment-schedules`, data),
+  updateSchedule: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/equipment-schedules/${id}`, data),
+  deleteSchedule: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/equipment-schedules/${id}`),
+};
+
+export const inputConsumptionAPI = {
+  getRecords: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/input-consumption`, { params }),
+  createRecord: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/input-consumption`, data),
+  updateRecord: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/input-consumption/${id}`, data),
+  deleteRecord: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/input-consumption/${id}`),
+};
+
+export const farmProductivityAPI = {
+  getMetrics: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/productivity-metrics`, { params }),
+  createMetric: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/productivity-metrics`, data),
+  updateMetric: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/productivity-metrics/${id}`, data),
+  deleteMetric: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/productivity-metrics/${id}`),
+};
+
+export const farmOperationsDashboardAPI = {
+  getKpis: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis`, { params }),
+  createKpi: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis`, data),
+  updateKpi: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis/${id}`, data),
+  deleteKpi: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis/${id}`),
+};
+
 // 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and
 // calls it directly with relative paths (api.get('/advanced-medical-coding/...'))
 // rather than through a dedicated *API object - only a default export
