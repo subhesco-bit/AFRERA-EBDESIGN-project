@@ -3932,9 +3932,15 @@ export const maintenanceAPI2 = {
   scheduleMaintenance: (data) => api.post('/maintenance/schedule', data),
 };
 
+// 2026-09-16: fixed a wrong POST path (was '/market-access/manage', a
+// path that has never matched any backend route) - the real winning
+// service (services/commerce/marketAccessService.js, confirmed via
+// DynamicServiceLoader) only mounts GET / and POST / at /api/v1/market-access.
+// Nothing in the frontend actually calls this export either way (checked),
+// so this is a correctness fix, not a behavior change anyone will see yet.
 export const marketAccessAPI = {
   getMarketAccess: () => api.get('/market-access'),
-  manageMarketAccess: (data) => api.post('/market-access/manage', data),
+  manageMarketAccess: (data) => api.post('/market-access', data),
 };
 
 export const marketAPI2 = {
@@ -5944,6 +5950,59 @@ export const varietyDirectoryAPI = {
   getCategories: () => api.get(`${VARIETY_DIRECTORY_BASE}/categories`),
   requestImage: (id) => api.post(`${VARIETY_DIRECTORY_BASE}/${id}/generate-image`),
   createListing: (id, data) => api.post(`${VARIETY_DIRECTORY_BASE}/${id}/create-listing`, data),
+};
+
+// 2026-09-16: householdEconomyAPI/sharedInfrastructureAPI/ruralFinanceAPI/
+// mobilityRidesAPI/machineryAccessAPI are all imported by
+// REOSDashboardPage.jsx (and MachineryManagementPage.jsx for the last one)
+// but none is ever actually called there yet (only 6 of REOSDashboardPage's
+// 13 imported REOS API objects are wired into a useQuery - these 5 fall
+// through to a generic "select a tab" placeholder). Wiring them anyway
+// because Vite/rolldown's MISSING_EXPORT check fires on the import
+// statement itself, regardless of call-site usage - an unused-but-real
+// export still fixes a real build error, and all 5 verified against a
+// genuine, live, DynamicServiceLoader-confirmed-winning setupRoutes()
+// implementation (not fabricated to match a call site that doesn't exist).
+export const householdEconomyAPI = {
+  getRecords: (params) => api.get('/household-economy', { params }),
+  createRecord: (data) => api.post('/household-economy', data),
+};
+
+// Distinct from sharedInfraAPI above (services/legacy/sharedInfraService.js,
+// /api/v1/shared-infra) - this is a separate real backend,
+// services/legacy/sharedInfrastructureService.js, mounted at
+// /api/v1/shared-infrastructure. Don't merge the two.
+export const sharedInfrastructureAPI = {
+  getAccess: (accessId) => api.get(`/shared-infrastructure/access/${accessId}`),
+  getAccessByVillage: (villageId) => api.get(`/shared-infrastructure/access/village/${villageId}`),
+  getAccessByType: (infrastructureType) => api.get(`/shared-infrastructure/access/type/${infrastructureType}`),
+  getVillageSummary: (villageId) => api.get(`/shared-infrastructure/access/village/${villageId}/summary`),
+  requestAccess: (data) => api.post('/shared-infrastructure/access', data),
+};
+
+export const ruralFinanceAPI = {
+  list: (params) => api.get('/rural-finance', { params }),
+  get: (id) => api.get(`/rural-finance/${id}`),
+  apply: (data) => api.post('/rural-finance', data),
+  disburse: (id, data) => api.post(`/rural-finance/${id}/disburse`, data),
+  repay: (id, data) => api.post(`/rural-finance/${id}/repay`, data),
+  checkRefinance: (id) => api.get(`/rural-finance/${id}/refinance-check`),
+};
+
+export const mobilityRidesAPI = {
+  getRide: (rideId) => api.get(`/mobility-rides/rides/${rideId}`),
+  getRidesByVillage: (villageId) => api.get(`/mobility-rides/rides/village/${villageId}`),
+  getRidesByDriver: (driverId) => api.get(`/mobility-rides/rides/driver/${driverId}`),
+  requestRide: (data) => api.post('/mobility-rides/rides', data),
+  updateRideStatus: (rideId, data) => api.put(`/mobility-rides/rides/${rideId}/status`, data),
+  getStatistics: () => api.get('/mobility-rides/rides/statistics'),
+};
+
+export const machineryAccessAPI = {
+  listBookings: (params) => api.get('/machinery-access', { params }),
+  createBooking: (data) => api.post('/machinery-access', data),
+  completeBooking: (id) => api.post(`/machinery-access/${id}/complete`),
+  getUtilization: (machineryId) => api.get(`/machinery-access/machinery/${machineryId}/utilization`),
 };
 
 // 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and

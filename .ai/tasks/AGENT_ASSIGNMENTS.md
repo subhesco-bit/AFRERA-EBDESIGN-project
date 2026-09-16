@@ -86,7 +86,16 @@ real backend's actual req.body/req.query/req.params shape, not guessed):
 `pigFarmingAPI`, `sheepFarmingAPI`, `poultryManagementAPI` (same real
 endpoints as the earlier `goatAPI`/`pigAPI` etc., different method names
 for a different consuming page, `LivestockManagementPage.jsx`),
-`varietyDirectoryAPI` (`/api/regionalvariety`, unversioned base).
+`varietyDirectoryAPI` (`/api/regionalvariety`, unversioned base),
+`householdEconomyAPI`, `sharedInfrastructureAPI`, `ruralFinanceAPI`,
+`mobilityRidesAPI`, `machineryAccessAPI` (all real, DynamicServiceLoader
+winner-verified, wired even though currently uncalled by any page - see
+the update below for why that's still correct). Also fixed a wrong path
+in the pre-existing `marketAccessAPI` export (`/market-access/manage` ->
+`/market-access`).
+
+Result: MISSING_EXPORT count 107 -> 97 (2026-09-16, via 4 parallel
+research passes covering all remaining candidates from the prior 109).
 
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
@@ -207,29 +216,82 @@ distinct from the already-wired `governmentSchemeAPI`), `organizationManagementA
 `pushNotificationsAPI` (Web Push subscribe/unsubscribe — no VAPID/web-push
 code anywhere) — confirmed gaps, no matching backend.
 
-`householdEconomyAPI`, `sharedInfrastructureAPI` (note: distinct from the
+`householdEconomyAPI`, `sharedInfrastructureAPI` (distinct from the
 already-wired `sharedInfraAPI` — different backend file,
-`sharedInfrastructureService.js` vs `sharedInfraService.js`), `ruralFinanceAPI`,
-`mobilityRidesAPI`, `marketAccessAPI` — **not gaps, DEAD IMPORTS**:
-`REOSDashboardPage.jsx` imports 13 REOS API names but only calls 6 of them
-in any `useQuery`; these 5 (plus the already-known duplicate-shadowed 6)
-are imported and never used anywhere in the frontend. `ruralFinanceAPI`
-and `mobilityRidesAPI` in particular have substantial, real, DB-backed
-`setupRoutes` implementations already live (`/api/v1/rural-finance`,
-`/api/v1/mobility-rides`) that could be wired proactively even though
-nothing currently calls them — not done here since nothing consumes them
-yet (wiring an unused export doesn't fix a build error). `marketAccessAPI`
-already exists as an export at `api.js` (~line 3935) but is an earlier
-fabricated placeholder hitting the wrong path (`POST
-/market-access/manage` vs the real `POST /market-access`) — flagged for
-cleanup, not fixed here since it's unused either way.
+`sharedInfrastructureService.js` vs `sharedInfraService.js`),
+`ruralFinanceAPI`, `mobilityRidesAPI`, `machineryAccessAPI` — **not gaps,
+now WIRED even though unused**: `REOSDashboardPage.jsx` imports 13 REOS
+API names but only calls 6 of them in any `useQuery`; these were dead
+imports in that sense, but **correction**: Vite/rolldown's
+`MISSING_EXPORT` check fires on the bare import statement, not on
+call-site usage — an unused-but-real export still fixes a real build
+error. All 5 verified live via the `DynamicServiceLoader` winner-check
+script (not assumed) and wired against their exact real endpoints
+(`/api/v1/household-economy`, `/api/v1/shared-infrastructure`,
+`/api/v1/rural-finance`, `/api/v1/mobility-rides`,
+`/api/v1/machinery-access`). `marketAccessAPI` already existed as an
+export at `api.js` but hit a wrong path (`POST /market-access/manage`
+instead of the real `POST /market-access`) — fixed in place.
 
-`organizationManagementAPI` and `platformTelemetryAPI` are the closest of
-this batch to a real fix if backend work comes into scope: both have a
-complete, correct implementation that's simply never `require()`'d by a
-mounted route (`platform/organizationManagementRoutes_merged.js` and
+`organizationManagementAPI` and `platformTelemetryAPI` remain genuine
+gaps but are the closest to a real fix if backend work comes into scope:
+both have a complete, correct implementation that's simply never
+`require()`'d by a mounted route
+(`platform/organizationManagementRoutes_merged.js` and
 `controllers/platformTelemetryController.js` respectively) — an
-unmount/wiring bug, not missing code.
+unmount/wiring bug, not missing code. `governmentAPI` and
+`pushNotificationsAPI` remain genuine gaps with no matching backend at
+all.
+
+Batch-verified 2026-09-16 (22 land/water/GIS/equipment names) — 21 of 22
+CONFIRMED GAP, 1 (`machineryAccessAPI`, above) CONFIRMED LIVE:
+
+`geoBoundaryAPI`, `gisLandMappingAPI`, `soilMappingAPI`,
+`waterResourceMappingAPI` — real `createCrudService(...)` CRUD objects in
+`services/legacy/landManagementService.js`, zero `setupRoutes`, the only
+matching mounted route (`landManagementRoutes.js`) is a dead stub. Same
+pattern as the other management-service batches above.
+
+`waterBudgetRecordsAPI`, `waterQualityRecordsAPI`, `rainwaterStructuresAPI`,
+`watershedRecordsAPI`, `waterAnalyticsRecordsAPI` — real CRUD objects in
+`services/legacy/waterManagementService.js`; **this one is a genuine
+regression, not just an unmounted stub**: `waterManagementRoutes.js` used
+to require this service and was overwritten with a dead "Route
+operational" placeholder stub by a later batch-fix commit
+(`a2beb556`, 2026-09-10) — confirmed via `git log`/`git show` on the exact
+file, not assumed from a stale comment.
+
+`waterBudgetingAPI`, `rainwaterHarvestingAPI`, `watershedManagementAPI`,
+`waterAnalyticsAPI` — action-style names (`designSystem`,
+`trackUsage`, etc.) matching real logic in `backend/src/modules/M076`-`M080`,
+but `backend/src/modules/` is never scanned by either dynamic loader (only
+3 of ~150+ M0xx modules are individually wired: M029, M400_AI_BACKBONE,
+M645100_LIBRARYKNOWLEDGE). `waterIrrigationRoutes.js` covers only a
+"create" endpoint for each (no `trackUsage`/`monitorHealth`/etc.), so
+these stay classified as gaps rather than partial matches.
+
+`assetLifecycleAPI`, `breakdownMaintenanceAPI`, `contractorManagementAPI`,
+`equipmentInventoryAPI`, `equipmentSchedulingAPI`, `fuelManagementAPI`,
+`preventiveMaintenanceAPI`, `sparePartsAPI` — real M10x modules exist
+(same unscanned-`modules/`-directory problem) and some of their *service*
+logic (not routes) gets merged into unrelated legacy services by an
+automated consolidation pass, but the actually-mounted route for each
+target service never calls the merged functions — verified by reading
+every real mount point directly, not by trusting page `backendNote`
+comments (`MachineryManagementPage.jsx`'s notes claiming several of these
+are "confirmed live" are themselves stale/incorrect — flagged, do not
+trust without re-verifying).
+
+**General caution for future work in this file**: several page-level
+`backendNote`/header comments (`WaterRecordsPage.jsx`,
+`WaterManagementPage.jsx`, `MachineryManagementPage.jsx`,
+`MedicalCodingDashboardPage.jsx`'s absence of one) assert specific routes
+are "real and functional" as of an earlier date. At least 2 confirmed
+cases this session (`waterManagementRoutes.js`, the claimed
+`backend-modules/:moduleId/:operation` bridge) were true when written but
+were later regressed to dead stubs by batch-fix commits on 2026-09-10 —
+always verify the *current* file content and git history, never trust an
+in-file comment's claim about backend state at face value.
 
 Batch-verified 2026-09-16 (25 crop/horticulture/agronomy names) — 24 of
 25 CONFIRMED GAP, added here, do not re-investigate:
