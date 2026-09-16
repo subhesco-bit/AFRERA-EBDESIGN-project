@@ -848,9 +848,13 @@ export const farmerAPI = {
   updateProfile: (data) => api.put('/farmer/profile', data),
 };
 
+// 2026-09-16: was api.get('/products') - resolves to /api/v1/products,
+// which doesn't exist. `productsAPI` (plural) above already points at
+// the real router correctly - this singular `productAPI` export is used
+// elsewhere and left pointed at the same real base for consistency.
 export const productAPI = {
-  getProducts: () => api.get('/products'),
-  getProduct: (id) => api.get(`/products/${id}`),
+  getProducts: (params) => api.get(PRODUCT_BASE, { params }),
+  getProduct: (id) => api.get(`${PRODUCT_BASE}/${id}`),
 };
 
 export const orderAPI = {
