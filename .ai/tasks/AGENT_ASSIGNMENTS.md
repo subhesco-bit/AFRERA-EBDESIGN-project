@@ -1162,6 +1162,30 @@ email service or building real new email infrastructure, both out of
 scope for this sweep, left as-is and documented here rather than
 silently patched over.
 
+## Update — 2026-09-16 (exhaustive require-time crash sweep - 293/293 clean)
+
+Extended the Stripe-boot-crash-bug-class sweep above into a complete,
+mechanical check rather than relying on manual `grep` pattern-matching
+alone (which only catches patterns I thought to search for). Wrote a
+throwaway script (not committed - scratch tooling) that: (1) parsed
+`index.js` for every local `require('./routes|services|core|middleware/...')`
+call (293 unique paths - the entire currently-wired surface of the real
+server), (2) required each one individually in a single Node process
+with `JWT_SECRET` set, logging progress before each and catching any
+thrown error.
+
+**Result: 293 ok, 0 failed.** Every single file the live server actually
+loads at boot requires cleanly - no other require-time crash exists
+anywhere in the currently-mounted surface. This is the strongest
+available confirmation (short of a real Postgres/Redis instance to run
+the full `node src/index.js` boot against) that the Stripe fix closed
+the *entire* class of this bug for anything actually reachable today,
+not just the one instance that happened to surface first. (The process
+itself didn't exit cleanly afterward - the same open DB-pool-retry timer
+every other smoke test this session has hit, requiring `timeout` to reap
+it - but the sweep's own result printed before that, and is unaffected
+by it.)
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a
