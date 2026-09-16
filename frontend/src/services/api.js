@@ -2707,9 +2707,19 @@ export const hybridFarmingAPI = {
   implementHybridFarming: (data) => api.post('/hybrid-farming/implement', data),
 };
 
+// 2026-09-16: was a pre-existing fabricated placeholder (generic
+// getHydroponics()/manageHydroponics() hitting made-up paths that never
+// matched any backend route or HorticultureManagementPage.jsx's real
+// getSystems/createSystem/updateSystem/deleteSystem calls). Fixed against
+// the new backend/src/routes/horticultureRegistryRoutes.js (wraps
+// services/legacy/horticultureManagementService.js's real
+// createCrudService(...) objects, previously unrouted).
+const HORTICULTURE_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/horticulture-registry`;
 export const hydroponicsAPI = {
-  getHydroponics: () => api.get('/hydroponics'),
-  manageHydroponics: (data) => api.post('/hydroponics/manage', data),
+  getSystems: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/hydroponic-systems`, { params }),
+  createSystem: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/hydroponic-systems`, data),
+  updateSystem: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/hydroponic-systems/${id}`, data),
+  deleteSystem: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/hydroponic-systems/${id}`),
 };
 
 export const homeAutomationAPI = {
@@ -6151,6 +6161,60 @@ export const farmOperationsDashboardAPI = {
   createKpi: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis`, data),
   updateKpi: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis/${id}`, data),
   deleteKpi: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis/${id}`),
+};
+
+// 2026-09-16: same pattern - services/legacy/horticultureManagementService.js
+// had real createCrudService(...) logic for these 7 remaining
+// HorticultureManagementPage.jsx tabs (hydroponicsAPI, above, was the
+// 8th) but no Express router at all - wired against
+// backend/src/routes/horticultureRegistryRoutes.js.
+export const vegetableProductionAPI = {
+  getRecords: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/vegetable-production`, { params }),
+  createRecord: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/vegetable-production`, data),
+  updateRecord: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/vegetable-production/${id}`, data),
+  deleteRecord: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/vegetable-production/${id}`),
+};
+
+export const floricultureAPI = {
+  getRecords: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/floriculture`, { params }),
+  createRecord: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/floriculture`, data),
+  updateRecord: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/floriculture/${id}`, data),
+  deleteRecord: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/floriculture/${id}`),
+};
+
+export const polyhouseAPI = {
+  getRecords: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/polyhouses`, { params }),
+  createRecord: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/polyhouses`, data),
+  updateRecord: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/polyhouses/${id}`, data),
+  deleteRecord: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/polyhouses/${id}`),
+};
+
+export const aeroponicsAPI = {
+  getSystems: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/aeroponic-systems`, { params }),
+  createSystem: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/aeroponic-systems`, data),
+  updateSystem: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/aeroponic-systems/${id}`, data),
+  deleteSystem: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/aeroponic-systems/${id}`),
+};
+
+export const precisionHorticultureAPI = {
+  getReadings: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/precision-readings`, { params }),
+  createReading: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/precision-readings`, data),
+  updateReading: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/precision-readings/${id}`, data),
+  deleteReading: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/precision-readings/${id}`),
+};
+
+export const protectedCultivationAPI = {
+  getStructures: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/protected-structures`, { params }),
+  createStructure: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/protected-structures`, data),
+  updateStructure: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/protected-structures/${id}`, data),
+  deleteStructure: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/protected-structures/${id}`),
+};
+
+export const horticultureAnalyticsAPI = {
+  getMetrics: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/analytics`, { params }),
+  createMetric: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/analytics`, data),
+  updateMetric: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/analytics/${id}`, data),
+  deleteMetric: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/analytics/${id}`),
 };
 
 // 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and

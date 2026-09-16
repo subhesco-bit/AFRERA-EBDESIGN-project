@@ -155,6 +155,21 @@ have a real backend.
 
 MISSING_EXPORT count: 89 -> 81.
 
+**Fourth new route file**: `backend/src/routes/horticultureRegistryRoutes.js`
+wraps all 8 `createCrudService(...)` objects in
+`services/legacy/horticultureManagementService.js` (vegetable
+production, floriculture, polyhouses, hydroponics, aeroponics, precision
+readings, protected structures, analytics), mounted at
+`/api/horticulture-registry`. Tested (9 tests). Fixed another
+pre-existing fabricated placeholder (`hydroponicsAPI`, same
+wrong-method-names pattern as the 4 fisheries ones) and wired the 7
+previously-missing exports (`vegetableProductionAPI`, `floricultureAPI`,
+`polyhouseAPI`, `aeroponicsAPI`, `precisionHorticultureAPI`,
+`protectedCultivationAPI`, `horticultureAnalyticsAPI`) - all 8 tabs on
+HorticultureManagementPage.jsx now have a real backend.
+
+MISSING_EXPORT count: 81 -> 74.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -352,12 +367,12 @@ in-file comment's claim about backend state at face value.
 Batch-verified 2026-09-16 (25 crop/horticulture/agronomy names) — 24 of
 25 CONFIRMED GAP, added here, do not re-investigate:
 
-`aeroponicsAPI`, `bioPesticideAPI`, `biofertilizerAPI`, `floricultureAPI`,
-`horticultureAnalyticsAPI`, `inputDistributionAPI`,
+`bioPesticideAPI`, `biofertilizerAPI`,
+`inputDistributionAPI`,
 `inputProcurementAPI`, `inputTraceabilityAPI`, `micronutrientAPI`,
-`nurseryAPI`, `organicInputAPI`, `pesticideInventoryAPI`, `polyhouseAPI`,
-`precisionHorticultureAPI`, `protectedCultivationAPI`, `seedPlanningAPI`,
-`sowingAPI`, `vegetableProductionAPI`, `surveyManagementAPI`,
+`nurseryAPI`, `organicInputAPI`, `pesticideInventoryAPI`,
+`seedPlanningAPI`,
+`sowingAPI`, `surveyManagementAPI`,
 `operationsAPI` —
 same pattern as the livestock batch above: real `createCrudService(...)`
 DB-backed objects in `services/legacy/{horticultureManagementService,
