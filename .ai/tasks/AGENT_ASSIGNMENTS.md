@@ -209,6 +209,16 @@ feature. All 6 tabs on LandManagementPage.jsx now have a real backend.
 
 MISSING_EXPORT count: 63 -> 57.
 
+**Eighth new route file**: `backend/src/routes/soilRegistryRoutes.js`
+wraps the 3 `createCrudService(...)` objects in
+`services/legacy/soilManagementService.js` (soil health cards, nutrient
+plans, fertility records), mounted at `/api/soil-registry`. Tested (4
+tests). Fixed 2 more pre-existing fabricated placeholders
+(`soilHealthAPI`, `nutrientManagementAPI`) and wired the 1
+previously-missing export (`fertilityManagementAPI`).
+
+MISSING_EXPORT count: 57 -> 56.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -305,7 +315,6 @@ still CONFIRMED GAP, but neither is the duplicate-filename bug**:
 Batch-verified 2026-09-16 (18 livestock/farm-ops + 10 REOS/platform names,
 via two research passes) — added to this gap list, do not re-investigate:
 
-`fertilityManagementAPI`,
 `pondAPI`,
 `medicalCodingAPI`, `nutritionIntelligenceAPI` — all trace to real
 `createCrudService(...)` DB-backed objects (`services/legacy/*.js`:

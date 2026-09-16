@@ -2435,9 +2435,17 @@ export const soilManagementAPI = {
   analyzeSoil: (data) => api.post('/soil-management/analyze', data),
 };
 
+// 2026-09-16: was a pre-existing fabricated placeholder (wrong method
+// names, missing update/delete entirely, made-up path). Fixed against
+// the new backend/src/routes/soilRegistryRoutes.js (wraps
+// services/legacy/soilManagementService.js's real createCrudService(...)
+// objects, previously unrouted).
+const SOIL_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/soil-registry`;
 export const soilHealthAPI = {
-  getSoilHealth: () => api.get('/soil-health'),
-  improveSoilHealth: (data) => api.post('/soil-health/improve', data),
+  getCards: (params) => api.get(`${SOIL_REGISTRY_BASE}/health-cards`, { params }),
+  createCard: (data) => api.post(`${SOIL_REGISTRY_BASE}/health-cards`, data),
+  updateCard: (id, data) => api.put(`${SOIL_REGISTRY_BASE}/health-cards/${id}`, data),
+  deleteCard: (id) => api.delete(`${SOIL_REGISTRY_BASE}/health-cards/${id}`),
 };
 
 export const sheepAPI = {
@@ -2778,9 +2786,19 @@ export const waterConservationAPI = {
   conserveWater: (data) => api.post('/water-conservation/conserve', data),
 };
 
+// Same fix as soilHealthAPI above.
 export const nutrientManagementAPI = {
-  getNutrientManagement: () => api.get('/nutrient-management'),
-  manageNutrients: (data) => api.post('/nutrient-management/manage', data),
+  getPlans: (params) => api.get(`${SOIL_REGISTRY_BASE}/nutrient-plans`, { params }),
+  createPlan: (data) => api.post(`${SOIL_REGISTRY_BASE}/nutrient-plans`, data),
+  updatePlan: (id, data) => api.put(`${SOIL_REGISTRY_BASE}/nutrient-plans/${id}`, data),
+  deletePlan: (id) => api.delete(`${SOIL_REGISTRY_BASE}/nutrient-plans/${id}`),
+};
+
+export const fertilityManagementAPI = {
+  getRecords: (params) => api.get(`${SOIL_REGISTRY_BASE}/fertility-records`, { params }),
+  createRecord: (data) => api.post(`${SOIL_REGISTRY_BASE}/fertility-records`, data),
+  updateRecord: (id, data) => api.put(`${SOIL_REGISTRY_BASE}/fertility-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${SOIL_REGISTRY_BASE}/fertility-records/${id}`),
 };
 
 export const soilHealthMonitoringAPI = {
