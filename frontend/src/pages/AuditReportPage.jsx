@@ -1,119 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Download, Shield, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
+// 2026-09-16: was a hardcoded `auditData` object (`totalAudits: 156`,
+// fabricated pass/fail/pending counts, fabricated security/compliance/
+// performance percentage scores) plus a "Generate Report" button that
+// just ran a fake `setTimeout`. Investigated a real backend:
+// - `routes/auditRoutes.js` is real and mounted at `/api/audit`
+//   (`GET /report` -> `auditService.generateAuditReport()`,
+//   `GET /security` -> `getSecurityAudit()`,
+//   `GET /compliance/:complianceType` -> `getComplianceAudit()`).
+// - But its shape is completely different from what this page needs:
+//   `generateAuditReport` returns real audit-log events grouped by user
+//   or entity (event/success/failure counts per user), and
+//   `getSecurityAudit` returns raw security-related log rows (logins,
+//   failed logins, permission denials) - there is no pass/fail "audit"
+//   count and no security/compliance/performance percentage score
+//   anywhere in this service. Checked the full service file directly,
+//   not assumed from the route names.
+// This page's specific "156 audits, 3 score percentages" concept doesn't
+// exist in the backend at all - it isn't a wiring gap, the metric itself
+// was invented. Converted to an honest unavailable state and removed the
+// fake "Generate Report" button (it never called a real API) rather than
+// inventing a mapping from real audit-log data to a score that doesn't
+// exist server-side.
 const AuditReportPage = () => {
-  const [loading, setLoading] = useState(false);
-
-  const auditData = {
-    totalAudits: 156,
-    passedAudits: 147,
-    failedAudits: 3,
-    pendingAudits: 6,
-    securityScore: 95,
-    complianceScore: 92,
-    performanceScore: 88,
-  };
-
-  const handleGenerate = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1500);
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Audit Report</h1>
-          <p className="text-muted-foreground">System compliance and security audit results</p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={handleGenerate} disabled={loading}>
-            {loading ? 'Generating...' : 'Generate Report'}
-          </Button>
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">Audit Report</h1>
+        <p className="text-muted-foreground">System compliance and security audit results</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Audits</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{auditData.totalAudits}</div>
-            <p className="text-xs text-muted-foreground">Comprehensive checks</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Passed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{auditData.passedAudits}</div>
-            <p className="text-xs text-muted-foreground">94% pass rate</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Failed</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{auditData.failedAudits}</div>
-            <p className="text-xs text-muted-foreground">Critical issues</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{auditData.pendingAudits}</div>
-            <p className="text-xs text-muted-foreground">Awaiting review</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Security Score</CardTitle>
-            <CardDescription>Overall security assessment</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-green-600">{auditData.securityScore}%</div>
-            <p className="text-sm text-muted-foreground mt-2">Excellent security posture</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Compliance Score</CardTitle>
-            <CardDescription>Regulatory compliance status</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-blue-600">{auditData.complianceScore}%</div>
-            <p className="text-sm text-muted-foreground mt-2">GDPR compliant</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance Score</CardTitle>
-            <CardDescription>System performance metrics</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-purple-600">{auditData.performanceScore}%</div>
-            <p className="text-sm text-muted-foreground mt-2">Good performance</p>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-muted-foreground" />
+            Live audit score data isn&apos;t available yet
+          </CardTitle>
+          <CardDescription>
+            The backend has a real audit log (event history, security events, compliance
+            events) but no pass/fail audit counts or security/compliance/performance
+            percentage scores - that scoring concept doesn&apos;t exist server-side yet. This
+            page will show real figures once a matching endpoint is built.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">No audit summary to display.</p>
+        </CardContent>
+      </Card>
     </div>
   );
 };

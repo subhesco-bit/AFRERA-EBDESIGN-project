@@ -6717,6 +6717,24 @@ export const waterQualityAPI = {};
 export const watershedManagementAPI = {};
 export const yieldAPI = {};
 
+// 2026-09-16: SalesReportPage.jsx was hardcoded (totalRevenue: 1250000,
+// fake top products/farmers). Found a real, mounted, matching endpoint:
+// `controllers/ecommerceBusinessSalesController.js`'s `getSalesAnalytics`
+// (backed by `services/legacy/ecommerceBusinessSalesService.js`, a real
+// query over `orders`/`order_items`/`product_listings`), routed at
+// `GET /api/ecommercebusinesssales/sales-analytics` (mounted in
+// backend/src/index.js). Returns `{success, filters, summary:
+// {total_orders, total_revenue, unique_customers, total_quantity},
+// daily_data: [...]}` directly (`res.json(result)`, no envelope wrapper)
+// - verified by reading the controller and service directly, not
+// guessed. No `topProducts`/`topFarmers`/`growthRate` exist in this
+// response, so SalesReportPage.jsx only renders the real summary +
+// daily_data fields, nothing invented.
+const ECOMMERCE_BUSINESS_SALES_BASE = `${UNVERSIONED_BASE}/api/ecommercebusinesssales`;
+export const salesAnalyticsAPI = {
+  getSalesAnalytics: (params) => api.get(`${ECOMMERCE_BUSINESS_SALES_BASE}/sales-analytics`, { params }),
+};
+
 export { api };
 
 export default api;
