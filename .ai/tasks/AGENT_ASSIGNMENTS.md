@@ -287,6 +287,104 @@ now-reachable endpoints.
 
 MISSING_EXPORT count: 51 -> 45.
 
+## Update — 2026-09-16 (later still): investigated wiring backend/src/modules/ for the remaining `modules/`-tree gaps - do NOT proceed, here's why
+
+Of the 45 remaining names, ~16 trace to `backend/src/modules/` (the
+~150+ M0xx tree, never scanned by either dynamic loader): `orchardAPI`,
+`pondAPI`, `assetLifecycleAPI`, `breakdownMaintenanceAPI`,
+`equipmentInventoryAPI`, `fuelManagementAPI`, `preventiveMaintenanceAPI`,
+`sparePartsAPI`, `waterBudgetingAPI`, `rainwaterHarvestingAPI`,
+`watershedManagementAPI`, `waterAnalyticsAPI`, `irrigationAPI`,
+`yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`. Investigated whether
+these modules could be safely wired the same way as the
+`createCrudService` batch above. Found two layered problems, fixed the
+first (safe, real) and stopped at the second (not safe, real backend
+work needed):
+
+**Problem 1 - fixed**: every M0xx module built from the generic
+scaffold template (`controller.js` + `service.js` + `routes.js`, 344
+files across the whole tree, confirmed via `require()`ing each module's
+`routes.js` directly) crashed immediately at require time with two
+systemic, shared missing dependencies:
+- `backend/src/utils/response.js` didn't exist at all -
+  `controller.js`'s `const { sendSuccess, sendError } = require('../../utils/response')`
+  threw `Cannot find module`. Created it, matching the exact call-site
+  signature (`sendSuccess(res, data, pagination, statusCode)`,
+  `sendError(res, error, statusCode)`) verified from real controller
+  usage, not invented.
+- `backend/src/middleware/validationMiddleware.js` didn't exist -
+  `routes.js`'s `const { validateRequest } = require('../../middleware/validationMiddleware')`
+  also threw. Grepped all 344 `routes.js` files for `validateRequest(` -
+  zero actual call sites (same dead-import class of bug as
+  `sharedInfrastructureAPI` earlier this session). Created a real,
+  correct pass-through middleware rather than leaving the require
+  broken.
+- Separately, `middleware/authMiddleware.js` (an existing compatibility
+  wrapper around `auth.js`) didn't export a name called `authenticate` -
+  314 of 344 `routes.js` files do
+  `const { authenticate } = require('../../middleware/authMiddleware')`
+  then the load-bearing `router.use(authenticate)` (not dead - actually
+  enforces auth). Fixed by aliasing the same real `authMiddleware`
+  function under both names, **mutating the existing exported object in
+  place** rather than wrapping it in a new one - 3 existing route files
+  (`infrastructureMonitoringRoutes.js`, `gdprComplianceRoutes.js`,
+  `aiTrainingEvaluationRoutes.js`) already depend on
+  `require('../middleware/authMiddleware')` being directly callable as
+  `router.use(authMiddleware)`, and a naive `Object.assign({}, ...)`
+  fix would have broken those 3 the same way this file was breaking the
+  M0xx scaffold. Verified all 3 still work. Added
+  `middleware/__tests__/authMiddleware.test.js` (2 tests) locking this
+  in.
+
+Verified all 3 fixes together: every module checked (M076-M080, M103,
+M107-M110, M132, M141 - the ones relevant to the 16 gaps above) now
+loads without throwing. **These 3 files are currently dormant/inert in
+the live app** - nothing requires `backend/src/modules/` today (neither
+dynamic loader scans it), so this fix changes zero current behavior; it
+only removes a load-time landmine for whoever mounts any of these
+modules next.
+
+**Problem 2 - stopped here, real backend work needed, not a wiring
+fix**: every module's `service.js` hardcodes `this.table` to a
+completely wrong, unrelated table name, disconnected from the module's
+stated domain - confirmed for all 12 checked: M076 (Water Budgeting) →
+`cooperatives`, M077 (Water Quality) → `credit`, M078 (Rainwater
+Harvesting) → `govt_schemes`, M079 (Watershed) → `equipment_rental`,
+M080 (Water Analytics) → `agri_tourism`, M103 → `bi`, M107 →
+`api_management`, M108 → `workflows`, M109 → `documents`, M110 →
+`contracts`, M132 (Pond, already known) → `messaging`, **M141
+(Orchard) → `releases`**. `model.sql` in each module directory is a
+placeholder comment with no actual schema (`-- SQL model placeholder for
+Orchard Management (M141)\n-- Define tables and indexes here`).
+Mounting any of these as-is would silently read/write a real but totally
+unrelated table - not a missing feature, an actively wrong one. This
+also invalidates part of an earlier assessment this session that called
+M141 "the standout gap, essentially complete" - it is not; the routes/
+controller shape is real but the data layer underneath is a scaffold
+placeholder, same class of problem as M132's already-documented
+`messaging`-table issue, just not caught until reading `service.js`
+directly instead of stopping at `routes.js`'s shape.
+
+Separately, for the water modules specifically (M076-M080): each has a
+**second** router at `index.js` (distinct from the generic-CRUD
+`routes.js`) with real action-style endpoints matching
+`WaterManagementPage.jsx`'s exact expected method names (e.g. M078's
+`router.post('/systems', controller.designHarvestingSystem)`) - but
+`controller.js` (shared with `routes.js`) only implements the generic
+`getAll/getById/create/update/delete/createBulk/search` methods, not
+`designHarvestingSystem`/`monitorCollection`/etc. Requiring `index.js`
+throws `Route.post() requires a callback function but got a [object
+Undefined]`. Building those specific controller methods would be
+writing new business logic, not wiring - explicitly out of scope.
+
+**Conclusion**: none of the 16 `modules/`-tree gaps are fixed here.
+They need real backend work (a correct migration + table binding per
+module at minimum, plus for the water modules specifically, writing the
+actual action-method controller logic) before any of them can be safely
+mounted - not a same-session wiring fix. The 3 dependency fixes are kept
+(safe, dormant, real bug fixes) as groundwork for whoever does that work
+next.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -489,14 +587,18 @@ DB-backed objects in `services/legacy/{horticultureManagementService,
 inputSupplyManagementService,cropManagementService,landManagementService,
 operationsManagementService}.js` (shared `resourceCrudFactory.js`
 factory), zero `setupRoutes`, never mounted — needs new route files, not
-a wiring fix. `orchardAPI` is the standout: a genuinely complete
-standalone module (`modules/M141/{controller,service,routes}.js`, real
-CRUD REST handlers matching the frontend's exact fields) but `modules/`
-is never scanned by either dynamic loader and never manually
-`require()`'d — only 3 of the ~150+ M0xx modules in that tree are
-individually wired (M029, M400_AI_BACKBONE, M645100_LIBRARYKNOWLEDGE).
-Cheapest real fix of this whole gap list if module-mounting ever comes
-into scope, not done here.
+a wiring fix. `orchardAPI` was flagged here as "the standout: a
+genuinely complete standalone module" — **correction, see the "Update —
+2026-09-16 (later still)" section below**: it is not complete.
+`modules/M141/service.js` hardcodes `this.table = 'releases'` (a
+completely wrong, unrelated table) and `model.sql` is an empty
+placeholder — the routes/controller shape matches the frontend, but the
+data layer underneath doesn't exist for real. Not the cheapest fix in
+this list after all; needs a real migration + table binding first, same
+as the other `modules/`-tree gaps. `modules/` is never scanned by either
+dynamic loader and never manually `require()`'d — only 3 of the ~150+
+M0xx modules in that tree are individually wired (M029, M400_AI_BACKBONE,
+M645100_LIBRARYKNOWLEDGE).
 
 `varietyDirectoryAPI` — the 1 of 25 that's CONFIRMED LIVE and now wired:
 `/api/regionalvariety` (unversioned base), static mount in `index.js` via
