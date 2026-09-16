@@ -1114,6 +1114,54 @@ available substitute for confirming the real mount line doesn't throw.
 217/217 real backend tests pass (same 6 pre-existing empty-stub suites,
 unrelated).
 
+## Update — 2026-09-16 (sweep for the Stripe-boot-crash bug class elsewhere)
+
+Following the `stripeWebhookRoutes.js` boot-crash fix (real, previously
+undetected: the Stripe SDK throws synchronously when constructed without
+an API key, crashing the entire process at require time), swept the
+codebase for the same pattern - any third-party SDK constructed
+unconditionally at module scope - rather than assuming that was the only
+instance.
+
+`grep`'d for `require('<sdk>')(...)` and `new <SDK>(...)` at module top
+level across `src/`. Found:
+- `services/paymentService.js` - already correctly guarded
+  (`process.env.STRIPE_SECRET_KEY ? require('stripe')(...) : null`, same
+  for Razorpay). Not a bug, confirmed by reading it directly.
+- `integrations/stripeIntegrationComplete.js` - **the same real bug**:
+  `const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);`
+  unconditional at module scope. Confirmed via `grep -rln` that this file
+  is currently required nowhere in the codebase (dead/orphaned - not a
+  live crash risk today), but the next orphaned-service wiring pass
+  (this session's single most common activity) would have hit this
+  exact crash the moment the file was required. Fixed with the identical
+  guarded pattern already used in `paymentService.js` and
+  `stripeWebhookRoutes.js`; all 9 methods already wrap their `stripe.*`
+  call in their own try/catch, so a `null` `stripe` now surfaces as one
+  clean per-request `TypeError`, not a process crash.
+- Checked `new Anthropic(...)` (3 call sites: `claudeAICoordinator.js`,
+  `claudeAIIntegration.js`, `aiImageGenerationEnhancedService.js`) -
+  `claudeAICoordinator.js` instantiates its class as a singleton at
+  require time (`module.exports = new ClaudeAICoordinator()`), so this
+  *would* matter if the SDK behaved like Stripe's - directly verified via
+  `new Anthropic({apiKey: undefined})` in a real Node REPL that the
+  `@anthropic-ai/sdk` constructor does **not** throw on a missing key
+  (only later calls would fail) - confirmed safe, not a bug.
+- MongoDB's `new Client(...)` in `database/connection.js` - already part
+  of this codebase's existing, already-tested graceful-degradation path
+  (the same fallback-mode logging already seen in every boot smoke test
+  this session) - not touched, out of scope.
+
+**Separate, unrelated finding in the same file, correctly left
+unfixed**: `stripeIntegrationComplete.js` also does
+`require('../services/emailService')`, and no `emailService.js` exists
+anywhere in this codebase under any name (confirmed via `find`) - a
+second, pre-existing, genuinely broken import. Since the file is dead
+code (required nowhere) and fixing this would mean either fabricating an
+email service or building real new email infrastructure, both out of
+scope for this sweep, left as-is and documented here rather than
+silently patched over.
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a

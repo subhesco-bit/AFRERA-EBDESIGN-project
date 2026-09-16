@@ -2700,6 +2700,26 @@ route/middleware/service suite still 188/188 passing alongside it (same
 `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16 (server boot-crash bug)"
 section for full detail.
 
+## Update 42 — swept for the Stripe-boot-crash bug class elsewhere
+
+Rather than assume `stripeWebhookRoutes.js` was the only instance of
+"SDK constructed unconditionally at module scope, throws without an API
+key, crashes the whole process at require time," searched the rest of
+the codebase for the same pattern. Found one more real instance:
+`integrations/stripeIntegrationComplete.js` had the identical bug
+(`new Stripe(process.env.STRIPE_SECRET_KEY)` at module scope) - currently
+dead code (required nowhere), so not a live crash today, but exactly the
+kind of file this session's orphaned-service wiring passes keep finding
+and mounting. Fixed with the same guarded pattern already used
+elsewhere. Checked `paymentService.js` (already correctly guarded) and
+all 3 `new Anthropic(...)` call sites (confirmed via a real REPL check
+that the Anthropic SDK, unlike Stripe's, doesn't throw on a missing key)
+- both false positives, not bugs. Also found a second, unrelated,
+pre-existing bug in the same dead file (`require('../services/emailService')`
+- no such file exists anywhere) - left unfixed since fixing it means
+building real new email infrastructure or fabricating a service, both
+out of scope for this sweep; documented instead.
+
 ## Update 40 — vite build fully green (0 MISSING_EXPORT errors)
 
 Closed out the frontend build blocker that's been red since this PR's
