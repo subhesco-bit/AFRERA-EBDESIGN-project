@@ -30,7 +30,7 @@ jest.mock('../../database/connection', () => ({
 const { generateAccessToken } = require('../../services/dual-use/authService');
 
 function mountedApp(routerPath, mountPath) {
-  // eslint-disable-next-line global-require, import/no-dynamic-require
+  // eslint-disable-next-line global-require
   const router = require(routerPath);
   const app = express();
   app.use(express.json());

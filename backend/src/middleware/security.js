@@ -219,7 +219,7 @@ const sanitizeInput = (req, res, next) => {
 const preventSQLInjection = (req, res, next) => {
   const sqlPatterns = [
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|EXEC|UNION|SCRIPT)\b)/i,
-    /(;|\-\-|\/\*|\*\/)/,
+    /(;|--|\/\*|\*\/)/,
     /(\b(OR|AND)\s+\d+\s*=\s*\d+)/i
   ];
 
