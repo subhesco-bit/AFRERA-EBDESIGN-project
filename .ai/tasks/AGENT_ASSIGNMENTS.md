@@ -929,6 +929,62 @@ with a genuinely missing dependency (`climateRouteSupport.js`, a whole
 validation library, not a simple bug) — not mounted, needs that library
 written for real before it can be.
 
+## Update — 2026-09-16 (server boot-crash bug, not a MISSING_EXPORT fix)
+
+Different class of bug from everything else in this file — found via a
+manual full-server-boot smoke test (`node src/index.js`, not
+`npm run test`), because CI's "Backend Tests" job
+(`.github/workflows/ci.yml` lines 46-91) spins up real Postgres/Redis
+containers but only ever runs `npm run test` (the jest unit suite) — it
+never actually boots the real server. A require-time crash in the real
+boot sequence is therefore structurally invisible to CI.
+
+`backend/src/routes/stripeWebhookRoutes.js` line 9 did
+`const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);`
+unconditionally at module load time. The Stripe SDK constructor throws
+synchronously (`Error: Neither apiKey nor config.authenticator
+provided`) when no key is configured — this crashed the **entire Node
+process** at boot, confirmed via a captured boot log showing AI Gateway,
+Analytics, the orphaned-services router (Dynamic Pricing, Farmer
+Training, Government Scheme, Greenhouse, Insurance Claims, Pre-Season
+Order, Shared Infrastructure, Soil Testing, Subsidy), and Twilio SMS/
+WhatsApp all mounting successfully first, then the process dying at this
+one `require()`. Every other optional third-party integration in this
+codebase (Twilio in `smsAuthService.js`/`whatsappService.js`,
+`OFFLINE_PAYMENT_SECRET`, `SYNC_SECRET`) already degrades gracefully with
+a warning log — Stripe was the one exception.
+
+Fixed by following the exact pattern already established in
+`services/platform/smsAuthService.js` for Twilio: the `stripe` client is
+now only constructed when `process.env.STRIPE_SECRET_KEY` is set; a
+`logger.warn(...)` fires in the same style when it isn't
+("STRIPE_SECRET_KEY not configured, Stripe webhook endpoint will run in
+disabled mode"); and the `POST /stripe-webhook` handler returns `503
+{ error: 'Stripe is not configured on this server' }` instead of
+throwing when `stripe` is undefined. No other line in the file changed —
+all 6 event handlers and their (separately pre-existing, still-partial —
+several just `logger.info('💾 Recording...')` without actually persisting,
+noted but out of scope here) helper functions are untouched.
+
+Verified two ways: (1) re-ran the same `node src/index.js` smoke test —
+the process now logs the new warning and proceeds cleanly through service
+discovery (313 services) and past the old crash point, instead of dying;
+confirmed via exit code (`124`, a timeout kill of a still-running
+process, not `1`, a crash). (2) New test file
+`backend/src/routes/__tests__/stripeWebhookRoutes.test.js` (3 tests):
+requiring the module without `STRIPE_SECRET_KEY` doesn't throw; `POST
+/stripe-webhook` returns 503 (not a crash) when unconfigured; requiring
+the module WITH a key still constructs a real client without throwing.
+Ran the full existing route/middleware/service test suite alongside it
+(`src/routes/__tests__`, `orphanedServiceRoutes.test.js`,
+`authMiddleware.test.js`, `erpService.test.js`) — 188/188 passing; the 6
+suite-level failures in that run are pre-existing empty stub test files
+(`waterSoilManagementRoutes.test.js`, `platformFoundationRoutes.test.js`,
+`operationsMachineryRoutes.test.js`, `livestockFisheriesRoutes.test.js`,
+`enterpriseCommerceSafety.test.js`, `climateRoutes.test.js`) that predate
+this session and contain zero test cases — unrelated to this change, not
+touched.
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a

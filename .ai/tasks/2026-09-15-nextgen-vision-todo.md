@@ -2668,3 +2668,34 @@ to keep searching for.
 **Running total this session**: 161 → 31 MISSING_EXPORT errors (130
 closed). 223/223 real backend tests pass (same 6 pre-existing
 empty-stub suites unrelated).
+
+## Update 39 — real server boot-crash bug found (not a MISSING_EXPORT fix)
+
+Different class of bug, found by doing something CI itself never does:
+actually booting the real server (`node src/index.js`) instead of just
+running the jest suite (`.github/workflows/ci.yml`'s "Backend Tests" job
+only ever runs `npm run test`, even though it spins up real Postgres/
+Redis containers - it never calls `node src/index.js`). A smoke test
+immediately found `backend/src/routes/stripeWebhookRoutes.js` crashing
+the entire process at require-time: `const stripe =
+require('stripe')(process.env.STRIPE_SECRET_KEY);` on line 9 threw
+synchronously (`Neither apiKey nor config.authenticator provided`)
+whenever `STRIPE_SECRET_KEY` isn't set - unlike Twilio/
+`OFFLINE_PAYMENT_SECRET`/`SYNC_SECRET`, which already degrade gracefully
+elsewhere in this codebase. Confirmed via captured boot log that many
+services (AI Gateway, Analytics, orphaned-services router, Twilio mock
+mode) mounted fine first, then the process died at this one line - a
+genuinely isolated, pre-existing bug.
+
+Fixed following the exact lazy-init pattern already used for Twilio in
+`services/platform/smsAuthService.js`: construct `stripe` only when
+`STRIPE_SECRET_KEY` is set, log a matching warning otherwise, and have
+the webhook handler return `503` instead of throwing when unconfigured.
+Re-ran the boot smoke test - process now proceeds cleanly past the old
+crash point (confirmed via exit code 124, a timeout of a still-running
+process, not the crash's exit code 1). New test file
+`stripeWebhookRoutes.test.js` (3 tests, all passing). Full existing
+route/middleware/service suite still 188/188 passing alongside it (same
+6 pre-existing empty-stub suites, unrelated, untouched). See
+`AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16 (server boot-crash bug)"
+section for full detail.
