@@ -22,7 +22,6 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
-| Claude (PR #21) | new `routes/pondRoutes.js`, `routes/medicalCodingRoutes.js`, `routes/nutritionIntelligenceRoutes.js`; `index.js` (append 3 mounts); `frontend/src/services/api.js` (adding real endpoints to `pondAPI`/`medicalCodingAPI`/`nutritionIntelligenceAPI` only) | 2026-09-16 | Wrapping 3 pre-existing, unrouted `createCrudService(...)` backends (see "Confirmed Missing-Feature Gaps" below) in thin Express routers - no new business logic, just mounting. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -800,14 +799,22 @@ Batch-verified 2026-09-16 (18 livestock/farm-ops + 10 REOS/platform names,
 via two research passes) — added to this gap list, do not re-investigate:
 
 `pondAPI`,
-`medicalCodingAPI`, `nutritionIntelligenceAPI` — all trace to real
+`medicalCodingAPI`, `nutritionIntelligenceAPI` — **correction, 2026-09-16
+(later)**: the "just needs a router" framing below turned out wrong for
+all 3 once someone actually tried to write the routers. Re-verified
+independently and fixed properly (see the "Update — 2026-09-16 (pond/
+medical/nutrition: 0-for-3 on 'just needs a router')" section further
+down) — leaving the original note intact below for the history, but
+treat the correction as authoritative: no wiring fix exists for any of
+these 3, they're genuine gaps, don't re-attempt a router for them.
+~~all trace to real
 `createCrudService(...)` DB-backed objects (`services/legacy/*.js`:
 `livestockManagementService.js`, `operationsManagementService.js`,
 `soilManagementService.js`, `fisheriesManagementService.js`) that were
 simply never wrapped in an Express router/`setupRoutes` — no
 `setupRoutes` string exists in those files at all, so even the loader
 can't mount them; needs a new route file written per service, not a
-wiring fix. (Exception: `pondAPI` — `modules/M132`'s own README claims a
+wiring fix.~~ (Exception: `pondAPI` — `modules/M132`'s own README claims a
 519-line real pond service reachable via a generic `/api/v1/backend-modules/M132/:operation`
 bridge; verified false — the actual file is 242 lines, is a generic
 messaging-table scaffold unrelated to ponds, and the claimed bridge route
@@ -1561,6 +1568,46 @@ Full frontend suite: **54/55 tests passing** (was 52/52 - 3 new tests
 now actually run instead of the whole suite being skipped). `node -c`/
 eslint clean; `npm run build` unaffected (this file isn't in the live
 router either way).
+
+## Update — 2026-09-16 (pond/medical/nutrition: 0-for-3 on "just needs a router")
+
+Attempted to close out `pondAPI`/`medicalCodingAPI`/`nutritionIntelligenceAPI`
+based on the earlier note's "all trace to real `createCrudService(...)`
+objects, just never wrapped in a router" claim. Re-verified each
+independently by reading the actual service files rather than trusting
+the mapping, and the claim didn't hold for any of the 3:
+
+- **`pondAPI`** — `fisheriesManagementService.js`'s own file header says
+  pond management explicitly isn't built there, deferring to
+  `modules/M132`. `modules/M132/service.js` (242 lines) hardcodes
+  `this.table = 'messaging'` - a generic scaffold with zero pond logic,
+  despite `modules/M132/README.md` claiming a "519-line real pond
+  service." `database/migrations/016_advanced_ponds_iot.sql` does define
+  real `ponds`/`pond_sensors` tables, but no service code anywhere reads
+  or writes them - schema with no implementation.
+- **`medicalCodingAPI`** — the page needs condition-keyed dietary
+  restriction/nutrient-requirement data (`dash_compliant`,
+  `glycemic_focus`, `portion_control`, etc.). The two real, adjacent
+  services (`advancedMedicalCodingService.js`, mounted but built for a
+  different page; `medicalCodingReferenceService.js`, unmounted and a
+  plain code-text search) neither implement this shape.
+- **`nutritionIntelligenceAPI`** — the real, already-mounted
+  `nutritionIntelligenceService.js` (`/api/nutritionintelligence`, 1212
+  lines) is entirely product/food-item nutrition (search, scoring,
+  pricing, recommendations) - no condition-specific requirement-checking
+  method exists anywhere for the page's `calculateNutrientProfile()`.
+
+No backend changes made (nothing safe to wire). Converted all 3 pages
+(`PondManagementPage.jsx`, `MedicalCodingDashboardPage.jsx`,
+`NutrientCalculatorPage.jsx`) to the established honest "not available
+yet" pattern, each with a code comment documenting the specific
+real-file findings above so the dead end isn't re-walked. Delegated the
+investigation+fix to a subagent, verified independently before
+committing: `npx eslint` clean on all 3 files, `npm run build` exit 0,
+full frontend suite still 54/55 (same one pre-existing, unrelated
+`criticalModules.test.jsx` failure, no regression). Corrected the
+original "just needs a router" note above in place rather than deleting
+it, so the dead end and why it's dead both stay on record.
 
 ## How To Add Your Own Section
 
