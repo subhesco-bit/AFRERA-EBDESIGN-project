@@ -219,6 +219,23 @@ previously-missing export (`fertilityManagementAPI`).
 
 MISSING_EXPORT count: 57 -> 56.
 
+**Ninth new route file**: `backend/src/routes/waterRecordsRegistryRoutes.js`
+wraps the 5 `createCrudService(...)` objects in
+`services/legacy/waterManagementService.js` (water budgets, quality
+readings, rainwater structures, watersheds, analytics), mounted at
+`/api/water-records-registry` (new path, not resurrecting the regressed
+`waterManagementRoutes.js` at `/api/watermanagement` in case its current
+stub behavior is relied on elsewhere). Tested (6 tests). Wired
+`waterBudgetRecordsAPI`/`waterQualityRecordsAPI`/`rainwaterStructuresAPI`/
+`watershedRecordsAPI`/`waterAnalyticsRecordsAPI` (these use plain
+`list/create/update/remove` method names, matching
+`WaterRecordsPage.jsx`'s calls directly - distinct from the still-gap
+`waterBudgetingAPI`/`rainwaterHarvestingAPI`/`watershedManagementAPI`/
+`waterAnalyticsAPI` on the separate `WaterManagementPage.jsx`, which need
+the unscanned `modules/M076`-`M080` tree wired instead, not done here).
+
+MISSING_EXPORT count: 56 -> 51.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -373,13 +390,14 @@ matching mounted route (`landManagementRoutes.js`) a dead stub - same
 pattern as the other management-service batches above).
 
 `waterBudgetRecordsAPI`, `waterQualityRecordsAPI`, `rainwaterStructuresAPI`,
-`watershedRecordsAPI`, `waterAnalyticsRecordsAPI` — real CRUD objects in
-`services/legacy/waterManagementService.js`; **this one is a genuine
-regression, not just an unmounted stub**: `waterManagementRoutes.js` used
-to require this service and was overwritten with a dead "Route
-operational" placeholder stub by a later batch-fix commit
-(`a2beb556`, 2026-09-10) — confirmed via `git log`/`git show` on the exact
-file, not assumed from a stale comment.
+`watershedRecordsAPI`, `waterAnalyticsRecordsAPI` — **now fixed, see the
+ninth new route file below** (was: real CRUD objects in
+`services/legacy/waterManagementService.js`; a genuine regression, not
+just an unmounted stub: `waterManagementRoutes.js` used to require this
+service and was overwritten with a dead "Route operational" placeholder
+stub by a later batch-fix commit (`a2beb556`, 2026-09-10) — confirmed via
+`git log`/`git show` on the exact file, not assumed from a stale
+comment).
 
 `waterBudgetingAPI`, `rainwaterHarvestingAPI`, `watershedManagementAPI`,
 `waterAnalyticsAPI` — action-style names (`designSystem`,

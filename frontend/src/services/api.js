@@ -2801,6 +2801,53 @@ export const fertilityManagementAPI = {
   deleteRecord: (id) => api.delete(`${SOIL_REGISTRY_BASE}/fertility-records/${id}`),
 };
 
+// 2026-09-16: WaterRecordsPage.jsx calls these 5 with plain list/create/
+// update/remove (matching resourceCrudFactory's own method names
+// directly, unlike most other pages' getX/createX convention). This is a
+// confirmed regression fix, not a fresh feature - see
+// backend/src/routes/waterRecordsRegistryRoutes.js's header comment:
+// waterManagementRoutes.js used to expose these same 5 real
+// createCrudService(...) objects and was overwritten with a stub by a
+// later batch-fix commit. Distinct from waterBudgetingAPI/
+// rainwaterHarvestingAPI/watershedManagementAPI/waterAnalyticsAPI
+// (WaterManagementPage.jsx, action-style names matching the unscanned
+// modules/M076-M080 tree) - those remain genuine gaps, not fixed here.
+const WATER_RECORDS_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/water-records-registry`;
+export const waterBudgetRecordsAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/budgets`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/budgets`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/budgets/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/budgets/${id}`),
+};
+
+export const waterQualityRecordsAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/quality-readings`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/quality-readings`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/quality-readings/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/quality-readings/${id}`),
+};
+
+export const rainwaterStructuresAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/rainwater-structures`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/rainwater-structures`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/rainwater-structures/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/rainwater-structures/${id}`),
+};
+
+export const watershedRecordsAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/watersheds`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/watersheds`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/watersheds/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/watersheds/${id}`),
+};
+
+export const waterAnalyticsRecordsAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/analytics`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/analytics`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/analytics/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/analytics/${id}`),
+};
+
 export const soilHealthMonitoringAPI = {
   getSoilHealthMonitoring: () => api.get('/soil-health-monitoring'),
   monitorSoilHealth: (data) => api.post('/soil-health-monitoring/monitor', data),
