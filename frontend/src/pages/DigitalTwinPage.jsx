@@ -1,17 +1,23 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Boxes, Radio, CloudSun, Sprout, ArrowRight } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Boxes, Radio, CloudSun, Sprout, ArrowRight, Plus } from 'lucide-react';
+import { digitalTwinAPI } from '../services/api';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 
-// 2026-09-16: was a 1-line placeholder (`<h1>DigitalTwinPage</h1>`), the
-// live `/digital-twin` route (dashboardRoutes, role 'farmer' - see
-// config/routes.js and App.jsx's RoleRoute) rendering nothing real.
-// Checked for a real backend first: services/api.js's `digitalTwinAPI`
-// (getDigitalTwin/createDigitalTwin) points at `/digital-twin`, and even
-// the correct mount (`/api/digitaltwin` -> routes/digitalTwinRoutes.js)
-// is a bare 38-line "Route operational" scaffold with no real simulation
-// endpoint - not wired here, since there is genuinely nothing real to
-// query. Built instead as honest static content describing what a
-// digital twin means for a farm operation, plus real navigation into the
-// actually routed monitoring pages that would feed one.
+// 2026-09-16: was a 1-line placeholder, then (earlier this session)
+// rewritten as honest static content after checking `/api/digitaltwin`
+// (routes/digitalTwinRoutes.js) and finding only a bare "Route
+// operational" scaffold. That check missed a *different* real,
+// DB-backed implementation at `/api/v1/digital-twin`
+// (services/legacy/digitalTwinService.js - create/list/get/simulate/
+// ingest-sensor-data, digital_twins table, real migrations 072/094) -
+// found during a later duplicate-service audit and now mounted (see
+// index.js). `digitalTwinAPI` in api.js already pointed at this exact
+// path, added correctly in anticipation before this backend was found.
+// Real data now drives the page; the static concept cards and
+// monitoring-page links stay since they're still accurate and useful.
 const concepts = [
   {
     icon: Radio,
@@ -31,6 +37,25 @@ const concepts = [
 ];
 
 export default function DigitalTwinPage() {
+  const queryClient = useQueryClient();
+  const [farmId, setFarmId] = useState('');
+  const [twinName, setTwinName] = useState('');
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['digital-twins'],
+    queryFn: () => digitalTwinAPI.getDigitalTwin().then((r) => r.data.twins || []),
+  });
+
+  const createTwin = useMutation({
+    mutationFn: () =>
+      digitalTwinAPI.createDigitalTwin({ farmId, configuration: { name: twinName || undefined } }),
+    onSuccess: () => {
+      setFarmId('');
+      setTwinName('');
+      queryClient.invalidateQueries({ queryKey: ['digital-twins'] });
+    },
+  });
+
   return (
     <div>
       <section className="bg-gradient-to-b from-green-50 to-white">
@@ -42,6 +67,62 @@ export default function DigitalTwinPage() {
             climate data you already track on AFRERA, kept up to date as conditions change.
           </p>
         </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-12">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Your digital twins</h2>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (farmId.trim()) createTwin.mutate();
+          }}
+          className="flex flex-wrap gap-2 mb-6"
+        >
+          <Input
+            value={farmId}
+            onChange={(e) => setFarmId(e.target.value)}
+            placeholder="Farm ID"
+            className="w-48"
+            aria-label="Farm ID"
+          />
+          <Input
+            value={twinName}
+            onChange={(e) => setTwinName(e.target.value)}
+            placeholder="Twin name (optional)"
+            className="w-56"
+            aria-label="Twin name"
+          />
+          <Button type="submit" disabled={!farmId.trim() || createTwin.isPending}>
+            <Plus className="w-4 h-4 mr-1" />
+            {createTwin.isPending ? 'Creating...' : 'Create twin'}
+          </Button>
+        </form>
+        {createTwin.isError && (
+          <p className="text-sm text-red-600 mb-4">
+            Failed to create digital twin: {createTwin.error?.response?.data?.error || createTwin.error?.message}
+          </p>
+        )}
+
+        {isLoading && <p className="text-gray-500">Loading digital twins...</p>}
+        {error && <p className="text-red-600">Failed to load digital twins: {error.message}</p>}
+        {!isLoading && !error && (data || []).length === 0 && (
+          <p className="text-gray-500 text-sm">No digital twins yet. Create one for a farm above.</p>
+        )}
+        {!isLoading && !error && (data || []).length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {data.map((twin) => (
+              <div key={twin.id} className="bg-white border border-gray-200 rounded-lg p-5">
+                <h3 className="font-semibold text-gray-900">{twin.name}</h3>
+                <p className="text-sm text-gray-600">{twin.farmName || `Farm ${twin.farmId}`}</p>
+                {twin.location && <p className="text-xs text-gray-500">{twin.location}</p>}
+                <p className="text-xs text-gray-400 mt-2">
+                  Last update: {twin.lastUpdate ? new Date(twin.lastUpdate).toLocaleString() : 'never'}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="container mx-auto px-4 py-16">

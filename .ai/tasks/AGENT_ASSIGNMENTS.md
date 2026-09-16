@@ -22,7 +22,6 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
-| Claude (PR #21) | `backend/src/index.js` (append 1 mount, same block as the escrow fix); `frontend/src/pages/DigitalTwinPage.jsx` | 2026-09-16 | Mounting real, unmounted `services/legacy/digitalTwinService.js` (found during the duplicate-service audit) and wiring `DigitalTwinPage.jsx` to it - `digitalTwinAPI` in api.js already matches the real routes exactly, no frontend client changes needed. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -1685,3 +1684,48 @@ earlier this session and never calls it) and the rest of `escrowService`'s
 duplicate-shadowing question itself (moot now that the real file is
 explicitly required by path, sidestepping the loader's ambiguity
 entirely, same as the 8 already-fixed cases).
+
+## Update — 2026-09-16 (digitalTwinService follow-up: the flagged item above, now fixed)
+
+Went back to the `digitalTwinService` item flagged (not fixed) above.
+Same shape as the escrow fix: real, DB-backed logic
+(create/update/ingest-sensor-data/simulate/get/list against a real,
+migrated `digital_twins` table - `migrations/072_tier1_m025_m030_schema.sql`
+and `094_create_digital_twin_tables.sql`) via `setupRoutes(app)`, never
+mounted; the live `/api/digitaltwin` mount is a separate, unrelated dead
+health-check scaffold. `digitalTwinAPI` in `api.js` already pointed at
+the exact right path (`/digital-twin` -> `/api/v1/digital-twin`) - added
+correctly in an earlier pass, before this real backend had been found,
+so no frontend-client changes were needed at all.
+
+Mounted via the same explicit `require(...).setupRoutes(app)` pattern
+(distinct `/api/v1/digital-twin` prefix, confirmed no collision with the
+dead `/api/digitaltwin` scaffold). Deliberately did **not** call the
+service's own `.initialize()` - it starts two un-refed `setInterval`
+timers (5-min/15-min background sync, no cleanup path), which would leak
+and could hang tests or short-lived processes. `list()`/`get()` read
+from an in-memory `Map` that `create()` already keeps in sync directly,
+so create-then-list works correctly within a running process without
+the boot-time DB preload; twins created before the current process
+started just won't appear until a restart - a pre-existing limitation in
+this legacy file, not something this fix changes or needed to change.
+
+Rewired `DigitalTwinPage.jsx` (previously honest static content, from
+the same earlier pass that missed this backend) to real data: a
+`useQuery`-driven twin list (real fields - name, farm name, location,
+last update) with an honest empty state, and a `useMutation`-driven
+create form (farm ID + optional name, matching the real
+`createDigitalTwin(farmId, configuration)` signature exactly) - kept the
+existing educational cards and monitoring-page links below it since
+they're still accurate.
+
+Verified: `node -c`/eslint clean on all 3 changed files; a direct HTTP
+smoke test (real Express app) confirmed `GET /api/v1/digital-twin`
+returns `{success, twins: []}` before any create, and the route registers
+correctly (`POST`'s 500 in the sandbox is `getPostgreSQL()` returning
+null with no real Postgres running - the same, already-accepted
+no-DB-in-sandbox behavior every other DB-backed route in this app has,
+not a bug); full boot smoke test still doesn't crash; `src/routes/__tests__`
++ `src/modules` unaffected (343/344, same 1 known M041 non-bug failure);
+frontend `npm run build` exits 0; frontend suite unaffected (54/55, same
+1 known unrelated failure).

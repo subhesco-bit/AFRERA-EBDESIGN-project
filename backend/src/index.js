@@ -767,6 +767,24 @@ async function startup() {
     // it. Mounted at /api/v1/escrow - distinct from the pre-existing dead
     // /api/escrow scaffold mount below, no collision.
     require('./services/legacy/escrowService.js').setupRoutes(app);
+    // 2026-09-16: same setupRoutes(app) pattern again - real, DB-backed
+    // digital twin logic (create/update/ingest-sensor-data/simulate/get/
+    // list, digital_twins table), never mounted. Mounted at
+    // /api/v1/digital-twin - distinct from the pre-existing dead
+    // /api/digitaltwin scaffold mount below, no collision. The frontend's
+    // digitalTwinAPI already pointed at this exact path (added in an
+    // earlier pass, correctly anticipating it, before this real backend
+    // was found) - no frontend client changes needed, only DigitalTwinPage.jsx
+    // itself now calls it. Deliberately NOT calling .initialize() here:
+    // it starts two un-refed setInterval timers (5min/15min background
+    // sync) with no cleanup path, which would leak and could hang tests/
+    // short-lived processes; list()/get() read from an in-memory Map that
+    // create() already keeps in sync directly, so basic create-then-list
+    // works correctly within a running process even without the boot-time
+    // DB preload - twins created before the current process started just
+    // won't appear until a restart. Pre-existing limitation in this file,
+    // not something this fix changes.
+    require('./services/legacy/digitalTwinService.js').setupRoutes(app);
     app.use('/api/wikipedia', wikipediaRoutes);
     app.use('/api/weather', weatherRoutes);
     app.use('/api/weatheradvisory', weatherAdvisory);
