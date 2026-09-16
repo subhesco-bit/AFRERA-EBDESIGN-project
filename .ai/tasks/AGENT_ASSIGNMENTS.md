@@ -82,7 +82,11 @@ real backend's actual req.body/req.query/req.params shape, not guessed):
 `predictiveAnalyticsAPI` (3 of 5 methods), `blockchainTraceabilityAPI`,
 `paymentGatewayAPI`, `formsAPI`, `farmerTrainingAPI` (2 of 3 methods),
 `pricingAPI`, `wearableAPI`, `villageProfileAPI`, `subsidyOpsAPI`,
-`governmentSchemeAPI`, `preSeasonAPI`, `sharedInfraAPI`.
+`governmentSchemeAPI`, `preSeasonAPI`, `sharedInfraAPI`, `goatFarmingAPI`,
+`pigFarmingAPI`, `sheepFarmingAPI`, `poultryManagementAPI` (same real
+endpoints as the earlier `goatAPI`/`pigAPI` etc., different method names
+for a different consuming page, `LivestockManagementPage.jsx`),
+`varietyDirectoryAPI` (`/api/regionalvariety`, unversioned base).
 
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
@@ -108,8 +112,17 @@ identical base filename across `services/`, `services/<domain>/`, and
 `services/legacy/` (e.g. `governmentSchemeService.js` in 3 places).
 `core/dynamicServiceLoader.js` discovers `setupRoutes(app)`-exporting
 services by walking the whole `services/` tree and keying a Map by base
-filename — whichever copy the walk visits *last* silently wins,
-independent of completeness. Confirmed concretely for 6 services
+filename — **correction, 2026-09-16**: `_registerService()`
+(`dynamicServiceLoader.js:82-85`) actually keeps the FIRST-discovered file
+for a name and skips+warns on later duplicates (`if
+(this.services.has(serviceName)) { logger.warn(...); return; }`), not
+"last wins" as originally written here. The practical effect is the same
+(you cannot predict the winner from the file list alone) because
+`fs.readdirSync` order is OS/filesystem-dependent, not alphabetical or
+depth-ordered — so which file counts as "first" isn't obvious either.
+Bottom line unchanged: always check the real winner with the loader
+script below, never guess from directory order. Confirmed concretely for
+6 services
 (`governmentSchemeService`, `aiAdvisoryService`, `buyingClubService`,
 `procurementSubscriptionService`, `renewableEnergyService`,
 `ruralEnterpriseService`): the winning file is a thinner variant missing
@@ -150,9 +163,104 @@ shadowing bug specifically — real code exists in `services/legacy/*.js`,
 just never reachable — a different kind of gap than the others in this
 list, see the update above), plus ~24 of `farmersAPI`'s methods (field
 management, harvest scoring, most market/pricing analytics — see the
-twenty-fourth update for the full list). `platformTelemetryAPI` and
-`mfaManagementAPI` are unconfirmed either way (see update above) — check
-before working on them, don't assume they're still on this list.
+twenty-fourth update for the full list).
+
+`platformTelemetryAPI` and `mfaManagementAPI` — **re-checked 2026-09-16,
+still CONFIRMED GAP, but neither is the duplicate-filename bug**:
+- `mfaManagementAPI` (`IdentityManagementPage.jsx` device-registry tab):
+  the page's own `backendNote` prop admits `/mfa-devices` was never
+  built. `mfaRoutes.js`/`mfaRoutes_merged.js` only implement per-user TOTP
+  (`/setup`,`/verify`,`/disable`,`/status`), no device CRUD, and neither
+  file is even `require()`'d in `index.js`.
+- `platformTelemetryAPI` (`PlatformManagementPage.jsx` `.getStatus()`/
+  `.getAnalytics()`): a real, working `controllers/platformTelemetryController.js`
+  exists (backed by `services/legacy/platformTelemetryService.js`) but is
+  never required by any route file — the only mounted route,
+  `routes/platformTelemetryRoutes.js` (`/api/platformtelemetry`), is an
+  unrelated stub that doesn't import the controller. Orphaned-controller
+  bug, not a Map-shadowing one — cheap fix if in scope, but out of scope
+  for a wiring pass (needs a new route file, not just an export).
+
+Batch-verified 2026-09-16 (18 livestock/farm-ops + 10 REOS/platform names,
+via two research passes) — added to this gap list, do not re-investigate:
+
+`cattleRegistryAPI`, `feedManagementAPI`, `livestockAnalyticsAPI`,
+`farmActivityAPI`, `farmTaskAPI`, `fertilityManagementAPI`,
+`fishHealthAPI`, `fishProcessingAPI`, `coldFishChainAPI`,
+`biofloccFarmAPI`, `aquacultureAnalyticsAPI`, `pondAPI`,
+`medicalCodingAPI`, `nutritionIntelligenceAPI` — all trace to real
+`createCrudService(...)` DB-backed objects (`services/legacy/*.js`:
+`livestockManagementService.js`, `operationsManagementService.js`,
+`soilManagementService.js`, `fisheriesManagementService.js`) that were
+simply never wrapped in an Express router/`setupRoutes` — no
+`setupRoutes` string exists in those files at all, so even the loader
+can't mount them; needs a new route file written per service, not a
+wiring fix. (Exception: `pondAPI` — `modules/M132`'s own README claims a
+519-line real pond service reachable via a generic `/api/v1/backend-modules/M132/:operation`
+bridge; verified false — the actual file is 242 lines, is a generic
+messaging-table scaffold unrelated to ponds, and the claimed bridge route
+doesn't exist anywhere in the code. Don't trust module READMEs without
+reading the actual file.)
+
+`governmentAPI` (2 methods — `getSchemeAnalytics`/`getComplianceStatus`,
+distinct from the already-wired `governmentSchemeAPI`), `organizationManagementAPI`,
+`pushNotificationsAPI` (Web Push subscribe/unsubscribe — no VAPID/web-push
+code anywhere) — confirmed gaps, no matching backend.
+
+`householdEconomyAPI`, `sharedInfrastructureAPI` (note: distinct from the
+already-wired `sharedInfraAPI` — different backend file,
+`sharedInfrastructureService.js` vs `sharedInfraService.js`), `ruralFinanceAPI`,
+`mobilityRidesAPI`, `marketAccessAPI` — **not gaps, DEAD IMPORTS**:
+`REOSDashboardPage.jsx` imports 13 REOS API names but only calls 6 of them
+in any `useQuery`; these 5 (plus the already-known duplicate-shadowed 6)
+are imported and never used anywhere in the frontend. `ruralFinanceAPI`
+and `mobilityRidesAPI` in particular have substantial, real, DB-backed
+`setupRoutes` implementations already live (`/api/v1/rural-finance`,
+`/api/v1/mobility-rides`) that could be wired proactively even though
+nothing currently calls them — not done here since nothing consumes them
+yet (wiring an unused export doesn't fix a build error). `marketAccessAPI`
+already exists as an export at `api.js` (~line 3935) but is an earlier
+fabricated placeholder hitting the wrong path (`POST
+/market-access/manage` vs the real `POST /market-access`) — flagged for
+cleanup, not fixed here since it's unused either way.
+
+`organizationManagementAPI` and `platformTelemetryAPI` are the closest of
+this batch to a real fix if backend work comes into scope: both have a
+complete, correct implementation that's simply never `require()`'d by a
+mounted route (`platform/organizationManagementRoutes_merged.js` and
+`controllers/platformTelemetryController.js` respectively) — an
+unmount/wiring bug, not missing code.
+
+Batch-verified 2026-09-16 (25 crop/horticulture/agronomy names) — 24 of
+25 CONFIRMED GAP, added here, do not re-investigate:
+
+`aeroponicsAPI`, `bioPesticideAPI`, `biofertilizerAPI`, `floricultureAPI`,
+`horticultureAnalyticsAPI`, `inputConsumptionAPI`, `inputDistributionAPI`,
+`inputProcurementAPI`, `inputTraceabilityAPI`, `micronutrientAPI`,
+`nurseryAPI`, `organicInputAPI`, `pesticideInventoryAPI`, `polyhouseAPI`,
+`precisionHorticultureAPI`, `protectedCultivationAPI`, `seedPlanningAPI`,
+`sowingAPI`, `vegetableProductionAPI`, `surveyManagementAPI`,
+`farmProductivityAPI`, `farmOperationsDashboardAPI`, `operationsAPI` —
+same pattern as the livestock batch above: real `createCrudService(...)`
+DB-backed objects in `services/legacy/{horticultureManagementService,
+inputSupplyManagementService,cropManagementService,landManagementService,
+operationsManagementService}.js` (shared `resourceCrudFactory.js`
+factory), zero `setupRoutes`, never mounted — needs new route files, not
+a wiring fix. `orchardAPI` is the standout: a genuinely complete
+standalone module (`modules/M141/{controller,service,routes}.js`, real
+CRUD REST handlers matching the frontend's exact fields) but `modules/`
+is never scanned by either dynamic loader and never manually
+`require()`'d — only 3 of the ~150+ M0xx modules in that tree are
+individually wired (M029, M400_AI_BACKBONE, M645100_LIBRARYKNOWLEDGE).
+Cheapest real fix of this whole gap list if module-mounting ever comes
+into scope, not done here.
+
+`varietyDirectoryAPI` — the 1 of 25 that's CONFIRMED LIVE and now wired:
+`/api/regionalvariety` (unversioned base), static mount in `index.js` via
+`regionalVarietyRoutes_merged.js` -> `services/legacy/regionalVarietyService.js`
+directly (no loader/shadowing involved at all). Distinct from the
+pre-existing `regionalVarietyAPI` export (different path,
+`/regional-variety`, different page) — don't conflate the two.
 
 `weatherRoutes_merged.js` is a related but distinct case: it's real code
 with a genuinely missing dependency (`climateRouteSupport.js`, a whole

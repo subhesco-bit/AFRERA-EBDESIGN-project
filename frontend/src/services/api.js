@@ -5898,6 +5898,54 @@ export const warningAPI = {
   getWarningHealth: () => api.get('/warnings/health'),
 };
 
+// 2026-09-16: LivestockManagementPage.jsx imports these 4 under different
+// names (getAnimals/getBatches vs listHerd, otherwise identical verbs) than
+// the pigAPI/goatAPI/sheepAIAPI/poultryAIAPI objects above, which were wired
+// earlier this session for PigFarmingPage.jsx/GoatFarmingPage.jsx/etc. Both
+// sets of names point at the exact same real, mounted routes (goatRoutes.js,
+// pigRoutes_merged.js, sheepRoutes_merged.js, poultryRoutes_merged.js) -
+// verified directly against each route file's registered paths, not assumed.
+export const goatFarmingAPI = {
+  getAnimals: (params) => api.get(`${GOAT_BASE}/herd`, { params }),
+  createAnimal: (data) => api.post(`${GOAT_BASE}/herd`, data),
+  updateAnimal: (id, data) => api.put(`${GOAT_BASE}/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${GOAT_BASE}/herd/${id}`),
+};
+
+export const pigFarmingAPI = {
+  getAnimals: (params) => api.get(`${PIG_BASE}/herd`, { params }),
+  createAnimal: (data) => api.post(`${PIG_BASE}/herd`, data),
+  updateAnimal: (id, data) => api.put(`${PIG_BASE}/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${PIG_BASE}/herd/${id}`),
+};
+
+export const sheepFarmingAPI = {
+  getAnimals: (params) => api.get(`${SHEEP_BASE}/flock`, { params }),
+  createAnimal: (data) => api.post(`${SHEEP_BASE}/flock`, data),
+  updateAnimal: (id, data) => api.put(`${SHEEP_BASE}/flock/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${SHEEP_BASE}/flock/${id}`),
+};
+
+export const poultryManagementAPI = {
+  getBatches: (params) => api.get(`${POULTRY_BASE}/flocks`, { params }),
+  createBatch: (data) => api.post(`${POULTRY_BASE}/flocks`, data),
+  updateBatch: (id, data) => api.put(`${POULTRY_BASE}/flocks/${id}`, data),
+  deleteBatch: (id) => api.delete(`${POULTRY_BASE}/flocks/${id}`),
+};
+
+// 2026-09-16: verified live at /api/regionalvariety (unversioned, static
+// mount in index.js via regionalVarietyRoutes_merged.js -> services/legacy
+// /regionalVarietyService.js directly - no shadowing risk). Distinct from
+// the older regionalVarietyAPI export elsewhere in this file, which hits a
+// different path (/regional-variety) for a different page - do not merge.
+const VARIETY_DIRECTORY_BASE = `${UNVERSIONED_BASE}/api/regionalvariety`;
+export const varietyDirectoryAPI = {
+  list: (params) => api.get(VARIETY_DIRECTORY_BASE, { params }),
+  getCategories: () => api.get(`${VARIETY_DIRECTORY_BASE}/categories`),
+  requestImage: (id) => api.post(`${VARIETY_DIRECTORY_BASE}/${id}/generate-image`),
+  createListing: (id, data) => api.post(`${VARIETY_DIRECTORY_BASE}/${id}/create-listing`, data),
+};
+
 // 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and
 // calls it directly with relative paths (api.get('/advanced-medical-coding/...'))
 // rather than through a dedicated *API object - only a default export
