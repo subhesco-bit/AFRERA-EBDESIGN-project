@@ -170,6 +170,19 @@ HorticultureManagementPage.jsx now have a real backend.
 
 MISSING_EXPORT count: 81 -> 74.
 
+**Fifth new route file**: `backend/src/routes/inputSupplyRegistryRoutes.js`
+wraps all 8 `createCrudService(...)` objects in
+`services/legacy/inputSupplyManagementService.js` (biofertilizer,
+pesticide inventory, bio-pesticide, micronutrient, organic input,
+procurement orders, distribution records, traceability records), mounted
+at `/api/input-supply-registry`. Tested (9 tests). Wired all 8
+previously-missing exports (`biofertilizerAPI`, `pesticideInventoryAPI`,
+`bioPesticideAPI`, `micronutrientAPI`, `organicInputAPI`,
+`inputProcurementAPI`, `inputDistributionAPI`, `inputTraceabilityAPI`) -
+all tabs on InputSupplyManagementPage.jsx now have a real backend.
+
+MISSING_EXPORT count: 74 -> 66.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -367,10 +380,7 @@ in-file comment's claim about backend state at face value.
 Batch-verified 2026-09-16 (25 crop/horticulture/agronomy names) — 24 of
 25 CONFIRMED GAP, added here, do not re-investigate:
 
-`bioPesticideAPI`, `biofertilizerAPI`,
-`inputDistributionAPI`,
-`inputProcurementAPI`, `inputTraceabilityAPI`, `micronutrientAPI`,
-`nurseryAPI`, `organicInputAPI`, `pesticideInventoryAPI`,
+`nurseryAPI`,
 `seedPlanningAPI`,
 `sowingAPI`, `surveyManagementAPI`,
 `operationsAPI` —

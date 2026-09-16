@@ -6217,6 +6217,67 @@ export const horticultureAnalyticsAPI = {
   deleteMetric: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/analytics/${id}`),
 };
 
+// 2026-09-16: services/legacy/inputSupplyManagementService.js had real
+// createCrudService(...) logic for these 8 InputSupplyManagementPage.jsx
+// tabs but no Express router at all - wired against
+// backend/src/routes/inputSupplyRegistryRoutes.js.
+const INPUT_SUPPLY_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/input-supply-registry`;
+export const biofertilizerAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/biofertilizer`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/biofertilizer`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/biofertilizer/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/biofertilizer/${id}`),
+};
+
+export const pesticideInventoryAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/pesticide-inventory`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/pesticide-inventory`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/pesticide-inventory/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/pesticide-inventory/${id}`),
+};
+
+export const bioPesticideAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/bio-pesticide`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/bio-pesticide`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/bio-pesticide/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/bio-pesticide/${id}`),
+};
+
+export const micronutrientAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/micronutrient`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/micronutrient`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/micronutrient/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/micronutrient/${id}`),
+};
+
+export const organicInputAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/organic-input`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/organic-input`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/organic-input/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/organic-input/${id}`),
+};
+
+export const inputProcurementAPI = {
+  getOrders: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/procurement-orders`, { params }),
+  createOrder: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/procurement-orders`, data),
+  updateOrder: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/procurement-orders/${id}`, data),
+  deleteOrder: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/procurement-orders/${id}`),
+};
+
+export const inputDistributionAPI = {
+  getRecords: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/distribution-records`, { params }),
+  createRecord: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/distribution-records`, data),
+  updateRecord: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/distribution-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/distribution-records/${id}`),
+};
+
+export const inputTraceabilityAPI = {
+  getRecords: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records`, { params }),
+  createRecord: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records`, data),
+  updateRecord: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records/${id}`),
+};
+
 // 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and
 // calls it directly with relative paths (api.get('/advanced-medical-coding/...'))
 // rather than through a dedicated *API object - only a default export
