@@ -118,6 +118,28 @@ first one.
 
 MISSING_EXPORT count: 97 -> 94.
 
+**Second new route file**: `backend/src/routes/fisheriesRegistryRoutes.js`
+wraps all 9 `createCrudService(...)` objects in
+`services/legacy/fisheriesManagementService.js` (biofloc tanks,
+hatcheries, feed logs, water quality, health records, harvests,
+processing batches, cold-chain shipments, analytics), mounted at
+`/api/fisheries-registry`. Tested (10 tests, same shape as the livestock
+one). This also fixed 4 **pre-existing fabricated placeholder exports**
+found already sitting in `api.js` before this session even started
+(`hatcheryManagementAPI`, `fishFeedAPI`, `fisheriesWaterQualityAPI`,
+`fisheriesHarvestAPI` - generic `getX()`/`manageX()` hitting made-up
+paths like `/hatchery-management/manage` that never matched any backend
+route or the real method names the page calls) - worth remembering that
+some already-exported names in this file predate this session's
+methodology and may be fabricated even though they don't show up in the
+MISSING_EXPORT list (the export exists, it just points nowhere real) -
+worth spot-checking any *API export against its actual consuming page's
+method calls before trusting it, not just checking it exists. Plus 5 new
+exports for the previously-missing `fishHealthAPI`/`fishProcessingAPI`/
+`coldFishChainAPI`/`biofloccFarmAPI`/`aquacultureAnalyticsAPI`.
+
+MISSING_EXPORT count: 94 -> 89.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -215,8 +237,7 @@ Batch-verified 2026-09-16 (18 livestock/farm-ops + 10 REOS/platform names,
 via two research passes) — added to this gap list, do not re-investigate:
 
 `farmActivityAPI`, `farmTaskAPI`, `fertilityManagementAPI`,
-`fishHealthAPI`, `fishProcessingAPI`, `coldFishChainAPI`,
-`biofloccFarmAPI`, `aquacultureAnalyticsAPI`, `pondAPI`,
+`pondAPI`,
 `medicalCodingAPI`, `nutritionIntelligenceAPI` — all trace to real
 `createCrudService(...)` DB-backed objects (`services/legacy/*.js`:
 `livestockManagementService.js`, `operationsManagementService.js`,

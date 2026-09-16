@@ -232,6 +232,9 @@ const goatRoutes = require('./routes/goatRoutes.js');
 // CRUD logic but no Express router at all - see that file's own header
 // comment.
 const livestockRegistryRoutes = require('./routes/livestockRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/fisheriesManagementService.js
+// had 9 real createCrudService(...) objects with no router at all.
+const fisheriesRegistryRoutes = require('./routes/fisheriesRegistryRoutes.js');
 // 2026-09-15: was a 38-line 'Route operational' scaffold. glutWarningRoutes_merged.js
 // is a real glut-risk check/scan implementation with its own router.
 const glutWarningRoutes = require('./routes/glutWarningRoutes_merged.js');
@@ -801,6 +804,7 @@ async function startup() {
     app.use('/api/governancemodule', governanceModule);
     app.use('/api/goat', goatRoutes);
     app.use('/api/livestock-registry', livestockRegistryRoutes);
+    app.use('/api/fisheries-registry', fisheriesRegistryRoutes);
     app.use('/api/glutwarning', glutWarningRoutes);
     app.use('/api/geofencing', geofencingRoutes);
     app.use('/api/freightpooling', freightPoolingRoutes);
