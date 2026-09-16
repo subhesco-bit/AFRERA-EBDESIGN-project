@@ -709,6 +709,89 @@ export const villageProfileAPI = {
   searchVillages: (params) => api.get('/village-profiles/villages/search', { params }),
 };
 
+// 2026-09-16: didn't exist. All of these back onto services/legacy/*.js
+// files exporting a setupRoutes(app) function - none were ever manually
+// require()'d anywhere, which first looked like 9+ genuinely unmounted
+// services (a file called routes/ORPHANED_SERVICES_MOUNT.js even tries
+// to fix this, but has its own bug - it passes a sub-router where the
+// code expects the real app, so its routes end up double-prefixed and
+// unreachable). Investigated further before wiring anything: this
+// backend already runs core/dynamicServiceLoader.js's
+// mountServiceRoutes(app), called for real in index.js's startup
+// sequence, which discovers every services/**/*.js file and calls its
+// setupRoutes(app) correctly. Verified live (not assumed): instantiated
+// the loader directly, pointed it at the real services/ directory, and
+// confirmed GET /api/v1/subsidy/schemes and POST /api/v1/subsidy/apply
+// both reach real handlers (500/401, never 404) with zero backend
+// changes. ORPHANED_SERVICES_MOUNT.js is real but harmless dead weight
+// (a second, broken mount at a garbled path nothing calls) - left alone,
+// not worth touching since it doesn't affect anything real.
+//
+// All paths below use the versioned relative-path pattern (no
+// UNVERSIONED_BASE) since these services' setupRoutes() hardcode
+// /api/v1/... prefixes matching the api instance's own baseURL.
+
+export const subsidyOpsAPI = {
+  apply: (data) => api.post('/subsidy/apply', data),
+  calculateGst: (data) => api.post('/subsidy/gst/calculate', data),
+  checkEquipmentSubsidy: (data) => api.post('/subsidy/equipment/check', data),
+  checkLogisticsSubsidy: (data) => api.post('/subsidy/logistics/check', data),
+  checkProjectSubsidy: (data) => api.post('/subsidy/project/check', data),
+  getSchemes: (params) => api.get('/subsidy/schemes', { params }),
+  track: (id) => api.get(`/subsidy/track/${id}`),
+};
+
+// 2026-09-16: schemeRegistryAPI (list/getExpiring) NOT wired - checked
+// live, not assumed. services/legacy/governmentSchemeService.js does
+// have matching /schemes/registry and /schemes/registry/expiring
+// endpoints in source, but core/dynamicServiceLoader.js's service
+// discovery keys services by base filename in a Map, and a second file
+// with the identical name (services/finance/governmentSchemeService.js -
+// a subset missing exactly these two endpoints) silently overwrites it
+// during directory-walk discovery. Verified live: GET
+// /api/v1/government/schemes/registry and .../registry/expiring both
+// 404 against the real mounting sequence, even though the code to serve
+// them exists in the repo. This is a distinct, deeper bug (duplicate
+// filenames silently shadowing each other in the service loader) than
+// a missing export - flagged in the TODO backlog, not fixed here.
+export const governmentSchemeAPI = {
+  getWeatherAlerts: (params) => api.get('/government/weather/alerts', { params }),
+  getAnnouncements: (params) => api.get('/government/announcements', { params }),
+  getCsrOpportunities: (params) => api.get('/government/csr/opportunities', { params }),
+};
+
+export const preSeasonAPI = {
+  getDashboard: (params) => api.get('/pre-season/dashboard', { params }),
+  createOrder: (data) => api.post('/pre-season/orders', data),
+};
+
+export const sharedInfraAPI = {
+  searchAssets: (params) => api.get('/shared-infra/assets/search', { params }),
+  searchSecondLife: (params) => api.get('/shared-infra/second-life/search', { params }),
+  getRenewableSupport: (params) => api.get('/shared-infra/renewable/support', { params }),
+  registerAsset: (data) => api.post('/shared-infra/assets/register', data),
+  bookAsset: (data) => api.post('/shared-infra/assets/book', data),
+};
+
+// 2026-09-16: aiAdvisoryAPI/buyingClubAPI/procurementSubscriptionAPI/
+// renewableEnergyAPI/ruralEnterpriseAPI (all needing just getStatistics)
+// NOT wired - same duplicate-filename shadowing bug as
+// governmentSchemeAPI's registry endpoints above, confirmed live for
+// each: the real, statistics-bearing implementation lives in
+// services/legacy/*.js, but a same-named file elsewhere
+// (services/ai/aiAdvisoryService.js, services/buyingClubService.js,
+// services/commerce/procurementSubscriptionService.js,
+// services/agriculture/renewableEnergyService.js,
+// services/agriculture/ruralEnterpriseService.js) wins the service
+// loader's discovery Map instead - some are thin generic-CRUD
+// placeholders, one (buyingClubService.js) is a re-export shim whose
+// source text doesn't literally contain the word "setupRoutes" so the
+// loader's naive text-scan skips it entirely, meaning it isn't mounted
+// at all. Verified live: every one of these five GET .../statistics
+// endpoints 404s against the real mounting sequence. Flagged in the
+// TODO backlog as the same systemic duplicate-filename bug, not
+// fabricated around.
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
