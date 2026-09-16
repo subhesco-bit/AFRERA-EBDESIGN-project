@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useStore } from '@/store';
-import './${className}.css';
+import { useAuthStore } from '@/store/authStore';
 
+// 2026-09-16: was `import { useStore } from '@/store';` - no file exports
+// a `useStore` under any name anywhere in this codebase (only
+// `useAuthStore` does, which is what this component actually reads -
+// just `user`). Also dropped `import './${className}.css'`, a literal,
+// never-templated placeholder string left over from this file's
+// generation - no such CSS file exists for this module.
 export default function M084Page() {
-  const { user } = useStore();
+  const { user } = useAuthStore();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

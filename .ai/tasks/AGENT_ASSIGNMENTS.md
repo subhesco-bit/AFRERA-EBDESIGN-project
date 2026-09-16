@@ -1521,6 +1521,46 @@ test exercising 3 of these dead pages directly) still fails to load for
 this reason - left as-is, documented here rather than silently
 worked around.
 
+## Update — 2026-09-16 (unblocked criticalModules.test.jsx - was 0 tests, now 2/3 passing)
+
+Revisited the one remaining frontend suite failure documented in the
+previous update, prompted by `MASTER_EXECUTION_PLAN.md`'s own tracked
+"repair the two failing frontend test suites" item. Previously concluded
+fixing it meant either inventing a shared `useStore` hook or guessing a
+CSS-file convention across 344 dead `modules/M0XX/*Page.jsx` files - that
+conclusion still holds for the *tree*, but a narrower check changes the
+answer for *this specific test*: `criticalModules.test.jsx` only
+statically imports 3 of those 344 files (`M001Page`, `M016Page`,
+`M084Page`), and only one of the three, `M084Page.jsx`, actually has the
+broken `@/store`/`'./${className}.css'` imports - confirmed via a direct
+`grep` across just those 3 files, not an assumption from the earlier,
+tree-wide finding.
+
+Since Jest fails the *entire* static import chain at the first broken
+import, that one file was blocking all 3 tests from ever running - not
+just M084's own test. Fixed narrowly: `useStore()` destructured only
+`{ user }`, and `store/authStore.js`'s real `useAuthStore()` already
+returns exactly that (`user: null` in its initial state) - a safe,
+real substitution, not an invented hook. Dropped the literal,
+never-templated `import './${className}.css'` (no such file exists for
+this module, nothing to point it at).
+
+Deliberately did **not** touch `M084Page.jsx`'s actual body - it's
+generic, auto-generated CRUD boilerplate (`<h1>M084</h1>`, calls to
+`/api/m084`) with no relation to the "Disaster Alerts" content its own
+test expects. Fixing the import bug was enough to convert a suite-level
+crash into a normal, isolated, honest test failure: **2 of the 3 tests
+(`M001Page`, `M016Page`) now genuinely pass** (they were never broken,
+just blocked by M084's crash); M084's own test still fails on a real,
+correctly-unfabricated content mismatch - building actual "Disaster
+Alerts" functionality is real feature work, out of scope here, same as
+the rest of the `modules/` tree.
+
+Full frontend suite: **54/55 tests passing** (was 52/52 - 3 new tests
+now actually run instead of the whole suite being skipped). `node -c`/
+eslint clean; `npm run build` unaffected (this file isn't in the live
+router either way).
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a

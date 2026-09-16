@@ -2760,6 +2760,26 @@ plus an untemplated literal `'./${className}.css'`. Left as-is,
 documented, not chased - same "needs real per-module work" conclusion
 as the backend `modules/` tree.
 
+## Update 49 — unblocked criticalModules.test.jsx (0 tests -> 2/3 passing)
+
+`MASTER_EXECUTION_PLAN.md` tracks "repair the two failing frontend test
+suites" - re-checked the one remaining suite failure rather than leaving
+it at the earlier tree-wide conclusion. `criticalModules.test.jsx` only
+imports 3 of the 344 dead `modules/M0XX` pages; only `M084Page.jsx` of
+those 3 actually has the broken `@/store`/`${className}.css` imports,
+and since Jest fails the whole file's import chain on the first broken
+one, all 3 tests were blocked, not just M084's. Fixed narrowly:
+`useStore()` only ever read `{ user }`, and the real `useAuthStore()`
+already provides exactly that - a safe substitution, not an invented
+hook. Left M084Page.jsx's actual body (generic CRUD boilerplate,
+unrelated to the "Disaster Alerts" content its test expects) untouched -
+that's real feature work, correctly out of scope.
+
+Result: 2 of 3 tests now genuinely pass (M001, M016 - never broken, just
+blocked); M084's own test still fails honestly on a real content
+mismatch instead of crashing the suite. Full frontend suite: 54/55
+tests passing (was 52/52 - 3 more tests now actually run).
+
 ## Update 46 — removed the 6 "pre-existing empty-stub" junk files for good
 
 Finally investigated the "6 pre-existing empty-stub test suites,
