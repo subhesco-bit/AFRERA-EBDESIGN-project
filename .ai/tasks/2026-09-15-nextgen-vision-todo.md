@@ -2700,6 +2700,22 @@ route/middleware/service suite still 188/188 passing alongside it (same
 `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16 (server boot-crash bug)"
 section for full detail.
 
+## Update 44 — swept for the masking-CR bug class, found a 4th instance
+
+Since the stray-bare-`\r` bug had now surfaced independently 3 times,
+wrote a script to scan the whole `backend/src/` tree for its exact byte
+signature (a `\r` not immediately followed by `\n`) instead of relying
+on stumbling into more instances. 3 files flagged: 2 false positives
+(`goatRoutes.js`/`animalHealthRoutes.js` - a harmless empty trailing
+comment, nothing swallowed), 1 real bug -
+`aiGatewayRoutes_merged.js` had the identical
+`platformCoreRoutes_merged.js` bug, trapping all 7 of its own
+documented honest-501 stub routes inside `notImplemented`'s never-invoked
+body - this router had **zero** registered routes at all before the
+fix. Fixed the same way; verified route count 0 -> 7 and real 501
+responses via a standalone smoke test. New test file (8 tests). 236/236
+real tests pass.
+
 ## Update 43 — real live bug found: platformCoreRoutes_merged.js swallowing 9 routes
 
 Started from CLAUDE.md's stale "frontend routes not added" claim -

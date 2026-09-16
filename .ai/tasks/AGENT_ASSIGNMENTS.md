@@ -1242,6 +1242,45 @@ session's extensive `api.js` growth. Not reconciled here - out of scope
 for this fix, which is specifically about the swallowed-routes bug, not
 a frontend wiring pass; flagged for whoever next touches `platformCoreAPI`.
 
+## Update — 2026-09-16 (systematic sweep for the masking-CR bug class - found & fixed a 4th instance)
+
+Given the same stray-bare-`\r` masking bug had now surfaced twice
+independently (the `_merged.js`-scaffold `livestockRouteSupport`/
+`enterpriseRouteSupport` brace-masking fixes from earlier in this PR,
+and `platformCoreRoutes_merged.js` just above), stopped relying on
+stumbling into instances one at a time and wrote a script to scan
+`backend/src/` for the exact byte signature: a `\r` NOT immediately
+followed by `\n` (a real CRLF line ending is fine; a lone `\r` is the
+tell - it reads as whitespace to JS, silently merging two "lines" that
+look separate to a human or to `cat`, into one).
+
+**3 files flagged, 1 real bug, 2 false positives** (confirmed by reading
+byte-level context around each, not assumed):
+- `routes/goatRoutes.js` / `routes/animalHealthRoutes.js` - both have a
+  lone `\r` right after `const router = express.Router();`, immediately
+  followed by an empty `// ` comment - harmless (the comment has nothing
+  after it before the real line break, so nothing is swallowed). A
+  leftover artifact of the same `/* DISABLED: protect... */` edit that
+  fixed a different bug in both files earlier in this PR, but not itself
+  a bug.
+- `routes/aiGatewayRoutes_merged.js` - **the exact same bug as
+  `platformCoreRoutes_merged.js`**: `res.status(501).json({...NOT_IMPLEMENTED});\rrouter.post('/chat', ...)`.
+  All 7 of this file's own documented honest-501 stub routes (`/chat`,
+  `/statistics`, `/providers`, `/models/:provider`,
+  `/providers/:provider/enable`, `/providers/:provider/disable`,
+  `/stream`) were trapped inside `notImplemented`'s own never-invoked
+  body - meaning this router had **zero** registered routes at all
+  (worse than 404: nothing here ever reached Express's route matching).
+  This file isn't statically mounted in `index.js`, but nothing excludes
+  it from `dynamicRouteLoader.js`'s auto-discovery either, so it's part
+  of the live, auto-mounted surface. Fixed with the same byte-precise
+  edit. Verified: `node -c` clean; route count 0 -> 7; a standalone
+  Express smoke test confirms every route now returns the real, intended
+  501 body (`{success:false, error:'...is not implemented',
+  code:'NOT_IMPLEMENTED'}`), not a 404. New test
+  `aiGatewayRoutes_merged.test.js` (8 tests, all passing). 236/236 real
+  backend tests pass (same 6 pre-existing empty-stub suites, unrelated).
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a
