@@ -22,6 +22,7 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
+| Claude (PR #21) | new `routes/pondRoutes.js`, `routes/medicalCodingRoutes.js`, `routes/nutritionIntelligenceRoutes.js`; `index.js` (append 3 mounts); `frontend/src/services/api.js` (adding real endpoints to `pondAPI`/`medicalCodingAPI`/`nutritionIntelligenceAPI` only) | 2026-09-16 | Wrapping 3 pre-existing, unrouted `createCrudService(...)` backends (see "Confirmed Missing-Feature Gaps" below) in thin Express routers - no new business logic, just mounting. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
