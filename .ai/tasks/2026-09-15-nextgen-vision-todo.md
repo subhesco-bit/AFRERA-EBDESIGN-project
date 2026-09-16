@@ -2700,6 +2700,26 @@ route/middleware/service suite still 188/188 passing alongside it (same
 `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16 (server boot-crash bug)"
 section for full detail.
 
+## Update 43 — real live bug found: platformCoreRoutes_merged.js swallowing 9 routes
+
+Started from CLAUDE.md's stale "frontend routes not added" claim -
+checked and found the AI/GDPR/MFA/Library components it names are
+already live in the real router (`config/routes.js`); the only
+genuinely unrouted component (`PlatformCoreDashboard.jsx`) is 100%
+hardcoded fake stats with zero real API calls, so correctly left
+unrouted rather than surfacing fabricated numbers to real admins.
+
+Checking for a real backend counterpart turned up something more
+valuable: `routes/platformCoreRoutes_merged.js` (already mounted at
+`/api/platformcore`) has the same masking-stray-CR bug already fixed
+twice elsewhere this session, in a third file - a bare `\r` (not a real
+line ending) trapped 10 intended `notImplemented()` route registrations
+inside their own function's body, so they never ran. All 9 of those
+endpoints were silently 404ing in production instead of the intended,
+honest 501. Fixed with a byte-precise edit; route count went 5 -> 15,
+verified with a direct route-stack check and a standalone Express smoke
+test. New test file (11 tests) locks it in. 228/228 real tests pass.
+
 ## Update 42 — swept for the Stripe-boot-crash bug class elsewhere
 
 Rather than assume `stripeWebhookRoutes.js` was the only instance of

@@ -1186,6 +1186,62 @@ every other smoke test this session has hit, requiring `timeout` to reap
 it - but the sweep's own result printed before that, and is unaffected
 by it.)
 
+## Update — 2026-09-16 (real live bug: platformCoreRoutes_merged.js swallowing 9 routes)
+
+Investigation started from CLAUDE.md's own "Frontend routes not added
+for new components" known problem - checked whether the AI/GDPR/MFA/
+Library components it names are actually unrouted. They aren't: `config/routes.js`
+(the real, live router - confirmed via `main.jsx`/`App.jsx`, which use
+`publicRoutes`/`protectedRoutes`/etc. from that file, not the two
+completely dead files `router/routes.jsx` and `config/componentRoutes.js`,
+neither imported anywhere) already routes MFASetupPage, GDPRConsentPage,
+LibraryBrowserPage, AIChatPage, AICollaborationPage, CopilotHubPage, and
+AIImageGenerator for real - CLAUDE.md's claim was stale.
+
+One genuinely unrouted component turned up: `components/PlatformCoreDashboard.jsx`
+(only referenced from the dead `componentRoutes.js`) - but its own body
+is 100% hardcoded fake data (`totalUsers: 2547`, `monthlyRevenue: 524000`,
+etc., no fetch, no `useEffect`) with zero backing API calls. Routing this
+would put fabricated business numbers in front of real admins - the
+opposite of this session's whole anti-fabrication mandate - so
+deliberately left unrouted, not fixed.
+
+Following the name, checked whether a real backend counterpart exists
+(`routes/platformCoreRoutes_merged.js`, `services/dual-use/platformCoreService.js`)
+and found something more valuable: a real, **live**, already-mounted
+(`/api/platformcore` in `index.js`) bug, not a wiring gap. A stray bare
+`\r` (not a real `\r\n` line ending - the exact same masking-CR bug
+pattern already fixed twice earlier in this PR for a different pair of
+files) sat between `res.status(501).json({...});` and the first
+`router.post('/initialize', ...)` call, so none of the 10 intended
+`notImplemented()`-wrapped route registrations for
+`/initialize`/`/scaling/recommendations`/`/capacity/predict`/
+`/disaster-recovery`/`/performance/monitor`/`/self-healing`/
+`/configuration/optimized`/`/configuration/apply`/`/metrics`/`/state`
+ever actually ran - they were trapped inside `notImplemented`'s own,
+never-invoked function body. All 9 endpoints the file's own comment
+claims to honestly 501 were instead silently 404ing in production.
+Fixed with a byte-precise Python edit (the stray `\r` broke the Edit
+tool's normal text matching - confirmed via `cat -A` that this file
+mixes CRLF and bare-CR line endings). Verified: `node -c` clean; a
+direct route-count check confirmed 5 -> 15 registered routes; a
+standalone Express smoke test confirms `POST /initialize`/`GET /metrics`
+etc. now reach the real 501 handler (return 401 when unauthenticated,
+same as any other authenticated route, not 404). New test
+`platformCoreRoutes_merged.test.js` (11 tests, all passing) locks in the
+full 15-route set and confirms none of the 10 fixed routes 404 anymore.
+228/228 real backend tests pass (same 6 pre-existing empty-stub suites,
+unrelated).
+
+Note: the frontend's own `platformCoreAPI` in `services/api.js` (2
+methods, `getPlatformStatus`/`getPlatformMetrics` against `/platform/status`
+`/platform/metrics`) doesn't match this backend file's mount path or
+method set at all - this backend file's own header comment (dated
+2026-08-30) references frontend line numbers that are stale after this
+session's extensive `api.js` growth. Not reconciled here - out of scope
+for this fix, which is specifically about the swallowed-routes bug, not
+a frontend wiring pass; flagged for whoever next touches `platformCoreAPI`.
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a
