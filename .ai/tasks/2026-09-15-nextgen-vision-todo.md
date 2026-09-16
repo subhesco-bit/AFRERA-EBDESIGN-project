@@ -2457,3 +2457,77 @@ several of which are security/auth-sensitive (SSO, RBAC, MFA device
 registry, session management, digital identity) and correctly not
 fabricated. Every one of the 45 is individually documented in
 `.ai/tasks/AGENT_ASSIGNMENTS.md`.
+
+## Update 36 (2026-09-16): investigated wiring backend/src/modules/ for the last 16 gaps - found a deeper problem, fixed what was safe, correctly stopped short of mounting anything
+
+Continuing from Update 35's clean 45-name remaining list: 16 of those 45
+trace to `backend/src/modules/` (the ~150+ M0xx tree never scanned by
+either dynamic loader) - `orchardAPI`, `pondAPI`, and 14 equipment/water
+names. Investigated whether this could be wired the same safe,
+mechanical way as the `createCrudService` batch in Updates 33-34.
+
+Found it's a two-layer problem. **Layer 1, fixed**: every module built
+from the generic scaffold template (344 `routes.js`/`controller.js`
+files total across the whole tree) crashes at `require()` time on 3
+systemic missing/misnamed shared dependencies -
+`backend/src/utils/response.js` (didn't exist), `backend/src/middleware/
+validationMiddleware.js` (didn't exist, though grepping confirmed its
+one export is never actually called - a dead import, same class as the
+`sharedInfrastructureAPI` bug from Update 34), and
+`middleware/authMiddleware.js` not exporting a name called
+`authenticate` that 314 of 344 files genuinely depend on as their real
+auth gate. Fixed all 3, carefully - the `authMiddleware.js` fix in
+particular had to preserve the file's existing "directly callable as
+`router.use(authMiddleware)`" shape (3 existing route files depend on
+that), so it mutates the existing export in place rather than
+introducing a new wrapper object that would have broken those 3 the same
+way it was breaking the M0xx scaffold. All 3 fixes are dormant in the
+live app right now (nothing currently requires `modules/`) - a real bug
+fix with zero live behavior change.
+
+**Layer 2, stopped here**: went on to try actually mounting
+`modules/M141` (Orchard) specifically, since its generic CRUD shape
+matches `orchardAPI`'s frontend calls (`getOrchards/createOrchard/
+updateOrchard/deleteOrchard`) almost exactly. Reading `service.js`
+directly (not just `routes.js`'s shape, which is what an earlier
+research pass in this session stopped at) found `this.table = 'releases'`
+- a completely wrong, unrelated table, with `model.sql` being an empty
+placeholder comment. Checked all 12 modules relevant to the 16 gaps:
+every single one is bound to a random, unrelated table name (M078
+"Rainwater Harvesting" -> `govt_schemes`, M079 "Watershed" ->
+`equipment_rental`, M110 -> `contracts`, etc.) - the exact same problem
+already known for M132's Pond module (`messaging` table), just not yet
+verified for the others until now. This means the routes/controller
+files are real code, but the data layer underneath is scaffolding that
+was never actually connected to the right schema - mounting any of them
+would silently read/write the wrong table, which is worse than a
+missing feature, not better. This corrects an earlier assessment in this
+session's own docs that called M141 "the standout gap, essentially
+complete" - it isn't.
+
+Separately checked the water modules' (M076-M080) *other* router file -
+each has a distinct `index.js` (not `routes.js`) with real action-style
+endpoints matching `WaterManagementPage.jsx`'s exact expected method
+names (`designHarvestingSystem`, `monitorCollection`, etc.) - but those
+methods don't exist on the shared generic-CRUD `controller.js`, so
+`index.js` throws `Route.post() requires a callback function but got a
+[object Undefined]` at require time too. Implementing those specific
+methods would be writing new business logic from scratch, not wiring
+existing code - explicitly out of scope for this pass regardless of the
+table problem.
+
+**Conclusion, none of the 16 `modules/`-tree gaps wired**: this needs
+real backend work (a correct migration + table binding per module at
+minimum, and for the 5 water modules specifically, the missing
+controller logic) before any of them is safe to mount - correctly left
+for whoever picks up backend development next, not guessed at. The 3
+dependency fixes are kept as safe, verified groundwork regardless.
+
+**Running total this session**: 161 → 45 MISSING_EXPORT errors (116
+closed). All 45 remaining are individually documented in
+`.ai/tasks/AGENT_ASSIGNMENTS.md`, and now cleanly split into exactly two
+categories, both requiring real backend/product decisions rather than a
+wiring fix: (a) 16 `modules/`-tree gaps needing a real data-layer fix per
+module, and (b) ~29 genuinely new backend features with no matching code
+anywhere, several security/auth-sensitive (SSO, RBAC, MFA device
+registry, session/identity management) and correctly not fabricated.
