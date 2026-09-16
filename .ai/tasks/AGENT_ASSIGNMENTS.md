@@ -22,7 +22,6 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
-| Claude (PR #21) | `services/`, `services/legacy/`, `services/<domain>/` duplicate-basename files (investigation only until specific fixes are identified); `backend/src/index.js` (read-only, checking `serviceLocator`/`DynamicServiceLoader` consumers) | 2026-09-16 | Auditing the ~100+ duplicate-service-basename shadowing bug (6 known cases already fixed, see "systemic bug" note below) for real, consumer-impacting instances beyond the 6 already fixed - not touching the 6 already-confirmed-fine cases. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -1616,3 +1615,72 @@ When Friend Claude or ChatGPT complete their first block of work, add a
 `## Completed This Session (<Agent> — <branch>)` section below this one,
 same format: what was fixed/added, verified how, and any new confirmed
 gaps found so the other two agents don't re-check them either.
+
+## Update — 2026-09-16 (duplicate-service audit: 0 new shadowing bugs, but found + fixed a real dead-backend + broken-frontend-client pair: escrowService/EscrowPage.jsx)
+
+Audited the full duplicate-service-basename list (185 groups, not ~24 as
+the earlier estimate guessed) for more instances of the shadowing bug
+beyond the 6 already fixed. Delegated to a subagent; verified its method
+before trusting its conclusion. Findings:
+
+- Confirmed `app.locals.serviceLocator`/`ServiceLocator.get()` has **zero
+  live callers anywhere** - the only mechanism that actually exercises
+  the ambiguous winner-takes-all Map is `DynamicServiceLoader.mountServiceRoutes(app)`,
+  which does a naive `source.includes('setupRoutes')` text check on the
+  winning file only.
+- 156 of 185 groups have no `setupRoutes` in any file in the group at
+  all - never touched by this mechanism either way, not this bug class.
+- Of the remaining 29: 6 already fixed (untouched, re-confirmed intact),
+  7 already correctly wired (verified: real winner's routes match
+  `api.js` exactly), 2 already fixed via the explicit-require pattern.
+  The other 14 were checked fresh - all either have identical/interchangeable
+  route sets regardless of which file wins, or have a real capability gap
+  but **zero live frontend callers today** (so not consumer-impacting,
+  correctly left alone per this task's own instructions not to fix
+  hypothetical gaps).
+
+**Net result of the shadowing-bug audit itself: 0 new fixes** - a
+legitimate, honest, thoroughly-checked negative, not a padded report.
+
+**Separate, real bug found while checking one of those 14** (`escrowService`):
+`frontend/src/pages/EscrowPage.jsx` (its own header comment already
+claimed it "backs services/legacy/escrowService.js — real, DB-backed
+fund holding") was calling `escrowAPI.list()`/`.release()`/`.refund()` -
+none of which existed on `escrowAPI` (`api.js` only had unused
+`getEscrows`/`createEscrow`, called nowhere) - a guaranteed `TypeError`
+crash on page load. Investigated the real backend directly:
+`services/legacy/escrowService.js` has real, DB-backed
+create/release/refund/get-by-id/get-by-order/get-by-user logic
+(confirmed against the real, migrated `escrow_transactions` table,
+`migrations/9991_1_escrow_transactions.sql`) via a `setupRoutes(app)`
+function - genuinely never mounted anywhere (the actually-live
+`/api/escrow` mount in `index.js` is a separate, unrelated dead
+scaffold, `routes/escrowRoutes.js`, health-check only). No endpoint
+existed for "list all transactions" (only by-order/by-user), which the
+page's admin-overview view needs - added `getAllEscrowTransactions()` +
+`GET /api/v1/escrow`, same shape/style as the file's own adjacent
+`getEscrowByOrder`, same real table, no fabricated fields. Mounted via
+the same explicit `require(...).setupRoutes(app)` pattern already
+proven safe for `marketIntelligenceService`/`villageProfileService`
+earlier this session (distinct `/api/v1/escrow` prefix, confirmed no
+collision with the dead `/api/escrow` scaffold). Rewrote `escrowAPI` to
+match the real, now-mounted routes exactly (`list`/`create`/`release`/
+`refund`/`get`/`getByOrder`/`getByUser`).
+
+Verified: `node -c` clean; a direct HTTP smoke test (real Express app,
+no mocks) proved `POST /api/v1/escrow` → `GET /api/v1/escrow` round-trips
+real data correctly end-to-end; eslint clean on all 4 changed files;
+full boot smoke test still doesn't crash; `src/routes/__tests__` +
+`src/modules` unaffected (343/344 suites, 3669/3680 tests - same 1 known
+M041 non-bug failure); frontend `npm run build` exits 0; frontend suite
+unaffected (54/55, same 1 known unrelated failure).
+
+Two items flagged, not fixed (real backend logic + matching frontend
+client already exist, but genuinely have zero live consumer today, so
+outside this task's "consumer-impacting" bar): `digitalTwinService` (real
+`/api/v1/digital-twin` routes + a matching `digitalTwinAPI` client exist,
+but `DigitalTwinPage.jsx` was deliberately rewritten as static content
+earlier this session and never calls it) and the rest of `escrowService`'s
+duplicate-shadowing question itself (moot now that the real file is
+explicitly required by path, sidestepping the loader's ambiguity
+entirely, same as the 8 already-fixed cases).

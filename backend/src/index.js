@@ -759,6 +759,14 @@ async function startup() {
     require('./services/legacy/renewableEnergyService.js').setupRoutes(app);
     require('./services/legacy/ruralEnterpriseService.js').setupRoutes(app);
     require('./services/legacy/governmentSchemeService.js').setupRoutes(app);
+    // 2026-09-16: same setupRoutes(app) pattern as the block above - real,
+    // DB-backed escrow logic (create/release/refund/list, escrow_transactions
+    // table confirmed migrated), never mounted. The only live consumer,
+    // EscrowPage.jsx, was crashing (escrowAPI.list/.release/.refund didn't
+    // exist on the frontend client) since nothing real was ever wired up to
+    // it. Mounted at /api/v1/escrow - distinct from the pre-existing dead
+    // /api/escrow scaffold mount below, no collision.
+    require('./services/legacy/escrowService.js').setupRoutes(app);
     app.use('/api/wikipedia', wikipediaRoutes);
     app.use('/api/weather', weatherRoutes);
     app.use('/api/weatheradvisory', weatherAdvisory);

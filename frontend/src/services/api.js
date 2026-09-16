@@ -2153,9 +2153,19 @@ export const experienceAPI = {
   addExperience: (data) => api.post('/experience/add', data),
 };
 
+// 2026-09-16: was { getEscrows, createEscrow } - unused by the one live
+// consumer, EscrowPage.jsx, which calls .list()/.release()/.refund() that
+// didn't exist here at all (a TypeError before any request was even sent).
+// Wired to the real, now-mounted services/legacy/escrowService.js routes
+// (/api/v1/escrow via the api instance's own baseURL) instead.
 export const escrowAPI = {
-  getEscrows: () => api.get('/escrow'),
-  createEscrow: (data) => api.post('/escrow', data),
+  list: () => api.get('/escrow'),
+  create: (data) => api.post('/escrow', data),
+  release: (escrowId, data) => api.post(`/escrow/${escrowId}/release`, data),
+  refund: (escrowId) => api.post(`/escrow/${escrowId}/refund`),
+  get: (escrowId) => api.get(`/escrow/${escrowId}`),
+  getByOrder: (orderId) => api.get(`/escrow/order/${orderId}`),
+  getByUser: (userId, role) => api.get(`/escrow/user/${userId}`, { params: role ? { role } : undefined }),
 };
 
 export const equipmentExchangeAPI = {
