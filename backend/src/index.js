@@ -247,6 +247,9 @@ const inputSupplyRegistryRoutes = require('./routes/inputSupplyRegistryRoutes.js
 // 2026-09-16: same pattern - services/legacy/cropManagementService.js had
 // 6 real createCrudService(...) objects with no router at all.
 const cropRegistryRoutes = require('./routes/cropRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/landManagementService.js had
+// 6 real createCrudService(...) objects with no router at all.
+const landRegistryRoutes = require('./routes/landRegistryRoutes.js');
 // 2026-09-15: was a 38-line 'Route operational' scaffold. glutWarningRoutes_merged.js
 // is a real glut-risk check/scan implementation with its own router.
 const glutWarningRoutes = require('./routes/glutWarningRoutes_merged.js');
@@ -821,6 +824,7 @@ async function startup() {
     app.use('/api/horticulture-registry', horticultureRegistryRoutes);
     app.use('/api/input-supply-registry', inputSupplyRegistryRoutes);
     app.use('/api/crop-registry', cropRegistryRoutes);
+    app.use('/api/land-registry', landRegistryRoutes);
     app.use('/api/glutwarning', glutWarningRoutes);
     app.use('/api/geofencing', geofencingRoutes);
     app.use('/api/freightpooling', freightPoolingRoutes);

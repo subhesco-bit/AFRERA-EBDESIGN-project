@@ -196,6 +196,19 @@ as fisheries/horticulture) and wired the 3 previously-missing exports
 
 MISSING_EXPORT count: 66 -> 63.
 
+**Seventh new route file**: `backend/src/routes/landRegistryRoutes.js`
+wraps all 6 `createCrudService(...)` objects in
+`services/legacy/landManagementService.js` (land leases, GIS mappings,
+soil zones, water resources, boundaries, surveys), mounted at
+`/api/land-registry` (distinct from the still-dead
+`landManagementRoutes.js` stub at `/api/landmanagement`). Tested (7
+tests). Wired all 6, including `landLeaseAPI` - previously documented as
+a plain confirmed gap before finding it's the same "real CRUD, zero
+router" pattern as the rest of this batch, not a genuinely missing
+feature. All 6 tabs on LandManagementPage.jsx now have a real backend.
+
+MISSING_EXPORT count: 63 -> 57.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -261,7 +274,7 @@ backend work gets built for any of these, wire the frontend client then
 `informationSharingAPI`, `logisticsEnhancementAPI`, `irrigationAPI`,
 `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`, `fleetManagementAPI`,
 `equipmentRentalAPI`, `implementManagementAPI`,
-`landLeaseAPI`, `shgAPI`, `publicDataAPI`, `consentManagementAPI`,
+`shgAPI`, `publicDataAPI`, `consentManagementAPI`,
 `digitalIdentityAPI`, `sessionManagementAPI`, `ssoAPI`,
 `securityAccessControlAPI`, `userManagementAPI`, `rolePermissionAPI`,
 `permissionManagementAPI`, `schemeRegistryAPI`, `aiAdvisoryAPI`,
@@ -344,10 +357,11 @@ Batch-verified 2026-09-16 (22 land/water/GIS/equipment names) — 21 of 22
 CONFIRMED GAP, 1 (`machineryAccessAPI`, above) CONFIRMED LIVE:
 
 `geoBoundaryAPI`, `gisLandMappingAPI`, `soilMappingAPI`,
-`waterResourceMappingAPI` — real `createCrudService(...)` CRUD objects in
+`waterResourceMappingAPI` — **now fixed, see the seventh new route file
+below** (was: real `createCrudService(...)` CRUD objects in
 `services/legacy/landManagementService.js`, zero `setupRoutes`, the only
-matching mounted route (`landManagementRoutes.js`) is a dead stub. Same
-pattern as the other management-service batches above.
+matching mounted route (`landManagementRoutes.js`) a dead stub - same
+pattern as the other management-service batches above).
 
 `waterBudgetRecordsAPI`, `waterQualityRecordsAPI`, `rainwaterStructuresAPI`,
 `watershedRecordsAPI`, `waterAnalyticsRecordsAPI` — real CRUD objects in

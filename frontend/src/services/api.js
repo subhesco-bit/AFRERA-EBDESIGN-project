@@ -3562,6 +3562,55 @@ export const cropMonitoringAPI = {
   deleteObservation: (id) => api.delete(`${CROP_REGISTRY_BASE}/monitoring-observations/${id}`),
 };
 
+// 2026-09-16: services/legacy/landManagementService.js had real
+// createCrudService(...) logic for these 6 LandManagementPage.jsx tabs
+// (including landLease - previously documented as a plain confirmed gap
+// before finding it's actually the same "real CRUD, zero router"
+// pattern as the rest of this file) but no Express router at all - wired
+// against backend/src/routes/landRegistryRoutes.js.
+const LAND_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/land-registry`;
+export const landLeaseAPI = {
+  getLeases: (params) => api.get(`${LAND_REGISTRY_BASE}/leases`, { params }),
+  createLease: (data) => api.post(`${LAND_REGISTRY_BASE}/leases`, data),
+  updateLease: (id, data) => api.put(`${LAND_REGISTRY_BASE}/leases/${id}`, data),
+  deleteLease: (id) => api.delete(`${LAND_REGISTRY_BASE}/leases/${id}`),
+};
+
+export const gisLandMappingAPI = {
+  getMappings: (params) => api.get(`${LAND_REGISTRY_BASE}/gis-mappings`, { params }),
+  createMapping: (data) => api.post(`${LAND_REGISTRY_BASE}/gis-mappings`, data),
+  updateMapping: (id, data) => api.put(`${LAND_REGISTRY_BASE}/gis-mappings/${id}`, data),
+  deleteMapping: (id) => api.delete(`${LAND_REGISTRY_BASE}/gis-mappings/${id}`),
+};
+
+export const soilMappingAPI = {
+  getZones: (params) => api.get(`${LAND_REGISTRY_BASE}/soil-zones`, { params }),
+  createZone: (data) => api.post(`${LAND_REGISTRY_BASE}/soil-zones`, data),
+  updateZone: (id, data) => api.put(`${LAND_REGISTRY_BASE}/soil-zones/${id}`, data),
+  deleteZone: (id) => api.delete(`${LAND_REGISTRY_BASE}/soil-zones/${id}`),
+};
+
+export const waterResourceMappingAPI = {
+  getResources: (params) => api.get(`${LAND_REGISTRY_BASE}/water-resources`, { params }),
+  createResource: (data) => api.post(`${LAND_REGISTRY_BASE}/water-resources`, data),
+  updateResource: (id, data) => api.put(`${LAND_REGISTRY_BASE}/water-resources/${id}`, data),
+  deleteResource: (id) => api.delete(`${LAND_REGISTRY_BASE}/water-resources/${id}`),
+};
+
+export const geoBoundaryAPI = {
+  getBoundaries: (params) => api.get(`${LAND_REGISTRY_BASE}/boundaries`, { params }),
+  createBoundary: (data) => api.post(`${LAND_REGISTRY_BASE}/boundaries`, data),
+  updateBoundary: (id, data) => api.put(`${LAND_REGISTRY_BASE}/boundaries/${id}`, data),
+  deleteBoundary: (id) => api.delete(`${LAND_REGISTRY_BASE}/boundaries/${id}`),
+};
+
+export const surveyManagementAPI = {
+  getSurveys: (params) => api.get(`${LAND_REGISTRY_BASE}/surveys`, { params }),
+  createSurvey: (data) => api.post(`${LAND_REGISTRY_BASE}/surveys`, data),
+  updateSurvey: (id, data) => api.put(`${LAND_REGISTRY_BASE}/surveys/${id}`, data),
+  deleteSurvey: (id) => api.delete(`${LAND_REGISTRY_BASE}/surveys/${id}`),
+};
+
 export const dairyAIAPI = {
   getDairyAI: () => api.get('/dairy-ai'),
   analyzeDairy: (data) => api.post('/dairy-ai/analyze', data),
