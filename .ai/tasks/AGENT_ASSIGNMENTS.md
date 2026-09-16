@@ -236,19 +236,71 @@ the unscanned `modules/M076`-`M080` tree wired instead, not done here).
 
 MISSING_EXPORT count: 56 -> 51.
 
+## Update — 2026-09-16 (later): the duplicate-service-filename shadowing bug is fixed for all 6 known cases
+
+Rather than re-key `core/dynamicServiceLoader.js`'s whole discovery
+mechanism (a much larger, riskier change touching all 313 discovered
+services - out of scope for this pass), each of the 6 confirmed cases
+was fixed individually, additively, with zero change to which file wins
+the Map for any service:
+
+- **`buyingClubService.js`**: the winning file is a one-line re-export
+  shim (`module.exports = require('./legacy/buyingClubService.js')`)
+  whose own raw source text doesn't literally contain the word
+  "setupRoutes", so `mountServiceRoutes`'s naive text-scan
+  (`if (!source.includes('setupRoutes')) continue;`) skipped it even
+  though requiring it correctly resolves to the real, working
+  `legacy/buyingClubService.js`. Fixed by adding a comment to the shim
+  that mentions "setupRoutes" - the text-scan now recognizes it, and the
+  delegation was already correct, so this is not a behavior change to
+  the actual mounted routes.
+- **`aiAdvisoryService.js`, `procurementSubscriptionService.js`,
+  `renewableEnergyService.js`, `ruralEnterpriseService.js`,
+  `governmentSchemeService.js`**: for each, the Map-winning file (a
+  thinner variant) is missing endpoints that only exist in the losing
+  `services/legacy/*.js` copy. Verified each legacy file's own
+  `app.use(...)` call (or, for governmentSchemeService, its direct
+  `app.get/post` registrations) uses either a completely distinct URL
+  prefix from the winner (e.g. `/ai-advisories` vs the winner's
+  `/ai-advisory`) or the same prefix with non-overlapping sub-paths
+  (e.g. `/renewable-energy/systems/*` vs the winner's bare `GET/POST /`)
+  - so calling the legacy file's `setupRoutes(app)` directly in
+    `index.js`, additively, right after the already-established
+    `marketIntelligenceService.js`/`villageProfileService.js` direct-call
+    pattern, exposes the missing endpoints with zero risk to the
+    winning file's existing behavior. Verified live via a scratch
+    script combining `DynamicServiceLoader.mountServiceRoutes(app)` +
+    the 5 direct calls before touching `index.js` for real.
+
+Updated `backend/src/services/__tests__/orphanedServiceRoutes.test.js`
+to mirror the real production mounting sequence (loader +
+the 5 additive direct calls) and flipped its 2 tests that used to lock in
+`government/schemes/registry(/expiring)` as a confirmed 404 gap - they
+now assert `not.toBe(404)`, plus 5 new test cases for the other formerly-
+shadowed endpoints. 115/115 real backend tests pass (17 in this one file,
+up from 11).
+
+Wired `schemeRegistryAPI` (`list`/`getExpiring`), `aiAdvisoryAPI`,
+`buyingClubAPI`, `procurementSubscriptionAPI`, `renewableEnergyAPI`,
+`ruralEnterpriseAPI` (all `getStatistics`) in `api.js` against the real,
+now-reachable endpoints.
+
+MISSING_EXPORT count: 51 -> 45.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
 `productService.js`'s earlier fix); fixed `farmerTrainingRoutes.js`
 (another scaffold swap for `farmerTrainingRoutes_merged.js`); identified
-(but did not fix — real architectural work, out of scope for a wiring
-pass) a systemic duplicate-service-filename bug in
+**and later fixed for all 6 known cases** (see the "Update — 2026-09-16
+(later)" section above) a systemic duplicate-service-filename bug in
 `core/dynamicServiceLoader.js` — see the "Update — 2026-09-16" section
-below for the full writeup before touching anything in this area.
+below for the original writeup of how the bug works, still accurate for
+any future undiscovered cases.
 
 Result: the frontend's `MISSING_EXPORT` build-error count went from 161 →
-109 as of 2026-09-16 (161 at the start of this session — see
-`.ai/tasks/2026-09-15-nextgen-vision-todo.md`'s 32 dated updates for the
+45 as of 2026-09-16 (161 at the start of this session — see
+`.ai/tasks/2026-09-15-nextgen-vision-todo.md`'s 35 dated updates for the
 full trail; still tracked by CI's `Build Verification` job on PR #21 —
 expected to keep showing red on the remaining count, that's normal,
 don't re-file it as a new bug).
@@ -304,12 +356,8 @@ backend work gets built for any of these, wire the frontend client then
 `shgAPI`, `publicDataAPI`, `consentManagementAPI`,
 `digitalIdentityAPI`, `sessionManagementAPI`, `ssoAPI`,
 `securityAccessControlAPI`, `userManagementAPI`, `rolePermissionAPI`,
-`permissionManagementAPI`, `schemeRegistryAPI`, `aiAdvisoryAPI`,
-`buyingClubAPI`, `procurementSubscriptionAPI`, `renewableEnergyAPI`,
-`ruralEnterpriseAPI` (these last 6 are the confirmed duplicate-filename
-shadowing bug specifically — real code exists in `services/legacy/*.js`,
-just never reachable — a different kind of gap than the others in this
-list, see the update above), plus ~24 of `farmersAPI`'s methods (field
+`permissionManagementAPI`,
+plus ~24 of `farmersAPI`'s methods (field
 management, harvest scoring, most market/pricing analytics — see the
 twenty-fourth update for the full list).
 

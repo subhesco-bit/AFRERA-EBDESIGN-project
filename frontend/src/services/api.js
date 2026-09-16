@@ -741,23 +741,25 @@ export const subsidyOpsAPI = {
   track: (id) => api.get(`/subsidy/track/${id}`),
 };
 
-// 2026-09-16: schemeRegistryAPI (list/getExpiring) NOT wired - checked
-// live, not assumed. services/legacy/governmentSchemeService.js does
-// have matching /schemes/registry and /schemes/registry/expiring
-// endpoints in source, but core/dynamicServiceLoader.js's service
-// discovery keys services by base filename in a Map, and a second file
-// with the identical name (services/finance/governmentSchemeService.js -
-// a subset missing exactly these two endpoints) silently overwrites it
-// during directory-walk discovery. Verified live: GET
-// /api/v1/government/schemes/registry and .../registry/expiring both
-// 404 against the real mounting sequence, even though the code to serve
-// them exists in the repo. This is a distinct, deeper bug (duplicate
-// filenames silently shadowing each other in the service loader) than
-// a missing export - flagged in the TODO backlog, not fixed here.
 export const governmentSchemeAPI = {
   getWeatherAlerts: (params) => api.get('/government/weather/alerts', { params }),
   getAnnouncements: (params) => api.get('/government/announcements', { params }),
   getCsrOpportunities: (params) => api.get('/government/csr/opportunities', { params }),
+};
+
+// 2026-09-16: was the duplicate-filename shadowing bug (services/finance/
+// governmentSchemeService.js won the service loader's Map over
+// services/legacy/governmentSchemeService.js, which has these 2
+// endpoints). Fixed not by re-keying the loader (too large/risky a
+// change - it discovers 313 services) but by calling the legacy file's
+// setupRoutes(app) directly in index.js, additively (see that file's own
+// comment) - both files register directly on `app` at the same
+// /api/v1/government/... prefix, so the winning file's 9 endpoints keep
+// working unchanged and these 2 extra ones from legacy are now also
+// registered.
+export const schemeRegistryAPI = {
+  list: (params) => api.get('/government/schemes/registry', { params }),
+  getExpiring: (days) => api.get('/government/schemes/registry/expiring', { params: { days } }),
 };
 
 export const preSeasonAPI = {
@@ -774,23 +776,30 @@ export const sharedInfraAPI = {
 };
 
 // 2026-09-16: aiAdvisoryAPI/buyingClubAPI/procurementSubscriptionAPI/
-// renewableEnergyAPI/ruralEnterpriseAPI (all needing just getStatistics)
-// NOT wired - same duplicate-filename shadowing bug as
-// governmentSchemeAPI's registry endpoints above, confirmed live for
-// each: the real, statistics-bearing implementation lives in
-// services/legacy/*.js, but a same-named file elsewhere
-// (services/ai/aiAdvisoryService.js, services/buyingClubService.js,
-// services/commerce/procurementSubscriptionService.js,
-// services/agriculture/renewableEnergyService.js,
-// services/agriculture/ruralEnterpriseService.js) wins the service
-// loader's discovery Map instead - some are thin generic-CRUD
-// placeholders, one (buyingClubService.js) is a re-export shim whose
-// source text doesn't literally contain the word "setupRoutes" so the
-// loader's naive text-scan skips it entirely, meaning it isn't mounted
-// at all. Verified live: every one of these five GET .../statistics
-// endpoints 404s against the real mounting sequence. Flagged in the
-// TODO backlog as the same systemic duplicate-filename bug, not
-// fabricated around.
+// renewableEnergyAPI/ruralEnterpriseAPI - same duplicate-filename
+// shadowing bug as schemeRegistryAPI above, same fix: each legacy file's
+// setupRoutes(app) is now called directly in index.js, additively (see
+// that file's comment - verified none collides with what the
+// Map-winning file already serves at each prefix).
+export const aiAdvisoryAPI = {
+  getStatistics: (params) => api.get('/ai-advisories/advisories/statistics', { params }),
+};
+
+export const buyingClubAPI = {
+  getStatistics: (params) => api.get('/buying-clubs/clubs/statistics', { params }),
+};
+
+export const procurementSubscriptionAPI = {
+  getStatistics: (params) => api.get('/procurement-subscriptions/subscriptions/statistics', { params }),
+};
+
+export const renewableEnergyAPI = {
+  getStatistics: (params) => api.get('/renewable-energy/systems/statistics', { params }),
+};
+
+export const ruralEnterpriseAPI = {
+  getStatistics: (params) => api.get('/rural-enterprises/enterprises/statistics', { params }),
+};
 
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),

@@ -712,6 +712,25 @@ async function startup() {
     // every search request was swallowed by the param route instead
     // (villageId literally "search") - see the file's own comment.
     require('./services/legacy/villageProfileService.js').setupRoutes(app);
+    // 2026-09-16: duplicate-service-filename shadowing bug fix (documented
+    // across this whole session, see .ai/tasks/AGENT_ASSIGNMENTS.md) - each
+    // of these 5 legacy/*.js files has real endpoints
+    // (advisories/statistics, subscriptions/statistics, systems/statistics,
+    // enterprises/statistics, schemes/registry) that a DIFFERENT file
+    // sharing the same base filename wins in core/dynamicServiceLoader.js's
+    // Map, silently shadowing them. Rather than change the loader's global
+    // keying behavior (a much larger, riskier change affecting all 313
+    // discovered services), each of these mounts additively at its own
+    // path/prefix - verified via each file's own app.use(...) call that
+    // none collides with what the Map-winning file already serves (either
+    // a distinct prefix entirely, e.g. /ai-advisories vs /ai-advisory, or
+    // the same prefix with non-overlapping sub-paths, e.g.
+    // /renewable-energy/systems/* vs the winner's bare GET/POST /).
+    require('./services/legacy/aiAdvisoryService.js').setupRoutes(app);
+    require('./services/legacy/procurementSubscriptionService.js').setupRoutes(app);
+    require('./services/legacy/renewableEnergyService.js').setupRoutes(app);
+    require('./services/legacy/ruralEnterpriseService.js').setupRoutes(app);
+    require('./services/legacy/governmentSchemeService.js').setupRoutes(app);
     app.use('/api/wikipedia', wikipediaRoutes);
     app.use('/api/weather', weatherRoutes);
     app.use('/api/weatheradvisory', weatherAdvisory);
