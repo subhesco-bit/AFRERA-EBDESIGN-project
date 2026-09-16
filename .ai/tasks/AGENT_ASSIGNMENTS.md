@@ -22,6 +22,7 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
+| Claude (PR #21) | `backend/src/index.js` (append 1 mount); `frontend/src/pages/CreditScorePage.jsx` | 2026-09-16 | Mounting real, unmounted `routes/claude/aiDecisionRoutes.js` (demand/price/credit-risk/fraud/recommend, Claude-AI-enhanced with honest non-AI fallback) and wiring `CreditScorePage.jsx`'s already-flagged gap to it. `routes/claude/` has 15 other unmounted files - NOT touching those this round, out of scope, flagging for a future pass. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
