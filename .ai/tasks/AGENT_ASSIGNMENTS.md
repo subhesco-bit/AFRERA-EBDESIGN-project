@@ -504,6 +504,43 @@ pre-existing empty-stub suites unrelated).
 
 MISSING_EXPORT count: 38 -> 36.
 
+## Update — 2026-09-16 (climate registry): an 11th pre-existing unrouted service + 5 more fabricated placeholders fixed (correctness only, count unchanged at 36)
+
+Found `services/legacy/climateMonitoringService.js` via direct filename
+search (same technique that found `identityManagementService.js`
+earlier) - another pre-existing (not written this session) file with 5
+real `createCrudService(...)` objects (drought, flood, disease
+forecasts, climate risk, agro-meteorology) and zero router, backing
+`ClimateMonitoringPage.jsx` (a *different* page from
+`ClimateMonitoringDashboardPage.jsx`, which is what the still-gap
+`climateMonitoringAPI` name belongs to - see below, don't conflate the
+two).
+
+Wrote `backend/src/routes/climateRegistryRoutes.js` (mounted at
+`/api/climate-registry`). Tested (6 tests). Fixed 5 pre-existing
+fabricated placeholder exports (`droughtMonitoringAPI`,
+`floodMonitoringAPI`, `diseaseForecastingAPI`, `climateRiskAPI`,
+`agroMeteorologyAPI` - same wrong-method-names pattern as the
+fisheries/horticulture/crop/soil batches earlier). None of these 5 names
+were themselves causing a `MISSING_EXPORT` error (the exports already
+existed, just fabricated) so this doesn't move the count - it's a
+correctness fix, not new wiring, same class of finding as Update 34's
+"existing exports can predate this session's methodology" lesson.
+
+`pestForecastingAPI` (the 6th tab on the same page) is a genuine gap -
+M087 Pest Forecasting is not covered by `climateMonitoringService.js` at
+all (confirmed via that file's own header comment, which lists exactly
+M085/M086/M088/M089/M090). Left as `{}` rather than fabricating a path.
+
+`climateMonitoringAPI` (the name actually in the `MISSING_EXPORT` list)
+belongs to the separate `ClimateMonitoringDashboardPage.jsx` and needs
+dashboard-aggregate methods (`getStatus`/`getAlerts`/`getDroughtData`/
+`getFloodData`/`generateReport`) that don't match this or any other
+file's shape - checked, remains a genuine, unfixed gap.
+
+148/148 real backend tests pass (same 6 pre-existing empty-stub suites
+unrelated).
+
 ## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
 
 Found that ~24 backend services exist as multiple files sharing the

@@ -2745,34 +2745,57 @@ export const homeAutomationAPI = {
 };
 
 // Climate and weather monitoring APIs
+// 2026-09-16: droughtMonitoringAPI/floodMonitoringAPI/diseaseForecastingAPI/
+// climateRiskAPI/agroMeteorologyAPI were pre-existing fabricated
+// placeholders (generic getX()/analyzeX() hitting made-up paths that
+// never matched any backend route or ClimateMonitoringPage.jsx's real
+// getRecords/createRecord/updateRecord/deleteRecord calls). Fixed
+// against the new backend/src/routes/climateRegistryRoutes.js (wraps
+// services/legacy/climateMonitoringService.js's real
+// createCrudService(...) objects, previously unrouted).
+const CLIMATE_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/climate-registry`;
+
 export const droughtMonitoringAPI = {
-  getDroughtData: () => api.get('/drought-monitoring'),
-  analyzeDrought: (data) => api.post('/drought-monitoring/analyze', data),
+  getRecords: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/drought`, { params }),
+  createRecord: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/drought`, data),
+  updateRecord: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/drought/${id}`, data),
+  deleteRecord: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/drought/${id}`),
 };
 
 export const floodMonitoringAPI = {
-  getFloodData: () => api.get('/flood-monitoring'),
-  analyzeFlood: (data) => api.post('/flood-monitoring/analyze', data),
+  getRecords: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/flood`, { params }),
+  createRecord: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/flood`, data),
+  updateRecord: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/flood/${id}`, data),
+  deleteRecord: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/flood/${id}`),
 };
 
-export const pestForecastingAPI = {
-  getPestForecast: () => api.get('/pest-forecasting'),
-  forecastPests: (data) => api.post('/pest-forecasting/forecast', data),
-};
+// 2026-09-16: M087 Pest Forecasting is NOT covered by
+// climateMonitoringService.js (only M085/M086/M088/M089/M090 are, per
+// that file's own header comment) - checked directly, no backend
+// implements a pest-forecast CRUD anywhere. getForecasts left undefined
+// rather than fabricated; ClimateMonitoringPage.jsx's pest tab only
+// calls this one method (no create/update/remove), still a genuine gap.
+export const pestForecastingAPI = {};
 
 export const diseaseForecastingAPI = {
-  getDiseaseForecast: () => api.get('/disease-forecasting'),
-  forecastDisease: (data) => api.post('/disease-forecasting/forecast', data),
+  getForecasts: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/disease-forecasts`, { params }),
+  createForecast: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/disease-forecasts`, data),
+  updateForecast: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/disease-forecasts/${id}`, data),
+  deleteForecast: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/disease-forecasts/${id}`),
 };
 
 export const climateRiskAPI = {
-  getClimateRisks: () => api.get('/climate-risk'),
-  assessRisk: (data) => api.post('/climate-risk/assess', data),
+  getAssessments: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/climate-risk`, { params }),
+  createAssessment: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/climate-risk`, data),
+  updateAssessment: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/climate-risk/${id}`, data),
+  deleteAssessment: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/climate-risk/${id}`),
 };
 
 export const agroMeteorologyAPI = {
-  getAgroMeteorology: () => api.get('/agro-meteorology'),
-  analyzeWeather: (data) => api.post('/agro-meteorology/analyze', data),
+  getRecords: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/agro-meteorology`, { params }),
+  createRecord: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/agro-meteorology`, data),
+  updateRecord: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/agro-meteorology/${id}`, data),
+  deleteRecord: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/agro-meteorology/${id}`),
 };
 
 export const climateSmartAgricultureAPI = {
