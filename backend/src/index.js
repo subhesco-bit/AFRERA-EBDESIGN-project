@@ -246,7 +246,11 @@ const fisheriesManagementRoutes = require('./routes/fisheriesManagementRoutes.js
 const financialAnalytics = require('./routes/financialAnalytics.js');
 const fertilizerRoutes = require('./routes/fertilizerRoutes.js');
 const farmerValueRoutes = require('./routes/farmerValueRoutes.js');
-const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. farmerTrainingRoutes_merged.js
+// is a real training-program/carbon-footprint/FOLU-compliance implementation
+// with its own router (routes/agriculture/farmerTrainingRoutes.js is a third,
+// separate generic-CRUD file with none of that - left alone, not this one).
+const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes_merged.js');
 // 2026-09-15: was routes/farmerRoutes.js, a 38-line "Route operational"
 // scaffold. routes/farmerRoutes_merged.js is a real, complete,
 // already-debugged (own "FIXED 2026-08-15" comments) implementation of

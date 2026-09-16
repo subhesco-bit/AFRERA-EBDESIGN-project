@@ -632,6 +632,58 @@ export const blockchainTraceabilityAPI = {
     api.get(`${BLOCKCHAIN_TRACEABILITY_BASE}/chain-of-custody/verify/${productId}`, { params: { batch_number: batchNumber } }),
 };
 
+// 2026-09-15: didn't exist - services/routes/paymentGatewayRoutes.js is
+// already mounted at /api/paymentgateway. All 4 methods matched 1:1
+// against paymentGatewayController.js directly.
+const PAYMENT_GATEWAY_BASE = `${UNVERSIONED_BASE}/api/paymentgateway`;
+
+export const paymentGatewayAPI = {
+  processPayment: (data) => api.post(`${PAYMENT_GATEWAY_BASE}/process`, data),
+  getPaymentStatus: (paymentId) => api.get(`${PAYMENT_GATEWAY_BASE}/status/${paymentId}`),
+  refundPayment: (paymentId, data) => api.post(`${PAYMENT_GATEWAY_BASE}/refund/${paymentId}`, data),
+  getSupportedGateways: () => api.get(`${PAYMENT_GATEWAY_BASE}/gateways`),
+};
+
+// 2026-09-15: didn't exist - services/legacy/formService.js is already
+// mounted at /api/form (one of the 40 real-but-unmounted services from
+// earlier this session). All 4 methods matched 1:1 against the route
+// file's own req.params destructuring.
+const FORM_BASE = `${UNVERSIONED_BASE}/api/form`;
+
+export const formsAPI = {
+  createForm: (data) => api.post(FORM_BASE, data),
+  getForms: () => api.get(FORM_BASE),
+  updateForm: (id, data) => api.put(`${FORM_BASE}/${id}`, data),
+  submitForm: (id, data) => api.post(`${FORM_BASE}/${id}/submit`, data),
+};
+
+// 2026-09-15: didn't exist - farmerTrainingRoutes_merged.js was a
+// 38-line scaffold swap this same session (mounted at
+// /api/farmertraining). Only 2 of the 3 methods the importing pages call
+// match this backend - register (POST /register) and getCarbonFootprint
+// (GET /carbon-footprint/:farmerId). getPrograms() has no matching
+// endpoint: the real backend only has POST /programs (create a program,
+// admin-facing), no GET /programs to list them - not fabricated, left
+// undefined.
+const FARMER_TRAINING_BASE = `${UNVERSIONED_BASE}/api/farmertraining`;
+
+export const farmerTrainingAPI = {
+  register: (data) => api.post(`${FARMER_TRAINING_BASE}/register`, data),
+  getCarbonFootprint: (farmerId) => api.get(`${FARMER_TRAINING_BASE}/carbon-footprint/${farmerId}`),
+};
+
+// 2026-09-15: didn't exist - riskPricingRoutes_merged.js is already
+// mounted at /api/riskpricing. Both methods' param names confirmed
+// directly against the route file's own req.query/req.body
+// destructuring (forward is a GET with crop/months/spot/etc as query
+// params; advise is a POST with cropKey/qtyKg/etc as body fields).
+const PRICING_BASE = `${UNVERSIONED_BASE}/api/riskpricing`;
+
+export const pricingAPI = {
+  forward: (params) => api.get(`${PRICING_BASE}/forward`, { params }),
+  advise: (data) => api.post(`${PRICING_BASE}/advise`, data),
+};
+
 export const aiSelfHealingAPI = {
   getSelfHealingStatus: () => api.get('/ai/self-healing/status'),
   initiateSelfHealing: (data) => api.post('/ai/self-healing/initiate', data),
