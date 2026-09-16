@@ -183,6 +183,19 @@ all tabs on InputSupplyManagementPage.jsx now have a real backend.
 
 MISSING_EXPORT count: 74 -> 66.
 
+**Sixth new route file**: `backend/src/routes/cropRegistryRoutes.js` wraps
+all 6 `createCrudService(...)` objects in
+`services/legacy/cropManagementService.js` (crop registrations,
+varieties, seed plans, nurseries, sowing records, monitoring
+observations - 6 separate dedicated pages, not one tab page), mounted at
+`/api/crop-registry`. Tested (7 tests). Fixed 3 more pre-existing
+fabricated placeholders (`cropMonitoringAPI`, `cropRegistrationAPI`,
+`cropVarietyAPI` - same wrong-method-names/missing-update-delete pattern
+as fisheries/horticulture) and wired the 3 previously-missing exports
+(`nurseryAPI`, `seedPlanningAPI`, `sowingAPI`).
+
+MISSING_EXPORT count: 66 -> 63.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -380,9 +393,7 @@ in-file comment's claim about backend state at face value.
 Batch-verified 2026-09-16 (25 crop/horticulture/agronomy names) — 24 of
 25 CONFIRMED GAP, added here, do not re-investigate:
 
-`nurseryAPI`,
-`seedPlanningAPI`,
-`sowingAPI`, `surveyManagementAPI`,
+`surveyManagementAPI`,
 `operationsAPI` —
 same pattern as the livestock batch above: real `createCrudService(...)`
 DB-backed objects in `services/legacy/{horticultureManagementService,

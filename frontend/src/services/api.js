@@ -3510,19 +3510,56 @@ export const cropCalendarAPI = {
   updateCropCalendar: (data) => api.put('/crop-calendar', data),
 };
 
-export const cropMonitoringAPI = {
-  getCropMonitoring: () => api.get('/crop-monitoring'),
-  monitorCrop: (data) => api.post('/crop-monitoring/monitor', data),
-};
+// 2026-09-16: cropMonitoringAPI/cropRegistrationAPI/cropVarietyAPI were
+// pre-existing fabricated placeholders (wrong method names, missing
+// update/delete entirely, made-up paths) - same recurring pattern found
+// in the fisheries and horticulture batches. Fixed against the new
+// backend/src/routes/cropRegistryRoutes.js (wraps
+// services/legacy/cropManagementService.js's real createCrudService(...)
+// objects, previously unrouted). Also wires the 3 previously-missing
+// exports (nurseryAPI, seedPlanningAPI, sowingAPI) from the same file.
+const CROP_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/crop-registry`;
 
 export const cropRegistrationAPI = {
-  getCropRegistrations: () => api.get('/crop-registrations'),
-  registerCrop: (data) => api.post('/crop-registrations', data),
+  getCrops: (params) => api.get(`${CROP_REGISTRY_BASE}/registrations`, { params }),
+  registerCrop: (data) => api.post(`${CROP_REGISTRY_BASE}/registrations`, data),
+  updateCrop: (id, data) => api.put(`${CROP_REGISTRY_BASE}/registrations/${id}`, data),
+  deleteCrop: (id) => api.delete(`${CROP_REGISTRY_BASE}/registrations/${id}`),
 };
 
 export const cropVarietyAPI = {
-  getCropVarieties: () => api.get('/crop-varieties'),
-  createCropVariety: (data) => api.post('/crop-varieties', data),
+  getVarieties: (params) => api.get(`${CROP_REGISTRY_BASE}/varieties`, { params }),
+  createVariety: (data) => api.post(`${CROP_REGISTRY_BASE}/varieties`, data),
+  updateVariety: (id, data) => api.put(`${CROP_REGISTRY_BASE}/varieties/${id}`, data),
+  deleteVariety: (id) => api.delete(`${CROP_REGISTRY_BASE}/varieties/${id}`),
+};
+
+export const seedPlanningAPI = {
+  getPlans: (params) => api.get(`${CROP_REGISTRY_BASE}/seed-plans`, { params }),
+  createPlan: (data) => api.post(`${CROP_REGISTRY_BASE}/seed-plans`, data),
+  updatePlan: (id, data) => api.put(`${CROP_REGISTRY_BASE}/seed-plans/${id}`, data),
+  deletePlan: (id) => api.delete(`${CROP_REGISTRY_BASE}/seed-plans/${id}`),
+};
+
+export const nurseryAPI = {
+  getNurseries: (params) => api.get(`${CROP_REGISTRY_BASE}/nurseries`, { params }),
+  createNursery: (data) => api.post(`${CROP_REGISTRY_BASE}/nurseries`, data),
+  updateNursery: (id, data) => api.put(`${CROP_REGISTRY_BASE}/nurseries/${id}`, data),
+  deleteNursery: (id) => api.delete(`${CROP_REGISTRY_BASE}/nurseries/${id}`),
+};
+
+export const sowingAPI = {
+  getRecords: (params) => api.get(`${CROP_REGISTRY_BASE}/sowing-records`, { params }),
+  createRecord: (data) => api.post(`${CROP_REGISTRY_BASE}/sowing-records`, data),
+  updateRecord: (id, data) => api.put(`${CROP_REGISTRY_BASE}/sowing-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${CROP_REGISTRY_BASE}/sowing-records/${id}`),
+};
+
+export const cropMonitoringAPI = {
+  getObservations: (params) => api.get(`${CROP_REGISTRY_BASE}/monitoring-observations`, { params }),
+  createObservation: (data) => api.post(`${CROP_REGISTRY_BASE}/monitoring-observations`, data),
+  updateObservation: (id, data) => api.put(`${CROP_REGISTRY_BASE}/monitoring-observations/${id}`, data),
+  deleteObservation: (id) => api.delete(`${CROP_REGISTRY_BASE}/monitoring-observations/${id}`),
 };
 
 export const dairyAIAPI = {
