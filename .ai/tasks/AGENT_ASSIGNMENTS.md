@@ -22,6 +22,7 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
+| Claude (PR #21) | `services/`, `services/legacy/`, `services/<domain>/` duplicate-basename files (investigation only until specific fixes are identified); `backend/src/index.js` (read-only, checking `serviceLocator`/`DynamicServiceLoader` consumers) | 2026-09-16 | Auditing the ~100+ duplicate-service-basename shadowing bug (6 known cases already fixed, see "systemic bug" note below) for real, consumer-impacting instances beyond the 6 already fixed - not touching the 6 already-confirmed-fine cases. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
