@@ -470,6 +470,40 @@ pre-existing empty-stub suites unrelated).
 
 MISSING_EXPORT count: 45 -> 38.
 
+## Update — 2026-09-16 (cheap fixes): closed the 2 already-flagged "orphaned real code" gaps — 38 -> 36
+
+Both had been flagged earlier this session as "the closest to a real
+fix if backend work comes into scope" - came back to actually close
+them.
+
+- **`organizationManagementAPI`**: the mounted route
+  (`routes/organizationManagementRoutes.js`, `/api/organizationmanagement`)
+  was a dead "Route operational" scaffold; the real implementation
+  (`routes/platform/organizationManagementRoutes_merged.js` - a genuine,
+  if in-memory/non-persistent, CRUD scaffold: `GET /`, `GET /:id`, `POST /`,
+  `PUT /:id`, `DELETE /:id`, matching `OrganizationTenantManagementPage.jsx`'s
+  `getAllOrganizations`/`createOrganization`/`deleteOrganization` exactly)
+  was never `require()`'d anywhere. Swapped the mount in `index.js` (same
+  scaffold-swap pattern as `glutWarningRoutes.js`/`foluBenchmarkRoutes.js`
+  earlier this session) and excluded the dead stub filename from the
+  dynamic route loader's auto-mount. Added
+  `routes/__tests__/organizationManagementRoutes.test.js` (5 tests).
+- **`platformTelemetryAPI`**: `controllers/platformTelemetryController.js`
+  (`getStatus`/`getAnalytics`, backed by real
+  `services/legacy/platformTelemetryService.js` methods, all verified to
+  exist directly) was a complete, correct controller that literally no
+  route file required - the mounted `routes/platformTelemetryRoutes.js`
+  was an unrelated dead stub. Rewrote that file (it had nothing worth
+  preserving) to route `GET /status` and `GET /analytics` to the real
+  controller - no `index.js` change needed since the filename, and
+  therefore the existing mount line, stayed the same. Added
+  `routes/__tests__/platformTelemetryRoutes.test.js` (3 tests).
+
+Both wired in `api.js`. 142/142 real backend tests pass (same 6
+pre-existing empty-stub suites unrelated).
+
+MISSING_EXPORT count: 38 -> 36.
+
 ## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
 
 Found that ~24 backend services exist as multiple files sharing the
@@ -532,16 +566,11 @@ was never built - true at the time, but it turned out
 unrelated to `mfaRoutes.js`/`mfaRoutes_merged.js`'s separate per-user TOTP
 flow) already had a real `mfa_devices` CRUD object with no router.
 
-`platformTelemetryAPI` — **re-checked 2026-09-16, still CONFIRMED GAP,
-not the duplicate-filename bug**:
-`platformTelemetryAPI` (`PlatformManagementPage.jsx` `.getStatus()`/
-  `.getAnalytics()`): a real, working `controllers/platformTelemetryController.js`
-  exists (backed by `services/legacy/platformTelemetryService.js`) but is
-  never required by any route file — the only mounted route,
-  `routes/platformTelemetryRoutes.js` (`/api/platformtelemetry`), is an
-  unrelated stub that doesn't import the controller. Orphaned-controller
-  bug, not a Map-shadowing one — cheap fix if in scope, but out of scope
-  for a wiring pass (needs a new route file, not just an export).
+`platformTelemetryAPI` — **now fixed, see the "Update — 2026-09-16
+(cheap fixes)" section below**. Was: not the duplicate-filename bug — a
+real, working `controllers/platformTelemetryController.js` existed
+(backed by `services/legacy/platformTelemetryService.js`) but was never
+required by any route file.
 
 Batch-verified 2026-09-16 (18 livestock/farm-ops + 10 REOS/platform names,
 via two research passes) — added to this gap list, do not re-investigate:
@@ -562,7 +591,7 @@ doesn't exist anywhere in the code. Don't trust module READMEs without
 reading the actual file.)
 
 `governmentAPI` (2 methods — `getSchemeAnalytics`/`getComplianceStatus`,
-distinct from the already-wired `governmentSchemeAPI`), `organizationManagementAPI`,
+distinct from the already-wired `governmentSchemeAPI`),
 `pushNotificationsAPI` (Web Push subscribe/unsubscribe — no VAPID/web-push
 code anywhere) — confirmed gaps, no matching backend.
 
@@ -583,15 +612,12 @@ script (not assumed) and wired against their exact real endpoints
 export at `api.js` but hit a wrong path (`POST /market-access/manage`
 instead of the real `POST /market-access`) — fixed in place.
 
-`organizationManagementAPI` and `platformTelemetryAPI` remain genuine
-gaps but are the closest to a real fix if backend work comes into scope:
-both have a complete, correct implementation that's simply never
-`require()`'d by a mounted route
-(`platform/organizationManagementRoutes_merged.js` and
-`controllers/platformTelemetryController.js` respectively) — an
-unmount/wiring bug, not missing code. `governmentAPI` and
-`pushNotificationsAPI` remain genuine gaps with no matching backend at
-all.
+`organizationManagementAPI` and `platformTelemetryAPI` — **now fixed,
+see the "Update — 2026-09-16 (cheap fixes)" section below**. Were: both
+had a complete, correct implementation that was simply never
+`require()`'d by a mounted route — an unmount/wiring bug, not missing
+code. `governmentAPI` and `pushNotificationsAPI` remain genuine gaps
+with no matching backend at all.
 
 Batch-verified 2026-09-16 (22 land/water/GIS/equipment names) — 21 of 22
 CONFIRMED GAP, 1 (`machineryAccessAPI`, above) CONFIRMED LIVE:

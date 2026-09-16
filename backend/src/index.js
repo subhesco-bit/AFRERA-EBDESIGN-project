@@ -111,7 +111,13 @@ const phase10 = require('./routes/phase10.js');
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const paymentGatewayRoutes = require('./routes/paymentGatewayRoutes.js');
 const ORPHANED_SERVICES_MOUNT = require('./routes/ORPHANED_SERVICES_MOUNT.js');
-const organizationManagementRoutes = require('./routes/organizationManagementRoutes.js');
+// 2026-09-16: was a 38-line 'Route operational' scaffold (POST / + GET
+// /health only). routes/platform/organizationManagementRoutes_merged.js
+// is a real in-memory CRUD implementation (GET/:id, POST, PUT/:id,
+// DELETE/:id) matching organizationManagementAPI's real needs
+// (getAllOrganizations/createOrganization/deleteOrganization) - was
+// never require()'d anywhere until now.
+const organizationManagementRoutes = require('./routes/platform/organizationManagementRoutes_merged.js');
 // 2026-09-15: was require('./routes/orderRoutes.js'), a 38-line scaffold
 // whose POST / just returned {message: 'Route operational'} with no real
 // order ever created. services/legacy/orderService.js is a real,

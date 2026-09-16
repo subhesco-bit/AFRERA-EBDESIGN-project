@@ -6507,6 +6507,28 @@ export const rolePermissionAPI = {
   createRole: (data) => api.post(ROLE_MANAGEMENT_BASE, data),
 };
 
+// 2026-09-16: routes/platform/organizationManagementRoutes_merged.js is
+// a real, in-memory CRUD implementation that was never require()'d
+// anywhere - the mounted route at /api/organizationmanagement used to be
+// a dead "Route operational" stub. Swapped in index.js; wired here
+// against the real endpoints (unversioned - matches the stub's own
+// unversioned mount path).
+export const organizationManagementAPI = {
+  getAllOrganizations: (params) => api.get(`${UNVERSIONED_BASE}/api/organizationmanagement`, { params }),
+  createOrganization: (data) => api.post(`${UNVERSIONED_BASE}/api/organizationmanagement`, data),
+  deleteOrganization: (id) => api.delete(`${UNVERSIONED_BASE}/api/organizationmanagement/${id}`),
+};
+
+// 2026-09-16: controllers/platformTelemetryController.js was a real,
+// working controller (backed by services/legacy/platformTelemetryService.js)
+// that was never actually wired to a route - routes/platformTelemetryRoutes.js
+// used to be an unrelated dead stub. Rewrote that file to route to the
+// real controller; wired here.
+export const platformTelemetryAPI = {
+  getStatus: () => api.get(`${UNVERSIONED_BASE}/api/platformtelemetry/status`),
+  getAnalytics: () => api.get(`${UNVERSIONED_BASE}/api/platformtelemetry/analytics`),
+};
+
 // 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and
 // calls it directly with relative paths (api.get('/advanced-medical-coding/...'))
 // rather than through a dedicated *API object - only a default export

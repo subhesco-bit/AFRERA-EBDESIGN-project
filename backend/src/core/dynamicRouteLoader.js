@@ -592,6 +592,12 @@ class DynamicRouteLoader {
     if (['glutWarningRoutes.js', 'foluBenchmarkRoutes.js', 'wikipediaRoutes.js', 'foluRoutes.js'].includes(base)) {
       return false;
     }
+    // 2026-09-16: same reasoning again - organizationManagementRoutes.js
+    // (flat) was a dead 'Route operational' scaffold, swapped out in
+    // index.js for the real platform/organizationManagementRoutes_merged.js.
+    if (base === 'organizationManagementRoutes.js') {
+      return false;
+    }
     // 2026-09-15: same reasoning again - farmerTrainingRoutes.js (flat) was
     // swapped out in index.js for its real _merged.js implementation.
     if (filePath.endsWith(`${path.sep}farmerTrainingRoutes.js`) && !filePath.includes(`${path.sep}agriculture${path.sep}`)) {
