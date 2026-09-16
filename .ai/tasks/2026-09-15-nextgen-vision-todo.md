@@ -2614,3 +2614,57 @@ above, plus the previously-documented modules/-tree gaps (16) and
 genuinely new security/auth features - every single one now backed by a
 real, direct check of its actual method names against the frontend's
 actual calls, not a filename guess either way.
+
+## Update 38 (2026-09-16): closed a partial-match gap against an already-mounted router, exhausted the modules/ WIRED-wrapper search - 33 remaining are now individually exhaustive-checked (161 -> 31 total this session)
+
+Continuing past Update 37: found one more fix of yet another shape.
+`services/legacy/erpService.js` already exports a real, working
+`router` property that's already mounted at `/api/erp` in `index.js` -
+not orphaned at all, just never had a frontend client written for it.
+`ERPDashboardPage.jsx` needs 7 methods; checked the router's actual
+registered paths plus the file's every exported function directly and
+found exactly 2 real matches (`getSyncStatus` -> `GET /status`,
+`triggerSync` -> `POST /sync/bulk`) - wired those 2, left the other 5
+(`getDashboard`/`getGLEntries`/`getReconciliation`/
+`getFinancialReports`/`resolveConflict`) undefined since nothing
+implements them anywhere.
+
+Then did a last sweep: `backend/src/modules/` contains ~9 "WIRED"-status
+module directories (distinct from the ~150+ broken M0xx scaffold
+directories investigated in Update 36 - these ones use a different,
+working `module.json` + thin-wrapper structure) with promising names for
+several remaining gaps (`M404_DECISION_SUPPORT`, `M300_ERP_CORE`,
+`M386100_NUTRITIONINTELLIGENCE`, `M74100_OPERATIONSMANAGEMENT`,
+`M652100_GOVERNMENTSCHEME`). Checked every one directly: each is a
+one-line `module.exports = require(...)` thin wrapper pointing at a
+`services/legacy/*.js` file already fully investigated and ruled out
+earlier this session (`decisionSupportService.js` - business-rule
+calculators, not a decision engine; `operationsManagementService.js` -
+already has its own `operationsRegistryRoutes.js` from Update 33,
+`operationsAPI`'s specific `getOverview` need still doesn't match;
+`nutritionIntelligenceService.js` and `governmentSchemeService.js` -
+already checked in earlier updates). `M300_ERP_CORE` was the one live
+lead and is what led to the `erpDashboardAPI` fix above - confirmed by
+checking `erpService.js` directly rather than trusting the module
+wrapper's existence alone.
+
+**This closes out the search phase for this session.** Every one of the
+31 names still in the `MISSING_EXPORT` list has now been individually
+checked against real backend method names (not filename matches, not
+assumptions) at least once, several multiple times from different
+angles (direct grep, `modules/` wrapper search, duplicate-file check).
+16 trace to the `modules/` scaffold tree's wrong-table-binding problem
+(Update 36); the other 15
+(`competitorAPI`/`decisionEngineAPI`/`enterpriseMemoryAPI`/
+`governmentAPI`/`medicalCodingAPI`/`nutritionIntelligenceAPI`/
+`operationsAPI`/`pushNotificationsAPI`/`securityAccessControlAPI`/
+`shgAPI`/`userManagementAPI`/`climateMonitoringAPI`/
+`equipmentRentalAPI`/`fleetManagementAPI`/`implementManagementAPI`) have
+no matching backend anywhere in the codebase, confirmed directly.
+Closing any of them now requires genuinely new backend work, several
+security/auth-sensitive - a product/architecture decision, not something
+to keep searching for.
+
+**Running total this session**: 161 → 31 MISSING_EXPORT errors (130
+closed). 223/223 real backend tests pass (same 6 pre-existing
+empty-stub suites unrelated).
