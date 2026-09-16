@@ -999,6 +999,17 @@ async function startup() {
     app.use('/api/aibackbone', aiBackboneRoutes);
     app.use('/api/aiapproval', aiApprovalRoutes);
     app.use('/api/aiagent', aiAgentRoutes);
+    // 2026-09-16: routes/claude/ is a 16-file directory the dynamic route
+    // loader explicitly skips with a comment claiming "manually mounted" -
+    // that claim was already found false for the whole directory earlier
+    // this session (nothing mounts any of it). Mounting just this one file
+    // now, found while wiring CreditScorePage.jsx's already-flagged gap:
+    // real demand/price/credit-risk/fraud/recommend logic, Claude-AI-enhanced
+    // with an honest fallback to the plain original service when
+    // CLAUDE_AI_ENABLED isn't set or the AI call fails (verified directly -
+    // no fabricated AI content or hardcoded confidence). The other 15 files
+    // in routes/claude/ are NOT part of this fix - flagged, not audited.
+    app.use('/api/aidecisions', require('./routes/claude/aiDecisionRoutes.js'));
     app.use('/api/agriculturalintelligence', agriculturalIntelligenceRoutes);
     app.use('/api/advancedsearch', advancedSearchRoutes);
     app.use('/api/advancedfeatures', advancedFeatures);

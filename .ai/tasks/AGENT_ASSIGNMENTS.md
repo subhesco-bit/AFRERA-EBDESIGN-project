@@ -22,7 +22,6 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
-| Claude (PR #21) | `backend/src/index.js` (append 1 mount); `frontend/src/pages/CreditScorePage.jsx` | 2026-09-16 | Mounting real, unmounted `routes/claude/aiDecisionRoutes.js` (demand/price/credit-risk/fraud/recommend, Claude-AI-enhanced with honest non-AI fallback) and wiring `CreditScorePage.jsx`'s already-flagged gap to it. `routes/claude/` has 15 other unmounted files - NOT touching those this round, out of scope, flagging for a future pass. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -1730,3 +1729,49 @@ not a bug); full boot smoke test still doesn't crash; `src/routes/__tests__`
 + `src/modules` unaffected (343/344, same 1 known M041 non-bug failure);
 frontend `npm run build` exits 0; frontend suite unaffected (54/55, same
 1 known unrelated failure).
+
+## Update — 2026-09-16 (aiDecisionRoutes.js mounted - real value, but CreditScorePage.jsx deliberately NOT wired, here's why)
+
+Went looking for a real backend behind `CreditScorePage.jsx`'s already-
+documented gap. `routes/claude/aiDecisionRoutes.js` (377 lines) is real:
+5 endpoints (predict/demand, optimize/price, assess/credit-risk,
+detect/fraud, recommend), each with a plain "original" version and a
+Claude-AI-enhanced version that gracefully falls back to the original
+when `CLAUDE_AI_ENABLED` isn't set or the AI call throws (verified
+directly in `services/claude/aiDecisionService.js` - no fabricated AI
+content or hardcoded confidence anywhere). `dynamicRouteLoader.js`
+explicitly skips the whole `routes/claude/` directory (16 files) with a
+comment claiming "manually mounted" - already found false for the
+directory as a whole earlier this session. Mounted just this one file at
+`/api/aidecisions` (plain `express.Router()`, no path conflicts).
+Verified: all 16 routes register correctly on a real Express app, eslint
+clean, boot smoke test still doesn't crash, `src/routes/__tests__` +
+`src/modules` unaffected (343/344, same 1 known M041 failure).
+
+**Deliberately did NOT wire `CreditScorePage.jsx` to `/assess/credit-risk`**,
+even though the route is now real and reachable. Reading
+`services/aiService/creditRisk.js`'s `assessCreditRisk()` (the function
+both the "original" and, on fallback, the "AI-enhanced" endpoint call)
+turned up an existing, already-documented `FIXME`: `calculateFDI(farmerId)`
+- 40% of the weight in the final credit score - returns the literal,
+hardcoded `{score: 72, grade: 'B+'}` for every farmer regardless of
+`farmerId`, feeding a fabricated number directly into the real
+interest-rate and loan-limit figures the endpoint returns. Repayment
+history, certifications and experience (the other 60%) are all real and
+DB-backed - only the FDI component is fake. This is exactly the kind of
+gap the PR description's own "Known follow-up" section already flags as
+"several security/auth-sensitive" among the confirmed-gap list -
+presenting a specific interest rate or loan limit derived from a known-
+fake 40% input to a farmer or loan officer, even behind a disclaimer,
+risks it being treated as a real number for a real financial decision.
+That's a product/domain call (fix `calculateFDI` for real, or drop its
+weighting, or decide the disclaimer approach), not a wiring fix - so
+`CreditScorePage.jsx` stays in its existing honest "not available yet"
+state. The route mount itself still has real value independent of this:
+demand prediction, price optimization, fraud detection and
+recommendations are all genuinely clean and now reachable for whichever
+consumer needs them.
+
+The other 15 files in `routes/claude/` were not audited this pass -
+flagged as a real, bounded follow-up opportunity (same "manually mounted"
+false-claim pattern likely applies), not touched.
