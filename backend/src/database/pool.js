@@ -302,6 +302,25 @@ function applyWhereFilter(rows, queryText, params) {
     const trimmed = clause.trim();
     if (!trimmed) continue;
 
+    // 2026-09-16: `<col> IS [NOT] NULL` has no `=`, so the regex below never
+    // matched it and the clause was silently dropped - every soft-delete
+    // guard shaped `AND deleted_at IS NULL` (the exact pattern every
+    // backend/src/modules/M0XX service.js's getById/getAll uses) was
+    // ignored, so a soft-deleted row still matched. This was masking a
+    // large share of module test failures under a `db.query is not a
+    // function` error until the shared connection-vs-pool import bug was
+    // fixed elsewhere - once real code ran, this surfaced directly.
+    const isNullMatch = trimmed.match(/^([a-z_][a-z0-9_]*)\s+is\s+(not\s+)?null$/i);
+    if (isNullMatch) {
+      const column = isNullMatch[1].toLowerCase();
+      const expectNull = !isNullMatch[2];
+      filtered = filtered.filter((row) => {
+        const isNullish = row[column] === undefined || row[column] === null;
+        return expectNull ? isNullish : !isNullish;
+      });
+      continue;
+    }
+
     const match = trimmed.match(/([a-z_][a-z0-9_]*)\s*=\s*(\$\d+|true|false|null|'([^']*)'|"([^"]*)")/i);
     if (!match) continue;
 
@@ -2161,6 +2180,24 @@ function makeTestPool() {
             testStores.organic_standards.set(row.id, row);
           }
         }
+      }
+
+      // 2026-09-16: SELECT COUNT(*) [as alias] FROM <table> [WHERE ...] with
+      // no dedicated handler. Without this, a COUNT query fell through to
+      // the generic SELECT * handler below and got back real data rows
+      // (not an aggregate row) - `result.rows[0].total` read undefined off
+      // a row that has no `total` column, throwing a TypeError that looked
+      // like the caller's bug rather than an unhandled query shape. This is
+      // exactly the pattern every backend/src/modules/M0XX service.js uses
+      // for its own pagination count.
+      const countMatch = (text || '').match(/^\s*select\s+count\(\*\)(?:\s+as\s+"?([a-z_][a-z0-9_]*)"?)?\s+from\s+"?([a-z_][a-z0-9_]*)"?/i);
+      if (countMatch) {
+        const alias = (countMatch[1] || 'count').toLowerCase();
+        const table = countMatch[2].toLowerCase();
+        const store = testStores[table];
+        const rows = store ? Array.from(store.values()) : [];
+        const total = applyWhereFilter(rows, text, params).length;
+        return { rows: [{ [alias]: String(total) }], rowCount: 1 };
       }
 
       // SELECT * FROM <table> with no dedicated handler: serve whatever the
