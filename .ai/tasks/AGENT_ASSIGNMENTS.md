@@ -79,33 +79,80 @@ real backend's actual req.body/req.query/req.params shape, not guessed):
 `nervousSystemAPI`, `organicTraceabilityAPI`, `nutrientValueSalesAPI`,
 `projectSystemsAPI`, `glutWarningAPI`, `foluBenchmarkAPI`, `wikipediaAPI`,
 `foluAPI`, `freightPoolingAPI`, `labourAPI`, `marketIntelligenceAPI`,
-`predictiveAnalyticsAPI` (3 of 5 methods), `blockchainTraceabilityAPI`.
+`predictiveAnalyticsAPI` (3 of 5 methods), `blockchainTraceabilityAPI`,
+`paymentGatewayAPI`, `formsAPI`, `farmerTrainingAPI` (2 of 3 methods),
+`pricingAPI`, `wearableAPI`, `villageProfileAPI`, `subsidyOpsAPI`,
+`governmentSchemeAPI`, `preSeasonAPI`, `sharedInfraAPI`.
+
+**Backend fixes beyond route mounting**: fixed a real route-shadowing bug
+in `services/legacy/villageProfileService.js` (`GET /villages/search`
+registered after `GET /villages/:villageId`, same shape as
+`productService.js`'s earlier fix); fixed `farmerTrainingRoutes.js`
+(another scaffold swap for `farmerTrainingRoutes_merged.js`); identified
+(but did not fix — real architectural work, out of scope for a wiring
+pass) a systemic duplicate-service-filename bug in
+`core/dynamicServiceLoader.js` — see the "Update — 2026-09-16" section
+below for the full writeup before touching anything in this area.
 
 Result: the frontend's `MISSING_EXPORT` build-error count went from 161 →
-122 across this session (still tracked by CI's `Build Verification` job on
-PR #21 — expected to still show red on ~122 remaining errors, that's
-normal, don't re-file it as a new bug).
+109 as of 2026-09-16 (161 at the start of this session — see
+`.ai/tasks/2026-09-15-nextgen-vision-todo.md`'s 32 dated updates for the
+full trail; still tracked by CI's `Build Verification` job on PR #21 —
+expected to keep showing red on the remaining count, that's normal,
+don't re-file it as a new bug).
+
+## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
+
+Found that ~24 backend services exist as multiple files sharing the
+identical base filename across `services/`, `services/<domain>/`, and
+`services/legacy/` (e.g. `governmentSchemeService.js` in 3 places).
+`core/dynamicServiceLoader.js` discovers `setupRoutes(app)`-exporting
+services by walking the whole `services/` tree and keying a Map by base
+filename — whichever copy the walk visits *last* silently wins,
+independent of completeness. Confirmed concretely for 6 services
+(`governmentSchemeService`, `aiAdvisoryService`, `buyingClubService`,
+`procurementSubscriptionService`, `renewableEnergyService`,
+`ruralEnterpriseService`): the winning file is a thinner variant missing
+exactly the endpoint the frontend needs, while the fuller
+`services/legacy/*.js` copy — which has the real, matching endpoint —
+loses and is never mounted at all. **Before adding anything to the
+confirmed-gap list below, check whether it's actually this bug instead**:
+`grep -rl '<serviceName>\.js$' backend/src/services` to find duplicates,
+then check which one `new DynamicServiceLoader(null).discoverServicesFromDirectory(servicesDir)`
+actually picks (`loader.services.get('<serviceName>').path`) before
+concluding the feature is genuinely missing. `platformTelemetryAPI` and
+`mfaManagementAPI` in particular haven't been re-checked against this
+specific failure mode yet — flagged, not confirmed either way.
 
 ## Confirmed Missing-Feature Gaps — Do NOT Re-Investigate, Do NOT Fabricate
 
 These frontend API names have **no real backend implementing their needed
-methods anywhere in the codebase**, checked directly (not assumed). Wiring
-a fake client to a nonexistent endpoint, or inventing backend logic to
-match, would reintroduce the exact fabrication problem this whole PR has
-been removing. If real backend work gets built for any of these, wire the
-frontend client then — not before:
+methods anywhere in the codebase**, checked directly (not assumed — and,
+as of the update above, checked for the duplicate-filename shadowing bug
+too, not just a plain file search). Wiring a fake client to a nonexistent
+endpoint, or inventing backend logic to match, would reintroduce the
+exact fabrication problem this whole PR has been removing. If real
+backend work gets built for any of these, wire the frontend client then
+— not before:
 
 `decisionEngineAPI`, `erpDashboardAPI`, `enterpriseMemoryAPI`,
-`climateMonitoringAPI`, `competitorAPI`, `platformTelemetryAPI`,
-`platformConfigurationAPI`, `mfaManagementAPI`, `informationSharingAPI`,
-`logisticsEnhancementAPI`, `irrigationAPI`, `yieldAPI`, `waterQualityAPI`,
-`soilTestingOpsAPI`, `fleetManagementAPI`, `equipmentRentalAPI`,
-`machineryOperationsAPI`, `implementManagementAPI`, `landLeaseAPI`,
-`shgAPI`, `publicDataAPI`, `consentManagementAPI`, `digitalIdentityAPI`,
-`sessionManagementAPI`, `ssoAPI`, `securityAccessControlAPI`,
-`userManagementAPI`, `rolePermissionAPI`, `permissionManagementAPI`, plus
-~24 of `farmersAPI`'s methods (field management, harvest scoring, most
-market/pricing analytics — see the twenty-fourth update for the full list).
+`climateMonitoringAPI`, `competitorAPI`, `platformConfigurationAPI`,
+`informationSharingAPI`, `logisticsEnhancementAPI`, `irrigationAPI`,
+`yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`, `fleetManagementAPI`,
+`equipmentRentalAPI`, `machineryOperationsAPI`, `implementManagementAPI`,
+`landLeaseAPI`, `shgAPI`, `publicDataAPI`, `consentManagementAPI`,
+`digitalIdentityAPI`, `sessionManagementAPI`, `ssoAPI`,
+`securityAccessControlAPI`, `userManagementAPI`, `rolePermissionAPI`,
+`permissionManagementAPI`, `schemeRegistryAPI`, `aiAdvisoryAPI`,
+`buyingClubAPI`, `procurementSubscriptionAPI`, `renewableEnergyAPI`,
+`ruralEnterpriseAPI` (these last 6 are the confirmed duplicate-filename
+shadowing bug specifically — real code exists in `services/legacy/*.js`,
+just never reachable — a different kind of gap than the others in this
+list, see the update above), plus ~24 of `farmersAPI`'s methods (field
+management, harvest scoring, most market/pricing analytics — see the
+twenty-fourth update for the full list). `platformTelemetryAPI` and
+`mfaManagementAPI` are unconfirmed either way (see update above) — check
+before working on them, don't assume they're still on this list.
 
 `weatherRoutes_merged.js` is a related but distinct case: it's real code
 with a genuinely missing dependency (`climateRouteSupport.js`, a whole
