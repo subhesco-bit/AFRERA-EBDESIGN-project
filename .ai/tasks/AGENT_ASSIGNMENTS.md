@@ -672,6 +672,39 @@ unrelated).
 
 MISSING_EXPORT count: 33 -> 32.
 
+## Update — 2026-09-16 (erp dashboard): a partial match against an already-mounted real router — 32 -> 31
+
+Different shape again: `services/legacy/erpService.js` already exports a
+real `router` property (`GET /status`, `POST /sync/product|order|farmer|
+transaction|asset|bulk`) that's already mounted at `/api/erp` in
+`index.js` - not orphaned at all, just never had a frontend client.
+`ERPDashboardPage.jsx`'s `erpDashboardAPI` needs 7 methods; only 2 have a
+real match: `getSyncStatus()` → `GET /status` (real, DB-backed against
+`products`/`orders`/`farmers`/`assets` tables, no auth required) and
+`triggerSync(syncType)` → `POST /sync/bulk` (auth required, body
+`{entity_type, erp_type}`). `getDashboard`/`getGLEntries`/
+`getReconciliation`/`getFinancialReports`/`resolveConflict` have no
+matching endpoint anywhere in this file (checked the full router and
+every exported function) - genuine gaps, left undefined rather than
+fabricated. Along the way also checked `decisionEngineAPI` against
+`modules/M404_DECISION_SUPPORT` (wraps
+`services/legacy/decisionSupportService.js` directly) - real methods,
+but business-rule calculators (credit eligibility, buy-vs-rent, fraud
+scoring), not the generic decision-engine-with-rules the frontend needs;
+confirmed gap, not fabricated around.
+
+Added `services/legacy/__tests__/erpService.test.js` (2 tests) since
+this router had no test before despite already being real and mounted.
+Wired the 2 real methods in `api.js`.
+
+223/223 real backend tests pass (same 6 pre-existing empty-stub suites
+unrelated; this count also reflects widening the test-run glob to
+include `services/legacy/__tests__` and `services/__tests__` for the
+first time this session, which picked up pre-existing passing suites
+too).
+
+MISSING_EXPORT count: 32 -> 31.
+
 ## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
 
 Found that ~24 backend services exist as multiple files sharing the
@@ -715,7 +748,14 @@ exact fabrication problem this whole PR has been removing. If real
 backend work gets built for any of these, wire the frontend client then
 — not before:
 
-`decisionEngineAPI`, `erpDashboardAPI`, `enterpriseMemoryAPI`
+`decisionEngineAPI` (checked `modules/M404_DECISION_SUPPORT` ->
+`services/legacy/decisionSupportService.js` directly - real methods, but
+business-rule calculators like `corpCreditEligible`/`buyVsRentDecision`/
+`claimFraudScore`, not the generic "rules + history + trigger" decision
+engine the frontend needs - different concept, not the same feature
+under a different name), `erpDashboardAPI` — **2 of 7 methods now fixed,
+see the "Update — 2026-09-16 (erp dashboard)" section below**,
+`enterpriseMemoryAPI`
 (checked directly against all 3 duplicate copies' real method names -
 `recordMemory`/`recallSimilar`/`recordCase`/`listRecent`/etc, none
 matches the frontend's `getCases`/`getLearningInsights`/

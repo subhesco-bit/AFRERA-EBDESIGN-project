@@ -6593,6 +6593,19 @@ export const publicDataAPI = {
   extract: (sourceId, filter) => api.post(`${UNVERSIONED_BASE}/api/publicdata/sources/${sourceId}/extract`, filter),
 };
 
+// 2026-09-16: services/legacy/erpService.js already exports a real
+// router (GET /status, POST /sync/bulk, etc.) already mounted at
+// /api/erp - ERPDashboardPage.jsx's erpDashboardAPI.getSyncStatus()/
+// .triggerSync() just never had a frontend client. Only these 2 of the
+// page's 7 methods match: getDashboard/getGLEntries/getReconciliation/
+// getFinancialReports/resolveConflict have no matching endpoint
+// anywhere in this file - checked directly, genuine gaps, not
+// fabricated.
+export const erpDashboardAPI = {
+  getSyncStatus: () => api.get(`${UNVERSIONED_BASE}/api/erp/status`),
+  triggerSync: (syncType) => api.post(`${UNVERSIONED_BASE}/api/erp/sync/bulk`, { entity_type: syncType }),
+};
+
 export const informationSharingAPI = {
   getDocuments: (params) => api.get(`${INFORMATION_SHARING_BASE}/documents`, { params }),
   getDocument: (documentId) => api.get(`${INFORMATION_SHARING_BASE}/documents/${documentId}`),
