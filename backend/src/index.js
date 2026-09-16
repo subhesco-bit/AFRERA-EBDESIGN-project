@@ -1096,6 +1096,71 @@ async function startup() {
     app.use('/api/voice-ai', voiceAIRoutesNewlyMounted);
     app.use('/api/whatsapp', whatsappRoutesNewlyMounted);
 
+    // 2026-09-16: audited the other 15 files in routes/claude/ (flagged
+    // alongside aiDecisionRoutes.js above as excluded-by-dynamicRouteLoader
+    // with the same false "manually mounted" comment). 11 were left alone -
+    // 8 are the generic "Route operational" scaffold (aiAgentRoutes,
+    // aiCoordinationRoutes, aiProviderRoutes, insuranceAIRoutes,
+    // logisticsAIRoutes, orderAIRoutes, productAIRoutes, unifiedAIRoutes),
+    // backendModuleBridge.js says "Placeholder route module" outright,
+    // aiCollaborationRoutes_merged.js duplicates the already-mounted
+    // /api/aicollaboration (routes/aiCollaborationRoutes.js - same
+    // services/claude/aiCollaborationService.js, same endpoints, plus its
+    // own Claude-API-configured check and handoff rate limiting), and
+    // aiStrategyRoutes.js calls originalService.generateStrategy() on
+    // services/legacy/aiBrainService.js, which does not export that
+    // function under any name (only executeCognitiveCycle/perception/
+    // attention/reasoning/decision/planning) - both its /ai-enhanced and
+    // plain endpoints throw unconditionally, aiEnabled true or false; only
+    // /ai-capability (a status stub) works, so nothing real to mount.
+    // The 4 below are real and mounted:
+    //  - aiCopilotRoutes.js: Claude-AI-enhanced wrapper (honest fallback to
+    //    the original when CLAUDE_AI_ENABLED isn't set, same pattern as
+    //    aiDecisionRoutes.js) around services/legacy/aiCopilotService.js's
+    //    real generateCopilotResponse() (DB-backed per-copilot-type lookups
+    //    against real tables, with an honest "I don't have a general-purpose
+    //    AI model configured" fallback when there's no match - not
+    //    fabricated). Mounted at /api/aicopilotenhanced, not /api/aicopilot -
+    //    that path is already taken (this same session, elsewhere) by the
+    //    legacy service's own router (session/message endpoints); this file
+    //    adds different endpoints (/ai-enhanced/generate-copilot-response,
+    //    /ai-context/copilot, /ai-capability, /generate-copilot-response),
+    //    not a duplicate of what's already there. Its /ai-context/copilot
+    //    endpoint calls service.getAIContext(), a method that doesn't exist
+    //    anywhere in this codebase (same bug independently found on all 5
+    //    of aiDecisionRoutes.js's /ai-context/* endpoints above - a
+    //    pre-existing, secondary-endpoint-only bug, not fabrication).
+    //  - financialAIRoutes.js: same honest-fallback wrapper around
+    //    services/legacy/financialService.js's real applyForLoan() (real
+    //    INSERT into loans). Mounted at /api/financialai. Its
+    //    /ai-enhanced/assess-credit endpoint is broken the same way as
+    //    aiStrategyRoutes.js above - it calls originalService.
+    //    assessCreditRisk(), which financialService.js does not export
+    //    (only farmerCreditRiskScore/getCreditScore/generateCreditScore) -
+    //    always throws. Left mounted for its two working endpoints
+    //    (process-loan, apply-loan) and /ai-capability; assess-credit is
+    //    flagged broken, not fixed (no invented implementation), and no
+    //    frontend page is wired to it.
+    //  - libraryRoutes.js: real file-backed catalog search over
+    //    services/legacy/libraryKnowledgeService.js (reads actual .md cards
+    //    under _EBDESIGN_LIBRARY/, computes real SHA256 content hashes, real
+    //    keyword search/relevance scoring) - not the same object as the
+    //    already-initialized services/libraryKnowledgeService.js (the
+    //    M645100_LIBRARYKNOWLEDGE module wrapper used internally), so this
+    //    is a second, self-contained, genuinely-real implementation, not
+    //    fake data. Mounted at /api/libraryknowledge, not /api/library -
+    //    that path is already taken by routes/libraryRoutes_merged.js,
+    //    itself a "Resources retrieved" CRUD scaffold returning data: []
+    //    (pre-existing, not this file, not touched here).
+    //  - moduleRegistryRoutes.js: real fs.readdirSync/module.json reads
+    //    over backend/src/modules/, no fabrication. Mounted at
+    //    /api/moduleregistry (unused prefix, verified against the full
+    //    mount list).
+    app.use('/api/aicopilotenhanced', require('./routes/claude/aiCopilotRoutes.js'));
+    app.use('/api/financialai', require('./routes/claude/financialAIRoutes.js'));
+    app.use('/api/libraryknowledge', require('./routes/claude/libraryRoutes.js'));
+    app.use('/api/moduleregistry', require('./routes/claude/moduleRegistryRoutes.js'));
+
     // Standardized error handling must follow every route registration.
     app.use(standardizeErrorResponse);
     app.use(errorHandler);

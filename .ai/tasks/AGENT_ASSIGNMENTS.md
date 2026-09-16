@@ -22,7 +22,6 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
-| Claude (PR #21) | `backend/src/routes/claude/` (investigation + selective mounting); `backend/src/index.js` (append mounts only); frontend pages only if a specific real, non-fabricating match is found | 2026-09-16 | Auditing the remaining 15 unmounted files in `routes/claude/` the same way `aiDecisionRoutes.js` was (see the "aiDecisionRoutes.js mounted" update below for the method and the fabrication trap found in `calculateFDI`). |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -1776,3 +1775,67 @@ consumer needs them.
 The other 15 files in `routes/claude/` were not audited this pass -
 flagged as a real, bounded follow-up opportunity (same "manually mounted"
 false-claim pattern likely applies), not touched.
+
+## Update — 2026-09-16 (routes/claude/ fully audited: 4 more real files mounted, 11 correctly left alone)
+
+Closed out the `routes/claude/` follow-up flagged above. Delegated to a
+subagent with the `calculateFDI` fabrication trap explicitly called out
+as the thing to watch for; verified independently before committing
+(re-confirmed the path-collision checks, the missing `assessCreditRisk`
+export, and the `aiCollaborationRoutes_merged.js` duplicate claim
+directly, not just trusted the report).
+
+**Mounted (4):**
+- `aiCopilotRoutes.js` → `/api/aicopilotenhanced` (not `/api/aicopilot` -
+  already taken by `services/legacy/aiCopilotService.js`'s own router,
+  different endpoints). Real, DB-backed per-copilot-type lookups with an
+  honest "I don't have a general-purpose AI model configured" fallback,
+  not fabricated. Its `/ai-context/copilot` endpoint calls a
+  `service.getAIContext()` that doesn't exist anywhere in this codebase -
+  the same pre-existing bug already on all 5 of `aiDecisionRoutes.js`'s
+  `/ai-context/*` endpoints, documented not fixed (secondary endpoints,
+  not the main capability).
+- `financialAIRoutes.js` → `/api/financialai`. Real `applyForLoan()`
+  (genuine `INSERT INTO loans`) behind 2 of its 3 real endpoints. Its
+  `/ai-enhanced/assess-credit` calls `financialService.js`'s
+  `assessCreditRisk()`, which - independently reconfirmed - **does not
+  exist** on that file (only `farmerCreditRiskScore`/`getCreditScore`/
+  `generateCreditScore`) - always throws. Mounted anyway for the 2
+  working endpoints; the broken one is documented, not invented a fix
+  for, and nothing on the frontend calls it.
+- `libraryRoutes.js` → `/api/libraryknowledge` (not `/api/library` -
+  already taken by a pre-existing, unrelated `data: []` scaffold). Real,
+  self-contained file-backed catalog search (`_EBDESIGN_LIBRARY/` .md
+  cards, real SHA256 hashing, real keyword search) - a second, genuinely
+  real implementation, not a duplicate of the already-initialized
+  library service used internally by the AI layer.
+- `moduleRegistryRoutes.js` → `/api/moduleregistry`. Plain, real
+  `fs.readdirSync`/`module.json` reads over `backend/src/modules/` - no
+  fabrication, no DB dependency.
+
+**Left alone (11), all confirmed genuinely not worth mounting:**
+8 are the identical generic "Route operational" scaffold
+(`aiAgentRoutes`, `aiCoordinationRoutes`, `aiProviderRoutes`,
+`insuranceAIRoutes`, `logisticsAIRoutes`, `orderAIRoutes`,
+`productAIRoutes`, `unifiedAIRoutes`); `backendModuleBridge.js` literally
+says "Placeholder route module"; `aiCollaborationRoutes_merged.js`
+duplicates the already-mounted `/api/aicollaboration` (independently
+diffed the two route-path lists - identical, confirmed); `aiStrategyRoutes.js`
+calls `aiBrainService.js`'s `generateStrategy()`, which doesn't exist
+under any name on that file (only cognitive-cycle primitives) - every
+endpoint that matters throws unconditionally regardless of
+`CLAUDE_AI_ENABLED`, so unlike `financialAIRoutes.js` (2 of 3 endpoints
+genuinely work) there was nothing real left to expose.
+
+No frontend files touched - no page anywhere calls any of these 4 newly
+real paths yet, so nothing needed wiring on this pass; that's a separate,
+future opportunity if a page needs one of these capabilities.
+
+Verified independently: `node -c`/eslint clean on `index.js`; a live
+mount script confirmed all 17 real routes register correctly across the
+4 files; full boot smoke test still doesn't crash (exit via timeout, no
+stack trace); `src/routes/__tests__` + `src/modules` unaffected (343/344
+suites, 3669/3680 tests - identical to the pre-existing baseline, same 1
+known M041 non-bug failure). `git diff --stat`: one file
+(`backend/src/index.js`), 65 insertions, 0 deletions - purely additive,
+no existing line touched or reordered.
