@@ -2072,3 +2072,110 @@ mount).
 closed). `subsidyOpsAPI` added to the confirmed-gap list alongside
 everything from the twenty-fourth/twenty-fifth/twenty-seventh/
 twenty-ninth/thirtieth updates.
+
+## Update — 2026-09-16, thirty-second follow-up: the biggest structural finding this session - and a correction to it, found by verifying live rather than trusting the first theory
+
+While checking `villageProfileAPI`, noticed `services/legacy/villageProfileService.js` and `marketIntelligenceService.js` (both fixed in the thirtieth update) share an unusual shape: instead of exporting a plain router, they export a `setupRoutes(app)` function that mounts itself. Went looking for how many other `services/legacy/*.js` files follow this pattern and are never called - found 24, and a file,
+`routes/ORPHANED_SERVICES_MOUNT.js`, that was apparently already written by
+a previous session/agent specifically to solve this ("Mounts all orphaned
+services that have setupRoutes() but were never called"). It requires 9 of
+them (dynamicPricingService, farmerTrainingService, governmentSchemeService,
+greenhouseService, insuranceClaimsService, preSeasonOrderService,
+sharedInfrastructureService, soilTestingService, subsidyService) and is
+itself mounted in `index.js` at `/api/orphaned_services_mount`.
+
+**First theory (real bug, confirmed, but not the actual blocker it looked
+like):** `ORPHANED_SERVICES_MOUNT.js` calls `service.setupRoutes(router)`,
+passing a plain `express.Router()` sub-router - but every one of these
+services' `setupRoutes(app)` hardcodes absolute paths like
+`app.get('/api/v1/subsidy/apply', ...)`, assuming `app` is the real
+Express app. Called with a sub-router mounted at
+`/api/orphaned_services_mount` instead, the routes register at a doubled,
+garbled path (`/api/orphaned_services_mount/api/v1/subsidy/apply`) that
+nothing would ever call. Verified this precisely with a live request:
+the intended path 404s, the doubled path reaches a real handler. This
+looked like the explanation for a large chunk of "unreachable routes."
+
+**The correction, found by testing the *real* startup sequence instead of
+stopping at the first confirmed bug:** `index.js` doesn't only mount
+`ORPHANED_SERVICES_MOUNT.js` - it also runs
+`core/dynamicServiceLoader.js`'s `mountServiceRoutes(app)` (`serviceLoader.mountServiceRoutes(app)`,
+called for real during startup), which walks the *entire* `services/`
+tree, finds every file whose source contains the string `setupRoutes`,
+and calls `fn.call(instance, app)` - correctly, with the real app.
+Instantiated this loader directly against the real `services/` directory
+and confirmed live: `GET /api/v1/subsidy/schemes` and
+`POST /api/v1/subsidy/apply` both reach real handlers (500/401, never
+404) with zero backend changes needed. So `ORPHANED_SERVICES_MOUNT.js` is
+real, but it's dead weight - a second, harmless, never-reached mount of
+services that were already correctly reachable through the real
+mechanism the whole time. **Correcting an earlier status update in this
+same conversation that called this "the biggest bug found this
+session" before this second check - it wasn't; the actual live app was
+never broken this way.** Left `ORPHANED_SERVICES_MOUNT.js` untouched -
+harmless, not worth the risk of touching for no functional gain.
+
+**A second, real, more interesting bug found along the way**: 24 services (`aiAdvisoryService`, `aiAgenticCompanionService`,
+`aiOperationIntelligenceService`, ... - names repeated 3-4x each) exist as
+multiple files with the *identical basename* across `services/`,
+`services/<domain>/`, and `services/legacy/` - dozens of them, judging by
+the "Duplicate service name" warnings logged during discovery.
+`DynamicServiceLoader` keys its discovery map by base filename, so
+whichever copy the directory walk visits *last* silently wins - not the
+most complete one, not the one anything else references, just whichever
+comes last alphabetically/structurally in the walk. Checked this
+concretely for 6 services before wiring their frontend clients:
+`governmentSchemeService`, `aiAdvisoryService`, `buyingClubService`,
+`procurementSubscriptionService`, `renewableEnergyService`,
+`ruralEnterpriseService`. In every case the *winning* file (confirmed via
+`loader.services.get(name).path`) is a thinner variant missing exactly
+the endpoints the frontend needs, while the fuller
+`services/legacy/*.js` implementation - which has real, matching
+endpoints - loses and is never actually mounted. One
+(`buyingClubService.js`, the flat top-level copy) is worse still: it's a
+one-line re-export shim (`module.exports = require('./legacy/buyingClubService.js')`)
+whose source text doesn't literally contain the word `setupRoutes`, so
+the loader's naive text-scan (`if (!source.includes('setupRoutes')) continue;`)
+skips it entirely - it isn't mounted *at all*, at any path.
+
+**What got wired, confirmed live, not assumed**: `subsidyOpsAPI` (7
+methods - the winning `services/finance/subsidyService.js` happens to
+have the same 7 endpoints as `services/legacy/subsidyService.js`),
+`governmentSchemeAPI` (3 of governmentSchemeService's methods - weather
+alerts/announcements/CSR opportunities are present in the winning
+`services/finance/` copy), `preSeasonAPI` (2 methods - winning
+`services/commerce/preSeasonOrderService.js` matches), `sharedInfraAPI`
+(5 methods - `services/legacy/sharedInfraService.js` has no competing
+duplicate and wins outright).
+
+**What was investigated and correctly NOT wired**: `schemeRegistryAPI`
+(governmentSchemeService's `/schemes/registry` + `/schemes/registry/expiring`
+- present only in the losing `services/legacy/` copy),
+`aiAdvisoryAPI`/`buyingClubAPI`/`procurementSubscriptionAPI`/
+`renewableEnergyAPI`/`ruralEnterpriseAPI` (all need `getStatistics` -
+present only in each one's losing `services/legacy/` copy). All 6
+confirmed 404 live against the real mounting sequence; 2 of the 11 new
+tests added this update assert that 404 explicitly (not skip it), so a
+future fix to the duplicate-filename bug has a test that flips from red
+to green instead of silently staying wrong forever.
+
+**Real architectural fix needed here, out of scope for this pass**:
+either (a) key `DynamicServiceLoader`'s discovery map by full path
+instead of base filename so duplicates coexist rather than silently
+overwrite, or (b) resolve each of the ~24 duplicate-name clusters by
+hand (delete/merge the losing copies the way the 2026-09-08
+"Duplicate-file remediation pass" comment in `buyingClubService.js`
+already did for that one file - evidently that remediation pass covered
+some but not all of these clusters). Either fix would very likely
+recover several more of the confirmed missing-feature gaps from earlier
+updates for free, since some of those may turn out to be the exact same
+duplicate-filename shadowing rather than genuinely absent code - worth
+re-checking `platformTelemetryAPI`, `mfaManagementAPI` and others against
+this specific failure mode before concluding they need new backend work.
+
+Confirmed via `vite build`: error count drops from 113 to 109 (4 real
+exports wired; the 6 investigated-and-rejected ones correctly don't
+count).
+
+**Running total this session**: 161 → 109 MISSING_EXPORT errors (52
+closed).
