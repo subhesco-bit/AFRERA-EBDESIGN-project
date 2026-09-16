@@ -2700,6 +2700,36 @@ route/middleware/service suite still 188/188 passing alongside it (same
 `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16 (server boot-crash bug)"
 section for full detail.
 
+## Update 47 — modules/ tree: 3103 failing tests → 23, via 4 root-cause fixes
+
+Ran the full local `npx jest` (not scoped to routes/services) for the
+first time and actually categorized the 3103 failures instead of
+assuming DB-connectivity - 3130 occurrences were `TypeError: DatabaseError
+is not a constructor`, a real bug: `utils/errors.js` never defined
+`DatabaseError` despite 313 `modules/` files throwing it. Fixed, which
+unmasked a second bug (313 files importing `database/connection`
+instead of `database/pool` for `db.query()` - the former has no `query`
+method at all), which unmasked two gaps in `database/pool.js`'s
+in-memory test mock (`SELECT COUNT(*)` had no handler; `IS NULL` clauses
+were silently dropped by the WHERE-filter parser), which unmasked a
+314-file floating-assertion bug in the module test files themselves
+(`expect(asyncFn).rejects.toThrow()` with no `await`, crashing the whole
+jest worker on an unhandled rejection - the actual cause of the 150-280s
+timeouts on every full-suite run this session).
+
+All 4 fixed: 1 new class definition, 1 bulk import-path fix (313 files,
+scripted, verified none of the 3 *live* modules affected), 1 targeted
+addition to the shared SQL mock (2 tests), 1 bulk regex fix (314 files,
+0 unmatched). `npx jest src/modules` now runs to completion in ~10s
+(previously never finished) at **3431/3454 passing (99.3%)**. The
+remaining 23 span 3 genuinely module-specific business-logic quirks -
+correctly out of scope.
+
+Also found, documented, not touched: `.github/workflows/ci.yml`'s
+backend/frontend test steps both have `continue-on-error: true` -
+"Backend Tests: success" throughout this whole PR has never actually
+meant tests passed. Full detail in `AGENT_ASSIGNMENTS.md`.
+
 ## Update 46 — removed the 6 "pre-existing empty-stub" junk files for good
 
 Finally investigated the "6 pre-existing empty-stub test suites,
