@@ -2935,3 +2935,73 @@ investigation to a subagent to conserve context; verified its work
 directly (syntax + eslint clean, full-tree lint clean, no test
 regressions) before committing. Both `npm run lint` invocations now
 exit with zero output.
+
+## Update 51 — 3 more bare-`.router`-export boot-crash files found and fixed
+
+Generalized `climateRouteSupport.js`'s already-fixed bug (bare
+`module.exports = router` while `index.js` mounts it via
+`X.router`, which is `undefined` -> `app.use(path, undefined)` throws
+synchronously -> `process.exit(1)` at every boot, unconditionally) into
+a targeted audit of every `*RouteSupport.js` file `index.js` mounts the
+same way. Found 3 more real instances: `operationsRouteSupport.js`,
+`livestockRouteSupport.js`, `enterpriseRouteSupport.js` - all identical
+bare exports, all 3 crashing the server at startup. Fixed identically
+(added `module.exports.router = router;` self-reference, preserving the
+existing plain-`require()` usage other files still rely on). Verified:
+`node -c` clean, direct `app.use(path, mod.router)` succeeds (previously
+threw `TypeError`), all 8 downstream consumer files that `require()`
+these same modules still load cleanly, eslint clean. Committed
+`f47d5686`.
+
+Also implemented the live site root (`/`, `HomePage.jsx`) - was a
+1-line `<h1>Home</h1>` placeholder despite being the actual homepage
+every visitor lands on. Built a real hero + 4-vertical-card landing page
+reusing `Footer.jsx`'s already-established real positioning/copy and
+linking only to routes confirmed live in `config/routes.js` - no
+fabricated stats. Verified: eslint clean, full suite unchanged at
+54/55, `npm run build` exit 0. Committed `d000548c`.
+
+## Update 52 — batch-fixed the last 16 flagged frontend pages (7 bare stubs + 9 fabricated-data pages)
+
+Per an explicit user directive to batch/delegate rather than treat each
+remaining flagged page as a bespoke build, split the last 16 items from
+the running fabricated-content/stub audit into two parallel background
+subagents. Verified both directly (eslint, `npm run build`, full test
+suite, plus manual route-existence and backend-response-shape checks on
+every "wired to real data" claim) before committing either batch.
+
+**Batch 1 - 7 bare-stub pages** (`AboutPage`, `DiscoverPage`,
+`AnalyticsPage`, `InsurancePage`, `LogisticsPage`, `DigitalTwinPage`,
+`DashboardPage`): none had a genuine, correctly-pathed backend to wire
+to (matching API clients either point at "Route operational" scaffolds
+or auth-gated single-record CRUD, not a listable/public source) - all 7
+rebuilt as honest static/navigational pages, every link checked directly
+against `config/routes.js`, contact details copied verbatim from
+`Footer.jsx`. Committed `f8e4281b`.
+
+**Batch 2 - 9 fabricated-data pages** (`ContractListingPage`,
+`BulkPurchasePage`, `GroupBuyingPage`, `CreditScorePage`,
+`SalesReportPage`, `FarmerReportPage`, `AuditReportPage`,
+`OperationsReportPage`, `ReportsDashboardPage`): investigated a real
+backend for each rather than defaulting to a static page.
+`SalesReportPage` and `FarmerReportPage` got wired for real
+(`/api/ecommercebusinesssales/sales-analytics`, `/api/farmer` -
+mount paths and response envelopes verified directly against
+`index.js` and `apiResponseHandler.sendSuccess`), dropping fields with
+no server-side equivalent (topProducts, avg FDI, regional breakdown)
+instead of fabricating them. The other 6 legitimately have no matching
+backend (unmounted routes - e.g. `routes/claude/aiDecisionRoutes.js`,
+confirmed via a real credit-risk-scoring implementation that exists but
+is unreachable by any mounted route - wrong-domain services, or a
+metric that doesn't exist server-side at all, like a pass/fail "audit
+score") - converted to honest unavailable states rather than fabricated
+numbers or a fetch to a dead route. Committed `2216c4bd`.
+
+Also fixed in passing: `backend/src/__scratch__/` (a throwaway
+route-mount probe script one of the subagents left behind mid-investigation)
+added to `.gitignore` rather than committed, matching the repo's existing
+convention for ad-hoc scratch content. Committed `b4531e95`.
+
+Full backend + frontend test suites unaffected by all of the above
+(backend 247/247, frontend 54/55 - same one pre-existing, documented,
+out-of-scope `criticalModules.test.jsx` failure throughout).
