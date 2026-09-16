@@ -6535,6 +6535,35 @@ export const rolePermissionAPI = {
 // ActionCard calls almost exactly - wired against the new
 // backend/src/routes/informationSharingRegistryRoutes.js.
 const INFORMATION_SHARING_BASE = `${UNVERSIONED_BASE}/api/information-sharing-registry`;
+// 2026-09-16: routes/logisticsEnhancements_merged.js was already
+// mounted and real (fleet/tracking/temperature/warehouse), but 3 of
+// LogisticsEnhancementPage.jsx's ActionCards (driver location tracking)
+// had no route even though logisticsEnhancementService.js already
+// implemented all 3 real, DB-backed methods - added the missing routes
+// to that same already-mounted file rather than writing a new one.
+const LOGISTICS_ENHANCEMENT_BASE = `${UNVERSIONED_BASE}/api/logisticsenhancements`;
+export const logisticsEnhancementAPI = {
+  addVehicle: (data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/fleet`, data),
+  getFleet: (params) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/fleet`, { params }),
+  getVehicle: (vehicleId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/fleet/${vehicleId}`),
+  updateVehicle: (vehicleId, data) => api.put(`${LOGISTICS_ENHANCEMENT_BASE}/fleet/${vehicleId}`, data),
+  scheduleMaintenance: (vehicleId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/fleet/${vehicleId}/maintenance`, data),
+  updateTracking: (shipmentId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/tracking`, data),
+  getTracking: (shipmentId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/tracking`),
+  getLiveTracking: (shipmentId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/live-tracking`),
+  setGeofence: (shipmentId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/geofence`, data),
+  recordTemperature: (shipmentId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/temperature`, data),
+  getTemperatureData: (shipmentId, params) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/temperature`, { params }),
+  getTemperatureAlerts: (shipmentId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/temperature-alerts`),
+  createWarehouse: (data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/warehouses`, data),
+  getWarehouses: (params) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/warehouses`, { params }),
+  addInventory: (warehouseId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/warehouses/${warehouseId}/inventory`, data),
+  getWarehouseInventory: (warehouseId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/warehouses/${warehouseId}/inventory`),
+  recordDriverLocation: (data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/drivers/location`, data),
+  getActiveDrivers: (params) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/drivers/active`, { params }),
+  getShipmentTrail: (id) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${id}/trail`),
+};
+
 export const informationSharingAPI = {
   getDocuments: (params) => api.get(`${INFORMATION_SHARING_BASE}/documents`, { params }),
   getDocument: (documentId) => api.get(`${INFORMATION_SHARING_BASE}/documents/${documentId}`),

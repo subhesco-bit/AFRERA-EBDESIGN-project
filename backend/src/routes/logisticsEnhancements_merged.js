@@ -221,5 +221,38 @@ router.get('/statistics', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
+// 2026-09-16: recordDriverLocation/getActiveDrivers/getShipmentTrail
+// already existed as real methods on logisticsEnhancementService but
+// were never routed - LogisticsEnhancementPage.jsx's ActionCards for
+// them called nowhere until now.
+router.post('/drivers/location', authLimiter, authMiddleware, async (req, res) => {
+  try {
+    const location = await logisticsEnhancementService.recordDriverLocation(req.body);
+    res.json({ success: true, data: location });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/drivers/active', authMiddleware, async (req, res) => {
+  try {
+    const staleAfterMinutes = req.query.staleAfterMinutes ? parseInt(req.query.staleAfterMinutes, 10) : undefined;
+    const drivers = await logisticsEnhancementService.getActiveDrivers({ staleAfterMinutes });
+    res.json({ success: true, data: drivers });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/shipments/:shipmentId/trail', authMiddleware, async (req, res) => {
+  try {
+    const { shipmentId } = req.params;
+    const trail = await logisticsEnhancementService.getShipmentTrail(shipmentId);
+    res.json({ success: true, data: trail });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;
 

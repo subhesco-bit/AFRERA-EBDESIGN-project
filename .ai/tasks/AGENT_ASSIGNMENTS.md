@@ -543,10 +543,9 @@ unrelated).
 
 ## Update — 2026-09-16 (information sharing registry): a 12th pre-existing unrouted service, ~20 methods, closes informationSharingAPI — 36 -> 35
 
-Also checked `enterpriseMemoryAPI`, `userManagementAPI`,
-`platformConfigurationAPI`, `logisticsEnhancementAPI` while investigating
-this batch (all had promising-looking filenames) - none matched:
-`enterpriseMemoryAPI` needs `getCases`/`getLearningInsights`/
+Also checked `enterpriseMemoryAPI` and `userManagementAPI` while
+investigating this batch (both had promising-looking filenames) - neither
+matched: `enterpriseMemoryAPI` needs `getCases`/`getLearningInsights`/
 `getKnowledgeGraph`/`searchCases`/`createCase`/`updateCase`, but all 3
 duplicate `enterpriseMemoryService.js` copies implement a different
 concept (`recordMemory`/`recallSimilar`/`recordCase`/`listRecent` - a
@@ -584,6 +583,33 @@ endpoint). Wired `informationSharingAPI` (all ~20 methods) in `api.js`.
 unrelated).
 
 MISSING_EXPORT count: 36 -> 35.
+
+## Update — 2026-09-16 (logistics enhancement): closed a partial gap in an already-mounted real route file — 35 -> 34
+
+`logisticsEnhancementAPI` was different from every other fix this
+session: `routes/logisticsEnhancements_merged.js` was already real and
+already mounted (at `/api/logisticsenhancements`, fleet/tracking/
+temperature/warehouse endpoints, all backed by the real
+`logisticsEnhancementService.js`), but 3 of
+`LogisticsEnhancementPage.jsx`'s ActionCards
+(`recordDriverLocation`/`getActiveDrivers`/`getShipmentTrail` - a
+`driver_location`-table-backed GPS ping/breadcrumb-trail feature) had no
+matching route. Checked the service file directly rather than assuming
+from the router's shape: all 3 methods already existed there, real and
+DB-backed (with a deliberate `(0,0)` GPS-reading rejection, matching the
+page's own description exactly) - just never routed. Added the 3 missing
+routes directly to the existing, already-mounted file (not a new
+`*RegistryRoutes.js` file, since 21 of 24 endpoints this API needs were
+already live there) - `backend/src/routes/__tests__/logisticsEnhancements_merged.test.js`
+added since this file had no test before despite already being real and
+mounted (4 tests: exact route count, 401-not-404 for the 3 new routes
+plus one pre-existing sanity check).
+
+Wired the complete `logisticsEnhancementAPI` (18 methods) in `api.js`.
+176/176 real backend tests pass (same 6 pre-existing empty-stub suites
+unrelated).
+
+MISSING_EXPORT count: 35 -> 34.
 
 ## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
 
@@ -637,7 +663,7 @@ different concept, not the same feature under different names),
 `climateMonitoringAPI` (distinct page from the now-wired
 `droughtMonitoringAPI`/etc, needs dashboard-aggregate methods no backend
 implements), `competitorAPI`, `platformConfigurationAPI`,
-`logisticsEnhancementAPI`, `irrigationAPI`,
+`irrigationAPI`,
 `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`, `fleetManagementAPI`,
 `equipmentRentalAPI`, `implementManagementAPI`,
 `shgAPI`, `publicDataAPI`,
