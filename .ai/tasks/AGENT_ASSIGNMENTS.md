@@ -1458,6 +1458,69 @@ maintainer decision on whether that's intentional, but changing CI gating
 behavior is a different kind of change than anything else in this PR -
 flagged here, not touched.
 
+## Update — 2026-09-16 (MarketplacePage.jsx: the live core marketplace route was a 2-line stub)
+
+Ran the full frontend `npx jest` suite (not scoped to a subset, applying
+the same "read the real failures instead of assuming" lesson from the
+backend `modules/` investigation) and found `src/__tests__/MarketplacePage.test.jsx`
+failing with a real assertion mismatch, not noise. `git log --follow`
+traced `src/pages/MarketplacePage.jsx` to commit `c69e30bf`
+("batch: Fill critical skeleton files - reduce from 317 to ~270",
+2026-09-08) - it was never implemented, only "filled" with a 2-line
+placeholder (`<h1>MarketplacePage</h1>`) to satisfy a completeness
+metric. **This is the live, routed `/marketplace` page** - the core
+product-browsing feature of an agricultural marketplace platform was
+rendering nothing real in production.
+
+The test itself is a real, unambiguous spec: mocks `useQuery` to return
+`{products: [{id, name, base_price, unit_symbol, category_name,
+state_name}], pagination: {total, totalPages}}` and expects a
+"Marketplace" heading plus the product's name rendered. Traced this
+exact shape to a real backend: `services/legacy/productService.js`'s
+`getProducts()` does a real `products` JOIN `categories`/`states`/`units`
+query and returns precisely `{products: result.rows, pagination:
+{page, limit, total, totalPages}}` - its own router (`GET /`) is already
+mounted live at `/api/product` (index.js). The frontend client already
+existed too, just under a different name than expected:
+`productsAPI` (plural, added earlier this session) at the correct
+`PRODUCT_BASE` path - the singular `productAPI` (used by nothing) was
+still pointed at the wrong `/products` (`/api/v1/products`, doesn't
+exist). Fixed `productAPI` to share the same, already-correct
+`PRODUCT_BASE` constant, then wrote a real `MarketplacePage.jsx`:
+`useQuery`-driven product grid (search, pagination, loading/error/empty
+states) using the existing `Card`/`Input` UI primitives, calling
+`productAPI.getProducts(params)` against the real endpoint.
+
+Verified: the pre-existing test now passes for real (not modified to
+match the implementation - the implementation was built to match it);
+eslint clean; a full `npm run build` still exits 0; full frontend suite
+now **52/52 tests passing, 15/16 suites** (was 51/52, 14/16) - the one
+remaining suite failure (`criticalModules.test.jsx`) is a separate,
+unrelated, confirmed-dead-code issue (see below).
+
+**Separate finding, not fixed**: while investigating, also found jest's
+`jest.config.js` had no `moduleNameMapper` entries for the `@`/`@components`/
+`@lib`/`@hooks`/`@services`/`@store`/`@utils` path aliases `vite.config.js`
+defines and 315 files use - any test transitively importing through one
+of those files failed to even load under Jest, independent of whether
+the code itself was correct. Added the missing aliases (mirrors
+`vite.config.js` exactly, purely additive). This exposed (did not
+create) a second, real, out-of-scope problem: `src/modules/M0XX/*Page.jsx`
+(344 files, confirmed via `grep`/`config/routes.js` to be entirely dead
+code - superseded by the generic `ModuleRuntimePage.jsx` runtime
+`App.jsx`'s own comments describe) import a `useStore` hook from `@/store`
+that doesn't exist anywhere in the codebase under any name (only
+`useAuthStore` does), and a literal, never-templated
+`import './${className}.css'` - CSS coverage for these modules is
+inconsistent (120 of 314 have a real `styles.css`, others don't).
+Fixing either would mean inventing a shared store hook or guessing a
+CSS-file strategy without uniform evidence across all 344 files - out of
+scope, matching the backend `modules/` tree's own "needs real per-module
+work" conclusion. `criticalModules.test.jsx` (a real, deliberately-written
+test exercising 3 of these dead pages directly) still fails to load for
+this reason - left as-is, documented here rather than silently
+worked around.
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a

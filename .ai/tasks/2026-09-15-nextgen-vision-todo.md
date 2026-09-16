@@ -2730,6 +2730,36 @@ backend/frontend test steps both have `continue-on-error: true` -
 "Backend Tests: success" throughout this whole PR has never actually
 meant tests passed. Full detail in `AGENT_ASSIGNMENTS.md`.
 
+## Update 48 — the live /marketplace route was a 2-line stub, now real
+
+Ran the full frontend `npx jest` for the first time this session and
+found a real failure, not noise: `MarketplacePage.test.jsx` expects
+product cards; `git log --follow` traced the actual
+`src/pages/MarketplacePage.jsx` to a 2026-09-08 "fill skeleton files"
+batch commit - it was never implemented, just a 2-line placeholder. This
+is the live, routed `/marketplace` page.
+
+The test itself is an unambiguous spec (mock `useQuery` data shape
+`{products, pagination}` with real product fields). Traced that exact
+shape to a real backend already mounted at `/api/product`
+(`services/legacy/productService.js`) and a real, already-correct
+frontend client under a different name (`productsAPI`, plural, from
+earlier this session) that the stub page never used. Fixed the unused
+singular `productAPI` to point at the same real endpoint, wrote a real
+`MarketplacePage.jsx` (search, pagination, loading/error states) against
+it. Test now passes for real; `npm run build` still exits 0; full
+frontend suite 52/52 passing (was 51/52).
+
+Also added the missing `@`/`@components`/etc. path aliases to
+`jest.config.js` (mirrors `vite.config.js`, was silently failing any
+test that imported through one of 315 files using them) - exposed a
+separate, genuinely out-of-scope issue: 344 dead `modules/M0XX/*Page.jsx`
+files (superseded by `ModuleRuntimePage.jsx`, confirmed unreferenced by
+the real router) import a `useStore` hook that doesn't exist anywhere,
+plus an untemplated literal `'./${className}.css'`. Left as-is,
+documented, not chased - same "needs real per-module work" conclusion
+as the backend `modules/` tree.
+
 ## Update 46 — removed the 6 "pre-existing empty-stub" junk files for good
 
 Finally investigated the "6 pre-existing empty-stub test suites,
