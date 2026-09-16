@@ -2179,3 +2179,105 @@ count).
 
 **Running total this session**: 161 → 109 MISSING_EXPORT errors (52
 closed).
+
+## Update 33 (2026-09-16): remaining MISSING_EXPORT backlog fully triaged - 109 -> 97, and every one of the 97 left is now a documented gap, not an unknown
+
+Continuing "complete all todo list": regenerated the MISSING_EXPORT
+candidate list (109 at the last update) and split the ~77 not already on
+the confirmed-gap list into 4 batches, researched in parallel by 4
+subagents against the real backend (route files, service files, the
+DynamicServiceLoader winner-check script for every duplicate-named
+service found, and git history where a page's own backendNote comment
+made a claim worth checking). No frontend client was wired without first
+confirming a real, reachable endpoint.
+
+**Wired (9 new/fixed exports this update, all verified live):**
+- `goatFarmingAPI`/`pigFarmingAPI`/`sheepFarmingAPI`/`poultryManagementAPI`
+  - same real /api/goat, /api/pig, /api/sheep, /api/poultry routes as the
+    earlier goatAPI/pigAPI/etc., just different method names
+    (getAnimals/getBatches vs listHerd) used by a different consumer,
+    LivestockManagementPage.jsx.
+- `varietyDirectoryAPI` - /api/regionalvariety (unversioned base), static
+  index.js mount, no shadowing risk.
+- `householdEconomyAPI`, `sharedInfrastructureAPI`, `ruralFinanceAPI`,
+  `mobilityRidesAPI`, `machineryAccessAPI` - all verified live via the
+  DynamicServiceLoader winner-check script. None of these 5 is actually
+  called by any page today (REOSDashboardPage.jsx imports 13 REOS API
+  names but only wires 6 into a useQuery - the rest fall through to a
+  placeholder tab), but wired them anyway: Vite/rolldown's MISSING_EXPORT
+  check fires on the bare import statement, not on call-site usage, so an
+  unused-but-real export still closes a real build error. This corrects
+  something I got wrong earlier this same update pass - I initially wrote
+  in AGENT_ASSIGNMENTS.md that "wiring an unused export doesn't fix a
+  build error," which is false; caught it by rebuilding and checking the
+  static-diff list before finalizing, corrected before pushing.
+- Fixed a pre-existing wrong path in `marketAccessAPI` (POST
+  `/market-access/manage`, which never matched any real route, to the
+  real POST `/market-access`).
+
+**New confirmed-gap findings worth remembering:**
+- A whole new gap *pattern*: several `services/legacy/*ManagementService.js`
+  files (livestockManagementService, operationsManagementService,
+  soilManagementService, fisheriesManagementService,
+  horticultureManagementService, inputSupplyManagementService,
+  cropManagementService, landManagementService, waterManagementService,
+  preventiveMaintenanceService) hold real, well-built
+  `createCrudService(table, {fields})` DB-backed CRUD objects (via a
+  shared `resourceCrudFactory.js`) that were simply never wrapped in an
+  Express router - zero `setupRoutes` string anywhere in the file, so not
+  even the loader's mounting mechanism could reach them regardless of the
+  duplicate-filename bug. This accounts for roughly 40 of the day's ~75
+  newly-classified gaps. Cheapest real fix across this whole session's
+  gap list: write one route file per management service wrapping its
+  existing list/get/create/update/remove functions - the DB logic already
+  works, it's just never exposed over HTTP.
+- `backend/src/modules/` (the ~150+ M0xx numbered-module tree) is *never
+  scanned* by either dynamic loader (`dynamicServiceLoader` walks only
+  `services/`, `dynamicRouteLoader` walks only `routes/`) - only 3 modules
+  in the whole tree are individually `require()`'d from a mounted route
+  (M029, M400_AI_BACKBONE, M645100_LIBRARYKNOWLEDGE). Several modules
+  (M141 Orchard, M076-M080 water modules, M103/M107/M108/M109/M110
+  equipment modules) contain complete, real REST implementations matching
+  the frontend's exact expected shape and are simply orphaned by this gap
+  - not scaffolds, just unmounted. `orchardAPI`/`M141` is the single
+  cleanest example: a real 5-endpoint CRUD router sitting unused.
+- A confirmed **regression**, not just an unmounted stub: git history
+  shows `waterManagementRoutes.js` used to `require()` the real
+  `waterManagementService.js` and was overwritten with a generic "Route
+  operational" placeholder by a later batch-fix commit (`a2beb556`,
+  2026-09-10, ironically titled "FINAL SUCCESS: Platform fully
+  operational and running!"). `WaterRecordsPage.jsx`'s own backendNote
+  comment still claims this route is "real and functional" - it was true
+  when written, is false now. Same regression pattern found for
+  `WaterManagementPage.jsx`'s claimed `backend-modules/:moduleId/:operation`
+  bridge route (also overwritten to a `/health`-only stub on 2026-09-10).
+  **Lesson for future work in this repo: never trust a page's own
+  backendNote/header comment about backend state without re-reading the
+  actual current file and, when in doubt, checking git log/git show on
+  it** - these comments go stale silently as batch-fix commits land.
+- Corrected an earlier mischaracterization (from an earlier update this
+  session) of `dynamicServiceLoader`'s duplicate-name resolution:
+  `_registerService()` actually keeps the FIRST-registered file for a
+  name and skips+warns on later duplicates, not "last wins" as previously
+  written. Doesn't change any previously-verified winner (those were
+  always checked empirically via the loader script, never assumed from
+  the mechanism description), but the mental model was wrong and is now
+  fixed in AGENT_ASSIGNMENTS.md. `fs.readdirSync` order is
+  OS/filesystem-dependent regardless, so "always verify via the script,
+  never guess from file order" remains the operative rule either way.
+
+All 97 names still in the MISSING_EXPORT list as of this update are now
+individually documented in `.ai/tasks/AGENT_ASSIGNMENTS.md`'s "Confirmed
+Missing-Feature Gaps" section with the specific reason each is
+unreachable - none are unresearched. Closing any more of them requires
+one of: (a) writing new route files for the `createCrudService` batch
+above, (b) wiring `backend/src/modules/` into one of the loaders (or
+individually requiring specific modules), (c) the duplicate-filename Map
+re-keying fix, or (d) genuinely new backend work for the small remainder
+with no matching code anywhere (`pushNotificationsAPI`, `mfaManagementAPI`
+device CRUD, `governmentAPI`'s 2 analytics methods, etc). All four are
+real backend/architecture changes, not a wiring-pass fix - correctly out
+of scope here, flagged for whoever picks up backend work next.
+
+**Running total this session**: 161 → 97 MISSING_EXPORT errors (64
+closed, 97 remaining and all fully triaged).
