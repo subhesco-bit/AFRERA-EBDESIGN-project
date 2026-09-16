@@ -2700,6 +2700,26 @@ route/middleware/service suite still 188/188 passing alongside it (same
 `AGENT_ASSIGNMENTS.md`'s "Update — 2026-09-16 (server boot-crash bug)"
 section for full detail.
 
+## Update 45 — severe real bug: the entire AI collaboration API was unreachable
+
+Generalized the masking-bug hunt into a general-purpose check: compared
+textual `router.X(...)` call counts against actual runtime
+`router.stack` entries for all 293 currently-wired route files, rather
+than only grepping for the specific stray-CR byte signature. Found
+`routes/aiCollaborationRoutes.js` (already mounted live at
+`/api/aicollaboration`) had **0** registered routes and **0** registered
+middleware despite 12 textual calls - a missing `};` after
+`ensureClaudeConfigured`'s `next();` trapped everything after it (both
+`router.use(...)` calls and all 10 route handlers) inside that one
+never-invoked function. **This is the entire Devin-Claude handoff API
+this session's own `.ai/AGENT_PROTOCOL.md` is built around** - it has
+been returning a bare 404 for every request, this whole session and
+presumably longer. Fixed; verified 0 -> 10 routes + 2 middleware, a
+smoke test confirming the real 401 (not 404) now returns. Re-ran the
+scanner across all 293 files after the fix - 0 flagged, confirming this
+was the only instance. New test file (11 tests). 247/247 real tests
+pass.
+
 ## Update 44 — swept for the masking-CR bug class, found a 4th instance
 
 Since the stray-bare-`\r` bug had now surfaced independently 3 times,

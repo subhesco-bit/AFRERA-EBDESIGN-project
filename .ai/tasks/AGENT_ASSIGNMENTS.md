@@ -1281,6 +1281,45 @@ byte-level context around each, not assumed):
   `aiGatewayRoutes_merged.test.js` (8 tests, all passing). 236/236 real
   backend tests pass (same 6 pre-existing empty-stub suites, unrelated).
 
+## Update — 2026-09-16 (significant real bug: the entire AI collaboration API was unreachable)
+
+Generalized the masking-bug hunt beyond the CR-specific signature: wrote
+a second script comparing, for every one of the 293 currently-wired
+route files, the textual count of `router.get/post/put/delete/patch/all/use(`
+calls in the source against the actual number of entries on the
+required router's own `.stack` at runtime. A large gap between the two
+signals routes trapped inside an unintended function scope, regardless
+of *why* (a stray CR, a missing `};`, anything else) - a broader,
+more direct check than grepping for one specific byte pattern.
+
+**Found one real, severe instance**: `routes/aiCollaborationRoutes.js`
+- already statically mounted live at `/api/aicollaboration` in
+`index.js` - had 12 textual route/`router.use` calls but **0** actual
+registered stack entries (routes AND middleware, both zero - confirmed
+directly via `router.stack.length === 0`). Root cause: `ensureClaudeConfigured`,
+a small middleware checking `ANTHROPIC_API_KEY`/`CLAUDE_API_KEY` is set,
+was missing its closing `};` after `next();` - so `handoffLimiter`'s
+definition, both `router.use(authMiddleware)`/`router.use(ensureClaudeConfigured)`
+calls, and all 10 route handlers (`/context`, `/log-work`,
+`/work-history/:aiSource`, `/continuable/:currentAI`, `/handoff`,
+`/handoff/:handoffId/accept`, `/handoffs/pending/:forAI`, `/stats`,
+`/report`) were all trapped inside that one never-invoked function body.
+**This is the entire Devin-Claude handoff API this session's own
+`.ai/AGENT_PROTOCOL.md` collaboration protocol is built around** - every
+request to it has been returning a plain 404 (route not found), not
+even reaching auth, since whenever this typo was introduced.
+
+Fixed by closing `ensureClaudeConfigured` properly and removing the
+now-orphaned trailing `}` that used to (accidentally) close it. Verified:
+`node -c` clean; a direct route-stack check confirms 0 -> 10 routes + 2
+middleware; a standalone Express smoke test confirms `GET /context`
+now correctly returns 401 (reaches `authMiddleware`) instead of 404.
+Re-ran the same mismatch scanner across all 293 wired files after the
+fix - **0 flagged**, confirming this was the only instance of this
+broader bug class among currently-live route files. New test
+`aiCollaborationRoutes.test.js` (11 tests, all passing). 247/247 real
+backend tests pass (same 6 pre-existing empty-stub suites, unrelated).
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a
