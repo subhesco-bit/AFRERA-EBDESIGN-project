@@ -1320,6 +1320,23 @@ broader bug class among currently-live route files. New test
 `aiCollaborationRoutes.test.js` (11 tests, all passing). 247/247 real
 backend tests pass (same 6 pre-existing empty-stub suites, unrelated).
 
+## Update — 2026-09-16 (route-count-mismatch scan extended to the entire routes/ tree)
+
+Extended the scanner used to find `aiCollaborationRoutes.js`'s bug from
+the 293 statically-required files to all 425 `.js` files under
+`backend/src/routes/` (recursively) - covering files only reachable via
+`dynamicRouteLoader.js`'s auto-discovery too, not just static
+`require()`s in `index.js` (this distinction mattered: `aiGatewayRoutes_merged.js`,
+fixed earlier this session, was exactly this kind of dynamically-only-
+reachable file, and wasn't in the narrower 293-file list). 411 files
+successfully required and checked (the other ~14 either aren't Express
+router exports or fail to load for reasons already covered by the
+separate require-time-crash sweep above) - **0 flagged**. Combined with
+the earlier whole-`src/`-tree byte-level CR sweep, this closes out both
+known instances of "route registrations silently swallowed" (missing
+brace/semicolon, and the stray-CR variant of the same root problem) as
+fully investigated and fixed wherever they exist in this codebase today.
+
 ## How To Add Your Own Section
 
 When Friend Claude or ChatGPT complete their first block of work, add a
