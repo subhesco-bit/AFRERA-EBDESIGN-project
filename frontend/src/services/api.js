@@ -6005,6 +6005,35 @@ export const machineryAccessAPI = {
   getUtilization: (machineryId) => api.get(`/machinery-access/machinery/${machineryId}/utilization`),
 };
 
+// 2026-09-16: services/legacy/livestockManagementService.js had real,
+// working createCrudService(...) logic for these 3 LivestockManagementPage.jsx
+// tabs but no Express router at all - wrote backend/src/routes/
+// livestockRegistryRoutes.js to wrap them (mounted at
+// /api/livestock-registry, unversioned to match the goat/pig/sheep/
+// poultry precedent and avoid colliding with the dynamic route loader's
+// own /api/v1/livestock-registry auto-mount of the same file).
+const LIVESTOCK_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/livestock-registry`;
+export const cattleRegistryAPI = {
+  getAnimals: (params) => api.get(`${LIVESTOCK_REGISTRY_BASE}/cattle`, { params }),
+  createAnimal: (data) => api.post(`${LIVESTOCK_REGISTRY_BASE}/cattle`, data),
+  updateAnimal: (id, data) => api.put(`${LIVESTOCK_REGISTRY_BASE}/cattle/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${LIVESTOCK_REGISTRY_BASE}/cattle/${id}`),
+};
+
+export const feedManagementAPI = {
+  getRecords: (params) => api.get(`${LIVESTOCK_REGISTRY_BASE}/feed`, { params }),
+  createRecord: (data) => api.post(`${LIVESTOCK_REGISTRY_BASE}/feed`, data),
+  updateRecord: (id, data) => api.put(`${LIVESTOCK_REGISTRY_BASE}/feed/${id}`, data),
+  deleteRecord: (id) => api.delete(`${LIVESTOCK_REGISTRY_BASE}/feed/${id}`),
+};
+
+export const livestockAnalyticsAPI = {
+  getRecords: (params) => api.get(`${LIVESTOCK_REGISTRY_BASE}/analytics`, { params }),
+  createRecord: (data) => api.post(`${LIVESTOCK_REGISTRY_BASE}/analytics`, data),
+  updateRecord: (id, data) => api.put(`${LIVESTOCK_REGISTRY_BASE}/analytics/${id}`, data),
+  deleteRecord: (id) => api.delete(`${LIVESTOCK_REGISTRY_BASE}/analytics/${id}`),
+};
+
 // 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and
 // calls it directly with relative paths (api.get('/advanced-medical-coding/...'))
 // rather than through a dedicated *API object - only a default export

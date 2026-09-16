@@ -97,6 +97,27 @@ in the pre-existing `marketAccessAPI` export (`/market-access/manage` ->
 Result: MISSING_EXPORT count 107 -> 97 (2026-09-16, via 4 parallel
 research passes covering all remaining candidates from the prior 109).
 
+**New backend route file** (first of this session to write new backend
+route surface rather than just fix/mount existing files):
+`backend/src/routes/livestockRegistryRoutes.js` wraps the 3
+`createCrudService(...)` objects in
+`services/legacy/livestockManagementService.js` (cattle registry, feed
+records, analytics records - real DB logic, previously zero Express
+router) in a plain REST router, mounted at `/api/livestock-registry`
+(unversioned, matching the goat/pig/sheep/poultry precedent so it
+doesn't collide with the dynamic route loader's own `/api/v1/...`
+auto-mount of the same file). Tested
+(`routes/__tests__/livestockRegistryRoutes.test.js`, 7 tests: route count
++ 401-not-404 per resource). Wired `cattleRegistryAPI`, `feedManagementAPI`,
+`livestockAnalyticsAPI` in `api.js` against it. This is the pattern to
+repeat for the other ~9 `*ManagementService.js` files with the same
+"real CRUD, zero router" shape documented above (fisheries, operations,
+horticulture, input-supply, land, water, crop) - each needs its own route
+file + test + api.js wiring, same shape, not started here beyond this
+first one.
+
+MISSING_EXPORT count: 97 -> 94.
+
 **Backend fixes beyond route mounting**: fixed a real route-shadowing bug
 in `services/legacy/villageProfileService.js` (`GET /villages/search`
 registered after `GET /villages/:villageId`, same shape as
@@ -193,7 +214,6 @@ still CONFIRMED GAP, but neither is the duplicate-filename bug**:
 Batch-verified 2026-09-16 (18 livestock/farm-ops + 10 REOS/platform names,
 via two research passes) — added to this gap list, do not re-investigate:
 
-`cattleRegistryAPI`, `feedManagementAPI`, `livestockAnalyticsAPI`,
 `farmActivityAPI`, `farmTaskAPI`, `fertilityManagementAPI`,
 `fishHealthAPI`, `fishProcessingAPI`, `coldFishChainAPI`,
 `biofloccFarmAPI`, `aquacultureAnalyticsAPI`, `pondAPI`,
