@@ -1839,3 +1839,41 @@ suites, 3669/3680 tests - identical to the pre-existing baseline, same 1
 known M041 non-bug failure). `git diff --stat`: one file
 (`backend/src/index.js`), 65 insertions, 0 deletions - purely additive,
 no existing line touched or reordered.
+
+## Update — 2026-09-16 (checked the loader's other blanket exclusion too - clean, nothing to fix)
+
+`dynamicRouteLoader.js`'s `_isMountableRouteFile()` has a second
+blanket, pattern-based exclusion besides `routes/claude/`:
+`if (base.startsWith('ai') && base.includes('Routes.js')) return false;`
+with a comment claiming these are "manually mounted in
+unifiedAIGateway.js" (a file that doesn't actually exist under that
+name - real file is `routes/unifiedAIGateway.js`, itself unrelated to
+this claim). Checked every matching basename (18 files across `routes/`
+and `routes/ai/`) against `index.js`'s actual requires directly, not
+the claim:
+
+- All but one are genuinely mounted - some via the exact flat filename
+  (`aiAgentRoutes.js`, `aiApprovalRoutes.js`, `aiCollaborationRoutes.js`,
+  `aiGatewayRoutes.js`, `aiModelsRoutes.js`,
+  `aiTrainingEvaluationRoutes.js`, `aiImageGenerationEnhancedRoutes.js`),
+  some via a real `_merged.js` sibling already swapped in
+  (`aiBrainRoutes_merged.js`, `aiOperationIntelligenceRoutes_merged.js`,
+  `aiSelfHealingRoutes_merged.js`) - the comment's literal wording
+  ("manually mounted") holds even though the specific filename
+  ("unifiedAIGateway.js") it names doesn't exist.
+- The one exception, `aiDomainAdapterRoutes.js`, is never required
+  anywhere in `index.js` - but read directly, it's an identical "Route
+  operational" scaffold (`POST /`, `GET /health` only), same as the 8
+  scaffolds already found and correctly left alone in the `routes/claude/`
+  audit above. Nothing real to mount.
+- Also checked the `routes/ai/` subdirectory copies of 5 of these
+  basenames (`aiAgentRoutes.js`, `aiBackboneRoutes.js`,
+  `aiBrainRoutes.js`, `aiGatewayRoutes.js`,
+  `aiOperationIntelligenceRoutes.js`, `aiSelfHealingRoutes.js`, all
+  excluded too since the check is basename-only) - all 6 are the
+  identical 39-line scaffold, confirmed via `wc -l` against their real
+  mounted counterparts (307-381 lines for the `_merged.js` versions).
+  Nothing missed there either.
+
+No files changed - this exclusion rule is accurate and safe as written.
+Documenting so this exact check isn't repeated.
