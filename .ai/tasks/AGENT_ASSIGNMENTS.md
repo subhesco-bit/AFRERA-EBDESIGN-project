@@ -646,6 +646,32 @@ unrelated).
 
 MISSING_EXPORT count: 34 -> 33.
 
+## Update — 2026-09-16 (public data extractor): a 13th orphaned-real-service fix, plus 5 more names ruled out — 33 -> 32
+
+Checked `fleetManagementAPI`, `equipmentRentalAPI`,
+`implementManagementAPI`, `securityAccessControlAPI` directly (filename
+search across `services/`, `routes/`, `modules/`) - zero matches
+anywhere, confirmed genuine gaps, nothing to find.
+
+`publicDataAPI` was the find: `services/publicDataExtractorService.js`
+(not a duplicate-named file, only one copy) has real, DB-backed
+(`public_data_sources`/`public_data_extraction_runs`/`public_data_records`
+tables), genuinely security-conscious methods (`listSources`,
+`registerSource`, `extractDataset` - HTTPS-only source URLs, an
+allowed-hosts allowlist checked before every fetch, a response-size cap,
+per-source result deduplication by content hash) matching
+`PublicDataExtractorPage.jsx`'s `publicDataAPI.listSources()`/
+`.registerSource()`/`.extract()` calls exactly - but the mounted
+`routes/publicDataRoutes.js` was the usual dead "Route operational"
+stub with zero connection to it. Rewrote that file (same
+platformTelemetry/platformConfiguration pattern - no `index.js` change
+needed, same mount). Tested (4 tests). Wired in `api.js`.
+
+183/183 real backend tests pass (same 6 pre-existing empty-stub suites
+unrelated).
+
+MISSING_EXPORT count: 33 -> 32.
+
 ## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
 
 Found that ~24 backend services exist as multiple files sharing the
@@ -701,7 +727,9 @@ implements), `competitorAPI`,
 `irrigationAPI`,
 `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`, `fleetManagementAPI`,
 `equipmentRentalAPI`, `implementManagementAPI`,
-`shgAPI`, `publicDataAPI`,
+`shgAPI` (checked `cooperativeShareService.js` directly - a real service,
+but it's FPO capital-share distribution, not the SHG group/member/savings
+API this page needs),
 `securityAccessControlAPI`, `userManagementAPI` (the real
 `services/userManagementService.js` is a genuine user CRUD, but
 `SystemAdministrationPage.jsx`'s `userManagementAPI` needs

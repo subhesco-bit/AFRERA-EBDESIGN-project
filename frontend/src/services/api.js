@@ -6581,6 +6581,18 @@ export const platformConfigurationAPI = {
   applyConfiguration: (config) => api.post(`${UNVERSIONED_BASE}/api/platformconfiguration/apply`, config),
 };
 
+// 2026-09-16: services/publicDataExtractorService.js's listSources/
+// registerSource/extractDataset were real, DB-backed, and genuinely
+// security-conscious (HTTPS-only, allowed-hosts validation, response
+// size limits) but had zero route - routes/publicDataRoutes.js used to
+// be an unrelated dead stub. Rewrote that file to route to the real
+// service; wired here.
+export const publicDataAPI = {
+  listSources: () => api.get(`${UNVERSIONED_BASE}/api/publicdata/sources`),
+  registerSource: (data) => api.post(`${UNVERSIONED_BASE}/api/publicdata/sources`, data),
+  extract: (sourceId, filter) => api.post(`${UNVERSIONED_BASE}/api/publicdata/sources/${sourceId}/extract`, filter),
+};
+
 export const informationSharingAPI = {
   getDocuments: (params) => api.get(`${INFORMATION_SHARING_BASE}/documents`, { params }),
   getDocument: (documentId) => api.get(`${INFORMATION_SHARING_BASE}/documents/${documentId}`),
