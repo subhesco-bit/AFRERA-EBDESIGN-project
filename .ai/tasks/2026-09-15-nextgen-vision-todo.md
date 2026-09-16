@@ -2281,3 +2281,103 @@ of scope here, flagged for whoever picks up backend work next.
 
 **Running total this session**: 161 → 97 MISSING_EXPORT errors (64
 closed, 97 remaining and all fully triaged).
+
+## Update 34 (2026-09-16): wrote 9 new backend route files closing 56 more MISSING_EXPORT errors (97 -> 51), exhausting the createCrudService-wrapping pattern
+
+Continuing straight from Update 33's finding that ~40 of the remaining
+gaps traced to real, working `createCrudService(...)` DB objects with
+zero Express router: went through every `services/legacy/
+*ManagementService.js` file matching that pattern and wrote a REST router
+for each, following the exact same shape (list/get/create/update/remove
+per resource, `authMiddleware` + `apiLimiter`, mounted at a new
+unversioned `/api/<domain>-registry` path so it can't collide with the
+dynamic route loader's own `/api/v1/...` auto-mount of the same file -
+same convention established for `livestockRegistryRoutes.js` in Update
+33). Every one of the 9 files was migration-verified (real Postgres
+table exists) and test-verified (401-not-404 under auth) before wiring
+any frontend export, and the full backend test suite was re-run after
+each addition to confirm zero regressions - ended at 109/109 real tests
+passing (same 6 pre-existing empty-stub suites still fail, unrelated).
+
+**9 new route files, 44 new resources, ~64 test cases:**
+1. `livestockRegistryRoutes.js` (3 resources: cattle, feed, analytics)
+2. `fisheriesRegistryRoutes.js` (9 resources: biofloc, hatcheries, feed
+   logs, water quality, health, harvests, processing, cold-chain,
+   analytics)
+3. `operationsRegistryRoutes.js` (8 resources: activities, tasks,
+   contractors, machinery ops, equipment schedules, input consumption,
+   productivity, dashboard KPIs)
+4. `horticultureRegistryRoutes.js` (8 resources: vegetable production,
+   floriculture, polyhouses, hydroponics, aeroponics, precision
+   readings, protected structures, analytics)
+5. `inputSupplyRegistryRoutes.js` (8 resources: biofertilizer, pesticide
+   inventory, bio-pesticide, micronutrient, organic input, procurement,
+   distribution, traceability)
+6. `cropRegistryRoutes.js` (6 resources: registrations, varieties, seed
+   plans, nurseries, sowing records, monitoring observations)
+7. `landRegistryRoutes.js` (6 resources: leases, GIS mappings, soil
+   zones, water resources, boundaries, surveys)
+8. `soilRegistryRoutes.js` (3 resources: health cards, nutrient plans,
+   fertility records)
+9. `waterRecordsRegistryRoutes.js` (5 resources: budgets, quality
+   readings, rainwater structures, watersheds, analytics) - a confirmed
+   **regression** fix, not a fresh gap: git history shows
+   `waterManagementRoutes.js` used to require() this exact service and
+   was overwritten with a generic "Route operational" stub by a later
+   batch-fix commit (`a2beb556`, 2026-09-10, ironically titled "FINAL
+   SUCCESS: Platform fully operational and running!").
+
+**Bonus finding while wiring**: 12 pre-existing fabricated placeholder
+exports were discovered already sitting in `api.js` *before this session
+started* - generic `getX()`/`manageX()` methods hitting made-up paths
+that never matched any real backend route or the actual method names
+each page calls (`hatcheryManagementAPI`, `fishFeedAPI`,
+`fisheriesWaterQualityAPI`, `fisheriesHarvestAPI`, `hydroponicsAPI`,
+`cropMonitoringAPI`, `cropRegistrationAPI`, `cropVarietyAPI`,
+`soilHealthAPI`, `nutrientManagementAPI`, plus `marketAccessAPI`'s wrong
+path from Update 32). These never showed up in the MISSING_EXPORT count
+(the export name existed, it just pointed nowhere real) - a reminder that
+existing exports in this file can predate this session's "verify live,
+not assumed" methodology and should be spot-checked against their
+consuming page's actual method calls, not just confirmed to exist. All
+12 fixed in place against the new real backends.
+
+**What's left (51 names, all individually documented in
+AGENT_ASSIGNMENTS.md)**: every remaining MISSING_EXPORT name now needs
+one of three real architectural changes, not a wiring fix:
+1. Wiring `backend/src/modules/` (the ~150+ M0xx tree) into one of the
+   two dynamic loaders, or individually `require()`-ing specific modules
+   - affects `assetLifecycleAPI`, `breakdownMaintenanceAPI`,
+   `equipmentInventoryAPI`, `fuelManagementAPI`,
+   `preventiveMaintenanceAPI`, `sparePartsAPI`, `orchardAPI`, `pondAPI`,
+   `waterBudgetingAPI`, `rainwaterHarvestingAPI`,
+   `watershedManagementAPI`, `waterAnalyticsAPI`, `irrigationAPI`,
+   `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`.
+2. The duplicate-service-filename Map-shadowing fix (re-key
+   `DynamicServiceLoader`'s discovery by full path, or resolve each
+   cluster by hand) - affects `aiAdvisoryAPI`, `buyingClubAPI`,
+   `procurementSubscriptionAPI`, `renewableEnergyAPI`,
+   `ruralEnterpriseAPI`, `schemeRegistryAPI`.
+3. Genuinely new backend work with no matching code anywhere -
+   `decisionEngineAPI`, `erpDashboardAPI`, `enterpriseMemoryAPI`,
+   `climateMonitoringAPI`, `competitorAPI`, `platformConfigurationAPI`,
+   `informationSharingAPI`, `logisticsEnhancementAPI`,
+   `fleetManagementAPI`, `equipmentRentalAPI`, `implementManagementAPI`,
+   `shgAPI`, `publicDataAPI`, `consentManagementAPI`,
+   `digitalIdentityAPI`, `sessionManagementAPI`, `ssoAPI`,
+   `securityAccessControlAPI`, `userManagementAPI`, `rolePermissionAPI`,
+   `permissionManagementAPI`, `governmentAPI`,
+   `organizationManagementAPI`, `pushNotificationsAPI`,
+   `mfaManagementAPI`, `platformTelemetryAPI`, `medicalCodingAPI`,
+   `nutritionIntelligenceAPI`, `operationsAPI`. Several of these are
+   security/auth-sensitive (SSO, RBAC, MFA device registry, session
+   management) - correctly not fabricated.
+
+None of the three categories above is a same-session wiring fix; each is
+a deliberate architectural or product decision for whoever picks up
+backend work next, not something to guess at.
+
+**Running total this session**: 161 → 51 MISSING_EXPORT errors (110
+closed across the whole session; 56 of those in this update alone via 9
+new route files, 44 new REST resources, and 12 fabricated-placeholder
+fixes).
