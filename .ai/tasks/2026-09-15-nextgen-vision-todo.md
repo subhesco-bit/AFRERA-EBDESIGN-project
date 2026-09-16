@@ -2011,3 +2011,64 @@ stayed green on every job except the known Build Verification/Check
 Status gap - Backend Tests in particular has passed on every single
 push, confirming none of this session's ~15 backend fixes/mounts this
 session have introduced a regression.
+
+## Update — 2026-09-16, thirty-first follow-up: 2 more real backend finds (one a route-shadowing bug), 6 more exports, 122 → 113
+
+Picked back up after a break. Checked 6 more candidates against real
+backends before wiring anything:
+
+- **`paymentGatewayAPI`** (4 methods) - `paymentGatewayRoutes.js`, already
+  mounted, matched 1:1 against `paymentGatewayController.js`.
+- **`formsAPI`** (4 methods) - `services/legacy/formService.js`, already
+  mounted at `/api/form`, matched 1:1.
+- **`farmerTrainingAPI`** (2 of 3 methods) - `farmerTrainingRoutes.js` was
+  yet another 38-line scaffold (its real implementation,
+  `farmerTrainingRoutes_merged.js`, sat unmounted next to it - a third,
+  unrelated file, `routes/agriculture/farmerTrainingRoutes.js`, is a
+  separate generic-CRUD placeholder, correctly left alone). Swapped the
+  scaffold for the real one. `getPrograms()` has no matching endpoint -
+  the real backend only has `POST /programs` (create, admin-facing), no
+  `GET /programs` to list them - left undefined.
+- **`pricingAPI`** (2 methods) - `riskPricingRoutes_merged.js`, already
+  mounted at `/api/riskpricing`, both methods' query/body param names
+  confirmed directly against the route file.
+- **`wearableAPI`** (6 methods) - `wearableIntegrationRoutes.js`, already
+  mounted, matched 1:1 against `wearableIntegrationController.js`
+  (Fitbit OAuth flow, activity sync).
+- **`villageProfileAPI`** (1 method) - real find, see below.
+
+**`villageProfileAPI`/`services/legacy/villageProfileService.js`** was a
+genuine two-part find. First, like `marketIntelligenceService.js` from
+the previous update, it was never mounted anywhere - it uses the same
+`setupRoutes(app)` pattern (mounts itself at `/api/v1/village-profiles`)
+rather than exporting a plain router, so it's called directly from
+`index.js` rather than via `require` + `app.use()`. Second, and more
+interesting: it had a real, live route-shadowing bug - `GET
+/villages/search` was registered *after* `GET /villages/:villageId`, so
+every search request would have been swallowed by the param route
+instead (Express matches in registration order; `villageId` would
+literally receive the string `"search"`). Exact same bug shape as
+`productService.js`'s `GET /search` fix from earlier this session. Fixed
+by moving the search route's registration above the param route. Locked
+in with a test that inspects the router's stack order directly (not just
+end-to-end behavior, which would look identical either way since auth
+runs before either handler and rejects both the same way with no token).
+
+Checked and ruled out `subsidyOpsAPI` (7 methods: apply,
+calculateGst, checkEquipmentSubsidy, checkLogisticsSubsidy,
+checkProjectSubsidy, getSchemes, track) - every subsidy-related service
+in the backend (`subsidyService.js`, `finance/subsidyService.js`,
+`strategic/governmentSubsidyService.js`) exports only plain functions,
+never a router; the one subsidy *route* file
+(`strategic/governmentSubsidyRoutes.js`) is a scaffold. Grepped the
+whole `routes/` tree for any of those 7 function names used anywhere -
+zero matches. Not fabricated, added to the missing-feature list.
+
+Confirmed via `vite build`: error count drops from 122 to 113 across
+this update's two commits (6 exports + 1 route-shadowing fix + 1
+mount).
+
+**Running total this session**: 161 → 113 MISSING_EXPORT errors (48
+closed). `subsidyOpsAPI` added to the confirmed-gap list alongside
+everything from the twenty-fourth/twenty-fifth/twenty-seventh/
+twenty-ninth/thirtieth updates.
