@@ -3005,3 +3005,60 @@ convention for ad-hoc scratch content. Committed `b4531e95`.
 Full backend + frontend test suites unaffected by all of the above
 (backend 247/247, frontend 54/55 - same one pre-existing, documented,
 out-of-scope `criticalModules.test.jsx` failure throughout).
+
+## Update 53 — pond/medical/nutrient investigation (0-for-3, honest gaps) + 2 real modules/ bugs fixed
+
+Attempted to close `pondAPI`/`medicalCodingAPI`/`nutritionIntelligenceAPI`
+per a prior note claiming they "just need a router." Delegated to a
+subagent; re-verified independently before committing. All 3 turned out
+to be genuine gaps once the real service files were read directly (pond
+has a DB schema but zero implementing code; medical coding and nutrition
+intelligence's real, adjacent services don't produce the shape either
+page needs) — no backend changes made, all 3 pages converted to the
+established honest unavailable-state pattern. Full trail in
+`AGENT_ASSIGNMENTS.md`. Committed `964da0e7`.
+
+Investigating the `backend/src/modules/` tree's last 23 known test
+failures (previously reduced from 3454 in Update 45's fix) found 2 more
+real, previously-undetected bugs, both confined to the `modules/` scaffold
+tree:
+
+1. **`modules/M261/service.js` + `database/migrations/561_3d_rendering.sql`**:
+   both used the unquoted table name `3d_rendering` throughout (table,
+   indexes, trigger, function, constraint names). An unquoted SQL
+   identifier can't start with a digit - real Postgres parses `3` as a
+   numeric literal and errors on the rest - so this migration would have
+   failed and blocked every migration after #561 the first time
+   `npm run migrate` actually ran, and every query M261's service built
+   was syntactically invalid. Renamed to `rendering_3d` throughout both
+   files (5 files total referenced `M261`; only these 2 referenced the
+   table name itself). Confirmed via `grep -rlP` this is the only
+   digit-leading identifier anywhere in `migrations/` or any
+   `modules/*/service.js`'s `this.table`.
+2. **`database/pool.js`'s test-mode mock had a special-cased
+   `insert into land_records` handler** hardcoding a 5-column shape
+   (farmer_id/land_area/location/soil_type/ownership_type) that never
+   actually matched `services/legacy/landRecordsService.js`'s real
+   16-column INSERT (already wrong for its own presumed purpose) - and,
+   since the match was a loose substring check, it also silently hijacked
+   `modules/M067/service.js`'s unrelated generic-scaffold INSERT (M067
+   happens to target a table also named `land_records`), corrupting its
+   columns via wrong positional mapping. Removed the special case
+   entirely; the generic, column-name-aware `parseInsertReturning()`
+   already elsewhere in the file handles both real shapes correctly.
+
+Verified: `node -c` clean on both edited files; `landRecordsRoutes.test.js`
+(4/4), `M067` (11/11), `M261` (11/11) all now pass, both in isolation and
+as part of the full `src/modules` run (**313/314 suites, 3443/3454 tests**
+- up from 311/314, 3431/3454); full `src/routes/__tests__` baseline
+unaffected (226/226, unchanged). The 1 remaining `modules/` failure,
+`M041`, is a different, non-bug case: `M041/service.js` is a real,
+bespoke Village Registry ERP module (`getVillageProfile`, `createVillage`,
+AI insight generation, finance/KPI tracking - 16 real methods), not a
+generic `createCrudService`-shaped scaffold, so its `module.exports` has
+no `create`/`getById`/`update`/etc. for the generic boilerplate test file
+to call - same pattern as `M084Page.jsx` from Update (unblocked
+criticalModules.test.jsx) earlier in this PR. Left as an honest,
+documented mismatch rather than fabricating generic CRUD methods that
+don't belong on a real bespoke service; writing a real test suite against
+M041's actual API is legitimate future work, out of scope here.

@@ -1769,23 +1769,19 @@ function makeTestPool() {
         return { rows: [row] };
       }
 
-      // Land records handlers
-      if (t.includes('insert into land_records')) {
-        const row = {
-          id: `lr-${Date.now()}`,
-          farmer_id: params[0],
-          land_area: Number(params[1]) || 0,
-          location: params[2] || '',
-          soil_type: params[3] || 'loam',
-          ownership_type: params[4] || 'owned',
-          created_at: new Date().toISOString(),
-        };
-        testStores.land_records = testStores.land_records || new Map();
-        const arr = testStores.land_records.get(row.farmer_id) || [];
-        arr.push(row);
-        testStores.land_records.set(row.farmer_id, arr);
-        return { rows: [row] };
-      }
+      // 2026-09-16: a special-cased `insert into land_records` handler
+      // used to live here, hardcoding a 5-column shape (farmer_id,
+      // land_area, location, soil_type, ownership_type) that never
+      // matched the real landRecordsService.js's actual 16-column INSERT
+      // (farmer_id, survey_number, village, district, state, ... 16
+      // total) - it was already wrong for its own presumed purpose. Worse,
+      // `t.includes('insert into land_records')` is a loose substring
+      // match, so it also hijacked modules/M067/service.js's unrelated
+      // generic-scaffold INSERT (M067 happens to use a table literally
+      // named `land_records` too), silently corrupting its columns via
+      // wrong positional mapping. Removed - the generic, column-name-aware
+      // `parseInsertReturning()` below already handles both cases
+      // correctly since both INSERTs use named columns.
 
       // Crop plans handlers
       if (t.includes('insert into crop_plans')) {
