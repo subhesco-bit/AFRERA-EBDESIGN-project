@@ -253,6 +253,10 @@ const landRegistryRoutes = require('./routes/landRegistryRoutes.js');
 // 2026-09-16: same pattern - services/legacy/soilManagementService.js had
 // 3 real createCrudService(...) objects with no router at all.
 const soilRegistryRoutes = require('./routes/soilRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/identityManagementService.js
+// (a pre-existing file from before this whole session, "Phase 2
+// Auto-Implementation", 2026-09-04) had 6 real resources with no router.
+const identityRegistryRoutes = require('./routes/identityRegistryRoutes.js');
 // 2026-09-16: same pattern - services/legacy/waterManagementService.js
 // had 5 real createCrudService(...) objects. Confirmed regression (not a
 // fresh gap): waterManagementRoutes.js used to require() this service
@@ -854,6 +858,7 @@ async function startup() {
     app.use('/api/crop-registry', cropRegistryRoutes);
     app.use('/api/land-registry', landRegistryRoutes);
     app.use('/api/soil-registry', soilRegistryRoutes);
+    app.use('/api/identity-registry', identityRegistryRoutes);
     app.use('/api/water-records-registry', waterRecordsRegistryRoutes);
     app.use('/api/glutwarning', glutWarningRoutes);
     app.use('/api/geofencing', geofencingRoutes);

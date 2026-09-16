@@ -397,11 +397,78 @@ below for the original writeup of how the bug works, still accurate for
 any future undiscovered cases.
 
 Result: the frontend's `MISSING_EXPORT` build-error count went from 161 →
-45 as of 2026-09-16 (161 at the start of this session — see
-`.ai/tasks/2026-09-15-nextgen-vision-todo.md`'s 35 dated updates for the
+38 as of 2026-09-16 (161 at the start of this session — see
+`.ai/tasks/2026-09-15-nextgen-vision-todo.md`'s 37 dated updates for the
 full trail; still tracked by CI's `Build Verification` job on PR #21 —
 expected to keep showing red on the remaining count, that's normal,
 don't re-file it as a new bug).
+
+## Update — 2026-09-16 (identity registry): found and wired a 10th pre-existing, never-routed service file — 45 -> 38
+
+After the `modules/` investigation above concluded with nothing safe to
+mount, went looking for any remaining `createCrudService`-shaped files
+that hadn't been checked yet by searching for filenames matching the
+still-open gap names directly, rather than re-running the same 4 batch
+searches. Found `services/legacy/identityManagementService.js` — **not
+written this session**: `git blame` shows it's from commit `8c8d06c2`,
+2026-09-04 ("Phase 2 Auto-Implementation - All 7 P0 Services Created"),
+predating this whole PR. Its own header comment independently confirms
+the same reasoning this session has used throughout (real
+`createCrudService(...)` objects, session-table reuse over forking a
+second sessions table, etc.) - it was simply never routed, same as every
+other file in this pattern.
+
+Covers 5 generic-CRUD resources (`permissionManagement` → `identity_permissions`,
+`ssoManagement` → `sso_providers`, `mfaManagement` → `mfa_devices`,
+`digitalIdentity` → `digital_identities`, `consentManagement` →
+`consent_records`) plus one hand-written `sessionManagement` object that
+is deliberately *not* a new table — it reads/terminates real rows in the
+`sessions` table `modules/M012` already writes to (join to `users` for a
+human-readable identifier), exactly the "don't fork the truth" principle
+already established for `pondAPI`/`M132` this session. Migration
+(`9999_..._identity_management_schema.sql`) confirmed for the 5 CRUD
+tables; `sessions` table confirmed via `014_platform_foundation_modules.sql`.
+
+Wrote `backend/src/routes/identityRegistryRoutes.js` (mounted at
+`/api/identity-registry`), all 6 resources, `sessionManagement`
+deliberately given no `POST` (sessions come from login, not manual
+creation — the frontend tab's own `backendNote` already said as much,
+"no 'add' form is offered here"). Tested
+(`routes/__tests__/identityRegistryRoutes.test.js`, 15 tests: exact
+route count including the missing sessions-POST, 401-not-404 per
+resource). Wired `permissionManagementAPI`, `ssoAPI`, `mfaManagementAPI`,
+`digitalIdentityAPI`, `consentManagementAPI`, `sessionManagementAPI` in
+`api.js` against it — all 6 previously-missing exports, all 6 tabs on
+`IdentityManagementPage.jsx` now have a real backend. This also resolves
+`mfaManagementAPI`'s earlier "confirmed gap" status — that assessment
+was correct about the per-user TOTP files
+(`mfaRoutes.js`/`mfaRoutes_merged.js`) having no device CRUD, it just
+hadn't found this separate, unrelated file yet.
+
+Separately, while investigating, found `routes/roleManagementRoutes.js`
+(a **different**, already-real, already-mounted file at
+`/api/rolemanagement`, wrapping `services/legacy/roleManagementService.js`
+directly — no loader/shadowing involved) that `RolePermissionPage.jsx`'s
+`rolePermissionAPI` needed but never had an export for.
+`RolePermissionPage.jsx`'s own in-file comment claims the real path is
+`/api/v1/roles` — checked live, that path doesn't exist anywhere in the
+codebase; the comment is stale/wrong about the path (though correct
+about the response shape, `{roles, total}` unwrapped — verified against
+`getRoles()`'s real return value). Wired only the 2 of 6 methods that
+have a real backend match — `listRoles`/`createRole` (`GET`/`POST
+/api/rolemanagement`, both behind `authMiddleware` +
+`requirePermission('read_roles'|'create_roles')`, so 401 unauthenticated
+/ 403 authenticated-without-permission) — `listPermissions`/
+`getPermissionMatrix`/`getRoleHierarchy`/`recommendRoleForUser` have no
+matching method anywhere in `roleManagementService.js` (checked its full
+method list directly), left undefined rather than fabricated. Added
+`routes/__tests__/roleManagementRoutes.test.js` (2 tests) since this
+route had none before despite already being mounted.
+
+134/134 real backend tests pass after both additions (same 6
+pre-existing empty-stub suites unrelated).
+
+MISSING_EXPORT count: 45 -> 38.
 
 ## Update — 2026-09-16: a systemic bug worth checking before adding anyone to the gap list below
 
@@ -451,22 +518,23 @@ backend work gets built for any of these, wire the frontend client then
 `informationSharingAPI`, `logisticsEnhancementAPI`, `irrigationAPI`,
 `yieldAPI`, `waterQualityAPI`, `soilTestingOpsAPI`, `fleetManagementAPI`,
 `equipmentRentalAPI`, `implementManagementAPI`,
-`shgAPI`, `publicDataAPI`, `consentManagementAPI`,
-`digitalIdentityAPI`, `sessionManagementAPI`, `ssoAPI`,
-`securityAccessControlAPI`, `userManagementAPI`, `rolePermissionAPI`,
-`permissionManagementAPI`,
+`shgAPI`, `publicDataAPI`,
+`securityAccessControlAPI`, `userManagementAPI`,
 plus ~24 of `farmersAPI`'s methods (field
 management, harvest scoring, most market/pricing analytics — see the
 twenty-fourth update for the full list).
 
-`platformTelemetryAPI` and `mfaManagementAPI` — **re-checked 2026-09-16,
-still CONFIRMED GAP, but neither is the duplicate-filename bug**:
-- `mfaManagementAPI` (`IdentityManagementPage.jsx` device-registry tab):
-  the page's own `backendNote` prop admits `/mfa-devices` was never
-  built. `mfaRoutes.js`/`mfaRoutes_merged.js` only implement per-user TOTP
-  (`/setup`,`/verify`,`/disable`,`/status`), no device CRUD, and neither
-  file is even `require()`'d in `index.js`.
-- `platformTelemetryAPI` (`PlatformManagementPage.jsx` `.getStatus()`/
+`mfaManagementAPI` — **now fixed, see the "Update — 2026-09-16
+(identity registry)" section below**. Was: `IdentityManagementPage.jsx`
+device-registry tab, page's own `backendNote` admitted `/mfa-devices`
+was never built - true at the time, but it turned out
+`services/legacy/identityManagementService.js` (a pre-existing file,
+unrelated to `mfaRoutes.js`/`mfaRoutes_merged.js`'s separate per-user TOTP
+flow) already had a real `mfa_devices` CRUD object with no router.
+
+`platformTelemetryAPI` — **re-checked 2026-09-16, still CONFIRMED GAP,
+not the duplicate-filename bug**:
+`platformTelemetryAPI` (`PlatformManagementPage.jsx` `.getStatus()`/
   `.getAnalytics()`): a real, working `controllers/platformTelemetryController.js`
   exists (backed by `services/legacy/platformTelemetryService.js`) but is
   never required by any route file — the only mounted route,

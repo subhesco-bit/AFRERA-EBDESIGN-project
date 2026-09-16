@@ -6438,6 +6438,75 @@ export const inputTraceabilityAPI = {
   deleteRecord: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records/${id}`),
 };
 
+// 2026-09-16: services/legacy/identityManagementService.js (a
+// pre-existing file from before this whole session, "Phase 2
+// Auto-Implementation", 2026-09-04) had real createCrudService(...)
+// logic for these 6 IdentityManagementPage.jsx tabs but no Express
+// router at all - wrote backend/src/routes/identityRegistryRoutes.js to
+// wrap them (mounted at /api/identity-registry). sessionManagement has
+// no create method (sessions come from login, not manual creation,
+// matching the page's own tab - no "add" form is offered there either).
+const IDENTITY_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/identity-registry`;
+
+export const permissionManagementAPI = {
+  getPermissions: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/permissions`, { params }),
+  createPermission: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/permissions`, data),
+  updatePermission: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/permissions/${id}`, data),
+  deletePermission: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/permissions/${id}`),
+};
+
+export const ssoAPI = {
+  getProviders: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/sso-providers`, { params }),
+  createProvider: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/sso-providers`, data),
+  updateProvider: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/sso-providers/${id}`, data),
+  deleteProvider: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/sso-providers/${id}`),
+};
+
+export const mfaManagementAPI = {
+  getDevices: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/mfa-devices`, { params }),
+  createDevice: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/mfa-devices`, data),
+  updateDevice: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/mfa-devices/${id}`, data),
+  deleteDevice: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/mfa-devices/${id}`),
+};
+
+export const digitalIdentityAPI = {
+  getIdentities: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/digital-identities`, { params }),
+  createIdentity: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/digital-identities`, data),
+  updateIdentity: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/digital-identities/${id}`, data),
+  deleteIdentity: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/digital-identities/${id}`),
+};
+
+export const consentManagementAPI = {
+  getRecords: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/consent-records`, { params }),
+  createRecord: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/consent-records`, data),
+  updateRecord: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/consent-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/consent-records/${id}`),
+};
+
+export const sessionManagementAPI = {
+  getSessions: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/sessions`, { params }),
+  updateSession: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/sessions/${id}`, data),
+  deleteSession: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/sessions/${id}`),
+};
+
+// 2026-09-16: RolePermissionPage.jsx's own comment claims "/api/v1/roles
+// returns {roles, total} unwrapped" - checked live, that path doesn't
+// exist anywhere. The real, already-mounted implementation is
+// routes/roleManagementRoutes.js -> services/legacy/roleManagementService.js
+// at the unversioned /api/rolemanagement (direct require, no
+// loader/shadowing risk) - confirmed getRoles() really does return
+// {roles, total} matching the page's expected shape, just at a
+// different path than the page's stale comment claims. Only
+// listRoles/createRole are wired: listPermissions/getPermissionMatrix/
+// getRoleHierarchy/recommendRoleForUser have no matching method
+// anywhere in roleManagementService.js (checked directly) - genuine
+// gaps, left undefined rather than fabricated.
+const ROLE_MANAGEMENT_BASE = `${UNVERSIONED_BASE}/api/rolemanagement`;
+export const rolePermissionAPI = {
+  listRoles: (params) => api.get(ROLE_MANAGEMENT_BASE, { params }),
+  createRole: (data) => api.post(ROLE_MANAGEMENT_BASE, data),
+};
+
 // 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and
 // calls it directly with relative paths (api.get('/advanced-medical-coding/...'))
 // rather than through a dedicated *API object - only a default export
