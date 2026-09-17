@@ -2446,6 +2446,14 @@ export const communityManagementAPI = {
 export const coldStorageAPI = {
   getColdStorage: () => api.get('/cold-storage'),
   manageColdStorage: (data) => api.post('/cold-storage/manage', data),
+  // 2026-09-17: real, mounted at /api/coldstorage (routes/coldStorageRoutes.js
+  // -> services/legacy/coldStorageService.js, a genuine transactional
+  // booking-capacity service). ColdStorageDashboardPage.jsx calls all 5.
+  getFacilities: (params) => api.get(`${UNVERSIONED_BASE}/api/coldstorage/facilities`, { params }),
+  getStatus: () => api.get(`${UNVERSIONED_BASE}/api/coldstorage/status`),
+  getTemperatureData: (facilityId, params) => api.get(`${UNVERSIONED_BASE}/api/coldstorage/${facilityId}/temperature`, { params }),
+  getComplianceStatus: (facilityId, hours) => api.get(`${UNVERSIONED_BASE}/api/coldstorage/${facilityId}/compliance`, { params: hours ? { hours } : undefined }),
+  bookFacility: (facilityId, data) => api.post(`${UNVERSIONED_BASE}/api/coldstorage/${facilityId}/book`, data),
 };
 
 export const coldChainMonitoringAPI = {

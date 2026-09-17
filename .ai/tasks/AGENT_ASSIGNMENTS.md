@@ -22,6 +22,7 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
+| Claude (PR #21) | `frontend/src/services/api.js` (append-only); `backend/src/index.js` (append mounts only, if needed); existing backend route/service files (adding real routes to existing scaffold route files, same pattern as `coldStorageRoutes.js` just fixed); ~36 remaining frontend pages from the loosened escrowAPI-class scan | 2026-09-17 | Round 3: re-checking the ~35 "probably unbuilt generic CRUD" candidates individually (a coldStorageAPI spot-check just proved that classification wrong once - see the update immediately above) for a real backing service before writing any of them off as genuine gaps. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -2042,3 +2043,35 @@ type" with no already-verified-real backend nearby - more likely
 genuinely unbuilt admin features than wiring bugs, but each still needs
 individual confirmation before being written off - flagged as a
 follow-up, not confirmed gaps yet.
+
+## Update — 2026-09-17 (spot-check proved the "probably unbuilt" call wrong for coldStorageAPI - fixed for real)
+
+Spot-checked 2 of the ~35 deferred "generic CRUD, probably unbuilt"
+candidates rather than trusting the classification. `farmCostingAPI`
+confirmed genuinely unbuilt (`services/farmCostingService.js` is 26
+lines, only `calculateFarmCost` - already wired). `coldStorageAPI` was
+wrong: `services/legacy/coldStorageService.js` is a real, 644-line,
+transactional service (row-locked, date-range-overlap capacity check
+for bookings - a genuine concurrency-safe business rule, not fabricated)
+with `getFacilities`/`getSystemStatus`/`getTemperatureReadings`/
+`getComplianceStats`/`bookFacility` methods matching
+`ColdStorageDashboardPage.jsx`'s 5 calls almost exactly - it just had no
+route file. The already-mounted `/api/coldstorage` was the usual dead
+"Route operational" scaffold in front of it (a *different* file,
+`routes/logistics/coldStorageRoutes_merged.js`, was ALSO just a
+scaffold - one of the rare cases this session where the `_merged.js`
+sibling isn't the real one). Added 5 real routes directly to the
+already-mounted scaffold file, wired `coldStorageAPI` to them.
+
+Verified: `node -c`/eslint clean; standalone mount script confirmed all
+7 routes (2 pre-existing + 5 new) register correctly; full boot smoke
+test still doesn't crash; `src/routes/__tests__` + `src/modules`
+unaffected (343/344, 3669/3680, same 1 known M041 failure); frontend
+`npm run build` exits 0; frontend suite 54/55 (same 1 known unrelated
+failure).
+
+**Lesson for whoever picks up the remaining ~35**: don't write off a
+"generic CRUD" candidate from the method-name pattern alone - check for
+a real `services/legacy/*.js` (or similarly-named) file first, the same
+way every other fix this session has. Delegating the rest with this
+lesson explicit.
