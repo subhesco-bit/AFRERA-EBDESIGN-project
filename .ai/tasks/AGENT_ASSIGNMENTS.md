@@ -22,6 +22,7 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
+| Claude (PR #21) | `frontend/src/services/api.js`/`componentApi.js` (append-only, adding real methods to existing partially-wired API objects); `backend/src/index.js` (append mounts only, if a real unmounted backend is found); ~50 specific frontend pages (see script output referenced in the update below) | 2026-09-16 | New bug class found via a static analysis script: frontend pages calling `xxxAPI.method()` where the API object is real (has some methods defined) but missing that specific method - same shape as the earlier `escrowAPI` bug, found at scale. Investigating each candidate individually before touching anything. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
