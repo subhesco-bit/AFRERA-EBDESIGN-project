@@ -1,11 +1,20 @@
 // Routes for M029 - Farmer Health & Welfare
 const express = require('express');
 const router = express.Router();
-const farmerHealthService = require('../../modules/M029/service');
+// 2026-09-17: was require('../../modules/M029/service'), the generic M029
+// scaffold whose listItems/getItem/... don't export any of the 8 method
+// names this router calls (listHealthRecords/getWelfarePrograms/
+// enrollWelfareProgram/...) - every route below threw "... is not a
+// function" at runtime regardless of auth, a gap this file's own comments
+// already flagged. services/farmerHealthService.js (top-level, not the
+// M029 scaffold) was written specifically to implement the 8 methods this
+// router expects, against the real schema (013_farmer_health_welfare_module.sql:
+// farmer_health_records, welfare_programs, welfare_enrollments), but was
+// never wired in here. Swapped to the real service; no route logic changed.
+const farmerHealthService = require('../../services/farmerHealthService');
 const { authMiddleware } = require('../../middleware/auth');
 const { adminMiddleware } = require('../../middleware/admin');
 const { resolveFarmerId } = require('../../middleware/resolveFarmerId');
-const { authMiddleware: authenticate } = require('../middleware/auth');
 
 
 /**

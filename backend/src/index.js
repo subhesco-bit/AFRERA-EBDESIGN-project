@@ -785,6 +785,33 @@ async function startup() {
     // won't appear until a restart. Pre-existing limitation in this file,
     // not something this fix changes.
     require('./services/legacy/digitalTwinService.js').setupRoutes(app);
+    // 2026-09-17: four more real-but-unreachable backends found while
+    // auditing frontend api.js objects with 1-2 methods missing against a
+    // real xxxAPI call site (same escrow/digitalTwin bug class as above).
+    // All four are mounted at a fresh /api/v1/* prefix, distinct from any
+    // pre-existing scaffold at the unversioned path, no collision:
+    //  - routes/finance/costRoutes_merged.js (corridor landed-cost model +
+    //    per-consignment cost breakup, services/legacy/costService.js) -
+    //    required a nonexistent module path (services/finance/costService,
+    //    fixed in that file to services/costService.js's confirmed-live
+    //    re-export) and so could never even be require()'d before now.
+    //  - routes/agriculture/farmerHealthRoutes.js (welfare programs +
+    //    enrollment, health records CRUD) - required the generic M029
+    //    scaffold service with none of this router's method names; fixed
+    //    in that file to services/farmerHealthService.js, written
+    //    specifically to implement them against the real schema.
+    //  - services/platform/erpService.js's own router (/status ->
+    //    getSyncStatus(), real DB-backed sync-state query across products/
+    //    orders/farmers/assets) - had its own Express router, like escrow/
+    //    digitalTwin above, but nothing ever required it.
+    //  - routes/aiBackboneRoutes_merged.js (/status -> real AI provider
+    //    configuration status) - the scaffold at routes/aiBackboneRoutes.js
+    //    is mounted at /api/aibackbone; this real router was never mounted
+    //    anywhere.
+    app.use('/api/v1/cost', require('./routes/finance/costRoutes_merged.js'));
+    app.use('/api/v1/farmer-health', require('./routes/agriculture/farmerHealthRoutes.js'));
+    app.use('/api/v1/erp', require('./services/platform/erpService.js').router);
+    app.use('/api/v1/aibackbone', require('./routes/aiBackboneRoutes_merged.js'));
     app.use('/api/wikipedia', wikipediaRoutes);
     app.use('/api/weather', weatherRoutes);
     app.use('/api/weatheradvisory', weatherAdvisory);

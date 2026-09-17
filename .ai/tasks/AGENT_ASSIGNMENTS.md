@@ -22,7 +22,6 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
-| Claude (PR #21) | `frontend/src/services/api.js`/`componentApi.js` (append-only, adding real methods to existing partially-wired API objects); `backend/src/index.js` (append mounts only, if a real unmounted backend is found); ~50 specific frontend pages (see script output referenced in the update below) | 2026-09-16 | New bug class found via a static analysis script: frontend pages calling `xxxAPI.method()` where the API object is real (has some methods defined) but missing that specific method - same shape as the earlier `escrowAPI` bug, found at scale. Investigating each candidate individually before touching anything. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -1878,3 +1877,96 @@ the claim:
 
 No files changed - this exclusion rule is accurate and safe as written.
 Documenting so this exact check isn't repeated.
+
+## Update — 2026-09-16/17 (escrowAPI bug class found at scale: 48 candidates, 27 fixed for real, rest documented)
+
+Wrote a static-analysis script parsing every `export const xxxAPI = {...}`
+block in `api.js`/`componentApi.js` plus every `xxxAPI.method(...)` call
+site across `frontend/src/pages/`, filtered to API objects that are
+real (2+ methods already defined) but missing 1-2 specific methods a
+page calls - the exact `escrowAPI` shape from earlier this session, at
+scale. 48 (page, API) pairs came back with zero prior mentions anywhere
+in this file or the todo log. Delegated the full audit to a subagent;
+verified independently before committing (re-ran `node -c`/eslint/build/
+both test suites myself, and spot-checked several of the specific route
+paths directly against the real route files, not just trusted the
+report - all confirmed correct).
+
+**27 methods wired for real** across 21 API objects/~19 pages. Two were
+genuine multi-file backend bugs beyond simple wiring, both fixed:
+- `routes/finance/costRoutes_merged.js` required a nonexistent module
+  path (`services/finance/costService`, real file is
+  `services/costService.js`) and a second broken auth-middleware path -
+  could never even be `require()`'d. Fixed both paths.
+- `routes/agriculture/farmerHealthRoutes.js` required the generic M029
+  scaffold service (none of its 8 method names existed there - a gap
+  the file's own comments already flagged) instead of
+  `services/farmerHealthService.js`, written specifically to implement
+  those exact methods against the real schema. Fixed the require.
+
+Both newly-functional routers, plus 2 more real-but-never-mounted ones
+(`services/platform/erpService.js`'s own router, `aiBackboneRoutes_merged.js`)
+mounted at fresh `/api/v1/*` prefixes in `index.js` (verified no
+collision with existing scaffold mounts at the unversioned path).
+
+Two real, confirmed **crash** bugs found beyond the original script's
+scope (unguarded `xxxAPI.method()` calls inside `useEffect`/array-literal
+construction, throwing synchronously on every render, not just
+theoretically on-demand):
+- `companyAPI.listCompanies()` - called bare on 3 pages
+  (AssetAccountingPage, ProjectSystemsPage, CostControlPage).
+- `platformCoreAPI.getHealth()` - called bare *inside a
+  `Promise.allSettled([...])` array literal* on PlatformFoundationPage,
+  so the synchronous TypeError aborted the whole array construction
+  before `allSettled` ever ran, silently breaking all 5 of the page's
+  independent data sources despite that being exactly the failure mode
+  the surrounding code was trying to guard against.
+
+**1 defensive fix, no backend to wire**: `TrainingAcademyPage.jsx`'s
+`farmerTrainingAPI.getPrograms()` - no backend anywhere exposes a "list
+all training programs" endpoint (only `POST /programs` to create one).
+Wrapped in try/catch so the TypeError is caught like any other load
+failure instead of propagating uncaught - not fabricated a list
+endpoint.
+
+**Documented, correctly left unwired** (each has a real reason, not
+just "couldn't find time" - see the subagent's full report for detail
+on each): `adminAPI.getRecentAudit`, `analyticsAPI.getPlatformStats`/
+`getInsights` (a same-named endpoint exists but serves unrelated
+form-submission data - wiring it would show wrong-domain numbers),
+`systemAPI.getHealth`, `caAPI.getAuditStats`, `fpoAPI.getStats`,
+`dashboardAPI.getStats`, `bankerAPI.getPortfolio`/`getRiskDashboard`,
+`ordersAPI.cancelOrder` (already documented elsewhere as no real
+endpoint), `financialAPI.getCreditScore`/`getLoans` (real backends
+exist but don't offer a self-scoped no-ID lookup, and the page's own
+farmer-ID is a permanent hardcoded placeholder), `predictiveAnalyticsAPI.getDemandForecast`/
+`getPricingPrediction` (real services keyed to numeric IDs, page sends
+strings - would silently return empty), `comprehensiveERPAPI.recordInspectionResult`
+(real function needs fields the page's form never collects),
+`tenantManagementAPI.deleteTenant`/`getAllTenants` (real service, zero
+route wiring anywhere, and the only mounted alternative is an
+explicitly-labeled non-persistent in-memory scaffold - not used, would
+be fabricating persistence), `walletAPI.getTransactions` (needs an
+explicit `walletId` the page has no way to obtain - also flagged: this
+sits in the same `Promise.all` as the now-fixed `financeAPI.getMyEnwrReceipts()`,
+so that fix won't actually execute on `BankPassportPage` until this one
+is separately solved too, noted honestly rather than claiming a
+partial win as complete). All of these already fail safely today
+(react-query error states or existing try/catch) - none crash.
+
+**2 false positives** from the script (caught and correctly not
+"fixed"): `CostControlPage.jsx`'s `rfqAPI.centrePnl` only appears in a
+comment, the page never calls `rfqAPI`; `ResearchDashboardPage.jsx`'s
+`researchAPI.getStats` only appears in a comment, the page was already
+fully migrated to the real, working `researchAndDevelopmentAPI`.
+
+Verified: `node -c`/eslint clean on all 6 backend files + 2 frontend
+files; standalone Express mount scripts confirmed all 4 newly-mounted
+routers register correctly; full boot smoke test still doesn't crash;
+`src/routes/__tests__` + `src/modules` unaffected (343/344 suites,
+3669/3680 tests, same 1 known M041 non-bug failure); frontend
+`npm run build` exits 0; frontend suite unaffected (54/55, same 1 known
+unrelated failure). Independently re-confirmed several of the specific
+route-path claims (compliance TDS routes, recoveredfinance ledger/enwr
+routes, platformcore health route) by grepping the actual route files
+directly, not just trusting the report.

@@ -98,6 +98,11 @@ export const aiAgentAPI = {
 export const aiBackboneAPI = {
   getBackboneStatus: () => api.get('/ai/backbone/status'),
   configureBackbone: (data) => api.put('/ai/backbone/config', data),
+  // 2026-09-17: real, mounted at /api/v1/aibackbone (routes/
+  // aiBackboneRoutes_merged.js -> services/legacy/aiBackboneService.js's
+  // getAIProviderStatus(), now mounted in index.js). PlatformManagementPage.jsx
+  // calls this exact method.
+  getAIProviderStatus: () => api.get(`${UNVERSIONED_BASE}/api/v1/aibackbone/status`),
 };
 
 export const aiBrainAPI = {
@@ -204,6 +209,13 @@ export const unifiedAIGatewayAPI = {
 export const platformCoreAPI = {
   getPlatformStatus: () => api.get('/platform/status'),
   getPlatformMetrics: () => api.get('/platform/metrics'),
+  // 2026-09-17: real, mounted at /api/platformcore/health (routes/
+  // platformCoreRoutes_merged.js -> services/dual-use/platformCoreService.js's
+  // getPlatformHealth(), a genuine DB-connectivity check). PlatformFoundationPage.jsx
+  // calls this via Promise.allSettled - previously a synchronous TypeError
+  // thrown while building that array aborted all 5 of its independent data
+  // sources, not just this one.
+  getHealth: () => api.get(`${UNVERSIONED_BASE}/api/platformcore/health`),
 };
 
 export const agriculturalIntelligenceAPI = {
@@ -257,6 +269,11 @@ export const productMediaAIAPI = {
     api.post(`${PRODUCT_MEDIA_AI_BASE}/products/${productId}/video-script`),
   generateVideo: (productId) =>
     api.post(`${PRODUCT_MEDIA_AI_BASE}/products/${productId}/video`),
+  // 2026-09-17: AIProductStudioPage.jsx calls getProviderStatus(), not
+  // getStatus() above - same real GET /status endpoint, just a different
+  // method name on the same object. Added as an alias rather than
+  // renaming getStatus (other callers may already use it).
+  getProviderStatus: () => api.get(`${PRODUCT_MEDIA_AI_BASE}/status`),
 };
 
 // 2026-09-15: productsAPI and productReviewsAPI didn't exist in this file
@@ -299,6 +316,11 @@ export const modulesAPI = {
   getModules: () => api.get(MODULE_CATALOG_BASE),
   getModule: (id) => api.get(`${MODULE_CATALOG_BASE}/${id}`),
   getOverview: () => api.get(`${MODULE_CATALOG_BASE}/overview`),
+  // 2026-09-17: real, mounted at /api/modulecatalog/assistant (services/
+  // legacy/moduleCatalogService.js's buildAssistantResponse() - a real,
+  // deterministic keyword match against the actual module catalog, not a
+  // live LLM call but not fabricated either). ModuleHubPage.jsx calls this.
+  askAssistant: (prompt) => api.post(`${MODULE_CATALOG_BASE}/assistant`, { prompt }),
 };
 
 // 2026-09-15: didn't exist at all - the highest-frequency remaining
@@ -332,6 +354,18 @@ export const farmersAPI = {
 export const nutritionAPI = {
   getNutritionData: () => api.get('/nutrition'),
   analyzeNutrition: (data) => api.post('/nutrition/analyze', data),
+  // 2026-09-17: real, mounted at /api/nutritionintelligence (routes/
+  // nutritionIntelligenceRoutes.js -> services/legacy/
+  // nutritionIntelligenceService.js). getWellnessPractices/getDietaryProfiles/
+  // generateRecipe are all real, DB-backed endpoints (wellness_natural_practices,
+  // dietary_profiles tables) - AIProductStudioPage.jsx and DietRecipesPage.jsx
+  // call these exact names.
+  getWellnessPractices: (params) => api.get(`${UNVERSIONED_BASE}/api/nutritionintelligence/wellness-practices`, { params }),
+  getDietaryProfiles: () => api.get(`${UNVERSIONED_BASE}/api/nutritionintelligence/dietary-profiles`),
+  generateRecipe: (dietaryProfileId, targetCalories) => api.post(`${UNVERSIONED_BASE}/api/nutritionintelligence/recipes`, {
+    dietary_profile_id: dietaryProfileId,
+    target_calories: targetCalories,
+  }),
 };
 
 // 2026-09-15: pigAPI/goatAPI/pigAIAPI/goatAIAPI/sheepAIAPI/poultryAIAPI
@@ -921,6 +955,20 @@ export const assetAccountingAPI = {
 export const companyAPI = {
   getCompanies: () => api.get('/company'),
   getCompany: (id) => api.get(`/company/${id}`),
+  // 2026-09-17: real, mounted at /api/company (routes/companyRoutes.js ->
+  // services/legacy/companyService.js). AssetAccountingPage.jsx,
+  // ProjectSystemsPage.jsx and CostControlPage.jsx all call
+  // companyAPI.listCompanies() bare (no try/catch) directly inside a
+  // useEffect body - since the method didn't exist, this was a genuine
+  // unguarded synchronous TypeError crash on every render of all three
+  // pages, the same bug class as the escrowAPI fix earlier this session.
+  // getFiscalYears/getChartOfAccounts added alongside it for the same
+  // reason - CostControlPage.jsx calls both bare inside a
+  // Promise.all([...]) array literal, same unguarded-crash shape, once
+  // companyId is set from the (now working) listCompanies() call above.
+  listCompanies: () => api.get(`${UNVERSIONED_BASE}/api/company`),
+  getFiscalYears: (companyId) => api.get(`${UNVERSIONED_BASE}/api/company/${companyId}/fiscal-years`),
+  getChartOfAccounts: (companyId) => api.get(`${UNVERSIONED_BASE}/api/company/${companyId}/chart-of-accounts`),
 };
 
 export const authorizationAPI = {
@@ -1021,6 +1069,13 @@ export const schemeAPI = {
 export const complianceAPI = {
   getComplianceStatus: () => api.get('/compliance/status'),
   submitReport: (data) => api.post('/compliance/reports', data),
+  // 2026-09-17: real, mounted at /api/compliance (routes/complianceRoutes.js
+  // -> services/legacy/complianceService.js, reads the tds_deductions
+  // table). CADashboardPage.jsx already had a comment claiming these were
+  // "genuinely wired up" but they were never actually added here - a
+  // documented-but-not-done gap, not a working feature.
+  tdsSummary: (params) => api.get(`${UNVERSIONED_BASE}/api/compliance/tds/summary`, { params }),
+  tdsRates: () => api.get(`${UNVERSIONED_BASE}/api/compliance/tds/rates`),
 };
 
 export const auditAPI = {
@@ -1076,6 +1131,14 @@ export const soilAPI = {
 export const weatherAPI = {
   getCurrentWeather: () => api.get('/weather/current'),
   getForecast: () => api.get('/weather/forecast'),
+  // 2026-09-17: real, mounted at /api/weather (routes/weatherRoutes_merged.js
+  // -> services/agriculture/weatherService.js, migration 057). ClimateAdvisoryPage.jsx's
+  // own comment already correctly identified these as real and mounted,
+  // but they were never actually added to this object. ForwardPricingPage.jsx
+  // calls forArp() for the same real /for-arp endpoint.
+  activeAlerts: () => api.get(`${UNVERSIONED_BASE}/api/weather/alerts/active`),
+  pestForecast: (params) => api.get(`${UNVERSIONED_BASE}/api/weather/pest-forecast`, { params }),
+  forArp: ({ state, district, days }) => api.get(`${UNVERSIONED_BASE}/api/weather/for-arp`, { params: { state, district, days } }),
 };
 
 export const schemeBenefitsAPI = {
@@ -1151,6 +1214,16 @@ export const hrAPI = {
 export const financeAPI = {
   getFinancialData: () => api.get('/finance'),
   getAccounts: () => api.get('/finance/accounts'),
+  // 2026-09-17: real, mounted at /api/recoveredfinance (routes/
+  // recoveredFinanceRoutes_merged.js -> services/finance/
+  // recoveredFinanceService.js). LedgerPage.jsx calls trialBalance()/
+  // verifyLedger() (hash-chained GL integrity check) inside a try/catch'd
+  // Promise.all - was already crash-safe, but had no real backend wired.
+  // BankPassportPage.jsx calls getMyEnwrReceipts() - self-scoped to the
+  // caller's own farmerId via resolveFarmerId middleware, no ID needed.
+  trialBalance: () => api.get(`${UNVERSIONED_BASE}/api/recoveredfinance/ledger/trial-balance`),
+  verifyLedger: () => api.get(`${UNVERSIONED_BASE}/api/recoveredfinance/ledger/verify`),
+  getMyEnwrReceipts: () => api.get(`${UNVERSIONED_BASE}/api/recoveredfinance/enwr/my-receipts`),
 };
 
 export const legalAPI = {
@@ -2206,6 +2279,12 @@ export const ecommerceAPI = {
 export const ecommerceMarketingAPI = {
   getEcommerceMarketing: () => api.get('/ecommerce-marketing'),
   runMarketingCampaign: (data) => api.post('/ecommerce-marketing/campaign', data),
+  // 2026-09-17: real, mounted at /api/ecommercemarketing (routes/
+  // ecommerceMarketingRoutes_merged.js -> controllers/
+  // ecommerceMarketingController.js -> services/legacy/
+  // ecommerceMarketingService.js). MarketingCenter.jsx calls both.
+  getMarketingAnalytics: (params) => api.get(`${UNVERSIONED_BASE}/api/ecommercemarketing/analytics`, { params }),
+  getSponsoredProducts: (params) => api.get(`${UNVERSIONED_BASE}/api/ecommercemarketing/sponsored-products`, { params }),
 };
 
 export const ecommerceIntegrationAPI = {
@@ -2261,6 +2340,14 @@ export const dairyAPI = {
 export const cropValueResearchAPI = {
   getCropValueResearch: () => api.get('/crop-value-research'),
   researchCropValue: (data) => api.post('/crop-value-research/research', data),
+  // 2026-09-17: real, mounted at /api/cropvalueresearch (routes/
+  // cropValueResearchRoutes.js, newly wired to controllers/
+  // cropValueResearchController.js -> services/legacy/
+  // cropValueResearchService.js's getPendingSuggestions()/reviewSuggestion()
+  // - AI-suggested crop value-compound reference data, verified=FALSE
+  // until a human approves via review()). CropValueReviewPage.jsx calls both.
+  getPending: () => api.get(`${UNVERSIONED_BASE}/api/cropvalueresearch/pending`),
+  review: (id, approve) => api.post(`${UNVERSIONED_BASE}/api/cropvalueresearch/${id}/review`, { approve }),
 };
 
 export const cropRecommendationsAPI = {
@@ -2341,6 +2428,11 @@ export const climateAdvisoryAPI = {
 export const civilDisruptionAPI = {
   getCivilDisruption: () => api.get('/civil-disruption'),
   reportDisruption: (data) => api.post('/civil-disruption/report', data),
+  // 2026-09-17: real, mounted at /api/civildisruption (routes/
+  // civilDisruptionRoutes.js -> services/legacy/civilDisruptionService.js).
+  // DisruptionPage.jsx calls both.
+  listActive: (params) => api.get(`${UNVERSIONED_BASE}/api/civildisruption/active`, { params }),
+  report: (data) => api.post(`${UNVERSIONED_BASE}/api/civildisruption`, data),
 };
 
 export const certificationManagementAPI = {
@@ -2416,6 +2508,14 @@ export const unifiedAIGatewayAPI2 = {
 export const transactionAPI = {
   getTransactions: () => api.get('/transactions'),
   createTransaction: (data) => api.post('/transactions', data),
+  // 2026-09-17: real, mounted at /api/transaction (routes/
+  // transactionRoutes.js -> controllers/transactionController.js ->
+  // services/transactionService.js's getUserTransactions). TransactionHistoryPage.jsx
+  // calls this - note that page currently passes a hardcoded 'user123'
+  // placeholder instead of a real user id (its own pre-existing, separately
+  // flagged TODO, not something this fix changes), so this will 404/return
+  // empty until that placeholder is replaced with a real id from auth.
+  getUserTransactions: (userId, params) => api.get(`${UNVERSIONED_BASE}/api/transaction/user/${userId}`, { params }),
 };
 
 export const trackDartAPI = {
@@ -2484,6 +2584,13 @@ export const sellerVerificationsAPI = {
 export const sellerRankingAPI = {
   getSellerRankings: () => api.get('/seller-ranking'),
   rankSeller: (id, data) => api.post(`/seller-ranking/${id}`, data),
+  // 2026-09-17: real, mounted at /api/sellerranking (routes/
+  // sellerRankingRoutes.js, newly wired to services/legacy/
+  // sellerRankingService.js - ranks sellers by real farmers.fdi_score/
+  // fulfilled_orders/disputes/years_active/certification_count/
+  // training_completed columns). MarketSignalsPage.jsx calls both.
+  getRankedSellers: (params) => api.get(`${UNVERSIONED_BASE}/api/sellerranking/ranked`, { params }),
+  getSellerTrustScore: (userId) => api.get(`${UNVERSIONED_BASE}/api/sellerranking/trust-score/${userId}`),
 };
 
 // 2026-09-15: pointed at /seed-vault, which doesn't exist under the
@@ -2511,6 +2618,12 @@ export const sapModuleArchitectureAPI = {
 export const roleManagementAPI = {
   getRoles: () => api.get('/role-management'),
   createRole: (data) => api.post('/role-management', data),
+  // 2026-09-17: real, mounted at /api/rolemanagement (routes/
+  // roleManagementRoutes.js -> services/legacy/roleManagementService.js).
+  // IdentityManagementPage.jsx's ResourceManager update/remove props call
+  // these exact names.
+  updateRole: (id, data) => api.put(`${UNVERSIONED_BASE}/api/rolemanagement/${id}`, data),
+  deleteRole: (id) => api.delete(`${UNVERSIONED_BASE}/api/rolemanagement/${id}`),
 };
 
 export const riskPricingAPI = {
@@ -3543,16 +3656,33 @@ export const individualResilienceFarmingAPI = {
 export const knowledgeGraphAPI = {
   getKnowledgeGraph: () => api.get('/knowledge-graph'),
   buildKnowledgeGraph: (data) => api.post('/knowledge-graph/build', data),
+  // 2026-09-17: real, mounted at /api/knowledgegraph (index.js requires
+  // services/legacy/knowledgeGraphService.js's router directly) - a real
+  // Postgres full-text search over knowledge_nodes. CommunityForumPage.jsx
+  // and KnowledgeBasePage.jsx call this.
+  searchNodes: (q) => api.get(`${UNVERSIONED_BASE}/api/knowledgegraph/knowledge-nodes/search`, { params: { q } }),
 };
 
 export const libraryAPI = {
   getLibrary: () => api.get('/library'),
   searchLibrary: (query) => api.post('/library/search', query),
+  // 2026-09-17: real, mounted at /api/libraryknowledge (routes/claude/
+  // libraryRoutes.js -> services/legacy/libraryKnowledgeService.js - reads
+  // actual .md cards under _EBDESIGN_LIBRARY/, real keyword search - not
+  // the same object as routes/libraryRoutes_merged.js at /api/library,
+  // which is a separate "Resources retrieved" CRUD scaffold). CommunityForumPage.jsx
+  // and KnowledgeBasePage.jsx call libraryAPI.search({query}).
+  search: ({ query }) => api.get(`${UNVERSIONED_BASE}/api/libraryknowledge/search`, { params: { query } }),
 };
 
 export const panchayatAPI = {
   getPanchayats: () => api.get('/panchayats'),
   getPanchayat: (id) => api.get(`/panchayats/${id}`),
+  // 2026-09-17: real, mounted at /api/governancemodule (routes/platform/
+  // governanceModule_merged.js -> services/legacy/governanceService.js -
+  // CommunityManagementPage.jsx's own comment already correctly identified
+  // this as real, but createPanchayat was never actually added here).
+  createPanchayat: (data) => api.post(`${UNVERSIONED_BASE}/api/governancemodule/panchayats`, data),
 };
 
 export const blockManagementAPI = {
@@ -3613,6 +3743,15 @@ export const vendorsAPI = {
 export const economicAPI = {
   getEconomicData: () => api.get('/economic'),
   analyzeEconomics: (data) => api.post('/economic/analyze', data),
+  // 2026-09-17: real, newly mounted at /api/v1/cost/corridor-model (routes/
+  // finance/costRoutes_merged.js, which required a nonexistent module path
+  // and was never mountable until fixed - see index.js). Real, DB-backed
+  // NE->NCR landed-cost business-plan model (services/costService.js ->
+  // legacy/costService.js). CorridorEconomicsPage.jsx calls this.
+  corridorModel: (corridor) => api.get(`${UNVERSIONED_BASE}/api/v1/cost/corridor-model`, { params: { corridor } }),
+  // Real, already-mounted at /api/demand/mandi-signal (routes/demandRoutes.js
+  // -> services/legacy/demandService.js's getMandiSignal()). Same page calls this.
+  mandiSignal: (params) => api.get(`${UNVERSIONED_BASE}/api/demand/mandi-signal`, { params }),
 };
 
 // Crop management APIs
@@ -3731,6 +3870,18 @@ export const dairyAIAPI = {
 export const financialAPI = {
   getFinancialData: () => api.get('/financial'),
   analyzeFinancials: (data) => api.post('/financial/analyze', data),
+  // 2026-09-17: real, mounted at /api/financial (index.js requires
+  // services/legacy/financialService.js's router directly) -> services/
+  // finance/revenueService.js's getOverview(), a real DB-backed revenue
+  // read (totalRevenue/pipelineValue/byStatus from revenue_contracts).
+  // FinancialServicesDashboard.jsx calls financialAPI.getOverview(timeRange)
+  // - note the real endpoint only returns totalRevenue/pipelineValue/
+  // byStatus, not the activeLoans/activePolicies/etc. fields this page's
+  // UI also renders; those honestly fall back to the page's own `|| 0`
+  // defaults rather than being fabricated here. timeRange itself isn't a
+  // real query param on this endpoint (it takes from/to/buyerId) - passed
+  // through unused rather than invented a date-range conversion.
+  getOverview: (timeRange) => api.get(`${UNVERSIONED_BASE}/api/financial/overview`, { params: { timeRange } }),
 };
 
 export const enterpriseControlAPI = {
@@ -3741,6 +3892,13 @@ export const enterpriseControlAPI = {
 export const erpAPI = {
   getERPData: () => api.get('/erp'),
   manageERP: (data) => api.post('/erp/manage', data),
+  // 2026-09-17: real, newly mounted at /api/v1/erp/status (services/
+  // platform/erpService.js's own router, real DB-backed sync-state query
+  // across products/orders/farmers/assets - see index.js). /api/erp is
+  // already taken by a different, pre-existing erpService.js (legacy/),
+  // hence the distinct /api/v1/erp prefix here. ExportDocumentationPage.jsx
+  // calls this.
+  getSyncStatus: () => api.get(`${UNVERSIONED_BASE}/api/v1/erp/status`),
 };
 
 export const fpoAPI = {
@@ -3756,6 +3914,16 @@ export const farmerHealthRecordsAPI = {
 export const farmerWelfareAPI = {
   getFarmerWelfare: () => api.get('/farmer-welfare'),
   manageWelfare: (data) => api.post('/farmer-welfare/manage', data),
+  // 2026-09-17: real, newly mounted at /api/v1/farmer-health (routes/
+  // agriculture/farmerHealthRoutes.js, fixed to require services/
+  // farmerHealthService.js instead of the generic M029 scaffold it was
+  // wired to before - see index.js). Real, DB-backed welfare program
+  // catalog + enrollment (welfare_programs/welfare_enrollments tables,
+  // migration 013). FarmerHealthWelfarePage.jsx calls both - enroll()
+  // self-scopes to the caller's own farmerId unless admin, but the
+  // frontend still sends farmerId for the admin case.
+  getPrograms: () => api.get(`${UNVERSIONED_BASE}/api/v1/farmer-health/welfare-programs`),
+  enroll: (farmerId, programId) => api.post(`${UNVERSIONED_BASE}/api/v1/farmer-health/welfare-enrollments`, { farmerId, programId }),
 };
 
 export const kycAPI = {
@@ -5685,6 +5853,15 @@ export const totalWarfareAPI = {
 export const blockchainVerificationAPI = {
   getVerifications: () => api.get('/blockchain-verification'),
   verifyBlockchain: (data) => api.post('/blockchain-verification/verify', data),
+  // 2026-09-17: real, mounted at /api/blockchainverification (routes/
+  // blockchainVerificationRoutes.js, newly wired to services/
+  // blockchainVerificationService.js - queries the real
+  // product_custody_transactions table, migration 072). BlockchainVerificationPage.jsx's
+  // field usage (totalTransactions/uniqueProducts/currentBlockHeight/
+  // authenticityScore/chainValid/custodyChain/...) matches this service's
+  // response shape exactly.
+  getStats: () => api.get(`${UNVERSIONED_BASE}/api/blockchainverification/stats`),
+  verifyProduct: (productId) => api.get(`${UNVERSIONED_BASE}/api/blockchainverification/verify/${productId}`),
 };
 
 export const bulkOrderAPI = {
