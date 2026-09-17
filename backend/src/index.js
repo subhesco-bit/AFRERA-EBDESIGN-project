@@ -812,6 +812,45 @@ async function startup() {
     app.use('/api/v1/farmer-health', require('./routes/agriculture/farmerHealthRoutes.js'));
     app.use('/api/v1/erp', require('./services/platform/erpService.js').router);
     app.use('/api/v1/aibackbone', require('./routes/aiBackboneRoutes_merged.js'));
+    // 2026-09-17: the digitalTwinService.setupRoutes(app) mount above never
+    // had its simulation engine initialized - the full initialize() is
+    // deliberately skipped (see the comment above it) because it also
+    // starts two un-refed background timers, but that means
+    // this.simulationEngine stayed null and every POST
+    // /api/v1/digital-twin/:twinId/simulate call threw a raw TypeError
+    // ("Cannot read properties of null"), not a graceful error.
+    // initializeSimulationEngine() alone is synchronous, starts no timers,
+    // and only builds the {cropGrowthModel, soilMoistureModel, ...} lookup
+    // object simulate needs - safe to call directly.
+    require('./services/legacy/digitalTwinService.js').initializeSimulationEngine();
+    // 2026-09-17: modules/M007 (Role & Permission Management - AI Enhanced)
+    // is a real, complete, DB-backed router (roles/permissions/user_roles
+    // tables, all confirmed real) with listPermissions/getPermissionMatrix/
+    // getRoleHierarchy/recommendRoleForUser - exactly the 4 methods
+    // RolePermissionPage.jsx's rolePermissionAPI was missing - but it was
+    // never required or mounted anywhere in this file. Mounted at a fresh
+    // /api/v1/role-permission prefix, distinct from the existing real
+    // roleManagementRoutes.js mount (ROLE_MANAGEMENT_BASE) that
+    // listRoles/createRole already use, no collision.
+    app.use('/api/v1/role-permission', require('./modules/M007/routes.js'));
+    // 2026-09-17: modules/M008 (Audit & Compliance - AI Enhanced) is a real,
+    // complete, DB-backed router (audit_logs with genuine sha256
+    // hash-chained integrity verification, compliance_rules, both confirmed
+    // real tables) with createAuditLog/getAuditLogs/listComplianceRules/
+    // detectAuditAnomalies/verifyAuditLogIntegrity - exactly the methods
+    // ComplianceDashboardPage.jsx and SystemAdministrationPage.jsx's shared
+    // auditComplianceAPI was missing - but it was never required or mounted
+    // anywhere in this file. Mounted at a fresh /api/v1/audit-compliance
+    // prefix, no collision with any existing mount.
+    app.use('/api/v1/audit-compliance', require('./modules/M008/routes.js'));
+    // 2026-09-17: modules/M011 (User Management - AI Enhanced) is a real,
+    // complete, DB-backed router (users table) with listUsers/updateUser -
+    // exactly what AuthorizationPage.jsx's authorizationAPI.getUsers/
+    // .updateUserRole needed - but it was never required or mounted
+    // anywhere in this file. Mounted at a fresh /api/v1/user-management
+    // prefix, distinct from the existing /api/user scaffold mount, no
+    // collision.
+    app.use('/api/v1/user-management', require('./modules/M011/routes.js'));
     app.use('/api/wikipedia', wikipediaRoutes);
     app.use('/api/weather', weatherRoutes);
     app.use('/api/weatheradvisory', weatherAdvisory);

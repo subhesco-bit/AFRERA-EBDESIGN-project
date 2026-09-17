@@ -2219,6 +2219,31 @@ export const breachAPI = {
 export const digitalTwinAPI = {
   getDigitalTwin: () => api.get('/digital-twin'),
   createDigitalTwin: (data) => api.post('/digital-twin', data),
+  // 2026-09-17: real, already mounted (services/legacy/digitalTwinService.js's
+  // own setupRoutes(app), see index.js) at /api/v1/digital-twin.
+  // DigitalTwinDashboardPage.jsx's getTwins/runSimulation map onto this
+  // exactly - GET /api/v1/digital-twin (list) responds {success, twins},
+  // reshaped here to a plain array to match how the page consumes it
+  // (`res.data` used directly as an array). POST .../simulate needs a real
+  // modelType key (cropGrowthModel/soilMoistureModel/pestSpreadModel/
+  // yieldPredictionModel/climateImpactModel from
+  // initializeSimulationEngine() - see index.js, which was never called
+  // before this fix, so simulate previously threw on the null engine
+  // regardless of frontend wiring) - the page's own hardcoded
+  // `{ type: 'standard' }` scenario didn't match any of those and has been
+  // corrected there.
+  //
+  // getStatus/syncRealData are NOT wired: getStatus's expected shape
+  // (`status.modelCount`) has no real backend counterpart anywhere, and the
+  // page calls syncRealData(twinId) with no sensor payload - the only real
+  // endpoint that could serve it (POST .../sensor-data) requires a real
+  // {type, value, unit, location} reading to insert; calling it empty would
+  // silently write a garbage/null sensor_data row and update twin state
+  // with `undefined` while the page shows "Data sync completed" - exactly
+  // the kind of fabricated-success trap this audit is watching for, so
+  // left unwired as a genuine, documented gap instead.
+  getTwins: () => api.get('/digital-twin').then((res) => ({ ...res, data: res.data?.twins ?? res.data })),
+  runSimulation: (twinId, modelType) => api.post(`/digital-twin/${twinId}/simulate`, { modelType }),
 };
 
 export const healthAPI = {
@@ -3855,6 +3880,17 @@ export const producerGroupAPI = {
 export const auditComplianceAPI = {
   getAuditCompliance: () => api.get('/audit-compliance'),
   runAudit: (data) => api.post('/audit-compliance/run', data),
+  // 2026-09-17: real, mounted at /api/v1/audit-compliance (modules/M008/routes.js
+  // -> modules/M008/service.js, table-backed audit_logs/compliance_rules
+  // with genuine sha256 hash-chained log integrity, not fabricated).
+  // ComplianceDashboardPage.jsx and SystemAdministrationPage.jsx both call
+  // these - all return {success, data} matching both pages' own
+  // `res.data.data` / `res.data?.data` unwraps.
+  getAuditLogs: (params) => api.get('/audit-compliance/logs', { params }),
+  createAuditLog: (data) => api.post('/audit-compliance/logs', data),
+  listComplianceRules: (params) => api.get('/audit-compliance/compliance-rules', { params }),
+  detectAuditAnomalies: (params) => api.get('/audit-compliance/anomalies', { params }),
+  verifyAuditLogIntegrity: (id) => api.get(`/audit-compliance/logs/${id}/verify`),
 };
 
 export const strategicAPI = {
@@ -6906,6 +6942,19 @@ const ROLE_MANAGEMENT_BASE = `${UNVERSIONED_BASE}/api/rolemanagement`;
 export const rolePermissionAPI = {
   listRoles: (params) => api.get(ROLE_MANAGEMENT_BASE, { params }),
   createRole: (data) => api.post(ROLE_MANAGEMENT_BASE, data),
+  // 2026-09-17: real, mounted at /api/v1/role-permission (modules/M007/routes.js
+  // -> modules/M007/service.js, table-backed roles/permissions/user_roles/
+  // audit_logs). RolePermissionPage.jsx's other 3 tabs plus its "recommend
+  // role" action call these 4 exact names - all return {success, data}
+  // matching the page's own `res.data.data` unwrap. Note getRoleHierarchy's
+  // real table has no parent_role_id column (confirmed absent from every
+  // migration that creates/alters `roles`), so it always returns every role
+  // as a flat, childless root - an honest reflection of there being no
+  // stored hierarchy data, not a bug introduced here.
+  listPermissions: () => api.get('/role-permission/permissions'),
+  getPermissionMatrix: () => api.get('/role-permission/permission-matrix'),
+  getRoleHierarchy: () => api.get('/role-permission/role-hierarchy'),
+  recommendRoleForUser: (userId) => api.get(`/role-permission/users/${userId}/recommend-role`),
 };
 
 // 2026-09-16: services/legacy/informationSharingService.js is a real,
