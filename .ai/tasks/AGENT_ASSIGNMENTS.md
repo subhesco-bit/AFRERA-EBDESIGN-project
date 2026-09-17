@@ -22,7 +22,6 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
-| Claude (PR #21) | `frontend/src/services/api.js` (append-only); `backend/src/index.js` (append mounts only, if needed); existing backend route/service files (adding real routes to existing scaffold route files, same pattern as `coldStorageRoutes.js` just fixed); ~36 remaining frontend pages from the loosened escrowAPI-class scan | 2026-09-17 | Round 3: re-checking the ~35 "probably unbuilt generic CRUD" candidates individually (a coldStorageAPI spot-check just proved that classification wrong once - see the update immediately above) for a real backing service before writing any of them off as genuine gaps. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -2075,3 +2074,140 @@ failure).
 a real `services/legacy/*.js` (or similarly-named) file first, the same
 way every other fix this session has. Delegating the rest with this
 lesson explicit.
+
+## Update — 2026-09-17 (round 3 complete: 24 of 36 candidates investigated)
+
+Background audit agent worked through 24 of the ~36 remaining
+escrowAPI-class candidates. Every change was independently re-verified
+before commit (real service/route existence, method signatures, response
+shapes, mount collisions - not just trusting the agent's own report) and
+pushed across 7 commits (`a322ea13`..`312f2706`). Backend test suite held
+at 343/344 suites (3669/3680 tests, same known M041 failure) and
+`npm run build` exited 0 after every commit.
+
+**13 pages/API objects wired to real, previously-unrouted-or-unmounted
+backends:**
+- `CommunityManagementPage.jsx` (6 objects: blockManagement/
+  districtManagement/stateManagement/producerGroup/communityAsset/
+  ruralDevelopment) → `communityManagementService.js` (real CRUD factory
+  over 6 real tables), 30 new routes added to the `communityManagementRoutes.js`
+  scaffold.
+- `LivestockManagementPage.jsx` (animalHealthAPI), `FertilizerInventoryPage.jsx`
+  (fertilizerAPI), `FarmerHealthWelfarePage.jsx` (farmerHealthRecordsAPI),
+  `DefenseFitnessPrepPage.jsx`, `EngineeringProjectPage.jsx`,
+  `ExperienceLayerPage.jsx`, `ERPDashboard.jsx` (ecommerceERPAPI) — each a
+  real, already-built or now-routed backend the page's own header comment
+  had already (incorrectly) claimed was "verified"/wired; api.js itself
+  was never actually updated.
+- `LogisticsMatchingPage.jsx` (returnLoadBoardAPI) → 4 routes added to the
+  `returnLoadBoardRoutes.js` scaffold (2 other route files already wrapped
+  the same real service correctly but neither was mounted).
+- `RolePermissionPage.jsx` → `modules/M007` mounted at `/api/v1/role-permission`.
+- `ComplianceDashboardPage.jsx` + `SystemAdministrationPage.jsx` (shared
+  auditComplianceAPI) → `modules/M008` (real sha256 hash-chained audit-log
+  integrity) mounted at `/api/v1/audit-compliance`.
+- `AuthorizationPage.jsx` (partial) → `modules/M011` mounted at
+  `/api/v1/user-management`; `getRoles` deliberately left unwired (would
+  require duplicating `authService.js`'s do-not-touch permission map; page
+  already has an identical fallback catalogue on error).
+- `EnterpriseIntegrationPage.jsx` (partial) → 2 routes added
+  (`getSystemStatus` deliberately not added - no real backend shape).
+- `RealtimeMonitoringPage.jsx`, `ResearchDashboardPage.jsx` → 5 routes
+  each added to their scaffolds.
+- `DigitalTwinDashboardPage.jsx` (partial) → `getTwins`/`runSimulation`
+  wired; `getStatus`/`syncRealData` deliberately left unwired (would
+  either fabricate a "modelCount" shape or silently write a garbage
+  sensor-data row while reporting success).
+- `DairyManagementPage.jsx` (dairyAIAPI) → 4 routes added to `dairyRoutes.js`.
+- `BulkOrderPage.jsx` (bulkOrderAPI) → 5 methods wired to the already-real,
+  already-mounted `/api/bulkorder`.
+
+**2 real backend bugs found and fixed along the way (not just wiring):**
+- `services/legacy/digitalTwinService.js`'s simulation engine was never
+  initialized anywhere - `initializeSimulationEngine()` (safe, synchronous,
+  no timers) was never called, only the full `initialize()` (deliberately
+  skipped elsewhere for timer-leak reasons) builds it - every
+  `POST .../simulate` call threw a raw TypeError. Fixed in `index.js`.
+- `routes/agriculture/farmerHealthRoutes.js`'s GET/POST/PUT/DELETE
+  `/health-records` never passed the `{farmerId, isAdmin}` second argument
+  `farmerHealthService.js`'s ownership-check logic requires - every create
+  failed with "farmerId is required", every get/update/delete 404'd
+  regardless of caller. Fixed the missing argument (agent's find) AND,
+  caught during this session's independent re-verification, the missing
+  `selfScopeUnlessAdmin` middleware on GET/PUT `/:id` that the argument
+  fix alone didn't cover - without it `req.farmerId` stayed `undefined`
+  for non-admin callers, so real farmers would still 404 on their own
+  records even after the argument fix (only admins would have worked).
+  Both pieces now fixed and verified together.
+
+**1 pre-existing fabrication issue flagged, not silently fixed or
+hidden:** `dairyService.js`'s `optimizeFeedComposition`/`recommendBreeding`
+feed a 100% hardcoded, identical-for-every-animal "current feed
+composition" into a real AI prompt (verified directly in source);
+`optimizeMilkProduction`/`predictHealthRisks` embed a cruder
+yield-derived estimate (already commented "Sample data" by the original
+author). Neither number reaches the frontend response directly (only the
+AI's free-text output does), so the routes were mounted for their real
+value (real DB-derived trends, real LLM call via `callAI()`, not
+`Math.random()`) with the caveat documented in both the route file and
+api.js for a dedicated follow-up.
+
+**8 confirmed genuine gaps** (investigated in depth, no real backend
+exists or the real backend is structurally incompatible with the page -
+do not re-investigate without new information):
+- `HorticultureManagementPage.jsx`/greenhouseAPI — real backend is
+  action/ID-based (design/monitor/predict-yield), not a CRUD registry;
+  `monitor` in the original candidate list was a false positive (only
+  appears in a string, never called).
+- `LandRegistryPage.jsx`/landAPI — the real CRUD services belong to a
+  different page (`LandManagementPage.jsx`); the only other candidate
+  (`landRecordsService.js`) is self-scoped by `req.user.id` with
+  different fields - using it would misattribute ownership.
+- `FarmerFamilyPage.jsx`/`FarmerProfilePage.jsx`/`FarmerSkillPage.jsx` —
+  `farmer_family_members` table exists but has zero JS reader/writer
+  anywhere; `modules/M022` (715 lines, real) uses a fundamentally
+  different normalized multi-table schema incompatible with these pages'
+  flat single-table forms.
+- `Generated/Page3.jsx`/userAPI — `services/userService.js` is an
+  explicit stub returning `{name:'Stub User'}`.
+- `CropCalendarPage.jsx`/cropCalendarAPI — `modules/M062` has a literal
+  placeholder `model.sql` ("Define tables and indexes here"), no real
+  schema.
+- `PlatformFoundationPage.jsx`/systemAdministrationAPI — a genuine
+  multi-layered fabrication trap: `systemAdministrationService.js` calls
+  `aiGatewayService.predict()`/`.analyze()` with the wrong argument shape
+  (would throw), the model types it would call aren't registered even if
+  fixed, and the capacity baseline it would forecast from is hardcoded
+  `{cpu:80, memory:70, storage:60, network:50}` regardless of real state.
+  Left unwired rather than papering over any one of the three layers.
+- `B2BMarketplace.jsx`/ecommerceBusinessSalesAPI — routes/controller/
+  service all real and mounted, but the underlying schema is broken:
+  `createBulkOrder`'s INSERT references columns that don't exist on the
+  `bulk_orders` table that actually wins migration ordering;
+  `createContractFarming` inserts into a table that doesn't exist at all;
+  a separate FK even has a type mismatch (VARCHAR vs SERIAL). Wiring
+  would trade a clean crash for a confusing SQL error, not fix anything.
+- `CorporateBuyerPage.jsx`/`LogisticsProviderPage.jsx` (vendorsAPI) — zero
+  backend anywhere for either page's methods (shallow-checked only, not
+  deep-dived like the rest of this list).
+- `ERPDashboardPage.jsx`/erpDashboardAPI — `getSyncStatus`/`triggerSync`
+  are real (already wired); the other 5 methods have no implementation
+  anywhere in the codebase, checked both ERP service duplicates and the
+  unrelated `unified_ledger` schema.
+
+**Process note**: two commits this round (`62b67035`, `b29aab10`) ended
+up including additional real, verified changes (the M008/M011 mounts,
+and the `ecommerceERPAPI` client methods) that the background agent added
+mid-flight, between when this session's diff review started and when
+`git add`/`commit` ran - both commits' messages under-described their own
+diffs as a result. Retroactively re-verified all of it after the fact
+(real services, correct mount prefixes, matching response shapes) - no
+functional problem, but a reminder to re-diff immediately before staging
+on any file a concurrent process might still be writing to, not just
+once at the start of a review.
+
+**Not yet examined** (~12 remaining, out of the original ~36):
+`CorporateBuyerPage.jsx`/`LogisticsProviderPage.jsx` only shallow-checked.
+Whoever continues this should re-read the full candidate list in this
+round's agent launch prompt (not reproduced here) before starting, to
+avoid re-deriving it from scratch.
