@@ -42,7 +42,11 @@ const InsuranceManagementPage = () => {
   });
 
   const policies = policiesData?.policies || policiesData?.items || [];
-  const products = insuranceProducts?.products || insuranceProducts?.items || [];
+  // insuranceAPI.getInsuranceProducts() (wired 2026-09-17) hits
+  // GET /api/insurance/products, which responds with a bare array, not
+  // {products:[...]} or {items:[...]} - handled directly rather than
+  // assuming a wrapper shape the real endpoint doesn't use.
+  const products = Array.isArray(insuranceProducts) ? insuranceProducts : (insuranceProducts?.products || insuranceProducts?.items || []);
   const claims = claimsData?.claims || claimsData?.items || [];
 
   const createPolicyMutation = useMutation({

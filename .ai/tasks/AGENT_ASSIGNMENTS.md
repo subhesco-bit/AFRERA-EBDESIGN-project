@@ -22,7 +22,6 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
-| Claude (PR #21) | `frontend/src/services/api.js` (append-only); `backend/src/index.js` (append mounts only, if needed); a handful of specific frontend pages: `ClimateWeatherPage.jsx`, `WeatherAnalyticsPage.jsx`, `MarketSignalsPage.jsx`, `WalletPage.jsx`, `InsuranceManagementPage.jsx`, `RfqPage.jsx`, `FarmerKycPage.jsx`, `FarmerVerificationPage.jsx` | 2026-09-16 | Continuing the escrowAPI-class scan with a loosened filter (3-5 missing methods instead of 1-2) - prioritizing continuations of already-verified-real backends (weatherAPI, civilDisruptionAPI) plus a few standalone promising candidates. Not touching the ~35 remaining candidates that look like generic CRUD "management" pages (block/district/state/producer-group admin) - those look like genuine unbuilt admin features, not wiring bugs, pending individual confirmation. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
@@ -1971,3 +1970,75 @@ unrelated failure). Independently re-confirmed several of the specific
 route-path claims (compliance TDS routes, recoveredfinance ledger/enwr
 routes, platformcore health route) by grepping the actual route files
 directly, not just trusting the report.
+
+## Update — 2026-09-17 (escrowAPI-class scan, round 2: 8-for-8, no backend changes needed)
+
+Loosened the scan's filter (3-5 missing methods instead of 1-2) and
+picked 8 of the ~46 new candidates most likely to be real bugs rather
+than unbuilt features (continuations of `weatherAPI`/`civilDisruptionAPI`,
+just wired in round 1, plus standalone ones with few real methods
+already). All 8 wired for real, zero fabrication, zero `index.js`
+changes needed - every backend was already reachable, either via an
+existing explicit mount or (for 2 of them) the `DynamicRouteLoader`'s
+auto-mount mechanism. Verified independently: confirmed the auto-mount
+claim myself (`_isMountableRouteFile()` returns true and
+`_toMountSegment()` produces the exact claimed path for both files,
+not just trusted the subagent's own mount-simulation script; confirmed
+`discoverAndMountRoutes` is genuinely invoked at boot) and re-grepped
+all 5 "already mounted" route paths directly in `index.js`.
+
+- `weatherAPI.coverage`/`dispatchCheck`/`forecastAccuracy`/`advisoryTriggers`
+  (ClimateWeatherPage, WeatherAnalyticsPage) → same already-mounted
+  `/api/weather` backend from round 1, real DB views
+  (`v_weather_coverage`, `v_active_dispatch_blocks`,
+  `v_forecast_accuracy`) and a real threshold-breach query over
+  `climate_indices`/`weather_observations`.
+- `civilDisruptionAPI.checkShipmentRisk`/`resolve`/`verify`
+  (MarketSignalsPage) → same already-mounted `/api/civildisruption`
+  backend from round 1.
+- `walletAPI.deposit`/`getTransactions`/`getWallet`/`transfer`/`withdraw`
+  (WalletPage) → real, transactional, row-locked wallet functions in
+  `services/legacy/farmerService.js`, self-scoped via
+  `resolveFarmerId` middleware (no walletId needed - exactly what the
+  page required), exposed at the already-mounted
+  `/api/farmerportalenhancements`. Left the object's pre-existing
+  `getWalletBalance`/`makePayment` alone (separate, apparently already-
+  broken mismatch, out of scope).
+- `insuranceAPI.getClaims`/`getInsuranceProducts`/`submitClaim`
+  (InsuranceManagementPage) → real DB-backed router at the already-
+  mounted `/api/insurance`. Found and fixed a real shape bug while
+  wiring: `GET /products` returns a bare array, but the page unwrapped
+  it as `.products`/`.items` - would have rendered an empty list
+  forever even with real data. One-line `Array.isArray` fix. Also
+  flagged, not silently patched: the route never injects `req.user.id`
+  into `submitClaim`, so claims save with a null `user_id` and won't
+  reappear in scoped `getClaims` queries - a real gap in the route
+  itself, beyond "wire the missing method," left for a dedicated fix.
+- `rfqAPI.activeHolds`/`centrePnl`/`lossAnalysis`/`releaseQcHold`
+  (RfqPage) → same already-mounted `/api/rfq` backend, real DB-backed
+  (`qc_holds`, `quote_outcomes`, `v_fpo_centre_pnl`).
+- `kycAPI.getApplications`/`rejectApplication`/`submitApplication`/`verifyApplication`
+  (FarmerKycPage) → real `services/farmerKycService.js` +
+  `routes/farmerKycRoutes.js`, never explicitly mounted but live via
+  the `DynamicRouteLoader` auto-mount at `/api/v1/farmer-kyc`.
+- `farmerVerificationAPI.getRequests`/`rejectRequest`/`submitRequest`/`verifyRequest`
+  (FarmerVerificationPage) → same auto-mount situation, real
+  `services/farmerVerificationService.js` at `/api/v1/farmer-verification`.
+  The page's own `backendNote` claiming "has not been built yet" was
+  stale (user-facing) - corrected to match reality.
+
+Verified: eslint clean on all 3 changed frontend files; `npm run build`
+exits 0; frontend suite 54/55 (same known unrelated failure); backend
+`src/routes/__tests__` + `src/modules` unaffected (343/344, 3669/3680 -
+identical to baseline, no backend files touched this round so this was
+a pure sanity re-check).
+
+**~35 remaining candidates from the loosened scan were deliberately not
+attempted this round** - they look like generic CRUD "management" pages
+(block/district/state/producer-group/panchayat admin, farmer
+family/skill/profile CRUD, cold storage, greenhouse registry, etc.)
+where the pattern is consistently "create/get/update/delete an entity
+type" with no already-verified-real backend nearby - more likely
+genuinely unbuilt admin features than wiring bugs, but each still needs
+individual confirmation before being written off - flagged as a
+follow-up, not confirmed gaps yet.

@@ -984,6 +984,18 @@ export const ecommerceBusinessSalesAPI = {
 export const walletAPI = {
   getWalletBalance: () => api.get('/wallet'),
   makePayment: (data) => api.post('/wallet/payment', data),
+  // 2026-09-17: real, DB-backed, transactional wallet functions
+  // (services/legacy/farmerService.js - row-level locking on deposit/
+  // withdraw/transfer, see that file's own comments) exposed self-scoped
+  // (no walletId needed - resolved server-side via resolveFarmerId from
+  // the authenticated user's own farmer record) at routes/
+  // farmerPortalEnhancements_merged.js, already mounted at
+  // /api/farmerportalenhancements. WalletPage.jsx calls all five.
+  getWallet: () => api.get(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet`),
+  getTransactions: (params) => api.get(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet/transactions`, { params }),
+  deposit: (data) => api.post(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet/deposit`, data),
+  withdraw: (data) => api.post(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet/withdraw`, data),
+  transfer: (data) => api.post(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet/transfer`, data),
 };
 
 export const finmanAPI = {
@@ -1024,6 +1036,15 @@ export const loanAPI = {
 export const insuranceAPI = {
   getPolicies: () => api.get('/insurance/policies'),
   createPolicy: (data) => api.post('/insurance/policies', data),
+  // 2026-09-17: real, DB-backed (services/legacy/insuranceService.js's own
+  // router), already mounted at /api/insurance (unversioned - note this
+  // differs from getPolicies/createPolicy above, which use the versioned
+  // relative path against a mount that doesn't actually exist there; a
+  // pre-existing mismatch, left as-is since it's outside this fix's scope).
+  // InsuranceManagementPage.jsx calls all three.
+  getInsuranceProducts: () => api.get(`${UNVERSIONED_BASE}/api/insurance/products`),
+  getClaims: () => api.get(`${UNVERSIONED_BASE}/api/insurance/claims`),
+  submitClaim: (data) => api.post(`${UNVERSIONED_BASE}/api/insurance/claims`, data),
 };
 
 export const logisticsAPI = {
@@ -1139,6 +1160,18 @@ export const weatherAPI = {
   activeAlerts: () => api.get(`${UNVERSIONED_BASE}/api/weather/alerts/active`),
   pestForecast: (params) => api.get(`${UNVERSIONED_BASE}/api/weather/pest-forecast`, { params }),
   forArp: ({ state, district, days }) => api.get(`${UNVERSIONED_BASE}/api/weather/for-arp`, { params: { state, district, days } }),
+  // 2026-09-17: same already-mounted router (routes/weatherRoutes_merged.js
+  // -> services/legacy/weatherService.js) also exposes these - all real,
+  // DB-backed (coverage/dispatchCheck read v_weather_coverage/
+  // v_active_dispatch_blocks; forecastAccuracy reads v_forecast_accuracy;
+  // advisoryTriggers reads real climate_indices/weather_observations rows -
+  // no fabricated values, see the service file's own header comment for
+  // the SPI/heat-stress thresholds used). ClimateWeatherPage.jsx and
+  // WeatherAnalyticsPage.jsx both call all four.
+  coverage: () => api.get(`${UNVERSIONED_BASE}/api/weather/coverage`),
+  dispatchCheck: (districts) => api.get(`${UNVERSIONED_BASE}/api/weather/alerts/dispatch-check`, { params: { districts: Array.isArray(districts) ? districts.join(',') : districts } }),
+  forecastAccuracy: () => api.get(`${UNVERSIONED_BASE}/api/weather/forecast-accuracy`),
+  advisoryTriggers: (params) => api.get(`${UNVERSIONED_BASE}/api/weather/advisory-triggers`, { params }),
 };
 
 export const schemeBenefitsAPI = {
@@ -2433,6 +2466,15 @@ export const civilDisruptionAPI = {
   // DisruptionPage.jsx calls both.
   listActive: (params) => api.get(`${UNVERSIONED_BASE}/api/civildisruption/active`, { params }),
   report: (data) => api.post(`${UNVERSIONED_BASE}/api/civildisruption`, data),
+  // 2026-09-17: same already-mounted router (routes/civilDisruptionRoutes.js
+  // -> services/legacy/civilDisruptionService.js) also exposes these
+  // admin/action endpoints - all real, DB-backed (civil_disruption_events
+  // table; checkShipmentRisk does a real ILIKE match against the shipment's
+  // own addresses, see the service file's header comment on why that is
+  // not GPS routing). MarketSignalsPage.jsx calls all three.
+  verify: (id) => api.post(`${UNVERSIONED_BASE}/api/civildisruption/${id}/verify`),
+  resolve: (id, endDate) => api.post(`${UNVERSIONED_BASE}/api/civildisruption/${id}/resolve`, { endDate }),
+  checkShipmentRisk: (shipmentId) => api.get(`${UNVERSIONED_BASE}/api/civildisruption/shipments/${shipmentId}/risk`),
 };
 
 export const certificationManagementAPI = {
@@ -2639,6 +2681,13 @@ export const riskAssessmentAPI = {
 export const rfqAPI = {
   getRFQs: () => api.get('/rfq'),
   createRFQ: (data) => api.post('/rfq', data),
+  // 2026-09-17: same already-mounted router (routes/rfqRoutes_merged.js at
+  // /api/rfq) also exposes these - all real, DB-backed (qc_holds,
+  // quote_outcomes, v_fpo_centre_pnl). RfqPage.jsx calls all four.
+  activeHolds: () => api.get(`${UNVERSIONED_BASE}/api/rfq/qc/holds`),
+  lossAnalysis: (params) => api.get(`${UNVERSIONED_BASE}/api/rfq/quotes/loss-analysis`, { params }),
+  centrePnl: (fpoId) => api.get(`${UNVERSIONED_BASE}/api/rfq/fpo/centre-pnl`, { params: fpoId ? { fpoId } : {} }),
+  releaseQcHold: (data) => api.post(`${UNVERSIONED_BASE}/api/rfq/qc/release`, data),
 };
 
 export const returnLoadBoardAPI = {
@@ -3929,6 +3978,17 @@ export const farmerWelfareAPI = {
 export const kycAPI = {
   getKYC: () => api.get('/kyc'),
   submitKYC: (data) => api.post('/kyc/submit', data),
+  // 2026-09-17: real, DB-backed (services/farmerKycService.js, migration
+  // 1003_farmer_kyc_applications.sql) router at routes/farmerKycRoutes.js -
+  // never explicitly mounted in index.js, but reachable via the dynamic
+  // route loader's own auto-mount at /api/v1/farmer-kyc (dynamicRouteLoader.js's
+  // _toMountSegment strips the "Routes" suffix and kebab-cases the rest;
+  // confirmed live by a direct standalone mount test, not assumed).
+  // FarmerKycPage.jsx calls all four.
+  getApplications: (params) => api.get('/farmer-kyc/applications', { params }),
+  submitApplication: (data) => api.post('/farmer-kyc/applications', data),
+  verifyApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/verify`, data),
+  rejectApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/reject`, data),
 };
 
 export const farmerProfileAPI = {
@@ -3949,6 +4009,17 @@ export const farmerSkillAPI = {
 export const farmerVerificationAPI = {
   getFarmerVerifications: () => api.get('/farmer-verifications'),
   verifyFarmer: (data) => api.post('/farmer-verifications/verify', data),
+  // 2026-09-17: real, DB-backed (services/farmerVerificationService.js,
+  // migration 1002_farmer_verification_requests.sql) router at
+  // routes/farmerVerificationRoutes.js - FarmerVerificationPage.jsx's own
+  // backendNote claiming this "has not been built yet" is stale; never
+  // explicitly mounted in index.js, but reachable via the dynamic route
+  // loader's own auto-mount at /api/v1/farmer-verification (confirmed live
+  // by a direct standalone mount test, not assumed). Page calls all four.
+  getRequests: (params) => api.get('/farmer-verification/requests', { params }),
+  submitRequest: (data) => api.post('/farmer-verification/requests', data),
+  verifyRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/verify`, data),
+  rejectRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/reject`, data),
 };
 
 // Additional missing exports for various pages

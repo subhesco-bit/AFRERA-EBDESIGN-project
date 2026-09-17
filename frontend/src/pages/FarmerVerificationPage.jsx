@@ -53,7 +53,7 @@ function FarmerVerificationPage() {
       searchPlaceholder="Search by farmer or verification type..."
       emptyMessage="No verification requests recorded yet."
       newLabel="Submit Request"
-      backendNote="Backend endpoint /farmer-verification/requests has not been built yet — this page is wired and ready to work once it is."
+      backendNote="Backend endpoint /farmer-verification/requests is live (routes/farmerVerificationRoutes.js) — this error means the request itself failed, not that the endpoint is missing."
       initialForm={initialForm}
       requiredFields={['farmer_name', 'verification_type']}
       columns={[
