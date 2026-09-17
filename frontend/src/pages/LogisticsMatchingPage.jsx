@@ -4,14 +4,18 @@ import ActionCard from '../components/common/ActionCard';
 import { freightPoolingAPI, returnLoadBoardAPI, equipmentExchangeAPI } from '../services/api';
 
 /**
- * Logistics matching hub: three real, mounted backend route files that had
- * zero frontend caller anywhere in the app -
- * backend/src/routes/freightPoolingRoutes.js (/api/v1/freight-pooling),
- * backend/src/routes/returnLoadBoardRoutes.js (/api/v1/return-load-board),
- * backend/src/routes/equipmentExchangeRoutes.js (/api/v1/equipment-exchange).
- * Grouped here since all three are logistics-side matching/marketplace
- * operations (action/lookup-oriented, not CRUD list pages), following the
- * ActionCard pattern from WaterManagementPage.jsx.
+ * Logistics matching hub: three real backend services that had zero
+ * frontend caller anywhere in the app - freight pooling, return-load board
+ * and equipment exchange. Grouped here since all three are logistics-side
+ * matching/marketplace operations (action/lookup-oriented, not CRUD list
+ * pages), following the ActionCard pattern from WaterManagementPage.jsx.
+ *
+ * 2026-09-17: the Return-Load Board tab's own methods didn't actually exist
+ * in api.js's returnLoadBoardAPI yet (this header's claim of
+ * "/api/v1/return-load-board" was aspirational, not reality either - the
+ * real, table-backed service is services/legacy/returnLoadBoardService.js,
+ * exposed at the newly-added routes under /api/returnloadboard/postings,
+ * see routes/returnLoadBoardRoutes.js). Now wired for real.
  */
 const TABS = [
   { id: 'freight', label: 'Freight Pooling', icon: Truck },
@@ -93,7 +97,7 @@ function LogisticsMatchingPage() {
             description="Post available backhaul/return capacity to the board."
             hasJsonPayload
             jsonLabel="Posting data (JSON)"
-            jsonPlaceholder='{"originAddress": "Shillong", "destinationAddress": "Guwahati", "capacityKg": 2000, "availableFrom": "2026-09-01"}'
+            jsonPlaceholder='{"originAddress": "Shillong", "destinationAddress": "Guwahati", "availableCapacityKg": 2000, "availableFrom": "2026-09-01T06:00:00Z", "availableUntil": "2026-09-02T18:00:00Z", "askingRatePerKgInr": 4.5}'
             onRun={(_, payload) => returnLoadBoardAPI.postCapacity(payload)}
           />
           <ActionCard

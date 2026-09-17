@@ -2360,6 +2360,13 @@ export const demandAPI = {
 export const defenseFitnessPrepAPI = {
   getDefenseFitnessPrep: () => api.get('/defense-fitness-prep'),
   prepareDefense: (data) => api.post('/defense-fitness-prep/prepare', data),
+  // 2026-09-17: real, mounted at /api/defensefitnessprep
+  // (routes/defenseFitnessPrepRoutes.js -> controllers/defenseFitnessPrepController.js
+  // -> services/legacy/defenseFitnessPrepService.js). DefenseFitnessPrepPage.jsx
+  // calls all 3.
+  getCategories: () => api.get(`${UNVERSIONED_BASE}/api/defensefitnessprep/categories`),
+  getReadiness: (category, gender) => api.get(`${UNVERSIONED_BASE}/api/defensefitnessprep/readiness/${category}`, { params: gender ? { gender } : undefined }),
+  recordAttempt: (category, testComponent, recordedValue, source) => api.post(`${UNVERSIONED_BASE}/api/defensefitnessprep/attempts`, { category, test_component: testComponent, recorded_value: recordedValue, source }),
 };
 
 export const decisionSupportAPI = {
@@ -2713,6 +2720,14 @@ export const rfqAPI = {
 export const returnLoadBoardAPI = {
   getReturnLoads: () => api.get('/return-load-board'),
   postReturnLoad: (data) => api.post('/return-load-board', data),
+  // 2026-09-17: real, mounted at /api/returnloadboard (routes/returnLoadBoardRoutes.js
+  // -> services/legacy/returnLoadBoardService.js, table-backed
+  // return_load_postings). LogisticsMatchingPage.jsx's Return-Load Board tab
+  // calls all 4.
+  postCapacity: (data) => api.post(`${UNVERSIONED_BASE}/api/returnloadboard/postings`, data),
+  searchAvailable: (params) => api.get(`${UNVERSIONED_BASE}/api/returnloadboard/postings`, { params }),
+  bookPosting: (postingId, shipmentId) => api.post(`${UNVERSIONED_BASE}/api/returnloadboard/postings/${postingId}/book`, { shipmentId }),
+  cancelPosting: (postingId) => api.delete(`${UNVERSIONED_BASE}/api/returnloadboard/postings/${postingId}`),
 };
 
 export const researchAndDevelopmentAPI = {
@@ -4021,6 +4036,26 @@ export const fpoAPI = {
 export const farmerHealthRecordsAPI = {
   getFarmerHealthRecords: () => api.get('/farmer-health-records'),
   createHealthRecord: (data) => api.post('/farmer-health-records', data),
+  // 2026-09-17: real, mounted at /api/v1/farmer-health (routes/agriculture/farmerHealthRoutes.js
+  // -> services/farmerHealthService.js, table-backed farmer_health_records,
+  // M029). FarmerHealthWelfarePage.jsx's health-records ResourceManager
+  // calls these 4 exact names (distinct from getFarmerHealthRecords/
+  // createHealthRecord above, which it never calls). While wiring, found
+  // and fixed a real bug in the route file itself: POST/PUT/DELETE/GET-by-id
+  // never passed the {farmerId, isAdmin} second argument the service
+  // requires for its ownership check, so all 4 always failed (create always
+  // "farmerId is required", update/delete/get-by-id always 404) regardless
+  // of caller - see routes/agriculture/farmerHealthRoutes.js for the fix.
+  // GET /farmer-health/health-records responds with {items, pagination}
+  // directly (services/farmerHealthService.js's listHealthRecords return
+  // value, json'd as-is by the route with no {success, data} wrapper) - not
+  // the {data: [...]} shape ResourceManager's generic unwrap
+  // (`res.data?.data ?? res.data ?? []`) expects, so it's reshaped here
+  // rather than assuming a wrapper the real endpoint doesn't use.
+  getRecords: (params) => api.get('/farmer-health/health-records', { params }).then((res) => ({ ...res, data: res.data?.items ?? res.data })),
+  createRecord: (data) => api.post('/farmer-health/health-records', data),
+  updateRecord: (id, data) => api.put(`/farmer-health/health-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`/farmer-health/health-records/${id}`),
 };
 
 export const farmerWelfareAPI = {
