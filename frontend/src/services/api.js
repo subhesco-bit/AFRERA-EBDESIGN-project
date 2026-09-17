@@ -945,6 +945,18 @@ export const searchAPI = {
 export const animalHealthAPI = {
   getAnimalHealth: () => api.get('/animal-health'),
   manageAnimalHealth: (data) => api.post('/animal-health/manage', data),
+  // 2026-09-17: real, mounted at /api/animalhealth (routes/animalHealthRoutes.js
+  // -> services/legacy/animalHealthService.js, table-backed
+  // animal_health_examinations, M127). LivestockManagementPage.jsx's health
+  // tab already carries a backendNote claiming this was "fixed 2026-08-17",
+  // but these methods were never actually added here - the note was stale/
+  // aspirational, not reality. Field names match the real INSERT columns
+  // exactly. deleteExamination exists on the real service/route too but the
+  // page never wires a `remove` prop for this tab (its own note says so) -
+  // left as-is, not added speculatively.
+  listExaminations: (params) => api.get(`${UNVERSIONED_BASE}/api/animalhealth/examinations`, { params }),
+  createExamination: (data) => api.post(`${UNVERSIONED_BASE}/api/animalhealth/examinations`, data),
+  updateExamination: (id, data) => api.put(`${UNVERSIONED_BASE}/api/animalhealth/examinations/${id}`, data),
 };
 
 export const assetAccountingAPI = {
@@ -3745,16 +3757,41 @@ export const panchayatAPI = {
 export const blockManagementAPI = {
   getBlocks: () => api.get('/blocks'),
   getBlock: (id) => api.get(`/blocks/${id}`),
+  // 2026-09-17: real, mounted at /api/communitymanagement (routes/communityManagementRoutes.js
+  // -> services/legacy/communityManagementService.js, a real parameterized-SQL
+  // CRUD service over the community_blocks table). getBlocks above already
+  // existed but points to /blocks, a dead endpoint with no backend anywhere -
+  // left untouched per the append-only rule; CommunityManagementPage.jsx's
+  // block tab was repointed to listBlocks (below) instead so list+create+
+  // update+delete all hit the same real backend.
+  listBlocks: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/blocks`, { params }),
+  createBlock: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/blocks`, data),
+  updateBlock: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/blocks/${id}`, data),
+  deleteBlock: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/blocks/${id}`),
 };
 
 export const districtManagementAPI = {
   getDistricts: () => api.get('/districts'),
   getDistrict: (id) => api.get(`/districts/${id}`),
+  // 2026-09-17: same situation as blockManagementAPI above - getDistricts
+  // exists but points to a dead /districts endpoint; page repointed to
+  // listDistricts (real, /api/communitymanagement/districts).
+  listDistricts: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/districts`, { params }),
+  createDistrict: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/districts`, data),
+  updateDistrict: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/districts/${id}`, data),
+  deleteDistrict: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/districts/${id}`),
 };
 
 export const stateManagementAPI = {
   getStates: () => api.get('/states'),
   getState: (id) => api.get(`/states/${id}`),
+  // 2026-09-17: same situation as blockManagementAPI above - getStates
+  // exists but points to a dead /states endpoint; page repointed to
+  // listStates (real, /api/communitymanagement/states).
+  listStates: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/states`, { params }),
+  createState: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/states`, data),
+  updateState: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/states/${id}`, data),
+  deleteState: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/states/${id}`),
 };
 
 export const villageManagementAPI = {
@@ -3775,11 +3812,29 @@ export const cooperativeAPI = {
 export const communityAssetAPI = {
   getCommunityAssets: () => api.get('/community-assets'),
   manageCommunityAsset: (data) => api.post('/community-assets/manage', data),
+  // 2026-09-17: real, mounted at /api/communitymanagement (routes/communityManagementRoutes.js
+  // -> services/legacy/communityManagementService.js, community_assets table).
+  // CommunityManagementPage.jsx's community-asset tab calls these 4 exact
+  // names (distinct from getCommunityAssets/manageCommunityAsset above, which
+  // it never calls).
+  getAssets: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/community-assets`, { params }),
+  createAsset: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/community-assets`, data),
+  updateAsset: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/community-assets/${id}`, data),
+  deleteAsset: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/community-assets/${id}`),
 };
 
 export const producerGroupAPI = {
   getProducerGroups: () => api.get('/producer-groups'),
   createProducerGroup: (data) => api.post('/producer-groups', data),
+  // 2026-09-17: real, mounted at /api/communitymanagement (routes/communityManagementRoutes.js
+  // -> services/legacy/communityManagementService.js, producer_groups table).
+  // CommunityManagementPage.jsx's producer-group tab calls these 4 exact
+  // names (distinct from getProducerGroups/createProducerGroup above, which
+  // it never calls).
+  getGroups: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/producer-groups`, { params }),
+  createGroup: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/producer-groups`, data),
+  updateGroup: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/producer-groups/${id}`, data),
+  deleteGroup: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/producer-groups/${id}`),
 };
 
 export const auditComplianceAPI = {
@@ -4034,6 +4089,15 @@ export const farmerVerificationAPI = {
 export const fertilizerAPI = {
   getFertilizers: () => api.get('/fertilizers'),
   manageFertilizer: (data) => api.post('/fertilizers/manage', data),
+  // 2026-09-17: real, mounted at /api/fertilizer (routes/fertilizerRoutes.js
+  // -> services/legacy/fertilizerInventoryService.js, a real transactional
+  // (row-locked issue-stock flow) service over the fertilizer_inventory
+  // table). FertilizerInventoryPage.jsx calls all 5.
+  getInventory: (params) => api.get(`${UNVERSIONED_BASE}/api/fertilizer/inventory`, { params }),
+  createInventoryItem: (data) => api.post(`${UNVERSIONED_BASE}/api/fertilizer/inventory`, data),
+  updateInventoryItem: (id, data) => api.put(`${UNVERSIONED_BASE}/api/fertilizer/inventory/${id}`, data),
+  deleteInventoryItem: (id) => api.delete(`${UNVERSIONED_BASE}/api/fertilizer/inventory/${id}`),
+  issueStock: (id, data) => api.post(`${UNVERSIONED_BASE}/api/fertilizer/inventory/${id}/issue`, data),
 };
 
 export const microFarmAPI = {
@@ -5436,6 +5500,15 @@ export const regionalDevelopmentAPI = {
 export const ruralDevelopmentAPI = {
   getRuralDevelopment: () => api.get('/rural-development'),
   planRuralDevelopment: (data) => api.post('/rural-development/plan', data),
+  // 2026-09-17: real, mounted at /api/communitymanagement (routes/communityManagementRoutes.js
+  // -> services/legacy/communityManagementService.js, rural_development_projects
+  // table). CommunityManagementPage.jsx's rural-development tab calls these 4
+  // exact names (distinct from getRuralDevelopment/planRuralDevelopment above,
+  // which it never calls).
+  getProjects: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/rural-development-projects`, { params }),
+  createProject: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/rural-development-projects`, data),
+  updateProject: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/rural-development-projects/${id}`, data),
+  deleteProject: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/rural-development-projects/${id}`),
 };
 
 export const urbanDevelopmentAPI = {

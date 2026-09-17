@@ -24,17 +24,34 @@ import ResourceManager from '../components/common/ResourceManager';
  * Built as one tabbed page (third batch, 2026-08-08), matching the
  * LandManagementPage.jsx / InputSupplyManagementPage.jsx pattern.
  *
- * Panchayat and Cooperative are the two tabs with REAL backend support:
+ * Panchayat and Cooperative are two tabs with REAL backend support:
  * backend/src/routes/governanceModule.js (mounted at /api/v1/governance in
  * backend/src/index.js) exposes POST+GET /governance/panchayats and
  * POST+GET /governance/cooperatives — but no PUT/DELETE for either, so those
  * two tabs are create+list only (no `update`/`remove` passed to
  * ResourceManager, which hides the Actions column when both are absent).
- * The remaining six tabs (Block, District, State, Producer Group, Community
- * Asset, Rural Development) have no matching backend route anywhere in the
- * codebase and are wired against a conventional REST shape with a
- * backendNote. M050 is catalogued ABSENT — no trace of the capability
- * anywhere.
+ *
+ * 2026-09-17: the remaining six tabs (Block, District, State, Producer
+ * Group, Community Asset, Rural Development) turned out to have a real
+ * backend too: backend/src/services/legacy/communityManagementService.js is
+ * a parameterized-SQL CRUD service (backend/src/services/legacy/resourceCrudFactory.js)
+ * over real tables (community_blocks/community_districts/community_states/
+ * producer_groups/community_assets/rural_development_projects - see
+ * database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql),
+ * exposed at backend/src/routes/communityManagementRoutes.js (mounted at
+ * /api/communitymanagement) - it just had no routes wired to it before (the
+ * mounted file was a dead "Route operational" scaffold). All 6 tabs are now
+ * full CRUD against that real backend. Note: producerGroupAPI/
+ * communityAssetAPI/ruralDevelopmentAPI in api.js each also still carry an
+ * older, separate, still-dead placeholder method
+ * (getProducerGroups/getCommunityAssets/getRuralDevelopment) this page never
+ * calls - left alone, not part of this fix. blockManagementAPI/
+ * districtManagementAPI/stateManagementAPI similarly still carry a dead
+ * getBlocks/getDistricts/getStates each; those WERE what this page's list
+ * calls used to hit, so those three tabs were repointed to new
+ * listBlocks/listDistricts/listStates methods instead (api.js is
+ * append-only in this codebase's workflow, so the old dead methods couldn't
+ * be edited in place).
  */
 const TABS = [
   { id: 'panchayat', label: 'Panchayat', icon: Landmark },
@@ -117,14 +134,14 @@ function CommunityManagementPage() {
           accent="blue"
           queryKey="blocks"
           idField="id"
-          list={(params) => blockManagementAPI.getBlocks(params)}
+          list={(params) => blockManagementAPI.listBlocks(params)}
           create={(data) => blockManagementAPI.createBlock(data)}
           update={(id, data) => blockManagementAPI.updateBlock(id, data)}
           remove={(id) => blockManagementAPI.deleteBlock(id)}
           searchPlaceholder="Search by block name..."
           emptyMessage="No blocks recorded yet."
           newLabel="Add Block"
-          backendNote="Backend endpoint /blocks has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Backed by the real /api/communitymanagement/blocks endpoint (community_blocks table)."
           initialForm={{ name: '', district: '', state: '', bdo_name: '', notes: '' }}
           requiredFields={['name']}
           columns={[
@@ -153,14 +170,14 @@ function CommunityManagementPage() {
           accent="indigo"
           queryKey="districts"
           idField="id"
-          list={(params) => districtManagementAPI.getDistricts(params)}
+          list={(params) => districtManagementAPI.listDistricts(params)}
           create={(data) => districtManagementAPI.createDistrict(data)}
           update={(id, data) => districtManagementAPI.updateDistrict(id, data)}
           remove={(id) => districtManagementAPI.deleteDistrict(id)}
           searchPlaceholder="Search by district name..."
           emptyMessage="No districts recorded yet."
           newLabel="Add District"
-          backendNote="Backend endpoint /districts has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Backed by the real /api/communitymanagement/districts endpoint (community_districts table)."
           initialForm={{ name: '', state: '', collector_name: '', notes: '' }}
           requiredFields={['name']}
           columns={[
@@ -187,14 +204,14 @@ function CommunityManagementPage() {
           accent="purple"
           queryKey="states"
           idField="id"
-          list={(params) => stateManagementAPI.getStates(params)}
+          list={(params) => stateManagementAPI.listStates(params)}
           create={(data) => stateManagementAPI.createState(data)}
           update={(id, data) => stateManagementAPI.updateState(id, data)}
           remove={(id) => stateManagementAPI.deleteState(id)}
           searchPlaceholder="Search by state name..."
           emptyMessage="No states recorded yet."
           newLabel="Add State"
-          backendNote="Backend endpoint /states has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Backed by the real /api/communitymanagement/states endpoint (community_states table)."
           initialForm={{ name: '', region: '', capital: '', notes: '' }}
           requiredFields={['name']}
           columns={[
@@ -262,7 +279,7 @@ function CommunityManagementPage() {
           searchPlaceholder="Search by group name..."
           emptyMessage="No producer groups recorded yet."
           newLabel="Add Producer Group"
-          backendNote="Backend endpoint /producer-groups has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Backed by the real /api/communitymanagement/producer-groups endpoint (producer_groups table)."
           initialForm={{ name: '', commodity_focus: '', member_count: '', village: '', notes: '' }}
           requiredFields={['name']}
           columns={[
@@ -298,7 +315,7 @@ function CommunityManagementPage() {
           searchPlaceholder="Search by asset name or village..."
           emptyMessage="No community assets recorded yet."
           newLabel="Add Community Asset"
-          backendNote="Backend endpoint /community-assets has not been built yet — this tab is wired and ready to work once it is."
+          backendNote="Backed by the real /api/communitymanagement/community-assets endpoint (community_assets table)."
           initialForm={{ name: '', asset_type: 'Community Hall', village: '', condition: '', notes: '' }}
           requiredFields={['name', 'asset_type']}
           columns={[
@@ -334,7 +351,7 @@ function CommunityManagementPage() {
           searchPlaceholder="Search by project name or village..."
           emptyMessage="No rural development projects recorded yet."
           newLabel="Add Project"
-          backendNote="Backend endpoint /rural-development/projects has not been built yet — this tab is wired and ready to work once it is. No prior evidence of this capability anywhere in the codebase (catalogued ABSENT)."
+          backendNote="Backed by the real /api/communitymanagement/rural-development-projects endpoint (rural_development_projects table)."
           initialForm={{ project_name: '', village: '', budget: '', status: 'Proposed', start_date: '', notes: '' }}
           requiredFields={['project_name']}
           columns={[
