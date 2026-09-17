@@ -4112,6 +4112,17 @@ export const surveyManagementAPI = {
 export const dairyAIAPI = {
   getDairyAI: () => api.get('/dairy-ai'),
   analyzeDairy: (data) => api.post('/dairy-ai/analyze', data),
+  // 2026-09-17: real, mounted at /api/dairy (routes/dairyRoutes.js ->
+  // services/legacy/dairyService.js, table-backed dairy_animals/
+  // dairy_milk_records with a real AI-backbone call). DairyManagementPage.jsx
+  // calls all 4. See routes/dairyRoutes.js's comment for a flagged, pre-
+  // existing caveat: 2 of these embed a fully hardcoded "feed composition"
+  // estimate into the AI's prompt input (not returned to the frontend
+  // directly) - not fixed here, just carried over honestly.
+  optimizeMilkProduction: (animalId) => api.post(`${UNVERSIONED_BASE}/api/dairy/ai/optimize-milk-production`, { animalId }),
+  predictHealthRisks: (animalId) => api.post(`${UNVERSIONED_BASE}/api/dairy/ai/predict-health-risks`, { animalId }),
+  optimizeFeedComposition: (animalId, options) => api.post(`${UNVERSIONED_BASE}/api/dairy/ai/optimize-feed-composition`, { animalId, productionGoal: options?.productionGoal }),
+  recommendBreeding: (animalId) => api.post(`${UNVERSIONED_BASE}/api/dairy/ai/recommend-breeding`, { animalId }),
 };
 
 // Additional missing exports
@@ -6175,6 +6186,17 @@ export const blockchainVerificationAPI = {
 export const bulkOrderAPI = {
   getBulkOrders: () => api.get('/bulk-orders'),
   createBulkOrder: (data) => api.post('/bulk-orders', data),
+  // 2026-09-17: real, mounted at /api/bulkorder (routes/bulkOrderRoutes.js
+  // -> controllers/bulkOrderController.js -> services/legacy/bulkOrderService.js).
+  // BulkOrderPage.jsx calls all 5. Note: createBulkOrder/getBulkOrders above
+  // point at a separate, dead /bulk-orders (hyphenated, versioned) path -
+  // pre-existing, out of scope for this fix (not on the missing-method
+  // list), flagged here rather than silently left for the next pass.
+  getUserBulkOrders: (userId) => api.get(`${UNVERSIONED_BASE}/api/bulkorder/user/${userId}`),
+  getBulkOrder: (orderId) => api.get(`${UNVERSIONED_BASE}/api/bulkorder/${orderId}`),
+  getBulkOrderQuotations: (orderId) => api.get(`${UNVERSIONED_BASE}/api/bulkorder/${orderId}/quotations`),
+  acceptQuotation: (quotationId, data) => api.post(`${UNVERSIONED_BASE}/api/bulkorder/quotations/${quotationId}/accept`, data),
+  cancelBulkOrder: (orderId, data) => api.post(`${UNVERSIONED_BASE}/api/bulkorder/${orderId}/cancel`, data),
 };
 
 export const caAPI = {
