@@ -22,6 +22,7 @@ churn on.
 
 | Agent | Files / Area | Started | Notes |
 |---|---|---|---|
+| Claude (PR #21) | `frontend/src/services/api.js` (append-only); `backend/src/index.js` (append mounts only, if needed); a handful of specific frontend pages: `ClimateWeatherPage.jsx`, `WeatherAnalyticsPage.jsx`, `MarketSignalsPage.jsx`, `WalletPage.jsx`, `InsuranceManagementPage.jsx`, `RfqPage.jsx`, `FarmerKycPage.jsx`, `FarmerVerificationPage.jsx` | 2026-09-16 | Continuing the escrowAPI-class scan with a loosened filter (3-5 missing methods instead of 1-2) - prioritizing continuations of already-verified-real backends (weatherAPI, civilDisruptionAPI) plus a few standalone promising candidates. Not touching the ~35 remaining candidates that look like generic CRUD "management" pages (block/district/state/producer-group admin) - those look like genuine unbuilt admin features, not wiring bugs, pending individual confirmation. |
 | _(empty — add yours above this line)_ | | | |
 
 ## Shared Files — Claim By Section, Not Whole File
