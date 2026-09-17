@@ -7,6 +7,13 @@ import ActionCard from '../components/common/ActionCard';
  * services/legacy/realtimeMonitoringService.js. All 5 methods verified to
  * exist (2026-08-29). In-memory resource monitoring/alerting engine,
  * platform-staff only. Action-oriented, ActionCard pattern.
+ *
+ * 2026-09-17: that verification checked the real service, not this page's
+ * own api.js client - realtimeMonitoringAPI never actually had these
+ * methods added, so every action here threw "is not a function". Now wired
+ * for real ("Start Monitoring" calls startResourceMonitor, since the
+ * api.js key `startMonitoring` was already taken by an older, dead
+ * placeholder method with a different signature).
  */
 function RealtimeMonitoringPage() {
   return (
@@ -26,7 +33,7 @@ function RealtimeMonitoringPage() {
         hasJsonPayload
         jsonLabel="Monitor config (JSON)"
         jsonPlaceholder='{"intervalMs": 30000, "threshold": 80}'
-        onRun={(v, payload) => realtimeMonitoringAPI.startMonitoring(v.resourceId, payload)}
+        onRun={(v, payload) => realtimeMonitoringAPI.startResourceMonitor(v.resourceId, payload)}
       />
       <ActionCard
         title="Get All Monitors"

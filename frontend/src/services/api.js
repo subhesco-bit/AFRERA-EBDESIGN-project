@@ -2314,6 +2314,15 @@ export const farmAnalyticsAPI = {
 export const experienceAPI = {
   getExperiences: () => api.get('/experience'),
   addExperience: (data) => api.post('/experience/add', data),
+  // 2026-09-17: real, already mounted at /api/experience (unversioned -
+  // routes/experienceRoutes.js -> services/legacy/experienceLayerService.js,
+  // a complete, real design-system/DXP backend, fully routed already, just
+  // never called from the frontend). ExperienceLayerPage.jsx calls all 5.
+  themes: () => api.get(`${UNVERSIONED_BASE}/api/experience/themes`),
+  motion: (reduced) => api.get(`${UNVERSIONED_BASE}/api/experience/motion`, { params: { reduced } }),
+  components: (params) => api.get(`${UNVERSIONED_BASE}/api/experience/components`, { params }),
+  accessibility: () => api.get(`${UNVERSIONED_BASE}/api/experience/accessibility`),
+  contrast: (fg, bg, large) => api.get(`${UNVERSIONED_BASE}/api/experience/contrast`, { params: { fg, bg, large } }),
 };
 
 // 2026-09-16: was { getEscrows, createEscrow } - unused by the one live
@@ -2410,6 +2419,16 @@ export const ecommerceIntegrationAPI = {
 export const ecommerceERPAPI = {
   getEcommerceERP: () => api.get('/ecommerce-erp'),
   configureERP: (data) => api.put('/ecommerce-erp/configure', data),
+  // 2026-09-17: real, already mounted at /api/ecommerceerp (routes/ecommerceERPRoutes_merged.js
+  // -> controllers/ecommerceERPController.js -> services/legacy/ecommerceERPService.js).
+  // ERPDashboard.jsx calls all 5 (a separate, unrelated in-memory scaffold
+  // also exists at routes/commerce/ecommerceERPRoutes.js, but nothing
+  // mounts it - not used here).
+  postToGeneralLedger: (transactionData) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/post-gl`, transactionData),
+  generateGSTInvoice: (orderId) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/generate-gst-invoice/${orderId}`),
+  syncInventoryWithERP: (productId) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/sync-inventory/${productId}`),
+  syncCustomerWithCRM: (userId) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/sync-customer/${userId}`),
+  createProductionOrder: (data) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/create-production-order`, data),
 };
 
 export const dprGenerationAPI = {
@@ -2803,6 +2822,15 @@ export const returnLoadBoardAPI = {
 export const researchAndDevelopmentAPI = {
   getRAndD: () => api.get('/research-and-development'),
   createResearch: (data) => api.post('/research-and-development', data),
+  // 2026-09-17: real, mounted at /api/researchanddevelopment (routes/researchAndDevelopmentRoutes.js
+  // -> services/legacy/researchAndDevelopmentService.js, a real in-memory
+  // R&D management service, not fabricated - see that route file's comment).
+  // ResearchDashboardPage.jsx calls all 5.
+  getRDProjects: (filters) => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/projects`, { params: filters }),
+  getCollaborations: (filters) => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/collaborations`, { params: filters }),
+  getInnovations: (filters) => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/innovations`, { params: filters }),
+  getRDAnalytics: () => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/analytics`),
+  searchKnowledgeBase: (query, filters) => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/knowledge-base`, { params: { q: query, ...filters } }),
 };
 
 export const regionalVarietyAPI = {
@@ -2823,6 +2851,18 @@ export const recoveredFinanceAPI = {
 export const realtimeMonitoringAPI = {
   getRealtimeMonitoring: () => api.get('/realtime-monitoring'),
   startMonitoring: (data) => api.post('/realtime-monitoring/start', data),
+  // 2026-09-17: real, mounted at /api/realtimemonitoring (routes/realtimeMonitoringRoutes.js
+  // -> services/legacy/realtimeMonitoringService.js, a real in-memory
+  // monitor registry - not fabricated telemetry, see that file's own
+  // comment on collectMetric). RealtimeMonitoringPage.jsx calls all 5;
+  // startMonitoring is exposed here as startResourceMonitor since the key
+  // `startMonitoring` above already points at a dead placeholder endpoint
+  // with a different (single-arg) signature.
+  startResourceMonitor: (resourceId, config) => api.post(`${UNVERSIONED_BASE}/api/realtimemonitoring/monitor/start`, { resourceId, ...config }),
+  getAllMonitors: () => api.get(`${UNVERSIONED_BASE}/api/realtimemonitoring/monitor`),
+  getMonitoringStatus: (id) => api.get(`${UNVERSIONED_BASE}/api/realtimemonitoring/monitor/${id}`),
+  stopMonitoring: (id) => api.delete(`${UNVERSIONED_BASE}/api/realtimemonitoring/monitor/${id}`),
+  healthCheck: () => api.get(`${UNVERSIONED_BASE}/api/realtimemonitoring/engine-health`),
 };
 
 export const qualityAssuranceAPI = {
