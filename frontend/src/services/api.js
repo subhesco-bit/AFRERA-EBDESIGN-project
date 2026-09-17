@@ -986,6 +986,26 @@ export const companyAPI = {
 export const authorizationAPI = {
   getAuthorizations: () => api.get('/authorization'),
   checkAuthorization: (data) => api.post('/authorization/check', data),
+  // 2026-09-17: getUsers/updateUserRole are real, mounted at
+  // /api/v1/user-management (modules/M011/routes.js -> modules/M011/service.js,
+  // table-backed `users`). GET responds {success, data: {users, pagination}},
+  // reshaped here to a plain array to match AuthorizationPage.jsx's own
+  // `res.data?.data ?? []` unwrap (which expects the array directly).
+  // getAuditLog reuses the real, already-wired M008 audit log endpoint
+  // (auditComplianceAPI.getAuditLogs's backend) - same real audit_logs
+  // table, no separate "authorization audit" concept exists or was
+  // invented. getRoles is deliberately NOT wired: the page needs
+  // [{role, permissions}] mirroring authService.js's hardcoded
+  // getUserPermissions() role map, but that function isn't exported from
+  // authService.js and this session treats authorization logic as
+  // do-not-modify - building a duplicate copy of that map elsewhere would
+  // risk silently drifting from the real enforced permissions, which is
+  // worse than the page's existing, explicitly-labelled fallback (the page
+  // already shows the identical FALLBACK_ROLES catalogue on error, so nothing
+  // is broken by leaving this one unwired).
+  getUsers: () => api.get('/user-management').then((res) => ({ ...res, data: { ...res.data, data: res.data?.data?.users ?? [] } })),
+  updateUserRole: (userId, data) => api.put(`/user-management/${userId}`, data),
+  getAuditLog: (params) => api.get('/audit-compliance/logs', { params }),
 };
 
 export const ecommerceBusinessSalesAPI = {
@@ -2324,6 +2344,14 @@ export const enterpriseRouteSupportAPI = {
 export const enterpriseIntegrationAPI = {
   getEnterpriseIntegration: () => api.get('/enterprise-integration'),
   integrateEnterprise: (data) => api.post('/enterprise-integration/integrate', data),
+  // 2026-09-17: real, mounted at /api/enterpriseintegration (routes/enterpriseIntegrationRoutes.js
+  // -> services/enterpriseIntegrationService.js, table-backed
+  // enterprise_integrations/integration_sync_logs). EnterpriseIntegrationPage.jsx
+  // calls both. getSystemStatus deliberately NOT added - see the route
+  // file's comment for why (no real backend match, would mean fabricating
+  // a summary).
+  getCurrentOrganizationIntegrations: () => api.get(`${UNVERSIONED_BASE}/api/enterpriseintegration/organizations/current`),
+  getIntegrationHealth: (integrationId) => api.get(`${UNVERSIONED_BASE}/api/enterpriseintegration/${integrationId}/health`),
 };
 
 export const enterpriseAIAPI = {
@@ -2334,6 +2362,23 @@ export const enterpriseAIAPI = {
 export const engineeringProjectAPI = {
   getEngineeringProjects: () => api.get('/engineering-project'),
   createProject: (data) => api.post('/engineering-project', data),
+  // 2026-09-17: real, mounted at /api/engineeringproject (routes/engineeringProjectRoutes.js
+  // -> services/legacy/engineeringProjectService.js, table-backed
+  // engineering_projects/boq_items/cost_estimates). EngineeringProjectPage.jsx's
+  // own header comment already claimed all 6 methods were "verified to
+  // exist on the service export (2026-08-29)" - true of the service, but
+  // api.js itself was never actually updated to add them, so every call
+  // threw "is not a function" regardless. createProject above already
+  // existed under this exact name pointing at a dead /engineering-project
+  // endpoint, so the real one is named createEngineeringProject instead and
+  // the page's call site updated to match (api.js is append-only, can't
+  // redefine the existing key).
+  createEngineeringProject: (data) => api.post(`${UNVERSIONED_BASE}/api/engineeringproject/projects`, data),
+  listProjects: (params) => api.get(`${UNVERSIONED_BASE}/api/engineeringproject/projects`, { params }),
+  getProject: (id) => api.get(`${UNVERSIONED_BASE}/api/engineeringproject/projects/${id}`),
+  updateProjectPhase: (id, data) => api.put(`${UNVERSIONED_BASE}/api/engineeringproject/projects/${id}/phase`, data),
+  createCostEstimate: (id, data) => api.post(`${UNVERSIONED_BASE}/api/engineeringproject/projects/${id}/cost-estimates`, data),
+  getCostEstimates: (id) => api.get(`${UNVERSIONED_BASE}/api/engineeringproject/projects/${id}/cost-estimates`),
 };
 
 export const energyAPI = {
