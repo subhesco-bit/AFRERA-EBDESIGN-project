@@ -199,6 +199,26 @@ async function getEscrowTransaction(escrowId) {
 }
 
 /**
+ * Get all escrow transactions
+ * 2026-09-16: added for EscrowPage.jsx's admin-overview list - the file
+ * previously only had per-order/per-user lookups, no platform-wide list,
+ * which is what that page (and no other endpoint) needs. Same shape/style
+ * as getEscrowByOrder below, same real table.
+ */
+async function getAllEscrowTransactions() {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM escrow_transactions ORDER BY created_at DESC',
+    );
+
+    return result.rows;
+  } catch (error) {
+    logger.error('Error getting all escrow transactions', { error: error.message });
+    throw error;
+  }
+}
+
+/**
  * Get escrow transactions by order
  */
 async function getEscrowByOrder(orderId) {
@@ -265,6 +285,16 @@ function verifyCondition(condition, data) {
  * Setup Express routes
  */
 function setupRoutes(app) {
+  // List all escrow transactions
+  app.get('/api/v1/escrow', async (req, res) => {
+    try {
+      const escrows = await getAllEscrowTransactions();
+      res.json({ success: true, data: escrows });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   // Create escrow transaction
   app.post('/api/v1/escrow', async (req, res) => {
     try {
@@ -332,6 +362,7 @@ module.exports = {
   releaseEscrowFunds,
   refundEscrowFunds,
   getEscrowTransaction,
+  getAllEscrowTransactions,
   getEscrowByOrder,
   getUserEscrowTransactions,
   setupRoutes,

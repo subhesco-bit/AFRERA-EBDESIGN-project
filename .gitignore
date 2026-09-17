@@ -42,3 +42,8 @@ FileAuditIndex.csv
 # it is project source, and the nested worktree would break `git add` if
 # ever swept in. ~2.1GB. Ignored, not deleted.
 New folder/
+
+# Throwaway investigation scripts written during a live debugging session
+# (e.g. one-off route-mount probes) - never deliverable code, deleted once
+# the investigation they support is done.
+backend/src/__scratch__/

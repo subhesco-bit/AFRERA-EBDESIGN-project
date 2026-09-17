@@ -2,25 +2,56 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
+// 2026-09-15: never mounted anywhere, and had the same silent
+// route-registration bug as seedVaultRoutes_merged.js/etc (a lone CR
+// where handle()'s closing brace should have been - see that file's own
+// header comment) - fixed, and mounted for the first time.
+const labourRoutes = require('./routes/labourRoutes.js');
+
+// 2026-09-15: real, 566-line, 23-route server provisioning/monitoring/
+// scaling/backup implementation, never mounted anywhere (the only other
+// file with this name, routes/platform/serverManagementRoutes.js, is a
+// 39-line generic CRUD placeholder, also unmounted). Had no auth middleware
+// at all - added authMiddleware + adminMiddleware inside the file itself,
+// matching every other admin-infrastructure route in this codebase, before
+// mounting it (see that file's own header comment for the full reasoning).
+const serverManagementRoutes = require('./routes/serverManagementRoutes_merged.js');
+
+// routes/index.js is a module exporter, not a router (see the "don't mount
+// it" comment near the old `app.use('/api/index', index)` line below) - the
+// `index` binding here is unused, just still-present dead code.
 const index = require('./routes/index.js');
 const devinRoutes = require('./routes/devinRoutes');
 const yieldManagement = require('./routes/yieldManagement.js');
-const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
-const weatherRoutes = require('./routes/weatherRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. wikipediaRoutes_merged.js
+// is a real Wikipedia lookup/summary implementation with its own router.
+const wikipediaRoutes = require('./routes/wikipediaRoutes_merged.js');
+// 2026-09-16: was require('./routes/weatherRoutes.js'), a 38-line
+// 'Route operational' scaffold. weatherRoutes_merged.js is the real
+// implementation over services/legacy/weatherService.js (real
+// Postgres-backed observations/forecasts/alerts) - it existed all along
+// but couldn't be require()'d: it depends on 9 request-validation
+// helpers from climateRouteSupport.js that never existed until now
+// (that file was itself a 12-line placeholder). Both fixed together;
+// swapped to the real router at the same /api/weather mount.
+const weatherRoutes = require('./routes/weatherRoutes_merged.js');
 const weatherAdvisory = require('./routes/weatherAdvisory.js');
 const wearableIntegrationRoutes = require('./routes/wearableIntegrationRoutes.js');
 const waterManagementRoutes = require('./routes/waterManagementRoutes.js');
 const warehouseManagement = require('./routes/warehouseManagement.js');
 const walletRoutes = require('./routes/walletRoutes.js');
 const vr = require('./routes/vr.js');
-const visionRoutes = require('./routes/visionRoutes.js');
+const visionRoutes = require('./routes/visionRoutes_merged.js');
 const videoAnalytics = require('./routes/videoAnalytics.js');
 const vendorRoutes = require('./routes/vendorRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
-const unifiedAIRoutes = require('./routes/unifiedAIRoutes.js');
+const unifiedAIRoutes = require('./routes/unifiedAIRoutes_merged.js');
 const unifiedAIGateway = require('./routes/unifiedAIGateway.js');
 const transactionRoutes = require('./routes/transactionRoutes.js');
-const trackDartRoutes = require('./routes/trackDartRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. trackDartRoutes_merged.js
+// is a real multi-key shipment-tracking implementation that used to throw a
+// missing-brace bug (see that file's own header comment) - now fixed.
+const trackDartRoutes = require('./routes/trackDartRoutes_merged.js');
 const tenantManagementRoutes = require('./routes/tenantManagementRoutes.js');
 const systemAdministrationRoutes = require('./routes/systemAdministrationRoutes.js');
 const supplyChainTracking = require('./routes/supplyChainTracking.js');
@@ -29,25 +60,35 @@ const supplyChainDecisionRoutes = require('./routes/supplyChainDecisionRoutes.js
 const subscriptions = require('./routes/subscriptions.js');
 const soilManagementRoutes = require('./routes/soilManagementRoutes.js');
 const soilHealth = require('./routes/soilHealth.js');
-const sheepRoutes = require('./routes/sheepRoutes.js');
+// 2026-09-15: was a 38-line scaffold. sheepRoutes_merged.js is the real,
+// Postgres-backed herd/milk/feed/breeding/vaccination implementation - it
+// used to throw "protectLivestockRouter is not a function" at load time
+// (see the file itself for the full writeup), now fixed the same way
+// goatRoutes.js/animalHealthRoutes.js already fixed the identical bug.
+const sheepRoutes = require('./routes/sheepRoutes_merged.js');
 const sellerVerifications = require('./routes/sellerVerifications.js');
 const sellerRankingRoutes = require('./routes/sellerRankingRoutes.js');
-const seedVaultRoutes = require('./routes/seedVaultRoutes.js');
+const seedVaultRoutes = require('./routes/seedVaultRoutes_merged.js');
 const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes.js');
 const roleManagementRoutes = require('./routes/roleManagementRoutes.js');
-const riskPricingRoutes = require('./routes/riskPricingRoutes.js');
+const riskPricingRoutes = require('./routes/riskPricingRoutes_merged.js');
 const riskAssessment = require('./routes/riskAssessment.js');
-const rfqRoutes = require('./routes/rfqRoutes.js');
+// 2026-09-15: was a 38-line scaffold. rfqRoutes_merged.js is the real
+// RFQ/quote/QC-hold/FPO-cost-centre implementation - same
+// protectRouter()-is-not-a-function bug as sheepRoutes_merged.js, now fixed.
+const rfqRoutes = require('./routes/rfqRoutes_merged.js');
 const revenueRoutes = require('./routes/revenueRoutes.js');
 const returnLoadBoardRoutes = require('./routes/returnLoadBoardRoutes.js');
 const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes.js');
-const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes.js');
+const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes_merged.js');
 const neVarietiesRoutes = require('./routes/neVarietiesRoutes.js');
-const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes.js');
+const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes_merged.js');
 const realtimeMonitoringRoutes = require('./routes/realtimeMonitoringRoutes.js');
 const qualityAssurance = require('./routes/qualityAssurance.js');
-const projectSystemsRoutes = require('./routes/projectSystemsRoutes.js');
-const productRoutes = require('./routes/productRoutes.js');
+const projectSystemsRoutes = require('./routes/projectSystemsRoutes_merged.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. services/legacy/productService.js
+// is a real, Postgres-backed product CRUD + search implementation with its own router.
+const { router: productRoutes } = require('./services/legacy/productService.js');
 const productReviewRoutes = require('./routes/productReviewRoutes.js');
 const productMediaAIRoutes = require('./routes/productMediaAIRoutes.js');
 const publicDataRoutes = require('./routes/publicDataRoutes.js');
@@ -55,12 +96,21 @@ const productCertifications = require('./routes/productCertifications.js');
 const priceForecasting = require('./routes/priceForecasting.js');
 const preventiveMaintenanceRoutes = require('./routes/preventiveMaintenanceRoutes.js');
 const predictiveIntelligenceRoutes = require('./routes/predictiveIntelligenceRoutes.js');
-const predictiveAnalytics = require('./routes/predictiveAnalytics.js');
-const poultryRoutes = require('./routes/poultryRoutes.js');
+// 2026-09-15: was an explicit 'Placeholder route module' (health check only).
+// services/legacy/predictiveAnalyticsService.js is a real predictive-models/
+// forecasts/alerts implementation with its own router.
+const { router: predictiveAnalytics } = require('./services/legacy/predictiveAnalyticsService.js');
+// 2026-09-15: was a 38-line scaffold. poultryRoutes_merged.js is the real
+// implementation - same protectLivestockRouter()-is-not-a-function bug as
+// sheepRoutes_merged.js, now fixed.
+const poultryRoutes = require('./routes/poultryRoutes_merged.js');
 const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes.js');
-const platformCoreRoutes = require('./routes/platformCoreRoutes.js');
+const platformCoreRoutes = require('./routes/platformCoreRoutes_merged.js');
 const platformConfigurationRoutes = require('./routes/platformConfigurationRoutes.js');
-const pigRoutes = require('./routes/pigRoutes.js');
+// 2026-09-15: was a 38-line scaffold. pigRoutes_merged.js is the real
+// implementation - same protectLivestockRouter()-is-not-a-function bug as
+// sheepRoutes_merged.js, now fixed.
+const pigRoutes = require('./routes/pigRoutes_merged.js');
 const phase9 = require('./routes/phase9.js');
 const phase8 = require('./routes/phase8.js');
 const phase12 = require('./routes/phase12.js');
@@ -69,33 +119,112 @@ const phase10 = require('./routes/phase10.js');
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const paymentGatewayRoutes = require('./routes/paymentGatewayRoutes.js');
 const ORPHANED_SERVICES_MOUNT = require('./routes/ORPHANED_SERVICES_MOUNT.js');
-const organizationManagementRoutes = require('./routes/organizationManagementRoutes.js');
-const orderRoutes = require('./routes/orderRoutes.js');
+// 2026-09-16: was a 38-line 'Route operational' scaffold (POST / + GET
+// /health only). routes/platform/organizationManagementRoutes_merged.js
+// is a real in-memory CRUD implementation (GET/:id, POST, PUT/:id,
+// DELETE/:id) matching organizationManagementAPI's real needs
+// (getAllOrganizations/createOrganization/deleteOrganization) - was
+// never require()'d anywhere until now.
+const organizationManagementRoutes = require('./routes/platform/organizationManagementRoutes_merged.js');
+// 2026-09-15: was require('./routes/orderRoutes.js'), a 38-line scaffold
+// whose POST / just returned {message: 'Route operational'} with no real
+// order ever created. services/legacy/orderService.js is a real,
+// Postgres-backed cart/order/payment implementation (real stock checks,
+// real per-item GST via gstService) with its own router that was never
+// wired to a live mount - swapped to use the real one.
+const { router: orderRoutes } = require('./services/legacy/orderService.js');
 const operationsRouteSupport = require('./routes/operationsRouteSupport.js');
 const operationsManagementRoutes = require('./routes/operationsManagementRoutes.js');
 const nutritionIntelligenceRoutes = require('./routes/nutritionIntelligenceRoutes.js');
-const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes.js');
+const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes_merged.js');
 const nlp = require('./routes/nlp.js');
-const nervousSystemRoutes = require('./routes/nervousSystemRoutes.js');
+const nervousSystemRoutes = require('./routes/nervousSystemRoutes_merged.js');
 const mlOptimization = require('./routes/mlOptimization.js');
-const marketplaceEnhancements = require('./routes/marketplaceEnhancements.js');
+// 2026-09-15: was never mounted anywhere. services/legacy/multilingualService.js
+// is a real, 821-line, Postgres-backed service (language detection,
+// translation, content translations, user language preferences,
+// pronunciation guides) with its own router that nothing ever wired in -
+// found investigating why MultilingualProvider.jsx's calls all failed.
+const { router: multilingualRoutes } = require('./services/legacy/multilingualService.js');
+// 2026-09-15: batch-mounted 38 real, previously-unmounted services/legacy/*.js
+// implementations discovered via a systematic sweep (each confirmed to load
+// cleanly and export a real router before being added here) - see
+// .ai/tasks/2026-09-15-nextgen-vision-todo.md for the full investigation.
+const { router: advancedAIRoutesNewlyMounted } = require('./services/legacy/advancedAIService.js');
+const { router: aiCopilotRoutesNewlyMounted } = require('./services/legacy/aiCopilotService.js');
+const { router: arVrRoutesNewlyMounted } = require('./services/legacy/arVrService.js');
+const { router: biodiversityRoutesNewlyMounted } = require('./services/legacy/biodiversityService.js');
+const { router: blockchainTraceabilityRoutesNewlyMounted } = require('./services/legacy/blockchainTraceabilityService.js');
+const { router: catalogIntelligenceRoutesNewlyMounted } = require('./services/legacy/catalogIntelligenceService.js');
+const { router: commerceRulesRoutesNewlyMounted } = require('./services/legacy/commerceRulesService.js');
+const { router: consumerHealthRoutesNewlyMounted } = require('./services/legacy/consumerHealthService.js');
+const { router: conversationalAIRoutesNewlyMounted } = require('./services/legacy/conversationalAIService.js');
+// Three more real, unmounted, non-duplicate services found at services/
+// root level (not services/legacy/) via the same sweep - none exist under
+// legacy/ under any name, so these are genuinely unique, not the
+// root/legacy duplication pattern seen elsewhere (e.g. productService.js
+// at both levels, where the root copy is a stale duplicate - NOT mounted).
+// advancedMedicalCodingService.js has a confirmed real frontend consumer:
+// pages/AdvancedMedicalCodingPage.jsx calls api.get('/advanced-medical-coding/...')
+// against the /api/v1-based `api` instance.
+const { router: advancedMedicalCodingRoutesNewlyMounted } = require('./services/advancedMedicalCodingService.js');
+const { router: advancedVoiceAIRoutesNewlyMounted } = require('./services/advancedVoiceAI.js');
+const { router: clinicalNutritionRoutesNewlyMounted } = require('./services/clinicalNutritionDecisionSupportService.js');
+// custodyEventRoutes.js deliberately NOT added here: unlike the other 40
+// services below, its filename matches /Routes\.js$/i, so it's already
+// auto-discovered and mounted at runtime by index.js's own
+// discoverServiceEmbeddedRoutes() (core/dynamicRouteLoader.js) - adding
+// it again here would just create a second, redundant mount.
+const { router: digitalProductPassportRoutesNewlyMounted } = require('./services/legacy/digitalProductPassportService.js');
+const { router: enterpriseControlRoutesNewlyMounted } = require('./services/legacy/enterpriseControlService.js');
+const { router: enterpriseMemoryRoutesNewlyMounted } = require('./services/legacy/enterpriseMemoryService.js');
+const { router: erpRoutesNewlyMounted } = require('./services/legacy/erpService.js');
+const { router: financialRoutesNewlyMounted } = require('./services/legacy/financialService.js');
+const { router: foodIntelligenceRoutesNewlyMounted } = require('./services/legacy/foodIntelligenceService.js');
+const { router: foodSafetyRoutesNewlyMounted } = require('./services/legacy/foodSafetyService.js');
+const { router: formRoutesNewlyMounted } = require('./services/legacy/formService.js');
+const { router: giIntelligenceRoutesNewlyMounted } = require('./services/legacy/giIntelligenceService.js');
+const { router: indigenousKnowledgeRoutesNewlyMounted } = require('./services/legacy/indigenousKnowledgeService.js');
+const { router: institutionalProcurementRoutesNewlyMounted } = require('./services/legacy/institutionalProcurementService.js');
+const { router: insuranceRoutesNewlyMounted } = require('./services/legacy/insuranceService.js');
+const { router: knowledgeGraphRoutesNewlyMounted } = require('./services/legacy/knowledgeGraphService.js');
+const { router: laboratoryERPRoutesNewlyMounted } = require('./services/legacy/laboratoryERPService.js');
+const { router: logisticsRoutesNewlyMounted } = require('./services/legacy/logisticsService.js');
+const { router: merchandisingRoutesNewlyMounted } = require('./services/legacy/merchandisingService.js');
+const { router: millCircuitRoutesNewlyMounted } = require('./services/legacy/millCircuitService.js');
+const { router: moduleCatalogRoutesNewlyMounted } = require('./services/legacy/moduleCatalogService.js');
+const { router: neProductIntelligenceRoutesNewlyMounted } = require('./services/legacy/neProductIntelligenceService.js');
+const { router: offlinePaymentRoutesNewlyMounted } = require('./services/legacy/offlinePaymentService.js');
+const { router: offlineSyncRoutesNewlyMounted } = require('./services/legacy/offlineSyncService.js');
+const { router: omnichannelAIRoutesNewlyMounted } = require('./services/legacy/omnichannelAIService.js');
+const { router: organicTraceabilityRoutesNewlyMounted } = require('./services/legacy/organicTraceabilityService.js');
+const { router: recipeIntelligenceRoutesNewlyMounted } = require('./services/legacy/recipeIntelligenceService.js');
+const { router: shelfLifeRoutesNewlyMounted } = require('./services/legacy/shelfLifeService.js');
+const { router: smsAuthRoutesNewlyMounted } = require('./services/legacy/smsAuthService.js');
+const { router: v42IntelligenceRoutesNewlyMounted } = require('./services/legacy/v42IntelligenceService.js');
+const { router: valueCommerceRoutesNewlyMounted } = require('./services/legacy/valueCommerceService.js');
+const { router: voiceAIRoutesNewlyMounted } = require('./services/legacy/voiceAIService.js');
+const { router: whatsappRoutesNewlyMounted } = require('./services/legacy/whatsappService.js');
+const marketplaceEnhancements = require('./routes/marketplaceEnhancements_merged.js');
 const marketDataRoutes = require('./routes/marketDataRoutes.js');
 const marketAnalytics = require('./routes/marketAnalytics.js');
 const m400AiBackboneRoutes = require('./routes/m400AiBackboneRoutes.js');
-const logisticsEnhancements = require('./routes/logisticsEnhancements.js');
+const logisticsEnhancements = require('./routes/logisticsEnhancements_merged.js');
 const logisticsEnhancementRoutes = require('./routes/logisticsEnhancementRoutes.js');
 const loanManagement = require('./routes/loanManagement.js');
 const livestockRouteSupport = require('./routes/livestockRouteSupport.js');
 const livestockManagementRoutes = require('./routes/livestockManagementRoutes.js');
 const livestock = require('./routes/livestock.js');
-const libraryRoutes = require('./routes/libraryRoutes.js');
+const libraryRoutes = require('./routes/libraryRoutes_merged.js');
 const landRecordsRoutes = require('./routes/landRecordsRoutes.js');
 const landManagementRoutes = require('./routes/landManagementRoutes.js');
 const knowledgeRoutes = require('./routes/knowledgeRoutes.js');
 const irrigationManagementRoutes = require('./routes/irrigationManagementRoutes.js');
 const iotSensors = require('./routes/iotSensors.js');
-const iotIntegrationRoutes = require('./routes/iotIntegrationRoutes.js');
-const insuranceEnhancements = require('./routes/insuranceEnhancements.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. services/legacy/iotIntegrationService.js
+// is a real device/sensor/alert implementation with its own router.
+const { router: iotIntegrationRoutes } = require('./services/legacy/iotIntegrationService.js');
+const insuranceEnhancements = require('./routes/insuranceEnhancements_merged.js');
 const inputSupplyManagementRoutes = require('./routes/inputSupplyManagementRoutes.js');
 const informationSharingRoutes = require('./routes/informationSharingRoutes.js');
 const identityManagementRoutes = require('./routes/identityManagementRoutes.js');
@@ -104,22 +233,92 @@ const horticultureManagementRoutes = require('./routes/horticultureManagementRou
 const horticulture = require('./routes/horticulture.js');
 const gstRoutes = require('./routes/gstRoutes.js');
 const greenhouse = require('./routes/greenhouse.js');
-const governanceModule = require('./routes/governanceModule.js');
+// 2026-09-15: was a 20-line 'Placeholder route module' scaffold.
+// platform/governanceModule_merged.js is a real 245-line, 24-route village/
+// panchayat/CSR/compliance/cooperative implementation that used to throw
+// "Route.post() requires a callback function but got a [object Undefined]"
+// (an authRateLimit import that middleware/rateLimiter.js never exported -
+// see that file's own header comment) - now fixed.
+const governanceModule = require('./routes/platform/governanceModule_merged.js');
 const goatRoutes = require('./routes/goatRoutes.js');
-const glutWarningRoutes = require('./routes/glutWarningRoutes.js');
+// 2026-09-16: new route file wrapping 3 createCrudService(...) objects in
+// services/legacy/livestockManagementService.js that had real DB-backed
+// CRUD logic but no Express router at all - see that file's own header
+// comment.
+const livestockRegistryRoutes = require('./routes/livestockRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/fisheriesManagementService.js
+// had 9 real createCrudService(...) objects with no router at all.
+const fisheriesRegistryRoutes = require('./routes/fisheriesRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/operationsManagementService.js
+// had 8 real createCrudService(...) objects with no router at all.
+const operationsRegistryRoutes = require('./routes/operationsRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/horticultureManagementService.js
+// had 8 real createCrudService(...) objects with no router at all.
+const horticultureRegistryRoutes = require('./routes/horticultureRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/inputSupplyManagementService.js
+// had 8 real createCrudService(...) objects with no router at all.
+const inputSupplyRegistryRoutes = require('./routes/inputSupplyRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/cropManagementService.js had
+// 6 real createCrudService(...) objects with no router at all.
+const cropRegistryRoutes = require('./routes/cropRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/landManagementService.js had
+// 6 real createCrudService(...) objects with no router at all.
+const landRegistryRoutes = require('./routes/landRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/soilManagementService.js had
+// 3 real createCrudService(...) objects with no router at all.
+const soilRegistryRoutes = require('./routes/soilRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/identityManagementService.js
+// (a pre-existing file from before this whole session, "Phase 2
+// Auto-Implementation", 2026-09-04) had 6 real resources with no router.
+const identityRegistryRoutes = require('./routes/identityRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/climateMonitoringService.js
+// had 5 real createCrudService(...) objects with no router at all.
+const climateRegistryRoutes = require('./routes/climateRegistryRoutes.js');
+// 2026-09-16: services/legacy/informationSharingService.js is a real,
+// complete in-memory service (documents/folders/permissions/sharing-links/
+// collaboration/AI-recommendations/activity-logs/analytics/health) that
+// was never routed at all - neither routes/informationSharingRoutes.js
+// (dead stub) nor routes/platform/informationSharingRoutes_merged.js
+// (generic CRUD, doesn't match this page's real needs) connect to it.
+const informationSharingRegistryRoutes = require('./routes/informationSharingRegistryRoutes.js');
+// 2026-09-16: same pattern - services/legacy/waterManagementService.js
+// had 5 real createCrudService(...) objects. Confirmed regression (not a
+// fresh gap): waterManagementRoutes.js used to require() this service
+// and was overwritten with a stub by a later batch-fix commit - see this
+// file's own header comment.
+const waterRecordsRegistryRoutes = require('./routes/waterRecordsRegistryRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. glutWarningRoutes_merged.js
+// is a real glut-risk check/scan implementation with its own router.
+const glutWarningRoutes = require('./routes/glutWarningRoutes_merged.js');
 const geofencingRoutes = require('./routes/geofencingRoutes.js');
 const freightPoolingRoutes = require('./routes/freightPoolingRoutes.js');
 const freightPooling = require('./routes/freightPooling.js');
 const foodRoutes = require('./routes/foodRoutes.js');
-const foluRoutes = require('./routes/foluRoutes.js');
-const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. foluRoutes_merged.js
+// is a real FOLU land-use/carbon/scheme-status implementation (built on
+// organicTraceabilityService.js) with its own router.
+const foluRoutes = require('./routes/foluRoutes_merged.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. foluBenchmarkRoutes_merged.js
+// is a real FOLU (forest/land-use) transitions/benchmark-report implementation
+// with its own router.
+const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes_merged.js');
 const fisheriesManagementRoutes = require('./routes/fisheriesManagementRoutes.js');
 const financialAnalytics = require('./routes/financialAnalytics.js');
 const fertilizerRoutes = require('./routes/fertilizerRoutes.js');
 const farmerValueRoutes = require('./routes/farmerValueRoutes.js');
-const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes.js');
-const farmerRoutes = require('./routes/farmerRoutes.js');
-const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. farmerTrainingRoutes_merged.js
+// is a real training-program/carbon-footprint/FOLU-compliance implementation
+// with its own router (routes/agriculture/farmerTrainingRoutes.js is a third,
+// separate generic-CRUD file with none of that - left alone, not this one).
+const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes_merged.js');
+// 2026-09-15: was routes/farmerRoutes.js, a 38-line "Route operational"
+// scaffold. routes/farmerRoutes_merged.js is a real, complete,
+// already-debugged (own "FIXED 2026-08-15" comments) implementation of
+// the exact same directory/profile/FDI/certification/FPO endpoints,
+// calling the real services/legacy/farmerService.js - was sitting next
+// to the scaffold, never mounted anywhere.
+const farmerRoutes = require('./routes/farmerRoutes_merged.js');
+const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements_merged.js');
 const farmerHealthRoutes = require('./routes/farmerHealthRoutes.js');
 const farmerFamilyRoutes = require('./routes/farmerFamilyRoutes.js');
 const farmCosting = require('./routes/farmCosting.js');
@@ -132,18 +331,21 @@ const enterpriseIntegrationRoutes = require('./routes/enterpriseIntegrationRoute
 const enterpriseAIRoutes = require('./routes/enterpriseAIRoutes.js');
 const engineeringProjectRoutes = require('./routes/engineeringProjectRoutes.js');
 const energyRoutes = require('./routes/energyRoutes.js');
-const ecommerceRoutes = require('./routes/ecommerceRoutes.js');
-const ecommerceMarketingRoutes = require('./routes/ecommerceMarketingRoutes.js');
-const ecommerceIntegrationRoutes = require('./routes/ecommerceIntegrationRoutes.js');
-const ecommerceERPRoutes = require('./routes/ecommerceERPRoutes.js');
-const ecommerceBusinessSalesRoutes = require('./routes/ecommerceBusinessSalesRoutes.js');
-const ecommerceAIRoutes = require('./routes/ecommerceAIRoutes.js');
-const dprGenerationRoutes = require('./routes/dprGenerationRoutes.js');
+const ecommerceRoutes = require('./routes/ecommerceRoutes_merged.js');
+const ecommerceMarketingRoutes = require('./routes/ecommerceMarketingRoutes_merged.js');
+const ecommerceIntegrationRoutes = require('./routes/ecommerceIntegrationRoutes_merged.js');
+const ecommerceERPRoutes = require('./routes/ecommerceERPRoutes_merged.js');
+const ecommerceBusinessSalesRoutes = require('./routes/ecommerceBusinessSalesRoutes_merged.js');
+const ecommerceAIRoutes = require('./routes/ecommerceAIRoutes_merged.js');
+const dprGenerationRoutes = require('./routes/dprGenerationRoutes_merged.js');
 const digitalTwinRoutes = require('./routes/digitalTwinRoutes.js');
 const dietTherapyRoutes = require('./routes/dietTherapyRoutes.js');
 const demandRoutes = require('./routes/demandRoutes.js');
 const defenseFitnessPrepRoutes = require('./routes/defenseFitnessPrepRoutes.js');
-const decisionSupportRoutes = require('./routes/decisionSupportRoutes.js');
+// 2026-09-15: was a 38-line scaffold. decisionSupportRoutes_merged.js exposes
+// 8 real pricing/logistics/finance/governance decision functions - same
+// protectRouter()-is-not-a-function bug as rfqRoutes_merged.js, now fixed.
+const decisionSupportRoutes = require('./routes/decisionSupportRoutes_merged.js');
 const dataVisualization = require('./routes/dataVisualization.js');
 const dashboardRoutes = require('./routes/dashboardRoutes.js');
 const dairyRoutes = require('./routes/dairyRoutes.js');
@@ -158,7 +360,7 @@ const comprehensiveERPRoutes = require('./routes/comprehensiveERPRoutes.js');
 const complianceTracking = require('./routes/complianceTracking.js');
 const complianceRoutes = require('./routes/complianceRoutes.js');
 const completeERPIntegrationRoutes = require('./routes/completeERPIntegrationRoutes.js');
-const completeAIIntegrationRoutes = require('./routes/completeAIIntegrationRoutes.js');
+const completeAIIntegrationRoutes = require('./routes/completeAIIntegrationRoutes_merged.js');
 const companyRoutes = require('./routes/companyRoutes.js');
 const communityManagementRoutes = require('./routes/communityManagementRoutes.js');
 const coldStorageRoutes = require('./routes/coldStorageRoutes.js');
@@ -176,7 +378,17 @@ const blockchainVerificationRoutes = require('./routes/blockchainVerificationRou
 const blockchainTrace = require('./routes/blockchainTrace.js');
 const biometric = require('./routes/biometric.js');
 const automation = require('./routes/automation.js');
-const authRoutes = require('./routes/authRoutes.js');
+// routes/authRoutes.js is a mock (in-memory Map, plaintext password compare,
+// fabricated `jwt_<id>_<timestamp>` tokens) left over from early scaffolding.
+// It was mounted at /api/auth while middleware/auth.js verifies tokens via
+// services/dual-use/authService.js's real jsonwebtoken-based verifyToken() -
+// so a token minted by the live login endpoint would fail real verification
+// on every subsequent protected request. authService.js already has a
+// complete real implementation (bcrypt, real JWT, rate limiting, JSON-file
+// fallback store when Postgres is unavailable, 2FA, OAuth) with its own
+// router that was built but never mounted. Swapping the mount below to that
+// real router is the fix, not a new implementation.
+const { router: authRoutes } = require('./services/dual-use/authService.js');
 const auditTrail = require('./routes/auditTrail.js');
 const auditRoutes = require('./routes/auditRoutes.js');
 const assetAccountingRoutes = require('./routes/assetAccountingRoutes.js');
@@ -184,11 +396,11 @@ const ar = require('./routes/ar.js');
 const apiCompatibilityRoutes = require('./routes/apiCompatibilityRoutes.js');
 const animalHealthRoutes = require('./routes/animalHealthRoutes.js');
 const analyticsReportRoutes = require('./routes/analyticsReportRoutes.js');
-const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes.js');
-const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes.js');
+const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes_merged.js');
+const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes_merged.js');
 const aiGatewayRoutes = require('./routes/aiGatewayRoutes.js');
 const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes.js');
-const aiBrainRoutes = require('./routes/aiBrainRoutes.js');
+const aiBrainRoutes = require('./routes/aiBrainRoutes_merged.js');
 const aiBackboneRoutes = require('./routes/aiBackboneRoutes.js');
 const aiApprovalRoutes = require('./routes/aiApprovalRoutes.js');
 const aiAgentRoutes = require('./routes/aiAgentRoutes.js');
@@ -516,6 +728,129 @@ async function startup() {
     logger.info('🏥 Mounting health check routes...');
     const healthRoutes = require('./routes/healthRoutes');
     app.use('/api/yieldmanagement', yieldManagement);
+    // 2026-09-15: never mounted anywhere. Unlike most services/legacy/*.js
+    // files, this one doesn't export a plain router - it exports a
+    // setupRoutes(app) function that mounts itself at the hardcoded path
+    // /api/v1/market-intelligence, so it's called directly here rather
+    // than via app.use() like the others.
+    require('./services/legacy/marketIntelligenceService.js').setupRoutes(app);
+    // 2026-09-15: same setupRoutes(app) pattern, also never mounted.
+    // Also found and fixed a real route-shadowing bug in this file: GET
+    // /villages/search was registered after GET /villages/:villageId, so
+    // every search request was swallowed by the param route instead
+    // (villageId literally "search") - see the file's own comment.
+    require('./services/legacy/villageProfileService.js').setupRoutes(app);
+    // 2026-09-16: duplicate-service-filename shadowing bug fix (documented
+    // across this whole session, see .ai/tasks/AGENT_ASSIGNMENTS.md) - each
+    // of these 5 legacy/*.js files has real endpoints
+    // (advisories/statistics, subscriptions/statistics, systems/statistics,
+    // enterprises/statistics, schemes/registry) that a DIFFERENT file
+    // sharing the same base filename wins in core/dynamicServiceLoader.js's
+    // Map, silently shadowing them. Rather than change the loader's global
+    // keying behavior (a much larger, riskier change affecting all 313
+    // discovered services), each of these mounts additively at its own
+    // path/prefix - verified via each file's own app.use(...) call that
+    // none collides with what the Map-winning file already serves (either
+    // a distinct prefix entirely, e.g. /ai-advisories vs /ai-advisory, or
+    // the same prefix with non-overlapping sub-paths, e.g.
+    // /renewable-energy/systems/* vs the winner's bare GET/POST /).
+    require('./services/legacy/aiAdvisoryService.js').setupRoutes(app);
+    require('./services/legacy/procurementSubscriptionService.js').setupRoutes(app);
+    require('./services/legacy/renewableEnergyService.js').setupRoutes(app);
+    require('./services/legacy/ruralEnterpriseService.js').setupRoutes(app);
+    require('./services/legacy/governmentSchemeService.js').setupRoutes(app);
+    // 2026-09-16: same setupRoutes(app) pattern as the block above - real,
+    // DB-backed escrow logic (create/release/refund/list, escrow_transactions
+    // table confirmed migrated), never mounted. The only live consumer,
+    // EscrowPage.jsx, was crashing (escrowAPI.list/.release/.refund didn't
+    // exist on the frontend client) since nothing real was ever wired up to
+    // it. Mounted at /api/v1/escrow - distinct from the pre-existing dead
+    // /api/escrow scaffold mount below, no collision.
+    require('./services/legacy/escrowService.js').setupRoutes(app);
+    // 2026-09-16: same setupRoutes(app) pattern again - real, DB-backed
+    // digital twin logic (create/update/ingest-sensor-data/simulate/get/
+    // list, digital_twins table), never mounted. Mounted at
+    // /api/v1/digital-twin - distinct from the pre-existing dead
+    // /api/digitaltwin scaffold mount below, no collision. The frontend's
+    // digitalTwinAPI already pointed at this exact path (added in an
+    // earlier pass, correctly anticipating it, before this real backend
+    // was found) - no frontend client changes needed, only DigitalTwinPage.jsx
+    // itself now calls it. Deliberately NOT calling .initialize() here:
+    // it starts two un-refed setInterval timers (5min/15min background
+    // sync) with no cleanup path, which would leak and could hang tests/
+    // short-lived processes; list()/get() read from an in-memory Map that
+    // create() already keeps in sync directly, so basic create-then-list
+    // works correctly within a running process even without the boot-time
+    // DB preload - twins created before the current process started just
+    // won't appear until a restart. Pre-existing limitation in this file,
+    // not something this fix changes.
+    require('./services/legacy/digitalTwinService.js').setupRoutes(app);
+    // 2026-09-17: four more real-but-unreachable backends found while
+    // auditing frontend api.js objects with 1-2 methods missing against a
+    // real xxxAPI call site (same escrow/digitalTwin bug class as above).
+    // All four are mounted at a fresh /api/v1/* prefix, distinct from any
+    // pre-existing scaffold at the unversioned path, no collision:
+    //  - routes/finance/costRoutes_merged.js (corridor landed-cost model +
+    //    per-consignment cost breakup, services/legacy/costService.js) -
+    //    required a nonexistent module path (services/finance/costService,
+    //    fixed in that file to services/costService.js's confirmed-live
+    //    re-export) and so could never even be require()'d before now.
+    //  - routes/agriculture/farmerHealthRoutes.js (welfare programs +
+    //    enrollment, health records CRUD) - required the generic M029
+    //    scaffold service with none of this router's method names; fixed
+    //    in that file to services/farmerHealthService.js, written
+    //    specifically to implement them against the real schema.
+    //  - services/platform/erpService.js's own router (/status ->
+    //    getSyncStatus(), real DB-backed sync-state query across products/
+    //    orders/farmers/assets) - had its own Express router, like escrow/
+    //    digitalTwin above, but nothing ever required it.
+    //  - routes/aiBackboneRoutes_merged.js (/status -> real AI provider
+    //    configuration status) - the scaffold at routes/aiBackboneRoutes.js
+    //    is mounted at /api/aibackbone; this real router was never mounted
+    //    anywhere.
+    app.use('/api/v1/cost', require('./routes/finance/costRoutes_merged.js'));
+    app.use('/api/v1/farmer-health', require('./routes/agriculture/farmerHealthRoutes.js'));
+    app.use('/api/v1/erp', require('./services/platform/erpService.js').router);
+    app.use('/api/v1/aibackbone', require('./routes/aiBackboneRoutes_merged.js'));
+    // 2026-09-17: the digitalTwinService.setupRoutes(app) mount above never
+    // had its simulation engine initialized - the full initialize() is
+    // deliberately skipped (see the comment above it) because it also
+    // starts two un-refed background timers, but that means
+    // this.simulationEngine stayed null and every POST
+    // /api/v1/digital-twin/:twinId/simulate call threw a raw TypeError
+    // ("Cannot read properties of null"), not a graceful error.
+    // initializeSimulationEngine() alone is synchronous, starts no timers,
+    // and only builds the {cropGrowthModel, soilMoistureModel, ...} lookup
+    // object simulate needs - safe to call directly.
+    require('./services/legacy/digitalTwinService.js').initializeSimulationEngine();
+    // 2026-09-17: modules/M007 (Role & Permission Management - AI Enhanced)
+    // is a real, complete, DB-backed router (roles/permissions/user_roles
+    // tables, all confirmed real) with listPermissions/getPermissionMatrix/
+    // getRoleHierarchy/recommendRoleForUser - exactly the 4 methods
+    // RolePermissionPage.jsx's rolePermissionAPI was missing - but it was
+    // never required or mounted anywhere in this file. Mounted at a fresh
+    // /api/v1/role-permission prefix, distinct from the existing real
+    // roleManagementRoutes.js mount (ROLE_MANAGEMENT_BASE) that
+    // listRoles/createRole already use, no collision.
+    app.use('/api/v1/role-permission', require('./modules/M007/routes.js'));
+    // 2026-09-17: modules/M008 (Audit & Compliance - AI Enhanced) is a real,
+    // complete, DB-backed router (audit_logs with genuine sha256
+    // hash-chained integrity verification, compliance_rules, both confirmed
+    // real tables) with createAuditLog/getAuditLogs/listComplianceRules/
+    // detectAuditAnomalies/verifyAuditLogIntegrity - exactly the methods
+    // ComplianceDashboardPage.jsx and SystemAdministrationPage.jsx's shared
+    // auditComplianceAPI was missing - but it was never required or mounted
+    // anywhere in this file. Mounted at a fresh /api/v1/audit-compliance
+    // prefix, no collision with any existing mount.
+    app.use('/api/v1/audit-compliance', require('./modules/M008/routes.js'));
+    // 2026-09-17: modules/M011 (User Management - AI Enhanced) is a real,
+    // complete, DB-backed router (users table) with listUsers/updateUser -
+    // exactly what AuthorizationPage.jsx's authorizationAPI.getUsers/
+    // .updateUserRole needed - but it was never required or mounted
+    // anywhere in this file. Mounted at a fresh /api/v1/user-management
+    // prefix, distinct from the existing /api/user scaffold mount, no
+    // collision.
+    app.use('/api/v1/user-management', require('./modules/M011/routes.js'));
     app.use('/api/wikipedia', wikipediaRoutes);
     app.use('/api/weather', weatherRoutes);
     app.use('/api/weatheradvisory', weatherAdvisory);
@@ -544,6 +879,7 @@ async function startup() {
     app.use('/api/trackdart', trackDartRoutes);
     app.use('/api/tenantmanagement', tenantManagementRoutes);
     app.use('/api/systemadministration', systemAdministrationRoutes);
+    app.use('/api/servermanagement', serverManagementRoutes);
     app.use('/api/supplychaintracking', supplyChainTracking);
     app.use('/api/supplychainanalytics', supplyChainAnalytics);
     app.use('/api/supply-chain', supplyChainDecisionRoutes);
@@ -600,6 +936,7 @@ async function startup() {
     app.use('/api/nlp', nlp);
     app.use('/api/nervoussystem', nervousSystemRoutes);
     app.use('/api/mloptimization', mlOptimization);
+    app.use('/api/multilingual', multilingualRoutes);
     app.use('/api/marketplaceenhancements', marketplaceEnhancements);
     app.use('/api/marketdata', marketDataRoutes);
     app.use('/api/marketanalytics', marketAnalytics);
@@ -609,6 +946,7 @@ async function startup() {
     app.use('/api/loanmanagement', loanManagement);
     app.use('/api/livestockroutesupport', livestockRouteSupport.router);
     app.use('/api/livestockmanagement', livestockManagementRoutes);
+    app.use('/api/labour', labourRoutes);
     app.use('/api/livestock', livestock);
     app.use('/api/library', libraryRoutes);
     app.use('/api/landrecords', landRecordsRoutes);
@@ -628,6 +966,18 @@ async function startup() {
     app.use('/api/greenhouse', greenhouse);
     app.use('/api/governancemodule', governanceModule);
     app.use('/api/goat', goatRoutes);
+    app.use('/api/livestock-registry', livestockRegistryRoutes);
+    app.use('/api/fisheries-registry', fisheriesRegistryRoutes);
+    app.use('/api/operations-registry', operationsRegistryRoutes);
+    app.use('/api/horticulture-registry', horticultureRegistryRoutes);
+    app.use('/api/input-supply-registry', inputSupplyRegistryRoutes);
+    app.use('/api/crop-registry', cropRegistryRoutes);
+    app.use('/api/land-registry', landRegistryRoutes);
+    app.use('/api/soil-registry', soilRegistryRoutes);
+    app.use('/api/identity-registry', identityRegistryRoutes);
+    app.use('/api/climate-registry', climateRegistryRoutes);
+    app.use('/api/information-sharing-registry', informationSharingRegistryRoutes);
+    app.use('/api/water-records-registry', waterRecordsRegistryRoutes);
     app.use('/api/glutwarning', glutWarningRoutes);
     app.use('/api/geofencing', geofencingRoutes);
     app.use('/api/freightpooling', freightPoolingRoutes);
@@ -715,6 +1065,17 @@ async function startup() {
     app.use('/api/aibackbone', aiBackboneRoutes);
     app.use('/api/aiapproval', aiApprovalRoutes);
     app.use('/api/aiagent', aiAgentRoutes);
+    // 2026-09-16: routes/claude/ is a 16-file directory the dynamic route
+    // loader explicitly skips with a comment claiming "manually mounted" -
+    // that claim was already found false for the whole directory earlier
+    // this session (nothing mounts any of it). Mounting just this one file
+    // now, found while wiring CreditScorePage.jsx's already-flagged gap:
+    // real demand/price/credit-risk/fraud/recommend logic, Claude-AI-enhanced
+    // with an honest fallback to the plain original service when
+    // CLAUDE_AI_ENABLED isn't set or the AI call fails (verified directly -
+    // no fabricated AI content or hardcoded confidence). The other 15 files
+    // in routes/claude/ are NOT part of this fix - flagged, not audited.
+    app.use('/api/aidecisions', require('./routes/claude/aiDecisionRoutes.js'));
     app.use('/api/agriculturalintelligence', agriculturalIntelligenceRoutes);
     app.use('/api/advancedsearch', advancedSearchRoutes);
     app.use('/api/advancedfeatures', advancedFeatures);
@@ -746,6 +1107,125 @@ async function startup() {
     // Blocker 4: Stripe Webhook Handler
     app.use('/api', stripeWebhookRoutes);
     logger.info('💳 Stripe webhook handler mounted at /api/stripe-webhook');
+
+    // Batch-mounted previously-unmounted real services (2026-09-15)
+    app.use('/api/advancedai', advancedAIRoutesNewlyMounted);
+    app.use('/api/aicopilot', aiCopilotRoutesNewlyMounted);
+    app.use('/api/arvr', arVrRoutesNewlyMounted);
+    app.use('/api/biodiversity', biodiversityRoutesNewlyMounted);
+    app.use('/api/blockchaintraceability', blockchainTraceabilityRoutesNewlyMounted);
+    app.use('/api/catalogintelligence', catalogIntelligenceRoutesNewlyMounted);
+    app.use('/api/commercerules', commerceRulesRoutesNewlyMounted);
+    app.use('/api/consumerhealth', consumerHealthRoutesNewlyMounted);
+    // Hyphenated path (not /api/conversationalai like the rest of this batch):
+    // components/Layout.jsx already documented this exact path from a prior
+    // investigation ("authMiddleware on /conversational-ai/sessions"), and
+    // ChatInterface.jsx's real calls (getDomains/createSession/respond/
+    // endSession) match this service's real routes exactly - matching that
+    // existing expectation instead of introducing a third path convention.
+    app.use('/api/conversational-ai', conversationalAIRoutesNewlyMounted);
+    // Matches the real frontend consumer exactly (see require comment above).
+    app.use('/api/v1/advanced-medical-coding', advancedMedicalCodingRoutesNewlyMounted);
+    app.use('/api/advanced-voice-ai', advancedVoiceAIRoutesNewlyMounted);
+    app.use('/api/clinical-nutrition', clinicalNutritionRoutesNewlyMounted);
+    app.use('/api/digitalproductpassport', digitalProductPassportRoutesNewlyMounted);
+    app.use('/api/enterprisecontrol', enterpriseControlRoutesNewlyMounted);
+    app.use('/api/enterprisememory', enterpriseMemoryRoutesNewlyMounted);
+    app.use('/api/erp', erpRoutesNewlyMounted);
+    app.use('/api/financial', financialRoutesNewlyMounted);
+    app.use('/api/foodintelligence', foodIntelligenceRoutesNewlyMounted);
+    app.use('/api/foodsafety', foodSafetyRoutesNewlyMounted);
+    app.use('/api/form', formRoutesNewlyMounted);
+    app.use('/api/giintelligence', giIntelligenceRoutesNewlyMounted);
+    app.use('/api/indigenousknowledge', indigenousKnowledgeRoutesNewlyMounted);
+    app.use('/api/institutionalprocurement', institutionalProcurementRoutesNewlyMounted);
+    app.use('/api/insurance', insuranceRoutesNewlyMounted);
+    app.use('/api/knowledgegraph', knowledgeGraphRoutesNewlyMounted);
+    app.use('/api/laboratoryerp', laboratoryERPRoutesNewlyMounted);
+    app.use('/api/logistics', logisticsRoutesNewlyMounted);
+    app.use('/api/merchandising', merchandisingRoutesNewlyMounted);
+    app.use('/api/millcircuit', millCircuitRoutesNewlyMounted);
+    app.use('/api/modulecatalog', moduleCatalogRoutesNewlyMounted);
+    app.use('/api/neproductintelligence', neProductIntelligenceRoutesNewlyMounted);
+    app.use('/api/offlinepayment', offlinePaymentRoutesNewlyMounted);
+    app.use('/api/offlinesync', offlineSyncRoutesNewlyMounted);
+    app.use('/api/omnichannelai', omnichannelAIRoutesNewlyMounted);
+    app.use('/api/organictraceability', organicTraceabilityRoutesNewlyMounted);
+    app.use('/api/recipeintelligence', recipeIntelligenceRoutesNewlyMounted);
+    app.use('/api/shelflife', shelfLifeRoutesNewlyMounted);
+    app.use('/api/smsauth', smsAuthRoutesNewlyMounted);
+    app.use('/api/v42intelligence', v42IntelligenceRoutesNewlyMounted);
+    app.use('/api/valuecommerce', valueCommerceRoutesNewlyMounted);
+    // Hyphenated path, same reasoning as /api/conversational-ai above:
+    // Layout.jsx documents "/voice-ai/voice-sessions", and VoiceAssistant.jsx's
+    // real calls match this service's real routes exactly.
+    app.use('/api/voice-ai', voiceAIRoutesNewlyMounted);
+    app.use('/api/whatsapp', whatsappRoutesNewlyMounted);
+
+    // 2026-09-16: audited the other 15 files in routes/claude/ (flagged
+    // alongside aiDecisionRoutes.js above as excluded-by-dynamicRouteLoader
+    // with the same false "manually mounted" comment). 11 were left alone -
+    // 8 are the generic "Route operational" scaffold (aiAgentRoutes,
+    // aiCoordinationRoutes, aiProviderRoutes, insuranceAIRoutes,
+    // logisticsAIRoutes, orderAIRoutes, productAIRoutes, unifiedAIRoutes),
+    // backendModuleBridge.js says "Placeholder route module" outright,
+    // aiCollaborationRoutes_merged.js duplicates the already-mounted
+    // /api/aicollaboration (routes/aiCollaborationRoutes.js - same
+    // services/claude/aiCollaborationService.js, same endpoints, plus its
+    // own Claude-API-configured check and handoff rate limiting), and
+    // aiStrategyRoutes.js calls originalService.generateStrategy() on
+    // services/legacy/aiBrainService.js, which does not export that
+    // function under any name (only executeCognitiveCycle/perception/
+    // attention/reasoning/decision/planning) - both its /ai-enhanced and
+    // plain endpoints throw unconditionally, aiEnabled true or false; only
+    // /ai-capability (a status stub) works, so nothing real to mount.
+    // The 4 below are real and mounted:
+    //  - aiCopilotRoutes.js: Claude-AI-enhanced wrapper (honest fallback to
+    //    the original when CLAUDE_AI_ENABLED isn't set, same pattern as
+    //    aiDecisionRoutes.js) around services/legacy/aiCopilotService.js's
+    //    real generateCopilotResponse() (DB-backed per-copilot-type lookups
+    //    against real tables, with an honest "I don't have a general-purpose
+    //    AI model configured" fallback when there's no match - not
+    //    fabricated). Mounted at /api/aicopilotenhanced, not /api/aicopilot -
+    //    that path is already taken (this same session, elsewhere) by the
+    //    legacy service's own router (session/message endpoints); this file
+    //    adds different endpoints (/ai-enhanced/generate-copilot-response,
+    //    /ai-context/copilot, /ai-capability, /generate-copilot-response),
+    //    not a duplicate of what's already there. Its /ai-context/copilot
+    //    endpoint calls service.getAIContext(), a method that doesn't exist
+    //    anywhere in this codebase (same bug independently found on all 5
+    //    of aiDecisionRoutes.js's /ai-context/* endpoints above - a
+    //    pre-existing, secondary-endpoint-only bug, not fabrication).
+    //  - financialAIRoutes.js: same honest-fallback wrapper around
+    //    services/legacy/financialService.js's real applyForLoan() (real
+    //    INSERT into loans). Mounted at /api/financialai. Its
+    //    /ai-enhanced/assess-credit endpoint is broken the same way as
+    //    aiStrategyRoutes.js above - it calls originalService.
+    //    assessCreditRisk(), which financialService.js does not export
+    //    (only farmerCreditRiskScore/getCreditScore/generateCreditScore) -
+    //    always throws. Left mounted for its two working endpoints
+    //    (process-loan, apply-loan) and /ai-capability; assess-credit is
+    //    flagged broken, not fixed (no invented implementation), and no
+    //    frontend page is wired to it.
+    //  - libraryRoutes.js: real file-backed catalog search over
+    //    services/legacy/libraryKnowledgeService.js (reads actual .md cards
+    //    under _EBDESIGN_LIBRARY/, computes real SHA256 content hashes, real
+    //    keyword search/relevance scoring) - not the same object as the
+    //    already-initialized services/libraryKnowledgeService.js (the
+    //    M645100_LIBRARYKNOWLEDGE module wrapper used internally), so this
+    //    is a second, self-contained, genuinely-real implementation, not
+    //    fake data. Mounted at /api/libraryknowledge, not /api/library -
+    //    that path is already taken by routes/libraryRoutes_merged.js,
+    //    itself a "Resources retrieved" CRUD scaffold returning data: []
+    //    (pre-existing, not this file, not touched here).
+    //  - moduleRegistryRoutes.js: real fs.readdirSync/module.json reads
+    //    over backend/src/modules/, no fabrication. Mounted at
+    //    /api/moduleregistry (unused prefix, verified against the full
+    //    mount list).
+    app.use('/api/aicopilotenhanced', require('./routes/claude/aiCopilotRoutes.js'));
+    app.use('/api/financialai', require('./routes/claude/financialAIRoutes.js'));
+    app.use('/api/libraryknowledge', require('./routes/claude/libraryRoutes.js'));
+    app.use('/api/moduleregistry', require('./routes/claude/moduleRegistryRoutes.js'));
 
     // Standardized error handling must follow every route registration.
     app.use(standardizeErrorResponse);

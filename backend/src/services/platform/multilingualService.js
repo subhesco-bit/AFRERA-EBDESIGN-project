@@ -15,6 +15,14 @@ const router = express.Router();
 const pool = require('../../database/pool');
 
 // Test-mode fallbacks to avoid DB dependencies during unit tests
+// These deliberately reassign the hoisted `function name() {}` declarations
+// further down in this file. That relies on function-declaration hoisting
+// (the real implementation exists before this block runs), so converting
+// these to `let name = function () {}` in place would break: this block
+// executes before that declaration point in file order and would hit the
+// `let` temporal dead zone. Suppressing no-func-assign here instead of
+// restructuring keeps the existing hoisting-dependent behavior intact.
+/* eslint-disable no-func-assign */
 if (process.env.NODE_ENV === 'test') {
   // In-memory stores for test mode
   const _translationStore = new Map();
@@ -81,6 +89,7 @@ if (process.env.NODE_ENV === 'test') {
 
   getTranslationMemoryStats = async () => ({ total_entries: 0, verified_entries: 0, auto_translated_entries: 0, avg_confidence: 0, total_usage: 0 });
 }
+/* eslint-enable no-func-assign */
 
 // ============================================================================
 // LANGUAGE DETECTION

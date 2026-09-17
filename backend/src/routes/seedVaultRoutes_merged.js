@@ -25,7 +25,19 @@ async function resolveFarmerId(req, res, next) {
     next();
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
-  }router.get('/', authMiddleware, resolveFarmerId, async (req, res) => {
+  }
+}
+
+// 2026-09-15: the closing brace above used to be missing - the very
+// next byte in the file was a lone CR (not a real newline), so
+// router.get('/', ...) below ran straight into resolveFarmerId's body
+// instead of module scope. Since resolveFarmerId is only ever invoked
+// as a route middleware, and no route existed yet to invoke it, every
+// router.*() call below was dead code - nothing on this router was ever
+// actually registered, so every request 404'd. node -c and a plain
+// require() both stayed silent about this (syntactically valid, just
+// the wrong scope) - only a live request caught it.
+router.get('/', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const seeds = await seedVaultService.listSeeds(req.farmerId);
     res.json({ success: true, data: seeds });
@@ -78,8 +90,5 @@ router.delete('/:seedId', authMiddleware, resolveFarmerId, async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 });
-
-
-}
 
 module.exports = router;

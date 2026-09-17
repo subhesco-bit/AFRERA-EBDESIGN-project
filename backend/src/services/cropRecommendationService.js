@@ -1,40 +1,85 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
+const claudeAICoordinator = require('../core/claudeAICoordinator');
 
+// Previously returned hardcoded canned data (a fixed Rice/Wheat/Corn list
+// with fabricated confidence scores, static guidance strings, and a
+// Math.random()-generated market price) while presenting itself as AI-driven
+// crop advisory. Now routes through the real Claude AI coordinator
+// (agent 'farmer-advisor') and falls back to labeled static data - never a
+// fabricated number - only when the AI call fails (e.g. ANTHROPIC_API_KEY
+// not configured). See __tests__/cropRecommendationService.test.js for the
+// exact contract this implements.
 class CropRecommendationService {
   async recommendCrops(farmerId, location, season) {
     try {
-      const recommendations = [
-        { crop: 'Rice', confidence: 0.92, roi: 25 },
-        { crop: 'Wheat', confidence: 0.85, roi: 20 },
-        { crop: 'Corn', confidence: 0.78, roi: 22 },
-      ];
-      logger.info(`Recommendations generated: ${farmerId}`);
-      return { farmer_id: farmerId, season, recommendations };
-    } catch (error) { logger.error(`Recommend failed: ${error.message}`); throw error; }
+      const result = await claudeAICoordinator.coordinateAIRequest({
+        requestType: 'conversational',
+        query: `Recommend the best crops to plant in ${location} for the ${season} season, with expected ROI for each.`,
+        agentPreference: 'farmer-advisor',
+        userId: farmerId,
+        context: { location, season },
+      });
+      return {
+        farmer_id: farmerId, season, location,
+        recommendations: result.response,
+        source: 'ai',
+      };
+    } catch (error) {
+      logger.warn(`AI crop recommendation unavailable, using static fallback: ${error.message}`);
+      return {
+        farmer_id: farmerId, season, location,
+        recommendations: [
+          { crop: 'Rice' },
+          { crop: 'Wheat' },
+          { crop: 'Corn' },
+        ],
+        source: 'fallback',
+      };
+    }
   }
 
   async getCropGuidance(cropType, phase) {
+    const staticGuidance = {
+      preparation: 'Prepare soil 2 weeks before planting',
+      planting: 'Sow seeds at recommended depth',
+      growth: 'Monitor irrigation and nutrition',
+      harvest: 'Pick at optimal ripeness',
+    };
+
     try {
-      const guidance = {
-        preparation: 'Prepare soil 2 weeks before planting',
-        planting: 'Sow seeds at recommended depth',
-        growth: 'Monitor irrigation and nutrition',
-        harvest: 'Pick at optimal ripeness',
+      const result = await claudeAICoordinator.coordinateAIRequest({
+        requestType: 'conversational',
+        query: `Provide ${phase}-stage growing guidance for ${cropType}.`,
+        agentPreference: 'farmer-advisor',
+        context: { cropType, phase },
+      });
+      return { crop: cropType, phase, guidance: result.response, source: 'ai' };
+    } catch (error) {
+      logger.warn(`AI crop guidance unavailable, using static fallback: ${error.message}`);
+      return {
+        crop: cropType, phase,
+        guidance: staticGuidance[phase] || 'Standard care',
+        source: 'fallback',
       };
-      return { crop: cropType, phase, guidance: guidance[phase] || 'Standard care' };
-    } catch (error) { logger.error(`Guidance failed: ${error.message}`); throw error; }
+    }
   }
 
   async getMarketOutlook(cropType) {
     try {
-      return {
-        crop: cropType,
-        price_trend: 'bullish',
-        demand: 'high',
-        expected_price: 5000 + Math.random() * 1000,
-      };
-    } catch (error) { logger.error(`Market outlook failed: ${error.message}`); throw error; }
+      const result = await claudeAICoordinator.coordinateAIRequest({
+        requestType: 'conversational',
+        query: `Summarize the current market demand and price trend outlook for ${cropType}.`,
+        agentPreference: 'farmer-advisor',
+        context: { cropType },
+      });
+      return { crop: cropType, outlook: result.response, source: 'ai' };
+    } catch (error) {
+      // Deliberately no expected_price / price_trend / demand fields here -
+      // there is no real market-price data source wired in yet, and a
+      // fabricated number is worse than no number.
+      logger.warn(`AI market outlook unavailable, no price data to fall back to: ${error.message}`);
+      return { crop: cropType, source: 'fallback' };
+    }
   }
 
   async calculateROI(crop, inputs) {

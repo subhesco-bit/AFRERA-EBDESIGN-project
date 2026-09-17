@@ -2,7 +2,7 @@
  * Request Validator (Section 23: Middleware)
  * Validates incoming requests against schemas
  */
-const logger = require('../../utils/logger');
+const { logger } = require('../../utils/logger');
 
 function requestValidator(schema) {
   return (req, res, next) => {

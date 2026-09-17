@@ -8,7 +8,18 @@ const router = express.Router();
 const governanceService = require('../../services/platform/governanceService');
 const { authMiddleware } = require('../../middleware/auth');
 const { adminMiddleware } = require('../../middleware/admin');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+// 2026-09-15: middleware/rateLimiter.js has never exported authRateLimit
+// (only authLimiter, a 5-requests-per-15-minutes brute-force-login
+// limiter - wrong semantics for these authenticated write endpoints, and
+// apiLimiter, the general per-request limiter every other authenticated
+// route in this codebase already uses e.g. pigRoutes_merged.js). This
+// threw "Route.post() requires a callback function but got a
+// [object Undefined]" the moment Express tried to register the first
+// route using it below. 15 other files import the same nonexistent name
+// but never actually call it as middleware, so they don't crash - only
+// this file does; fixed narrowly here by aliasing to apiLimiter rather
+// than changing rateLimiter.js's exports for every one of those files.
+const { apiLimiter: authRateLimit } = require('../../middleware/rateLimiter');
 
 // Village Management Routes
 router.post('/villages', authMiddleware, adminMiddleware, async (req, res) => {

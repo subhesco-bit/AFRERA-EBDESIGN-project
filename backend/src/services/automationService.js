@@ -1,5 +1,5 @@
 const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 class AutomationService {
   async triggerWorkflow(workflowId, params) {

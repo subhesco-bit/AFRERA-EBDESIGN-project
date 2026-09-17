@@ -44,7 +44,6 @@ async function optimizePrice(productId, currentPrice) {
       current_price: currentPrice,
       optimal_price: optimalPrice,
       price_change: ((optimalPrice - currentPrice) / currentPrice * 100).toFixed(2),
-      confidence: 0.82,
       market_analysis: {
         average_price: market.avg_market_price,
         price_range: {
@@ -85,9 +84,13 @@ function calculateOptimalPrice(currentPrice, market, competitorPrices) {
 }
 
 function calculatePriceElasticity(productId) {
-  // Simplified elasticity calculation
-  // In production, use historical price/demand data
-  return -1.2; // Typical agricultural product elasticity
+  // FIXME: not wired to real historical price/demand data - returns the
+  // identical -1.2 for every product regardless of productId, which then
+  // directly scales the real optimal_price's reported demand/revenue
+  // impact below. A generic "typical agricultural elasticity" is a
+  // starting assumption, not a per-product measurement; fixing this needs
+  // real historical price/demand data, not a different guessed constant.
+  return -1.2;
 }
 
 function calculateRevenueImpact(currentPrice, optimalPrice, elasticity) {
@@ -97,15 +100,22 @@ function calculateRevenueImpact(currentPrice, optimalPrice, elasticity) {
 }
 
 function calculateMarginImpact(currentPrice, optimalPrice) {
-  const currentMargin = 0.25; // 25% margin
-  const optimalMargin = 0.28; // Slightly better margin at optimal price
+  // FIXME: not wired to any real cost/COGS data - doesn't use currentPrice,
+  // optimalPrice, or productId at all, and returns the identical margin
+  // delta for every product. Needs a real product cost data source.
+  const currentMargin = 0.25;
+  const optimalMargin = 0.28;
   return ((optimalMargin - currentMargin) / currentMargin * 100).toFixed(2);
 }
 
 function getCompetitorPrices(productId) {
-  // Simulated competitor prices
-  // In production, fetch from market data APIs
-  return [280, 295, 310, 275, 305];
+  // No real market-data API is configured - this used to return the
+  // identical hardcoded [280, 295, 310, 275, 305] for every product,
+  // presented as real competitor pricing. calculateOptimalPrice() already
+  // falls back to currentPrice when this is empty, so an honest "no data"
+  // result here doesn't break the weighted-average calculation, it just
+  // drops the (fake) competitor signal from it.
+  return [];
 }
 
 function generatePricingRecommendations(optimalPrice, market) {

@@ -14,6 +14,19 @@
 const express = require('express');
 const router = express.Router();
 const serverManagementService = require('../services/serverManagementService');
+const { authMiddleware } = require('../middleware/auth');
+const { adminMiddleware } = require('../middleware/admin');
+
+// 2026-09-15: this file had no auth middleware at all - every other
+// server/infrastructure-admin route file in this codebase (auditRoutes.js,
+// systemAdministrationRoutes.js, tenantManagementRoutes.js) requires both
+// authMiddleware and adminMiddleware, since these are all admin-only
+// provisioning/scaling/backup/deletion operations. Added the same
+// protection before mounting rather than exposing server provisioning as
+// an open endpoint - this file was never mounted anywhere before, so
+// there's no existing behavior this could regress.
+router.use(authMiddleware);
+router.use(adminMiddleware);
 
 /**
  * Provision server

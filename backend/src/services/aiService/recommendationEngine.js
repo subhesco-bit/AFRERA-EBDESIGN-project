@@ -53,7 +53,6 @@ async function generateRecommendations(userId, context = {}) {
     return {
       user_id: userId,
       recommendations: recommendations.slice(0, 20), // Top 20
-      confidence: 0.78,
       categories: {
         collaborative: collaborativeRecs.length,
         content_based: contentRecs.length,
@@ -68,17 +67,20 @@ async function generateRecommendations(userId, context = {}) {
 }
 
 async function getCollaborativeRecommendations(userId, history) {
-  // Implement collaborative filtering
+  // Not implemented - honestly returns no recommendations from this
+  // source rather than fabricating any.
   return [];
 }
 
 async function getContentBasedRecommendations(history) {
-  // Implement content-based filtering
+  // Not implemented - honestly returns no recommendations from this
+  // source rather than fabricating any.
   return [];
 }
 
 async function getContextualRecommendations(context) {
-  // Implement contextual recommendations
+  // Not implemented - honestly returns no recommendations from this
+  // source rather than fabricating any.
   return [];
 }
 
@@ -88,6 +90,13 @@ function combineRecommendations(collaborative, content, contextual) {
 }
 
 function generateRecommendationExplanation(recommendations) {
+  // All three source functions above are unimplemented stubs that always
+  // return [] - this used to unconditionally claim "based on your
+  // purchase history, similar users, and current market conditions"
+  // regardless, which is never true yet (recommendations is always empty).
+  if (recommendations.length === 0) {
+    return 'No personalized recommendations are available yet - collaborative, content-based, and contextual recommendation sources are not implemented.';
+  }
   return 'Recommendations based on your purchase history, similar users, and current market conditions.';
 }
 

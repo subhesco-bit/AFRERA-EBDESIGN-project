@@ -46,13 +46,20 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken) throw new Error('No refresh token available');
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+        // The real backend refresh endpoint lives at /api/auth/refresh, not
+        // under API_BASE_URL (".../api/v1") - see coreApi.js's AUTH_BASE for
+        // the same reasoning. It also responds with camelCase
+        // accessToken/refreshToken (services/dual-use/authService.js), not
+        // snake_case - reading access_token/refresh_token here always
+        // produced undefined and silently broke token refresh.
+        const authBase = `${API_BASE_URL.replace(/\/api\/v1\/?$/, '')}/api/auth`;
+        const response = await axios.post(`${authBase}/refresh`, {
           refresh_token: refreshToken,
         });
-        const { access_token, refresh_token: newRefreshToken } = response.data;
-        localStorage.setItem('access_token', access_token);
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        localStorage.setItem('access_token', accessToken);
         localStorage.setItem('refresh_token', newRefreshToken);
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem('access_token');

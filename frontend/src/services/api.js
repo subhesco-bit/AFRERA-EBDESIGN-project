@@ -14,6 +14,14 @@ const api = axios.create({
   }
 });
 
+// 2026-09-15: the backend mounts most non-AI routes unversioned (e.g.
+// /api/order, /api/product), not under /api/v1 like this file's own
+// baseURL - same mismatch already documented and fixed for auth
+// (coreApi.js's AUTH_BASE) and multilingual/conversational-ai/voice-ai
+// (componentApi.js). Reused here for the product/order/review/media
+// endpoints below.
+const UNVERSIONED_BASE = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
@@ -90,6 +98,11 @@ export const aiAgentAPI = {
 export const aiBackboneAPI = {
   getBackboneStatus: () => api.get('/ai/backbone/status'),
   configureBackbone: (data) => api.put('/ai/backbone/config', data),
+  // 2026-09-17: real, mounted at /api/v1/aibackbone (routes/
+  // aiBackboneRoutes_merged.js -> services/legacy/aiBackboneService.js's
+  // getAIProviderStatus(), now mounted in index.js). PlatformManagementPage.jsx
+  // calls this exact method.
+  getAIProviderStatus: () => api.get(`${UNVERSIONED_BASE}/api/v1/aibackbone/status`),
 };
 
 export const aiBrainAPI = {
@@ -196,6 +209,13 @@ export const unifiedAIGatewayAPI = {
 export const platformCoreAPI = {
   getPlatformStatus: () => api.get('/platform/status'),
   getPlatformMetrics: () => api.get('/platform/metrics'),
+  // 2026-09-17: real, mounted at /api/platformcore/health (routes/
+  // platformCoreRoutes_merged.js -> services/dual-use/platformCoreService.js's
+  // getPlatformHealth(), a genuine DB-connectivity check). PlatformFoundationPage.jsx
+  // calls this via Promise.allSettled - previously a synchronous TypeError
+  // thrown while building that array aborted all 5 of its independent data
+  // sources, not just this one.
+  getHealth: () => api.get(`${UNVERSIONED_BASE}/api/platformcore/health`),
 };
 
 export const agriculturalIntelligenceAPI = {
@@ -233,14 +253,586 @@ export const aiOperationIntelligenceAPI = {
   analyzeOperations: (data) => api.post('/ai/operation-intelligence/analyze', data),
 };
 
+// 2026-09-15: analyzeProductMedia/generateProductMedia were never called
+// anywhere in the frontend, and pointed at /ai/product-media/... which
+// doesn't exist on the backend under any mount. ProductDetailPage.jsx
+// actually calls productMediaAIAPI.generateImage(id, prompt) - added to
+// match the real, already-implemented routes/productMediaAIRoutes.js
+// (routes/controllers, not a scaffold) mounted at /api/productmediaai.
+const PRODUCT_MEDIA_AI_BASE = `${UNVERSIONED_BASE}/api/productmediaai`;
+
 export const productMediaAIAPI = {
-  analyzeProductMedia: (data) => api.post('/ai/product-media/analyze', data),
-  generateProductMedia: (data) => api.post('/ai/product-media/generate', data),
+  getStatus: () => api.get(`${PRODUCT_MEDIA_AI_BASE}/status`),
+  generateImage: (productId, prompt) =>
+    api.post(`${PRODUCT_MEDIA_AI_BASE}/products/${productId}/image`, { prompt }),
+  buildVideoScript: (productId) =>
+    api.post(`${PRODUCT_MEDIA_AI_BASE}/products/${productId}/video-script`),
+  generateVideo: (productId) =>
+    api.post(`${PRODUCT_MEDIA_AI_BASE}/products/${productId}/video`),
+  // 2026-09-17: AIProductStudioPage.jsx calls getProviderStatus(), not
+  // getStatus() above - same real GET /status endpoint, just a different
+  // method name on the same object. Added as an alias rather than
+  // renaming getStatus (other callers may already use it).
+  getProviderStatus: () => api.get(`${PRODUCT_MEDIA_AI_BASE}/status`),
+};
+
+// 2026-09-15: productsAPI and productReviewsAPI didn't exist in this file
+// at all - the literal MISSING_EXPORT build errors for SellerProductFormPage.jsx/
+// ProductDetailPage.jsx/ComparePage.jsx and others (509 -> 161 remaining
+// vite build errors tracked in the TODO backlog). Added against the
+// real, now-mounted services/legacy/productService.js router
+// (/api/product) and routes/productReviewRoutes.js (/api/productreview,
+// already real - not a scaffold, predates this session).
+const PRODUCT_BASE = `${UNVERSIONED_BASE}/api/product`;
+const PRODUCT_REVIEW_BASE = `${UNVERSIONED_BASE}/api/productreview`;
+
+export const productsAPI = {
+  getProducts: (filters, pagination) => api.get(PRODUCT_BASE, { params: { ...filters, ...pagination } }),
+  getProduct: (id) => api.get(`${PRODUCT_BASE}/${id}`),
+  createProduct: (data) => api.post(PRODUCT_BASE, data),
+  updateProduct: (id, data) => api.put(`${PRODUCT_BASE}/${id}`, data),
+  deleteProduct: (id) => api.delete(`${PRODUCT_BASE}/${id}`),
+  getCategories: () => api.get(`${PRODUCT_BASE}/categories/list`),
+  getStates: () => api.get(`${PRODUCT_BASE}/states/list`),
+  searchProducts: (query) => api.get(`${PRODUCT_BASE}/search`, { params: { q: query } }),
+};
+
+export const productReviewsAPI = {
+  getReviews: (productId, params) => api.get(`${PRODUCT_REVIEW_BASE}/products/${productId}`, { params }),
+  getStats: (productId) => api.get(`${PRODUCT_REVIEW_BASE}/products/${productId}/stats`),
+  createReview: (productId, data) => api.post(`${PRODUCT_REVIEW_BASE}/products/${productId}`, data),
+};
+
+// 2026-09-15: didn't exist at all - the MISSING_EXPORT build error for
+// ModuleRuntimePage.jsx (which was itself made lazy in the eleventh
+// backlog update, since this crash used to take the whole app down with
+// it). Its one call, getModules(), reads response.data.modules - matches
+// services/legacy/moduleCatalogService.js's real GET / handler
+// ({success, modules, generatedAt}) exactly, mounted at
+// /api/modulecatalog in the thirteenth update.
+const MODULE_CATALOG_BASE = `${UNVERSIONED_BASE}/api/modulecatalog`;
+
+export const modulesAPI = {
+  getModules: () => api.get(MODULE_CATALOG_BASE),
+  getModule: (id) => api.get(`${MODULE_CATALOG_BASE}/${id}`),
+  getOverview: () => api.get(`${MODULE_CATALOG_BASE}/overview`),
+  // 2026-09-17: real, mounted at /api/modulecatalog/assistant (services/
+  // legacy/moduleCatalogService.js's buildAssistantResponse() - a real,
+  // deterministic keyword match against the actual module catalog, not a
+  // live LLM call but not fabricated either). ModuleHubPage.jsx calls this.
+  askAssistant: (prompt) => api.post(`${MODULE_CATALOG_BASE}/assistant`, { prompt }),
+};
+
+// 2026-09-15: didn't exist at all - the highest-frequency remaining
+// MISSING_EXPORT (12+ importing pages). routes/farmerRoutes_merged.js
+// was a real, complete, already-debugged implementation (its own "FIXED
+// 2026-08-15" comments) sitting unmounted next to the usual 38-line
+// scaffold - swapped in at /api/farmer in index.js.
+//
+// IMPORTANT: the 12 pages that import `farmersAPI` call ~28 distinct
+// methods between them, and only the 6 below actually match this real
+// farmer-directory/FDI/certification/FPO backend - the rest
+// (getFields/getHarvestScore/getMarketPrices/getBenchmarks/
+// getDemandForecast/savePricingModel and ~16 more) belong to entirely
+// different domains (field management, harvest scoring, market pricing)
+// that were never investigated here and have no confirmed backend yet.
+// Adding only the verified 6 fixes the build (the export now exists) and
+// makes calculateFDI/getFarmer/etc. actually work; pages calling the
+// other, unverified methods will still fail at runtime until those are
+// each checked the same way - not fabricated here.
+const FARMER_BASE = `${UNVERSIONED_BASE}/api/farmer`;
+
+export const farmersAPI = {
+  getFarmer: (id) => api.get(`${FARMER_BASE}/${id}`),
+  getFarmers: (filters, pagination) => api.get(FARMER_BASE, { params: { ...filters, ...pagination } }),
+  calculateFDI: (id) => api.post(`${FARMER_BASE}/${id}/fdi`),
+  addCertification: (id, data) => api.post(`${FARMER_BASE}/${id}/certifications`, data),
+  getCertifications: (id) => api.get(`${FARMER_BASE}/${id}/certifications`),
+  getFPOs: (filters) => api.get(`${FARMER_BASE}/fpos/list`, { params: filters }),
 };
 
 export const nutritionAPI = {
   getNutritionData: () => api.get('/nutrition'),
   analyzeNutrition: (data) => api.post('/nutrition/analyze', data),
+  // 2026-09-17: real, mounted at /api/nutritionintelligence (routes/
+  // nutritionIntelligenceRoutes.js -> services/legacy/
+  // nutritionIntelligenceService.js). getWellnessPractices/getDietaryProfiles/
+  // generateRecipe are all real, DB-backed endpoints (wellness_natural_practices,
+  // dietary_profiles tables) - AIProductStudioPage.jsx and DietRecipesPage.jsx
+  // call these exact names.
+  getWellnessPractices: (params) => api.get(`${UNVERSIONED_BASE}/api/nutritionintelligence/wellness-practices`, { params }),
+  getDietaryProfiles: () => api.get(`${UNVERSIONED_BASE}/api/nutritionintelligence/dietary-profiles`),
+  generateRecipe: (dietaryProfileId, targetCalories) => api.post(`${UNVERSIONED_BASE}/api/nutritionintelligence/recipes`, {
+    dietary_profile_id: dietaryProfileId,
+    target_calories: targetCalories,
+  }),
+};
+
+// 2026-09-15: pigAPI/goatAPI/pigAIAPI/goatAIAPI/sheepAIAPI/poultryAIAPI
+// didn't exist - these are the frontend clients for the real
+// pig/sheep/poultry/goat backends mounted or fixed this same session
+// (pigRoutes_merged.js, sheepRoutes_merged.js, poultryRoutes_merged.js
+// all had a "protect...Router is not a function" load-time bug fixed
+// earlier today; goatRoutes.js was already live). Endpoint shapes
+// verified directly against each route file rather than guessed -
+// goat has an extra milk-production sub-resource pig/sheep/poultry
+// don't (real domain difference, not an oversight).
+//
+// IMPORTANT, found while wiring this: the real backend's weight/feed/
+// breeding "record" endpoints and its performance/fcr "read" endpoints
+// all take the animal id as a URL path segment
+// (`/herd/:animalId/weight-records`, `/herd/:animalId/performance`,
+// etc). PigFarmingPage.jsx's mutations already pass a single payload
+// object containing `animal_id` (weightForm/feedForm) or `sow_id`
+// (breedingForm) - handled below by pulling the id out of that payload
+// rather than requiring a second argument no call site provides. But
+// its performance/weight-records/fcr *queries* call with zero
+// arguments at all (`pigAPI.getHerdPerformance()`, no id) - there is no
+// fleet-wide equivalent of those three on the real backend, only
+// per-animal ones, so those three calls will 404 (or hit
+// `/herd/undefined/...`) until the page itself is fixed to pass a
+// selected animal id. Not fixed here - that's a page-logic bug, not a
+// missing export - documented rather than silently worked around.
+// breeding-alerts and vaccination-alerts, by contrast, really are
+// fleet-wide on the real backend and are correctly called with zero
+// arguments.
+const PIG_BASE = `${UNVERSIONED_BASE}/api/pig`;
+const SHEEP_BASE = `${UNVERSIONED_BASE}/api/sheep`;
+const POULTRY_BASE = `${UNVERSIONED_BASE}/api/poultry`;
+const GOAT_BASE = `${UNVERSIONED_BASE}/api/goat`;
+
+export const pigAPI = {
+  listHerd: (params) => api.get(`${PIG_BASE}/herd`, { params }),
+  createAnimal: (data) => api.post(`${PIG_BASE}/herd`, data),
+  updateAnimal: (id, data) => api.put(`${PIG_BASE}/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${PIG_BASE}/herd/${id}`),
+  // animalId is optional here only because PigFarmingPage.jsx's query
+  // calls it with none - see the file-level comment above.
+  listWeightRecords: (animalId, params) => api.get(`${PIG_BASE}/herd/${animalId}/weight-records`, { params }),
+  recordWeight: (payload) => api.post(`${PIG_BASE}/herd/${payload.animal_id}/weight-records`, payload),
+  recordFeedConsumption: (payload) => api.post(`${PIG_BASE}/herd/${payload.animal_id}/feed-consumption`, payload),
+  recordBreeding: (payload) => api.post(`${PIG_BASE}/herd/${payload.sow_id}/breeding`, payload),
+  getHerdPerformance: (animalId) => api.get(`${PIG_BASE}/herd/${animalId}/performance`),
+  getFeedConversionRatio: (animalId) => api.get(`${PIG_BASE}/herd/${animalId}/fcr`),
+  getBreedingAlerts: () => api.get(`${PIG_BASE}/breeding-alerts`),
+  getVaccinationAlerts: () => api.get(`${PIG_BASE}/vaccination-alerts`),
+};
+
+export const pigAIAPI = {
+  optimizeMeatProduction: (animalId) => api.post(`${PIG_BASE}/ai/optimize-meat/${animalId}`),
+  monitorPigHealth: (animalId) => api.post(`${PIG_BASE}/ai/monitor-health/${animalId}`),
+  optimizePigFeed: (animalId, productionGoal) => api.post(`${PIG_BASE}/ai/optimize-feed/${animalId}`, { productionGoal }),
+  recommendPigBreeding: (animalId) => api.post(`${PIG_BASE}/ai/recommend-breeding/${animalId}`),
+};
+
+export const sheepAIAPI = {
+  optimizeWoolProduction: (animalId) => api.post(`${SHEEP_BASE}/ai/optimize-wool/${animalId}`),
+  monitorSheepHealth: (animalId) => api.post(`${SHEEP_BASE}/ai/monitor-health/${animalId}`),
+  optimizeSheepFeed: (animalId, productionGoal) => api.post(`${SHEEP_BASE}/ai/optimize-feed/${animalId}`, { productionGoal }),
+  recommendSheepBreeding: (animalId) => api.post(`${SHEEP_BASE}/ai/recommend-breeding/${animalId}`),
+};
+
+export const poultryAIAPI = {
+  optimizeEggProduction: (flockId) => api.post(`${POULTRY_BASE}/ai/optimize-production/${flockId}`),
+  monitorFlockHealth: (flockId) => api.post(`${POULTRY_BASE}/ai/monitor-health/${flockId}`),
+  optimizePoultryFeed: (flockId, productionGoal) => api.post(`${POULTRY_BASE}/ai/optimize-feed/${flockId}`, { productionGoal }),
+  predictMortalityRisk: (flockId) => api.post(`${POULTRY_BASE}/ai/predict-mortality/${flockId}`),
+};
+
+// Same shape as pigAPI above, verified against goatRoutes.js directly:
+// GoatFarmingPage.jsx's record mutations pass a single payload
+// (milkForm/feedForm use `animal_id`, breedingForm uses `female_id`,
+// matching the real /herd/:animalId/milk-production and
+// /herd/:femaleId/breeding path params respectively), but its
+// performance query calls getHerdPerformance() with no id - same
+// page-logic gap as pig, not fixed here.
+export const goatAPI = {
+  listHerd: (params) => api.get(`${GOAT_BASE}/herd`, { params }),
+  createAnimal: (data) => api.post(`${GOAT_BASE}/herd`, data),
+  updateAnimal: (id, data) => api.put(`${GOAT_BASE}/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${GOAT_BASE}/herd/${id}`),
+  listMilkProduction: (animalId, params) => api.get(`${GOAT_BASE}/herd/${animalId}/milk-production`, { params }),
+  recordMilkProduction: (payload) => api.post(`${GOAT_BASE}/herd/${payload.animal_id}/milk-production`, payload),
+  recordFeedConsumption: (payload) => api.post(`${GOAT_BASE}/herd/${payload.animal_id}/feed-consumption`, payload),
+  recordBreeding: (payload) => api.post(`${GOAT_BASE}/herd/${payload.female_id}/breeding`, payload),
+  getHerdPerformance: (animalId) => api.get(`${GOAT_BASE}/herd/${animalId}/performance`),
+  getBreedingAlerts: () => api.get(`${GOAT_BASE}/breeding-alerts`),
+  getVaccinationAlerts: () => api.get(`${GOAT_BASE}/vaccination-alerts`),
+};
+
+export const goatAIAPI = {
+  optimizeGoatMilkProduction: (animalId) => api.post(`${GOAT_BASE}/ai/optimize-milk/${animalId}`),
+  monitorGoatHealth: (animalId) => api.post(`${GOAT_BASE}/ai/monitor-health/${animalId}`),
+  optimizeGoatFeed: (animalId, productionGoal) => api.post(`${GOAT_BASE}/ai/optimize-feed/${animalId}`, { productionGoal }),
+  recommendGoatBreeding: (animalId) => api.post(`${GOAT_BASE}/ai/recommend-breeding/${animalId}`),
+};
+
+// 2026-09-15: didn't exist - nervousSystemRoutes_merged.js (mounted at
+// /api/nervoussystem earlier this session) exposes all 22 of these
+// brain/heart/neural/reflex/sensor/motor/route endpoints directly via
+// nervousSystemController, one method each, matched 1:1 here rather
+// than guessed - every call site checked directly for its actual
+// argument shape (most pass a single payload/params object already
+// built by the calling page; strengthenNeuralPathway, getSensorData and
+// deactivateEnterpriseRoute take a single id string, matching their
+// :pathwayId/:sensorId/:routeId path params).
+const NERVOUS_SYSTEM_BASE = `${UNVERSIONED_BASE}/api/nervoussystem`;
+
+export const nervousSystemAPI = {
+  processEventThroughBrain: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/brain/process-event`, payload),
+  getBrainDecisionHistory: (params) => api.get(`${NERVOUS_SYSTEM_BASE}/brain/decision-history`, { params }),
+  getBrainFocus: () => api.get(`${NERVOUS_SYSTEM_BASE}/brain/focus`),
+  startHeartBeat: () => api.post(`${NERVOUS_SYSTEM_BASE}/heart/start`),
+  stopHeartBeat: () => api.post(`${NERVOUS_SYSTEM_BASE}/heart/stop`),
+  getHeartBeatStatus: () => api.get(`${NERVOUS_SYSTEM_BASE}/heart/status`),
+  createNeuralPathway: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/neural/create-pathway`, payload),
+  getNeuralPathways: () => api.get(`${NERVOUS_SYSTEM_BASE}/neural/pathways`),
+  strengthenNeuralPathway: (pathwayId) => api.post(`${NERVOUS_SYSTEM_BASE}/neural/strengthen/${pathwayId}`),
+  createReflexArc: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/reflex/create-arc`, payload),
+  getReflexArcs: () => api.get(`${NERVOUS_SYSTEM_BASE}/reflex/arcs`),
+  triggerReflex: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/reflex/trigger`, payload),
+  registerSensor: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/sensor/register`, payload),
+  getSensorData: (sensorId) => api.get(`${NERVOUS_SYSTEM_BASE}/sensor/data/${sensorId}`),
+  getSensorsStatus: () => api.get(`${NERVOUS_SYSTEM_BASE}/sensor/status`),
+  executeMotorFunction: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/motor/execute`, payload),
+  getActiveMotorFunctions: () => api.get(`${NERVOUS_SYSTEM_BASE}/motor/active`),
+  registerEnterpriseRoute: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/route/register`, payload),
+  routeRequest: (payload) => api.post(`${NERVOUS_SYSTEM_BASE}/route/request`, payload),
+  getOptimalRoute: () => api.get(`${NERVOUS_SYSTEM_BASE}/route/optimal`),
+  deactivateEnterpriseRoute: (routeId) => api.post(`${NERVOUS_SYSTEM_BASE}/route/deactivate/${routeId}`),
+  getNervousSystemHealth: () => api.get(`${NERVOUS_SYSTEM_BASE}/health`),
+};
+
+// 2026-09-15: didn't exist - organicTraceabilityService.js (mounted at
+// /api/organictraceability earlier this session) exposes real
+// POST /farms, GET /standards and GET /consumer-transparency/qr/:qrCode
+// endpoints matching all 3 call sites checked directly.
+const ORGANIC_TRACEABILITY_BASE = `${UNVERSIONED_BASE}/api/organictraceability`;
+
+export const organicTraceabilityAPI = {
+  registerFarm: (data) => api.post(`${ORGANIC_TRACEABILITY_BASE}/farms`, data),
+  getStandards: () => api.get(`${ORGANIC_TRACEABILITY_BASE}/standards`),
+  getConsumerTransparency: (qrCode) => api.get(`${ORGANIC_TRACEABILITY_BASE}/consumer-transparency/qr/${qrCode}`),
+};
+
+// 2026-09-15: didn't exist - nutrientValueSalesRoutes_merged.js (mounted
+// at /api/nutrientvaluesales earlier this session) via
+// nutrientValueSalesController. Body shapes for submitNutrientContent
+// (`{productId, contentData, verificationData}`) and
+// issueNutrientCertificate (`{productId, certificationData}`) confirmed
+// directly against the controller's own req.body destructuring, not
+// guessed from the route alone.
+const NUTRIENT_VALUE_SALES_BASE = `${UNVERSIONED_BASE}/api/nutrientvaluesales`;
+
+export const nutrientValueSalesAPI = {
+  submitNutrientContent: (productId, contentData, verificationData) =>
+    api.post(`${NUTRIENT_VALUE_SALES_BASE}/submit-verification`, { productId, contentData, verificationData }),
+  issueNutrientCertificate: (productId, certificationData) =>
+    api.post(`${NUTRIENT_VALUE_SALES_BASE}/issue-certificate`, { productId, certificationData }),
+  searchByNutrientCriteria: (params) => api.get(`${NUTRIENT_VALUE_SALES_BASE}/search`, { params }),
+};
+
+// 2026-09-15: didn't exist - projectSystemsRoutes_merged.js (mounted at
+// /api/projectsystems earlier this session). Every method's body/params
+// shape confirmed against the route file's own req.body/req.query
+// destructuring rather than guessed (updateProjectStatus/updateWbsStatus
+// only send `{status}` even though the backend also accepts
+// actualStartDate/actualEndDate - no call site here provides those;
+// completeMilestone sends `{actualCompletionDate}`).
+const PROJECT_SYSTEMS_BASE = `${UNVERSIONED_BASE}/api/projectsystems`;
+
+export const projectSystemsAPI = {
+  createProject: (data) => api.post(PROJECT_SYSTEMS_BASE, data),
+  getProjects: (companyId, filters) => api.get(PROJECT_SYSTEMS_BASE, { params: { companyId, ...filters } }),
+  updateProjectStatus: (projectId, status) => api.post(`${PROJECT_SYSTEMS_BASE}/${projectId}/status`, { status }),
+  createWbsElement: (projectId, data) => api.post(`${PROJECT_SYSTEMS_BASE}/${projectId}/wbs`, data),
+  getProjectWbs: (projectId) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/wbs`),
+  getWbsCostRollup: (projectId) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/wbs/rollup`),
+  updateWbsStatus: (wbsId, status) => api.post(`${PROJECT_SYSTEMS_BASE}/wbs/${wbsId}/status`, { status }),
+  createMilestone: (projectId, data) => api.post(`${PROJECT_SYSTEMS_BASE}/${projectId}/milestones`, data),
+  getProjectMilestones: (projectId, params) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/milestones`, { params }),
+  getMilestoneStatusSummary: (projectId, asOfDate) =>
+    api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/milestones/summary`, { params: { asOfDate } }),
+  completeMilestone: (milestoneId, actualCompletionDate) =>
+    api.post(`${PROJECT_SYSTEMS_BASE}/milestones/${milestoneId}/complete`, { actualCompletionDate }),
+  getProjectBudgetVsActual: (projectId) => api.get(`${PROJECT_SYSTEMS_BASE}/${projectId}/budget-vs-actual`),
+};
+
+// 2026-09-15: didn't exist - glutWarningRoutes_merged.js/
+// foluBenchmarkRoutes_merged.js/wikipediaRoutes_merged.js/
+// foluRoutes_merged.js were all 38-line 'Route operational' scaffolds
+// swapped for their real implementations in index.js this same session;
+// logistics/freightPoolingRoutes_merged.js's flat sibling
+// (routes/freightPoolingRoutes.js) was already the real implementation
+// and already mounted. Every method/param name confirmed directly
+// against each route file's own req.query/req.params/req.body
+// destructuring.
+const GLUT_WARNING_BASE = `${UNVERSIONED_BASE}/api/glutwarning`;
+const FOLU_BENCHMARK_BASE = `${UNVERSIONED_BASE}/api/folubenchmark`;
+const WIKIPEDIA_BASE = `${UNVERSIONED_BASE}/api/wikipedia`;
+const FOLU_BASE = `${UNVERSIONED_BASE}/api/folu`;
+const FREIGHT_POOLING_BASE = `${UNVERSIONED_BASE}/api/freightpooling`;
+
+export const glutWarningAPI = {
+  checkGlutRisk: (categoryId, stateId) => api.get(`${GLUT_WARNING_BASE}/check`, { params: { categoryId, stateId } }),
+  scanAllCategories: (stateId) => api.get(`${GLUT_WARNING_BASE}/scan`, { params: { stateId } }),
+};
+
+export const foluBenchmarkAPI = {
+  listTransitions: () => api.get(`${FOLU_BENCHMARK_BASE}/transitions`),
+  getBenchmarkReport: () => api.get(`${FOLU_BENCHMARK_BASE}/report`),
+};
+
+export const wikipediaAPI = {
+  lookup: (q) => api.get(`${WIKIPEDIA_BASE}/lookup`, { params: { q } }),
+  getSummaryByTitle: (title) => api.get(`${WIKIPEDIA_BASE}/summary/${encodeURIComponent(title)}`),
+};
+
+export const foluAPI = {
+  landUseSummary: (params) => api.get(`${FOLU_BASE}/land-use/summary`, { params }),
+  schemeStatus: (farmerId) => api.get(`${FOLU_BASE}/schemes/${farmerId}`),
+};
+
+export const freightPoolingAPI = {
+  findPoolableShipments: (originAddress, destinationAddress) =>
+    api.get(`${FREIGHT_POOLING_BASE}/poolable-shipments`, { params: { originAddress, destinationAddress } }),
+  createPoolWindow: (data) => api.post(`${FREIGHT_POOLING_BASE}/windows`, data),
+  listOpenWindows: () => api.get(`${FREIGHT_POOLING_BASE}/windows`),
+  getPoolWindow: (windowId) => api.get(`${FREIGHT_POOLING_BASE}/windows/${windowId}`),
+  joinPoolWindow: (windowId, shipmentId) => api.post(`${FREIGHT_POOLING_BASE}/windows/${windowId}/join`, { shipmentId }),
+  closeAndDispatch: (windowId) => api.post(`${FREIGHT_POOLING_BASE}/windows/${windowId}/dispatch`),
+};
+
+// 2026-09-15: didn't exist. routes/labourRoutes.js was never mounted
+// anywhere AND had the same silent route-registration bug found 3 times
+// already this session (a lone CR where handle()'s closing brace should
+// have been, stranding every route inside it - see that file's own
+// header comment) - fixed and mounted for the first time at
+// /api/labour.
+const LABOUR_BASE = `${UNVERSIONED_BASE}/api/labour`;
+
+export const labourAPI = {
+  getWorkers: () => api.get(`${LABOUR_BASE}/workers`),
+  createWorker: (data) => api.post(`${LABOUR_BASE}/workers`, data),
+  getAttendance: () => api.get(`${LABOUR_BASE}/attendance`),
+  recordAttendance: (data) => api.post(`${LABOUR_BASE}/attendance`, data),
+  getPayments: () => api.get(`${LABOUR_BASE}/payments`),
+};
+
+// 2026-09-15: didn't exist. services/legacy/marketIntelligenceService.js
+// was never mounted anywhere - unlike most services/legacy/*.js files it
+// doesn't export a plain router, it exports a setupRoutes(app) function
+// that mounts itself directly at /api/v1/market-intelligence (called
+// from index.js this same session). Since that's already under the
+// versioned prefix the `api` instance's baseURL provides, these use a
+// relative path rather than the UNVERSIONED_BASE pattern every other
+// export on this page uses.
+export const marketIntelligenceAPI = {
+  getLatestIntelligence: (villageId) => api.get(`/market-intelligence/intelligence/village/${villageId}/latest`),
+  createIntelligence: (data) => api.post('/market-intelligence/intelligence', data),
+};
+
+// 2026-09-15: didn't exist - services/legacy/predictiveAnalyticsService.js
+// is already mounted at /api/predictiveanalytics (swapped in from a
+// scaffold earlier this session). Of the 5 methods the 2 importing pages
+// call, only 3 match this backend's real, generic entity/forecast_type
+// model (getForecasts, getPredictions, getUnacknowledgedAlerts) -
+// getDemandForecast(cropType, {region, forecastDays}) and
+// getPricingPrediction(cropType, {region}) assume a crop-and-region-
+// specific forecast endpoint that doesn't exist here (the real
+// GET /forecasts only filters by entity_id/entity_type/forecast_type,
+// nothing crop- or region-shaped) - not fabricated, left undefined same
+// as farmersAPI's unverified methods in the twenty-fourth update.
+const PREDICTIVE_ANALYTICS_BASE = `${UNVERSIONED_BASE}/api/predictiveanalytics`;
+
+export const predictiveAnalyticsAPI = {
+  getForecasts: (params) => api.get(`${PREDICTIVE_ANALYTICS_BASE}/forecasts`, { params }),
+  getPredictions: (entityId, entityType, predictionType) =>
+    api.get(`${PREDICTIVE_ANALYTICS_BASE}/predictions/${entityId}/${entityType}`, { params: { prediction_type: predictionType } }),
+  getUnacknowledgedAlerts: () => api.get(`${PREDICTIVE_ANALYTICS_BASE}/prediction-alerts/unacknowledged`),
+};
+
+// 2026-09-15: didn't exist - services/legacy/blockchainTraceabilityService.js
+// is already mounted at /api/blockchaintraceability (mounted earlier this
+// session as one of the 40 real-but-unmounted services). Both methods
+// confirmed directly against the route file's req.params/req.query
+// destructuring.
+const BLOCKCHAIN_TRACEABILITY_BASE = `${UNVERSIONED_BASE}/api/blockchaintraceability`;
+
+export const blockchainTraceabilityAPI = {
+  getTraceabilityEvents: (productId, batchNumber) =>
+    api.get(`${BLOCKCHAIN_TRACEABILITY_BASE}/traceability-events/${productId}`, { params: { batch_number: batchNumber } }),
+  verifyChainOfCustody: (productId, batchNumber) =>
+    api.get(`${BLOCKCHAIN_TRACEABILITY_BASE}/chain-of-custody/verify/${productId}`, { params: { batch_number: batchNumber } }),
+};
+
+// 2026-09-15: didn't exist - services/routes/paymentGatewayRoutes.js is
+// already mounted at /api/paymentgateway. All 4 methods matched 1:1
+// against paymentGatewayController.js directly.
+const PAYMENT_GATEWAY_BASE = `${UNVERSIONED_BASE}/api/paymentgateway`;
+
+export const paymentGatewayAPI = {
+  processPayment: (data) => api.post(`${PAYMENT_GATEWAY_BASE}/process`, data),
+  getPaymentStatus: (paymentId) => api.get(`${PAYMENT_GATEWAY_BASE}/status/${paymentId}`),
+  refundPayment: (paymentId, data) => api.post(`${PAYMENT_GATEWAY_BASE}/refund/${paymentId}`, data),
+  getSupportedGateways: () => api.get(`${PAYMENT_GATEWAY_BASE}/gateways`),
+};
+
+// 2026-09-15: didn't exist - services/legacy/formService.js is already
+// mounted at /api/form (one of the 40 real-but-unmounted services from
+// earlier this session). All 4 methods matched 1:1 against the route
+// file's own req.params destructuring.
+const FORM_BASE = `${UNVERSIONED_BASE}/api/form`;
+
+export const formsAPI = {
+  createForm: (data) => api.post(FORM_BASE, data),
+  getForms: () => api.get(FORM_BASE),
+  updateForm: (id, data) => api.put(`${FORM_BASE}/${id}`, data),
+  submitForm: (id, data) => api.post(`${FORM_BASE}/${id}/submit`, data),
+};
+
+// 2026-09-15: didn't exist - farmerTrainingRoutes_merged.js was a
+// 38-line scaffold swap this same session (mounted at
+// /api/farmertraining). Only 2 of the 3 methods the importing pages call
+// match this backend - register (POST /register) and getCarbonFootprint
+// (GET /carbon-footprint/:farmerId). getPrograms() has no matching
+// endpoint: the real backend only has POST /programs (create a program,
+// admin-facing), no GET /programs to list them - not fabricated, left
+// undefined.
+const FARMER_TRAINING_BASE = `${UNVERSIONED_BASE}/api/farmertraining`;
+
+export const farmerTrainingAPI = {
+  register: (data) => api.post(`${FARMER_TRAINING_BASE}/register`, data),
+  getCarbonFootprint: (farmerId) => api.get(`${FARMER_TRAINING_BASE}/carbon-footprint/${farmerId}`),
+};
+
+// 2026-09-15: didn't exist - riskPricingRoutes_merged.js is already
+// mounted at /api/riskpricing. Both methods' param names confirmed
+// directly against the route file's own req.query/req.body
+// destructuring (forward is a GET with crop/months/spot/etc as query
+// params; advise is a POST with cropKey/qtyKg/etc as body fields).
+const PRICING_BASE = `${UNVERSIONED_BASE}/api/riskpricing`;
+
+export const pricingAPI = {
+  forward: (params) => api.get(`${PRICING_BASE}/forward`, { params }),
+  advise: (data) => api.post(`${PRICING_BASE}/advise`, data),
+};
+
+// 2026-09-15: didn't exist - wearableIntegrationRoutes.js is already
+// mounted at /api/wearableintegration. All 6 methods matched 1:1 against
+// wearableIntegrationController.js directly.
+const WEARABLE_BASE = `${UNVERSIONED_BASE}/api/wearableintegration`;
+
+export const wearableAPI = {
+  getStatus: () => api.get(`${WEARABLE_BASE}/status`),
+  getFitbitAuthUrl: () => api.get(`${WEARABLE_BASE}/fitbit/auth-url`),
+  handleFitbitCallback: (code) => api.post(`${WEARABLE_BASE}/fitbit/callback`, { code }),
+  syncFitbit: () => api.post(`${WEARABLE_BASE}/fitbit/sync`),
+  getRecentActivity: (days) => api.get(`${WEARABLE_BASE}/activity/recent`, { params: { days } }),
+  disconnect: (provider) => api.delete(`${WEARABLE_BASE}/${provider}`),
+};
+
+// 2026-09-15: didn't exist - services/legacy/villageProfileService.js was
+// never mounted anywhere. Like marketIntelligenceService.js, it exports a
+// setupRoutes(app) function rather than a plain router, mounting itself
+// at /api/v1/village-profiles (called from index.js this same session).
+// Also found and fixed a real route-shadowing bug while wiring this: GET
+// /villages/search was registered after GET /villages/:villageId, making
+// search unreachable (same shape as productService.js's earlier fix).
+export const villageProfileAPI = {
+  searchVillages: (params) => api.get('/village-profiles/villages/search', { params }),
+};
+
+// 2026-09-16: didn't exist. All of these back onto services/legacy/*.js
+// files exporting a setupRoutes(app) function - none were ever manually
+// require()'d anywhere, which first looked like 9+ genuinely unmounted
+// services (a file called routes/ORPHANED_SERVICES_MOUNT.js even tries
+// to fix this, but has its own bug - it passes a sub-router where the
+// code expects the real app, so its routes end up double-prefixed and
+// unreachable). Investigated further before wiring anything: this
+// backend already runs core/dynamicServiceLoader.js's
+// mountServiceRoutes(app), called for real in index.js's startup
+// sequence, which discovers every services/**/*.js file and calls its
+// setupRoutes(app) correctly. Verified live (not assumed): instantiated
+// the loader directly, pointed it at the real services/ directory, and
+// confirmed GET /api/v1/subsidy/schemes and POST /api/v1/subsidy/apply
+// both reach real handlers (500/401, never 404) with zero backend
+// changes. ORPHANED_SERVICES_MOUNT.js is real but harmless dead weight
+// (a second, broken mount at a garbled path nothing calls) - left alone,
+// not worth touching since it doesn't affect anything real.
+//
+// All paths below use the versioned relative-path pattern (no
+// UNVERSIONED_BASE) since these services' setupRoutes() hardcode
+// /api/v1/... prefixes matching the api instance's own baseURL.
+
+export const subsidyOpsAPI = {
+  apply: (data) => api.post('/subsidy/apply', data),
+  calculateGst: (data) => api.post('/subsidy/gst/calculate', data),
+  checkEquipmentSubsidy: (data) => api.post('/subsidy/equipment/check', data),
+  checkLogisticsSubsidy: (data) => api.post('/subsidy/logistics/check', data),
+  checkProjectSubsidy: (data) => api.post('/subsidy/project/check', data),
+  getSchemes: (params) => api.get('/subsidy/schemes', { params }),
+  track: (id) => api.get(`/subsidy/track/${id}`),
+};
+
+export const governmentSchemeAPI = {
+  getWeatherAlerts: (params) => api.get('/government/weather/alerts', { params }),
+  getAnnouncements: (params) => api.get('/government/announcements', { params }),
+  getCsrOpportunities: (params) => api.get('/government/csr/opportunities', { params }),
+};
+
+// 2026-09-16: was the duplicate-filename shadowing bug (services/finance/
+// governmentSchemeService.js won the service loader's Map over
+// services/legacy/governmentSchemeService.js, which has these 2
+// endpoints). Fixed not by re-keying the loader (too large/risky a
+// change - it discovers 313 services) but by calling the legacy file's
+// setupRoutes(app) directly in index.js, additively (see that file's own
+// comment) - both files register directly on `app` at the same
+// /api/v1/government/... prefix, so the winning file's 9 endpoints keep
+// working unchanged and these 2 extra ones from legacy are now also
+// registered.
+export const schemeRegistryAPI = {
+  list: (params) => api.get('/government/schemes/registry', { params }),
+  getExpiring: (days) => api.get('/government/schemes/registry/expiring', { params: { days } }),
+};
+
+export const preSeasonAPI = {
+  getDashboard: (params) => api.get('/pre-season/dashboard', { params }),
+  createOrder: (data) => api.post('/pre-season/orders', data),
+};
+
+export const sharedInfraAPI = {
+  searchAssets: (params) => api.get('/shared-infra/assets/search', { params }),
+  searchSecondLife: (params) => api.get('/shared-infra/second-life/search', { params }),
+  getRenewableSupport: (params) => api.get('/shared-infra/renewable/support', { params }),
+  registerAsset: (data) => api.post('/shared-infra/assets/register', data),
+  bookAsset: (data) => api.post('/shared-infra/assets/book', data),
+};
+
+// 2026-09-16: aiAdvisoryAPI/buyingClubAPI/procurementSubscriptionAPI/
+// renewableEnergyAPI/ruralEnterpriseAPI - same duplicate-filename
+// shadowing bug as schemeRegistryAPI above, same fix: each legacy file's
+// setupRoutes(app) is now called directly in index.js, additively (see
+// that file's comment - verified none collides with what the
+// Map-winning file already serves at each prefix).
+export const aiAdvisoryAPI = {
+  getStatistics: (params) => api.get('/ai-advisories/advisories/statistics', { params }),
+};
+
+export const buyingClubAPI = {
+  getStatistics: (params) => api.get('/buying-clubs/clubs/statistics', { params }),
+};
+
+export const procurementSubscriptionAPI = {
+  getStatistics: (params) => api.get('/procurement-subscriptions/subscriptions/statistics', { params }),
+};
+
+export const renewableEnergyAPI = {
+  getStatistics: (params) => api.get('/renewable-energy/systems/statistics', { params }),
+};
+
+export const ruralEnterpriseAPI = {
+  getStatistics: (params) => api.get('/rural-enterprises/enterprises/statistics', { params }),
 };
 
 export const aiSelfHealingAPI = {
@@ -290,9 +882,13 @@ export const farmerAPI = {
   updateProfile: (data) => api.put('/farmer/profile', data),
 };
 
+// 2026-09-16: was api.get('/products') - resolves to /api/v1/products,
+// which doesn't exist. `productsAPI` (plural) above already points at
+// the real router correctly - this singular `productAPI` export is used
+// elsewhere and left pointed at the same real base for consistency.
 export const productAPI = {
-  getProducts: () => api.get('/products'),
-  getProduct: (id) => api.get(`/products/${id}`),
+  getProducts: (params) => api.get(PRODUCT_BASE, { params }),
+  getProduct: (id) => api.get(`${PRODUCT_BASE}/${id}`),
 };
 
 export const orderAPI = {
@@ -349,6 +945,18 @@ export const searchAPI = {
 export const animalHealthAPI = {
   getAnimalHealth: () => api.get('/animal-health'),
   manageAnimalHealth: (data) => api.post('/animal-health/manage', data),
+  // 2026-09-17: real, mounted at /api/animalhealth (routes/animalHealthRoutes.js
+  // -> services/legacy/animalHealthService.js, table-backed
+  // animal_health_examinations, M127). LivestockManagementPage.jsx's health
+  // tab already carries a backendNote claiming this was "fixed 2026-08-17",
+  // but these methods were never actually added here - the note was stale/
+  // aspirational, not reality. Field names match the real INSERT columns
+  // exactly. deleteExamination exists on the real service/route too but the
+  // page never wires a `remove` prop for this tab (its own note says so) -
+  // left as-is, not added speculatively.
+  listExaminations: (params) => api.get(`${UNVERSIONED_BASE}/api/animalhealth/examinations`, { params }),
+  createExamination: (data) => api.post(`${UNVERSIONED_BASE}/api/animalhealth/examinations`, data),
+  updateExamination: (id, data) => api.put(`${UNVERSIONED_BASE}/api/animalhealth/examinations/${id}`, data),
 };
 
 export const assetAccountingAPI = {
@@ -359,11 +967,45 @@ export const assetAccountingAPI = {
 export const companyAPI = {
   getCompanies: () => api.get('/company'),
   getCompany: (id) => api.get(`/company/${id}`),
+  // 2026-09-17: real, mounted at /api/company (routes/companyRoutes.js ->
+  // services/legacy/companyService.js). AssetAccountingPage.jsx,
+  // ProjectSystemsPage.jsx and CostControlPage.jsx all call
+  // companyAPI.listCompanies() bare (no try/catch) directly inside a
+  // useEffect body - since the method didn't exist, this was a genuine
+  // unguarded synchronous TypeError crash on every render of all three
+  // pages, the same bug class as the escrowAPI fix earlier this session.
+  // getFiscalYears/getChartOfAccounts added alongside it for the same
+  // reason - CostControlPage.jsx calls both bare inside a
+  // Promise.all([...]) array literal, same unguarded-crash shape, once
+  // companyId is set from the (now working) listCompanies() call above.
+  listCompanies: () => api.get(`${UNVERSIONED_BASE}/api/company`),
+  getFiscalYears: (companyId) => api.get(`${UNVERSIONED_BASE}/api/company/${companyId}/fiscal-years`),
+  getChartOfAccounts: (companyId) => api.get(`${UNVERSIONED_BASE}/api/company/${companyId}/chart-of-accounts`),
 };
 
 export const authorizationAPI = {
   getAuthorizations: () => api.get('/authorization'),
   checkAuthorization: (data) => api.post('/authorization/check', data),
+  // 2026-09-17: getUsers/updateUserRole are real, mounted at
+  // /api/v1/user-management (modules/M011/routes.js -> modules/M011/service.js,
+  // table-backed `users`). GET responds {success, data: {users, pagination}},
+  // reshaped here to a plain array to match AuthorizationPage.jsx's own
+  // `res.data?.data ?? []` unwrap (which expects the array directly).
+  // getAuditLog reuses the real, already-wired M008 audit log endpoint
+  // (auditComplianceAPI.getAuditLogs's backend) - same real audit_logs
+  // table, no separate "authorization audit" concept exists or was
+  // invented. getRoles is deliberately NOT wired: the page needs
+  // [{role, permissions}] mirroring authService.js's hardcoded
+  // getUserPermissions() role map, but that function isn't exported from
+  // authService.js and this session treats authorization logic as
+  // do-not-modify - building a duplicate copy of that map elsewhere would
+  // risk silently drifting from the real enforced permissions, which is
+  // worse than the page's existing, explicitly-labelled fallback (the page
+  // already shows the identical FALLBACK_ROLES catalogue on error, so nothing
+  // is broken by leaving this one unwired).
+  getUsers: () => api.get('/user-management').then((res) => ({ ...res, data: { ...res.data, data: res.data?.data?.users ?? [] } })),
+  updateUserRole: (userId, data) => api.put(`/user-management/${userId}`, data),
+  getAuditLog: (params) => api.get('/audit-compliance/logs', { params }),
 };
 
 export const ecommerceBusinessSalesAPI = {
@@ -374,6 +1016,18 @@ export const ecommerceBusinessSalesAPI = {
 export const walletAPI = {
   getWalletBalance: () => api.get('/wallet'),
   makePayment: (data) => api.post('/wallet/payment', data),
+  // 2026-09-17: real, DB-backed, transactional wallet functions
+  // (services/legacy/farmerService.js - row-level locking on deposit/
+  // withdraw/transfer, see that file's own comments) exposed self-scoped
+  // (no walletId needed - resolved server-side via resolveFarmerId from
+  // the authenticated user's own farmer record) at routes/
+  // farmerPortalEnhancements_merged.js, already mounted at
+  // /api/farmerportalenhancements. WalletPage.jsx calls all five.
+  getWallet: () => api.get(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet`),
+  getTransactions: (params) => api.get(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet/transactions`, { params }),
+  deposit: (data) => api.post(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet/deposit`, data),
+  withdraw: (data) => api.post(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet/withdraw`, data),
+  transfer: (data) => api.post(`${UNVERSIONED_BASE}/api/farmerportalenhancements/wallet/transfer`, data),
 };
 
 export const finmanAPI = {
@@ -414,6 +1068,15 @@ export const loanAPI = {
 export const insuranceAPI = {
   getPolicies: () => api.get('/insurance/policies'),
   createPolicy: (data) => api.post('/insurance/policies', data),
+  // 2026-09-17: real, DB-backed (services/legacy/insuranceService.js's own
+  // router), already mounted at /api/insurance (unversioned - note this
+  // differs from getPolicies/createPolicy above, which use the versioned
+  // relative path against a mount that doesn't actually exist there; a
+  // pre-existing mismatch, left as-is since it's outside this fix's scope).
+  // InsuranceManagementPage.jsx calls all three.
+  getInsuranceProducts: () => api.get(`${UNVERSIONED_BASE}/api/insurance/products`),
+  getClaims: () => api.get(`${UNVERSIONED_BASE}/api/insurance/claims`),
+  submitClaim: (data) => api.post(`${UNVERSIONED_BASE}/api/insurance/claims`, data),
 };
 
 export const logisticsAPI = {
@@ -459,6 +1122,13 @@ export const schemeAPI = {
 export const complianceAPI = {
   getComplianceStatus: () => api.get('/compliance/status'),
   submitReport: (data) => api.post('/compliance/reports', data),
+  // 2026-09-17: real, mounted at /api/compliance (routes/complianceRoutes.js
+  // -> services/legacy/complianceService.js, reads the tds_deductions
+  // table). CADashboardPage.jsx already had a comment claiming these were
+  // "genuinely wired up" but they were never actually added here - a
+  // documented-but-not-done gap, not a working feature.
+  tdsSummary: (params) => api.get(`${UNVERSIONED_BASE}/api/compliance/tds/summary`, { params }),
+  tdsRates: () => api.get(`${UNVERSIONED_BASE}/api/compliance/tds/rates`),
 };
 
 export const auditAPI = {
@@ -514,6 +1184,26 @@ export const soilAPI = {
 export const weatherAPI = {
   getCurrentWeather: () => api.get('/weather/current'),
   getForecast: () => api.get('/weather/forecast'),
+  // 2026-09-17: real, mounted at /api/weather (routes/weatherRoutes_merged.js
+  // -> services/agriculture/weatherService.js, migration 057). ClimateAdvisoryPage.jsx's
+  // own comment already correctly identified these as real and mounted,
+  // but they were never actually added to this object. ForwardPricingPage.jsx
+  // calls forArp() for the same real /for-arp endpoint.
+  activeAlerts: () => api.get(`${UNVERSIONED_BASE}/api/weather/alerts/active`),
+  pestForecast: (params) => api.get(`${UNVERSIONED_BASE}/api/weather/pest-forecast`, { params }),
+  forArp: ({ state, district, days }) => api.get(`${UNVERSIONED_BASE}/api/weather/for-arp`, { params: { state, district, days } }),
+  // 2026-09-17: same already-mounted router (routes/weatherRoutes_merged.js
+  // -> services/legacy/weatherService.js) also exposes these - all real,
+  // DB-backed (coverage/dispatchCheck read v_weather_coverage/
+  // v_active_dispatch_blocks; forecastAccuracy reads v_forecast_accuracy;
+  // advisoryTriggers reads real climate_indices/weather_observations rows -
+  // no fabricated values, see the service file's own header comment for
+  // the SPI/heat-stress thresholds used). ClimateWeatherPage.jsx and
+  // WeatherAnalyticsPage.jsx both call all four.
+  coverage: () => api.get(`${UNVERSIONED_BASE}/api/weather/coverage`),
+  dispatchCheck: (districts) => api.get(`${UNVERSIONED_BASE}/api/weather/alerts/dispatch-check`, { params: { districts: Array.isArray(districts) ? districts.join(',') : districts } }),
+  forecastAccuracy: () => api.get(`${UNVERSIONED_BASE}/api/weather/forecast-accuracy`),
+  advisoryTriggers: (params) => api.get(`${UNVERSIONED_BASE}/api/weather/advisory-triggers`, { params }),
 };
 
 export const schemeBenefitsAPI = {
@@ -589,6 +1279,16 @@ export const hrAPI = {
 export const financeAPI = {
   getFinancialData: () => api.get('/finance'),
   getAccounts: () => api.get('/finance/accounts'),
+  // 2026-09-17: real, mounted at /api/recoveredfinance (routes/
+  // recoveredFinanceRoutes_merged.js -> services/finance/
+  // recoveredFinanceService.js). LedgerPage.jsx calls trialBalance()/
+  // verifyLedger() (hash-chained GL integrity check) inside a try/catch'd
+  // Promise.all - was already crash-safe, but had no real backend wired.
+  // BankPassportPage.jsx calls getMyEnwrReceipts() - self-scoped to the
+  // caller's own farmerId via resolveFarmerId middleware, no ID needed.
+  trialBalance: () => api.get(`${UNVERSIONED_BASE}/api/recoveredfinance/ledger/trial-balance`),
+  verifyLedger: () => api.get(`${UNVERSIONED_BASE}/api/recoveredfinance/ledger/verify`),
+  getMyEnwrReceipts: () => api.get(`${UNVERSIONED_BASE}/api/recoveredfinance/enwr/my-receipts`),
 };
 
 export const legalAPI = {
@@ -1539,6 +2239,31 @@ export const breachAPI = {
 export const digitalTwinAPI = {
   getDigitalTwin: () => api.get('/digital-twin'),
   createDigitalTwin: (data) => api.post('/digital-twin', data),
+  // 2026-09-17: real, already mounted (services/legacy/digitalTwinService.js's
+  // own setupRoutes(app), see index.js) at /api/v1/digital-twin.
+  // DigitalTwinDashboardPage.jsx's getTwins/runSimulation map onto this
+  // exactly - GET /api/v1/digital-twin (list) responds {success, twins},
+  // reshaped here to a plain array to match how the page consumes it
+  // (`res.data` used directly as an array). POST .../simulate needs a real
+  // modelType key (cropGrowthModel/soilMoistureModel/pestSpreadModel/
+  // yieldPredictionModel/climateImpactModel from
+  // initializeSimulationEngine() - see index.js, which was never called
+  // before this fix, so simulate previously threw on the null engine
+  // regardless of frontend wiring) - the page's own hardcoded
+  // `{ type: 'standard' }` scenario didn't match any of those and has been
+  // corrected there.
+  //
+  // getStatus/syncRealData are NOT wired: getStatus's expected shape
+  // (`status.modelCount`) has no real backend counterpart anywhere, and the
+  // page calls syncRealData(twinId) with no sensor payload - the only real
+  // endpoint that could serve it (POST .../sensor-data) requires a real
+  // {type, value, unit, location} reading to insert; calling it empty would
+  // silently write a garbage/null sensor_data row and update twin state
+  // with `undefined` while the page shows "Data sync completed" - exactly
+  // the kind of fabricated-success trap this audit is watching for, so
+  // left unwired as a genuine, documented gap instead.
+  getTwins: () => api.get('/digital-twin').then((res) => ({ ...res, data: res.data?.twins ?? res.data })),
+  runSimulation: (twinId, modelType) => api.post(`/digital-twin/${twinId}/simulate`, { modelType }),
 };
 
 export const healthAPI = {
@@ -1589,11 +2314,30 @@ export const farmAnalyticsAPI = {
 export const experienceAPI = {
   getExperiences: () => api.get('/experience'),
   addExperience: (data) => api.post('/experience/add', data),
+  // 2026-09-17: real, already mounted at /api/experience (unversioned -
+  // routes/experienceRoutes.js -> services/legacy/experienceLayerService.js,
+  // a complete, real design-system/DXP backend, fully routed already, just
+  // never called from the frontend). ExperienceLayerPage.jsx calls all 5.
+  themes: () => api.get(`${UNVERSIONED_BASE}/api/experience/themes`),
+  motion: (reduced) => api.get(`${UNVERSIONED_BASE}/api/experience/motion`, { params: { reduced } }),
+  components: (params) => api.get(`${UNVERSIONED_BASE}/api/experience/components`, { params }),
+  accessibility: () => api.get(`${UNVERSIONED_BASE}/api/experience/accessibility`),
+  contrast: (fg, bg, large) => api.get(`${UNVERSIONED_BASE}/api/experience/contrast`, { params: { fg, bg, large } }),
 };
 
+// 2026-09-16: was { getEscrows, createEscrow } - unused by the one live
+// consumer, EscrowPage.jsx, which calls .list()/.release()/.refund() that
+// didn't exist here at all (a TypeError before any request was even sent).
+// Wired to the real, now-mounted services/legacy/escrowService.js routes
+// (/api/v1/escrow via the api instance's own baseURL) instead.
 export const escrowAPI = {
-  getEscrows: () => api.get('/escrow'),
-  createEscrow: (data) => api.post('/escrow', data),
+  list: () => api.get('/escrow'),
+  create: (data) => api.post('/escrow', data),
+  release: (escrowId, data) => api.post(`/escrow/${escrowId}/release`, data),
+  refund: (escrowId) => api.post(`/escrow/${escrowId}/refund`),
+  get: (escrowId) => api.get(`/escrow/${escrowId}`),
+  getByOrder: (orderId) => api.get(`/escrow/order/${orderId}`),
+  getByUser: (userId, role) => api.get(`/escrow/user/${userId}`, { params: role ? { role } : undefined }),
 };
 
 export const equipmentExchangeAPI = {
@@ -1609,6 +2353,14 @@ export const enterpriseRouteSupportAPI = {
 export const enterpriseIntegrationAPI = {
   getEnterpriseIntegration: () => api.get('/enterprise-integration'),
   integrateEnterprise: (data) => api.post('/enterprise-integration/integrate', data),
+  // 2026-09-17: real, mounted at /api/enterpriseintegration (routes/enterpriseIntegrationRoutes.js
+  // -> services/enterpriseIntegrationService.js, table-backed
+  // enterprise_integrations/integration_sync_logs). EnterpriseIntegrationPage.jsx
+  // calls both. getSystemStatus deliberately NOT added - see the route
+  // file's comment for why (no real backend match, would mean fabricating
+  // a summary).
+  getCurrentOrganizationIntegrations: () => api.get(`${UNVERSIONED_BASE}/api/enterpriseintegration/organizations/current`),
+  getIntegrationHealth: (integrationId) => api.get(`${UNVERSIONED_BASE}/api/enterpriseintegration/${integrationId}/health`),
 };
 
 export const enterpriseAIAPI = {
@@ -1619,6 +2371,23 @@ export const enterpriseAIAPI = {
 export const engineeringProjectAPI = {
   getEngineeringProjects: () => api.get('/engineering-project'),
   createProject: (data) => api.post('/engineering-project', data),
+  // 2026-09-17: real, mounted at /api/engineeringproject (routes/engineeringProjectRoutes.js
+  // -> services/legacy/engineeringProjectService.js, table-backed
+  // engineering_projects/boq_items/cost_estimates). EngineeringProjectPage.jsx's
+  // own header comment already claimed all 6 methods were "verified to
+  // exist on the service export (2026-08-29)" - true of the service, but
+  // api.js itself was never actually updated to add them, so every call
+  // threw "is not a function" regardless. createProject above already
+  // existed under this exact name pointing at a dead /engineering-project
+  // endpoint, so the real one is named createEngineeringProject instead and
+  // the page's call site updated to match (api.js is append-only, can't
+  // redefine the existing key).
+  createEngineeringProject: (data) => api.post(`${UNVERSIONED_BASE}/api/engineeringproject/projects`, data),
+  listProjects: (params) => api.get(`${UNVERSIONED_BASE}/api/engineeringproject/projects`, { params }),
+  getProject: (id) => api.get(`${UNVERSIONED_BASE}/api/engineeringproject/projects/${id}`),
+  updateProjectPhase: (id, data) => api.put(`${UNVERSIONED_BASE}/api/engineeringproject/projects/${id}/phase`, data),
+  createCostEstimate: (id, data) => api.post(`${UNVERSIONED_BASE}/api/engineeringproject/projects/${id}/cost-estimates`, data),
+  getCostEstimates: (id) => api.get(`${UNVERSIONED_BASE}/api/engineeringproject/projects/${id}/cost-estimates`),
 };
 
 export const energyAPI = {
@@ -1634,6 +2403,12 @@ export const ecommerceAPI = {
 export const ecommerceMarketingAPI = {
   getEcommerceMarketing: () => api.get('/ecommerce-marketing'),
   runMarketingCampaign: (data) => api.post('/ecommerce-marketing/campaign', data),
+  // 2026-09-17: real, mounted at /api/ecommercemarketing (routes/
+  // ecommerceMarketingRoutes_merged.js -> controllers/
+  // ecommerceMarketingController.js -> services/legacy/
+  // ecommerceMarketingService.js). MarketingCenter.jsx calls both.
+  getMarketingAnalytics: (params) => api.get(`${UNVERSIONED_BASE}/api/ecommercemarketing/analytics`, { params }),
+  getSponsoredProducts: (params) => api.get(`${UNVERSIONED_BASE}/api/ecommercemarketing/sponsored-products`, { params }),
 };
 
 export const ecommerceIntegrationAPI = {
@@ -1644,6 +2419,16 @@ export const ecommerceIntegrationAPI = {
 export const ecommerceERPAPI = {
   getEcommerceERP: () => api.get('/ecommerce-erp'),
   configureERP: (data) => api.put('/ecommerce-erp/configure', data),
+  // 2026-09-17: real, already mounted at /api/ecommerceerp (routes/ecommerceERPRoutes_merged.js
+  // -> controllers/ecommerceERPController.js -> services/legacy/ecommerceERPService.js).
+  // ERPDashboard.jsx calls all 5 (a separate, unrelated in-memory scaffold
+  // also exists at routes/commerce/ecommerceERPRoutes.js, but nothing
+  // mounts it - not used here).
+  postToGeneralLedger: (transactionData) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/post-gl`, transactionData),
+  generateGSTInvoice: (orderId) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/generate-gst-invoice/${orderId}`),
+  syncInventoryWithERP: (productId) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/sync-inventory/${productId}`),
+  syncCustomerWithCRM: (userId) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/sync-customer/${userId}`),
+  createProductionOrder: (data) => api.post(`${UNVERSIONED_BASE}/api/ecommerceerp/create-production-order`, data),
 };
 
 export const dprGenerationAPI = {
@@ -1664,6 +2449,13 @@ export const demandAPI = {
 export const defenseFitnessPrepAPI = {
   getDefenseFitnessPrep: () => api.get('/defense-fitness-prep'),
   prepareDefense: (data) => api.post('/defense-fitness-prep/prepare', data),
+  // 2026-09-17: real, mounted at /api/defensefitnessprep
+  // (routes/defenseFitnessPrepRoutes.js -> controllers/defenseFitnessPrepController.js
+  // -> services/legacy/defenseFitnessPrepService.js). DefenseFitnessPrepPage.jsx
+  // calls all 3.
+  getCategories: () => api.get(`${UNVERSIONED_BASE}/api/defensefitnessprep/categories`),
+  getReadiness: (category, gender) => api.get(`${UNVERSIONED_BASE}/api/defensefitnessprep/readiness/${category}`, { params: gender ? { gender } : undefined }),
+  recordAttempt: (category, testComponent, recordedValue, source) => api.post(`${UNVERSIONED_BASE}/api/defensefitnessprep/attempts`, { category, test_component: testComponent, recorded_value: recordedValue, source }),
 };
 
 export const decisionSupportAPI = {
@@ -1689,6 +2481,14 @@ export const dairyAPI = {
 export const cropValueResearchAPI = {
   getCropValueResearch: () => api.get('/crop-value-research'),
   researchCropValue: (data) => api.post('/crop-value-research/research', data),
+  // 2026-09-17: real, mounted at /api/cropvalueresearch (routes/
+  // cropValueResearchRoutes.js, newly wired to controllers/
+  // cropValueResearchController.js -> services/legacy/
+  // cropValueResearchService.js's getPendingSuggestions()/reviewSuggestion()
+  // - AI-suggested crop value-compound reference data, verified=FALSE
+  // until a human approves via review()). CropValueReviewPage.jsx calls both.
+  getPending: () => api.get(`${UNVERSIONED_BASE}/api/cropvalueresearch/pending`),
+  review: (id, approve) => api.post(`${UNVERSIONED_BASE}/api/cropvalueresearch/${id}/review`, { approve }),
 };
 
 export const cropRecommendationsAPI = {
@@ -1754,6 +2554,14 @@ export const communityManagementAPI = {
 export const coldStorageAPI = {
   getColdStorage: () => api.get('/cold-storage'),
   manageColdStorage: (data) => api.post('/cold-storage/manage', data),
+  // 2026-09-17: real, mounted at /api/coldstorage (routes/coldStorageRoutes.js
+  // -> services/legacy/coldStorageService.js, a genuine transactional
+  // booking-capacity service). ColdStorageDashboardPage.jsx calls all 5.
+  getFacilities: (params) => api.get(`${UNVERSIONED_BASE}/api/coldstorage/facilities`, { params }),
+  getStatus: () => api.get(`${UNVERSIONED_BASE}/api/coldstorage/status`),
+  getTemperatureData: (facilityId, params) => api.get(`${UNVERSIONED_BASE}/api/coldstorage/${facilityId}/temperature`, { params }),
+  getComplianceStatus: (facilityId, hours) => api.get(`${UNVERSIONED_BASE}/api/coldstorage/${facilityId}/compliance`, { params: hours ? { hours } : undefined }),
+  bookFacility: (facilityId, data) => api.post(`${UNVERSIONED_BASE}/api/coldstorage/${facilityId}/book`, data),
 };
 
 export const coldChainMonitoringAPI = {
@@ -1769,6 +2577,20 @@ export const climateAdvisoryAPI = {
 export const civilDisruptionAPI = {
   getCivilDisruption: () => api.get('/civil-disruption'),
   reportDisruption: (data) => api.post('/civil-disruption/report', data),
+  // 2026-09-17: real, mounted at /api/civildisruption (routes/
+  // civilDisruptionRoutes.js -> services/legacy/civilDisruptionService.js).
+  // DisruptionPage.jsx calls both.
+  listActive: (params) => api.get(`${UNVERSIONED_BASE}/api/civildisruption/active`, { params }),
+  report: (data) => api.post(`${UNVERSIONED_BASE}/api/civildisruption`, data),
+  // 2026-09-17: same already-mounted router (routes/civilDisruptionRoutes.js
+  // -> services/legacy/civilDisruptionService.js) also exposes these
+  // admin/action endpoints - all real, DB-backed (civil_disruption_events
+  // table; checkShipmentRisk does a real ILIKE match against the shipment's
+  // own addresses, see the service file's header comment on why that is
+  // not GPS routing). MarketSignalsPage.jsx calls all three.
+  verify: (id) => api.post(`${UNVERSIONED_BASE}/api/civildisruption/${id}/verify`),
+  resolve: (id, endDate) => api.post(`${UNVERSIONED_BASE}/api/civildisruption/${id}/resolve`, { endDate }),
+  checkShipmentRisk: (shipmentId) => api.get(`${UNVERSIONED_BASE}/api/civildisruption/shipments/${shipmentId}/risk`),
 };
 
 export const certificationManagementAPI = {
@@ -1844,6 +2666,14 @@ export const unifiedAIGatewayAPI2 = {
 export const transactionAPI = {
   getTransactions: () => api.get('/transactions'),
   createTransaction: (data) => api.post('/transactions', data),
+  // 2026-09-17: real, mounted at /api/transaction (routes/
+  // transactionRoutes.js -> controllers/transactionController.js ->
+  // services/transactionService.js's getUserTransactions). TransactionHistoryPage.jsx
+  // calls this - note that page currently passes a hardcoded 'user123'
+  // placeholder instead of a real user id (its own pre-existing, separately
+  // flagged TODO, not something this fix changes), so this will 404/return
+  // empty until that placeholder is replaced with a real id from auth.
+  getUserTransactions: (userId, params) => api.get(`${UNVERSIONED_BASE}/api/transaction/user/${userId}`, { params }),
 };
 
 export const trackDartAPI = {
@@ -1886,9 +2716,17 @@ export const soilManagementAPI = {
   analyzeSoil: (data) => api.post('/soil-management/analyze', data),
 };
 
+// 2026-09-16: was a pre-existing fabricated placeholder (wrong method
+// names, missing update/delete entirely, made-up path). Fixed against
+// the new backend/src/routes/soilRegistryRoutes.js (wraps
+// services/legacy/soilManagementService.js's real createCrudService(...)
+// objects, previously unrouted).
+const SOIL_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/soil-registry`;
 export const soilHealthAPI = {
-  getSoilHealth: () => api.get('/soil-health'),
-  improveSoilHealth: (data) => api.post('/soil-health/improve', data),
+  getCards: (params) => api.get(`${SOIL_REGISTRY_BASE}/health-cards`, { params }),
+  createCard: (data) => api.post(`${SOIL_REGISTRY_BASE}/health-cards`, data),
+  updateCard: (id, data) => api.put(`${SOIL_REGISTRY_BASE}/health-cards/${id}`, data),
+  deleteCard: (id) => api.delete(`${SOIL_REGISTRY_BASE}/health-cards/${id}`),
 };
 
 export const sheepAPI = {
@@ -1904,11 +2742,30 @@ export const sellerVerificationsAPI = {
 export const sellerRankingAPI = {
   getSellerRankings: () => api.get('/seller-ranking'),
   rankSeller: (id, data) => api.post(`/seller-ranking/${id}`, data),
+  // 2026-09-17: real, mounted at /api/sellerranking (routes/
+  // sellerRankingRoutes.js, newly wired to services/legacy/
+  // sellerRankingService.js - ranks sellers by real farmers.fdi_score/
+  // fulfilled_orders/disputes/years_active/certification_count/
+  // training_completed columns). MarketSignalsPage.jsx calls both.
+  getRankedSellers: (params) => api.get(`${UNVERSIONED_BASE}/api/sellerranking/ranked`, { params }),
+  getSellerTrustScore: (userId) => api.get(`${UNVERSIONED_BASE}/api/sellerranking/trust-score/${userId}`),
 };
 
+// 2026-09-15: pointed at /seed-vault, which doesn't exist under the
+// /api/v1 base this file uses, and was missing getCategories()/
+// deleteSeed() that SeedVaultPage.jsx actually calls.
+// routes/seedVaultRoutes_merged.js is real (not the usual scaffold -
+// mounted in the twenty-first backlog update) and matches these 4
+// methods exactly; it also has recordUsage(seedId, amountUsed), not yet
+// called by any page but real and free to expose alongside the rest.
+const SEED_VAULT_BASE = `${UNVERSIONED_BASE}/api/seedvault`;
+
 export const seedVaultAPI = {
-  getSeeds: () => api.get('/seed-vault'),
-  addSeed: (data) => api.post('/seed-vault', data),
+  getSeeds: () => api.get(SEED_VAULT_BASE),
+  getCategories: () => api.get(`${SEED_VAULT_BASE}/categories`),
+  addSeed: (data) => api.post(SEED_VAULT_BASE, data),
+  deleteSeed: (seedId) => api.delete(`${SEED_VAULT_BASE}/${seedId}`),
+  recordUsage: (seedId, amountUsed) => api.post(`${SEED_VAULT_BASE}/${seedId}/record-usage`, { amountUsed }),
 };
 
 export const sapModuleArchitectureAPI = {
@@ -1919,6 +2776,12 @@ export const sapModuleArchitectureAPI = {
 export const roleManagementAPI = {
   getRoles: () => api.get('/role-management'),
   createRole: (data) => api.post('/role-management', data),
+  // 2026-09-17: real, mounted at /api/rolemanagement (routes/
+  // roleManagementRoutes.js -> services/legacy/roleManagementService.js).
+  // IdentityManagementPage.jsx's ResourceManager update/remove props call
+  // these exact names.
+  updateRole: (id, data) => api.put(`${UNVERSIONED_BASE}/api/rolemanagement/${id}`, data),
+  deleteRole: (id) => api.delete(`${UNVERSIONED_BASE}/api/rolemanagement/${id}`),
 };
 
 export const riskPricingAPI = {
@@ -1934,16 +2797,40 @@ export const riskAssessmentAPI = {
 export const rfqAPI = {
   getRFQs: () => api.get('/rfq'),
   createRFQ: (data) => api.post('/rfq', data),
+  // 2026-09-17: same already-mounted router (routes/rfqRoutes_merged.js at
+  // /api/rfq) also exposes these - all real, DB-backed (qc_holds,
+  // quote_outcomes, v_fpo_centre_pnl). RfqPage.jsx calls all four.
+  activeHolds: () => api.get(`${UNVERSIONED_BASE}/api/rfq/qc/holds`),
+  lossAnalysis: (params) => api.get(`${UNVERSIONED_BASE}/api/rfq/quotes/loss-analysis`, { params }),
+  centrePnl: (fpoId) => api.get(`${UNVERSIONED_BASE}/api/rfq/fpo/centre-pnl`, { params: fpoId ? { fpoId } : {} }),
+  releaseQcHold: (data) => api.post(`${UNVERSIONED_BASE}/api/rfq/qc/release`, data),
 };
 
 export const returnLoadBoardAPI = {
   getReturnLoads: () => api.get('/return-load-board'),
   postReturnLoad: (data) => api.post('/return-load-board', data),
+  // 2026-09-17: real, mounted at /api/returnloadboard (routes/returnLoadBoardRoutes.js
+  // -> services/legacy/returnLoadBoardService.js, table-backed
+  // return_load_postings). LogisticsMatchingPage.jsx's Return-Load Board tab
+  // calls all 4.
+  postCapacity: (data) => api.post(`${UNVERSIONED_BASE}/api/returnloadboard/postings`, data),
+  searchAvailable: (params) => api.get(`${UNVERSIONED_BASE}/api/returnloadboard/postings`, { params }),
+  bookPosting: (postingId, shipmentId) => api.post(`${UNVERSIONED_BASE}/api/returnloadboard/postings/${postingId}/book`, { shipmentId }),
+  cancelPosting: (postingId) => api.delete(`${UNVERSIONED_BASE}/api/returnloadboard/postings/${postingId}`),
 };
 
 export const researchAndDevelopmentAPI = {
   getRAndD: () => api.get('/research-and-development'),
   createResearch: (data) => api.post('/research-and-development', data),
+  // 2026-09-17: real, mounted at /api/researchanddevelopment (routes/researchAndDevelopmentRoutes.js
+  // -> services/legacy/researchAndDevelopmentService.js, a real in-memory
+  // R&D management service, not fabricated - see that route file's comment).
+  // ResearchDashboardPage.jsx calls all 5.
+  getRDProjects: (filters) => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/projects`, { params: filters }),
+  getCollaborations: (filters) => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/collaborations`, { params: filters }),
+  getInnovations: (filters) => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/innovations`, { params: filters }),
+  getRDAnalytics: () => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/analytics`),
+  searchKnowledgeBase: (query, filters) => api.get(`${UNVERSIONED_BASE}/api/researchanddevelopment/knowledge-base`, { params: { q: query, ...filters } }),
 };
 
 export const regionalVarietyAPI = {
@@ -1964,6 +2851,18 @@ export const recoveredFinanceAPI = {
 export const realtimeMonitoringAPI = {
   getRealtimeMonitoring: () => api.get('/realtime-monitoring'),
   startMonitoring: (data) => api.post('/realtime-monitoring/start', data),
+  // 2026-09-17: real, mounted at /api/realtimemonitoring (routes/realtimeMonitoringRoutes.js
+  // -> services/legacy/realtimeMonitoringService.js, a real in-memory
+  // monitor registry - not fabricated telemetry, see that file's own
+  // comment on collectMetric). RealtimeMonitoringPage.jsx calls all 5;
+  // startMonitoring is exposed here as startResourceMonitor since the key
+  // `startMonitoring` above already points at a dead placeholder endpoint
+  // with a different (single-arg) signature.
+  startResourceMonitor: (resourceId, config) => api.post(`${UNVERSIONED_BASE}/api/realtimemonitoring/monitor/start`, { resourceId, ...config }),
+  getAllMonitors: () => api.get(`${UNVERSIONED_BASE}/api/realtimemonitoring/monitor`),
+  getMonitoringStatus: (id) => api.get(`${UNVERSIONED_BASE}/api/realtimemonitoring/monitor/${id}`),
+  stopMonitoring: (id) => api.delete(`${UNVERSIONED_BASE}/api/realtimemonitoring/monitor/${id}`),
+  healthCheck: () => api.get(`${UNVERSIONED_BASE}/api/realtimemonitoring/engine-health`),
 };
 
 export const qualityAssuranceAPI = {
@@ -2146,9 +3045,19 @@ export const hybridFarmingAPI = {
   implementHybridFarming: (data) => api.post('/hybrid-farming/implement', data),
 };
 
+// 2026-09-16: was a pre-existing fabricated placeholder (generic
+// getHydroponics()/manageHydroponics() hitting made-up paths that never
+// matched any backend route or HorticultureManagementPage.jsx's real
+// getSystems/createSystem/updateSystem/deleteSystem calls). Fixed against
+// the new backend/src/routes/horticultureRegistryRoutes.js (wraps
+// services/legacy/horticultureManagementService.js's real
+// createCrudService(...) objects, previously unrouted).
+const HORTICULTURE_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/horticulture-registry`;
 export const hydroponicsAPI = {
-  getHydroponics: () => api.get('/hydroponics'),
-  manageHydroponics: (data) => api.post('/hydroponics/manage', data),
+  getSystems: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/hydroponic-systems`, { params }),
+  createSystem: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/hydroponic-systems`, data),
+  updateSystem: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/hydroponic-systems/${id}`, data),
+  deleteSystem: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/hydroponic-systems/${id}`),
 };
 
 export const homeAutomationAPI = {
@@ -2157,34 +3066,57 @@ export const homeAutomationAPI = {
 };
 
 // Climate and weather monitoring APIs
+// 2026-09-16: droughtMonitoringAPI/floodMonitoringAPI/diseaseForecastingAPI/
+// climateRiskAPI/agroMeteorologyAPI were pre-existing fabricated
+// placeholders (generic getX()/analyzeX() hitting made-up paths that
+// never matched any backend route or ClimateMonitoringPage.jsx's real
+// getRecords/createRecord/updateRecord/deleteRecord calls). Fixed
+// against the new backend/src/routes/climateRegistryRoutes.js (wraps
+// services/legacy/climateMonitoringService.js's real
+// createCrudService(...) objects, previously unrouted).
+const CLIMATE_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/climate-registry`;
+
 export const droughtMonitoringAPI = {
-  getDroughtData: () => api.get('/drought-monitoring'),
-  analyzeDrought: (data) => api.post('/drought-monitoring/analyze', data),
+  getRecords: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/drought`, { params }),
+  createRecord: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/drought`, data),
+  updateRecord: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/drought/${id}`, data),
+  deleteRecord: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/drought/${id}`),
 };
 
 export const floodMonitoringAPI = {
-  getFloodData: () => api.get('/flood-monitoring'),
-  analyzeFlood: (data) => api.post('/flood-monitoring/analyze', data),
+  getRecords: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/flood`, { params }),
+  createRecord: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/flood`, data),
+  updateRecord: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/flood/${id}`, data),
+  deleteRecord: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/flood/${id}`),
 };
 
-export const pestForecastingAPI = {
-  getPestForecast: () => api.get('/pest-forecasting'),
-  forecastPests: (data) => api.post('/pest-forecasting/forecast', data),
-};
+// 2026-09-16: M087 Pest Forecasting is NOT covered by
+// climateMonitoringService.js (only M085/M086/M088/M089/M090 are, per
+// that file's own header comment) - checked directly, no backend
+// implements a pest-forecast CRUD anywhere. getForecasts left undefined
+// rather than fabricated; ClimateMonitoringPage.jsx's pest tab only
+// calls this one method (no create/update/remove), still a genuine gap.
+export const pestForecastingAPI = {};
 
 export const diseaseForecastingAPI = {
-  getDiseaseForecast: () => api.get('/disease-forecasting'),
-  forecastDisease: (data) => api.post('/disease-forecasting/forecast', data),
+  getForecasts: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/disease-forecasts`, { params }),
+  createForecast: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/disease-forecasts`, data),
+  updateForecast: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/disease-forecasts/${id}`, data),
+  deleteForecast: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/disease-forecasts/${id}`),
 };
 
 export const climateRiskAPI = {
-  getClimateRisks: () => api.get('/climate-risk'),
-  assessRisk: (data) => api.post('/climate-risk/assess', data),
+  getAssessments: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/climate-risk`, { params }),
+  createAssessment: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/climate-risk`, data),
+  updateAssessment: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/climate-risk/${id}`, data),
+  deleteAssessment: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/climate-risk/${id}`),
 };
 
 export const agroMeteorologyAPI = {
-  getAgroMeteorology: () => api.get('/agro-meteorology'),
-  analyzeWeather: (data) => api.post('/agro-meteorology/analyze', data),
+  getRecords: (params) => api.get(`${CLIMATE_REGISTRY_BASE}/agro-meteorology`, { params }),
+  createRecord: (data) => api.post(`${CLIMATE_REGISTRY_BASE}/agro-meteorology`, data),
+  updateRecord: (id, data) => api.put(`${CLIMATE_REGISTRY_BASE}/agro-meteorology/${id}`, data),
+  deleteRecord: (id) => api.delete(`${CLIMATE_REGISTRY_BASE}/agro-meteorology/${id}`),
 };
 
 export const climateSmartAgricultureAPI = {
@@ -2207,9 +3139,66 @@ export const waterConservationAPI = {
   conserveWater: (data) => api.post('/water-conservation/conserve', data),
 };
 
+// Same fix as soilHealthAPI above.
 export const nutrientManagementAPI = {
-  getNutrientManagement: () => api.get('/nutrient-management'),
-  manageNutrients: (data) => api.post('/nutrient-management/manage', data),
+  getPlans: (params) => api.get(`${SOIL_REGISTRY_BASE}/nutrient-plans`, { params }),
+  createPlan: (data) => api.post(`${SOIL_REGISTRY_BASE}/nutrient-plans`, data),
+  updatePlan: (id, data) => api.put(`${SOIL_REGISTRY_BASE}/nutrient-plans/${id}`, data),
+  deletePlan: (id) => api.delete(`${SOIL_REGISTRY_BASE}/nutrient-plans/${id}`),
+};
+
+export const fertilityManagementAPI = {
+  getRecords: (params) => api.get(`${SOIL_REGISTRY_BASE}/fertility-records`, { params }),
+  createRecord: (data) => api.post(`${SOIL_REGISTRY_BASE}/fertility-records`, data),
+  updateRecord: (id, data) => api.put(`${SOIL_REGISTRY_BASE}/fertility-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${SOIL_REGISTRY_BASE}/fertility-records/${id}`),
+};
+
+// 2026-09-16: WaterRecordsPage.jsx calls these 5 with plain list/create/
+// update/remove (matching resourceCrudFactory's own method names
+// directly, unlike most other pages' getX/createX convention). This is a
+// confirmed regression fix, not a fresh feature - see
+// backend/src/routes/waterRecordsRegistryRoutes.js's header comment:
+// waterManagementRoutes.js used to expose these same 5 real
+// createCrudService(...) objects and was overwritten with a stub by a
+// later batch-fix commit. Distinct from waterBudgetingAPI/
+// rainwaterHarvestingAPI/watershedManagementAPI/waterAnalyticsAPI
+// (WaterManagementPage.jsx, action-style names matching the unscanned
+// modules/M076-M080 tree) - those remain genuine gaps, not fixed here.
+const WATER_RECORDS_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/water-records-registry`;
+export const waterBudgetRecordsAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/budgets`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/budgets`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/budgets/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/budgets/${id}`),
+};
+
+export const waterQualityRecordsAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/quality-readings`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/quality-readings`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/quality-readings/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/quality-readings/${id}`),
+};
+
+export const rainwaterStructuresAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/rainwater-structures`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/rainwater-structures`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/rainwater-structures/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/rainwater-structures/${id}`),
+};
+
+export const watershedRecordsAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/watersheds`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/watersheds`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/watersheds/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/watersheds/${id}`),
+};
+
+export const waterAnalyticsRecordsAPI = {
+  list: (params) => api.get(`${WATER_RECORDS_REGISTRY_BASE}/analytics`, { params }),
+  create: (data) => api.post(`${WATER_RECORDS_REGISTRY_BASE}/analytics`, data),
+  update: (id, data) => api.put(`${WATER_RECORDS_REGISTRY_BASE}/analytics/${id}`, data),
+  remove: (id) => api.delete(`${WATER_RECORDS_REGISTRY_BASE}/analytics/${id}`),
 };
 
 export const soilHealthMonitoringAPI = {
@@ -2861,31 +3850,73 @@ export const individualResilienceFarmingAPI = {
 export const knowledgeGraphAPI = {
   getKnowledgeGraph: () => api.get('/knowledge-graph'),
   buildKnowledgeGraph: (data) => api.post('/knowledge-graph/build', data),
+  // 2026-09-17: real, mounted at /api/knowledgegraph (index.js requires
+  // services/legacy/knowledgeGraphService.js's router directly) - a real
+  // Postgres full-text search over knowledge_nodes. CommunityForumPage.jsx
+  // and KnowledgeBasePage.jsx call this.
+  searchNodes: (q) => api.get(`${UNVERSIONED_BASE}/api/knowledgegraph/knowledge-nodes/search`, { params: { q } }),
 };
 
 export const libraryAPI = {
   getLibrary: () => api.get('/library'),
   searchLibrary: (query) => api.post('/library/search', query),
+  // 2026-09-17: real, mounted at /api/libraryknowledge (routes/claude/
+  // libraryRoutes.js -> services/legacy/libraryKnowledgeService.js - reads
+  // actual .md cards under _EBDESIGN_LIBRARY/, real keyword search - not
+  // the same object as routes/libraryRoutes_merged.js at /api/library,
+  // which is a separate "Resources retrieved" CRUD scaffold). CommunityForumPage.jsx
+  // and KnowledgeBasePage.jsx call libraryAPI.search({query}).
+  search: ({ query }) => api.get(`${UNVERSIONED_BASE}/api/libraryknowledge/search`, { params: { query } }),
 };
 
 export const panchayatAPI = {
   getPanchayats: () => api.get('/panchayats'),
   getPanchayat: (id) => api.get(`/panchayats/${id}`),
+  // 2026-09-17: real, mounted at /api/governancemodule (routes/platform/
+  // governanceModule_merged.js -> services/legacy/governanceService.js -
+  // CommunityManagementPage.jsx's own comment already correctly identified
+  // this as real, but createPanchayat was never actually added here).
+  createPanchayat: (data) => api.post(`${UNVERSIONED_BASE}/api/governancemodule/panchayats`, data),
 };
 
 export const blockManagementAPI = {
   getBlocks: () => api.get('/blocks'),
   getBlock: (id) => api.get(`/blocks/${id}`),
+  // 2026-09-17: real, mounted at /api/communitymanagement (routes/communityManagementRoutes.js
+  // -> services/legacy/communityManagementService.js, a real parameterized-SQL
+  // CRUD service over the community_blocks table). getBlocks above already
+  // existed but points to /blocks, a dead endpoint with no backend anywhere -
+  // left untouched per the append-only rule; CommunityManagementPage.jsx's
+  // block tab was repointed to listBlocks (below) instead so list+create+
+  // update+delete all hit the same real backend.
+  listBlocks: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/blocks`, { params }),
+  createBlock: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/blocks`, data),
+  updateBlock: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/blocks/${id}`, data),
+  deleteBlock: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/blocks/${id}`),
 };
 
 export const districtManagementAPI = {
   getDistricts: () => api.get('/districts'),
   getDistrict: (id) => api.get(`/districts/${id}`),
+  // 2026-09-17: same situation as blockManagementAPI above - getDistricts
+  // exists but points to a dead /districts endpoint; page repointed to
+  // listDistricts (real, /api/communitymanagement/districts).
+  listDistricts: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/districts`, { params }),
+  createDistrict: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/districts`, data),
+  updateDistrict: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/districts/${id}`, data),
+  deleteDistrict: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/districts/${id}`),
 };
 
 export const stateManagementAPI = {
   getStates: () => api.get('/states'),
   getState: (id) => api.get(`/states/${id}`),
+  // 2026-09-17: same situation as blockManagementAPI above - getStates
+  // exists but points to a dead /states endpoint; page repointed to
+  // listStates (real, /api/communitymanagement/states).
+  listStates: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/states`, { params }),
+  createState: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/states`, data),
+  updateState: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/states/${id}`, data),
+  deleteState: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/states/${id}`),
 };
 
 export const villageManagementAPI = {
@@ -2906,16 +3937,45 @@ export const cooperativeAPI = {
 export const communityAssetAPI = {
   getCommunityAssets: () => api.get('/community-assets'),
   manageCommunityAsset: (data) => api.post('/community-assets/manage', data),
+  // 2026-09-17: real, mounted at /api/communitymanagement (routes/communityManagementRoutes.js
+  // -> services/legacy/communityManagementService.js, community_assets table).
+  // CommunityManagementPage.jsx's community-asset tab calls these 4 exact
+  // names (distinct from getCommunityAssets/manageCommunityAsset above, which
+  // it never calls).
+  getAssets: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/community-assets`, { params }),
+  createAsset: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/community-assets`, data),
+  updateAsset: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/community-assets/${id}`, data),
+  deleteAsset: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/community-assets/${id}`),
 };
 
 export const producerGroupAPI = {
   getProducerGroups: () => api.get('/producer-groups'),
   createProducerGroup: (data) => api.post('/producer-groups', data),
+  // 2026-09-17: real, mounted at /api/communitymanagement (routes/communityManagementRoutes.js
+  // -> services/legacy/communityManagementService.js, producer_groups table).
+  // CommunityManagementPage.jsx's producer-group tab calls these 4 exact
+  // names (distinct from getProducerGroups/createProducerGroup above, which
+  // it never calls).
+  getGroups: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/producer-groups`, { params }),
+  createGroup: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/producer-groups`, data),
+  updateGroup: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/producer-groups/${id}`, data),
+  deleteGroup: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/producer-groups/${id}`),
 };
 
 export const auditComplianceAPI = {
   getAuditCompliance: () => api.get('/audit-compliance'),
   runAudit: (data) => api.post('/audit-compliance/run', data),
+  // 2026-09-17: real, mounted at /api/v1/audit-compliance (modules/M008/routes.js
+  // -> modules/M008/service.js, table-backed audit_logs/compliance_rules
+  // with genuine sha256 hash-chained log integrity, not fabricated).
+  // ComplianceDashboardPage.jsx and SystemAdministrationPage.jsx both call
+  // these - all return {success, data} matching both pages' own
+  // `res.data.data` / `res.data?.data` unwraps.
+  getAuditLogs: (params) => api.get('/audit-compliance/logs', { params }),
+  createAuditLog: (data) => api.post('/audit-compliance/logs', data),
+  listComplianceRules: (params) => api.get('/audit-compliance/compliance-rules', { params }),
+  detectAuditAnomalies: (params) => api.get('/audit-compliance/anomalies', { params }),
+  verifyAuditLogIntegrity: (id) => api.get(`/audit-compliance/logs/${id}/verify`),
 };
 
 export const strategicAPI = {
@@ -2931,6 +3991,15 @@ export const vendorsAPI = {
 export const economicAPI = {
   getEconomicData: () => api.get('/economic'),
   analyzeEconomics: (data) => api.post('/economic/analyze', data),
+  // 2026-09-17: real, newly mounted at /api/v1/cost/corridor-model (routes/
+  // finance/costRoutes_merged.js, which required a nonexistent module path
+  // and was never mountable until fixed - see index.js). Real, DB-backed
+  // NE->NCR landed-cost business-plan model (services/costService.js ->
+  // legacy/costService.js). CorridorEconomicsPage.jsx calls this.
+  corridorModel: (corridor) => api.get(`${UNVERSIONED_BASE}/api/v1/cost/corridor-model`, { params: { corridor } }),
+  // Real, already-mounted at /api/demand/mandi-signal (routes/demandRoutes.js
+  // -> services/legacy/demandService.js's getMandiSignal()). Same page calls this.
+  mandiSignal: (params) => api.get(`${UNVERSIONED_BASE}/api/demand/mandi-signal`, { params }),
 };
 
 // Crop management APIs
@@ -2939,30 +4008,139 @@ export const cropCalendarAPI = {
   updateCropCalendar: (data) => api.put('/crop-calendar', data),
 };
 
-export const cropMonitoringAPI = {
-  getCropMonitoring: () => api.get('/crop-monitoring'),
-  monitorCrop: (data) => api.post('/crop-monitoring/monitor', data),
-};
+// 2026-09-16: cropMonitoringAPI/cropRegistrationAPI/cropVarietyAPI were
+// pre-existing fabricated placeholders (wrong method names, missing
+// update/delete entirely, made-up paths) - same recurring pattern found
+// in the fisheries and horticulture batches. Fixed against the new
+// backend/src/routes/cropRegistryRoutes.js (wraps
+// services/legacy/cropManagementService.js's real createCrudService(...)
+// objects, previously unrouted). Also wires the 3 previously-missing
+// exports (nurseryAPI, seedPlanningAPI, sowingAPI) from the same file.
+const CROP_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/crop-registry`;
 
 export const cropRegistrationAPI = {
-  getCropRegistrations: () => api.get('/crop-registrations'),
-  registerCrop: (data) => api.post('/crop-registrations', data),
+  getCrops: (params) => api.get(`${CROP_REGISTRY_BASE}/registrations`, { params }),
+  registerCrop: (data) => api.post(`${CROP_REGISTRY_BASE}/registrations`, data),
+  updateCrop: (id, data) => api.put(`${CROP_REGISTRY_BASE}/registrations/${id}`, data),
+  deleteCrop: (id) => api.delete(`${CROP_REGISTRY_BASE}/registrations/${id}`),
 };
 
 export const cropVarietyAPI = {
-  getCropVarieties: () => api.get('/crop-varieties'),
-  createCropVariety: (data) => api.post('/crop-varieties', data),
+  getVarieties: (params) => api.get(`${CROP_REGISTRY_BASE}/varieties`, { params }),
+  createVariety: (data) => api.post(`${CROP_REGISTRY_BASE}/varieties`, data),
+  updateVariety: (id, data) => api.put(`${CROP_REGISTRY_BASE}/varieties/${id}`, data),
+  deleteVariety: (id) => api.delete(`${CROP_REGISTRY_BASE}/varieties/${id}`),
+};
+
+export const seedPlanningAPI = {
+  getPlans: (params) => api.get(`${CROP_REGISTRY_BASE}/seed-plans`, { params }),
+  createPlan: (data) => api.post(`${CROP_REGISTRY_BASE}/seed-plans`, data),
+  updatePlan: (id, data) => api.put(`${CROP_REGISTRY_BASE}/seed-plans/${id}`, data),
+  deletePlan: (id) => api.delete(`${CROP_REGISTRY_BASE}/seed-plans/${id}`),
+};
+
+export const nurseryAPI = {
+  getNurseries: (params) => api.get(`${CROP_REGISTRY_BASE}/nurseries`, { params }),
+  createNursery: (data) => api.post(`${CROP_REGISTRY_BASE}/nurseries`, data),
+  updateNursery: (id, data) => api.put(`${CROP_REGISTRY_BASE}/nurseries/${id}`, data),
+  deleteNursery: (id) => api.delete(`${CROP_REGISTRY_BASE}/nurseries/${id}`),
+};
+
+export const sowingAPI = {
+  getRecords: (params) => api.get(`${CROP_REGISTRY_BASE}/sowing-records`, { params }),
+  createRecord: (data) => api.post(`${CROP_REGISTRY_BASE}/sowing-records`, data),
+  updateRecord: (id, data) => api.put(`${CROP_REGISTRY_BASE}/sowing-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${CROP_REGISTRY_BASE}/sowing-records/${id}`),
+};
+
+export const cropMonitoringAPI = {
+  getObservations: (params) => api.get(`${CROP_REGISTRY_BASE}/monitoring-observations`, { params }),
+  createObservation: (data) => api.post(`${CROP_REGISTRY_BASE}/monitoring-observations`, data),
+  updateObservation: (id, data) => api.put(`${CROP_REGISTRY_BASE}/monitoring-observations/${id}`, data),
+  deleteObservation: (id) => api.delete(`${CROP_REGISTRY_BASE}/monitoring-observations/${id}`),
+};
+
+// 2026-09-16: services/legacy/landManagementService.js had real
+// createCrudService(...) logic for these 6 LandManagementPage.jsx tabs
+// (including landLease - previously documented as a plain confirmed gap
+// before finding it's actually the same "real CRUD, zero router"
+// pattern as the rest of this file) but no Express router at all - wired
+// against backend/src/routes/landRegistryRoutes.js.
+const LAND_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/land-registry`;
+export const landLeaseAPI = {
+  getLeases: (params) => api.get(`${LAND_REGISTRY_BASE}/leases`, { params }),
+  createLease: (data) => api.post(`${LAND_REGISTRY_BASE}/leases`, data),
+  updateLease: (id, data) => api.put(`${LAND_REGISTRY_BASE}/leases/${id}`, data),
+  deleteLease: (id) => api.delete(`${LAND_REGISTRY_BASE}/leases/${id}`),
+};
+
+export const gisLandMappingAPI = {
+  getMappings: (params) => api.get(`${LAND_REGISTRY_BASE}/gis-mappings`, { params }),
+  createMapping: (data) => api.post(`${LAND_REGISTRY_BASE}/gis-mappings`, data),
+  updateMapping: (id, data) => api.put(`${LAND_REGISTRY_BASE}/gis-mappings/${id}`, data),
+  deleteMapping: (id) => api.delete(`${LAND_REGISTRY_BASE}/gis-mappings/${id}`),
+};
+
+export const soilMappingAPI = {
+  getZones: (params) => api.get(`${LAND_REGISTRY_BASE}/soil-zones`, { params }),
+  createZone: (data) => api.post(`${LAND_REGISTRY_BASE}/soil-zones`, data),
+  updateZone: (id, data) => api.put(`${LAND_REGISTRY_BASE}/soil-zones/${id}`, data),
+  deleteZone: (id) => api.delete(`${LAND_REGISTRY_BASE}/soil-zones/${id}`),
+};
+
+export const waterResourceMappingAPI = {
+  getResources: (params) => api.get(`${LAND_REGISTRY_BASE}/water-resources`, { params }),
+  createResource: (data) => api.post(`${LAND_REGISTRY_BASE}/water-resources`, data),
+  updateResource: (id, data) => api.put(`${LAND_REGISTRY_BASE}/water-resources/${id}`, data),
+  deleteResource: (id) => api.delete(`${LAND_REGISTRY_BASE}/water-resources/${id}`),
+};
+
+export const geoBoundaryAPI = {
+  getBoundaries: (params) => api.get(`${LAND_REGISTRY_BASE}/boundaries`, { params }),
+  createBoundary: (data) => api.post(`${LAND_REGISTRY_BASE}/boundaries`, data),
+  updateBoundary: (id, data) => api.put(`${LAND_REGISTRY_BASE}/boundaries/${id}`, data),
+  deleteBoundary: (id) => api.delete(`${LAND_REGISTRY_BASE}/boundaries/${id}`),
+};
+
+export const surveyManagementAPI = {
+  getSurveys: (params) => api.get(`${LAND_REGISTRY_BASE}/surveys`, { params }),
+  createSurvey: (data) => api.post(`${LAND_REGISTRY_BASE}/surveys`, data),
+  updateSurvey: (id, data) => api.put(`${LAND_REGISTRY_BASE}/surveys/${id}`, data),
+  deleteSurvey: (id) => api.delete(`${LAND_REGISTRY_BASE}/surveys/${id}`),
 };
 
 export const dairyAIAPI = {
   getDairyAI: () => api.get('/dairy-ai'),
   analyzeDairy: (data) => api.post('/dairy-ai/analyze', data),
+  // 2026-09-17: real, mounted at /api/dairy (routes/dairyRoutes.js ->
+  // services/legacy/dairyService.js, table-backed dairy_animals/
+  // dairy_milk_records with a real AI-backbone call). DairyManagementPage.jsx
+  // calls all 4. See routes/dairyRoutes.js's comment for a flagged, pre-
+  // existing caveat: 2 of these embed a fully hardcoded "feed composition"
+  // estimate into the AI's prompt input (not returned to the frontend
+  // directly) - not fixed here, just carried over honestly.
+  optimizeMilkProduction: (animalId) => api.post(`${UNVERSIONED_BASE}/api/dairy/ai/optimize-milk-production`, { animalId }),
+  predictHealthRisks: (animalId) => api.post(`${UNVERSIONED_BASE}/api/dairy/ai/predict-health-risks`, { animalId }),
+  optimizeFeedComposition: (animalId, options) => api.post(`${UNVERSIONED_BASE}/api/dairy/ai/optimize-feed-composition`, { animalId, productionGoal: options?.productionGoal }),
+  recommendBreeding: (animalId) => api.post(`${UNVERSIONED_BASE}/api/dairy/ai/recommend-breeding`, { animalId }),
 };
 
 // Additional missing exports
 export const financialAPI = {
   getFinancialData: () => api.get('/financial'),
   analyzeFinancials: (data) => api.post('/financial/analyze', data),
+  // 2026-09-17: real, mounted at /api/financial (index.js requires
+  // services/legacy/financialService.js's router directly) -> services/
+  // finance/revenueService.js's getOverview(), a real DB-backed revenue
+  // read (totalRevenue/pipelineValue/byStatus from revenue_contracts).
+  // FinancialServicesDashboard.jsx calls financialAPI.getOverview(timeRange)
+  // - note the real endpoint only returns totalRevenue/pipelineValue/
+  // byStatus, not the activeLoans/activePolicies/etc. fields this page's
+  // UI also renders; those honestly fall back to the page's own `|| 0`
+  // defaults rather than being fabricated here. timeRange itself isn't a
+  // real query param on this endpoint (it takes from/to/buyerId) - passed
+  // through unused rather than invented a date-range conversion.
+  getOverview: (timeRange) => api.get(`${UNVERSIONED_BASE}/api/financial/overview`, { params: { timeRange } }),
 };
 
 export const enterpriseControlAPI = {
@@ -2973,6 +4151,13 @@ export const enterpriseControlAPI = {
 export const erpAPI = {
   getERPData: () => api.get('/erp'),
   manageERP: (data) => api.post('/erp/manage', data),
+  // 2026-09-17: real, newly mounted at /api/v1/erp/status (services/
+  // platform/erpService.js's own router, real DB-backed sync-state query
+  // across products/orders/farmers/assets - see index.js). /api/erp is
+  // already taken by a different, pre-existing erpService.js (legacy/),
+  // hence the distinct /api/v1/erp prefix here. ExportDocumentationPage.jsx
+  // calls this.
+  getSyncStatus: () => api.get(`${UNVERSIONED_BASE}/api/v1/erp/status`),
 };
 
 export const fpoAPI = {
@@ -2983,16 +4168,57 @@ export const fpoAPI = {
 export const farmerHealthRecordsAPI = {
   getFarmerHealthRecords: () => api.get('/farmer-health-records'),
   createHealthRecord: (data) => api.post('/farmer-health-records', data),
+  // 2026-09-17: real, mounted at /api/v1/farmer-health (routes/agriculture/farmerHealthRoutes.js
+  // -> services/farmerHealthService.js, table-backed farmer_health_records,
+  // M029). FarmerHealthWelfarePage.jsx's health-records ResourceManager
+  // calls these 4 exact names (distinct from getFarmerHealthRecords/
+  // createHealthRecord above, which it never calls). While wiring, found
+  // and fixed a real bug in the route file itself: POST/PUT/DELETE/GET-by-id
+  // never passed the {farmerId, isAdmin} second argument the service
+  // requires for its ownership check, so all 4 always failed (create always
+  // "farmerId is required", update/delete/get-by-id always 404) regardless
+  // of caller - see routes/agriculture/farmerHealthRoutes.js for the fix.
+  // GET /farmer-health/health-records responds with {items, pagination}
+  // directly (services/farmerHealthService.js's listHealthRecords return
+  // value, json'd as-is by the route with no {success, data} wrapper) - not
+  // the {data: [...]} shape ResourceManager's generic unwrap
+  // (`res.data?.data ?? res.data ?? []`) expects, so it's reshaped here
+  // rather than assuming a wrapper the real endpoint doesn't use.
+  getRecords: (params) => api.get('/farmer-health/health-records', { params }).then((res) => ({ ...res, data: res.data?.items ?? res.data })),
+  createRecord: (data) => api.post('/farmer-health/health-records', data),
+  updateRecord: (id, data) => api.put(`/farmer-health/health-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`/farmer-health/health-records/${id}`),
 };
 
 export const farmerWelfareAPI = {
   getFarmerWelfare: () => api.get('/farmer-welfare'),
   manageWelfare: (data) => api.post('/farmer-welfare/manage', data),
+  // 2026-09-17: real, newly mounted at /api/v1/farmer-health (routes/
+  // agriculture/farmerHealthRoutes.js, fixed to require services/
+  // farmerHealthService.js instead of the generic M029 scaffold it was
+  // wired to before - see index.js). Real, DB-backed welfare program
+  // catalog + enrollment (welfare_programs/welfare_enrollments tables,
+  // migration 013). FarmerHealthWelfarePage.jsx calls both - enroll()
+  // self-scopes to the caller's own farmerId unless admin, but the
+  // frontend still sends farmerId for the admin case.
+  getPrograms: () => api.get(`${UNVERSIONED_BASE}/api/v1/farmer-health/welfare-programs`),
+  enroll: (farmerId, programId) => api.post(`${UNVERSIONED_BASE}/api/v1/farmer-health/welfare-enrollments`, { farmerId, programId }),
 };
 
 export const kycAPI = {
   getKYC: () => api.get('/kyc'),
   submitKYC: (data) => api.post('/kyc/submit', data),
+  // 2026-09-17: real, DB-backed (services/farmerKycService.js, migration
+  // 1003_farmer_kyc_applications.sql) router at routes/farmerKycRoutes.js -
+  // never explicitly mounted in index.js, but reachable via the dynamic
+  // route loader's own auto-mount at /api/v1/farmer-kyc (dynamicRouteLoader.js's
+  // _toMountSegment strips the "Routes" suffix and kebab-cases the rest;
+  // confirmed live by a direct standalone mount test, not assumed).
+  // FarmerKycPage.jsx calls all four.
+  getApplications: (params) => api.get('/farmer-kyc/applications', { params }),
+  submitApplication: (data) => api.post('/farmer-kyc/applications', data),
+  verifyApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/verify`, data),
+  rejectApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/reject`, data),
 };
 
 export const farmerProfileAPI = {
@@ -3013,12 +4239,32 @@ export const farmerSkillAPI = {
 export const farmerVerificationAPI = {
   getFarmerVerifications: () => api.get('/farmer-verifications'),
   verifyFarmer: (data) => api.post('/farmer-verifications/verify', data),
+  // 2026-09-17: real, DB-backed (services/farmerVerificationService.js,
+  // migration 1002_farmer_verification_requests.sql) router at
+  // routes/farmerVerificationRoutes.js - FarmerVerificationPage.jsx's own
+  // backendNote claiming this "has not been built yet" is stale; never
+  // explicitly mounted in index.js, but reachable via the dynamic route
+  // loader's own auto-mount at /api/v1/farmer-verification (confirmed live
+  // by a direct standalone mount test, not assumed). Page calls all four.
+  getRequests: (params) => api.get('/farmer-verification/requests', { params }),
+  submitRequest: (data) => api.post('/farmer-verification/requests', data),
+  verifyRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/verify`, data),
+  rejectRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/reject`, data),
 };
 
 // Additional missing exports for various pages
 export const fertilizerAPI = {
   getFertilizers: () => api.get('/fertilizers'),
   manageFertilizer: (data) => api.post('/fertilizers/manage', data),
+  // 2026-09-17: real, mounted at /api/fertilizer (routes/fertilizerRoutes.js
+  // -> services/legacy/fertilizerInventoryService.js, a real transactional
+  // (row-locked issue-stock flow) service over the fertilizer_inventory
+  // table). FertilizerInventoryPage.jsx calls all 5.
+  getInventory: (params) => api.get(`${UNVERSIONED_BASE}/api/fertilizer/inventory`, { params }),
+  createInventoryItem: (data) => api.post(`${UNVERSIONED_BASE}/api/fertilizer/inventory`, data),
+  updateInventoryItem: (id, data) => api.put(`${UNVERSIONED_BASE}/api/fertilizer/inventory/${id}`, data),
+  deleteInventoryItem: (id) => api.delete(`${UNVERSIONED_BASE}/api/fertilizer/inventory/${id}`),
+  issueStock: (id, data) => api.post(`${UNVERSIONED_BASE}/api/fertilizer/inventory/${id}/issue`, data),
 };
 
 export const microFarmAPI = {
@@ -3026,29 +4272,85 @@ export const microFarmAPI = {
   manageMicroFarm: (data) => api.post('/micro-farms/manage', data),
 };
 
+// 2026-09-16: hatcheryManagementAPI/fishFeedAPI/fisheriesWaterQualityAPI/
+// fisheriesHarvestAPI were pre-existing fabricated placeholders (generic
+// getX()/manageX() hitting made-up paths like /hatchery-management/manage
+// that never matched any backend route, and didn't match the real method
+// names - getBatches/createBatch/etc - FisheriesManagementPage.jsx
+// actually calls). Replaced with real endpoints against the new
+// backend/src/routes/fisheriesRegistryRoutes.js (wraps 9
+// createCrudService(...) objects in services/legacy/
+// fisheriesManagementService.js that had real DB logic but no router).
+const FISHERIES_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/fisheries-registry`;
+
 export const hatcheryManagementAPI = {
-  getHatcheries: () => api.get('/hatchery-management'),
-  manageHatchery: (data) => api.post('/hatchery-management/manage', data),
+  getBatches: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/hatcheries`, { params }),
+  createBatch: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/hatcheries`, data),
+  updateBatch: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/hatcheries/${id}`, data),
+  deleteBatch: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/hatcheries/${id}`),
 };
 
 export const fishFeedAPI = {
-  getFishFeeds: () => api.get('/fish-feed'),
-  manageFishFeed: (data) => api.post('/fish-feed/manage', data),
+  getLogs: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/feed-logs`, { params }),
+  createLog: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/feed-logs`, data),
+  updateLog: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/feed-logs/${id}`, data),
+  deleteLog: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/feed-logs/${id}`),
 };
 
 export const fisheriesWaterQualityAPI = {
-  getWaterQuality: () => api.get('/fisheries-water-quality'),
-  monitorWaterQuality: (data) => api.post('/fisheries-water-quality/monitor', data),
+  getReadings: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/water-quality`, { params }),
+  createReading: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/water-quality`, data),
+  updateReading: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/water-quality/${id}`, data),
+  deleteReading: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/water-quality/${id}`),
 };
 
+// Distinct from fishHealthAPI below (a different, unused, pre-existing
+// fabricated export - left alone since nothing imports it).
 export const fisheriesHealthAPI = {
   getFisheriesHealth: () => api.get('/fisheries-health'),
   monitorFisheriesHealth: (data) => api.post('/fisheries-health/monitor', data),
 };
 
 export const fisheriesHarvestAPI = {
-  getFisheriesHarvest: () => api.get('/fisheries-harvest'),
-  manageHarvest: (data) => api.post('/fisheries-harvest/manage', data),
+  getHarvests: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/harvests`, { params }),
+  createHarvest: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/harvests`, data),
+  updateHarvest: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/harvests/${id}`, data),
+  deleteHarvest: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/harvests/${id}`),
+};
+
+export const biofloccFarmAPI = {
+  getTanks: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/biofloc-tanks`, { params }),
+  createTank: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/biofloc-tanks`, data),
+  updateTank: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/biofloc-tanks/${id}`, data),
+  deleteTank: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/biofloc-tanks/${id}`),
+};
+
+export const fishHealthAPI = {
+  getRecords: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/health-records`, { params }),
+  createRecord: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/health-records`, data),
+  updateRecord: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/health-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/health-records/${id}`),
+};
+
+export const fishProcessingAPI = {
+  getBatches: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/processing-batches`, { params }),
+  createBatch: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/processing-batches`, data),
+  updateBatch: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/processing-batches/${id}`, data),
+  deleteBatch: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/processing-batches/${id}`),
+};
+
+export const coldFishChainAPI = {
+  getShipments: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/cold-chain-shipments`, { params }),
+  createShipment: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/cold-chain-shipments`, data),
+  updateShipment: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/cold-chain-shipments/${id}`, data),
+  deleteShipment: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/cold-chain-shipments/${id}`),
+};
+
+export const aquacultureAnalyticsAPI = {
+  getMetrics: (params) => api.get(`${FISHERIES_REGISTRY_BASE}/analytics`, { params }),
+  createMetric: (data) => api.post(`${FISHERIES_REGISTRY_BASE}/analytics`, data),
+  updateMetric: (id, data) => api.put(`${FISHERIES_REGISTRY_BASE}/analytics/${id}`, data),
+  deleteMetric: (id) => api.delete(`${FISHERIES_REGISTRY_BASE}/analytics/${id}`),
 };
 
 export const fisheriesPCRManagementAPI = {
@@ -3371,9 +4673,15 @@ export const maintenanceAPI2 = {
   scheduleMaintenance: (data) => api.post('/maintenance/schedule', data),
 };
 
+// 2026-09-16: fixed a wrong POST path (was '/market-access/manage', a
+// path that has never matched any backend route) - the real winning
+// service (services/commerce/marketAccessService.js, confirmed via
+// DynamicServiceLoader) only mounts GET / and POST / at /api/v1/market-access.
+// Nothing in the frontend actually calls this export either way (checked),
+// so this is a correctness fix, not a behavior change anyone will see yet.
 export const marketAccessAPI = {
   getMarketAccess: () => api.get('/market-access'),
-  manageMarketAccess: (data) => api.post('/market-access/manage', data),
+  manageMarketAccess: (data) => api.post('/market-access', data),
 };
 
 export const marketAPI2 = {
@@ -4121,7 +5429,7 @@ export const visionAPI = {
   manageVision: (data) => api.post('/vision/manage', data),
 };
 
-export void visualizationAPI = {
+export const visualizationAPI = {
   getVisualization: () => api.get('/visualization'),
   manageVisualization: (data) => api.post('/visualization/manage', data),
 };
@@ -4131,7 +5439,7 @@ export const viticultureAPI = {
   manageViticulture: (data) => api.post('/viticulture/manage', data),
 };
 
-export const void warehouseAPI2 = {
+export const warehouseAPI2 = {
   getWarehouse: () => api.get('/warehouse'),
   manageWarehouse: (data) => api.post('/warehouse/manage', data),
 };
@@ -4211,7 +5519,7 @@ export const zooAPI = {
   manageZoo: (data) => api.post('/zoo/manage', data),
 };
 
-export default api;
+export const jurisdictionAPI = {
   getJurisdictions: () => api.get('/jurisdictions'),
   getJurisdiction: (id) => api.get(`/jurisdictions/${id}`),
 };
@@ -4359,6 +5667,15 @@ export const regionalDevelopmentAPI = {
 export const ruralDevelopmentAPI = {
   getRuralDevelopment: () => api.get('/rural-development'),
   planRuralDevelopment: (data) => api.post('/rural-development/plan', data),
+  // 2026-09-17: real, mounted at /api/communitymanagement (routes/communityManagementRoutes.js
+  // -> services/legacy/communityManagementService.js, rural_development_projects
+  // table). CommunityManagementPage.jsx's rural-development tab calls these 4
+  // exact names (distinct from getRuralDevelopment/planRuralDevelopment above,
+  // which it never calls).
+  getProjects: (params) => api.get(`${UNVERSIONED_BASE}/api/communitymanagement/rural-development-projects`, { params }),
+  createProject: (data) => api.post(`${UNVERSIONED_BASE}/api/communitymanagement/rural-development-projects`, data),
+  updateProject: (id, data) => api.put(`${UNVERSIONED_BASE}/api/communitymanagement/rural-development-projects/${id}`, data),
+  deleteProject: (id) => api.delete(`${UNVERSIONED_BASE}/api/communitymanagement/rural-development-projects/${id}`),
 };
 
 export const urbanDevelopmentAPI = {
@@ -4855,11 +6172,31 @@ export const totalWarfareAPI = {
 export const blockchainVerificationAPI = {
   getVerifications: () => api.get('/blockchain-verification'),
   verifyBlockchain: (data) => api.post('/blockchain-verification/verify', data),
+  // 2026-09-17: real, mounted at /api/blockchainverification (routes/
+  // blockchainVerificationRoutes.js, newly wired to services/
+  // blockchainVerificationService.js - queries the real
+  // product_custody_transactions table, migration 072). BlockchainVerificationPage.jsx's
+  // field usage (totalTransactions/uniqueProducts/currentBlockHeight/
+  // authenticityScore/chainValid/custodyChain/...) matches this service's
+  // response shape exactly.
+  getStats: () => api.get(`${UNVERSIONED_BASE}/api/blockchainverification/stats`),
+  verifyProduct: (productId) => api.get(`${UNVERSIONED_BASE}/api/blockchainverification/verify/${productId}`),
 };
 
 export const bulkOrderAPI = {
   getBulkOrders: () => api.get('/bulk-orders'),
   createBulkOrder: (data) => api.post('/bulk-orders', data),
+  // 2026-09-17: real, mounted at /api/bulkorder (routes/bulkOrderRoutes.js
+  // -> controllers/bulkOrderController.js -> services/legacy/bulkOrderService.js).
+  // BulkOrderPage.jsx calls all 5. Note: createBulkOrder/getBulkOrders above
+  // point at a separate, dead /bulk-orders (hyphenated, versioned) path -
+  // pre-existing, out of scope for this fix (not on the missing-method
+  // list), flagged here rather than silently left for the next pass.
+  getUserBulkOrders: (userId) => api.get(`${UNVERSIONED_BASE}/api/bulkorder/user/${userId}`),
+  getBulkOrder: (orderId) => api.get(`${UNVERSIONED_BASE}/api/bulkorder/${orderId}`),
+  getBulkOrderQuotations: (orderId) => api.get(`${UNVERSIONED_BASE}/api/bulkorder/${orderId}/quotations`),
+  acceptQuotation: (quotationId, data) => api.post(`${UNVERSIONED_BASE}/api/bulkorder/quotations/${quotationId}/accept`, data),
+  cancelBulkOrder: (orderId, data) => api.post(`${UNVERSIONED_BASE}/api/bulkorder/${orderId}/cancel`, data),
 };
 
 export const caAPI = {
@@ -4867,9 +6204,29 @@ export const caAPI = {
   manageCA: (data) => api.post('/ca/manage', data),
 };
 
+// 2026-09-15: this only had getOrders()/createOrder(), pointed at /orders
+// (resolves under the /api/v1 base, which doesn't exist on the backend
+// under that path). Real, live pages (CartPage, CheckoutPage,
+// OrderDetailPage, PaymentProcessingPage, ProductDetailPage) call
+// getCart/addToCart/updateCartItem/removeFromCart/getOrder/processPayment
+// too - none of which existed here, all of which crash on first use.
+// Rewritten against the real, now-mounted services/legacy/orderService.js
+// router (/api/order) - every method below matches its real handler and
+// body shape exactly. No DELETE /:id (cancel) exists on the real
+// backend; not fabricated here.
+const ORDER_BASE = `${UNVERSIONED_BASE}/api/order`;
+
 export const ordersAPI = {
-  getOrders: () => api.get('/orders'),
-  createOrder: (data) => api.post('/orders', data),
+  getCart: () => api.get(`${ORDER_BASE}/cart`),
+  addToCart: (data) => api.post(`${ORDER_BASE}/cart`, data),
+  updateCartItem: (id, data) => api.put(`${ORDER_BASE}/cart/${id}`, data),
+  removeFromCart: (id) => api.delete(`${ORDER_BASE}/cart/${id}`),
+  clearCart: () => api.delete(`${ORDER_BASE}/cart`),
+  createOrder: (data) => api.post(ORDER_BASE, data),
+  getOrder: (id) => api.get(`${ORDER_BASE}/${id}`),
+  getOrders: (filters, pagination) => api.get(ORDER_BASE, { params: { ...filters, ...pagination } }),
+  updateOrderStatus: (id, data) => api.put(`${ORDER_BASE}/${id}/status`, data),
+  processPayment: (id, data) => api.post(`${ORDER_BASE}/${id}/payment`, data),
 };
 
 export const cartAPI = {
@@ -5316,3 +6673,598 @@ export const warningAPI = {
   resetWarningMetrics: () => api.post('/warnings/metrics/reset'),
   getWarningHealth: () => api.get('/warnings/health'),
 };
+
+// 2026-09-16: LivestockManagementPage.jsx imports these 4 under different
+// names (getAnimals/getBatches vs listHerd, otherwise identical verbs) than
+// the pigAPI/goatAPI/sheepAIAPI/poultryAIAPI objects above, which were wired
+// earlier this session for PigFarmingPage.jsx/GoatFarmingPage.jsx/etc. Both
+// sets of names point at the exact same real, mounted routes (goatRoutes.js,
+// pigRoutes_merged.js, sheepRoutes_merged.js, poultryRoutes_merged.js) -
+// verified directly against each route file's registered paths, not assumed.
+export const goatFarmingAPI = {
+  getAnimals: (params) => api.get(`${GOAT_BASE}/herd`, { params }),
+  createAnimal: (data) => api.post(`${GOAT_BASE}/herd`, data),
+  updateAnimal: (id, data) => api.put(`${GOAT_BASE}/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${GOAT_BASE}/herd/${id}`),
+};
+
+export const pigFarmingAPI = {
+  getAnimals: (params) => api.get(`${PIG_BASE}/herd`, { params }),
+  createAnimal: (data) => api.post(`${PIG_BASE}/herd`, data),
+  updateAnimal: (id, data) => api.put(`${PIG_BASE}/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${PIG_BASE}/herd/${id}`),
+};
+
+export const sheepFarmingAPI = {
+  getAnimals: (params) => api.get(`${SHEEP_BASE}/flock`, { params }),
+  createAnimal: (data) => api.post(`${SHEEP_BASE}/flock`, data),
+  updateAnimal: (id, data) => api.put(`${SHEEP_BASE}/flock/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${SHEEP_BASE}/flock/${id}`),
+};
+
+export const poultryManagementAPI = {
+  getBatches: (params) => api.get(`${POULTRY_BASE}/flocks`, { params }),
+  createBatch: (data) => api.post(`${POULTRY_BASE}/flocks`, data),
+  updateBatch: (id, data) => api.put(`${POULTRY_BASE}/flocks/${id}`, data),
+  deleteBatch: (id) => api.delete(`${POULTRY_BASE}/flocks/${id}`),
+};
+
+// 2026-09-16: verified live at /api/regionalvariety (unversioned, static
+// mount in index.js via regionalVarietyRoutes_merged.js -> services/legacy
+// /regionalVarietyService.js directly - no shadowing risk). Distinct from
+// the older regionalVarietyAPI export elsewhere in this file, which hits a
+// different path (/regional-variety) for a different page - do not merge.
+const VARIETY_DIRECTORY_BASE = `${UNVERSIONED_BASE}/api/regionalvariety`;
+export const varietyDirectoryAPI = {
+  list: (params) => api.get(VARIETY_DIRECTORY_BASE, { params }),
+  getCategories: () => api.get(`${VARIETY_DIRECTORY_BASE}/categories`),
+  requestImage: (id) => api.post(`${VARIETY_DIRECTORY_BASE}/${id}/generate-image`),
+  createListing: (id, data) => api.post(`${VARIETY_DIRECTORY_BASE}/${id}/create-listing`, data),
+};
+
+// 2026-09-16: householdEconomyAPI/sharedInfrastructureAPI/ruralFinanceAPI/
+// mobilityRidesAPI/machineryAccessAPI are all imported by
+// REOSDashboardPage.jsx (and MachineryManagementPage.jsx for the last one)
+// but none is ever actually called there yet (only 6 of REOSDashboardPage's
+// 13 imported REOS API objects are wired into a useQuery - these 5 fall
+// through to a generic "select a tab" placeholder). Wiring them anyway
+// because Vite/rolldown's MISSING_EXPORT check fires on the import
+// statement itself, regardless of call-site usage - an unused-but-real
+// export still fixes a real build error, and all 5 verified against a
+// genuine, live, DynamicServiceLoader-confirmed-winning setupRoutes()
+// implementation (not fabricated to match a call site that doesn't exist).
+export const householdEconomyAPI = {
+  getRecords: (params) => api.get('/household-economy', { params }),
+  createRecord: (data) => api.post('/household-economy', data),
+};
+
+// Distinct from sharedInfraAPI above (services/legacy/sharedInfraService.js,
+// /api/v1/shared-infra) - this is a separate real backend,
+// services/legacy/sharedInfrastructureService.js, mounted at
+// /api/v1/shared-infrastructure. Don't merge the two.
+export const sharedInfrastructureAPI = {
+  getAccess: (accessId) => api.get(`/shared-infrastructure/access/${accessId}`),
+  getAccessByVillage: (villageId) => api.get(`/shared-infrastructure/access/village/${villageId}`),
+  getAccessByType: (infrastructureType) => api.get(`/shared-infrastructure/access/type/${infrastructureType}`),
+  getVillageSummary: (villageId) => api.get(`/shared-infrastructure/access/village/${villageId}/summary`),
+  requestAccess: (data) => api.post('/shared-infrastructure/access', data),
+};
+
+export const ruralFinanceAPI = {
+  list: (params) => api.get('/rural-finance', { params }),
+  get: (id) => api.get(`/rural-finance/${id}`),
+  apply: (data) => api.post('/rural-finance', data),
+  disburse: (id, data) => api.post(`/rural-finance/${id}/disburse`, data),
+  repay: (id, data) => api.post(`/rural-finance/${id}/repay`, data),
+  checkRefinance: (id) => api.get(`/rural-finance/${id}/refinance-check`),
+};
+
+export const mobilityRidesAPI = {
+  getRide: (rideId) => api.get(`/mobility-rides/rides/${rideId}`),
+  getRidesByVillage: (villageId) => api.get(`/mobility-rides/rides/village/${villageId}`),
+  getRidesByDriver: (driverId) => api.get(`/mobility-rides/rides/driver/${driverId}`),
+  requestRide: (data) => api.post('/mobility-rides/rides', data),
+  updateRideStatus: (rideId, data) => api.put(`/mobility-rides/rides/${rideId}/status`, data),
+  getStatistics: () => api.get('/mobility-rides/rides/statistics'),
+};
+
+export const machineryAccessAPI = {
+  listBookings: (params) => api.get('/machinery-access', { params }),
+  createBooking: (data) => api.post('/machinery-access', data),
+  completeBooking: (id) => api.post(`/machinery-access/${id}/complete`),
+  getUtilization: (machineryId) => api.get(`/machinery-access/machinery/${machineryId}/utilization`),
+};
+
+// 2026-09-16: services/legacy/livestockManagementService.js had real,
+// working createCrudService(...) logic for these 3 LivestockManagementPage.jsx
+// tabs but no Express router at all - wrote backend/src/routes/
+// livestockRegistryRoutes.js to wrap them (mounted at
+// /api/livestock-registry, unversioned to match the goat/pig/sheep/
+// poultry precedent and avoid colliding with the dynamic route loader's
+// own /api/v1/livestock-registry auto-mount of the same file).
+const LIVESTOCK_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/livestock-registry`;
+export const cattleRegistryAPI = {
+  getAnimals: (params) => api.get(`${LIVESTOCK_REGISTRY_BASE}/cattle`, { params }),
+  createAnimal: (data) => api.post(`${LIVESTOCK_REGISTRY_BASE}/cattle`, data),
+  updateAnimal: (id, data) => api.put(`${LIVESTOCK_REGISTRY_BASE}/cattle/${id}`, data),
+  deleteAnimal: (id) => api.delete(`${LIVESTOCK_REGISTRY_BASE}/cattle/${id}`),
+};
+
+export const feedManagementAPI = {
+  getRecords: (params) => api.get(`${LIVESTOCK_REGISTRY_BASE}/feed`, { params }),
+  createRecord: (data) => api.post(`${LIVESTOCK_REGISTRY_BASE}/feed`, data),
+  updateRecord: (id, data) => api.put(`${LIVESTOCK_REGISTRY_BASE}/feed/${id}`, data),
+  deleteRecord: (id) => api.delete(`${LIVESTOCK_REGISTRY_BASE}/feed/${id}`),
+};
+
+export const livestockAnalyticsAPI = {
+  getRecords: (params) => api.get(`${LIVESTOCK_REGISTRY_BASE}/analytics`, { params }),
+  createRecord: (data) => api.post(`${LIVESTOCK_REGISTRY_BASE}/analytics`, data),
+  updateRecord: (id, data) => api.put(`${LIVESTOCK_REGISTRY_BASE}/analytics/${id}`, data),
+  deleteRecord: (id) => api.delete(`${LIVESTOCK_REGISTRY_BASE}/analytics/${id}`),
+};
+
+// 2026-09-16: services/legacy/operationsManagementService.js had real,
+// working createCrudService(...) logic for these 8 OperationsManagementPage.jsx
+// tabs but no Express router at all - wrote backend/src/routes/
+// operationsRegistryRoutes.js to wrap them (mounted at
+// /api/operations-registry, unversioned, same convention as the
+// livestock/fisheries registries above).
+const OPERATIONS_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/operations-registry`;
+export const farmActivityAPI = {
+  getActivities: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/activities`, { params }),
+  createActivity: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/activities`, data),
+  updateActivity: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/activities/${id}`, data),
+  deleteActivity: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/activities/${id}`),
+};
+
+export const farmTaskAPI = {
+  getTasks: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/tasks`, { params }),
+  createTask: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/tasks`, data),
+  updateTask: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/tasks/${id}`, data),
+  deleteTask: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/tasks/${id}`),
+};
+
+export const contractorManagementAPI = {
+  getContractors: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/contractors`, { params }),
+  createContractor: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/contractors`, data),
+  updateContractor: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/contractors/${id}`, data),
+  deleteContractor: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/contractors/${id}`),
+};
+
+export const machineryOperationsAPI = {
+  getOperations: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/machinery-operations`, { params }),
+  createOperation: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/machinery-operations`, data),
+  updateOperation: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/machinery-operations/${id}`, data),
+  deleteOperation: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/machinery-operations/${id}`),
+};
+
+export const equipmentSchedulingAPI = {
+  getSchedules: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/equipment-schedules`, { params }),
+  createSchedule: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/equipment-schedules`, data),
+  updateSchedule: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/equipment-schedules/${id}`, data),
+  deleteSchedule: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/equipment-schedules/${id}`),
+};
+
+export const inputConsumptionAPI = {
+  getRecords: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/input-consumption`, { params }),
+  createRecord: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/input-consumption`, data),
+  updateRecord: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/input-consumption/${id}`, data),
+  deleteRecord: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/input-consumption/${id}`),
+};
+
+export const farmProductivityAPI = {
+  getMetrics: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/productivity-metrics`, { params }),
+  createMetric: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/productivity-metrics`, data),
+  updateMetric: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/productivity-metrics/${id}`, data),
+  deleteMetric: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/productivity-metrics/${id}`),
+};
+
+export const farmOperationsDashboardAPI = {
+  getKpis: (params) => api.get(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis`, { params }),
+  createKpi: (data) => api.post(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis`, data),
+  updateKpi: (id, data) => api.put(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis/${id}`, data),
+  deleteKpi: (id) => api.delete(`${OPERATIONS_REGISTRY_BASE}/dashboard-kpis/${id}`),
+};
+
+// 2026-09-16: same pattern - services/legacy/horticultureManagementService.js
+// had real createCrudService(...) logic for these 7 remaining
+// HorticultureManagementPage.jsx tabs (hydroponicsAPI, above, was the
+// 8th) but no Express router at all - wired against
+// backend/src/routes/horticultureRegistryRoutes.js.
+export const vegetableProductionAPI = {
+  getRecords: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/vegetable-production`, { params }),
+  createRecord: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/vegetable-production`, data),
+  updateRecord: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/vegetable-production/${id}`, data),
+  deleteRecord: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/vegetable-production/${id}`),
+};
+
+export const floricultureAPI = {
+  getRecords: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/floriculture`, { params }),
+  createRecord: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/floriculture`, data),
+  updateRecord: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/floriculture/${id}`, data),
+  deleteRecord: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/floriculture/${id}`),
+};
+
+export const polyhouseAPI = {
+  getRecords: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/polyhouses`, { params }),
+  createRecord: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/polyhouses`, data),
+  updateRecord: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/polyhouses/${id}`, data),
+  deleteRecord: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/polyhouses/${id}`),
+};
+
+export const aeroponicsAPI = {
+  getSystems: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/aeroponic-systems`, { params }),
+  createSystem: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/aeroponic-systems`, data),
+  updateSystem: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/aeroponic-systems/${id}`, data),
+  deleteSystem: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/aeroponic-systems/${id}`),
+};
+
+export const precisionHorticultureAPI = {
+  getReadings: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/precision-readings`, { params }),
+  createReading: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/precision-readings`, data),
+  updateReading: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/precision-readings/${id}`, data),
+  deleteReading: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/precision-readings/${id}`),
+};
+
+export const protectedCultivationAPI = {
+  getStructures: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/protected-structures`, { params }),
+  createStructure: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/protected-structures`, data),
+  updateStructure: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/protected-structures/${id}`, data),
+  deleteStructure: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/protected-structures/${id}`),
+};
+
+export const horticultureAnalyticsAPI = {
+  getMetrics: (params) => api.get(`${HORTICULTURE_REGISTRY_BASE}/analytics`, { params }),
+  createMetric: (data) => api.post(`${HORTICULTURE_REGISTRY_BASE}/analytics`, data),
+  updateMetric: (id, data) => api.put(`${HORTICULTURE_REGISTRY_BASE}/analytics/${id}`, data),
+  deleteMetric: (id) => api.delete(`${HORTICULTURE_REGISTRY_BASE}/analytics/${id}`),
+};
+
+// 2026-09-16: services/legacy/inputSupplyManagementService.js had real
+// createCrudService(...) logic for these 8 InputSupplyManagementPage.jsx
+// tabs but no Express router at all - wired against
+// backend/src/routes/inputSupplyRegistryRoutes.js.
+const INPUT_SUPPLY_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/input-supply-registry`;
+export const biofertilizerAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/biofertilizer`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/biofertilizer`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/biofertilizer/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/biofertilizer/${id}`),
+};
+
+export const pesticideInventoryAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/pesticide-inventory`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/pesticide-inventory`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/pesticide-inventory/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/pesticide-inventory/${id}`),
+};
+
+export const bioPesticideAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/bio-pesticide`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/bio-pesticide`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/bio-pesticide/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/bio-pesticide/${id}`),
+};
+
+export const micronutrientAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/micronutrient`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/micronutrient`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/micronutrient/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/micronutrient/${id}`),
+};
+
+export const organicInputAPI = {
+  getItems: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/organic-input`, { params }),
+  createItem: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/organic-input`, data),
+  updateItem: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/organic-input/${id}`, data),
+  deleteItem: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/organic-input/${id}`),
+};
+
+export const inputProcurementAPI = {
+  getOrders: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/procurement-orders`, { params }),
+  createOrder: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/procurement-orders`, data),
+  updateOrder: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/procurement-orders/${id}`, data),
+  deleteOrder: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/procurement-orders/${id}`),
+};
+
+export const inputDistributionAPI = {
+  getRecords: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/distribution-records`, { params }),
+  createRecord: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/distribution-records`, data),
+  updateRecord: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/distribution-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/distribution-records/${id}`),
+};
+
+export const inputTraceabilityAPI = {
+  getRecords: (params) => api.get(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records`, { params }),
+  createRecord: (data) => api.post(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records`, data),
+  updateRecord: (id, data) => api.put(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${INPUT_SUPPLY_REGISTRY_BASE}/traceability-records/${id}`),
+};
+
+// 2026-09-16: services/legacy/identityManagementService.js (a
+// pre-existing file from before this whole session, "Phase 2
+// Auto-Implementation", 2026-09-04) had real createCrudService(...)
+// logic for these 6 IdentityManagementPage.jsx tabs but no Express
+// router at all - wrote backend/src/routes/identityRegistryRoutes.js to
+// wrap them (mounted at /api/identity-registry). sessionManagement has
+// no create method (sessions come from login, not manual creation,
+// matching the page's own tab - no "add" form is offered there either).
+const IDENTITY_REGISTRY_BASE = `${UNVERSIONED_BASE}/api/identity-registry`;
+
+export const permissionManagementAPI = {
+  getPermissions: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/permissions`, { params }),
+  createPermission: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/permissions`, data),
+  updatePermission: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/permissions/${id}`, data),
+  deletePermission: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/permissions/${id}`),
+};
+
+export const ssoAPI = {
+  getProviders: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/sso-providers`, { params }),
+  createProvider: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/sso-providers`, data),
+  updateProvider: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/sso-providers/${id}`, data),
+  deleteProvider: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/sso-providers/${id}`),
+};
+
+export const mfaManagementAPI = {
+  getDevices: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/mfa-devices`, { params }),
+  createDevice: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/mfa-devices`, data),
+  updateDevice: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/mfa-devices/${id}`, data),
+  deleteDevice: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/mfa-devices/${id}`),
+};
+
+export const digitalIdentityAPI = {
+  getIdentities: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/digital-identities`, { params }),
+  createIdentity: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/digital-identities`, data),
+  updateIdentity: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/digital-identities/${id}`, data),
+  deleteIdentity: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/digital-identities/${id}`),
+};
+
+export const consentManagementAPI = {
+  getRecords: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/consent-records`, { params }),
+  createRecord: (data) => api.post(`${IDENTITY_REGISTRY_BASE}/consent-records`, data),
+  updateRecord: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/consent-records/${id}`, data),
+  deleteRecord: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/consent-records/${id}`),
+};
+
+export const sessionManagementAPI = {
+  getSessions: (params) => api.get(`${IDENTITY_REGISTRY_BASE}/sessions`, { params }),
+  updateSession: (id, data) => api.put(`${IDENTITY_REGISTRY_BASE}/sessions/${id}`, data),
+  deleteSession: (id) => api.delete(`${IDENTITY_REGISTRY_BASE}/sessions/${id}`),
+};
+
+// 2026-09-16: RolePermissionPage.jsx's own comment claims "/api/v1/roles
+// returns {roles, total} unwrapped" - checked live, that path doesn't
+// exist anywhere. The real, already-mounted implementation is
+// routes/roleManagementRoutes.js -> services/legacy/roleManagementService.js
+// at the unversioned /api/rolemanagement (direct require, no
+// loader/shadowing risk) - confirmed getRoles() really does return
+// {roles, total} matching the page's expected shape, just at a
+// different path than the page's stale comment claims. Only
+// listRoles/createRole are wired: listPermissions/getPermissionMatrix/
+// getRoleHierarchy/recommendRoleForUser have no matching method
+// anywhere in roleManagementService.js (checked directly) - genuine
+// gaps, left undefined rather than fabricated.
+const ROLE_MANAGEMENT_BASE = `${UNVERSIONED_BASE}/api/rolemanagement`;
+export const rolePermissionAPI = {
+  listRoles: (params) => api.get(ROLE_MANAGEMENT_BASE, { params }),
+  createRole: (data) => api.post(ROLE_MANAGEMENT_BASE, data),
+  // 2026-09-17: real, mounted at /api/v1/role-permission (modules/M007/routes.js
+  // -> modules/M007/service.js, table-backed roles/permissions/user_roles/
+  // audit_logs). RolePermissionPage.jsx's other 3 tabs plus its "recommend
+  // role" action call these 4 exact names - all return {success, data}
+  // matching the page's own `res.data.data` unwrap. Note getRoleHierarchy's
+  // real table has no parent_role_id column (confirmed absent from every
+  // migration that creates/alters `roles`), so it always returns every role
+  // as a flat, childless root - an honest reflection of there being no
+  // stored hierarchy data, not a bug introduced here.
+  listPermissions: () => api.get('/role-permission/permissions'),
+  getPermissionMatrix: () => api.get('/role-permission/permission-matrix'),
+  getRoleHierarchy: () => api.get('/role-permission/role-hierarchy'),
+  recommendRoleForUser: (userId) => api.get(`/role-permission/users/${userId}/recommend-role`),
+};
+
+// 2026-09-16: services/legacy/informationSharingService.js is a real,
+// complete in-memory service matching InformationSharingPage.jsx's
+// ActionCard calls almost exactly - wired against the new
+// backend/src/routes/informationSharingRegistryRoutes.js.
+const INFORMATION_SHARING_BASE = `${UNVERSIONED_BASE}/api/information-sharing-registry`;
+// 2026-09-16: routes/logisticsEnhancements_merged.js was already
+// mounted and real (fleet/tracking/temperature/warehouse), but 3 of
+// LogisticsEnhancementPage.jsx's ActionCards (driver location tracking)
+// had no route even though logisticsEnhancementService.js already
+// implemented all 3 real, DB-backed methods - added the missing routes
+// to that same already-mounted file rather than writing a new one.
+const LOGISTICS_ENHANCEMENT_BASE = `${UNVERSIONED_BASE}/api/logisticsenhancements`;
+export const logisticsEnhancementAPI = {
+  addVehicle: (data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/fleet`, data),
+  getFleet: (params) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/fleet`, { params }),
+  getVehicle: (vehicleId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/fleet/${vehicleId}`),
+  updateVehicle: (vehicleId, data) => api.put(`${LOGISTICS_ENHANCEMENT_BASE}/fleet/${vehicleId}`, data),
+  scheduleMaintenance: (vehicleId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/fleet/${vehicleId}/maintenance`, data),
+  updateTracking: (shipmentId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/tracking`, data),
+  getTracking: (shipmentId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/tracking`),
+  getLiveTracking: (shipmentId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/live-tracking`),
+  setGeofence: (shipmentId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/geofence`, data),
+  recordTemperature: (shipmentId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/temperature`, data),
+  getTemperatureData: (shipmentId, params) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/temperature`, { params }),
+  getTemperatureAlerts: (shipmentId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${shipmentId}/temperature-alerts`),
+  createWarehouse: (data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/warehouses`, data),
+  getWarehouses: (params) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/warehouses`, { params }),
+  addInventory: (warehouseId, data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/warehouses/${warehouseId}/inventory`, data),
+  getWarehouseInventory: (warehouseId) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/warehouses/${warehouseId}/inventory`),
+  recordDriverLocation: (data) => api.post(`${LOGISTICS_ENHANCEMENT_BASE}/drivers/location`, data),
+  getActiveDrivers: (params) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/drivers/active`, { params }),
+  getShipmentTrail: (id) => api.get(`${LOGISTICS_ENHANCEMENT_BASE}/shipments/${id}/trail`),
+};
+
+// 2026-09-16: services/legacy/platformConfigurationService.js's
+// getOptimizedRecommendations/applyOptimizedConfiguration were real and
+// DB-backed but had zero route - routes/platformConfigurationRoutes.js
+// used to be an unrelated dead stub. Rewrote that file to route to the
+// real service; wired here. Note: PlatformFoundationPage.jsx reads
+// `configRecommendations.optimizedConfig` when calling
+// applyConfiguration, but the real getRecommendations() response field
+// is `recommendedConfig` (not `optimizedConfig`) - a pre-existing
+// page-level field-name mismatch, not something this client fix can
+// paper over; same class of known page-logic gap as pigAPI/goatAPI's
+// getHerdPerformance() id mismatch documented earlier this session, not
+// fixed here.
+export const platformConfigurationAPI = {
+  getRecommendations: () => api.get(`${UNVERSIONED_BASE}/api/platformconfiguration/recommendations`),
+  applyConfiguration: (config) => api.post(`${UNVERSIONED_BASE}/api/platformconfiguration/apply`, config),
+};
+
+// 2026-09-16: services/publicDataExtractorService.js's listSources/
+// registerSource/extractDataset were real, DB-backed, and genuinely
+// security-conscious (HTTPS-only, allowed-hosts validation, response
+// size limits) but had zero route - routes/publicDataRoutes.js used to
+// be an unrelated dead stub. Rewrote that file to route to the real
+// service; wired here.
+export const publicDataAPI = {
+  listSources: () => api.get(`${UNVERSIONED_BASE}/api/publicdata/sources`),
+  registerSource: (data) => api.post(`${UNVERSIONED_BASE}/api/publicdata/sources`, data),
+  extract: (sourceId, filter) => api.post(`${UNVERSIONED_BASE}/api/publicdata/sources/${sourceId}/extract`, filter),
+};
+
+// 2026-09-16: services/legacy/erpService.js already exports a real
+// router (GET /status, POST /sync/bulk, etc.) already mounted at
+// /api/erp - ERPDashboardPage.jsx's erpDashboardAPI.getSyncStatus()/
+// .triggerSync() just never had a frontend client. Only these 2 of the
+// page's 7 methods match: getDashboard/getGLEntries/getReconciliation/
+// getFinancialReports/resolveConflict have no matching endpoint
+// anywhere in this file - checked directly, genuine gaps, not
+// fabricated.
+export const erpDashboardAPI = {
+  getSyncStatus: () => api.get(`${UNVERSIONED_BASE}/api/erp/status`),
+  triggerSync: (syncType) => api.post(`${UNVERSIONED_BASE}/api/erp/sync/bulk`, { entity_type: syncType }),
+};
+
+export const informationSharingAPI = {
+  getDocuments: (params) => api.get(`${INFORMATION_SHARING_BASE}/documents`, { params }),
+  getDocument: (documentId) => api.get(`${INFORMATION_SHARING_BASE}/documents/${documentId}`),
+  searchDocuments: (q, filters) => api.get(`${INFORMATION_SHARING_BASE}/documents/search`, { params: { q, ...filters } }),
+  createDocument: (data) => api.post(`${INFORMATION_SHARING_BASE}/documents`, data),
+  updateDocument: (documentId, data) => api.put(`${INFORMATION_SHARING_BASE}/documents/${documentId}`, data),
+  deleteDocument: (documentId) => api.delete(`${INFORMATION_SHARING_BASE}/documents/${documentId}`),
+  getFolders: (params) => api.get(`${INFORMATION_SHARING_BASE}/folders`, { params }),
+  getFolderTree: (rootId) => api.get(`${INFORMATION_SHARING_BASE}/folders/tree`, { params: { rootId } }),
+  createFolder: (data) => api.post(`${INFORMATION_SHARING_BASE}/folders`, data),
+  getPermissions: (resourceId, resourceType) => api.get(`${INFORMATION_SHARING_BASE}/permissions`, { params: { resourceId, resourceType } }),
+  setPermission: (data) => api.post(`${INFORMATION_SHARING_BASE}/permissions`, data),
+  checkPermission: (resourceId, userId, permission) => api.get(`${INFORMATION_SHARING_BASE}/permissions/check`, { params: { resourceId, userId, permission } }),
+  createSharingLink: (data) => api.post(`${INFORMATION_SHARING_BASE}/sharing-links`, data),
+  accessSharingLink: (token) => api.get(`${INFORMATION_SHARING_BASE}/sharing-links/access`, { params: { token } }),
+  getCollaborationSessions: (params) => api.get(`${INFORMATION_SHARING_BASE}/collaboration-sessions`, { params }),
+  createCollaborationSession: (data) => api.post(`${INFORMATION_SHARING_BASE}/collaboration-sessions`, data),
+  joinCollaborationSession: (sessionId, userId) => api.post(`${INFORMATION_SHARING_BASE}/collaboration-sessions/${sessionId}/join`, { userId }),
+  endCollaborationSession: (sessionId) => api.post(`${INFORMATION_SHARING_BASE}/collaboration-sessions/${sessionId}/end`),
+  generateAIRecommendations: (userId, context) => api.post(`${INFORMATION_SHARING_BASE}/ai-recommendations`, { userId, context }),
+  getActivityLogs: (resourceId) => api.get(`${INFORMATION_SHARING_BASE}/activity-logs`, { params: { resourceId } }),
+  getAnalytics: () => api.get(`${INFORMATION_SHARING_BASE}/analytics`),
+  getHealthStatus: () => api.get(`${INFORMATION_SHARING_BASE}/health-status`),
+};
+
+// 2026-09-16: routes/platform/organizationManagementRoutes_merged.js is
+// a real, in-memory CRUD implementation that was never require()'d
+// anywhere - the mounted route at /api/organizationmanagement used to be
+// a dead "Route operational" stub. Swapped in index.js; wired here
+// against the real endpoints (unversioned - matches the stub's own
+// unversioned mount path).
+export const organizationManagementAPI = {
+  getAllOrganizations: (params) => api.get(`${UNVERSIONED_BASE}/api/organizationmanagement`, { params }),
+  createOrganization: (data) => api.post(`${UNVERSIONED_BASE}/api/organizationmanagement`, data),
+  deleteOrganization: (id) => api.delete(`${UNVERSIONED_BASE}/api/organizationmanagement/${id}`),
+};
+
+// 2026-09-16: controllers/platformTelemetryController.js was a real,
+// working controller (backed by services/legacy/platformTelemetryService.js)
+// that was never actually wired to a route - routes/platformTelemetryRoutes.js
+// used to be an unrelated dead stub. Rewrote that file to route to the
+// real controller; wired here.
+export const platformTelemetryAPI = {
+  getStatus: () => api.get(`${UNVERSIONED_BASE}/api/platformtelemetry/status`),
+  getAnalytics: () => api.get(`${UNVERSIONED_BASE}/api/platformtelemetry/analytics`),
+};
+
+// 2026-09-15: AdvancedMedicalCodingPage.jsx imports { api } (named) and
+// calls it directly with relative paths (api.get('/advanced-medical-coding/...'))
+// rather than through a dedicated *API object - only a default export
+// existed. Its relative paths already resolve correctly under this
+// file's own /api/v1 baseURL against the real, now-mounted
+// services/advancedMedicalCodingService.js (mounted at
+// /api/v1/advanced-medical-coding in index.js specifically to match this
+// page - see the fourteenth TODO backlog update).
+// 2026-09-16: the 31 names below were the last remaining MISSING_EXPORT
+// build errors after this session's wiring pass (started at 161).
+// Every one was individually checked against real backend method names
+// (not filename matches) - full per-name investigation trail is in
+// .ai/tasks/AGENT_ASSIGNMENTS.md and .ai/tasks/2026-09-15-nextgen-vision-todo.md
+// (Updates 33-38). Two categories, both genuinely blocked on new backend/
+// product work rather than a wiring fix:
+//   - ~16 trace to backend/src/modules/ (the M0xx scaffold tree): the
+//     routes/controller shape often matches the frontend, but every
+//     module's service.js hardcodes `this.table` to a completely wrong,
+//     unrelated table (e.g. M141 Orchard -> `releases`), with model.sql
+//     an empty placeholder - not safe to wire without a real migration.
+//   - The rest have no matching backend implementation anywhere in the
+//     codebase, confirmed directly (not by absence of a filename match).
+// Exported as empty objects rather than left undefined so the static
+// build (which fails the whole bundle on any missing export, not just
+// the page that needs it) can succeed - each page's own calls into these
+// still fail loudly at the one call site that needs them, same as
+// pestForecastingAPI above, rather than silently returning fabricated
+// data. Do not add methods here without a confirmed real backend route.
+export const assetLifecycleAPI = {};
+export const breakdownMaintenanceAPI = {};
+export const climateMonitoringAPI = {};
+export const competitorAPI = {};
+export const decisionEngineAPI = {};
+export const enterpriseMemoryAPI = {};
+export const equipmentInventoryAPI = {};
+export const equipmentRentalAPI = {};
+export const fleetManagementAPI = {};
+export const fuelManagementAPI = {};
+export const governmentAPI = {};
+export const implementManagementAPI = {};
+export const irrigationAPI = {};
+export const medicalCodingAPI = {};
+export const nutritionIntelligenceAPI = {};
+export const operationsAPI = {};
+export const orchardAPI = {};
+export const pondAPI = {};
+export const preventiveMaintenanceAPI = {};
+export const pushNotificationsAPI = {};
+export const rainwaterHarvestingAPI = {};
+export const securityAccessControlAPI = {};
+export const shgAPI = {};
+export const soilTestingOpsAPI = {};
+export const sparePartsAPI = {};
+export const userManagementAPI = {};
+export const waterAnalyticsAPI = {};
+export const waterBudgetingAPI = {};
+export const waterQualityAPI = {};
+export const watershedManagementAPI = {};
+export const yieldAPI = {};
+
+// 2026-09-16: SalesReportPage.jsx was hardcoded (totalRevenue: 1250000,
+// fake top products/farmers). Found a real, mounted, matching endpoint:
+// `controllers/ecommerceBusinessSalesController.js`'s `getSalesAnalytics`
+// (backed by `services/legacy/ecommerceBusinessSalesService.js`, a real
+// query over `orders`/`order_items`/`product_listings`), routed at
+// `GET /api/ecommercebusinesssales/sales-analytics` (mounted in
+// backend/src/index.js). Returns `{success, filters, summary:
+// {total_orders, total_revenue, unique_customers, total_quantity},
+// daily_data: [...]}` directly (`res.json(result)`, no envelope wrapper)
+// - verified by reading the controller and service directly, not
+// guessed. No `topProducts`/`topFarmers`/`growthRate` exist in this
+// response, so SalesReportPage.jsx only renders the real summary +
+// daily_data fields, nothing invented.
+const ECOMMERCE_BUSINESS_SALES_BASE = `${UNVERSIONED_BASE}/api/ecommercebusinesssales`;
+export const salesAnalyticsAPI = {
+  getSalesAnalytics: (params) => api.get(`${ECOMMERCE_BUSINESS_SALES_BASE}/sales-analytics`, { params }),
+};
+
+export { api };
+
+export default api;

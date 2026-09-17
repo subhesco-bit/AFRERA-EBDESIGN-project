@@ -18,10 +18,17 @@ import monitoring from './utils/monitoring';
 import analytics from './utils/analytics';
 import { MultilingualProvider } from './components/Multilingual/MultilingualProvider';
 import { AccessibilityProvider } from './components/Accessibility/AccessibilityProvider';
-import ModuleRuntimePage from './pages/ModuleRuntimePage';
 
 // Lazy load EconomicDashboard (not in centralized routes yet)
 const EconomicDashboard = lazy(() => import('./pages/economic/EconomicDashboard'));
+// ModuleRuntimePage (2026-09-15): was a static import - the only one in
+// this file, everything else here is already lazy. It imports a named
+// export (modulesAPI) that doesn't exist in services/api.js, and a
+// static import's module-graph error blocks the ENTIRE app from
+// rendering (confirmed: this was making every route show a blank page,
+// not just /module/:moduleId). Lazy-loading it, like every other page
+// here, contains that failure to its own route instead of the whole app.
+const ModuleRuntimePage = lazy(() => import('./pages/ModuleRuntimePage'));
 
 function App() {
   const { user, checkAuth } = useAuthStore();

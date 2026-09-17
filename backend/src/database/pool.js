@@ -302,6 +302,25 @@ function applyWhereFilter(rows, queryText, params) {
     const trimmed = clause.trim();
     if (!trimmed) continue;
 
+    // 2026-09-16: `<col> IS [NOT] NULL` has no `=`, so the regex below never
+    // matched it and the clause was silently dropped - every soft-delete
+    // guard shaped `AND deleted_at IS NULL` (the exact pattern every
+    // backend/src/modules/M0XX service.js's getById/getAll uses) was
+    // ignored, so a soft-deleted row still matched. This was masking a
+    // large share of module test failures under a `db.query is not a
+    // function` error until the shared connection-vs-pool import bug was
+    // fixed elsewhere - once real code ran, this surfaced directly.
+    const isNullMatch = trimmed.match(/^([a-z_][a-z0-9_]*)\s+is\s+(not\s+)?null$/i);
+    if (isNullMatch) {
+      const column = isNullMatch[1].toLowerCase();
+      const expectNull = !isNullMatch[2];
+      filtered = filtered.filter((row) => {
+        const isNullish = row[column] === undefined || row[column] === null;
+        return expectNull ? isNullish : !isNullish;
+      });
+      continue;
+    }
+
     const match = trimmed.match(/([a-z_][a-z0-9_]*)\s*=\s*(\$\d+|true|false|null|'([^']*)'|"([^"]*)")/i);
     if (!match) continue;
 
@@ -1750,23 +1769,19 @@ function makeTestPool() {
         return { rows: [row] };
       }
 
-      // Land records handlers
-      if (t.includes('insert into land_records')) {
-        const row = {
-          id: `lr-${Date.now()}`,
-          farmer_id: params[0],
-          land_area: Number(params[1]) || 0,
-          location: params[2] || '',
-          soil_type: params[3] || 'loam',
-          ownership_type: params[4] || 'owned',
-          created_at: new Date().toISOString(),
-        };
-        testStores.land_records = testStores.land_records || new Map();
-        const arr = testStores.land_records.get(row.farmer_id) || [];
-        arr.push(row);
-        testStores.land_records.set(row.farmer_id, arr);
-        return { rows: [row] };
-      }
+      // 2026-09-16: a special-cased `insert into land_records` handler
+      // used to live here, hardcoding a 5-column shape (farmer_id,
+      // land_area, location, soil_type, ownership_type) that never
+      // matched the real landRecordsService.js's actual 16-column INSERT
+      // (farmer_id, survey_number, village, district, state, ... 16
+      // total) - it was already wrong for its own presumed purpose. Worse,
+      // `t.includes('insert into land_records')` is a loose substring
+      // match, so it also hijacked modules/M067/service.js's unrelated
+      // generic-scaffold INSERT (M067 happens to use a table literally
+      // named `land_records` too), silently corrupting its columns via
+      // wrong positional mapping. Removed - the generic, column-name-aware
+      // `parseInsertReturning()` below already handles both cases
+      // correctly since both INSERTs use named columns.
 
       // Crop plans handlers
       if (t.includes('insert into crop_plans')) {
@@ -2161,6 +2176,24 @@ function makeTestPool() {
             testStores.organic_standards.set(row.id, row);
           }
         }
+      }
+
+      // 2026-09-16: SELECT COUNT(*) [as alias] FROM <table> [WHERE ...] with
+      // no dedicated handler. Without this, a COUNT query fell through to
+      // the generic SELECT * handler below and got back real data rows
+      // (not an aggregate row) - `result.rows[0].total` read undefined off
+      // a row that has no `total` column, throwing a TypeError that looked
+      // like the caller's bug rather than an unhandled query shape. This is
+      // exactly the pattern every backend/src/modules/M0XX service.js uses
+      // for its own pagination count.
+      const countMatch = (text || '').match(/^\s*select\s+count\(\*\)(?:\s+as\s+"?([a-z_][a-z0-9_]*)"?)?\s+from\s+"?([a-z_][a-z0-9_]*)"?/i);
+      if (countMatch) {
+        const alias = (countMatch[1] || 'count').toLowerCase();
+        const table = countMatch[2].toLowerCase();
+        const store = testStores[table];
+        const rows = store ? Array.from(store.values()) : [];
+        const total = applyWhereFilter(rows, text, params).length;
+        return { rows: [{ [alias]: String(total) }], rowCount: 1 };
       }
 
       // SELECT * FROM <table> with no dedicated handler: serve whatever the

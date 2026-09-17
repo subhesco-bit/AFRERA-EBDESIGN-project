@@ -17,6 +17,18 @@ function setupRoutes(app) {
   const authMiddleware = require('../../middleware/auth');
   router.use(authMiddleware);
 
+  // 2026-09-15: /villages/search must be registered before the
+  // /villages/:villageId param route below - Express matches routes in
+  // registration order, so with the param route first, every GET
+  // /villages/search request used to be swallowed by it (villageId
+  // literally set to the string "search"), making the real search
+  // endpoint unreachable. Same route-shadowing bug shape already found
+  // and fixed in productService.js's GET /search earlier this session.
+  router.get('/villages/search', async (req, res) => {
+    try { res.json({ success: true, data: await villageService.searchVillages(req.query) }); }
+    catch (error) { logger.error(`Village search failed: ${error.message}`); res.status(error.statusCode || 500).json({ success: false, error: error.message }); }
+  });
+
   router.get('/villages/:villageId', async (req, res) => {
     try { res.json({ success: true, data: await villageService.getVillageProfile(req.params.villageId) }); }
     catch (error) { logger.error(`Village profile lookup failed: ${error.message}`); res.status(error.statusCode || 404).json({ success: false, error: error.message }); }
@@ -45,11 +57,6 @@ function setupRoutes(app) {
   router.put('/villages/:villageId', async (req, res) => {
     try { res.json({ success: true, data: await villageService.updateVillage(req.params.villageId, req.body) }); }
     catch (error) { logger.error(`Village update failed: ${error.message}`); res.status(error.statusCode || 400).json({ success: false, error: error.message }); }
-  });
-
-  router.get('/villages/search', async (req, res) => {
-    try { res.json({ success: true, data: await villageService.searchVillages(req.query) }); }
-    catch (error) { logger.error(`Village search failed: ${error.message}`); res.status(error.statusCode || 500).json({ success: false, error: error.message }); }
   });
 
   app.use('/api/v1/village-profiles', router);

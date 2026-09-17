@@ -100,7 +100,7 @@ function FertilizerInventoryPage() {
       {isLoading && <div className="animate-pulse h-40 bg-gray-200 rounded-lg" />}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4">
-          Error loading inventory: {error.message}. Backend endpoint /fertilizer/inventory has not been built yet — this page is wired and ready once it is.
+          Error loading inventory: {error.message}. Backed by the real /api/fertilizer/inventory endpoint (fertilizer_inventory table).
         </div>
       )}
       {!isLoading && !error && (

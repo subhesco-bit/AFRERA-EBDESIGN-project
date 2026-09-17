@@ -13,6 +13,16 @@ import { Progress } from '../components/ui/progress'
  * Digital Twin Dashboard - Production-grade farm simulation monitoring
  * Real backend: digitalTwinService with simulation engine
  * Provides visibility into farm digital twin and predictive models
+ *
+ * 2026-09-17: getTwins/runSimulation now wired to the real, already-mounted
+ * /api/v1/digital-twin backend (services/legacy/digitalTwinService.js).
+ * "Run Simulation" passes a real model key ('cropGrowthModel', matching
+ * initializeSimulationEngine()'s lookup table) instead of the previous
+ * `{ type: 'standard' }`, which matched nothing and always 500'd.
+ * getStatus/syncRealData are deliberately NOT wired - see api.js's
+ * digitalTwinAPI comment for why (no real backend match for a "status"
+ * summary, and syncing with no sensor payload would silently write a
+ * garbage reading rather than anything real).
  */
 export default function DigitalTwinDashboardPage() {
   const queryClient = useQueryClient()
@@ -291,9 +301,9 @@ export default function DigitalTwinDashboardPage() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button 
+                        <Button
                           size="sm"
-                          onClick={() => simulationMutation.mutate({ twinId: twin.id, scenario: { type: 'standard' } })}
+                          onClick={() => simulationMutation.mutate({ twinId: twin.id, scenario: 'cropGrowthModel' })}
                         >
                           <Play className="w-3 h-3 mr-1" />
                           Run Simulation

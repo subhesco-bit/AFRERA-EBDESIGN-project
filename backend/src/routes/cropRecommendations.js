@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const cropRecommendationService = require('../services/cropRecommendationService');
 const { authMiddleware: authenticateToken } = require('../middleware/auth');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 const { authMiddleware: authenticate } = require('../middleware/auth');
 
 

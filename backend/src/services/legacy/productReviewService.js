@@ -428,28 +428,17 @@ class ProductReviewService {
 
 module.exports = new ProductReviewService();
 
-// Merged unique operations from backend/src/modules/M060 (see git history there for
-// full context) - complementary functionality this service did not have. createReview and
-// getProductReviews collided with different signatures AND different table/schema
-// (product_reviews+users join vs a simpler reviews table) - both already had live callers
-// with the original signature (marketplaceEnhancements.js) - aliased rather than overwritten.
-{
-  const m060 = require('../../modules/M060/service');
-  const { createReview: createReviewSimple, getProductReviews: getProductReviewsSimple, ...rest } = m060;
-  Object.assign(module.exports, rest, { createReviewSimple, getProductReviewsSimple });
-}
-
-// Merged from backend/src/modules/M052
-{
-  const m052 = require('../../modules/M052/service');
-  const { ...rest } = m052;
-  Object.assign(module.exports, rest);
-}
-
-// Merged from backend/src/modules/M058
-{
-  const m058 = require('../../modules/M058/service');
-  const { ...rest } = m058;
-  Object.assign(module.exports, rest);
-}
+// The block that used to sit here ("Merged unique operations from
+// modules/M060/M052/M058") assumed those modules had review-specific
+// createReview/getProductReviews logic to alias in. Verified 2026-09-15:
+// none of the three ever did in any git history for their current
+// service.js - M060/M052/M058 are all generic auto-generated CRUD
+// templates (this.table = 'input_supply'/'crop_diseases'/'crop_insurance'
+// respectively), untouched by review logic. createReviewSimple/
+// getProductReviewsSimple were always undefined (destructured from
+// properties that don't exist) and had zero callers anywhere in the repo;
+// the Object.assign() calls only polluted this service's exports with 21
+// unrelated generic method names (getAll/getById/create/update/delete/
+// createBulk/search x3) that nothing called either. Removed rather than
+// left as dead, misleading code.
 

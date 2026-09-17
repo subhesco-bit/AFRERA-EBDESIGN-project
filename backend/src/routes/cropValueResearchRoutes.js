@@ -12,6 +12,17 @@ try {
   // Auth optional
 }
 
+// 2026-09-17: cropValueResearchController.js (getPending/review, wrapping
+// the real services/legacy/cropValueResearchService.js AI-suggestion review
+// queue) was never wired to any route anywhere - CropValueReviewPage.jsx's
+// cropValueResearchAPI.getPending()/review(id, approve) calls threw. Added
+// here rather than as a new file since this scaffold is already mounted at
+// /api/cropvalueresearch.
+const cropValueResearchController = require('../controllers/cropValueResearchController');
+
+router.get('/pending', cropValueResearchController.getPending);
+router.post('/:id/review', cropValueResearchController.review);
+
 /**
  * Main endpoint
  */

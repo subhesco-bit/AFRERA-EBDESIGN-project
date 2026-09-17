@@ -186,6 +186,10 @@ async function createProduct(productData) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = `
       INSERT INTO products (name, slug, sku, category_id, state_id, unit_id, description, usp,
                          gi_status, gi_certificate_number, gi_registry_date, organic,
@@ -253,6 +257,10 @@ async function createProduct(productData) {
 async function updateProduct(productId, productData, ownerUserId = null) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     if (ownerUserId) {
       const owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
@@ -346,6 +354,10 @@ async function deleteProduct(productId, ownerUserId = null) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     if (ownerUserId) {
       const owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
       if (owned.rows.length === 0) {
@@ -382,8 +394,12 @@ async function getCategories() {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = `
-      SELECT c.*, 
+      SELECT c.*,
              (SELECT COUNT(*) FROM products WHERE category_id = c.id AND is_active = TRUE) as product_count
       FROM categories c
       WHERE c.is_active = TRUE
@@ -405,6 +421,10 @@ async function getCategories() {
 async function getStates() {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     const query = `
       SELECT s.*,
@@ -429,6 +449,10 @@ async function getStates() {
 async function searchProducts(searchTerm, filters = {}) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     const query = `
       SELECT p.*, c.name as category_name, s.name as state_name,
@@ -491,6 +515,27 @@ router.get('/', async (req, res) => {
 
     const result = await getProducts(filters, pagination);
     res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Search products
+// 2026-09-15: moved from after /categories/list and /states/list (both
+// unaffected - real 2-segment paths, don't collide with /:id) to here,
+// before /:id. GET /search is a single path segment, so Express's
+// registration-order matching had /:id (id='search') shadowing this
+// route completely - searchProducts() was real and correct but never
+// reachable through the live API.
+router.get('/search', async (req, res) => {
+  try {
+    const searchTerm = req.query.q;
+    if (!searchTerm) {
+      return res.status(400).json({ error: 'Search term required' });
+    }
+
+    const products = await searchProducts(searchTerm);
+    res.json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -566,21 +611,6 @@ router.get('/states/list', async (req, res) => {
   try {
     const states = await getStates();
     res.json(states);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Search products
-router.get('/search', async (req, res) => {
-  try {
-    const searchTerm = req.query.q;
-    if (!searchTerm) {
-      return res.status(400).json({ error: 'Search term required' });
-    }
-
-    const products = await searchProducts(searchTerm);
-    res.json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

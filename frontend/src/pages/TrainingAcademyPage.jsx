@@ -15,10 +15,24 @@ export default function TrainingAcademyPage() {
 
   const loadPrograms = () => {
     setState({ loading: true, error: null });
-    farmerTrainingAPI.getPrograms().then((response) => {
-      setPrograms(listFrom(response?.data));
-      setState({ loading: false, error: null });
-    }).catch((error) => setState({ loading: false, error: error.message || 'Training programs could not be loaded.' }));
+    // 2026-09-17: farmerTrainingAPI has no getPrograms() method, and no
+    // backend anywhere exposes a "list all training programs" endpoint
+    // (farmerTrainingRoutes_merged.js, the real mounted router, only has
+    // POST /programs to create one, plus per-registration/per-farmer
+    // lookups - no GET list). Rather than fabricate one, this just wraps
+    // the call so the resulting TypeError is caught like any other load
+    // failure instead of throwing uncaught inside this effect-triggered
+    // function (it was previously called bare, with only a `.catch()`
+    // chained onto its return value, which never runs when the call itself
+    // throws synchronously).
+    try {
+      farmerTrainingAPI.getPrograms().then((response) => {
+        setPrograms(listFrom(response?.data));
+        setState({ loading: false, error: null });
+      }).catch((error) => setState({ loading: false, error: error.message || 'Training programs could not be loaded.' }));
+    } catch (error) {
+      setState({ loading: false, error: error.message || 'Training programs could not be loaded.' });
+    }
   };
 
   useEffect(() => { loadPrograms(); }, []);

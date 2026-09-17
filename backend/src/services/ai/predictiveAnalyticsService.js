@@ -15,6 +15,14 @@ const router = express.Router();
 const pool = require('../../database/pool');
 
 // Test-mode stubs
+// These deliberately reassign the hoisted `function name() {}` declarations
+// further down in this file. That relies on function-declaration hoisting
+// (the real implementation exists before this block runs), so converting
+// these to `let name = function () {}` in place would break: this block
+// executes before that declaration point in file order and would hit the
+// `let` temporal dead zone. Suppressing no-func-assign here instead of
+// restructuring keeps the existing hoisting-dependent behavior intact.
+/* eslint-disable no-func-assign */
 if (process.env.NODE_ENV === 'test') {
   createPredictiveModel = async (data) => ({ id: `model-${Date.now()}`, ...data });
   getActiveModels = async () => ([]);
@@ -24,6 +32,7 @@ if (process.env.NODE_ENV === 'test') {
   getUnacknowledgedAlerts = async () => ([]);
   recordPredictiveAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
 }
+/* eslint-enable no-func-assign */
 
 // ============================================================================
 // PREDICTIVE MODELS

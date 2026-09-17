@@ -21,6 +21,14 @@ const router = express.Router();
 const pool = require('../../database/pool');
 
 // Test-mode lightweight stubs for IoT service
+// These deliberately reassign the hoisted `function name() {}` declarations
+// further down in this file. That relies on function-declaration hoisting
+// (the real implementation exists before this block runs), so converting
+// these to `let name = function () {}` in place would break: this block
+// executes before that declaration point in file order and would hit the
+// `let` temporal dead zone. Suppressing no-func-assign here instead of
+// restructuring keeps the existing hoisting-dependent behavior intact.
+/* eslint-disable no-func-assign */
 if (process.env.NODE_ENV === 'test') {
   registerIoTDevice = async (data) => ({ id: `dev-${Date.now()}`, device_id: data.device_id || `dev-${Date.now()}`, device_name: data.device_name || 'Test Device', status: 'active' });
   getIoTDevices = async () => ([]);
@@ -34,6 +42,7 @@ if (process.env.NODE_ENV === 'test') {
   checkDeviceHealth = async () => ({ health_status: 'unknown' });
   recordIoTAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
 }
+/* eslint-enable no-func-assign */
 
 // ============================================================================
 // IOT DEVICES

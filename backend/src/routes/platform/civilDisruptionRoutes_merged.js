@@ -5,7 +5,11 @@
 
 const express = require('express');
 const router = express.Router();
-const civilDisruptionService = require('../../services/platform/civilDisruptionService');
+// 2026-09-15: was '../../services/platform/civilDisruptionService', which
+// doesn't exist (no services/platform/civilDisruptionService.js) - threw
+// "Cannot find module" at load time, matching this file's own header
+// comment pointing at services/civilDisruptionService.js instead.
+const civilDisruptionService = require('../../services/civilDisruptionService');
 const { authMiddleware } = require('../../middleware/auth');
 const { adminMiddleware } = require('../../middleware/admin');
 

@@ -10,7 +10,12 @@ const express = require('express');
 const router = express.Router();
 const xp = require('../../services/platform/experienceLayerService');
 const { authMiddleware } = require('../../middleware/auth');
-const { authMiddleware: authenticate } = require('../middleware/auth');
+// 2026-09-15: was 'require('../middleware/auth')' (one '../' short - no
+// src/routes/middleware/ directory exists), threw "Cannot find module" at
+// load time. `authenticate` is never referenced anywhere else in this
+// file - authMiddleware above is the one actually used - so this was dead,
+// broken code; removed rather than fixed, since fixing the path would
+// just reintroduce an unused duplicate import.
 
 const fail = (res, e) => res.status(/required|cannot|must/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });

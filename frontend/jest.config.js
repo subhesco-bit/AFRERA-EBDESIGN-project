@@ -2,6 +2,18 @@ module.exports = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
+    // 2026-09-16: mirrors vite.config.js's resolve.alias exactly - jest had
+    // no equivalent, so any test that transitively imports through one of
+    // the 315 files using these aliases (e.g. `import x from '@/store'`)
+    // failed with "Cannot find module", even for files Vite itself
+    // resolves correctly in the real app.
+    '^@components/(.*)$': '<rootDir>/src/components/$1',
+    '^@lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
+    '^@services/(.*)$': '<rootDir>/src/services/$1',
+    '^@store/(.*)$': '<rootDir>/src/store/$1',
+    '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js'
   },

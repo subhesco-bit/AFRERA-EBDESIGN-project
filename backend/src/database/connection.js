@@ -92,6 +92,14 @@ async function initPostgreSQL() {
     logger.info('PostgreSQL connection established successfully');
     return pgPool;
   } catch (error) {
+    // pgPool was already assigned above (before the connection test) so a
+    // failed test left it pointing at an unusable Pool instead of null.
+    // getPostgreSQL() only returns null when pgPool is falsy, so every
+    // `if (!pg) { fall back to degraded mode }` check across the codebase
+    // (authService's JSON-store fallback among them) was never reached -
+    // callers got a truthy pool and only failed later, on the first query,
+    // with a raw ECONNREFUSED instead of the intended fallback behavior.
+    pgPool = null;
     logger.error('PostgreSQL connection failed', { error: error.message, stack: error.stack });
     throw error;
   }

@@ -15,7 +15,11 @@ const { authMiddleware: authenticate } = require('../middleware/auth');
 const fail = (res, e) => res.status(/required|must|not found|not open|closed|requires/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });
 
-protectRouter(router, { signal: 'commerce.rfq.changed', params: { id: true } });
+// 2026-09-15: enterpriseRouteSupport.js is a scaffold stub, no protectRouter()
+// export - same bug as decisionSupportRoutes_merged.js, see
+// pigRoutes_merged.js for the full writeup. Every route below already gets
+// authMiddleware directly.
+// protectRouter(router, { signal: 'commerce.rfq.changed', params: { id: true } });
 
 router.post('/rfq', authMiddleware, async (req, res) => {
   try { res.json({ success: true, data: await s.createRfq(req.body) }); } catch (e) { fail(res, e); }

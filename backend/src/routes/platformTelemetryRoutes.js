@@ -1,38 +1,25 @@
 /**
- * platform Telemetry Routes
+ * Platform Telemetry Routes — REST wrapper for
+ * controllers/platformTelemetryController.js, a real, working controller
+ * (backed by services/legacy/platformTelemetryService.js's real
+ * getSystemMetrics/getServiceHealth/getPlatformAnalytics) that was never
+ * actually required by any route file - this file used to be a dead
+ * "Route operational" scaffold with no connection to the controller at
+ * all. Matches PlatformManagementPage.jsx's platformTelemetryAPI.getStatus()/
+ * .getAnalytics() calls exactly.
  */
+
+'use strict';
 
 const express = require('express');
+const platformTelemetryController = require('../controllers/platformTelemetryController');
+const { authMiddleware } = require('../middleware/auth');
+
 const router = express.Router();
 
-try {
-  const { authMiddleware } = require('../middleware/auth');
-  router.use(authMiddleware);
-} catch (e) {
-  // Auth optional
-}
+router.use(authMiddleware);
 
-/**
- * Main endpoint
- */
-router.post('/', async (req, res) => {
-  res.json({
-    success: true,
-    module: 'platformTelemetryRoutes',
-    message: 'Route operational',
-    timestamp: new Date().toISOString()
-  });
-});
-
-/**
- * Health check
- */
-router.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    status: 'healthy',
-    module: 'platformTelemetryRoutes'
-  });
-});
+router.get('/status', platformTelemetryController.getStatus);
+router.get('/analytics', platformTelemetryController.getAnalytics);
 
 module.exports = router;

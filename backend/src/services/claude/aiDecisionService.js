@@ -28,7 +28,10 @@ const { logger } = require('../../utils/logger');
 const { getPostgreSQL, getMongoDatabase } = require('../../database/connection');
 const claudeAICoordinator = require('../../core/claudeAICoordinator');
 const libraryKnowledgeService = require('../../services/libraryKnowledgeService');
-const aiCollaborationService = require('../../services/aiCollaborationService');
+// See claudeAICoordinator.js for why: the real logWork() implementation is
+// the sibling file in this same directory, not the generic scaffold stub
+// at services/aiCollaborationService.js.
+const aiCollaborationService = require('./aiCollaborationService');
 
 // Import original service for compatibility
 const originalAIService = require('../legacy/aiService');

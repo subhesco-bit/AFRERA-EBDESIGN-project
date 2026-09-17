@@ -7,6 +7,17 @@ import ActionCard from '../components/common/ActionCard';
  * services/legacy/engineeringProjectService.js. All 6 methods verified to
  * exist on the service export (2026-08-29). Project/phase management + cost
  * estimation - action-oriented, ActionCard pattern.
+ *
+ * 2026-09-17: that verification checked the real service, not this page's
+ * own api.js client - engineeringProjectAPI never actually had these
+ * methods added, so every action here threw "is not a function". Now
+ * wired for real (createProject renamed to createEngineeringProject below
+ * since the api.js key `createProject` was already taken by an older, dead
+ * placeholder method - see api.js's comment). Also corrected "Create Cost
+ * Estimate"'s example JSON, which used a `lines` key with `item`/no
+ * `category` - the real endpoint requires `items` with
+ * category/description/unit/quantity/unitRate per line and would have
+ * 400'd on the example as originally written.
  */
 function EngineeringProjectPage() {
   return (
@@ -25,7 +36,7 @@ function EngineeringProjectPage() {
         hasJsonPayload
         jsonLabel="Project data (JSON)"
         jsonPlaceholder='{"name": "Cold Chain Expansion", "type": "infrastructure", "budgetInr": 5000000}'
-        onRun={(_, payload) => engineeringProjectAPI.createProject(payload)}
+        onRun={(_, payload) => engineeringProjectAPI.createEngineeringProject(payload)}
       />
       <ActionCard
         title="List Projects"
@@ -54,7 +65,7 @@ function EngineeringProjectPage() {
         fields={[{ name: 'id', label: 'Project ID' }]}
         hasJsonPayload
         jsonLabel="Estimate data (JSON)"
-        jsonPlaceholder='{"lines": [{"item": "cement", "quantity": 100, "unit": "bag"}]}'
+        jsonPlaceholder='{"items": [{"category": "civil", "description": "Cement OPC 53", "unit": "bag", "quantity": 100, "unitRate": 420}], "region": "Northeast", "contingencyPercentage": 10}'
         onRun={(v, payload) => engineeringProjectAPI.createCostEstimate(v.id, payload)}
       />
       <ActionCard

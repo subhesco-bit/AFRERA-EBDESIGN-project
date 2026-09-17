@@ -65,6 +65,10 @@ async function addToCart(userId, productId, quantity = 1, attributes = {}) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     // Check if product exists
     const productQuery = 'SELECT id, base_price, is_active FROM products WHERE id = $1';
     const productResult = await pg.query(productQuery, [productId]);
@@ -126,6 +130,10 @@ async function updateCartItem(userId, cartItemId, quantity) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     if (quantity <= 0) {
       // Remove item
       const deleteQuery = 'DELETE FROM cart WHERE id = $1 AND user_id = $2 RETURNING *';
@@ -168,6 +176,10 @@ async function removeFromCart(userId, cartItemId) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = 'DELETE FROM cart WHERE id = $1 AND user_id = $2 RETURNING *';
     const result = await pg.query(query, [cartItemId, userId]);
 
@@ -190,6 +202,10 @@ async function clearCart(userId) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = 'DELETE FROM cart WHERE user_id = $1';
     await pg.query(query, [userId]);
 
@@ -207,6 +223,10 @@ async function clearCart(userId) {
 async function createOrder(userId, orderData) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     // Get cart items — pulls the same HSN/branding columns gstService.calculateOrderGST
     // uses, so tax can be computed for real per item instead of guessed as a flat rate.
@@ -373,6 +393,10 @@ async function getOrderById(orderId, userId = null) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     let query = `
       SELECT o.*, u.name as customer_name, u.email as customer_email,
              sa.address_line1 as shipping_line1, sa.city as shipping_city,
@@ -427,6 +451,10 @@ async function getOrderById(orderId, userId = null) {
 async function getUserOrders(userId, filters = {}, pagination = {}) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     const { status, search } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
@@ -496,6 +524,10 @@ async function updateOrderStatus(orderId, status, notes = null) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = `
       UPDATE orders
       SET status = $1, notes = COALESCE($2, notes), updated_at = NOW()
@@ -541,6 +573,10 @@ async function updateOrderStatus(orderId, status, notes = null) {
 async function processPayment(orderId, paymentData, userId = null) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     // Get order with optional ownership check
     let orderQuery = 'SELECT * FROM orders WHERE id = $1';
@@ -643,6 +679,10 @@ async function processPayment(orderId, paymentData, userId = null) {
 async function calculateDiscount(couponCode, orderAmount) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     const query = `
       SELECT * FROM coupons

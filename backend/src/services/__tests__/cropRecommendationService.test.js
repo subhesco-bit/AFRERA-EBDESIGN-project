@@ -10,7 +10,7 @@ jest.mock('../../core/claudeAICoordinator', () => ({
   coordinateAIRequest: jest.fn(),
 }));
 jest.mock('../../utils/logger', () => ({
-  info: jest.fn(), error: jest.fn(), warn: jest.fn(),
+  logger: { info: jest.fn(), error: jest.fn(), warn: jest.fn() },
 }));
 
 const claudeAICoordinator = require('../../core/claudeAICoordinator');

@@ -1,5 +1,5 @@
 const database = require("../../database/connection");
-const logger = require("../../utils/logger");
+const { logger } = require("../../utils/logger");
 
 class AIAgentService {
   async initializeAgent(agentConfig) {

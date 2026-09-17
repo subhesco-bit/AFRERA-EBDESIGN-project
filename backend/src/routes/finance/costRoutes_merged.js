@@ -8,9 +8,16 @@
  */
 const express = require('express');
 const router = express.Router();
-const costService = require('../../services/finance/costService');
+// 2026-09-17: both requires below pointed at nonexistent paths
+// (services/finance/costService doesn't exist - the real module is
+// services/costService.js, itself a thin re-export of
+// services/legacy/costService.js per the 2026-09-08 duplicate-file
+// remediation pass; and '../middleware/auth' from routes/finance/ resolves
+// to the nonexistent routes/middleware/auth) - this file threw
+// "Cannot find module" on require() and was never mountable. Fixed to the
+// real paths; no route logic changed.
+const costService = require('../../services/costService');
 const { authMiddleware } = require('../../middleware/auth');
-const { authMiddleware: authenticate } = require('../middleware/auth');
 
 
 const fail = (res, e) => res.status(/required|No landed-cost/i.test(e.message) ? 400 : 500)

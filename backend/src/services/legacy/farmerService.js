@@ -14,6 +14,10 @@ async function getFarmerById(farmerId) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = `
       SELECT f.*, u.name, u.email, u.phone, u.status as user_status,
              fpo.name as fpo_name, fpo.registration_number as fpo_reg
@@ -42,6 +46,10 @@ async function getFarmerById(farmerId) {
 async function getFarmers(filters = {}, pagination = {}) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     const { fpo_id, min_fdi, max_fdi, certification_count_min, status } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
@@ -122,6 +130,10 @@ async function getFarmers(filters = {}, pagination = {}) {
 async function calculateFDI(farmerId) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     // Get farmer data
     const farmerQuery = `
@@ -213,6 +225,10 @@ async function addFarmerCertification(farmerId, certificationData) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = `
       INSERT INTO farmer_certifications (farmer_id, certification_type, certificate_number,
                                          issuing_authority, issue_date, expiry_date, document_url)
@@ -255,6 +271,10 @@ async function getFarmerCertifications(farmerId) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = `
       SELECT * FROM farmer_certifications
       WHERE farmer_id = $1
@@ -276,6 +296,10 @@ async function getFarmerCertifications(farmerId) {
 async function getFPOs(filters = {}) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     const { state, min_members } = filters;
 
@@ -328,6 +352,11 @@ async function getFPOs(filters = {}) {
 async function getFarmerWallet(farmerId) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+
     const query = `
       SELECT fw.*,
              (SELECT COUNT(*) FROM wallet_transactions WHERE wallet_id = fw.id) as transaction_count
@@ -642,6 +671,10 @@ async function getWalletBalance(farmerId) {
 async function linkBankAccount(farmerId, bankName, accountNumber, ifscCode, accountHolder) {
   try {
     const pg = getPostgreSQL();
+
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
 
     // Previously every linked account was inserted with is_primary=true - no
     // constraint stops that, so a farmer's second/third account would each

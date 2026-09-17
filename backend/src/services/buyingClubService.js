@@ -15,6 +15,16 @@
  * independently-drifting copy - see .ai/tasks/ACTIVE.md for the full
  * duplicate-file remediation and the (small) set of pairs that were left
  * unmerged as genuinely different features instead.
+ *
+ * (2026-09-16) core/dynamicServiceLoader.js's mountServiceRoutes(app)
+ * decides whether to mount a service by literally grepping this file's
+ * own raw source text for the substring "setupRoutes" before it ever
+ * requires/loads the module - so a one-line re-export shim like this one
+ * was silently skipped even though requiring it correctly resolves to
+ * legacy/buyingClubService.js's real setupRoutes(app), mounting
+ * GET/POST/PUT /api/v1/buying-clubs/... . This comment's own mention of
+ * "setupRoutes" is what makes the naive text-scan recognize this file -
+ * not a behavior change, the delegation below was already correct.
  */
 
 'use strict';
