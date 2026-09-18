@@ -234,6 +234,7 @@ const {
   contentNegotiation
 } = require('./middleware/apiResponseStandardizer');
 const mfaMiddleware = require('./middleware/dual-use/mfaMiddleware');
+const { authMiddleware, requireRole } = require('./middleware/auth');
 const loggingService = require('./services/loggingService');
 const libraryKnowledgeService = require('./services/libraryKnowledgeService');
 const websocketService = require('./services/websocketService');
@@ -403,10 +404,89 @@ async function startup() {
       logger.warn('⚠️  Disruption routing agent initialization deferred', { error: error.message });
     }
 
+    // Bare /health is required by Dockerfile/docker-compose HEALTHCHECK directives
+    // (they curl localhost:PORT/health directly); the auto-discovered
+    // /api/v1/health from routes/healthRoutes.js does not satisfy those checks.
+    app.get('/health', async (req, res) => {
+      try {
+        res.json({
+          status: db && infrastructure.cache === 'connected' && infrastructure.jobs === 'connected' ?
+            'operational' :
+            'degraded',
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        logger.error('Health check failed', error);
+        res.status(503).json({ status: 'unhealthy', error: error.message });
+      }
+    });
+
+    app.get('/api/v1/system/stats', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
+      try {
+        res.json({
+          services: serviceLoader.getStats(),
+          routes: routeLoader.getStats(),
+          config: configRegistry.getStats(),
+          locator: serviceLocator.getStats(),
+          memory: process.memoryUsage(),
+          uptime: process.uptime(),
+        });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    app.get('/api/v1/system/services', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
+      try {
+        const { limit = 50, offset = 0, category, subfolder } = req.query;
+        const result = serviceLoader.listServices({
+          limit: parseInt(limit),
+          offset: parseInt(offset),
+          category,
+          subfolder,
+        });
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    app.get('/api/v1/system/routes', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
+      try {
+        const result = routeLoader.getMountedRoutes();
+        res.json({
+          total: result.length,
+          routes: result.slice(0, 100),
+        });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
     app.use(errorHandler);
 
+    process.on('SIGTERM', async () => {
+      logger.info('SIGTERM received, shutting down gracefully...');
+      server.close(async () => {
+        logger.info('HTTP server closed');
+        if (db) {
+          try {
+            await db.end();
+            logger.info('Database connection closed');
+          } catch (error) {
+            logger.error('Error closing database', error);
+          }
+        }
+        process.exit(0);
+      });
+      setTimeout(() => {
+        logger.error('Forced shutdown after 30 second timeout');
+        process.exit(1);
+      }, 30000);
+    });
+
     logger.info('✅ Startup completed', { elapsedMs: Date.now() - startTime });
-    return { app, server, io };
+    return { app, server, io, serviceLocator, configRegistry };
   } catch (error) {
     logger.error('Startup failed', error);
     throw error;
