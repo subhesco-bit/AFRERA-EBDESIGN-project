@@ -168,3 +168,97 @@ a single sitting for a path set of this size.
    instead of touching 014 directly. Left unfixed pending that decision.
 2. Consider whether `bulkOrderService`'s 3-way live-path split (legacy / root /
    commerce) should be unified — flagged, out of scope for this pass.
+
+---
+
+## Systemic FK type-mismatch sweep (70 non-frozen fixes)
+
+**Date:** 2026-09-18
+**Tooling:** order-aware FK checker (re-derives `migrate.js`'s `CREATE TABLE IF NOT
+EXISTS` "first file wins" semantics per table, then flags any FK column whose type
+doesn't match its target's *actually-winning* column type — not just its own file's
+declared type). Read-only; run as `node order-aware-fk-check.cjs <db-dir>`.
+
+**Baseline:** 78 total order-resolved mismatches. 8 of these fall inside the
+CLAUDE.md freeze on migrations 000-071 (`014_platform_foundation_modules.sql` ×2,
+`041_rural_life_os_schema.sql` ×4, `047_gst_tables.sql` ×1,
+`061_village_project_dpr_subsidy_intelligence.sql` ×1) and were left untouched —
+out of scope, pending explicit human sign-off on the freeze exception. This pass
+covers the remaining **70**, all in files with numeric prefix ≥ 072 or no numeric
+prefix.
+
+### Clean fixes: 62 of 70
+
+Each is a single `CREATE TABLE` column retype (`INTEGER`→`UUID` or `UUID`→`INTEGER`)
+to match the *live* winning declaration of the column it references. Verified via
+`localDeclarationLive: true` in the tool's output (this file's own CREATE TABLE for
+that table is the one that actually executes) before editing, and regression-checked
+against the tool after each batch.
+
+| File | Column(s) fixed | Direction |
+|---|---|---|
+| `091_create_ai_optimizations_table.sql` | `ai_optimizations.farm_id`, `.farmer_id` | INTEGER→UUID |
+| `092_create_ai_analyses_table.sql` | `ai_analyses.farm_id` | INTEGER→UUID |
+| `096_create_gdpr_tables.sql` | `data_inventory.user_id`, `user_consents.user_id`, `data_exports.user_id`, `deletion_requests.user_id` | INTEGER→UUID |
+| `097_ai_image_generation_enhanced.sql` | `ai_generated_images.product_id`/`.farmer_id`, `product_listings.product_id`, `farmer_image_portfolios.farmer_id`, `farmer_products.farmer_id`, `sku_images.product_id` | INTEGER→UUID |
+| `200_m047_irrigation_management.sql` | `water_sources.farm_id`, `irrigation_schedules.farm_id`, `irrigation_delivery_logs.operator_id`, `irrigation_efficiency_metrics.farm_id` | INTEGER→UUID |
+| `9994_platform_content_and_m0xx_indexes.sql` | `community_posts.author_id`, `community_replies.author_id`, `community_votes.user_id`, `knowledge_articles.author_id`, `info_announcements.published_by`, `info_announcement_reads.user_id` | INTEGER→UUID |
+| `406_production_supply_market_bridge.sql` | `production_supply_lots.crop_plan_id` | INTEGER→UUID |
+| `10000_village_external_supply_demand.sql` | `village_external_demands.village_id`, `village_supply_orders.village_id` | INTEGER→UUID |
+| `9994_village_completeness_operating_layer.sql` | 14 `village_id` columns (institutions, governance_records, grievances, assets, service_coverage, livelihoods, skill_gaps, financial_access_points, hazard_profiles, emergency_resources, connectivity_profiles, natural_resources, environment_indicators, readiness_snapshots) | INTEGER→UUID |
+| `9998_village_erp_operating_system.sql` | 7 `village_id` columns (households, enterprises, budgets, finance_dimensions, operational_kpis, workflow_tasks, ai_insights) | INTEGER→UUID |
+| `9996_village_economy_geo_logistics.sql` | `village_production_records.village_id`, `village_economic_flows.village_id`, `village_logistics_routes.village_id`, `village_logistics_profiles.village_id` | INTEGER→UUID |
+| `9998_village_production_potential.sql` | `village_commodity_potential_profiles.village_id` | INTEGER→UUID |
+| `9996_project_systems_schema.sql` | `project_wbs.project_id`, `project_milestones.project_id` | INTEGER→UUID (`projects.id` is UUID per winning `411_projects.sql`; this file's own `projects` CREATE TABLE is itself a dead no-op, but `project_wbs`/`project_milestones` are live) |
+| `9997_cooperative_shares_schema.sql` | `cooperative_share_transactions.member_id`, `.counterparty_member_id` | **UUID→INTEGER** (`cooperative_members.id` is SERIAL/integer per winning `012_governance_module.sql`) |
+| `991_aeos_folu_ne_policy.sql` | `yield_actuals.crop_id`, `farmer_revenue.crop_id`, `farmer_listings.crop_id` | UUID→INTEGER (`crops.id` is integer per winning `001_skeleton_complete_schema.sql`) |
+| `9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql` | `irrigation_logs.schedule_id` | UUID→INTEGER (`irrigation_schedules.id` is integer per winning `200_m047_irrigation_management.sql`) |
+| `strategic_services_schema.sql` | `pre_season_agreements.crop_id`, `pre_season_opportunities.crop_id` | UUID→INTEGER |
+
+Committed in 5 batches (`4e78dea0`, `caabd04d`, `35972ebf`, `35127e75`, plus one
+folded into the irrigation/AEOS batch), each listing the exact table.column retypes.
+
+### Verified moot, no edit made: 8 of 70
+
+These carry `localDeclarationLive: false` — the file's own `CREATE TABLE IF NOT
+EXISTS` for that table never executes because an earlier-sorted file already
+declared it, so retyping the column in *this* file would be dead code with zero
+runtime effect. Per instructions, each was checked against its actual winning
+declaration instead of being edited blind:
+
+| File (dead declaration) | Table.column | Winning file | Result |
+|---|---|---|---|
+| `405_main_operational_erp_reconciliation.sql` | `inventory_movements.inventory_id` | `034_logistics_enhancement_schema.sql` | **Different FK entirely.** The winning declaration's `inventory_id INTEGER REFERENCES warehouse_inventory(id)` — not `inventory(id)` as in the dead file — and `warehouse_inventory.id` is itself `SERIAL`/integer. No mismatch exists in the live schema. |
+| `3100_ecommerce_tables.sql` | `gi_marketplace_listings.product_id` | `027_gi_intelligence_schema.sql` | Winning declaration already has `product_id UUID REFERENCES products(id)`, matching `products.id` (UUID). Already consistent. |
+| `3100_ecommerce_tables.sql` | `product_reviews.product_id` | `009_marketplace_enhancements.sql` | Winning declaration already `UUID REFERENCES products(id)`. Already consistent. |
+| `3102_ecommerce_ai_erp_business_marketing.sql` | `demand_forecasts.product_id` | `015_advanced_features.sql` | Winning declaration already `UUID REFERENCES products(id)`. Already consistent. |
+| `3102_ecommerce_ai_erp_business_marketing.sql` | `gst_invoices.order_id` | `028_gst_schema.sql` | Winning declaration's `order_id INTEGER NOT NULL` carries **no FK constraint at all** on this column — no live type mismatch (a missing-FK gap, but out of this sweep's scope). |
+| `3102_ecommerce_ai_erp_business_marketing.sql` | `warehouse_inventory.product_id` | `013_logistics_enhancements.sql` | Winning declaration already `UUID NOT NULL REFERENCES products(id)`. Already consistent. |
+| `9997_village_economy_flow_intelligence.sql` | `village_production_records.village_id` | `9996_village_economy_geo_logistics.sql` | Winning declaration was itself one of the 62 live fixes above (retyped INTEGER→UUID this pass); once fixed there, this dead duplicate is moot too. |
+| `m011_water_irrigation_schema.sql` | `irrigation_logs.schedule_id` | `9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql` | Winning declaration was itself one of the 62 live fixes above (retyped UUID→INTEGER this pass); once fixed there, this dead duplicate is moot too. |
+
+No item required a full stop for ambiguity, application-code risk, or "possibly
+intentional" reasons — every one of the 70 resolved cleanly into either a
+straightforward retype or a verified-moot dead declaration.
+
+### Final verified count
+
+Re-running the order-aware checker after all edits: **`realOrderResolvedMismatches`
+dropped from 78 to 14.**
+
+14, not 8, remain — this is **not** a discrepancy in the fix count, it's arithmetic:
+- 8 are the frozen items (untouched, as instructed).
+- 6 are exactly the "verified moot" dead-declaration rows from the table above
+  (`405` ×1, `3100` ×2, `3102` ×3) — the checker still *reports* them because it
+  flags every FK site regardless of whether its own declaration is live, and their
+  *own* file's column genuinely still says `INTEGER`/`UUID` where the target's
+  winning type differs. Retyping them would be a no-op against the live schema (as
+  shown above) and was correctly not done; they are pre-existing dead code, not a
+  live bug, and are not part of the 70 in scope.
+- The other 2 dead rows from the original 8 (`9997_village_economy_flow_intelligence.sql`,
+  `m011_water_irrigation_schema.sql`) disappeared from the checker's output entirely
+  once their live counterparts were retyped, confirming those two really were
+  fully resolved.
+
+70/70 items processed: 62 fixed with a real column retype, 8 verified moot
+(dead code, zero live effect, correctly left alone). 0 stopped on ambiguity.
