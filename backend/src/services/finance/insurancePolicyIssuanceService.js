@@ -5,6 +5,7 @@
 
 const { logger } = require('../../utils/logger');
 const insurancePremiumService = require('./insurancePremiumService');
+const { withTransaction } = require('../../core/withTransaction');
 
 class InsurancePolicyIssuanceService {
   constructor() {
@@ -47,34 +48,44 @@ class InsurancePolicyIssuanceService {
         endDate
       );
 
-      const query = `
-        INSERT INTO insurance_policies 
-        (policy_number, policyholder_id, insurance_type, quote_id, premium_amount,
-         payment_method, payment_reference, start_date, end_date, payment_schedule,
-         policy_data, status, issued_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'active', NOW())
-        RETURNING *
-      `;
+      // BR-08: issuing the policy row and flipping the source quote to
+      // 'issued' must commit together — if the quote update were lost, the
+      // still-'accepted' quote could be issued again, producing two active
+      // policies (and two premium schedules) for the same accepted quote.
+      // Nothing external is called inside this boundary (the quote lookup
+      // and payment-schedule calculation already happened above).
+      const policy = await withTransaction(async (client) => {
+        const query = `
+          INSERT INTO insurance_policies
+          (policy_number, policyholder_id, insurance_type, quote_id, premium_amount,
+           payment_method, payment_reference, start_date, end_date, payment_schedule,
+           policy_data, status, issued_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'active', NOW())
+          RETURNING *
+        `;
 
-      const result = await this.pool.query(query, [
-        policyNumber,
-        policyholderId,
-        insuranceType,
-        quoteId,
-        premiumAmount,
-        paymentMethod,
-        paymentReference,
-        startDate,
-        endDate,
-        JSON.stringify(paymentSchedule),
-        JSON.stringify(riskData)
-      ]);
+        const result = await client.query(query, [
+          policyNumber,
+          policyholderId,
+          insuranceType,
+          quoteId,
+          premiumAmount,
+          paymentMethod,
+          paymentReference,
+          startDate,
+          endDate,
+          JSON.stringify(paymentSchedule),
+          JSON.stringify(riskData)
+        ]);
 
-      // Update quote status
-      await this.updateQuoteStatus(quoteId, 'issued');
+        // Update quote status
+        await this.updateQuoteStatus(quoteId, 'issued', client);
+
+        return result.rows[0];
+      }, { name: 'insurancePolicyIssuanceService.issuePolicy' });
 
       logger.info(`Policy ${policyNumber} issued for policyholder ${policyholderId}`);
-      return result.rows[0];
+      return policy;
     } catch (error) {
       logger.error('Error issuing policy', { error: error.message, stack: error.stack });
       throw error;
@@ -182,7 +193,7 @@ class InsurancePolicyIssuanceService {
   /**
    * Update quote status
    */
-  async updateQuoteStatus(quoteId, status) {
+  async updateQuoteStatus(quoteId, status, executor = this.pool) {
     try {
       const query = `
         UPDATE insurance_quotes
@@ -191,7 +202,7 @@ class InsurancePolicyIssuanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [status, quoteId]);
+      const result = await executor.query(query, [status, quoteId]);
       return result.rows[0];
     } catch (error) {
       logger.error('Error updating quote status', { error: error.message, stack: error.stack });
