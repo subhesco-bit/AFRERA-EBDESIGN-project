@@ -17,6 +17,7 @@
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
 const { signalBus } = require('../../core/signalBus');
+const { withTransaction } = require('../../core/withTransaction');
 
 // ============================================================================
 // FARMER MODULE ERP INTEGRATION
@@ -39,43 +40,49 @@ async function syncFarmerCropPlanningWithERP(farmerId, cropPlanData) {
       return { success: true, message: 'No active crop plans found' };
     }
 
-    // Create ERP production orders for each crop plan
-    for (const plan of cropPlan.rows) {
-      const productionOrder = {
-        farmer_id: farmerId,
-        crop_type: plan.crop_type,
-        planned_area: plan.planned_area,
-        expected_yield: plan.expected_yield,
-        planting_date: plan.planting_date,
-        harvest_date: plan.harvest_date,
-        resource_requirements: {
-          seeds: plan.seed_quantity,
-          fertilizers: plan.fertilizer_requirements,
-          labor: plan.labor_requirements,
-          equipment: plan.equipment_requirements,
-        },
-        cost_allocations: {
-          seed_cost: plan.seed_cost,
-          fertilizer_cost: plan.fertilizer_cost,
-          labor_cost: plan.labor_cost,
-          equipment_cost: plan.equipment_cost,
-          other_costs: plan.other_costs,
-        },
-      };
+    // BR-08: each plan's production order and its GL cost-allocation entry
+    // must land together, and all plans in this sync run together — a
+    // partial run leaves ERP production orders with no matching cost
+    // allocation (or vice versa), corrupting the financial ERP's picture of
+    // this farmer's committed costs.
+    await withTransaction(async (client) => {
+      for (const plan of cropPlan.rows) {
+        const productionOrder = {
+          farmer_id: farmerId,
+          crop_type: plan.crop_type,
+          planned_area: plan.planned_area,
+          expected_yield: plan.expected_yield,
+          planting_date: plan.planting_date,
+          harvest_date: plan.harvest_date,
+          resource_requirements: {
+            seeds: plan.seed_quantity,
+            fertilizers: plan.fertilizer_requirements,
+            labor: plan.labor_requirements,
+            equipment: plan.equipment_requirements,
+          },
+          cost_allocations: {
+            seed_cost: plan.seed_cost,
+            fertilizer_cost: plan.fertilizer_cost,
+            labor_cost: plan.labor_cost,
+            equipment_cost: plan.equipment_cost,
+            other_costs: plan.other_costs,
+          },
+        };
 
-      // Create production order in ERP
-      await pg.query(`
-        INSERT INTO erp_production_orders 
-        (farmer_id, crop_type, planned_area, expected_yield, planting_date, harvest_date, 
-         resource_requirements, cost_allocations, order_status, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'planned', NOW())
-      `, [farmerId, plan.crop_type, plan.planned_area, plan.expected_yield,
-        plan.planting_date, plan.harvest_date, JSON.stringify(productionOrder.resource_requirements),
-        JSON.stringify(productionOrder.cost_allocations)]);
+        // Create production order in ERP
+        await client.query(`
+          INSERT INTO erp_production_orders
+          (farmer_id, crop_type, planned_area, expected_yield, planting_date, harvest_date,
+           resource_requirements, cost_allocations, order_status, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'planned', NOW())
+        `, [farmerId, plan.crop_type, plan.planned_area, plan.expected_yield,
+          plan.planting_date, plan.harvest_date, JSON.stringify(productionOrder.resource_requirements),
+          JSON.stringify(productionOrder.cost_allocations)]);
 
-      // Post initial cost allocation to financial ERP
-      await postCostAllocationToGL(farmerId, plan.crop_type, productionOrder.cost_allocations);
-    }
+        // Post initial cost allocation to financial ERP
+        await postCostAllocationToGL(farmerId, plan.crop_type, productionOrder.cost_allocations, client);
+      }
+    }, { name: 'completeERPIntegrationService.syncFarmerCropPlanningWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.farmer.crop_plan.synced', {
@@ -100,28 +107,34 @@ async function syncFarmerHarvestWithERP(farmerId, harvestData) {
   const pg = getPostgreSQL();
 
   try {
-    // Update ERP inventory with harvest data
-    await pg.query(`
-      INSERT INTO erp_inventory 
-      (farmer_id, product_type, quantity, quality_grade, harvest_date, location, source_type, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, 'harvest', NOW())
-      ON CONFLICT (farmer_id, product_type, harvest_date) 
-      DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
-    `, [farmerId, harvestData.crop_type, harvestData.quantity, harvestData.quality_grade,
-      harvestData.harvest_date, harvestData.location]);
-
     // Calculate revenue based on quality grade and market price
     const revenue = await calculateHarvestRevenue(harvestData);
 
-    // Post revenue to financial ERP
-    await postRevenueToGL(farmerId, harvestData.crop_type, revenue, 'harvest');
+    // BR-08: the inventory update, the GL revenue posting, and the farmer's
+    // financial record are one economic event — a partial run leaves either
+    // inventory booked with no matching revenue, or a financial record with
+    // no GL entry backing it, both of which are accounting-integrity bugs.
+    await withTransaction(async (client) => {
+      // Update ERP inventory with harvest data
+      await client.query(`
+        INSERT INTO erp_inventory
+        (farmer_id, product_type, quantity, quality_grade, harvest_date, location, source_type, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, 'harvest', NOW())
+        ON CONFLICT (farmer_id, product_type, harvest_date)
+        DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
+      `, [farmerId, harvestData.crop_type, harvestData.quantity, harvestData.quality_grade,
+        harvestData.harvest_date, harvestData.location]);
 
-    // Update farmer's financial records
-    await pg.query(`
-      INSERT INTO farmer_financial_records 
-      (farmer_id, transaction_type, amount, description, related_crop, transaction_date, created_at)
-      VALUES ($1, 'revenue', $2, 'Harvest revenue', $3, $4, NOW())
-    `, [farmerId, revenue.total_value, harvestData.crop_type, harvestData.harvest_date]);
+      // Post revenue to financial ERP
+      await postRevenueToGL(farmerId, harvestData.crop_type, revenue, 'harvest', client);
+
+      // Update farmer's financial records
+      await client.query(`
+        INSERT INTO farmer_financial_records
+        (farmer_id, transaction_type, amount, description, related_crop, transaction_date, created_at)
+        VALUES ($1, 'revenue', $2, 'Harvest revenue', $3, $4, NOW())
+      `, [farmerId, revenue.total_value, harvestData.crop_type, harvestData.harvest_date]);
+    }, { name: 'completeERPIntegrationService.syncFarmerHarvestWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.farmer.harvest.synced', {
@@ -147,21 +160,27 @@ async function syncFarmerFieldWithERP(farmerId, fieldData) {
   const pg = getPostgreSQL();
 
   try {
-    // Register field as asset in ERP
-    await pg.query(`
-      INSERT INTO erp_assets 
-      (asset_type, owner_id, asset_name, location, area_size, soil_type, irrigation_type, 
-       current_value, acquisition_date, asset_status, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active', NOW())
-      ON CONFLICT (owner_id, asset_name, location) 
-      DO UPDATE SET area_size = $5, current_value = $8, asset_status = 'active'
-    `, ['land', farmerId, fieldData.field_name, fieldData.location, fieldData.area_size,
-      fieldData.soil_type, fieldData.irrigation_type, fieldData.estimated_value,
-      fieldData.acquisition_date]);
-
     // Calculate depreciation and post to financial ERP
     const depreciation = calculateLandDepreciation(fieldData.estimated_value, fieldData.acquisition_date);
-    await postDepreciationToGL(farmerId, fieldData.field_name, depreciation);
+
+    // BR-08: registering the asset and posting its depreciation are one
+    // event — a partial run leaves an asset with no depreciation schedule
+    // in the GL, or a GL entry for an asset that was never registered.
+    await withTransaction(async (client) => {
+      // Register field as asset in ERP
+      await client.query(`
+        INSERT INTO erp_assets
+        (asset_type, owner_id, asset_name, location, area_size, soil_type, irrigation_type,
+         current_value, acquisition_date, asset_status, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active', NOW())
+        ON CONFLICT (owner_id, asset_name, location)
+        DO UPDATE SET area_size = $5, current_value = $8, asset_status = 'active'
+      `, ['land', farmerId, fieldData.field_name, fieldData.location, fieldData.area_size,
+        fieldData.soil_type, fieldData.irrigation_type, fieldData.estimated_value,
+        fieldData.acquisition_date]);
+
+      await postDepreciationToGL(farmerId, fieldData.field_name, depreciation, client);
+    }, { name: 'completeERPIntegrationService.syncFarmerFieldWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.farmer.field.synced', {
@@ -203,36 +222,42 @@ async function syncCropLifecycleWithERP(cropId, lifecycleData) {
 
     const cropData = crop.rows[0];
 
-    // Update ERP production tracking based on lifecycle stage
-    await pg.query(`
-      INSERT INTO erp_production_tracking 
-      (crop_id, stage, stage_start_date, stage_end_date, resources_used, 
-       costs_incurred, outputs_produced, quality_metrics, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
-      ON CONFLICT (crop_id, stage) 
-      DO UPDATE SET stage_end_date = $4, resources_used = $5, costs_incurred = $6, 
-                   outputs_produced = $7, quality_metrics = $8
-    `, [cropId, lifecycleData.stage, lifecycleData.start_date, lifecycleData.end_date,
-      JSON.stringify(lifecycleData.resources_used), JSON.stringify(lifecycleData.costs_incurred),
-      JSON.stringify(lifecycleData.outputs_produced), JSON.stringify(lifecycleData.quality_metrics)]);
+    // BR-08: the production-tracking row, its stage-cost GL posting, and any
+    // inventory produced by this stage are one lifecycle event — a partial
+    // run leaves a stage recorded with no matching cost or output, silently
+    // understating either the crop's cost basis or its produced inventory.
+    await withTransaction(async (client) => {
+      // Update ERP production tracking based on lifecycle stage
+      await client.query(`
+        INSERT INTO erp_production_tracking
+        (crop_id, stage, stage_start_date, stage_end_date, resources_used,
+         costs_incurred, outputs_produced, quality_metrics, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+        ON CONFLICT (crop_id, stage)
+        DO UPDATE SET stage_end_date = $4, resources_used = $5, costs_incurred = $6,
+                     outputs_produced = $7, quality_metrics = $8
+      `, [cropId, lifecycleData.stage, lifecycleData.start_date, lifecycleData.end_date,
+        JSON.stringify(lifecycleData.resources_used), JSON.stringify(lifecycleData.costs_incurred),
+        JSON.stringify(lifecycleData.outputs_produced), JSON.stringify(lifecycleData.quality_metrics)]);
 
-    // Post stage costs to financial ERP
-    if (lifecycleData.costs_incurred) {
-      await postStageCostsToGL(cropId, lifecycleData.stage, lifecycleData.costs_incurred);
-    }
-
-    // Update inventory if stage produces outputs
-    if (lifecycleData.outputs_produced) {
-      for (const output of lifecycleData.outputs_produced) {
-        await pg.query(`
-          INSERT INTO erp_inventory 
-          (crop_id, product_type, quantity, quality_grade, production_date, source_type, created_at)
-          VALUES ($1, $2, $3, $4, $5, 'production', NOW())
-          ON CONFLICT (crop_id, product_type, production_date) 
-          DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
-        `, [cropId, output.product_type, output.quantity, output.quality_grade, output.production_date]);
+      // Post stage costs to financial ERP
+      if (lifecycleData.costs_incurred) {
+        await postStageCostsToGL(cropId, lifecycleData.stage, lifecycleData.costs_incurred, client);
       }
-    }
+
+      // Update inventory if stage produces outputs
+      if (lifecycleData.outputs_produced) {
+        for (const output of lifecycleData.outputs_produced) {
+          await client.query(`
+            INSERT INTO erp_inventory
+            (crop_id, product_type, quantity, quality_grade, production_date, source_type, created_at)
+            VALUES ($1, $2, $3, $4, $5, 'production', NOW())
+            ON CONFLICT (crop_id, product_type, production_date)
+            DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
+          `, [cropId, output.product_type, output.quantity, output.quality_grade, output.production_date]);
+        }
+      }
+    }, { name: 'completeERPIntegrationService.syncCropLifecycleWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.crop.lifecycle.synced', {
@@ -266,31 +291,37 @@ async function syncCropYieldWithERP(cropId, yieldData) {
       protein_content: yieldData.protein_content,
     };
 
-    // Update ERP inventory with yield data
-    for (const qualityGrade of Object.keys(yieldData.quality_distribution)) {
-      const quantity = yieldData.quality_distribution[qualityGrade];
-
-      await pg.query(`
-        INSERT INTO erp_inventory 
-        (crop_id, product_type, quantity, quality_grade, harvest_date, location, source_type, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, 'yield', NOW())
-        ON CONFLICT (crop_id, product_type, harvest_date, quality_grade) 
-        DO UPDATE SET quantity = erp_inventory.quantity + $3
-      `, [cropId, yieldData.crop_type, quantity, qualityGrade, yieldData.harvest_date, yieldData.location]);
-    }
-
     // Calculate revenue based on quality and market prices
     const revenue = await calculateYieldRevenue(yieldData);
 
-    // Post revenue to financial ERP
-    await postRevenueToGL(null, yieldData.crop_type, revenue, 'crop_yield');
+    // BR-08: the per-grade inventory rows, the GL revenue posting, and the
+    // crop financial record are one economic event — a partial run leaves
+    // inventory booked with no matching revenue recognized, or a financial
+    // record referencing yield inventory that was never written.
+    await withTransaction(async (client) => {
+      // Update ERP inventory with yield data
+      for (const qualityGrade of Object.keys(yieldData.quality_distribution)) {
+        const quantity = yieldData.quality_distribution[qualityGrade];
 
-    // Update crop financial records
-    await pg.query(`
-      INSERT INTO crop_financial_records 
-      (crop_id, transaction_type, amount, description, quality_metrics, transaction_date, created_at)
-      VALUES ($1, 'revenue', $2, 'Crop yield revenue', $3, $4, NOW())
-    `, [cropId, revenue.total_value, JSON.stringify(yieldMetrics), yieldData.harvest_date]);
+        await client.query(`
+          INSERT INTO erp_inventory
+          (crop_id, product_type, quantity, quality_grade, harvest_date, location, source_type, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, 'yield', NOW())
+          ON CONFLICT (crop_id, product_type, harvest_date, quality_grade)
+          DO UPDATE SET quantity = erp_inventory.quantity + $3
+        `, [cropId, yieldData.crop_type, quantity, qualityGrade, yieldData.harvest_date, yieldData.location]);
+      }
+
+      // Post revenue to financial ERP
+      await postRevenueToGL(null, yieldData.crop_type, revenue, 'crop_yield', client);
+
+      // Update crop financial records
+      await client.query(`
+        INSERT INTO crop_financial_records
+        (crop_id, transaction_type, amount, description, quality_metrics, transaction_date, created_at)
+        VALUES ($1, 'revenue', $2, 'Crop yield revenue', $3, $4, NOW())
+      `, [cropId, revenue.total_value, JSON.stringify(yieldMetrics), yieldData.harvest_date]);
+    }, { name: 'completeERPIntegrationService.syncCropYieldWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.crop.yield.synced', {
@@ -320,21 +351,27 @@ async function syncLivestockWithERP(livestockId, livestockData) {
   const pg = getPostgreSQL();
 
   try {
-    // Register livestock as asset in ERP
-    await pg.query(`
-      INSERT INTO erp_assets 
-      (asset_type, owner_id, asset_name, breed, age, location, current_value, 
-       acquisition_date, asset_status, health_status, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active', $9, NOW())
-      ON CONFLICT (owner_id, asset_name, breed) 
-      DO UPDATE SET current_value = $7, health_status = $9, asset_status = 'active'
-    `, ['livestock', livestockData.owner_id, livestockData.name, livestockData.breed,
-      livestockData.age, livestockData.location, livestockData.current_value,
-      livestockData.acquisition_date, livestockData.health_status]);
-
     // Calculate depreciation and post to financial ERP
     const depreciation = calculateLivestockDepreciation(livestockData.current_value, livestockData.age);
-    await postDepreciationToGL(livestockData.owner_id, livestockData.name, depreciation);
+
+    // BR-08: registering the livestock asset and posting its depreciation
+    // are one event — see syncFarmerFieldWithERP for why a partial run here
+    // corrupts the asset/GL relationship.
+    await withTransaction(async (client) => {
+      // Register livestock as asset in ERP
+      await client.query(`
+        INSERT INTO erp_assets
+        (asset_type, owner_id, asset_name, breed, age, location, current_value,
+         acquisition_date, asset_status, health_status, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active', $9, NOW())
+        ON CONFLICT (owner_id, asset_name, breed)
+        DO UPDATE SET current_value = $7, health_status = $9, asset_status = 'active'
+      `, ['livestock', livestockData.owner_id, livestockData.name, livestockData.breed,
+        livestockData.age, livestockData.location, livestockData.current_value,
+        livestockData.acquisition_date, livestockData.health_status]);
+
+      await postDepreciationToGL(livestockData.owner_id, livestockData.name, depreciation, client);
+    }, { name: 'completeERPIntegrationService.syncLivestockWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.livestock.synced', {
@@ -360,30 +397,35 @@ async function syncLivestockProductionWithERP(livestockId, productionData) {
   const pg = getPostgreSQL();
 
   try {
-    // Update ERP inventory with production data
-    for (const product of productionData.products) {
-      await pg.query(`
-        INSERT INTO erp_inventory 
-        (livestock_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, 'livestock_production', NOW())
-        ON CONFLICT (livestock_id, product_type, production_date) 
-        DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
-      `, [livestockId, product.product_type, product.quantity, product.quality_grade,
-        productionData.production_date, productionData.location]);
-    }
-
     // Calculate revenue based on production
     const revenue = await calculateLivestockProductionRevenue(productionData);
 
-    // Post revenue to financial ERP
-    await postRevenueToGL(productionData.owner_id, productionData.livestock_type, revenue, 'livestock_production');
+    // BR-08: production inventory, the GL revenue posting, and the
+    // livestock financial record are one economic event; see
+    // syncFarmerHarvestWithERP for why a partial run corrupts the books.
+    await withTransaction(async (client) => {
+      // Update ERP inventory with production data
+      for (const product of productionData.products) {
+        await client.query(`
+          INSERT INTO erp_inventory
+          (livestock_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, 'livestock_production', NOW())
+          ON CONFLICT (livestock_id, product_type, production_date)
+          DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
+        `, [livestockId, product.product_type, product.quantity, product.quality_grade,
+          productionData.production_date, productionData.location]);
+      }
 
-    // Update livestock financial records
-    await pg.query(`
-      INSERT INTO livestock_financial_records 
-      (livestock_id, transaction_type, amount, description, production_metrics, transaction_date, created_at)
-      VALUES ($1, 'revenue', $2, 'Livestock production revenue', $3, $4, NOW())
-    `, [livestockId, revenue.total_value, JSON.stringify(productionData.production_metrics), productionData.production_date]);
+      // Post revenue to financial ERP
+      await postRevenueToGL(productionData.owner_id, productionData.livestock_type, revenue, 'livestock_production', client);
+
+      // Update livestock financial records
+      await client.query(`
+        INSERT INTO livestock_financial_records
+        (livestock_id, transaction_type, amount, description, production_metrics, transaction_date, created_at)
+        VALUES ($1, 'revenue', $2, 'Livestock production revenue', $3, $4, NOW())
+      `, [livestockId, revenue.total_value, JSON.stringify(productionData.production_metrics), productionData.production_date]);
+    }, { name: 'completeERPIntegrationService.syncLivestockProductionWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.livestock.production.synced', {
@@ -409,18 +451,28 @@ async function syncLivestockHealthWithERP(livestockId, healthData) {
   const pg = getPostgreSQL();
 
   try {
-    // Update asset health status in ERP
-    await pg.query(`
-      UPDATE erp_assets 
-      SET health_status = $1, last_health_check = NOW()
-      WHERE asset_type = 'livestock' AND asset_id = $2
-    `, [healthData.health_status, livestockId]);
+    // If health issue, calculate potential loss ahead of the write
+    const isHealthIssue = healthData.health_status === 'sick' || healthData.health_status === 'critical';
+    const potentialLoss = isHealthIssue
+      ? await calculateHealthEventCost(livestockId, healthData)
+      : null;
 
-    // If health issue, calculate potential loss and post to financial ERP
-    if (healthData.health_status === 'sick' || healthData.health_status === 'critical') {
-      const potentialLoss = await calculateHealthEventCost(livestockId, healthData);
-      await postProvisionToGL(healthData.owner_id, livestockId, potentialLoss, 'health_event');
-    }
+    // BR-08: the asset health-status update and its GL provision (when the
+    // event is a health issue) are one event — a partial run leaves the
+    // asset marked sick/critical with no provision booked, understating
+    // financial risk exposure.
+    await withTransaction(async (client) => {
+      // Update asset health status in ERP
+      await client.query(`
+        UPDATE erp_assets
+        SET health_status = $1, last_health_check = NOW()
+        WHERE asset_type = 'livestock' AND asset_id = $2
+      `, [healthData.health_status, livestockId]);
+
+      if (isHealthIssue) {
+        await postProvisionToGL(healthData.owner_id, livestockId, potentialLoss, 'health_event', client);
+      }
+    }, { name: 'completeERPIntegrationService.syncLivestockHealthWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.livestock.health.synced', {
@@ -449,23 +501,26 @@ async function syncDairyProductionWithERP(dairyId, productionData) {
   const pg = getPostgreSQL();
 
   try {
-    // Update ERP inventory with dairy production
-    for (const product of productionData.products) {
-      await pg.query(`
-        INSERT INTO erp_inventory 
-        (dairy_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, 'dairy_production', NOW())
-        ON CONFLICT (dairy_id, product_type, production_date) 
-        DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
-      `, [dairyId, product.product_type, product.quantity, product.quality_grade,
-        productionData.production_date, productionData.location]);
-    }
-
     // Calculate revenue
     const revenue = await calculateDairyProductionRevenue(productionData);
 
-    // Post revenue to financial ERP
-    await postRevenueToGL(productionData.owner_id, 'dairy', revenue, 'dairy_production');
+    // BR-08: production inventory and its GL revenue posting are one event.
+    await withTransaction(async (client) => {
+      // Update ERP inventory with dairy production
+      for (const product of productionData.products) {
+        await client.query(`
+          INSERT INTO erp_inventory
+          (dairy_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, 'dairy_production', NOW())
+          ON CONFLICT (dairy_id, product_type, production_date)
+          DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
+        `, [dairyId, product.product_type, product.quantity, product.quality_grade,
+          productionData.production_date, productionData.location]);
+      }
+
+      // Post revenue to financial ERP
+      await postRevenueToGL(productionData.owner_id, 'dairy', revenue, 'dairy_production', client);
+    }, { name: 'completeERPIntegrationService.syncDairyProductionWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.dairy.production.synced', {
@@ -491,23 +546,26 @@ async function syncPoultryProductionWithERP(poultryId, productionData) {
   const pg = getPostgreSQL();
 
   try {
-    // Update ERP inventory with poultry production
-    for (const product of productionData.products) {
-      await pg.query(`
-        INSERT INTO erp_inventory 
-        (poultry_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, 'poultry_production', NOW())
-        ON CONFLICT (poultry_id, product_type, production_date) 
-        DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
-      `, [poultryId, product.product_type, product.quantity, product.quality_grade,
-        productionData.production_date, productionData.location]);
-    }
-
     // Calculate revenue
     const revenue = await calculatePoultryProductionRevenue(productionData);
 
-    // Post revenue to financial ERP
-    await postRevenueToGL(productionData.owner_id, 'poultry', revenue, 'poultry_production');
+    // BR-08: production inventory and its GL revenue posting are one event.
+    await withTransaction(async (client) => {
+      // Update ERP inventory with poultry production
+      for (const product of productionData.products) {
+        await client.query(`
+          INSERT INTO erp_inventory
+          (poultry_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, 'poultry_production', NOW())
+          ON CONFLICT (poultry_id, product_type, production_date)
+          DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
+        `, [poultryId, product.product_type, product.quantity, product.quality_grade,
+          productionData.production_date, productionData.location]);
+      }
+
+      // Post revenue to financial ERP
+      await postRevenueToGL(productionData.owner_id, 'poultry', revenue, 'poultry_production', client);
+    }, { name: 'completeERPIntegrationService.syncPoultryProductionWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.poultry.production.synced', {
@@ -533,23 +591,26 @@ async function syncGoatProductionWithERP(goatId, productionData) {
   const pg = getPostgreSQL();
 
   try {
-    // Update ERP inventory with goat production
-    for (const product of productionData.products) {
-      await pg.query(`
-        INSERT INTO erp_inventory 
-        (goat_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, 'goat_production', NOW())
-        ON CONFLICT (goat_id, product_type, production_date) 
-        DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
-      `, [goatId, product.product_type, product.quantity, product.quality_grade,
-        productionData.production_date, productionData.location]);
-    }
-
     // Calculate revenue
     const revenue = await calculateGoatProductionRevenue(productionData);
 
-    // Post revenue to financial ERP
-    await postRevenueToGL(productionData.owner_id, 'goat', revenue, 'goat_production');
+    // BR-08: production inventory and its GL revenue posting are one event.
+    await withTransaction(async (client) => {
+      // Update ERP inventory with goat production
+      for (const product of productionData.products) {
+        await client.query(`
+          INSERT INTO erp_inventory
+          (goat_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, 'goat_production', NOW())
+          ON CONFLICT (goat_id, product_type, production_date)
+          DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
+        `, [goatId, product.product_type, product.quantity, product.quality_grade,
+          productionData.production_date, productionData.location]);
+      }
+
+      // Post revenue to financial ERP
+      await postRevenueToGL(productionData.owner_id, 'goat', revenue, 'goat_production', client);
+    }, { name: 'completeERPIntegrationService.syncGoatProductionWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.goat.production.synced', {
@@ -575,23 +636,26 @@ async function syncSheepProductionWithERP(sheepId, productionData) {
   const pg = getPostgreSQL();
 
   try {
-    // Update ERP inventory with sheep production
-    for (const product of productionData.products) {
-      await pg.query(`
-        INSERT INTO erp_inventory 
-        (sheep_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, 'sheep_production', NOW())
-        ON CONFLICT (sheep_id, product_type, production_date) 
-        DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
-      `, [sheepId, product.product_type, product.quantity, product.quality_grade,
-        productionData.production_date, productionData.location]);
-    }
-
     // Calculate revenue
     const revenue = await calculateSheepProductionRevenue(productionData);
 
-    // Post revenue to financial ERP
-    await postRevenueToGL(productionData.owner_id, 'sheep', revenue, 'sheep_production');
+    // BR-08: production inventory and its GL revenue posting are one event.
+    await withTransaction(async (client) => {
+      // Update ERP inventory with sheep production
+      for (const product of productionData.products) {
+        await client.query(`
+          INSERT INTO erp_inventory
+          (sheep_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, 'sheep_production', NOW())
+          ON CONFLICT (sheep_id, product_type, production_date)
+          DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
+        `, [sheepId, product.product_type, product.quantity, product.quality_grade,
+          productionData.production_date, productionData.location]);
+      }
+
+      // Post revenue to financial ERP
+      await postRevenueToGL(productionData.owner_id, 'sheep', revenue, 'sheep_production', client);
+    }, { name: 'completeERPIntegrationService.syncSheepProductionWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.sheep.production.synced', {
@@ -617,23 +681,26 @@ async function syncPigProductionWithERP(pigId, productionData) {
   const pg = getPostgreSQL();
 
   try {
-    // Update ERP inventory with pig production
-    for (const product of productionData.products) {
-      await pg.query(`
-        INSERT INTO erp_inventory 
-        (pig_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, 'pig_production', NOW())
-        ON CONFLICT (pig_id, product_type, production_date) 
-        DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
-      `, [pigId, product.product_type, product.quantity, product.quality_grade,
-        productionData.production_date, productionData.location]);
-    }
-
     // Calculate revenue
     const revenue = await calculatePigProductionRevenue(productionData);
 
-    // Post revenue to financial ERP
-    await postRevenueToGL(productionData.owner_id, 'pig', revenue, 'pig_production');
+    // BR-08: production inventory and its GL revenue posting are one event.
+    await withTransaction(async (client) => {
+      // Update ERP inventory with pig production
+      for (const product of productionData.products) {
+        await client.query(`
+          INSERT INTO erp_inventory
+          (pig_id, product_type, quantity, quality_grade, production_date, location, source_type, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, 'pig_production', NOW())
+          ON CONFLICT (pig_id, product_type, production_date)
+          DO UPDATE SET quantity = erp_inventory.quantity + $3, quality_grade = $4
+        `, [pigId, product.product_type, product.quantity, product.quality_grade,
+          productionData.production_date, productionData.location]);
+      }
+
+      // Post revenue to financial ERP
+      await postRevenueToGL(productionData.owner_id, 'pig', revenue, 'pig_production', client);
+    }, { name: 'completeERPIntegrationService.syncPigProductionWithERP' });
 
     // Emit signal bus event
     await signalBus.emit('erp.pig.production.synced', {
@@ -656,55 +723,45 @@ async function syncPigProductionWithERP(pigId, productionData) {
 // FINANCIAL ERP HELPER FUNCTIONS
 // ============================================================================
 
-async function postCostAllocationToGL(ownerId, cropType, costAllocations) {
-  const pg = getPostgreSQL();
-
+async function postCostAllocationToGL(ownerId, cropType, costAllocations, executor = getPostgreSQL()) {
   const totalCost = Object.values(costAllocations).reduce((sum, cost) => sum + (cost || 0), 0);
 
-  await pg.query(`
-    INSERT INTO erp_gl_entries 
+  await executor.query(`
+    INSERT INTO erp_gl_entries
     (account_type, amount, description, reference_id, reference_type, transaction_date, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
   `, ['expense', totalCost, `Cost allocation for ${cropType}`, ownerId, 'cost_allocation']);
 }
 
-async function postRevenueToGL(ownerId, productType, revenue, source) {
-  const pg = getPostgreSQL();
-
-  await pg.query(`
-    INSERT INTO erp_gl_entries 
+async function postRevenueToGL(ownerId, productType, revenue, source, executor = getPostgreSQL()) {
+  await executor.query(`
+    INSERT INTO erp_gl_entries
     (account_type, amount, description, reference_id, reference_type, transaction_date, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
   `, ['revenue', revenue.total_value, `Revenue from ${source} - ${productType}`, ownerId, source]);
 }
 
-async function postDepreciationToGL(ownerId, assetName, depreciation) {
-  const pg = getPostgreSQL();
-
-  await pg.query(`
-    INSERT INTO erp_gl_entries 
+async function postDepreciationToGL(ownerId, assetName, depreciation, executor = getPostgreSQL()) {
+  await executor.query(`
+    INSERT INTO erp_gl_entries
     (account_type, amount, description, reference_id, reference_type, transaction_date, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
   `, ['depreciation', depreciation.amount, `Depreciation for ${assetName}`, ownerId, 'depreciation']);
 }
 
-async function postProvisionToGL(ownerId, assetId, provision, source) {
-  const pg = getPostgreSQL();
-
-  await pg.query(`
-    INSERT INTO erp_gl_entries 
+async function postProvisionToGL(ownerId, assetId, provision, source, executor = getPostgreSQL()) {
+  await executor.query(`
+    INSERT INTO erp_gl_entries
     (account_type, amount, description, reference_id, reference_type, transaction_date, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
   `, ['provision', provision.amount, `Provision for ${source}`, assetId, source]);
 }
 
-async function postStageCostsToGL(cropId, stage, costs) {
-  const pg = getPostgreSQL();
-
+async function postStageCostsToGL(cropId, stage, costs, executor = getPostgreSQL()) {
   const totalCost = Object.values(costs).reduce((sum, cost) => sum + (cost || 0), 0);
 
-  await pg.query(`
-    INSERT INTO erp_gl_entries 
+  await executor.query(`
+    INSERT INTO erp_gl_entries
     (account_type, amount, description, reference_id, reference_type, transaction_date, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
   `, ['expense', totalCost, `Stage costs for ${stage}`, cropId, 'crop_stage']);
