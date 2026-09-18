@@ -4,6 +4,7 @@
  */
 
 const { getPostgreSQL } = require('../../database/connection');
+const { withTransaction } = require('../../core/withTransaction');
 
 class GDPRService {
   get pool() {
@@ -56,33 +57,39 @@ class GDPRService {
    */
   async rightToBeForgotten(userId, reason, requestId) {
     try {
-      // Start transaction
-      await this.pool.query('BEGIN');
+      // BR-08: anonymizing the user row and recording the compliance audit
+      // trail (data_subject_requests) must commit together — a crash between
+      // them would either anonymize a user with no record that it happened
+      // (an unauditable GDPR action) or, if reordered, log a completed
+      // erasure that never actually happened. The previous code issued
+      // BEGIN/COMMIT/ROLLBACK via `this.pool`, the shared pool getter, not a
+      // dedicated client — each call could land on a different pooled
+      // connection, so it provided no real atomicity. No external call is
+      // involved, so the whole thing is safe inside one DB transaction.
+      await withTransaction(async (client) => {
+        // Anonymize user personal data
+        await client.query(`
+          UPDATE users
+          SET
+            email = 'deleted_' || id || '@deleted.local',
+            phone_number = NULL,
+            first_name = 'Deleted',
+            last_name = 'User',
+            address = NULL,
+            city = NULL,
+            state = NULL,
+            zip_code = NULL,
+            deleted_at = CURRENT_TIMESTAMP
+          WHERE id = $1
+          RETURNING *
+        `, [userId]);
 
-      // Anonymize user personal data
-      const anonymizedUser = await this.pool.query(`
-        UPDATE users 
-        SET 
-          email = 'deleted_' || id || '@deleted.local',
-          phone_number = NULL,
-          first_name = 'Deleted',
-          last_name = 'User',
-          address = NULL,
-          city = NULL,
-          state = NULL,
-          zip_code = NULL,
-          deleted_at = CURRENT_TIMESTAMP
-        WHERE id = $1
-        RETURNING *
-      `, [userId]);
-
-      // Log the deletion request
-      await this.pool.query(`
-        INSERT INTO data_subject_requests (user_id, request_type, reason, status, created_at)
-        VALUES ($1, 'RIGHT_TO_BE_FORGOTTEN', $2, 'COMPLETED', CURRENT_TIMESTAMP)
-      `, [userId, reason]);
-
-      await this.pool.query('COMMIT');
+        // Log the deletion request
+        await client.query(`
+          INSERT INTO data_subject_requests (user_id, request_type, reason, status, created_at)
+          VALUES ($1, 'RIGHT_TO_BE_FORGOTTEN', $2, 'COMPLETED', CURRENT_TIMESTAMP)
+        `, [userId, reason]);
+      }, { name: 'gdprService.rightToBeForgotten' });
 
       return {
         success: true,
@@ -90,7 +97,6 @@ class GDPRService {
         requestId,
       };
     } catch (error) {
-      await this.pool.query('ROLLBACK');
       console.error('Error processing right to be forgotten:', error);
       throw new Error('Failed to process right to be forgotten');
     }
