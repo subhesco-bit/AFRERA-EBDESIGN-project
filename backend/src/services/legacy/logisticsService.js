@@ -8,6 +8,7 @@ const { getPostgreSQL } = require('../../database/connection');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
 const { LOGISTICS_ROLES } = require('../../middleware/roleGroups');
 const decisionSupportService = require('./decisionSupportService');
+const { withTransaction } = require('../../core/withTransaction');
 
 /**
  * Create shipment
@@ -340,33 +341,42 @@ async function getVehicles(filters = {}) {
  */
 async function registerDriver(driverData) {
   try {
-    const pg = getPostgreSQL();
+    // BR-08: creating the driver row and linking it back from the assigned
+    // vehicle are two sides of one relationship. If the vehicle UPDATE were
+    // lost after the driver INSERT committed, the driver would show
+    // assigned_vehicle_id set while the vehicle's own driver_id stays empty
+    // — a fleet dispatch view keyed off vehicles.driver_id would never see
+    // this driver, and the vehicle could be handed to a second driver at
+    // the same time. No external call is involved.
+    const driver = await withTransaction(async (client) => {
+      const query = `
+        INSERT INTO drivers (name, phone, license_number, license_expiry_date, assigned_vehicle_id)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+      `;
 
-    const query = `
-      INSERT INTO drivers (name, phone, license_number, license_expiry_date, assigned_vehicle_id)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *
-    `;
+      const result = await client.query(query, [
+        driverData.name,
+        driverData.phone,
+        driverData.license_number,
+        driverData.license_expiry_date,
+        driverData.assigned_vehicle_id || null,
+      ]);
 
-    const result = await pg.query(query, [
-      driverData.name,
-      driverData.phone,
-      driverData.license_number,
-      driverData.license_expiry_date,
-      driverData.assigned_vehicle_id || null,
-    ]);
+      // Update vehicle if assigned
+      if (driverData.assigned_vehicle_id) {
+        await client.query(
+          'UPDATE vehicles SET driver_id = $1 WHERE id = $2',
+          [result.rows[0].id, driverData.assigned_vehicle_id],
+        );
+      }
 
-    // Update vehicle if assigned
-    if (driverData.assigned_vehicle_id) {
-      await pg.query(
-        'UPDATE vehicles SET driver_id = $1 WHERE id = $2',
-        [result.rows[0].id, driverData.assigned_vehicle_id],
-      );
-    }
+      return result.rows[0];
+    }, { name: 'logisticsService.registerDriver' });
 
     logger.info(`Driver registered: ${driverData.name}`);
 
-    return result.rows[0];
+    return driver;
   } catch (error) {
     logger.error('Error registering driver', { error: error.message, stack: error.stack });
     throw error;

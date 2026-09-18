@@ -4,6 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
+const { withTransaction } = require('../../core/withTransaction');
 
 class BulkOrderService {
   constructor() {
@@ -227,11 +228,11 @@ class BulkOrderService {
   /**
    * Update bulk order status
    */
-  async updateBulkOrderStatus(orderId, status, adminId, notes = null) {
+  async updateBulkOrderStatus(orderId, status, adminId, notes = null, executor = this.pool) {
     try {
       const query = `
         UPDATE bulk_orders
-        SET 
+        SET
           status = $1,
           reviewed_by = $2,
           review_notes = $3,
@@ -241,7 +242,7 @@ class BulkOrderService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [status, adminId, notes, orderId]);
+      const result = await executor.query(query, [status, adminId, notes, orderId]);
 
       if (result.rows.length === 0) {
         throw new Error('Bulk order not found');
@@ -270,30 +271,38 @@ class BulkOrderService {
     } = quotationData;
 
     try {
-      const query = `
-        INSERT INTO bulk_order_quotations 
-        (bulk_order_id, price_per_unit, total_price, valid_until, terms,
-         conditions, delivery_timeline, payment_terms, status)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'sent')
-        RETURNING *
-      `;
+      // BR-08: the quotation row and the bulk order's status flip to
+      // 'quoted' must commit together — otherwise a quotation can exist
+      // that the bulk order's own status never reflects. No external call
+      // is involved.
+      const quotation = await withTransaction(async (client) => {
+        const query = `
+          INSERT INTO bulk_order_quotations
+          (bulk_order_id, price_per_unit, total_price, valid_until, terms,
+           conditions, delivery_timeline, payment_terms, status)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'sent')
+          RETURNING *
+        `;
 
-      const result = await this.pool.query(query, [
-        orderId,
-        pricePerUnit,
-        totalPrice,
-        validUntil,
-        terms,
-        conditions,
-        deliveryTimeline,
-        paymentTerms
-      ]);
+        const result = await client.query(query, [
+          orderId,
+          pricePerUnit,
+          totalPrice,
+          validUntil,
+          terms,
+          conditions,
+          deliveryTimeline,
+          paymentTerms
+        ]);
 
-      // Update bulk order status
-      await this.updateBulkOrderStatus(orderId, 'quoted', null);
+        // Update bulk order status
+        await this.updateBulkOrderStatus(orderId, 'quoted', null, null, client);
+
+        return result.rows[0];
+      }, { name: 'bulkOrderService.createQuotation' });
 
       logger.info(`Quotation created for bulk order ${orderId}`);
-      return result.rows[0];
+      return quotation;
     } catch (error) {
       logger.error('Error creating quotation', { error: error.message, stack: error.stack });
       throw error;
@@ -305,28 +314,39 @@ class BulkOrderService {
    */
   async acceptQuotation(quotationId, userId) {
     try {
-      const query = `
-        UPDATE bulk_order_quotations
-        SET 
-          status = 'accepted',
-          accepted_at = NOW(),
-          accepted_by = $1
-        WHERE id = $2
-        RETURNING *
-      `;
+      // BR-08: accepting a quotation and converting it into a real order
+      // (orders + order_items + the bulk_orders status flip) is one
+      // lifecycle transition across four tables. A failure partway through
+      // previously left a quotation marked 'accepted' with no order behind
+      // it (money the buyer expects to owe with nothing to fulfill), or an
+      // order created without its line item, or a bulk order stuck reading
+      // its pre-conversion status forever. No external call is involved.
+      const result = await withTransaction(async (client) => {
+        const query = `
+          UPDATE bulk_order_quotations
+          SET
+            status = 'accepted',
+            accepted_at = NOW(),
+            accepted_by = $1
+          WHERE id = $2
+          RETURNING *
+        `;
 
-      const result = await this.pool.query(query, [userId, quotationId]);
+        const quotationResult = await client.query(query, [userId, quotationId]);
 
-      if (result.rows.length === 0) {
-        throw new Error('Quotation not found');
-      }
+        if (quotationResult.rows.length === 0) {
+          throw new Error('Quotation not found');
+        }
 
-      // Convert to actual order
-      const quotation = result.rows[0];
-      await this.convertQuotationToOrder(quotation);
+        // Convert to actual order
+        const quotation = quotationResult.rows[0];
+        await this.convertQuotationToOrder(quotation, client);
+
+        return quotationResult.rows[0];
+      }, { name: 'bulkOrderService.acceptQuotation' });
 
       logger.info(`Quotation ${quotationId} accepted by user ${userId}`);
-      return result.rows[0];
+      return result;
     } catch (error) {
       logger.error('Error accepting quotation', { error: error.message, stack: error.stack });
       throw error;
@@ -336,25 +356,25 @@ class BulkOrderService {
   /**
    * Convert quotation to actual order
    */
-  async convertQuotationToOrder(quotation) {
+  async convertQuotationToOrder(quotation, executor = this.pool) {
     try {
       // Get bulk order details
       const bulkOrderQuery = `
         SELECT * FROM bulk_orders WHERE id = $1
       `;
-      const bulkOrderResult = await this.pool.query(bulkOrderQuery, [quotation.bulk_order_id]);
+      const bulkOrderResult = await executor.query(bulkOrderQuery, [quotation.bulk_order_id]);
       const bulkOrder = bulkOrderResult.rows[0];
 
       // Create order
       const orderQuery = `
-        INSERT INTO orders 
+        INSERT INTO orders
         (user_id, total_amount, gst_amount, status, order_type, delivery_location,
          contact_person, contact_phone, contact_email, special_requirements)
         VALUES ($1, $2, 0, 'confirmed', 'bulk', $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      const orderResult = await this.pool.query(orderQuery, [
+      const orderResult = await executor.query(orderQuery, [
         bulkOrder.user_id,
         quotation.total_price,
         bulkOrder.delivery_location,
@@ -368,13 +388,13 @@ class BulkOrderService {
 
       // Add order item
       const itemQuery = `
-        INSERT INTO order_items 
+        INSERT INTO order_items
         (order_id, product_id, quantity, unit_price, total_price)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *
       `;
 
-      await this.pool.query(itemQuery, [
+      await executor.query(itemQuery, [
         order.id,
         bulkOrder.product_id,
         bulkOrder.quantity,
@@ -383,7 +403,7 @@ class BulkOrderService {
       ]);
 
       // Update bulk order status
-      await this.updateBulkOrderStatus(bulkOrder.id, 'confirmed', null);
+      await this.updateBulkOrderStatus(bulkOrder.id, 'confirmed', null, null, executor);
 
       logger.info(`Bulk order ${bulkOrder.id} converted to order ${order.id}`);
       return order;

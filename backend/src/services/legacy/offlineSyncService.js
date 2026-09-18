@@ -26,6 +26,7 @@ const router = express.Router();
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../../database/pool');
+const { withTransaction } = require('../../core/withTransaction');
 
 // Offline Sync Configuration
 const OFFLINE_SYNC_CONFIG = {
@@ -216,7 +217,7 @@ async function processSyncQueue(userId) {
 /**
  * Process individual sync item
  */
-async function processSyncItem(syncItem) {
+async function processSyncItem(syncItem, executor = pool) {
   let entityData;
   try {
     entityData = JSON.parse(syncItem.entity_data);
@@ -234,24 +235,24 @@ async function processSyncItem(syncItem) {
   // Process based on entity type and operation
   switch (syncItem.entity_type) {
     case 'order':
-      return await syncOrder(entityData, syncItem.operation);
+      return await syncOrder(entityData, syncItem.operation, executor);
     case 'product':
-      return await syncProduct(entityData, syncItem.operation);
+      return await syncProduct(entityData, syncItem.operation, executor);
     case 'user_profile':
-      return await syncUserProfile(entityData, syncItem.operation);
+      return await syncUserProfile(entityData, syncItem.operation, executor);
     case 'inventory':
-      return await syncInventory(entityData, syncItem.operation);
+      return await syncInventory(entityData, syncItem.operation, executor);
     case 'payment':
-      return await syncPayment(entityData, syncItem.operation);
+      return await syncPayment(entityData, syncItem.operation, executor);
     default:
-      return await syncGenericEntity(entityData, syncItem.entity_type, syncItem.operation);
+      return await syncGenericEntity(entityData, syncItem.entity_type, syncItem.operation, executor);
   }
 }
 
 /**
  * Sync order data
  */
-async function syncOrder(orderData, operation) {
+async function syncOrder(orderData, operation, executor = pool) {
   try {
     switch (operation) {
       case 'create': {
@@ -261,7 +262,7 @@ async function syncOrder(orderData, operation) {
           ON CONFLICT (id) DO NOTHING
           RETURNING id
         `;
-        await pool.query(createQuery, [
+        await executor.query(createQuery, [
           orderData.id,
           orderData.user_id,
           orderData.total_amount,
@@ -279,7 +280,7 @@ async function syncOrder(orderData, operation) {
           WHERE id = $1
           RETURNING id
         `;
-        await pool.query(updateQuery, [
+        await executor.query(updateQuery, [
           orderData.id,
           orderData.total_amount,
           orderData.status,
@@ -289,7 +290,7 @@ async function syncOrder(orderData, operation) {
       }
 
       case 'delete':
-        await pool.query('DELETE FROM orders WHERE id = $1', [orderData.id]);
+        await executor.query('DELETE FROM orders WHERE id = $1', [orderData.id]);
         break;
     }
 
@@ -303,7 +304,7 @@ async function syncOrder(orderData, operation) {
 /**
  * Sync product data
  */
-async function syncProduct(productData, operation) {
+async function syncProduct(productData, operation, executor = pool) {
   try {
     switch (operation) {
       case 'create': {
@@ -313,7 +314,7 @@ async function syncProduct(productData, operation) {
           ON CONFLICT (id) DO NOTHING
           RETURNING id
         `;
-        await pool.query(createQuery, [
+        await executor.query(createQuery, [
           productData.id,
           productData.name,
           productData.category,
@@ -332,7 +333,7 @@ async function syncProduct(productData, operation) {
           WHERE id = $1
           RETURNING id
         `;
-        await pool.query(updateQuery, [
+        await executor.query(updateQuery, [
           productData.id,
           productData.name,
           productData.category,
@@ -344,7 +345,7 @@ async function syncProduct(productData, operation) {
       }
 
       case 'delete':
-        await pool.query('DELETE FROM products WHERE id = $1', [productData.id]);
+        await executor.query('DELETE FROM products WHERE id = $1', [productData.id]);
         break;
     }
 
@@ -358,7 +359,7 @@ async function syncProduct(productData, operation) {
 /**
  * Sync user profile data
  */
-async function syncUserProfile(profileData, operation) {
+async function syncUserProfile(profileData, operation, executor = pool) {
   try {
     switch (operation) {
       case 'update': {
@@ -368,7 +369,7 @@ async function syncUserProfile(profileData, operation) {
           WHERE user_id = $1
           RETURNING user_id
         `;
-        await pool.query(updateQuery, [
+        await executor.query(updateQuery, [
           profileData.user_id,
           profileData.first_name,
           profileData.last_name,
@@ -390,7 +391,7 @@ async function syncUserProfile(profileData, operation) {
 /**
  * Sync inventory data
  */
-async function syncInventory(inventoryData, operation) {
+async function syncInventory(inventoryData, operation, executor = pool) {
   try {
     switch (operation) {
       case 'update': {
@@ -400,7 +401,7 @@ async function syncInventory(inventoryData, operation) {
           WHERE product_id = $1 AND warehouse_id = $5
           RETURNING product_id
         `;
-        await pool.query(updateQuery, [
+        await executor.query(updateQuery, [
           inventoryData.product_id,
           inventoryData.quantity,
           inventoryData.location,
@@ -421,7 +422,7 @@ async function syncInventory(inventoryData, operation) {
 /**
  * Sync payment data
  */
-async function syncPayment(paymentData, operation) {
+async function syncPayment(paymentData, operation, executor = pool) {
   try {
     switch (operation) {
       case 'create': {
@@ -431,7 +432,7 @@ async function syncPayment(paymentData, operation) {
           ON CONFLICT (transaction_id) DO NOTHING
           RETURNING transaction_id
         `;
-        await pool.query(createQuery, [
+        await executor.query(createQuery, [
           paymentData.transaction_id,
           paymentData.user_id,
           paymentData.type,
@@ -450,7 +451,7 @@ async function syncPayment(paymentData, operation) {
           WHERE transaction_id = $1
           RETURNING transaction_id
         `;
-        await pool.query(updateQuery, [
+        await executor.query(updateQuery, [
           paymentData.transaction_id,
           paymentData.status,
           JSON.stringify(paymentData.metadata || {}),
@@ -469,7 +470,7 @@ async function syncPayment(paymentData, operation) {
 /**
  * Sync generic entity
  */
-async function syncGenericEntity(entityData, entityType, operation) {
+async function syncGenericEntity(entityData, entityType, operation, executor = pool) {
   try {
     // Generic sync handler for entities without specific handlers
     const query = `
@@ -481,7 +482,7 @@ async function syncGenericEntity(entityData, entityType, operation) {
       RETURNING id
     `;
 
-    await pool.query(query, [
+    await executor.query(query, [
       entityType,
       entityData.id,
       JSON.stringify(entityData),
@@ -500,58 +501,67 @@ async function syncGenericEntity(entityData, entityType, operation) {
  */
 async function resolveSyncConflict(conflictId, resolution, resolvedData) {
   try {
-    const conflictQuery = `
-      SELECT * FROM sync_conflicts
-      WHERE id = $1
-    `;
+    // BR-08: applying the winning data to its entity table and marking the
+    // conflict row resolved are two writes that must succeed or fail
+    // together — otherwise a crash between them either re-applies the same
+    // data on the next retry (conflict still shows unresolved) or, worse,
+    // marks the conflict resolved without the data ever having been applied.
+    // No external HTTP call is involved, so the whole thing is safe to hold
+    // inside one DB transaction.
+    return await withTransaction(async (client) => {
+      const conflictQuery = `
+        SELECT * FROM sync_conflicts
+        WHERE id = $1
+      `;
 
-    const conflictResult = await pool.query(conflictQuery, [conflictId]);
+      const conflictResult = await client.query(conflictQuery, [conflictId]);
 
-    if (conflictResult.rows.length === 0) {
-      throw new Error('Conflict not found');
-    }
+      if (conflictResult.rows.length === 0) {
+        throw new Error('Conflict not found');
+      }
 
-    const conflict = conflictResult.rows[0];
+      const conflict = conflictResult.rows[0];
 
-    switch (resolution) {
-      case 'client_wins':
-        // Apply client data
-        await processSyncItem({
-          entity_type: conflict.entity_type,
-          entity_data: conflict.client_data,
-          operation: conflict.operation,
-          sync_token: conflict.client_sync_token,
-        });
-        break;
+      switch (resolution) {
+        case 'client_wins':
+          // Apply client data
+          await processSyncItem({
+            entity_type: conflict.entity_type,
+            entity_data: conflict.client_data,
+            operation: conflict.operation,
+            sync_token: conflict.client_sync_token,
+          }, client);
+          break;
 
-      case 'server_wins':
-        // Server data already exists, no action needed
-        break;
+        case 'server_wins':
+          // Server data already exists, no action needed
+          break;
 
-      case 'manual':
-        // Apply manually resolved data
-        await processSyncItem({
-          entity_type: conflict.entity_type,
-          entity_data: resolvedData,
-          operation: conflict.operation,
-          sync_token: generateSyncToken(resolvedData),
-        });
-        break;
-    }
+        case 'manual':
+          // Apply manually resolved data
+          await processSyncItem({
+            entity_type: conflict.entity_type,
+            entity_data: resolvedData,
+            operation: conflict.operation,
+            sync_token: generateSyncToken(resolvedData),
+          }, client);
+          break;
+      }
 
-    // Mark conflict as resolved
-    await pool.query(
-      'UPDATE sync_conflicts SET status = \'resolved\', resolution = $1, resolved_at = NOW() WHERE id = $2',
-      [resolution, conflictId],
-    );
+      // Mark conflict as resolved
+      await client.query(
+        'UPDATE sync_conflicts SET status = \'resolved\', resolution = $1, resolved_at = NOW() WHERE id = $2',
+        [resolution, conflictId],
+      );
 
-    logger.info(`Sync conflict resolved: ${conflictId} with resolution: ${resolution}`);
+      logger.info(`Sync conflict resolved: ${conflictId} with resolution: ${resolution}`);
 
-    return {
-      success: true,
-      message: 'Conflict resolved successfully',
-      resolution,
-    };
+      return {
+        success: true,
+        message: 'Conflict resolved successfully',
+        resolution,
+      };
+    }, { name: 'offlineSync.resolveSyncConflict', lockTables: ['sync_conflicts'] });
   } catch (error) {
     logger.error('Conflict resolution failed', { error: error.message, stack: error.stack });
     throw error;

@@ -13,6 +13,7 @@ const router = express.Router();
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../../database/pool');
+const { withTransaction } = require('../../core/withTransaction');
 
 // ============================================================================
 // ORGANIC FARM REGISTRY
@@ -279,33 +280,43 @@ async function recordHarvest(data) {
   } = data;
 
   try {
-    const result = await pool.query(
-      `INSERT INTO organic_harvests 
-       (organic_crop_id, harvest_number, harvest_date, total_quantity_kg, grade,
-        moisture_content, quality_parameters, harvested_by, storage_location, batch_number)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-       RETURNING *`,
-      [
-        organic_crop_id,
-        `HVST-${Date.now()}`,
-        harvest_date,
-        total_quantity_kg,
-        grade,
-        moisture_content,
-        JSON.stringify(quality_parameters),
-        harvested_by,
-        storage_location,
-        `BATCH-${Date.now()}`,
-      ],
-    );
+    // BR-08: the harvest record and the parent crop's status/yield must
+    // commit together — this is a traceability chain (seed to consumer), so
+    // a harvest row that exists while its crop still reads
+    // status='growing'/no actual_yield_kg breaks the chain-of-custody query
+    // that consumer-facing QR lookups walk, and would let the same crop be
+    // "harvested" again. No external call is involved.
+    const harvest = await withTransaction(async (client) => {
+      const result = await client.query(
+        `INSERT INTO organic_harvests
+         (organic_crop_id, harvest_number, harvest_date, total_quantity_kg, grade,
+          moisture_content, quality_parameters, harvested_by, storage_location, batch_number)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         RETURNING *`,
+        [
+          organic_crop_id,
+          `HVST-${Date.now()}`,
+          harvest_date,
+          total_quantity_kg,
+          grade,
+          moisture_content,
+          JSON.stringify(quality_parameters),
+          harvested_by,
+          storage_location,
+          `BATCH-${Date.now()}`,
+        ],
+      );
 
-    // Update crop status
-    await pool.query(
-      'UPDATE organic_crops SET actual_harvest_date = $1, actual_yield_kg = $2, status = $3 WHERE id = $4',
-      [harvest_date, total_quantity_kg, 'harvested', organic_crop_id],
-    );
+      // Update crop status
+      await client.query(
+        'UPDATE organic_crops SET actual_harvest_date = $1, actual_yield_kg = $2, status = $3 WHERE id = $4',
+        [harvest_date, total_quantity_kg, 'harvested', organic_crop_id],
+      );
 
-    return result.rows[0];
+      return result.rows[0];
+    }, { name: 'organicTraceabilityService.recordHarvest' });
+
+    return harvest;
   } catch (error) {
     logger.error('Record harvest error', { error: error.message, stack: error.stack });
     throw error;
