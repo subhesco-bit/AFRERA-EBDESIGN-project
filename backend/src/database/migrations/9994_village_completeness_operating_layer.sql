@@ -9,7 +9,7 @@ BEGIN;
 -- 1. Local institutions and governance
 CREATE TABLE IF NOT EXISTS village_institutions (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   institution_type VARCHAR(60) NOT NULL,
   name VARCHAR(255) NOT NULL,
   code VARCHAR(100),
@@ -28,7 +28,7 @@ CREATE INDEX IF NOT EXISTS idx_village_institutions_village_type ON village_inst
 
 CREATE TABLE IF NOT EXISTS village_governance_records (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   governance_type VARCHAR(60) NOT NULL,
   meeting_date DATE,
   agenda TEXT,
@@ -43,7 +43,7 @@ CREATE INDEX IF NOT EXISTS idx_village_governance_village_date ON village_govern
 
 CREATE TABLE IF NOT EXISTS village_grievances (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   household_id BIGINT REFERENCES village_households(id) ON DELETE SET NULL,
   category VARCHAR(80) NOT NULL,
   priority VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (priority IN ('low','medium','high','critical')),
@@ -60,7 +60,7 @@ CREATE INDEX IF NOT EXISTS idx_village_grievances_village_status ON village_grie
 -- 2. Community/public assets and service coverage
 CREATE TABLE IF NOT EXISTS village_assets (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   asset_type VARCHAR(80) NOT NULL,
   name VARCHAR(255) NOT NULL,
   asset_code VARCHAR(100),
@@ -83,7 +83,7 @@ CREATE INDEX IF NOT EXISTS idx_village_assets_village_type ON village_assets(vil
 
 CREATE TABLE IF NOT EXISTS village_service_coverage (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   service_type VARCHAR(80) NOT NULL,
   coverage_percent NUMERIC(6,2) NOT NULL DEFAULT 0 CHECK (coverage_percent BETWEEN 0 AND 100),
   served_population INTEGER CHECK (served_population IS NULL OR served_population >= 0),
@@ -100,7 +100,7 @@ CREATE INDEX IF NOT EXISTS idx_village_service_coverage ON village_service_cover
 -- 3. Livelihoods, skills and employment gaps
 CREATE TABLE IF NOT EXISTS village_livelihoods (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   household_id BIGINT REFERENCES village_households(id) ON DELETE SET NULL,
   livelihood_type VARCHAR(80) NOT NULL,
   primary_flag BOOLEAN NOT NULL DEFAULT FALSE,
@@ -116,7 +116,7 @@ CREATE INDEX IF NOT EXISTS idx_village_livelihoods_village_type ON village_livel
 
 CREATE TABLE IF NOT EXISTS village_skill_gaps (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   skill_code VARCHAR(80) NOT NULL,
   skill_name VARCHAR(160) NOT NULL,
   workers_available INTEGER NOT NULL DEFAULT 0 CHECK (workers_available >= 0),
@@ -132,7 +132,7 @@ CREATE INDEX IF NOT EXISTS idx_village_skill_gaps_priority ON village_skill_gaps
 -- 4. Financial inclusion / access points (actual financial ledger remains in ERP)
 CREATE TABLE IF NOT EXISTS village_financial_access_points (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   access_type VARCHAR(60) NOT NULL,
   provider_name VARCHAR(255),
   service_scope JSONB NOT NULL DEFAULT '{}',
@@ -147,7 +147,7 @@ CREATE INDEX IF NOT EXISTS idx_village_financial_access ON village_financial_acc
 -- 5. Climate/disaster resilience and emergency readiness
 CREATE TABLE IF NOT EXISTS village_hazard_profiles (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   hazard_type VARCHAR(60) NOT NULL,
   likelihood_score NUMERIC(6,2) CHECK (likelihood_score BETWEEN 0 AND 100),
   impact_score NUMERIC(6,2) CHECK (impact_score BETWEEN 0 AND 100),
@@ -165,7 +165,7 @@ CREATE INDEX IF NOT EXISTS idx_village_hazard_risk ON village_hazard_profiles(vi
 
 CREATE TABLE IF NOT EXISTS village_emergency_resources (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   resource_type VARCHAR(80) NOT NULL,
   name VARCHAR(255) NOT NULL,
   capacity JSONB NOT NULL DEFAULT '{}',
@@ -180,7 +180,7 @@ CREATE INDEX IF NOT EXISTS idx_village_emergency_resources ON village_emergency_
 
 -- 6. Digital/telecom connectivity
 CREATE TABLE IF NOT EXISTS village_connectivity_profiles (
-  village_id INTEGER PRIMARY KEY REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID PRIMARY KEY REFERENCES villages(id) ON DELETE CASCADE,
   mobile_coverage_percent NUMERIC(6,2) CHECK (mobile_coverage_percent IS NULL OR mobile_coverage_percent BETWEEN 0 AND 100),
   broadband_coverage_percent NUMERIC(6,2) CHECK (broadband_coverage_percent IS NULL OR broadband_coverage_percent BETWEEN 0 AND 100),
   internet_quality_score NUMERIC(6,2) CHECK (internet_quality_score IS NULL OR internet_quality_score BETWEEN 0 AND 100),
@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS village_connectivity_profiles (
 -- 7. Environment, biodiversity and common-resource accounting
 CREATE TABLE IF NOT EXISTS village_natural_resources (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   resource_type VARCHAR(80) NOT NULL,
   resource_name VARCHAR(255),
   area_or_capacity NUMERIC(20,4),
@@ -213,7 +213,7 @@ CREATE INDEX IF NOT EXISTS idx_village_natural_resources ON village_natural_reso
 
 CREATE TABLE IF NOT EXISTS village_environment_indicators (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   indicator_code VARCHAR(80) NOT NULL,
   indicator_name VARCHAR(160) NOT NULL,
   value NUMERIC(20,6),
@@ -228,7 +228,7 @@ CREATE INDEX IF NOT EXISTS idx_village_environment_indicators ON village_environ
 -- 8. Village-level digital twin / readiness snapshot
 CREATE TABLE IF NOT EXISTS village_readiness_snapshots (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   snapshot_date DATE NOT NULL,
   governance_score NUMERIC(6,2),
   economic_score NUMERIC(6,2),

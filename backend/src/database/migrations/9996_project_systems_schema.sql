@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS projects (
 
 CREATE TABLE IF NOT EXISTS project_wbs (
     id SERIAL PRIMARY KEY,
-    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     parent_id INTEGER REFERENCES project_wbs(id) ON DELETE CASCADE,
     wbs_code VARCHAR(40) NOT NULL,
     wbs_name VARCHAR(255) NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS project_wbs (
 
 CREATE TABLE IF NOT EXISTS project_milestones (
     id SERIAL PRIMARY KEY,
-    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     -- Optional: a milestone can mark the completion of a specific WBS
     -- element ("packhouse shell complete") or stand at the project level
     -- ("FPO facility handover").

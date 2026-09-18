@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS village_households (
     id BIGSERIAL PRIMARY KEY,
-    village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+    village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
     household_code VARCHAR(60) NOT NULL,
     head_name VARCHAR(200),
     phone VARCHAR(30),
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS village_household_members (
 
 CREATE TABLE IF NOT EXISTS village_enterprises (
     id BIGSERIAL PRIMARY KEY,
-    village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+    village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
     enterprise_code VARCHAR(60) NOT NULL,
     enterprise_name VARCHAR(200) NOT NULL,
     enterprise_type VARCHAR(80) NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS village_enterprises (
 
 CREATE TABLE IF NOT EXISTS village_budgets (
     id BIGSERIAL PRIMARY KEY,
-    village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+    village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
     fiscal_year_id INTEGER REFERENCES fiscal_years(id) ON DELETE RESTRICT,
     budget_code VARCHAR(60) NOT NULL,
     category VARCHAR(80) NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS village_budgets (
 );
 
 CREATE TABLE IF NOT EXISTS village_finance_dimensions (
-    village_id INTEGER PRIMARY KEY REFERENCES villages(id) ON DELETE CASCADE,
+    village_id UUID PRIMARY KEY REFERENCES villages(id) ON DELETE CASCADE,
     company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE RESTRICT,
     cost_center_id INTEGER REFERENCES cost_centers(id) ON DELETE SET NULL,
     profit_center_id INTEGER REFERENCES profit_centers(id) ON DELETE SET NULL,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS village_finance_dimensions (
 
 CREATE TABLE IF NOT EXISTS village_operational_kpis (
     id BIGSERIAL PRIMARY KEY,
-    village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+    village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
     metric_date DATE NOT NULL,
     households INTEGER NOT NULL DEFAULT 0 CHECK (households >= 0),
     active_farmers INTEGER NOT NULL DEFAULT 0 CHECK (active_farmers >= 0),
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS village_operational_kpis (
 
 CREATE TABLE IF NOT EXISTS village_workflow_tasks (
     id BIGSERIAL PRIMARY KEY,
-    village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+    village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
     task_type VARCHAR(80) NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS village_workflow_tasks (
 
 CREATE TABLE IF NOT EXISTS village_ai_insights (
     id BIGSERIAL PRIMARY KEY,
-    village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+    village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
     insight_type VARCHAR(80) NOT NULL,
     severity VARCHAR(20) NOT NULL DEFAULT 'info' CHECK (severity IN ('info','low','medium','high','critical')),
     title VARCHAR(255) NOT NULL,

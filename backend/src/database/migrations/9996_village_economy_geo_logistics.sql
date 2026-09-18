@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS village_production_commodities (
 
 CREATE TABLE IF NOT EXISTS village_production_records (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   commodity_id BIGINT NOT NULL REFERENCES village_production_commodities(id),
   producer_type VARCHAR(30) NOT NULL DEFAULT 'farmer',
   producer_id VARCHAR(100),
@@ -68,7 +68,7 @@ CREATE INDEX IF NOT EXISTS idx_village_production_commodity
 
 CREATE TABLE IF NOT EXISTS village_economic_flows (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   production_record_id BIGINT REFERENCES village_production_records(id) ON DELETE SET NULL,
   commodity_id BIGINT NOT NULL REFERENCES village_production_commodities(id),
   flow_type VARCHAR(40) NOT NULL,
@@ -122,7 +122,7 @@ CREATE INDEX IF NOT EXISTS idx_village_logistics_facilities_admin
 
 CREATE TABLE IF NOT EXISTS village_logistics_routes (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   facility_id BIGINT NOT NULL REFERENCES village_logistics_facilities(id) ON DELETE CASCADE,
   route_type VARCHAR(40) NOT NULL DEFAULT 'road',
   distance_km NUMERIC(12,3),
@@ -139,7 +139,7 @@ CREATE INDEX IF NOT EXISTS idx_village_logistics_routes_village
   ON village_logistics_routes(village_id, route_type, distance_km);
 
 CREATE TABLE IF NOT EXISTS village_logistics_profiles (
-  village_id INTEGER PRIMARY KEY REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID PRIMARY KEY REFERENCES villages(id) ON DELETE CASCADE,
   nearest_post_office_id BIGINT REFERENCES village_logistics_facilities(id),
   nearest_post_office_distance_km NUMERIC(12,3),
   nearest_railway_station_id BIGINT REFERENCES village_logistics_facilities(id),

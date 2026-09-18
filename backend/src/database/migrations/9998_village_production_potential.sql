@@ -49,7 +49,7 @@ CREATE INDEX IF NOT EXISTS idx_village_production_benchmarks_lookup
   ON village_production_benchmarks(commodity_id, state, district, block, season, active);
 
 CREATE TABLE IF NOT EXISTS village_commodity_potential_profiles (
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   commodity_id BIGINT NOT NULL REFERENCES village_production_commodities(id) ON DELETE CASCADE,
   potential_area_acres NUMERIC(18,4),
   benchmark_yield_per_acre NUMERIC(18,4),
