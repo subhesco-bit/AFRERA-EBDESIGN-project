@@ -63,9 +63,18 @@ CREATE INDEX idx_organizations_tenant ON organizations(tenant_id);
 CREATE INDEX idx_organizations_status ON organizations(status);
 
 -- Environments Table
+-- 2026-09-18: organization_id retyped INTEGER -> UUID. organizations.id (this
+-- same file, above) is UUID; an INTEGER FK against it is rejected by Postgres
+-- at CREATE TABLE time, aborting this file and, per migrate.js's preflight
+-- blocker check for this exact mismatch class, preventing `npm run migrate`
+-- from executing ANY migration until fixed - a repair migration cannot help
+-- since preflight never lets the run start. Explicit exception to CLAUDE.md's
+-- 000-071 freeze, authorized 2026-09-18: fix already validated correct on an
+-- unmerged claude/* branch (blob 1f159b8c); migrations are not currently
+-- executed against any live database, so no live-data risk.
 CREATE TABLE IF NOT EXISTS environments (
   id SERIAL PRIMARY KEY,
-  organization_id INTEGER REFERENCES organizations(id),
+  organization_id UUID REFERENCES organizations(id),
   name VARCHAR(100) NOT NULL,
   type VARCHAR(50) DEFAULT 'production' CHECK (type IN ('development', 'staging', 'production')),
   status VARCHAR(50) DEFAULT 'active',
@@ -215,11 +224,13 @@ CREATE INDEX idx_role_permissions_role ON role_permissions(role_id);
 CREATE INDEX idx_role_permissions_permission ON role_permissions(permission_id);
 
 -- Single Sign-On Configurations Table
+-- 2026-09-18: organization_id retyped INTEGER -> UUID, same reason and same
+-- authorized freeze exception as the environments table above.
 CREATE TABLE IF NOT EXISTS sso_configurations (
   id SERIAL PRIMARY KEY,
   provider VARCHAR(50) NOT NULL,
   provider_config JSONB NOT NULL,
-  organization_id INTEGER REFERENCES organizations(id),
+  organization_id UUID REFERENCES organizations(id),
   is_enabled BOOLEAN DEFAULT false,
   is_default BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
