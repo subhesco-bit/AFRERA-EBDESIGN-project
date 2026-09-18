@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS water_sources (
   id SERIAL PRIMARY KEY,
-  farm_id INTEGER NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
+  farm_id UUID NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
   source_type VARCHAR(100) NOT NULL CHECK (source_type IN ('well', 'canal', 'pond', 'borehole', 'river', 'tank')),
   source_name VARCHAR(200),
   capacity_liters INTEGER CHECK (capacity_liters IS NULL OR capacity_liters >= 0),
@@ -23,7 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_water_sources_type ON water_sources(source_type);
 
 CREATE TABLE IF NOT EXISTS irrigation_schedules (
   id SERIAL PRIMARY KEY,
-  farm_id INTEGER NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
+  farm_id UUID NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
   crop_type VARCHAR(100) NOT NULL,
   water_volume INTEGER NOT NULL CHECK (water_volume > 0),
   schedule_type VARCHAR(50) NOT NULL CHECK (schedule_type IN ('manual', 'automated', 'sensor_triggered')),
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS irrigation_delivery_logs (
   delivery_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   delivery_status VARCHAR(50) DEFAULT 'completed' CHECK (delivery_status IN ('completed', 'partial', 'failed', 'skipped')),
   notes TEXT,
-  operator_id INTEGER REFERENCES users(id),
+  operator_id UUID REFERENCES users(id),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -61,7 +61,7 @@ CREATE INDEX IF NOT EXISTS idx_irrigation_delivery_status ON irrigation_delivery
 
 CREATE TABLE IF NOT EXISTS irrigation_efficiency_metrics (
   id SERIAL PRIMARY KEY,
-  farm_id INTEGER NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
+  farm_id UUID NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
   scheduled_volume INTEGER CHECK (scheduled_volume IS NULL OR scheduled_volume >= 0),
   actual_volume INTEGER CHECK (actual_volume IS NULL OR actual_volume >= 0),
   efficiency_percentage DECIMAL(5,2) CHECK (efficiency_percentage IS NULL OR (efficiency_percentage >= 0 AND efficiency_percentage <= 100)),

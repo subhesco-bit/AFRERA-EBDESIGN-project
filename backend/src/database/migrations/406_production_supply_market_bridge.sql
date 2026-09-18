@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS production_supply_lots (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE RESTRICT,
   land_record_id INTEGER REFERENCES land_records(id) ON DELETE SET NULL,
-  crop_plan_id INTEGER REFERENCES crop_plans(id) ON DELETE SET NULL,
+  crop_plan_id UUID REFERENCES crop_plans(id) ON DELETE SET NULL,
   harvest_plan_id INTEGER,
   fpo_id UUID,
   product_name VARCHAR(255) NOT NULL,

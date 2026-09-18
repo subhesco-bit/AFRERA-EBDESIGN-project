@@ -30,7 +30,7 @@ CREATE INDEX IF NOT EXISTS idx_village_supply_catalog_layer_category
 
 CREATE TABLE IF NOT EXISTS village_external_demands (
   id BIGSERIAL PRIMARY KEY,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   demand_layer VARCHAR(20) NOT NULL,
   household_id VARCHAR(100),
   requester_type VARCHAR(50),
@@ -63,7 +63,7 @@ CREATE INDEX IF NOT EXISTS idx_village_external_demands_item
 CREATE TABLE IF NOT EXISTS village_supply_orders (
   id BIGSERIAL PRIMARY KEY,
   order_number VARCHAR(60) UNIQUE NOT NULL,
-  village_id INTEGER NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
+  village_id UUID NOT NULL REFERENCES villages(id) ON DELETE CASCADE,
   demand_layer VARCHAR(20) NOT NULL,
   requested_by_type VARCHAR(50),
   requested_by_id VARCHAR(100),

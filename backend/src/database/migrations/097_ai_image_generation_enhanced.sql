@@ -4,8 +4,8 @@
 CREATE TABLE IF NOT EXISTS ai_generated_images (
   id SERIAL PRIMARY KEY,
   image_id VARCHAR(255) UNIQUE NOT NULL,
-  product_id INTEGER REFERENCES products(id),
-  farmer_id INTEGER REFERENCES farmers(id),
+  product_id UUID REFERENCES products(id),
+  farmer_id UUID REFERENCES farmers(id),
   prompt_text TEXT,
   image_url VARCHAR(500),
   cdn_url VARCHAR(500),
@@ -38,7 +38,7 @@ CREATE INDEX IF NOT EXISTS idx_metadata_category ON ai_image_metadata(category);
 CREATE TABLE IF NOT EXISTS product_listings (
   id SERIAL PRIMARY KEY,
   listing_id VARCHAR(255) UNIQUE NOT NULL,
-  product_id INTEGER REFERENCES products(id),
+  product_id UUID REFERENCES products(id),
   primary_image_id VARCHAR(255) REFERENCES ai_generated_images(image_id),
   category VARCHAR(100), quality_score DECIMAL(5, 2), region VARCHAR(50), language VARCHAR(10),
   visibility_marketplace BOOLEAN DEFAULT TRUE, visibility_website BOOLEAN DEFAULT TRUE, visibility_mobile BOOLEAN DEFAULT TRUE,
@@ -60,7 +60,7 @@ CREATE INDEX IF NOT EXISTS idx_optimization_marketplace ON listing_marketplace_o
 CREATE TABLE IF NOT EXISTS farmer_image_portfolios (
   id SERIAL PRIMARY KEY,
   portfolio_id VARCHAR(255) UNIQUE NOT NULL,
-  farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+  farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
   farmer_name VARCHAR(255), region VARCHAR(50), languages TEXT,
   total_images INTEGER DEFAULT 0, approved_images INTEGER DEFAULT 0, pending_images INTEGER DEFAULT 0, rejected_images INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS farmer_products (
   id SERIAL PRIMARY KEY,
   product_id VARCHAR(255) UNIQUE NOT NULL,
   portfolio_id VARCHAR(255) NOT NULL REFERENCES farmer_image_portfolios(portfolio_id) ON DELETE CASCADE,
-  farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+  farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
   product_name VARCHAR(255), category VARCHAR(100), description TEXT, quantity INTEGER, price_per_unit DECIMAL(10, 2),
   status VARCHAR(50), marketplace_listing_id VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, published_at TIMESTAMP
@@ -112,7 +112,7 @@ CREATE INDEX IF NOT EXISTS idx_feedback_image ON image_quality_feedback(image_id
 CREATE TABLE IF NOT EXISTS sku_images (
   id SERIAL PRIMARY KEY,
   sku VARCHAR(255) UNIQUE NOT NULL,
-  product_id INTEGER REFERENCES products(id), image_id VARCHAR(255) REFERENCES ai_generated_images(image_id),
+  product_id UUID REFERENCES products(id), image_id VARCHAR(255) REFERENCES ai_generated_images(image_id),
   variant_name VARCHAR(255), quality_score DECIMAL(5, 2), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_sku_images_product ON sku_images(product_id);
