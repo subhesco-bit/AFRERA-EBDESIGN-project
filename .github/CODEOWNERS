@@ -1,0 +1,23 @@
+# Backend services
+/backend/src/services/**        @subhesco/backend-team
+/backend/src/modules/**         @subhesco/backend-team
+/backend/src/database/**        @subhesco/dba
+
+# Frontend
+/frontend/src/pages/**          @subhesco/frontend-team
+/frontend/src/components/**     @subhesco/frontend-team
+
+# Infrastructure
+/docker-compose.yml             @subhesco/devops
+/.github/**                     @subhesco/devops
+/backend/.env*                  @subhesco/devops
+
+# AI & Security
+/backend/src/core/**            @subhesco/lead
+/backend/src/middleware/**      @subhesco/security
+
+# Database
+*.sql                           @subhesco/dba
+
+# Default
+*                               @subhesco/lead
