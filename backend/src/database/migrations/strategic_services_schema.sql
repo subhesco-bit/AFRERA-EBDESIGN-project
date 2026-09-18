@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS pre_season_agreements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   farmer_id UUID NOT NULL REFERENCES farmers(id),
   buyer_id UUID NOT NULL REFERENCES buyers(id),
-  crop_id UUID NOT NULL REFERENCES crops(id),
+  crop_id INTEGER NOT NULL REFERENCES crops(id),
   variety_id INTEGER NOT NULL REFERENCES regional_variety_directory(id),
   
   -- Agreement terms
@@ -163,7 +163,7 @@ CREATE INDEX idx_pre_season_milestones_status ON pre_season_milestones(status);
 CREATE TABLE IF NOT EXISTS pre_season_opportunities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   buyer_id UUID NOT NULL REFERENCES buyers(id),
-  crop_id UUID NOT NULL REFERENCES crops(id),
+  crop_id INTEGER NOT NULL REFERENCES crops(id),
   variety_id INTEGER NOT NULL REFERENCES regional_variety_directory(id),
   
   quantity_required DECIMAL(10,2) NOT NULL,
