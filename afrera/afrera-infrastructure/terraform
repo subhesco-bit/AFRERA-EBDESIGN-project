@@ -1,0 +1,26 @@
+afrera-infrastructure/
+└── terraform/
+    ├── modules/
+    │   ├── network/
+    │   │   ├── main.tf
+    │   │   └── variables.tf
+    │   ├── database/
+    │   │   ├── main.tf
+    │   │   └── variables.tf
+    │   ├── storage/
+    │   │   ├── main.tf
+    │   │   └── variables.tf
+    │   └── compute/
+    │       ├── main.tf
+    │       └── variables.tf
+    ├── environments/
+    │   ├── development/
+    │   │   ├── main.tf
+    │   │   └── variables.tf
+    │   ├── staging/
+    │   │   ├── main.tf
+    │   │   └── variables.tf
+    │   └── production/
+    │       ├── main.tf
+    │       └── variables.tf
+    └── main.tf

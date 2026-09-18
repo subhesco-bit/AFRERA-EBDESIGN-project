@@ -1,0 +1,13 @@
+afrera-web/src
+├── components
+│   ├── Header.tsx
+│   ├── Footer.tsx
+│   └── MainContent.tsx
+├── pages
+│   ├── index.tsx
+│   ├── about.tsx
+│   └── contact.tsx
+├── styles
+│   └── styles.css
+├── App.tsx
+└── index.tsx

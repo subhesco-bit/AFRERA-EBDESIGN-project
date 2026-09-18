@@ -1,0 +1,90 @@
+# afrera-infrastructure/monitoring
+
+# Monitoring and Observability Configuration
+
+## Prometheus Configuration
+
+# prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'afrera-api'
+    static_configs:
+      - targets: ['afrera-api:3000']
+
+  - job_name: 'afrera-ai'
+    static_configs:
+      - targets: ['afrera-ai:8000']
+
+## Grafana Dashboard Configuration
+
+# dashboards.json
+{
+  "dashboard": {
+    "title": "AFRERA Monitoring Dashboard",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "API Response Time",
+        "targets": [
+          {
+            "target": "avg(rate(http_request_duration_seconds_sum[5m]))"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Error Rate",
+        "targets": [
+          {
+            "target": "sum(rate(http_requests_total{status!=\"200\"}[5m]))"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+## Alerting Configuration
+
+# alerts.yml
+groups:
+  - name: afrera-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status!=\"200\"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "More than 5% of requests are failing."
+
+## Grafana Provisioning Configuration
+
+# provisioning.yml
+apiVersion: 1
+providers:
+  - name: 'AFRERA Dashboards'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards
+
+## README.md
+
+# Monitoring and Observability
+
+This directory contains configurations for monitoring and observability of the AFRERA project. It includes Prometheus configurations for scraping metrics, Grafana dashboards for visualizing metrics, and alerting rules for monitoring system health.
+
+### Files Included
+
+- **prometheus.yml**: Configuration for Prometheus to scrape metrics from AFRERA services.
+- **dashboards.json**: Configuration for Grafana dashboards to visualize key metrics.
+- **alerts.yml**: Alerting rules for Prometheus to notify on critical issues.
+- **provisioning.yml**: Configuration for Grafana to provision dashboards automatically.
+
+Ensure to update the configurations as necessary to fit the deployment environment and service endpoints.

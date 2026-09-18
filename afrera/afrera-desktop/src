@@ -1,0 +1,13 @@
+afrera-desktop/src
+├── index.ts
+├── App.tsx
+├── components
+│   ├── Header.tsx
+│   ├── Footer.tsx
+│   └── Dashboard.tsx
+├── hooks
+│   └── useFetch.ts
+├── styles
+│   └── App.css
+└── utils
+    └── api.ts
