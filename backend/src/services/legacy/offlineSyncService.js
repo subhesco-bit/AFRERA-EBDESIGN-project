@@ -501,25 +501,31 @@ async function syncGenericEntity(entityData, entityType, operation, executor = p
  */
 async function resolveSyncConflict(conflictId, resolution, resolvedData) {
   try {
-    const conflictQuery = `
-      SELECT * FROM sync_conflicts
-      WHERE id = $1
-    `;
-
-    const conflictResult = await pool.query(conflictQuery, [conflictId]);
-
-    if (conflictResult.rows.length === 0) {
-      throw new Error('Conflict not found');
-    }
-
-    const conflict = conflictResult.rows[0];
-
     // BR-08: applying the winning data and marking the conflict 'resolved'
     // are one event — if the status update were lost after the data write
     // committed, the conflict would stay 'unresolved' forever (visible in
     // getSyncStatus's active_conflicts) even though the data was already
-    // applied, and a later re-resolution attempt could re-apply it.
+    // applied, and a later re-resolution attempt could re-apply it. The
+    // existence/status check must also happen inside this same transaction
+    // under a table lock rather than as a plain pool.query before BEGIN:
+    // reading it outside lets two concurrent resolveSyncConflict calls for
+    // the same conflictId both pass the check before either writes, so both
+    // apply the winning data — a real double-apply, not just a duplicate
+    // status update.
     await withTransaction(async (client) => {
+      const conflictQuery = `
+        SELECT * FROM sync_conflicts
+        WHERE id = $1
+      `;
+
+      const conflictResult = await client.query(conflictQuery, [conflictId]);
+
+      if (conflictResult.rows.length === 0) {
+        throw new Error('Conflict not found');
+      }
+
+      const conflict = conflictResult.rows[0];
+
       switch (resolution) {
         case 'client_wins':
           // Apply client data
@@ -551,7 +557,7 @@ async function resolveSyncConflict(conflictId, resolution, resolvedData) {
         'UPDATE sync_conflicts SET status = \'resolved\', resolution = $1, resolved_at = NOW() WHERE id = $2',
         [resolution, conflictId],
       );
-    }, { name: 'offlineSyncService.resolveSyncConflict' });
+    }, { name: 'offlineSyncService.resolveSyncConflict', lockTables: ['sync_conflicts'] });
 
     logger.info(`Sync conflict resolved: ${conflictId} with resolution: ${resolution}`);
 
