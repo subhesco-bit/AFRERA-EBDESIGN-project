@@ -450,21 +450,28 @@ async function processUSSDPayment(ussdCode, userId, pin) {
     // Process payment
     const transactionId = `USSD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    await pool.query(
-      `INSERT INTO offline_transactions
-       (transaction_id, payer_id, merchant_id, amount, pin_verified, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, 'completed', NOW())`,
-      [transactionId, userId, merchantId, amount, true]
-    );
+    // BR-08: same reasoning as processOfflinePayment — recording the
+    // transaction, closing the USSD request, and queuing it for sync must
+    // land together or the same USSD code (still 'pending') could be
+    // replayed. No external call is involved (PIN check already happened
+    // above), so it is safe as one DB transaction.
+    await withTransaction(async (client) => {
+      await client.query(
+        `INSERT INTO offline_transactions
+         (transaction_id, payer_id, merchant_id, amount, pin_verified, status, created_at)
+         VALUES ($1, $2, $3, $4, $5, 'completed', NOW())`,
+        [transactionId, userId, merchantId, amount, true]
+      );
 
-    // Update USSD request status
-    await pool.query(
-      "UPDATE ussd_payment_requests SET status = 'completed', completed_at = NOW() WHERE id = $1",
-      [ussdRequest.id]
-    );
+      // Update USSD request status
+      await client.query(
+        "UPDATE ussd_payment_requests SET status = 'completed', completed_at = NOW() WHERE id = $1",
+        [ussdRequest.id]
+      );
 
-    // Add to sync queue
-    await addToSyncQueue(transactionId, 'ussd_payment');
+      // Add to sync queue
+      await addToSyncQueue(transactionId, 'ussd_payment', client);
+    }, { name: 'offlinePaymentService.processUSSDPayment' });
 
     return {
       success: true,
