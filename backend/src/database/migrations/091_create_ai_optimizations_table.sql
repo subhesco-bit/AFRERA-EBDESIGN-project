@@ -1,8 +1,8 @@
 -- Create AI Optimizations Table
 CREATE TABLE IF NOT EXISTS ai_optimizations (
   id SERIAL PRIMARY KEY,
-  farm_id INTEGER REFERENCES farms(id) ON DELETE CASCADE,
-  farmer_id INTEGER REFERENCES farmers(id) ON DELETE CASCADE,
+  farm_id UUID REFERENCES farms(id) ON DELETE CASCADE,
+  farmer_id UUID REFERENCES farmers(id) ON DELETE CASCADE,
   optimization_type VARCHAR(100) NOT NULL,
   result JSONB,
   savings_percent DECIMAL(5,2),
