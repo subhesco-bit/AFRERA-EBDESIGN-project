@@ -1,0 +1,45 @@
+{
+  "moduleId": "M032",
+  "version": "0.1.0",
+  "name": "M032 Module",
+  "description": "backend module bound to the 'suppliers' table.",
+  "category": "agriculture",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m032",
+      "backend",
+      "suppliers",
+      "Crop Management"
+    ],
+    "capabilities": [
+      "validateInput",
+      "getAll",
+      "getById",
+      "create",
+      "update",
+      "delete",
+      "createBulk",
+      "search",
+      "offset"
+    ],
+    "aiContext": "backend operations over the 'suppliers' table."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js table binding",
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

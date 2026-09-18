@@ -1,0 +1,45 @@
+{
+  "moduleId": "M054",
+  "version": "0.1.0",
+  "name": "M054 Module",
+  "description": "backend module bound to the 'irrigation' table.",
+  "category": "commerce",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m054",
+      "backend",
+      "irrigation",
+      "E-commerce"
+    ],
+    "capabilities": [
+      "validateInput",
+      "getAll",
+      "getById",
+      "create",
+      "update",
+      "delete",
+      "createBulk",
+      "search",
+      "offset"
+    ],
+    "aiContext": "backend operations over the 'irrigation' table."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js table binding",
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

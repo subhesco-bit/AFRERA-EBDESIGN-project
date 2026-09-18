@@ -1,0 +1,42 @@
+{
+  "moduleId": "M013",
+  "version": "0.1.0",
+  "name": "M013 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "platform",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m013",
+      "backend"
+    ],
+    "capabilities": [
+      "listAuthorizations",
+      "getAuthorization",
+      "createAuthorization",
+      "updateAuthorization",
+      "deleteAuthorization",
+      "checkPermission",
+      "evaluatePermissions",
+      "evaluateContextAwarePermissions",
+      "grantPermission",
+      "revokePermission",
+      "getUserPermissions",
+      "createRole"
+    ],
+    "aiContext": "backend module M013; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

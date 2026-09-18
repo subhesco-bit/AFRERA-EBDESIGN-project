@@ -1,0 +1,27 @@
+{
+  "moduleId": "M268",
+  "version": "0.1.0",
+  "name": "M268 Module",
+  "description": "frontend module. Purpose not yet declared by the module itself.",
+  "category": "unclassified",
+  "status": "generated",
+  "surface": "frontend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m268",
+      "frontend"
+    ],
+    "capabilities": [],
+    "aiContext": "frontend module M268; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

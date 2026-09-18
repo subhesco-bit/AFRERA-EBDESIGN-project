@@ -1,0 +1,43 @@
+{
+  "moduleId": "M128",
+  "version": "0.1.0",
+  "name": "M128 Module",
+  "description": "backend module bound to the 'marketing_automation' table.",
+  "category": "commerce",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m128",
+      "backend",
+      "marketing_automation"
+    ],
+    "capabilities": [
+      "validateInput",
+      "getAll",
+      "getById",
+      "create",
+      "update",
+      "delete",
+      "createBulk",
+      "search",
+      "offset"
+    ],
+    "aiContext": "backend operations over the 'marketing_automation' table."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js table binding",
+      "service.js method names"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "moduleId": "M009",
+  "version": "0.1.0",
+  "name": "M009 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "platform",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m009",
+      "backend",
+      "Platform Foundation"
+    ],
+    "capabilities": [
+      "createSecurityEvent",
+      "getSecurityEvents",
+      "addToIpList",
+      "removeFromIpList",
+      "getIpLists",
+      "checkIpAccess",
+      "checkRateLimit",
+      "detectThreats",
+      "calculateSecurityScore",
+      "createAccessPolicy",
+      "evaluateAccessPolicy",
+      "offset"
+    ],
+    "aiContext": "backend module M009; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

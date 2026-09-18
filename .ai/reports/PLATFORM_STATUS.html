@@ -1,0 +1,237 @@
+<title>EBDESIGN Platform Status</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ink:#14171C; --ink-2:#4A525E; --ink-3:#7C8595;
+  --ground:#F7F8FA; --panel:#FFFFFF; --rule:#E1E5EB; --rule-2:#CBD2DC;
+  --ok:#1F6F4A; --ok-bg:#E7F3ED;
+  --warn:#9A6414; --warn-bg:#FBF1DF;
+  --bad:#A6382A; --bad-bg:#FAE9E6;
+  --accent:#1F4FA8;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink:#E7EAEF; --ink-2:#A3ACBA; --ink-3:#6F7888;
+  --ground:#0E1116; --panel:#161A21; --rule:#252B34; --rule-2:#333B47;
+  --ok:#5FBF8E; --ok-bg:#16281F;
+  --warn:#D9A44E; --warn-bg:#2A2113;
+  --bad:#E2796A; --bad-bg:#2B1614;
+  --accent:#6C9BEF;
+}}
+:root[data-theme="dark"]{
+  --ink:#E7EAEF; --ink-2:#A3ACBA; --ink-3:#6F7888;
+  --ground:#0E1116; --panel:#161A21; --rule:#252B34; --rule-2:#333B47;
+  --ok:#5FBF8E; --ok-bg:#16281F;
+  --warn:#D9A44E; --warn-bg:#2A2113;
+  --bad:#E2796A; --bad-bg:#2B1614;
+  --accent:#6C9BEF;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.65}
+.wrap{max-width:1080px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
+h1,h2{margin:0;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:1.9rem}
+h2{font-size:1.05rem;margin-bottom:.15rem}
+p{margin:0 0 .9rem;color:var(--ink-2);max-width:72ch}
+code{font-family:var(--mono);font-size:.86em;background:var(--ground);border:1px solid var(--rule);border-radius:3px;padding:.08em .35em}
+.eyebrow{font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+
+header{border-bottom:2px solid var(--ink);padding-bottom:1.1rem;margin-bottom:1.6rem}
+header .eyebrow{display:block;margin-bottom:.5rem}
+.stamp{display:flex;flex-wrap:wrap;gap:1.2rem;margin-top:.7rem;font-family:var(--mono);font-size:.74rem;color:var(--ink-3)}
+.stamp b{color:var(--ink-2);font-weight:600}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:2.2rem}
+.cell{background:var(--panel);padding:.9rem 1rem}
+.cell .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.cell .v{font-family:var(--mono);font-size:1.45rem;font-weight:600;line-height:1.15;margin-top:.3rem;font-variant-numeric:tabular-nums}
+.cell .s{font-size:.73rem;color:var(--ink-2);margin-top:.15rem}
+.v.ok{color:var(--ok)} .v.warn{color:var(--warn)} .v.bad{color:var(--bad)}
+
+section{margin-bottom:2.4rem}
+.shead{display:flex;align-items:baseline;gap:.7rem;border-bottom:1px solid var(--rule-2);padding-bottom:.4rem;margin-bottom:.9rem}
+.shead .n{font-family:var(--mono);font-size:.72rem;color:var(--ink-3)}
+
+.chip{display:inline-block;font-family:var(--mono);font-size:.63rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border:1px solid currentColor;border-radius:2px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:var(--ok-bg)}
+.chip.warn{color:var(--warn);background:var(--warn-bg)}
+.chip.bad{color:var(--bad);background:var(--bad-bg)}
+
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:520px}
+th{text-align:left;font-family:var(--mono);font-size:.64rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--rule-2);padding:0 .8rem .45rem 0}
+td{padding:.5rem .8rem .5rem 0;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.was{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px}
+.now{color:var(--ok);font-weight:600}
+
+.bar{display:flex;height:20px;border:1px solid var(--rule-2);overflow:hidden;margin:.5rem 0 .3rem}
+.legend{display:flex;flex-wrap:wrap;gap:1rem;font-family:var(--mono);font-size:.7rem;color:var(--ink-2)}
+.legend i{display:inline-block;width:9px;height:9px;margin-right:.35rem}
+
+.rows{border-top:1px solid var(--rule)}
+.row{display:grid;grid-template-columns:8.5rem 1fr;gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--rule)}
+.row .t{font-weight:600;font-size:.9rem;margin-bottom:.15rem}
+.row .d{font-size:.84rem;color:var(--ink-2);max-width:80ch}
+.row .d em{color:var(--ink);font-style:normal;font-weight:500}
+
+.callout{border-left:3px solid var(--warn);background:var(--warn-bg);padding:.85rem 1.1rem;margin:1rem 0}
+.callout.bad{border-left-color:var(--bad);background:var(--bad-bg)}
+.callout p{margin:0;font-size:.86rem;max-width:80ch}
+.callout .h{font-weight:600;font-size:.88rem;margin-bottom:.25rem}
+
+.cmd{font-family:var(--mono);font-size:.78rem;background:var(--panel);border:1px solid var(--rule-2);padding:.7rem .9rem;overflow-x:auto;white-space:pre;color:var(--ink);margin:.6rem 0}
+
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule-2);font-family:var(--mono);font-size:.72rem;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:1.3rem;justify-content:space-between}
+
+@media (max-width:640px){
+  .wrap{padding:1.6rem 1rem 3rem}
+  .row{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">Subhesco / EBDESIGN &middot; Agricultural Digital Operating System</span>
+  <h1>Platform Status &amp; Remaining Work</h1>
+  <div class="stamp">
+    <span><b>Measured</b> 13 Sept 2026</span>
+    <span><b>Branch</b> checkpoint/pre-clean-rebuild-20260913</span>
+    <span><b>Head</b> fbf6a815</span>
+    <span><b>Commits</b> 23 this session</span>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="cell"><div class="k">Backend API</div><div class="v ok">UP</div><div class="s">:5000</div></div>
+  <div class="cell"><div class="k">Endpoints OK</div><div class="v ok">92%</div><div class="s">1,232 / 1,346</div></div>
+  <div class="cell"><div class="k">Datastores</div><div class="v ok">3/3</div><div class="s">pg&middot;redis&middot;mongo</div></div>
+  <div class="cell"><div class="k">Tables</div><div class="v">1,745</div><div class="s">724 migrations</div></div>
+  <div class="cell"><div class="k">AI system</div><div class="v ok">8/8</div><div class="s">zero degraded</div></div>
+  <div class="cell"><div class="k">Auth</div><div class="v ok">REAL</div><div class="s">was a mock</div></div>
+  <div class="cell"><div class="k">Disk free</div><div class="v bad">12 GB</div><div class="s">98% used</div></div>
+</div>
+
+<section>
+  <div class="shead"><span class="n">01</span><h2>Where it started, where it is</h2></div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Measure</th><th class="num">Session start</th><th class="num">Now</th></tr></thead>
+      <tbody>
+        <tr><td>Backend process</td><td class="num was">exit 1 on boot</td><td class="num now">listening</td></tr>
+        <tr><td>Endpoints answering correctly</td><td class="num was">21%</td><td class="num now">92%</td></tr>
+        <tr><td><code>200 OK</code> responses</td><td class="num was">216</td><td class="num now">1,172</td></tr>
+        <tr><td>Database tables</td><td class="num was">1,395</td><td class="num now">1,745</td></tr>
+        <tr><td>Migrations applied</td><td class="num was">384</td><td class="num now">724</td></tr>
+        <tr><td>Migration failures</td><td class="num was">337</td><td class="num now">28</td></tr>
+        <tr><td>Authentication</td><td class="num was">mock, plaintext</td><td class="num now">real JWT</td></tr>
+        <tr><td>AI components running</td><td class="num was">0</td><td class="num now">8</td></tr>
+        <tr><td>Server under full probe</td><td class="num was">crashed</td><td class="num now">stable</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="n">02</span><h2>Endpoint profile</h2></div>
+  <div class="bar">
+    <span style="width:87.1%;background:var(--ok)"></span>
+    <span style="width:3.9%;background:var(--accent)"></span>
+    <span style="width:3.6%;background:var(--ink-3)"></span>
+    <span style="width:3.3%;background:var(--bad)"></span>
+    <span style="width:2.1%;background:var(--warn)"></span>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--ok)"></i>200 &mdash; 1,172</span>
+    <span><i style="background:var(--accent)"></i>400 route works &mdash; 53</span>
+    <span><i style="background:var(--ink-3)"></i>404 &mdash; 49</span>
+    <span><i style="background:var(--bad)"></i>500 &mdash; 44</span>
+    <span><i style="background:var(--warn)"></i>other &mdash; 28</span>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="n">03</span><h2>The AI system</h2></div>
+  <p>Eight components, started together in dependency order, zero degraded. Two backbones, intentionally separate and interdependent through the shared <code>ai_decisions</code> and <code>ai_strategies</code> tables.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Capability class</th><th>Serves</th><th>Autonomy</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td><b>Agentic AI</b></td><td>commerce, ERP workflows, logistics</td><td><code>act</code></td><td><span class="chip ok">Live</span></td></tr>
+        <tr><td><b>AI Security &amp; Trust</b></td><td>finance, compliance, health data</td><td><code>reflex</code></td><td><span class="chip ok">Live</span></td></tr>
+        <tr><td><b>Frontier AI Models</b></td><td>weather, tutorials, DPR, loans, subsidy</td><td><code>advise</code></td><td><span class="chip warn">Built</span></td></tr>
+        <tr><td>Artificial Scientists</td><td>subsidy evidence, agronomy trials</td><td><code>observe</code></td><td><span class="chip bad">Absent</span></td></tr>
+        <tr><td>Humanoid / Embodied</td><td>warehouse, cold chain, manufacturing</td><td><code>observe</code></td><td><span class="chip bad">Absent</span></td></tr>
+        <tr><td>Quantum + AI</td><td>cost, order allocation, routing</td><td><code>advise</code></td><td><span class="chip bad">Absent</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:1rem">Proven working: three module signals correlate into one auditable decision (<code>hold_shipment, trigger_inspection, reprioritise_logistics, open_claim</code>, confidence 1, requiresHuman true), fraud probability 0.97 freezes an account while 0.42 does not, and unfreezing without naming an authoriser is refused.</p>
+</section>
+
+<section>
+  <div class="shead"><span class="n">04</span><h2>Remaining work</h2></div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Item</th><th style="width:6rem">Priority</th><th>Why it matters</th></tr></thead>
+      <tbody>
+        <tr><td><b>PR cannot be pushed</b></td><td><span class="chip bad">blocking</span></td><td>Three 194&nbsp;MB CSVs in <code>_MERGE_LAB</code> exceed GitHub's hard 100&nbsp;MB limit. Needs a history rewrite &mdash; see below.</td></tr>
+        <tr><td><b>Test suite is 93% stubs</b></td><td><span class="chip bad">blocking</span></td><td>1,040 of 1,122 files assert nothing. Nothing on this page should be called "verified" on that basis.</td></tr>
+        <tr><td><b>Disk at 98%</b></td><td><span class="chip bad">blocking</span></td><td>12&nbsp;GB free. 773&nbsp;MB verified safe to reclaim.</td></tr>
+        <tr><td>No AI provider enabled</td><td><span class="chip warn">high</span></td><td>Claude is <code>configured: true, enabled: false</code>. No frontier model is reachable &mdash; configuration, not development.</td></tr>
+        <tr><td>28 migrations still failing</td><td><span class="chip warn">high</span></td><td>See the schema-ownership note below; 8 of them are one defect.</td></tr>
+        <tr><td>44 &times; 500, 49 &times; 404</td><td><span class="chip warn">medium</span></td><td>Count unchanged across runs &mdash; some fixed, others regress under load. Investigate before treating 92% as stable.</td></tr>
+        <tr><td>Truthpack empty</td><td><span class="chip warn">medium</span></td><td>0 of 13 files, so the project's own Rule 6 cannot be satisfied.</td></tr>
+        <tr><td>44 signals produce no action</td><td><span class="chip warn">medium</span></td><td>All 55 reach the engine; only 11 act. Rule authorship needs domain input.</td></tr>
+        <tr><td>Squash 745 migrations</td><td><span class="chip warn">low</span></td><td>58 are repair/collision files. Do it after the 28 pass. Never drop the database.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="n">05</span><h2>Two findings worth acting on</h2></div>
+
+  <div class="callout bad">
+    <div class="h">The migration backlog is a schema-ownership problem, not a list of bugs</div>
+    <p>Eight migrations failed on <code>deleted_at</code>. Adding it moved all eight to <code>user_id</code>. They open with <code>CREATE TABLE IF NOT EXISTS</code> against tables an earlier migration already created with a different shape, so creation is skipped and every subsequent column reference fails in turn. Patching column by column chases a cascade. Someone has to decide which definition is authoritative &mdash; the earlier table or the later migration.</p>
+  </div>
+
+  <div class="callout">
+    <div class="h">The reference data now has one backup, and it is in git</div>
+    <p>3,327 curated rows &mdash; the NE variety directory, HSN/GST mappings, nutrients, government schemes, the chart of accounts &mdash; existed only inside one Docker volume. <code>backend/src/database/seeds/001_reference_data.sql</code> reproduces 1,135 of them and restores clean into an empty database. Wage and payroll tables were checked specifically and are empty. Note that <code>_MERGE_LAB</code>, which holds the only copies of ~9,000 unmerged source variants, still has no backup at all.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="n">06</span><h2>To unblock the PR</h2></div>
+  <p>Strips 1,616&nbsp;MB of local scratch from git history. Files stay on disk.</p>
+  <div class="cmd">printf '\n_MERGE_LAB/\n_UNIFIED_PROJECT/\n_ACTIVE_PROJECT/\n.ai/inventory/\n' &gt;&gt; .gitignore
+git add .gitignore &amp;&amp; git commit -m "chore: exclude local scratch dirs from git"
+FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --index-filter \
+  'git rm -r --cached --ignore-unmatch "_MERGE_LAB" "_UNIFIED_PROJECT" "_ACTIVE_PROJECT" ".ai/inventory"' \
+  --prune-empty $(git rev-parse e5ee63e7^)..HEAD
+git push -u origin checkpoint/pre-clean-rebuild-20260913</div>
+</section>
+
+<section>
+  <div class="shead"><span class="n">07</span><h2>How these numbers were obtained</h2></div>
+  <p>Every figure is probed against the running server or queried from the database. Static analysis was wrong six times during this work &mdash; reading <code>index.js</code> for route mounts, probing without a token, reading a truncated route listing, missing dynamically-registered effectors, quoting <code>pg_stat_user_tables</code> without <code>ANALYZE</code>, and guessing endpoint URLs. Regenerate rather than trusting anything written here:</p>
+  <div class="cmd">node tools/route-reachability-audit.js    # endpoint health, with auth
+node tools/route-map-by-concept.js       # what is mounted, by business concept
+node tools/signal-graph-audit.js         # signal publish/subscribe graph
+node tools/domain-chain-audit.js         # table to service to route to page
+node src/database/migrate.js --continue  # every migration failure in one pass</div>
+</section>
+
+<footer>
+  <span>Measured, not asserted</span>
+  <span>23 commits &middot; head fbf6a815</span>
+  <span>13 Sept 2026</span>
+</footer>
+
+</div>

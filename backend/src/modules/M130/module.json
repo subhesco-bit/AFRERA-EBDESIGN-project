@@ -1,0 +1,45 @@
+{
+  "moduleId": "M130",
+  "version": "0.1.0",
+  "name": "M130 Module",
+  "description": "backend module bound to the 'social_media' table.",
+  "category": "agriculture",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m130",
+      "backend",
+      "social_media",
+      "Livestock"
+    ],
+    "capabilities": [
+      "validateInput",
+      "getAll",
+      "getById",
+      "create",
+      "update",
+      "delete",
+      "createBulk",
+      "search",
+      "offset"
+    ],
+    "aiContext": "backend operations over the 'social_media' table."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js table binding",
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

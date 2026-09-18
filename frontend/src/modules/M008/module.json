@@ -1,0 +1,30 @@
+{
+  "moduleId": "M008",
+  "version": "0.1.0",
+  "name": "M008 Module",
+  "description": "frontend module. Purpose not yet declared by the module itself.",
+  "category": "platform",
+  "status": "generated",
+  "surface": "frontend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m008",
+      "frontend",
+      "Platform Foundation"
+    ],
+    "capabilities": [],
+    "aiContext": "frontend module M008; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

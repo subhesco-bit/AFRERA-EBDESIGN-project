@@ -1,0 +1,513 @@
+<title>EBDESIGN Strategic Architecture Enhancement Plan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root {
+  --slate:      #2C3E50;
+  --sage:       #6B8E23;
+  --clay:       #D4A574;
+  --accent:     #1E6FD9;
+  --critical:   #A63D2F;
+  --cream:      #F0EBDE;
+  --ground:     #FAF8F3;
+  --text:       #1F1E1A;
+  --text-2:     #57544C;
+  --text-3:     #8A867B;
+  --border:     #DED8C8;
+  --rule:       #C9C2AE;
+
+  --display: 'Playfair Display', Georgia, serif;
+  --body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono:    'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --slate:    #DDE4EA;
+    --sage:     #9CBF3B;
+    --clay:     #D4A574;
+    --accent:   #6AA9F0;
+    --critical: #E07A63;
+    --cream:    #232420;
+    --ground:   #161714;
+    --text:     #F2EFE6;
+    --text-2:   #B6B2A6;
+    --text-3:   #837F74;
+    --border:   #34362F;
+    --rule:     #43453C;
+  }
+}
+:root[data-theme="dark"] {
+  --slate:    #DDE4EA;
+  --sage:     #9CBF3B;
+  --clay:     #D4A574;
+  --accent:   #6AA9F0;
+  --critical: #E07A63;
+  --cream:    #232420;
+  --ground:   #161714;
+  --text:     #F2EFE6;
+  --text-2:   #B6B2A6;
+  --text-3:   #837F74;
+  --border:   #34362F;
+  --rule:     #43453C;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.65;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 3rem 1.75rem 5rem; }
+
+h1, h2, h3 { font-family: var(--display); font-weight: 700; line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 4.5vw, 3rem); color: var(--slate); letter-spacing: -0.015em; }
+h2 { font-size: 1.5rem; color: var(--text); margin-bottom: .35rem; }
+h3 { font-size: 1.05rem; font-family: var(--body); font-weight: 700; color: var(--text); }
+p  { margin: 0 0 1rem; color: var(--text-2); max-width: 68ch; }
+a  { color: var(--accent); }
+code {
+  font-family: var(--mono); font-size: .84em;
+  background: var(--cream); padding: .12em .4em; border-radius: 2px;
+  border: 1px solid var(--border);
+}
+
+.eyebrow {
+  font-family: var(--mono); font-size: .7rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--text-3);
+}
+
+/* ---------- masthead ---------- */
+.masthead { border-bottom: 3px solid var(--sage); padding-bottom: 1.75rem; margin-bottom: 2rem; }
+.masthead .eyebrow { display: block; margin-bottom: .6rem; }
+.sub { font-size: 1.1rem; color: var(--text-2); margin: .6rem 0 0; font-weight: 500; }
+.meta {
+  display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: 1.1rem;
+  font-family: var(--mono); font-size: .78rem; color: var(--text-3);
+}
+.meta b { color: var(--text-2); font-weight: 600; }
+
+/* ---------- status notice ---------- */
+.notice {
+  display: grid; grid-template-columns: auto 1fr; gap: 1rem;
+  border-left: 4px solid var(--critical);
+  background: var(--cream);
+  padding: 1.25rem 1.4rem; margin: 0 0 3rem;
+}
+.notice-tag {
+  font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--critical); white-space: nowrap; padding-top: .18rem;
+}
+.notice p { margin: 0; max-width: 72ch; font-size: .93rem; }
+.notice p + p { margin-top: .6rem; }
+
+section { margin-bottom: 3.25rem; }
+.lede { font-size: 1.02rem; }
+
+/* ---------- variance table ---------- */
+.tablewrap { overflow-x: auto; margin: 1.25rem 0 0; }
+table { border-collapse: collapse; width: 100%; font-size: .89rem; min-width: 520px; }
+caption {
+  text-align: left; font-family: var(--mono); font-size: .72rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-3); padding-bottom: .7rem;
+}
+th {
+  text-align: left; font-family: var(--mono); font-size: .7rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--text-3);
+  border-bottom: 1.5px solid var(--rule); padding: 0 .8rem .55rem 0;
+}
+td { padding: .58rem .8rem .58rem 0; border-bottom: 1px solid var(--border); vertical-align: baseline; }
+tr:last-child td { border-bottom: none; }
+.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.was { color: var(--text-3); text-decoration: line-through; text-decoration-thickness: 1px; }
+.now { color: var(--text); font-weight: 600; }
+.delta { font-family: var(--mono); font-size: .8rem; color: var(--clay); white-space: nowrap; }
+.delta.bad { color: var(--critical); }
+
+/* ---------- substance bars ---------- */
+.bars { display: grid; gap: .5rem; margin-top: 1.25rem; }
+.bar-row {
+  display: grid; grid-template-columns: 11rem 1fr 5.5rem;
+  gap: .9rem; align-items: center; font-size: .85rem;
+}
+.bar-label { font-family: var(--mono); font-size: .78rem; color: var(--text-2); }
+.track { height: 20px; background: var(--cream); border: 1px solid var(--border); position: relative; }
+.fill { height: 100%; background: var(--sage); }
+.fill.low { background: var(--critical); }
+.fill.mid { background: var(--clay); }
+.bar-val {
+  font-family: var(--mono); font-size: .78rem; color: var(--text-2);
+  font-variant-numeric: tabular-nums; text-align: right;
+}
+
+/* ---------- blockers ---------- */
+.blockers { display: grid; gap: 0; margin-top: 1.25rem; border-top: 1px solid var(--border); }
+.blocker {
+  display: grid; grid-template-columns: 7.5rem 1fr; gap: 1.4rem;
+  padding: 1.3rem 0; border-bottom: 1px solid var(--border);
+}
+.blocker-id {
+  font-family: var(--mono); font-size: .72rem; font-weight: 600; letter-spacing: .06em;
+  color: var(--critical); padding-top: .15rem;
+}
+.blocker h3 { margin-bottom: .4rem; }
+.blocker p { font-size: .89rem; margin-bottom: .5rem; }
+.fix {
+  font-size: .85rem; color: var(--text-2); border-left: 2px solid var(--sage);
+  padding-left: .8rem; margin-top: .7rem;
+}
+.fix b { color: var(--sage); font-weight: 600; }
+
+/* path remap list */
+.remap { font-family: var(--mono); font-size: .76rem; margin: .7rem 0 0; display: grid; gap: .2rem; }
+.remap div { display: grid; grid-template-columns: 1fr auto 1fr; gap: .6rem; align-items: baseline; }
+.remap .from { color: var(--critical); overflow-wrap: anywhere; }
+.remap .to { color: var(--sage); overflow-wrap: anywhere; }
+.remap .arrow { color: var(--text-3); }
+
+/* ---------- rules ---------- */
+.rules { display: grid; gap: 0; margin-top: 1.25rem; border-top: 1px solid var(--border); }
+.rule-row {
+  display: grid; grid-template-columns: 2.2rem 1fr 8.5rem; gap: 1rem;
+  padding: .85rem 0; border-bottom: 1px solid var(--border); align-items: baseline;
+}
+.rule-n { font-family: var(--mono); font-size: .8rem; color: var(--text-3); }
+.rule-name { font-weight: 600; font-size: .92rem; }
+.rule-name span { display: block; font-weight: 400; font-size: .84rem; color: var(--text-2); margin-top: .12rem; }
+.pill {
+  font-family: var(--mono); font-size: .66rem; font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; padding: .22rem .5rem; text-align: center; white-space: nowrap;
+  border: 1px solid currentColor;
+}
+.pill.ok   { color: var(--sage); }
+.pill.warn { color: var(--critical); }
+
+/* ---------- phases ---------- */
+.phases { display: grid; gap: 0; margin-top: 1.25rem; }
+.phase {
+  display: grid; grid-template-columns: 9rem 1fr; gap: 1.5rem;
+  padding: 1.5rem 0; border-top: 1px solid var(--border);
+}
+.phase:last-child { border-bottom: 1px solid var(--border); }
+.phase-key .eyebrow { display: block; margin-bottom: .3rem; }
+.phase-key .name { font-family: var(--display); font-size: 1.15rem; font-weight: 700; color: var(--slate); line-height: 1.2; }
+.phase ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .38rem; }
+.phase li { font-size: .89rem; color: var(--text-2); padding-left: 1.15rem; position: relative; }
+.phase li::before { content: "▸"; position: absolute; left: 0; color: var(--clay); }
+.phase li.done { color: var(--text-3); }
+.phase li.done::before { content: "✓"; color: var(--sage); }
+.phase li b { color: var(--text); font-weight: 600; }
+
+/* ---------- decisions ---------- */
+.decisions { margin-top: 1.25rem; }
+
+/* ---------- callout ---------- */
+.callout {
+  background: var(--cream); border: 1px solid var(--border);
+  padding: 1.4rem 1.5rem; margin-top: 1.25rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout .eyebrow { display: block; margin-bottom: .6rem; color: var(--clay); }
+
+footer {
+  margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule);
+  font-family: var(--mono); font-size: .74rem; color: var(--text-3);
+  display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between;
+}
+
+@media (max-width: 720px) {
+  .wrap { padding: 2rem 1.1rem 3rem; }
+  .blocker, .phase { grid-template-columns: 1fr; gap: .5rem; }
+  .rule-row { grid-template-columns: 1.6rem 1fr; }
+  .rule-row .pill { grid-column: 2; justify-self: start; margin-top: .3rem; }
+  .bar-row { grid-template-columns: 8rem 1fr 4.5rem; gap: .5rem; }
+  .remap div { grid-template-columns: 1fr; gap: 0; }
+  .remap .arrow { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <span class="eyebrow">Claude Design Governance Framework</span>
+  <h1>EBDESIGN Strategic Architecture Enhancement</h1>
+  <p class="sub">Execution framework for Phase 0–3 production delivery</p>
+  <div class="meta">
+    <span><b>Issued</b> 1 Sept 2026</span>
+    <span><b>Reconciled</b> 13 Sept 2026</span>
+    <span><b>Evidence</b> 68,952 files scanned</span>
+    <span><b>Owner</b> Claude (orchestration)</span>
+  </div>
+</header>
+
+<div class="notice">
+  <span class="notice-tag">Metrics<br>superseded</span>
+  <div>
+    <p>The governance rules in this plan remain in force. <b>Its figures do not.</b> Every quantity in the 1 September issue was an estimate made before any full-tree measurement existed, and each is wrong by a factor of three to five. A whole-repository scan on 13 September replaced them with counted values.</p>
+    <p>The plan also recorded <b>zero critical blockers</b>. There are at least three, and one of them is that the backend does not start.</p>
+  </div>
+</div>
+
+<section>
+  <h2>Strategic thesis, restated</h2>
+  <p class="lede">EBDESIGN holds a substantial and genuinely valuable backend — 309 services carrying real implementation weight. That work is protected and is not being rewritten. What has never existed is a running datastore: not one of 773 migrations has ever executed, so no route has been exercised against a real schema and no integration has ever been proven.</p>
+  <p>The constraint is therefore not architecture. It is verification. This revision reorders the programme around a single principle: <b>nothing is reported as working until it has run.</b></p>
+</section>
+
+<section>
+  <h2>Governance rules</h2>
+  <p>All six rules from the original issue carry forward and bind every commit.</p>
+  <div class="rules">
+    <div class="rule-row">
+      <span class="rule-n">01</span>
+      <div class="rule-name">Preserve existing work
+        <span>Clarified: preserve <em>features</em>, delete <em>copies</em>. The duplication is not in the implementation — it is in four snapshot folders.</span>
+      </div>
+      <span class="pill ok">Adopted</span>
+    </div>
+    <div class="rule-row">
+      <span class="rule-n">02</span>
+      <div class="rule-name">Verify before modify
+        <span>Strengthened: now backed by a queryable inventory database rather than inspection by eye.</span>
+      </div>
+      <span class="pill ok">Adopted</span>
+    </div>
+    <div class="rule-row">
+      <span class="rule-n">03</span>
+      <div class="rule-name">Database-first integration
+        <span>Elevated from a task to the critical path. The original plan was right about this and scheduled it as one item among four.</span>
+      </div>
+      <span class="pill ok">Adopted</span>
+    </div>
+    <div class="rule-row">
+      <span class="rule-n">04</span>
+      <div class="rule-name">Atomic commits
+        <span>One feature or fix per commit, each carrying its decision-log reference.</span>
+      </div>
+      <span class="pill ok">Adopted</span>
+    </div>
+    <div class="rule-row">
+      <span class="rule-n">05</span>
+      <div class="rule-name">Audit-ready documentation
+        <span>This reconciliation is issued under it.</span>
+      </div>
+      <span class="pill ok">Adopted</span>
+    </div>
+    <div class="rule-row">
+      <span class="rule-n">06</span>
+      <div class="rule-name">Zero hallucination
+        <span>Requires cross-referencing <code>.vibecheck/truthpack/</code> before writing code. That directory is empty — zero of thirteen required files exist.</span>
+      </div>
+      <span class="pill warn">Violated</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Plan against measurement</h2>
+  <p>Struck figures are from the 1 September issue. Bold figures are counted from the 13 September scan.</p>
+  <div class="tablewrap">
+    <table>
+      <caption>Inventory variance</caption>
+      <thead>
+        <tr><th>Metric</th><th class="num">Planned</th><th class="num">Measured</th><th class="num">Variance</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Backend services</td><td class="num was">226</td><td class="num now">649</td><td class="num delta">2.9×</td></tr>
+        <tr><td>Backend route files</td><td class="num was">154</td><td class="num now">690</td><td class="num delta">4.5×</td></tr>
+        <tr><td>Route declarations</td><td class="num was">—</td><td class="num now">8,245</td><td class="num delta">uncounted</td></tr>
+        <tr><td>Frontend pages</td><td class="num was">212</td><td class="num now">1,112</td><td class="num delta">5.0×</td></tr>
+        <tr><td>Frontend components</td><td class="num was">74</td><td class="num now">479</td><td class="num delta">6.5×</td></tr>
+        <tr><td>Migration files</td><td class="num was">349</td><td class="num now">773</td><td class="num delta">2.2×</td></tr>
+        <tr><td>Tables created</td><td class="num was">523</td><td class="num now">1,867</td><td class="num delta">3.6×</td></tr>
+        <tr><td>Files in project</td><td class="num was">911</td><td class="num now">68,952</td><td class="num delta">76×</td></tr>
+        <tr><td>Critical blockers</td><td class="num was">0</td><td class="num now">3</td><td class="num delta bad">understated</td></tr>
+        <tr><td>Completion rate</td><td class="num was">96%</td><td class="num now">n/a</td><td class="num delta bad">not reproducible</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Why 96% could not be reproduced</h2>
+  <p>Completion was measured by counting files that exist. The scan measures whether those files contain behaviour — the share of each layer above 6&nbsp;KB, the threshold below which a file cannot hold a working implementation.</p>
+  <div class="bars">
+    <div class="bar-row"><span class="bar-label">backend-database</span><span class="track"><span class="fill" style="width:75%"></span></span><span class="bar-val">48 / 64</span></div>
+    <div class="bar-row"><span class="bar-label">backend-core</span><span class="track"><span class="fill" style="width:61%"></span></span><span class="bar-val">27 / 44</span></div>
+    <div class="bar-row"><span class="bar-label">backend-service</span><span class="track"><span class="fill" style="width:48%"></span></span><span class="bar-val">309 / 649</span></div>
+    <div class="bar-row"><span class="bar-label">backend-module</span><span class="track"><span class="fill mid" style="width:17%"></span></span><span class="bar-val">399 / 2,283</span></div>
+    <div class="bar-row"><span class="bar-label">frontend-page</span><span class="track"><span class="fill mid" style="width:14%"></span></span><span class="bar-val">155 / 1,112</span></div>
+    <div class="bar-row"><span class="bar-label">frontend-component</span><span class="track"><span class="fill low" style="width:10%"></span></span><span class="bar-val">47 / 479</span></div>
+    <div class="bar-row"><span class="bar-label">backend-route</span><span class="track"><span class="fill low" style="width:7%"></span></span><span class="bar-val">46 / 690</span></div>
+    <div class="bar-row"><span class="bar-label">test</span><span class="track"><span class="fill low" style="width:3%"></span></span><span class="bar-val">29 / 1,122</span></div>
+  </div>
+  <div class="callout">
+    <span class="eyebrow">What this says</span>
+    <p>Backend services hold up: 309 substantive files is real engineering, and Rule&nbsp;1 protects it. But 690 route files yielding 46 substantive ones means the API surface is mostly thin generated wrappers around that work.</p>
+    <p>The test layer is the sharpest finding. 1,040 of 1,122 test files are stubs. The previously reported <b>0% coverage was optimistic</b> — the tests exist as files and assert nothing, which is worse than absent because it reads as coverage in a file count.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Critical blockers</h2>
+  <div class="blockers">
+
+    <article class="blocker">
+      <span class="blocker-id">BLOCKER-1</span>
+      <div>
+        <h3>Truthpack is empty</h3>
+        <p><code>.vibecheck/truthpack/</code> contains no files. Rule 6 requires every code change to be cross-referenced against it, so every truthpack-verified claim made since the directory emptied has been unverifiable.</p>
+        <p class="fix"><b>Fix:</b> regenerate before any code is written, or Rule 6 is decorative.</p>
+      </div>
+    </article>
+
+    <article class="blocker">
+      <span class="blocker-id">BLOCKER-2</span>
+      <div>
+        <h3>The backend does not boot</h3>
+        <p><code>node src/index.js</code> exits 1. It resolves 684 of 691 local requires, initialises its services cleanly, then dies on seven paths left stale by an earlier reorganisation. All seven target files exist — they were moved into subfolders and the entry point was never updated.</p>
+        <div class="remap">
+          <div><span class="from">./routes/gstRoutes.js</span><span class="arrow">→</span><span class="to">routes/finance/gstRoutes.js</span></div>
+          <div><span class="from">./routes/enterpriseAIRoutes.js</span><span class="arrow">→</span><span class="to">routes/ai/enterpriseAIRoutes.js</span></div>
+          <div><span class="from">./routes/equipmentExchangeRoutes.js</span><span class="arrow">→</span><span class="to">routes/commerce/equipmentExchangeRoutes.js</span></div>
+          <div><span class="from">./routes/farmerHealthRoutes.js</span><span class="arrow">→</span><span class="to">routes/agriculture/farmerHealthRoutes.js</span></div>
+          <div><span class="from">./routes/finance/costRoutes_merged.js</span><span class="arrow">→</span><span class="to">routes/costRoutes.js</span></div>
+          <div><span class="from">./routes/platform/governanceModule_merged.js</span><span class="arrow">→</span><span class="to">routes/governanceModule.js</span></div>
+          <div><span class="from">./routes/seedVaultRoutes_merged.js</span><span class="arrow">→</span><span class="to">routes/seedVaultRoutes.js</span></div>
+        </div>
+        <p class="fix"><b>Fix:</b> seven path corrections — the cheapest high-value change in the programme. Everything downstream depends on it.</p>
+      </div>
+    </article>
+
+    <article class="blocker">
+      <span class="blocker-id">BLOCKER-3</span>
+      <div>
+        <h3>No datastore has ever run</h3>
+        <p>PostgreSQL, Redis and the Docker daemon are all down. Zero of 773 migrations have executed. No route has been exercised against a real schema, and <b>172 table names are created in more than one migration</b> — including <code>users</code>, <code>roles</code>, <code>user_roles</code> and <code>audit_logs</code>. Migration order is undefined, so applying them as they stand is non-deterministic.</p>
+        <p class="fix"><b>Fix:</b> order and de-conflict the migration set before execution. The original plan budgeted this inside an eight-hour phase; 1,867 tables across 773 unordered files is not an eight-hour job.</p>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<section>
+  <h2>Further defects</h2>
+  <p>Load-bearing, though not blocking.</p>
+  <div class="tablewrap">
+    <table>
+      <caption>Scan findings</caption>
+      <thead><tr><th>Finding</th><th class="num">Count</th><th>Disposition</th></tr></thead>
+      <tbody>
+        <tr><td>Byte-identical redundant copies, whole tree</td><td class="num now">48,522</td><td>2,414 MB reclaimable — snapshot folders only</td></tr>
+        <tr><td>Redundant copies inside the live tree</td><td class="num now">563</td><td>Small; 284 are source and must be merged, not deleted</td></tr>
+        <tr><td>Unresolved relative imports</td><td class="num now">807</td><td>Across 628 files</td></tr>
+        <tr><td>…of those, one generator bug emitting <code>./${className}.css</code></td><td class="num now">314</td><td>One pattern fix clears 39% of all broken imports</td></tr>
+        <tr><td>Tables defined in more than one migration</td><td class="num now">172</td><td>Must be resolved before execution</td></tr>
+        <tr><td>Distinct frontend API URLs found</td><td class="num now">3</td><td>Unverified — scanner may be missing an indirection</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <span class="eyebrow">Stated limitation</span>
+    <p>Two defects in the scanner itself are disclosed rather than quietly corrected. Its SQL parser caught prose from comments as table names, and its API matcher only recognises literal <code>/api/v1/</code> strings — which is why it reports just three frontend endpoints across 1,112 pages. That figure is almost certainly an artefact of an axios <code>baseURL</code> indirection the matcher does not follow. Both are fixed before the database work; neither changes any conclusion above.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Revised phasing</h2>
+  <p>The three original phases are kept. Their contents change, because the plan assumed a booting system with a live database and neither exists. A fourth phase is prepended: the disk sits at 95% capacity, and there is not room to build without reclaiming first.</p>
+  <div class="phases">
+
+    <article class="phase">
+      <div class="phase-key">
+        <span class="eyebrow">Phase 0 · new</span>
+        <span class="name">Reclaim &amp; stabilise</span>
+      </div>
+      <ul>
+        <li class="done">Checkpoint branch committed — <code>e5ee63e7</code>, full restore point</li>
+        <li class="done">Canonical inventory database built — <code>.ai/inventory/inventory.db</code></li>
+        <li>Delete four snapshot folders after harvesting their audit artifacts — <b>2,414 MB</b></li>
+        <li>Investigate <code>_EBDESIGN_LIBRARY</code>: 996 files occupying <b>3,075 MB</b></li>
+        <li>Retire ~60 overlapping scanner scripts superseded by the inventory</li>
+        <li>Regenerate truthpack — clears <b>BLOCKER-1</b></li>
+      </ul>
+    </article>
+
+    <article class="phase">
+      <div class="phase-key">
+        <span class="eyebrow">Phase 1</span>
+        <span class="name">Make it run</span>
+      </div>
+      <ul>
+        <li>Seven path corrections — clears <b>BLOCKER-2</b>, backend boots</li>
+        <li>Fix the <code>${className}.css</code> generator bug — 314 imports resolved</li>
+        <li>Stand up PostgreSQL and Redis</li>
+        <li>Order and de-conflict 773 migrations; resolve 172 duplicate table definitions</li>
+        <li>Execute migrations — clears <b>BLOCKER-3</b></li>
+        <li>Verify: server boots, routes respond, schema matches</li>
+      </ul>
+    </article>
+
+    <article class="phase">
+      <div class="phase-key">
+        <span class="eyebrow">Phase 2</span>
+        <span class="name">Make it true</span>
+      </div>
+      <ul>
+        <li>Map every route against a real database round-trip — the AI Library module, built from <b>observed runtime behaviour</b> rather than filenames</li>
+        <li>Merge the 284 genuine live-tree source duplicates under the merge rule</li>
+        <li>Confirm or refute the frontend-wiring finding; wire what is genuinely unwired</li>
+        <li>Replace 1,040 stub tests with assertions on paths proven in Phase 1</li>
+        <li>Consolidate the three Claude Design canvases into one system</li>
+      </ul>
+    </article>
+
+    <article class="phase">
+      <div class="phase-key">
+        <span class="eyebrow">Phase 3</span>
+        <span class="name">Production hardening</span>
+      </div>
+      <ul>
+        <li>Security audit, compliance gates, load and stress testing</li>
+        <li>Deployment readiness and rollout</li>
+        <li>Then, and only then, the enhancement pass to international standard</li>
+      </ul>
+    </article>
+
+  </div>
+</section>
+
+<section>
+  <h2>On “five days to production”</h2>
+  <p>Not credible, and the plan's own arithmetic shows why. It budgeted 42 hours against 226 services; there are 649. It budgeted nothing for a database that has never run, 773 migrations that have never been ordered, and 1,040 tests that assert nothing.</p>
+  <p><b>No revised date is offered here.</b> A date issued before the database runs once would repeat the error this reconciliation exists to correct. A defensible estimate becomes possible at the end of Phase 1 — and not before.</p>
+</section>
+
+<section>
+  <h2>Standing decisions</h2>
+  <div class="tablewrap decisions">
+    <table>
+      <caption>Decisions carried into execution</caption>
+      <thead><tr><th style="width:3rem">#</th><th>Decision</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td class="num">D1</td><td>Rebuild <b>in place</b>; no new project folder</td><td>Two prior copy-folders produced 19,000 duplicates and zero working features</td></tr>
+        <tr><td class="num">D2</td><td>Delete snapshot folders after harvesting audits</td><td>SHA-256 proves zero unique content; reclaims 2,414 MB</td></tr>
+        <tr><td class="num">D3</td><td>Inventory database is the single source of structural truth</td><td>Replaces ~60 scattered scanner outputs</td></tr>
+        <tr><td class="num">D4</td><td>No completion percentage without a substance measure</td><td>“96% complete” counted files, not behaviour</td></tr>
+        <tr><td class="num">D5</td><td>No production date until the database has run once</td><td>Every prior date was issued against unmeasured assumptions</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <span>Classification: audit-ready</span>
+  <span>Evidence: .ai/inventory/inventory.db · 68,952 files</span>
+  <span>Reconciled 13 Sept 2026</span>
+</footer>
+
+</div>

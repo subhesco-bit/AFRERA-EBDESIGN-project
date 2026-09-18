@@ -1,0 +1,286 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-09-16",
+    "totalModules": 230,
+    "governance": "RFC + Owner approval required for breaking changes"
+  },
+  "modules": {
+    "M001": {
+      "id": "M001",
+      "name": "Platform Core",
+      "owner": "Claude",
+      "status": "VERIFIED_WORKING",
+      "tier": 1,
+      "dependencies": [],
+      "conflicts": [],
+      "aliases": ["platform", "core"],
+      "apiContract": {
+        "baseRoute": "/api/v1/platform",
+        "methods": ["GET", "POST", "PUT"]
+      },
+      "databaseSchema": {
+        "tables": ["platform_config", "platform_features"],
+        "migrations": ["m001_platform_core_schema.sql"]
+      },
+      "services": ["platformCoreService.js"],
+      "routes": ["platformCoreRoutes.js"],
+      "frontendComponents": ["PlatformDashboard.jsx"],
+      "tests": {
+        "unit": { "count": 0, "coverage": 0 },
+        "integration": { "count": 0, "coverage": 0 },
+        "e2e": { "count": 0, "coverage": 0 }
+      },
+      "observability": {
+        "metrics": ["platform_requests", "platform_errors"],
+        "logs": "INFO level",
+        "traces": "Not configured"
+      },
+      "healthCheck": {
+        "endpoint": "/api/v1/platform/health",
+        "interval": "30s"
+      },
+      "roadmap": {
+        "current": "Database execution pending",
+        "next": "Testing + monitoring",
+        "deprecation": null
+      },
+      "lifecycle": {
+        "proposed": "2026-08-24",
+        "implemented": "2026-08-24",
+        "production": "BLOCKED (DB migrations)",
+        "deprecation": null
+      }
+    },
+    "M002": {
+      "id": "M002",
+      "name": "User Management",
+      "owner": "Backend",
+      "status": "PARTIALLY_WORKING",
+      "tier": 1,
+      "dependencies": ["M001", "M026"],
+      "conflicts": [],
+      "aliases": ["users", "user-mgmt"],
+      "apiContract": {
+        "baseRoute": "/api/v1/users",
+        "methods": ["GET", "POST", "PUT", "DELETE"]
+      },
+      "databaseSchema": {
+        "tables": ["users", "user_roles", "user_permissions"],
+        "migrations": []
+      },
+      "services": ["userService.js"],
+      "routes": ["userRoutes.js"],
+      "frontendComponents": ["UserManagement.jsx", "UserProfile.jsx"],
+      "tests": {
+        "unit": { "count": 0, "coverage": 0 },
+        "integration": { "count": 0, "coverage": 0 },
+        "e2e": { "count": 0, "coverage": 0 }
+      },
+      "observability": {
+        "metrics": ["user_creates", "user_updates", "auth_failures"],
+        "logs": "DEBUG level",
+        "traces": "Not configured"
+      },
+      "healthCheck": {
+        "endpoint": "/api/v1/users/health",
+        "interval": "30s"
+      },
+      "roadmap": {
+        "current": "Core CRUD + test coverage",
+        "next": "Advanced user segmentation",
+        "deprecation": null
+      },
+      "lifecycle": {
+        "proposed": "2026-08-24",
+        "implemented": "2026-08-24",
+        "production": "BLOCKED (Auth audit + Tests)",
+        "deprecation": null
+      },
+      "blockers": [
+        "CRITICAL: Authentication system audit (plaintext passwords)",
+        "Unit tests not written",
+        "User validation incomplete"
+      ]
+    },
+    "M003": {
+      "id": "M003",
+      "name": "Organization Management",
+      "owner": "Backend",
+      "status": "PARTIALLY_WORKING",
+      "tier": 1,
+      "dependencies": ["M001", "M002"],
+      "conflicts": [],
+      "aliases": ["orgs", "org-mgmt"],
+      "apiContract": {
+        "baseRoute": "/api/v1/organizations",
+        "methods": ["GET", "POST", "PUT", "DELETE"]
+      },
+      "databaseSchema": {
+        "tables": ["organizations", "org_members"],
+        "migrations": []
+      },
+      "services": ["organizationService.js"],
+      "routes": ["organizationRoutes.js"],
+      "frontendComponents": ["OrganizationManagement.jsx"],
+      "tests": {
+        "unit": { "count": 0, "coverage": 0 },
+        "integration": { "count": 0, "coverage": 0 },
+        "e2e": { "count": 0, "coverage": 0 }
+      },
+      "observability": {
+        "metrics": ["org_creates", "org_updates"],
+        "logs": "INFO level",
+        "traces": "Not configured"
+      },
+      "healthCheck": {
+        "endpoint": "/api/v1/organizations/health",
+        "interval": "30s"
+      },
+      "roadmap": {
+        "current": "Multi-organization support",
+        "next": "Organization hierarchies",
+        "deprecation": null
+      },
+      "lifecycle": {
+        "proposed": "2026-08-24",
+        "implemented": "2026-08-24",
+        "production": "BLOCKED (Tests + Multi-org logic)",
+        "deprecation": null
+      }
+    },
+    "M026": {
+      "id": "M026",
+      "name": "MFA Service",
+      "owner": "Claude",
+      "status": "SCAFFOLDED",
+      "tier": 1,
+      "dependencies": ["M002"],
+      "conflicts": [],
+      "aliases": ["mfa", "two-factor"],
+      "apiContract": {
+        "baseRoute": "/api/v1/mfa",
+        "methods": ["GET", "POST", "PUT"]
+      },
+      "databaseSchema": {
+        "tables": ["mfa_configs", "mfa_attempts"],
+        "migrations": ["mfa_schema.sql"]
+      },
+      "services": ["mfaService.js"],
+      "routes": ["mfaRoutes.js"],
+      "frontendComponents": ["MFASetup.jsx", "MFAVerify.jsx"],
+      "tests": {
+        "unit": { "count": 0, "coverage": 0 },
+        "integration": { "count": 0, "coverage": 0 },
+        "e2e": { "count": 0, "coverage": 0 }
+      },
+      "observability": {
+        "metrics": ["mfa_enrollments", "mfa_verifications", "mfa_failures"],
+        "logs": "WARN level (security)",
+        "traces": "Security-critical"
+      },
+      "healthCheck": {
+        "endpoint": "/api/v1/mfa/health",
+        "interval": "30s"
+      },
+      "roadmap": {
+        "current": "TOTP + SMS implementation",
+        "next": "Biometric support",
+        "deprecation": null
+      },
+      "lifecycle": {
+        "proposed": "2026-09-16",
+        "implemented": "2026-09-16",
+        "production": "BLOCKED (DB migrations + Tests)",
+        "deprecation": null
+      }
+    },
+    "M201": {
+      "id": "M201",
+      "name": "Claude AI Coordinator",
+      "owner": "Claude",
+      "status": "VERIFIED_WORKING",
+      "tier": 5,
+      "dependencies": [],
+      "conflicts": [],
+      "aliases": ["ai-coordinator", "claude-ai"],
+      "apiContract": {
+        "baseRoute": "/api/v1/ai/coordinator",
+        "methods": ["POST", "GET"]
+      },
+      "databaseSchema": {
+        "tables": ["ai_coordinator_state", "ai_decisions"],
+        "migrations": ["unified_ai_schema.sql"]
+      },
+      "services": ["claudeAICoordinator.js"],
+      "routes": ["aiCoordinatorRoutes.js"],
+      "frontendComponents": ["AIChat.jsx", "AICollaborationDashboard.jsx"],
+      "tests": {
+        "unit": { "count": 0, "coverage": 0 },
+        "integration": { "count": 0, "coverage": 0 },
+        "e2e": { "count": 0, "coverage": 0 }
+      },
+      "observability": {
+        "metrics": ["ai_requests", "ai_decisions", "ai_latency"],
+        "logs": "DEBUG level",
+        "traces": "Full tracing enabled"
+      },
+      "healthCheck": {
+        "endpoint": "/api/v1/ai/coordinator/health",
+        "interval": "10s"
+      },
+      "roadmap": {
+        "current": "Devin-Claude coordination",
+        "next": "Multi-agent orchestration",
+        "deprecation": null
+      },
+      "lifecycle": {
+        "proposed": "2026-09-16",
+        "implemented": "2026-09-16",
+        "production": "BLOCKED (DB migrations + Tests)",
+        "deprecation": null
+      }
+    }
+  },
+  "governance": {
+    "lifecycle": {
+      "proposal": "RFC + owner approval",
+      "implementation": "Code review + tests (>80% coverage)",
+      "testing": "Unit + integration + E2E required",
+      "production": "Security audit + performance baseline",
+      "deprecation": "6-month notice + migration path"
+    },
+    "changePolicy": {
+      "breaking": "RFC required, all stakeholders notified",
+      "major": "Owner approval + changelog entry",
+      "minor": "Code review only",
+      "patch": "Auto-merge if tests pass"
+    },
+    "ownership": {
+      "assignment": "Owner assigned at proposal phase",
+      "transfer": "Explicit RFC + both parties agree",
+      "conflicts": "Architecture team resolves"
+    }
+  },
+  "statistics": {
+    "byStatus": {
+      "VERIFIED_WORKING": 6,
+      "PARTIALLY_WORKING": 15,
+      "SCAFFOLDED": 40,
+      "DOCUMENTED_ONLY": 80,
+      "DISCONNECTED": 5,
+      "DUPLICATED": 4,
+      "BLOCKED": 10
+    },
+    "byTier": {
+      "tier1": 30,
+      "tier2": 40,
+      "tier3": 40,
+      "tier4": 40,
+      "tier5": 30,
+      "tier6": 50
+    },
+    "testCoverage": 0,
+    "docCoverage": 45
+  }
+}

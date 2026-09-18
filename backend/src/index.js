@@ -285,6 +285,16 @@ app.use(rateLimit);
 // when directory discovery is running in degraded mode.
 app.use('/api/v1/operational-modules', operationalModuleRoutes);
 
+// M007 Role & Permission Management (AI-enhanced) lives under
+// backend/src/modules/M007/routes.js, not backend/src/routes/, so
+// DynamicRouteLoader's routesDir walk does not discover it. RolePermissionPage.jsx's
+// rolePermissionAPI client depends on this mount (listPermissions/getPermissionMatrix/
+// getRoleHierarchy/recommendRoleForUser). Ported from
+// origin/claude/keen-gates-663i5d commit 62b67035 ("mount M007 role-permission
+// module") during the multi-branch consolidation — distinct prefix from
+// roleManagementRoutes.js's existing /api/rolemanagement mount, no collision.
+app.use('/api/v1/role-permission', require('./modules/M007/routes'));
+
 async function startup() {
   try {
     const startTime = Date.now();

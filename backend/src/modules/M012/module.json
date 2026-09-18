@@ -1,0 +1,44 @@
+{
+  "moduleId": "M012",
+  "version": "0.1.0",
+  "name": "M012 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "platform",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m012",
+      "backend",
+      "Identity"
+    ],
+    "capabilities": [
+      "login",
+      "register",
+      "refreshToken",
+      "logout",
+      "detectLoginAnomaly",
+      "createSession",
+      "validateSession",
+      "invalidateSession",
+      "invalidateAllUserSessions",
+      "recordDeviceFingerprint",
+      "getUserDevices",
+      "logSecurityEvent"
+    ],
+    "aiContext": "backend module M012; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

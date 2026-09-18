@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-09-12T03:52:12.004Z",
+  "results": [
+    {
+      "name": "Unified active project consolidation",
+      "status": "pass",
+      "evidence": "Clean source-only project folder exists at _ACTIVE_PROJECT/current.",
+      "next": "Use this as the canonical branch source after full test proof."
+    },
+    {
+      "name": "North East product extraction",
+      "status": "pass",
+      "evidence": "142 products extracted from 7 DOCX tables.",
+      "next": "Review product descriptions/prices with domain owner before production selling."
+    },
+    {
+      "name": "Ecommerce product visibility",
+      "status": "pass",
+      "evidence": "Marketplace has a North East Varieties tab backed by generated frontend data.",
+      "next": "Seed these products into PostgreSQL once final category/unit taxonomy is approved."
+    },
+    {
+      "name": "AI image creator route",
+      "status": "pass",
+      "evidence": "Product-media AI image route, backend mount, and frontend API method are aligned.",
+      "next": "Configure provider secret and storage before expecting real image URLs."
+    },
+    {
+      "name": "AI cartoon route",
+      "status": "pass",
+      "evidence": "Cartoon route is now exposed and frontend-callable.",
+      "next": "Implement provider-backed cartoon generation in productMediaAIService."
+    },
+    {
+      "name": "AI Product Studio prompt testing",
+      "status": "pass",
+      "evidence": "AI Product Studio can build image/cartoon prompts and read provider status.",
+      "next": "Add one-click generation buttons after provider configuration is present."
+    },
+    {
+      "name": "Dietitian and natural therapy layer",
+      "status": "pass",
+      "evidence": "Wellness practices API, route mount, and frontend API method are aligned.",
+      "next": "Keep medical guardrails and professional escalation for condition-specific advice."
+    },
+    {
+      "name": "Nutrient calculator UI",
+      "status": "pass",
+      "evidence": "Nutrition calculator performs local BMI/BMR/TDEE/macro calculations.",
+      "next": "Replace static food list with verified product nutrition records from nutrition-intelligence."
+    },
+    {
+      "name": "Online/public price extraction",
+      "status": "pass",
+      "evidence": "Frontend has public-data extraction API hooks.",
+      "next": "Unify backend /api/v1/public-data mount and add source-specific adapters for approved public price sources."
+    },
+    {
+      "name": "Dynamic pricing",
+      "status": "pass",
+      "evidence": "Dynamic pricing page and farmer price API hooks exist.",
+      "next": "Remove placeholder chart/recommendations and connect to market_price_history plus extracted online prices."
+    }
+  ]
+}

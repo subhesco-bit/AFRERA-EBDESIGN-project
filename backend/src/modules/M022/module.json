@@ -1,0 +1,44 @@
+{
+  "moduleId": "M022",
+  "version": "0.1.0",
+  "name": "M022 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "agriculture",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m022",
+      "backend",
+      "Farmer"
+    ],
+    "capabilities": [
+      "createProfile",
+      "getProfile",
+      "getProfileByFarmerId",
+      "listProfiles",
+      "updateProfile",
+      "addContactInfo",
+      "addHouseholdMember",
+      "addSkill",
+      "enrichProfile",
+      "analyzeProfileCompleteness",
+      "getFullProfile",
+      "generateId"
+    ],
+    "aiContext": "backend module M022; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}
