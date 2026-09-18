@@ -1,4 +1,4 @@
-const db = require('../../database/pool');
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
 const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 

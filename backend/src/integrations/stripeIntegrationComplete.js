@@ -3,24 +3,12 @@
  * Handles all Stripe payment operations
  */
 
+const Stripe = require('stripe');
 const db = require('../database/connection');
 const { logger } = require('../utils/logger');
 const { sendEmail } = require('../services/emailService');
 
-// 2026-09-16: was `new Stripe(process.env.STRIPE_SECRET_KEY)` unconditionally
-// at module load - the Stripe SDK throws synchronously with no key
-// configured, which would crash the whole server the moment anything
-// required this file (the exact bug already found and fixed in
-// stripeWebhookRoutes.js). Not currently required anywhere, so it wasn't
-// live, but the next thing to wire it up would have reintroduced the same
-// crash. Matches the guarded pattern paymentService.js already uses for
-// its own Stripe/Razorpay clients. `stripe` stays null when unconfigured;
-// every method below already wraps its call in try/catch, so a null
-// `stripe` surfaces as one clear, per-request TypeError instead of taking
-// the process down.
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
-  : null;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 class StripeIntegrationComplete {
   // Create payment intent

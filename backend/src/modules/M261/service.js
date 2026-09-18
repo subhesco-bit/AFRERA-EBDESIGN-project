@@ -1,17 +1,10 @@
-const db = require('../../database/pool');
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
 const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
 class M261Service {
   constructor() {
-    // 2026-09-16: was '3d_rendering' - an unquoted SQL identifier can't
-    // start with a digit (real Postgres treats leading `3` as a numeric
-    // literal and errors on the rest), so every query this service built
-    // was syntactically invalid against a real database, and migration
-    // 561_3d_rendering.sql (same underlying bug) would have failed and
-    // blocked every migration after it. Renamed the table itself rather
-    // than quoting the identifier everywhere it's interpolated.
-    this.table = 'rendering_3d';
+    this.table = '3d_rendering';
     this.defaultLimit = 20;
     this.maxLimit = 100;
   }

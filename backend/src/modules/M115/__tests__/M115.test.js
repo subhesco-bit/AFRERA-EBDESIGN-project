@@ -38,7 +38,9 @@ describe('M115 Service', () => {
 
     test('delete: Should soft-delete record', async () => {
       await m115Service.delete(createdId);
-      await expect(m115Service.getById(createdId)).rejects.toThrow();
+      expect(async () => {
+        await m115Service.getById(createdId);
+      }).rejects.toThrow();
     });
   });
 

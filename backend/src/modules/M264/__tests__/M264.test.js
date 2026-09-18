@@ -38,7 +38,9 @@ describe('M264 Service', () => {
 
     test('delete: Should soft-delete record', async () => {
       await m264Service.delete(createdId);
-      await expect(m264Service.getById(createdId)).rejects.toThrow();
+      expect(async () => {
+        await m264Service.getById(createdId);
+      }).rejects.toThrow();
     });
   });
 

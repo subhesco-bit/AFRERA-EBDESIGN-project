@@ -6,26 +6,12 @@
 
 const express = require('express');
 const router = express.Router();
+// The Stripe SDK throws at construction time if no key is configured
+// (unlike this codebase's other SDK clients), which would otherwise crash
+// the whole server on boot whenever STRIPE_SECRET_KEY is unset.
+const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 
 const { logger } = require('../utils/logger');
-
-// Initialize Stripe client.
-//
-// The Stripe SDK constructor throws synchronously when no API key is
-// provided ("Neither apiKey nor config.authenticator provided"), so
-// constructing it unconditionally at module load time crashed the entire
-// server on boot whenever STRIPE_SECRET_KEY wasn't set - unlike every other
-// optional integration in this codebase (Twilio, OFFLINE_PAYMENT_SECRET,
-// SYNC_SECRET), which logs a warning and degrades gracefully. This mirrors
-// that pattern: the client is only constructed when a key is present, and
-// the webhook handler below returns 503 rather than throwing when it isn't.
-let stripe;
-if (process.env.STRIPE_SECRET_KEY) {
-  // eslint-disable-next-line global-require
-  stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-} else {
-  logger.warn('STRIPE_SECRET_KEY not configured, Stripe webhook endpoint will run in disabled mode');
-}
 
 /**
  * Raw body middleware for Stripe webhook signature verification
@@ -38,7 +24,7 @@ const express_raw = require('body-parser').raw({ type: 'application/json' });
  */
 router.post('/stripe-webhook', express_raw, async (req, res) => {
   if (!stripe) {
-    return res.status(503).json({ error: 'Stripe is not configured on this server' });
+    return res.status(503).json({ success: false, error: 'Stripe is not configured' });
   }
 
   const sig = req.headers['stripe-signature'];

@@ -36,11 +36,7 @@ const { logger } = require('../utils/logger');
 const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
-// 2026-09-15: see pigRoutes_merged.js for the full explanation - this is the
-// same "protectLivestockRouter is not a function" bug (livestockRouteSupport.js
-// is a scaffold stub, not a real function), fixed the same already-proven way
-// goatRoutes.js/animalHealthRoutes.js fixed it: skip the call, keep authMiddleware.
-// protectLivestockRouter(router);
+protectLivestockRouter(router);
 
 router.use(authMiddleware);
 router.use(apiLimiter);

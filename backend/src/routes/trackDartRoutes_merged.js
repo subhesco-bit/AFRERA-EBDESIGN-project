@@ -36,18 +36,7 @@ async function trackOneKey(key) {
     return { queriedKey: trimmed, matchType: 'vehicle_registration', vehicle: byVehicle.rows[0], note: 'This schema does not link shipments to a vehicle directly, so no shipment history is attached here.' };
   }
 
-  return { queriedKey: trimmed, matchType: 'not_found', shipment: null };
-}
-
-// 2026-09-15: the closing brace above used to be missing - trackOneKey's
-// body ran straight into this router.get('/', ...) call (only a lone CR,
-// not a real newline+brace, separated them), same bug shape as
-// seedVaultRoutes_merged.js/unifiedAIRoutes_merged.js (see those files
-// for the full writeup). Since trackOneKey is only ever invoked via
-// keyList.map(trackOneKey) below, and this was the router's only route,
-// node -c and require() both stayed silent - the router loaded fine and
-// exported a real Express router, it just had zero routes registered.
-router.get('/', authMiddleware, async (req, res) => {
+  return { queriedKey: trimmed, matchType: 'not_found', shipment: null };router.get('/', authMiddleware, async (req, res) => {
   try {
     const { keys } = req.query;
     if (!keys) return res.status(400).json({ success: false, error: 'keys query parameter is required (comma-separated for multi-query)' });
@@ -61,5 +50,8 @@ router.get('/', authMiddleware, async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 });
+
+
+}
 
 module.exports = router;
