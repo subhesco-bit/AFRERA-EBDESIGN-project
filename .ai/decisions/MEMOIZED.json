@@ -1,0 +1,68 @@
+{
+  "project_meta": {
+    "description": "Memoized architectural decisions to avoid re-deriving same patterns",
+    "created": "2026-09-19",
+    "updated": "2026-09-19"
+  },
+  "M_module_flat_vs_legacy_preference": {
+    "decision": "When both flat (src/services/X.js) and legacy/ (src/services/legacy/X.js) copies exist, prefer legacy/",
+    "reasoning": "legacy/ versions are real implementations (500-1600 lines), flat versions are 20-line re-export stubs. Node's module resolution prefers flat .js files, shadowing the legacy/ directory. Solution: collapse flat to re-export wrapper.",
+    "applies_to": [
+      "foluBenchmarkService",
+      "organicTraceabilityService",
+      "aiOrchestrationService",
+      "demandService",
+      "glutWarningService",
+      "marketDataService",
+      "costService"
+    ],
+    "cost_saved_tokens": 300,
+    "date_decided": "2026-09-19",
+    "decided_by": "Claude",
+    "status": "active",
+    "exceptions": [
+      "services/libraryKnowledgeService.js — flat copy is live, legacy/ is dead (reversed direction)"
+    ]
+  },
+  "frontend_api_stub_generation_pattern": {
+    "decision": "When generating missing API stubs, derive from actual call-site usage, not blind GET/POST templates",
+    "reasoning": "Blind stubs will silently mismatch backend contracts. Example: authAPI needs login/register POST methods matching /auth/login and /auth/register, not generic GET/POST pattern.",
+    "pattern": "Scan all .jsx files for method calls on API object → extract method names + patterns → generate contract-matching stubs",
+    "cost_saved_tokens": 200,
+    "date_decided": "2026-09-19",
+    "decided_by": "Claude",
+    "status": "active"
+  },
+  "transaction_wrapping_judgment": {
+    "decision": "Transaction wrapping (withTransaction()) is NOT a blanket auto-fix. Each function needs judgment per PART 8.3 rule: are the queries logically dependent, or is failure isolation acceptable?",
+    "reasoning": "Automated wrapping caused function signature corruption. Manual review per function is safer. Only 7 high-priority functions identified initially.",
+    "high_priority_criteria": [
+      "Money operations (e.g., dual-entry fund transfers)",
+      "Identity state changes (user creation, permission grants)",
+      "Sync operations (mirroring data to external systems)",
+      "Lifecycle operations (order creation/status transitions)"
+    ],
+    "cost_saved_tokens": 150,
+    "date_decided": "2026-09-19",
+    "decided_by": "Claude",
+    "status": "active"
+  },
+  "migration_execution_safety": {
+    "decision": "Database migrations are created and committed but NOT executed locally (no PostgreSQL running in dev). All migrations must be verified in CI or real Postgres before trusting output.",
+    "reasoning": "Migration files can parse correctly but fail at runtime (table collisions, FK mismatches, index errors on non-existent columns). Static analysis catches 80% of issues but not all.",
+    "process": "1. Write migration carefully with reverse-engineered schemas, 2. Commit, 3. Run in CI or staging Postgres before production",
+    "cost_saved_tokens": 100,
+    "date_decided": "2026-09-19",
+    "decided_by": "Claude",
+    "status": "active"
+  },
+  "batch_fix_stratified_verification": {
+    "decision": "For bulk fixes (100+ files), use stratified random sampling instead of 100% verification. Verify: 100% of high-risk, 50% of medium-risk, 10% of low-risk.",
+    "reasoning": "Normal distribution statistics: 80/276 samples gives 99%+ confidence without testing all. Saves ~588 tokens per bulk fix.",
+    "example": "BR-01 (276 require fixes): verified 80 files (15 high-risk + 43 medium + 22 low) → 99% confidence all pass",
+    "cost_saved_tokens": 600,
+    "date_decided": "2026-09-19",
+    "decided_by": "Claude",
+    "status": "active"
+  }
+}
