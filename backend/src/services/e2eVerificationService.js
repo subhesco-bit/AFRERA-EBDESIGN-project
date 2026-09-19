@@ -1,5 +1,5 @@
 const crypto=require('crypto');
-const {getPostgreSQL}=require('../database');
+const {getPostgreSQL}=require('../database/connection');
 class E2EVerificationService{
  constructor(){this.db=getPostgreSQL();}
  async start(input){const id=crypto.randomUUID(), correlationId=input.correlationId||crypto.randomUUID();const q=await this.db.query(`INSERT INTO e2e_flow_runs (id,correlation_id,flow_type,status,metadata) VALUES ($1,$2,$3,'started',$4) RETURNING *`,[id,correlationId,input.flowType||'village_to_settlement',JSON.stringify(input)]);return q.rows[0];}

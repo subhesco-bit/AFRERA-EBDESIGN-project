@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { getPostgreSQL } = require('../database');
+const { getPostgreSQL } = require('../database/connection');
 const id = () => crypto.randomUUID();
 
 class PredictiveOptimizationService {

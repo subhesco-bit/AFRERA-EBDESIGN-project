@@ -14,7 +14,7 @@
  *
  * (M11) Split from the former single-file services/advancedAIService.js into
  * this directory, purely for code organization - behavior is unchanged. Node
- * module resolution treats `require('./services/advancedAIService')` as
+ * module resolution treats `require('../legacy/advancedAIService')` as
  * `./services/advancedAIService.js` OR `./services/advancedAIService/index.js`,
  * whichever exists, so every existing caller anywhere in the codebase
  * continues to resolve here identically, unchanged.

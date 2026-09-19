@@ -2,7 +2,7 @@ const express=require('express');
 const crypto=require('crypto');
 const router=express.Router();
 const hardening=require('../services/m051m100ProductionHardeningService');
-const {getPostgreSQL}=require('../database');
+const {getPostgreSQL}=require('../database/connection');
 const {authMiddleware}=require('../middleware/auth');
 router.use(authMiddleware);
 router.get('/',(req,res)=>res.json({success:true,modules:hardening.list()}));

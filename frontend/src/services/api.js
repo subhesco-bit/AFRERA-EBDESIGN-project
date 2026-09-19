@@ -6,7 +6,7 @@ import axios from 'axios';
  */
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
   headers: {
@@ -4121,7 +4121,7 @@ export const visionAPI = {
   manageVision: (data) => api.post('/vision/manage', data),
 };
 
-export void visualizationAPI = {
+export const visualizationAPI = {
   getVisualization: () => api.get('/visualization'),
   manageVisualization: (data) => api.post('/visualization/manage', data),
 };
@@ -4131,7 +4131,7 @@ export const viticultureAPI = {
   manageViticulture: (data) => api.post('/viticulture/manage', data),
 };
 
-export const void warehouseAPI2 = {
+export const warehouseAPI2 = {
   getWarehouse: () => api.get('/warehouse'),
   manageWarehouse: (data) => api.post('/warehouse/manage', data),
 };
@@ -4211,7 +4211,7 @@ export const zooAPI = {
   manageZoo: (data) => api.post('/zoo/manage', data),
 };
 
-export default api;
+export const jurisdictionAPI = {
   getJurisdictions: () => api.get('/jurisdictions'),
   getJurisdiction: (id) => api.get(`/jurisdictions/${id}`),
 };
@@ -5316,3 +5316,1040 @@ export const warningAPI = {
   resetWarningMetrics: () => api.post('/warnings/metrics/reset'),
   getWarningHealth: () => api.get('/warnings/health'),
 };
+
+export default api;
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+};
+
+// --- Added: previously-missing API stubs referenced by pages. ---
+// Generated to match this file's existing get/post stub convention (base resource path
+// derived from the API name, sub-path derived from each method name); not individually
+// verified against a specific backend route contract, same as the file's pre-existing entries.
+export const blockchainTraceabilityAPI = {
+  getTraceabilityEvents: (params) => api.get('/blockchain-traceability/traceability-events', { params }),
+  verifyChainOfCustody: (data) => api.post('/blockchain-traceability/verify-chain-of-custody', data),
+};
+
+export const climateMonitoringAPI = {
+  getStatus: (params) => api.get('/climate-monitoring/status', { params }),
+  getAlerts: (params) => api.get('/climate-monitoring/alerts', { params }),
+  getDroughtData: (params) => api.get('/climate-monitoring/drought-data', { params }),
+  getFloodData: (params) => api.get('/climate-monitoring/flood-data', { params }),
+  generateReport: (data) => api.post('/climate-monitoring/report', data),
+};
+
+export const competitorAPI = {
+  observe: (params) => api.get('/competitor/observe', { params }),
+  position: (params) => api.get('/competitor/position', { params }),
+};
+
+export const decisionEngineAPI = {
+  getStatus: (params) => api.get('/decision-engine/status', { params }),
+  getActiveDecisions: (params) => api.get('/decision-engine/active-decisions', { params }),
+  getDecisionHistory: (params) => api.get('/decision-engine/decision-history', { params }),
+  getRules: (params) => api.get('/decision-engine/rules', { params }),
+  evaluateDecision: (data) => api.post('/decision-engine/evaluate-decision', data),
+  createRule: (data) => api.post('/decision-engine/rule', data),
+  updateRule: (data) => api.post('/decision-engine/rule', data),
+  deleteRule: (data) => api.post('/decision-engine/rule', data),
+  triggerDecision: (data) => api.post('/decision-engine/decision', data),
+};
+
+export const enterpriseMemoryAPI = {
+  getCases: (params) => api.get('/enterprise-memory/cases', { params }),
+  getLearningInsights: (params) => api.get('/enterprise-memory/learning-insights', { params }),
+  getKnowledgeGraph: (params) => api.get('/enterprise-memory/knowledge-graph', { params }),
+  searchCases: (params) => api.get('/enterprise-memory/cases', { params }),
+  createCase: (data) => api.post('/enterprise-memory/case', data),
+  updateCase: (data) => api.post('/enterprise-memory/case', data),
+};
+
+export const erpDashboardAPI = {
+  getDashboard: (params) => api.get('/erp-dashboard/dashboard', { params }),
+  getSyncStatus: (params) => api.get('/erp-dashboard/sync-status', { params }),
+  getGLEntries: (params) => api.get('/erp-dashboard/glentries', { params }),
+  getReconciliation: (params) => api.get('/erp-dashboard/reconciliation', { params }),
+  getFinancialReports: (params) => api.get('/erp-dashboard/financial-reports', { params }),
+  triggerSync: (data) => api.post('/erp-dashboard/sync', data),
+  resolveConflict: (data) => api.post('/erp-dashboard/resolve-conflict', data),
+};
+
+export const farmerTrainingAPI = {
+  getCarbonFootprint: (params) => api.get('/farmer-training/carbon-footprint', { params }),
+  getPrograms: (params) => api.get('/farmer-training/programs', { params }),
+  register: (data) => api.post('/farmer-training/register', data),
+};
+
+export const farmersAPI = {
+  getProductsForCompare: (params) => api.get('/farmers/products-for-compare', { params }),
+  getMarketComparisonData: (params) => api.get('/farmers/market-comparison-data', { params }),
+  getFarmer: (params) => api.get('/farmers/farmer', { params }),
+  getFeaturedProducts: (params) => api.get('/farmers/featured-products', { params }),
+  getTrendingProducts: (params) => api.get('/farmers/trending-products', { params }),
+  getDiscoverCategories: (params) => api.get('/farmers/discover-categories', { params }),
+  getRegions: (params) => api.get('/farmers/regions', { params }),
+  getPriceDynamics: (params) => api.get('/farmers/price-dynamics', { params }),
+  getDemandForecast: (params) => api.get('/farmers/demand-forecast', { params }),
+  getPriceSignals: (params) => api.get('/farmers/price-signals', { params }),
+  getAdvisoryContext: (params) => api.get('/farmers/advisory-context', { params }),
+  getQuickQuestions: (params) => api.get('/farmers/quick-questions', { params }),
+  getFields: (params) => api.get('/farmers/fields', { params }),
+  deleteField: (data) => api.post('/farmers/field', data),
+  getFarmerDashboard: (params) => api.get('/farmers/farmer-dashboard', { params }),
+  getNotifications: (params) => api.get('/farmers/notifications', { params }),
+  calculateFDI: (params) => api.get('/farmers/fdi', { params }),
+  getCategories: (params) => api.get('/farmers/categories', { params }),
+  createListing: (data) => api.post('/farmers/listing', data),
+  getHarvestPlans: (params) => api.get('/farmers/harvest-plans', { params }),
+  getHarvestScore: (params) => api.get('/farmers/harvest-score', { params }),
+  getScoreHistory: (params) => api.get('/farmers/score-history', { params }),
+  getBenchmarks: (params) => api.get('/farmers/benchmarks', { params }),
+  getPreOrders: (params) => api.get('/farmers/pre-orders', { params }),
+  getBenchmarkPrices: (params) => api.get('/farmers/benchmark-prices', { params }),
+  getMarketConditions: (params) => api.get('/farmers/market-conditions', { params }),
+  savePricingModel: (data) => api.post('/farmers/pricing-model', data),
+  getMarketPrices: (params) => api.get('/farmers/market-prices', { params }),
+  getPriceTrends: (params) => api.get('/farmers/price-trends', { params }),
+  getStates: (params) => api.get('/farmers/states', { params }),
+  getPriceCategories: (params) => api.get('/farmers/price-categories', { params }),
+  getTimingRecommendations: (params) => api.get('/farmers/timing-recommendations', { params }),
+  getPriceSeasonality: (params) => api.get('/farmers/price-seasonality', { params }),
+  getMarketEvents: (params) => api.get('/farmers/market-events', { params }),
+  getCropSuggestions: (params) => api.get('/farmers/crop-suggestions', { params }),
+};
+
+export const fertilityManagementAPI = {
+  getRecords: (params) => api.get('/fertility-management/records', { params }),
+  createRecord: (data) => api.post('/fertility-management/record', data),
+  updateRecord: (data) => api.post('/fertility-management/record', data),
+  deleteRecord: (data) => api.post('/fertility-management/record', data),
+};
+
+export const foluAPI = {
+  landUseSummary: (data) => api.post('/folu/land-use-summary', data),
+  schemeStatus: (data) => api.post('/folu/scheme-status', data),
+};
+
+export const foluBenchmarkAPI = {
+  listTransitions: (params) => api.get('/folu-benchmark/transitions', { params }),
+  getBenchmarkReport: (params) => api.get('/folu-benchmark/benchmark-report', { params }),
+};
+
+export const formsAPI = {
+  getForms: (params) => api.get('/forms/forms', { params }),
+  updateForm: (data) => api.post('/forms/form', data),
+  createForm: (data) => api.post('/forms/form', data),
+  submitForm: (data) => api.post('/forms/form', data),
+};
+
+export const freightPoolingAPI = {
+  findPoolableShipments: (params) => api.get('/freight-pooling/poolable-shipments', { params }),
+  createPoolWindow: (data) => api.post('/freight-pooling/pool-window', data),
+  listOpenWindows: (params) => api.get('/freight-pooling/open-windows', { params }),
+  getPoolWindow: (params) => api.get('/freight-pooling/pool-window', { params }),
+  joinPoolWindow: (data) => api.post('/freight-pooling/pool-window', data),
+  closeAndDispatch: (data) => api.post('/freight-pooling/and-dispatch', data),
+};
+
+export const glutWarningAPI = {
+  checkGlutRisk: (params) => api.get('/glut-warning/glut-risk', { params }),
+  scanAllCategories: (data) => api.post('/glut-warning/all-categories', data),
+};
+
+export const goatAIAPI = {
+  optimizeGoatMilkProduction: (data) => api.post('/goat-ai/goat-milk-production', data),
+  monitorGoatHealth: (data) => api.post('/goat-ai/goat-health', data),
+  optimizeGoatFeed: (data) => api.post('/goat-ai/goat-feed', data),
+  recommendGoatBreeding: (data) => api.post('/goat-ai/goat-breeding', data),
+};
+
+export const goatAPI = {
+  listHerd: (params) => api.get('/goat/herd', { params }),
+  listMilkProduction: (params) => api.get('/goat/milk-production', { params }),
+  getHerdPerformance: (params) => api.get('/goat/herd-performance', { params }),
+  getBreedingAlerts: (params) => api.get('/goat/breeding-alerts', { params }),
+  getVaccinationAlerts: (params) => api.get('/goat/vaccination-alerts', { params }),
+  updateAnimal: (data) => api.post('/goat/animal', data),
+  createAnimal: (data) => api.post('/goat/animal', data),
+  deleteAnimal: (data) => api.post('/goat/animal', data),
+  recordMilkProduction: (data) => api.post('/goat/milk-production', data),
+  recordFeedConsumption: (data) => api.post('/goat/feed-consumption', data),
+  recordBreeding: (data) => api.post('/goat/breeding', data),
+};
+
+export const governmentAPI = {
+  getSchemeAnalytics: (params) => api.get('/government/scheme-analytics', { params }),
+  getComplianceStatus: (params) => api.get('/government/compliance-status', { params }),
+};
+
+export const governmentSchemeAPI = {
+  getWeatherAlerts: (params) => api.get('/government-scheme/weather-alerts', { params }),
+  getAnnouncements: (params) => api.get('/government-scheme/announcements', { params }),
+  getCsrOpportunities: (params) => api.get('/government-scheme/csr-opportunities', { params }),
+};
+
+export const informationSharingAPI = {
+  getDocuments: (params) => api.get('/information-sharing/documents', { params }),
+  getDocument: (params) => api.get('/information-sharing/document', { params }),
+  searchDocuments: (params) => api.get('/information-sharing/documents', { params }),
+  createDocument: (data) => api.post('/information-sharing/document', data),
+  updateDocument: (data) => api.post('/information-sharing/document', data),
+  deleteDocument: (data) => api.post('/information-sharing/document', data),
+  getFolders: (params) => api.get('/information-sharing/folders', { params }),
+  getFolderTree: (params) => api.get('/information-sharing/folder-tree', { params }),
+  createFolder: (data) => api.post('/information-sharing/folder', data),
+  getPermissions: (params) => api.get('/information-sharing/permissions', { params }),
+  setPermission: (data) => api.post('/information-sharing/permission', data),
+  checkPermission: (params) => api.get('/information-sharing/permission', { params }),
+  createSharingLink: (data) => api.post('/information-sharing/sharing-link', data),
+  accessSharingLink: (data) => api.post('/information-sharing/sharing-link', data),
+  getCollaborationSessions: (params) => api.get('/information-sharing/collaboration-sessions', { params }),
+  createCollaborationSession: (data) => api.post('/information-sharing/collaboration-session', data),
+  joinCollaborationSession: (data) => api.post('/information-sharing/collaboration-session', data),
+  endCollaborationSession: (data) => api.post('/information-sharing/collaboration-session', data),
+  generateAIRecommendations: (data) => api.post('/information-sharing/airecommendations', data),
+  getActivityLogs: (params) => api.get('/information-sharing/activity-logs', { params }),
+  getAnalytics: (params) => api.get('/information-sharing/analytics', { params }),
+  getHealthStatus: (params) => api.get('/information-sharing/health-status', { params }),
+};
+
+export const irrigationAPI = {
+  getSchedules: (params) => api.get('/irrigation/schedules', { params }),
+  getWaterSources: (params) => api.get('/irrigation/water-sources', { params }),
+  updateSchedule: (data) => api.post('/irrigation/schedule', data),
+  createSchedule: (data) => api.post('/irrigation/schedule', data),
+  deleteSchedule: (data) => api.post('/irrigation/schedule', data),
+};
+
+export const labourAPI = {
+  getWorkers: (params) => api.get('/labour/workers', { params }),
+  getAttendance: (params) => api.get('/labour/attendance', { params }),
+  getPayments: (params) => api.get('/labour/payments', { params }),
+  createWorker: (data) => api.post('/labour/worker', data),
+  recordAttendance: (data) => api.post('/labour/attendance', data),
+};
+
+export const logisticsEnhancementAPI = {
+  addVehicle: (data) => api.post('/logistics-enhancement/vehicle', data),
+  getFleet: (params) => api.get('/logistics-enhancement/fleet', { params }),
+  getVehicle: (params) => api.get('/logistics-enhancement/vehicle', { params }),
+  updateVehicle: (data) => api.post('/logistics-enhancement/vehicle', data),
+  scheduleMaintenance: (data) => api.post('/logistics-enhancement/schedule-maintenance', data),
+  updateTracking: (data) => api.post('/logistics-enhancement/tracking', data),
+  getTracking: (params) => api.get('/logistics-enhancement/tracking', { params }),
+  getLiveTracking: (params) => api.get('/logistics-enhancement/live-tracking', { params }),
+  setGeofence: (data) => api.post('/logistics-enhancement/geofence', data),
+  recordTemperature: (data) => api.post('/logistics-enhancement/temperature', data),
+  getTemperatureData: (params) => api.get('/logistics-enhancement/temperature-data', { params }),
+  getTemperatureAlerts: (params) => api.get('/logistics-enhancement/temperature-alerts', { params }),
+  createWarehouse: (data) => api.post('/logistics-enhancement/warehouse', data),
+  getWarehouses: (params) => api.get('/logistics-enhancement/warehouses', { params }),
+  addInventory: (data) => api.post('/logistics-enhancement/inventory', data),
+  getWarehouseInventory: (params) => api.get('/logistics-enhancement/warehouse-inventory', { params }),
+  recordDriverLocation: (data) => api.post('/logistics-enhancement/driver-location', data),
+  getActiveDrivers: (params) => api.get('/logistics-enhancement/active-drivers', { params }),
+  getShipmentTrail: (params) => api.get('/logistics-enhancement/shipment-trail', { params }),
+};
+
+export const marketIntelligenceAPI = {
+  getLatestIntelligence: (params) => api.get('/market-intelligence/latest-intelligence', { params }),
+  createIntelligence: (data) => api.post('/market-intelligence/intelligence', data),
+};
+
+export const medicalCodingAPI = {
+  getMedicalConditionCodes: (params) => api.get('/medical-coding/medical-condition-codes', { params }),
+  getDietaryRestrictions: (params) => api.get('/medical-coding/dietary-restrictions', { params }),
+  getNutrientRequirements: (params) => api.get('/medical-coding/nutrient-requirements', { params }),
+};
+
+export const modulesAPI = {
+  getModules: (params) => api.get('/modules/modules', { params }),
+  getOverview: (params) => api.get('/modules/overview', { params }),
+  askAssistant: (data) => api.post('/modules/ask-assistant', data),
+};
+
+export const nervousSystemAPI = {
+  processEventThroughBrain: (data) => api.post('/nervous-system/event-through-brain', data),
+  getBrainDecisionHistory: (params) => api.get('/nervous-system/brain-decision-history', { params }),
+  getBrainFocus: (params) => api.get('/nervous-system/brain-focus', { params }),
+  startHeartBeat: (data) => api.post('/nervous-system/heart-beat', data),
+  stopHeartBeat: (data) => api.post('/nervous-system/heart-beat', data),
+  getHeartBeatStatus: (params) => api.get('/nervous-system/heart-beat-status', { params }),
+  createNeuralPathway: (data) => api.post('/nervous-system/neural-pathway', data),
+  getNeuralPathways: (params) => api.get('/nervous-system/neural-pathways', { params }),
+  strengthenNeuralPathway: (data) => api.post('/nervous-system/neural-pathway', data),
+  createReflexArc: (data) => api.post('/nervous-system/reflex-arc', data),
+  getReflexArcs: (params) => api.get('/nervous-system/reflex-arcs', { params }),
+  triggerReflex: (data) => api.post('/nervous-system/reflex', data),
+  registerSensor: (data) => api.post('/nervous-system/sensor', data),
+  getSensorData: (params) => api.get('/nervous-system/sensor-data', { params }),
+  getSensorsStatus: (params) => api.get('/nervous-system/sensors-status', { params }),
+  executeMotorFunction: (data) => api.post('/nervous-system/motor-function', data),
+  getActiveMotorFunctions: (params) => api.get('/nervous-system/active-motor-functions', { params }),
+  registerEnterpriseRoute: (data) => api.post('/nervous-system/enterprise-route', data),
+  routeRequest: (data) => api.post('/nervous-system/route-request', data),
+  getOptimalRoute: (params) => api.get('/nervous-system/optimal-route', { params }),
+  deactivateEnterpriseRoute: (data) => api.post('/nervous-system/enterprise-route', data),
+  getNervousSystemHealth: (params) => api.get('/nervous-system/nervous-system-health', { params }),
+};
+
+export const nurseryAPI = {
+  getNurseries: (params) => api.get('/nursery/nurseries', { params }),
+  createNursery: (data) => api.post('/nursery/nursery', data),
+  updateNursery: (data) => api.post('/nursery/nursery', data),
+  deleteNursery: (data) => api.post('/nursery/nursery', data),
+};
+
+export const nutrientValueSalesAPI = {
+  searchByNutrientCriteria: (params) => api.get('/nutrient-value-sales/by-nutrient-criteria', { params }),
+  submitNutrientContent: (data) => api.post('/nutrient-value-sales/nutrient-content', data),
+  issueNutrientCertificate: (data) => api.post('/nutrient-value-sales/nutrient-certificate', data),
+};
+
+export const nutritionIntelligenceAPI = {
+  calculateNutrientProfile: (params) => api.get('/nutrition-intelligence/nutrient-profile', { params }),
+};
+
+export const operationsAPI = {
+  getOverview: (params) => api.get('/operations/overview', { params }),
+};
+
+export const orchardAPI = {
+  getOrchards: (params) => api.get('/orchard/orchards', { params }),
+  updateOrchard: (data) => api.post('/orchard/orchard', data),
+  createOrchard: (data) => api.post('/orchard/orchard', data),
+  deleteOrchard: (data) => api.post('/orchard/orchard', data),
+  recordHarvest: (data) => api.post('/orchard/harvest', data),
+};
+
+export const organicTraceabilityAPI = {
+  getStandards: (params) => api.get('/organic-traceability/standards', { params }),
+  registerFarm: (data) => api.post('/organic-traceability/farm', data),
+  getConsumerTransparency: (params) => api.get('/organic-traceability/consumer-transparency', { params }),
+};
+
+export const organizationManagementAPI = {
+  getAllOrganizations: (params) => api.get('/organization-management/all-organizations', { params }),
+  createOrganization: (data) => api.post('/organization-management/organization', data),
+  deleteOrganization: (data) => api.post('/organization-management/organization', data),
+};
+
+export const paymentGatewayAPI = {
+  getSupportedGateways: (params) => api.get('/payment-gateway/supported-gateways', { params }),
+  processPayment: (data) => api.post('/payment-gateway/payment', data),
+  refundPayment: (data) => api.post('/payment-gateway/payment', data),
+  getPaymentStatus: (params) => api.get('/payment-gateway/payment-status', { params }),
+};
+
+export const pigAIAPI = {
+  optimizeMeatProduction: (data) => api.post('/pig-ai/meat-production', data),
+  monitorPigHealth: (data) => api.post('/pig-ai/pig-health', data),
+  optimizePigFeed: (data) => api.post('/pig-ai/pig-feed', data),
+  recommendPigBreeding: (data) => api.post('/pig-ai/pig-breeding', data),
+};
+
+export const pigAPI = {
+  listHerd: (params) => api.get('/pig/herd', { params }),
+  listWeightRecords: (params) => api.get('/pig/weight-records', { params }),
+  getHerdPerformance: (params) => api.get('/pig/herd-performance', { params }),
+  getBreedingAlerts: (params) => api.get('/pig/breeding-alerts', { params }),
+  getVaccinationAlerts: (params) => api.get('/pig/vaccination-alerts', { params }),
+  getFeedConversionRatio: (params) => api.get('/pig/feed-conversion-ratio', { params }),
+  updateAnimal: (data) => api.post('/pig/animal', data),
+  createAnimal: (data) => api.post('/pig/animal', data),
+  deleteAnimal: (data) => api.post('/pig/animal', data),
+  recordWeight: (data) => api.post('/pig/weight', data),
+  recordFeedConsumption: (data) => api.post('/pig/feed-consumption', data),
+  recordBreeding: (data) => api.post('/pig/breeding', data),
+};
+
+export const platformConfigurationAPI = {
+  getRecommendations: (params) => api.get('/platform-configuration/recommendations', { params }),
+  applyConfiguration: (data) => api.post('/platform-configuration/configuration', data),
+};
+
+export const platformTelemetryAPI = {
+  getStatus: (params) => api.get('/platform-telemetry/status', { params }),
+  getAnalytics: (params) => api.get('/platform-telemetry/analytics', { params }),
+};
+
+export const pondAPI = {
+  getPonds: (params) => api.get('/pond/ponds', { params }),
+  updatePond: (data) => api.post('/pond/pond', data),
+  createPond: (data) => api.post('/pond/pond', data),
+  deletePond: (data) => api.post('/pond/pond', data),
+};
+
+export const poultryAIAPI = {
+  optimizeEggProduction: (data) => api.post('/poultry-ai/egg-production', data),
+  monitorFlockHealth: (data) => api.post('/poultry-ai/flock-health', data),
+  optimizePoultryFeed: (data) => api.post('/poultry-ai/poultry-feed', data),
+  predictMortalityRisk: (data) => api.post('/poultry-ai/mortality-risk', data),
+};
+
+export const preSeasonAPI = {
+  getDashboard: (params) => api.get('/pre-season/dashboard', { params }),
+  createOrder: (data) => api.post('/pre-season/order', data),
+};
+
+export const predictiveAnalyticsAPI = {
+  getForecasts: (params) => api.get('/predictive-analytics/forecasts', { params }),
+  getPredictions: (params) => api.get('/predictive-analytics/predictions', { params }),
+  getUnacknowledgedAlerts: (params) => api.get('/predictive-analytics/unacknowledged-alerts', { params }),
+  getDemandForecast: (params) => api.get('/predictive-analytics/demand-forecast', { params }),
+  getPricingPrediction: (params) => api.get('/predictive-analytics/pricing-prediction', { params }),
+};
+
+export const pricingAPI = {
+  forward: (data) => api.post('/pricing/forward', data),
+  advise: (data) => api.post('/pricing/advise', data),
+};
+
+export const productReviewsAPI = {
+  getStats: (params) => api.get('/product-reviews/stats', { params }),
+};
+
+export const productsAPI = {
+  getProducts: (params) => api.get('/products/products', { params }),
+  requestImage: (data) => api.post('/products/request-image', data),
+  getProduct: (params) => api.get('/products/product', { params }),
+  createProduct: (data) => api.post('/products/product', data),
+  getCategories: (params) => api.get('/products/categories', { params }),
+  getStates: (params) => api.get('/products/states', { params }),
+};
+
+export const projectSystemsAPI = {
+  getProjects: (params) => api.get('/project-systems/projects', { params }),
+  getProjectWbs: (params) => api.get('/project-systems/project-wbs', { params }),
+  getWbsCostRollup: (params) => api.get('/project-systems/wbs-cost-rollup', { params }),
+  getProjectMilestones: (params) => api.get('/project-systems/project-milestones', { params }),
+  getMilestoneStatusSummary: (params) => api.get('/project-systems/milestone-status-summary', { params }),
+  getProjectBudgetVsActual: (params) => api.get('/project-systems/project-budget-vs-actual', { params }),
+  createWbsElement: (data) => api.post('/project-systems/wbs-element', data),
+  updateWbsStatus: (data) => api.post('/project-systems/wbs-status', data),
+  createMilestone: (data) => api.post('/project-systems/milestone', data),
+  completeMilestone: (data) => api.post('/project-systems/milestone', data),
+  updateProjectStatus: (data) => api.post('/project-systems/project-status', data),
+  createProject: (data) => api.post('/project-systems/project', data),
+};
+
+export const publicDataAPI = {
+  listSources: (params) => api.get('/public-data/sources', { params }),
+  registerSource: (data) => api.post('/public-data/source', data),
+  extract: (data) => api.post('/public-data/extract', data),
+};
+
+export const pushNotificationsAPI = {
+  subscribe: (data) => api.post('/push-notifications/subscribe', data),
+  unsubscribe: (data) => api.post('/push-notifications/unsubscribe', data),
+};
+
+export const rolePermissionAPI = {
+  listRoles: (params) => api.get('/role-permission/roles', { params }),
+  listPermissions: (params) => api.get('/role-permission/permissions', { params }),
+  getPermissionMatrix: (params) => api.get('/role-permission/permission-matrix', { params }),
+  getRoleHierarchy: (params) => api.get('/role-permission/role-hierarchy', { params }),
+  createRole: (data) => api.post('/role-permission/role', data),
+  recommendRoleForUser: (data) => api.post('/role-permission/role-for-user', data),
+};
+
+export const schemeRegistryAPI = {
+  list: (params) => api.get('/scheme-registry/list', { params }),
+  getExpiring: (params) => api.get('/scheme-registry/expiring', { params }),
+};
+
+export const securityAccessControlAPI = {
+  getSecurityEvents: (params) => api.get('/security-access-control/security-events', { params }),
+  getIpLists: (params) => api.get('/security-access-control/ip-lists', { params }),
+  calculateSecurityScore: (params) => api.get('/security-access-control/security-score', { params }),
+};
+
+export const seedPlanningAPI = {
+  getPlans: (params) => api.get('/seed-planning/plans', { params }),
+  createPlan: (data) => api.post('/seed-planning/plan', data),
+  updatePlan: (data) => api.post('/seed-planning/plan', data),
+  deletePlan: (data) => api.post('/seed-planning/plan', data),
+};
+
+export const sharedInfraAPI = {
+  searchAssets: (params) => api.get('/shared-infra/assets', { params }),
+  searchSecondLife: (params) => api.get('/shared-infra/second-life', { params }),
+  getRenewableSupport: (params) => api.get('/shared-infra/renewable-support', { params }),
+  registerAsset: (data) => api.post('/shared-infra/asset', data),
+  bookAsset: (data) => api.post('/shared-infra/asset', data),
+};
+
+export const sheepAIAPI = {
+  optimizeWoolProduction: (data) => api.post('/sheep-ai/wool-production', data),
+  monitorSheepHealth: (data) => api.post('/sheep-ai/sheep-health', data),
+  optimizeSheepFeed: (data) => api.post('/sheep-ai/sheep-feed', data),
+  recommendSheepBreeding: (data) => api.post('/sheep-ai/sheep-breeding', data),
+};
+
+export const shgAPI = {
+  getGroups: (params) => api.get('/shg/groups', { params }),
+  getMembers: (params) => api.get('/shg/members', { params }),
+  getSavings: (params) => api.get('/shg/savings', { params }),
+  createGroup: (data) => api.post('/shg/group', data),
+  addMember: (data) => api.post('/shg/member', data),
+  recordSaving: (data) => api.post('/shg/saving', data),
+};
+
+export const soilTestingOpsAPI = {
+  submitSample: (data) => api.post('/soil-testing-ops/sample', data),
+  trackSample: (data) => api.post('/soil-testing-ops/sample', data),
+  getHealthCard: (params) => api.get('/soil-testing-ops/health-card', { params }),
+};
+
+export const sowingAPI = {
+  getRecords: (params) => api.get('/sowing/records', { params }),
+  updateRecord: (data) => api.post('/sowing/record', data),
+  createRecord: (data) => api.post('/sowing/record', data),
+  deleteRecord: (data) => api.post('/sowing/record', data),
+};
+
+export const subsidyOpsAPI = {
+  checkProjectSubsidy: (params) => api.get('/subsidy-ops/project-subsidy', { params }),
+  checkEquipmentSubsidy: (params) => api.get('/subsidy-ops/equipment-subsidy', { params }),
+  checkLogisticsSubsidy: (params) => api.get('/subsidy-ops/logistics-subsidy', { params }),
+  getSchemes: (params) => api.get('/subsidy-ops/schemes', { params }),
+  apply: (data) => api.post('/subsidy-ops/apply', data),
+  track: (data) => api.post('/subsidy-ops/track', data),
+  calculateGst: (params) => api.get('/subsidy-ops/gst', { params }),
+};
+
+export const userManagementAPI = {
+  getSettings: (params) => api.get('/user-management/settings', { params }),
+  getSystemAnalytics: (params) => api.get('/user-management/system-analytics', { params }),
+  detectAnomalies: (params) => api.get('/user-management/anomalies', { params }),
+  getPredictiveMaintenance: (params) => api.get('/user-management/predictive-maintenance', { params }),
+  upsertSetting: (data) => api.post('/user-management/setting', data),
+};
+
+export const varietyDirectoryAPI = {
+  requestImage: (data) => api.post('/variety-directory/request-image', data),
+  createListing: (data) => api.post('/variety-directory/listing', data),
+  getCategories: (params) => api.get('/variety-directory/categories', { params }),
+  list: (params) => api.get('/variety-directory/list', { params }),
+};
+
+export const villageAPI = {
+  createVillage: (data) => api.post('/village/village', data),
+  addVillageResource: (data) => api.post('/village/village-resource', data),
+  getVillageAnalytics: (params) => api.get('/village/village-analytics', { params }),
+};
+
+export const wearableAPI = {
+  handleFitbitCallback: (data) => api.post('/wearable/fitbit-callback', data),
+  getStatus: (params) => api.get('/wearable/status', { params }),
+  getRecentActivity: (params) => api.get('/wearable/recent-activity', { params }),
+  getFitbitAuthUrl: (params) => api.get('/wearable/fitbit-auth-url', { params }),
+  syncFitbit: (data) => api.post('/wearable/fitbit', data),
+  disconnect: (data) => api.post('/wearable/disconnect', data),
+};
+
+export const wikipediaAPI = {
+  lookup: (params) => api.get('/wikipedia/lookup', { params }),
+  getSummaryByTitle: (params) => api.get('/wikipedia/summary-by-title', { params }),
+};
+
+export const yieldAPI = {
+  lotsNeedingAttention: (data) => api.post('/yield/lots-needing-attention', data),
+  lotPrice: (data) => api.post('/yield/lot-price', data),
+  openNextBucket: (data) => api.post('/yield/open-next-bucket', data),
+  bookingCurve: (data) => api.post('/yield/ing-curve', data),
+};
+
+
+// --- Added: previously-missing API stubs referenced by pages. ---
+// Generated to match this file's existing get/post stub convention (base resource path
+// derived from the API name, sub-path derived from each method name); not individually
+// verified against a specific backend route contract, same as the file's pre-existing entries.
+export const aeroponicsAPI = {
+  getSystems: (params) => api.get('/aeroponics/systems', { params }),
+  createSystem: (data) => api.post('/aeroponics/system', data),
+  updateSystem: (data) => api.post('/aeroponics/system', data),
+  deleteSystem: (data) => api.post('/aeroponics/system', data),
+};
+
+export const aiAdvisoryAPI = {
+  getStatistics: (params) => api.get('/ai-advisory/statistics', { params }),
+};
+
+export const aquacultureAnalyticsAPI = {
+  getMetrics: (params) => api.get('/aquaculture-analytics/metrics', { params }),
+  createMetric: (data) => api.post('/aquaculture-analytics/metric', data),
+  updateMetric: (data) => api.post('/aquaculture-analytics/metric', data),
+  deleteMetric: (data) => api.post('/aquaculture-analytics/metric', data),
+};
+
+export const assetLifecycleAPI = {
+  getAssets: (params) => api.get('/asset-lifecycle/assets', { params }),
+  createAsset: (data) => api.post('/asset-lifecycle/asset', data),
+};
+
+export const bioPesticideAPI = {
+  getItems: (params) => api.get('/bio-pesticide/items', { params }),
+  createItem: (data) => api.post('/bio-pesticide/item', data),
+  updateItem: (data) => api.post('/bio-pesticide/item', data),
+  deleteItem: (data) => api.post('/bio-pesticide/item', data),
+};
+
+export const biofertilizerAPI = {
+  getItems: (params) => api.get('/biofertilizer/items', { params }),
+  createItem: (data) => api.post('/biofertilizer/item', data),
+  updateItem: (data) => api.post('/biofertilizer/item', data),
+  deleteItem: (data) => api.post('/biofertilizer/item', data),
+};
+
+export const biofloccFarmAPI = {
+  getTanks: (params) => api.get('/bioflocc-farm/tanks', { params }),
+  createTank: (data) => api.post('/bioflocc-farm/tank', data),
+  updateTank: (data) => api.post('/bioflocc-farm/tank', data),
+  deleteTank: (data) => api.post('/bioflocc-farm/tank', data),
+};
+
+export const breakdownMaintenanceAPI = {
+  getRecords: (params) => api.get('/breakdown-maintenance/records', { params }),
+  createRecord: (data) => api.post('/breakdown-maintenance/record', data),
+};
+
+export const buyingClubAPI = {
+  getStatistics: (params) => api.get('/buying-club/statistics', { params }),
+};
+
+export const cattleRegistryAPI = {
+  getAnimals: (params) => api.get('/cattle-registry/animals', { params }),
+  createAnimal: (data) => api.post('/cattle-registry/animal', data),
+  updateAnimal: (data) => api.post('/cattle-registry/animal', data),
+  deleteAnimal: (data) => api.post('/cattle-registry/animal', data),
+};
+
+export const coldFishChainAPI = {
+  getShipments: (params) => api.get('/cold-fish-chain/shipments', { params }),
+  createShipment: (data) => api.post('/cold-fish-chain/shipment', data),
+  updateShipment: (data) => api.post('/cold-fish-chain/shipment', data),
+  deleteShipment: (data) => api.post('/cold-fish-chain/shipment', data),
+};
+
+export const consentManagementAPI = {
+  getRecords: (params) => api.get('/consent-management/records', { params }),
+  createRecord: (data) => api.post('/consent-management/record', data),
+  updateRecord: (data) => api.post('/consent-management/record', data),
+  deleteRecord: (data) => api.post('/consent-management/record', data),
+};
+
+export const contractorManagementAPI = {
+  getContractors: (params) => api.get('/contractor-management/contractors', { params }),
+  createContractor: (data) => api.post('/contractor-management/contractor', data),
+  updateContractor: (data) => api.post('/contractor-management/contractor', data),
+  deleteContractor: (data) => api.post('/contractor-management/contractor', data),
+};
+
+export const digitalIdentityAPI = {
+  getIdentities: (params) => api.get('/digital-identity/identities', { params }),
+  createIdentity: (data) => api.post('/digital-identity/identity', data),
+  updateIdentity: (data) => api.post('/digital-identity/identity', data),
+  deleteIdentity: (data) => api.post('/digital-identity/identity', data),
+};
+
+export const equipmentInventoryAPI = {
+  getEquipment: (params) => api.get('/equipment-inventory/equipment', { params }),
+  createEquipment: (data) => api.post('/equipment-inventory/equipment', data),
+};
+
+export const equipmentRentalAPI = {
+  getRentals: (params) => api.get('/equipment-rental/rentals', { params }),
+  createRental: (data) => api.post('/equipment-rental/rental', data),
+};
+
+export const equipmentSchedulingAPI = {
+  getSchedules: (params) => api.get('/equipment-scheduling/schedules', { params }),
+  createSchedule: (data) => api.post('/equipment-scheduling/schedule', data),
+  updateSchedule: (data) => api.post('/equipment-scheduling/schedule', data),
+  deleteSchedule: (data) => api.post('/equipment-scheduling/schedule', data),
+};
+
+export const farmActivityAPI = {
+  getActivities: (params) => api.get('/farm-activity/activities', { params }),
+  createActivity: (data) => api.post('/farm-activity/activity', data),
+  updateActivity: (data) => api.post('/farm-activity/activity', data),
+  deleteActivity: (data) => api.post('/farm-activity/activity', data),
+};
+
+export const farmOperationsDashboardAPI = {
+  getKpis: (params) => api.get('/farm-operations-dashboard/kpis', { params }),
+  createKpi: (data) => api.post('/farm-operations-dashboard/kpi', data),
+  updateKpi: (data) => api.post('/farm-operations-dashboard/kpi', data),
+  deleteKpi: (data) => api.post('/farm-operations-dashboard/kpi', data),
+};
+
+export const farmProductivityAPI = {
+  getMetrics: (params) => api.get('/farm-productivity/metrics', { params }),
+  createMetric: (data) => api.post('/farm-productivity/metric', data),
+  updateMetric: (data) => api.post('/farm-productivity/metric', data),
+  deleteMetric: (data) => api.post('/farm-productivity/metric', data),
+};
+
+export const farmTaskAPI = {
+  getTasks: (params) => api.get('/farm-task/tasks', { params }),
+  createTask: (data) => api.post('/farm-task/task', data),
+  updateTask: (data) => api.post('/farm-task/task', data),
+  deleteTask: (data) => api.post('/farm-task/task', data),
+};
+
+export const feedManagementAPI = {
+  getRecords: (params) => api.get('/feed-management/records', { params }),
+  createRecord: (data) => api.post('/feed-management/record', data),
+  updateRecord: (data) => api.post('/feed-management/record', data),
+  deleteRecord: (data) => api.post('/feed-management/record', data),
+};
+
+export const fishHealthAPI = {
+  getRecords: (params) => api.get('/fish-health/records', { params }),
+  createRecord: (data) => api.post('/fish-health/record', data),
+  updateRecord: (data) => api.post('/fish-health/record', data),
+  deleteRecord: (data) => api.post('/fish-health/record', data),
+};
+
+export const fishProcessingAPI = {
+  getBatches: (params) => api.get('/fish-processing/batches', { params }),
+  createBatch: (data) => api.post('/fish-processing/batch', data),
+  updateBatch: (data) => api.post('/fish-processing/batch', data),
+  deleteBatch: (data) => api.post('/fish-processing/batch', data),
+};
+
+export const fleetManagementAPI = {
+  getMaintenanceDue: (params) => api.get('/fleet-management/maintenance-due', { params }),
+  getFleet: (params) => api.get('/fleet-management/fleet', { params }),
+  addVehicle: (data) => api.post('/fleet-management/vehicle', data),
+  updateVehicle: (data) => api.post('/fleet-management/vehicle', data),
+};
+
+export const floricultureAPI = {
+  getRecords: (params) => api.get('/floriculture/records', { params }),
+  createRecord: (data) => api.post('/floriculture/record', data),
+  updateRecord: (data) => api.post('/floriculture/record', data),
+  deleteRecord: (data) => api.post('/floriculture/record', data),
+};
+
+export const fuelManagementAPI = {
+  getLogs: (params) => api.get('/fuel-management/logs', { params }),
+  createLog: (data) => api.post('/fuel-management/log', data),
+};
+
+export const geoBoundaryAPI = {
+  getBoundaries: (params) => api.get('/geo-boundary/boundaries', { params }),
+  createBoundary: (data) => api.post('/geo-boundary/boundary', data),
+  updateBoundary: (data) => api.post('/geo-boundary/boundary', data),
+  deleteBoundary: (data) => api.post('/geo-boundary/boundary', data),
+};
+
+export const gisLandMappingAPI = {
+  getMappings: (params) => api.get('/gis-land-mapping/mappings', { params }),
+  createMapping: (data) => api.post('/gis-land-mapping/mapping', data),
+  updateMapping: (data) => api.post('/gis-land-mapping/mapping', data),
+  deleteMapping: (data) => api.post('/gis-land-mapping/mapping', data),
+};
+
+export const goatFarmingAPI = {
+  getAnimals: (params) => api.get('/goat-farming/animals', { params }),
+  createAnimal: (data) => api.post('/goat-farming/animal', data),
+  updateAnimal: (data) => api.post('/goat-farming/animal', data),
+  deleteAnimal: (data) => api.post('/goat-farming/animal', data),
+};
+
+export const horticultureAnalyticsAPI = {
+  getMetrics: (params) => api.get('/horticulture-analytics/metrics', { params }),
+  createMetric: (data) => api.post('/horticulture-analytics/metric', data),
+  updateMetric: (data) => api.post('/horticulture-analytics/metric', data),
+  deleteMetric: (data) => api.post('/horticulture-analytics/metric', data),
+};
+
+export const householdEconomyAPI = {
+};
+
+export const implementManagementAPI = {
+  getImplements: (params) => api.get('/implement-management/implements', { params }),
+  createImplement: (data) => api.post('/implement-management/implement', data),
+};
+
+export const inputConsumptionAPI = {
+  getRecords: (params) => api.get('/input-consumption/records', { params }),
+  createRecord: (data) => api.post('/input-consumption/record', data),
+  updateRecord: (data) => api.post('/input-consumption/record', data),
+  deleteRecord: (data) => api.post('/input-consumption/record', data),
+};
+
+export const inputDistributionAPI = {
+  getRecords: (params) => api.get('/input-distribution/records', { params }),
+  createRecord: (data) => api.post('/input-distribution/record', data),
+  updateRecord: (data) => api.post('/input-distribution/record', data),
+  deleteRecord: (data) => api.post('/input-distribution/record', data),
+};
+
+export const inputProcurementAPI = {
+  getOrders: (params) => api.get('/input-procurement/orders', { params }),
+  createOrder: (data) => api.post('/input-procurement/order', data),
+  updateOrder: (data) => api.post('/input-procurement/order', data),
+  deleteOrder: (data) => api.post('/input-procurement/order', data),
+};
+
+export const inputTraceabilityAPI = {
+  getRecords: (params) => api.get('/input-traceability/records', { params }),
+  createRecord: (data) => api.post('/input-traceability/record', data),
+  updateRecord: (data) => api.post('/input-traceability/record', data),
+  deleteRecord: (data) => api.post('/input-traceability/record', data),
+};
+
+export const landLeaseAPI = {
+  getLeases: (params) => api.get('/land-lease/leases', { params }),
+  createLease: (data) => api.post('/land-lease/lease', data),
+  updateLease: (data) => api.post('/land-lease/lease', data),
+  deleteLease: (data) => api.post('/land-lease/lease', data),
+};
+
+export const livestockAnalyticsAPI = {
+  getRecords: (params) => api.get('/livestock-analytics/records', { params }),
+  createRecord: (data) => api.post('/livestock-analytics/record', data),
+  updateRecord: (data) => api.post('/livestock-analytics/record', data),
+  deleteRecord: (data) => api.post('/livestock-analytics/record', data),
+};
+
+export const machineryAccessAPI = {
+};
+
+export const machineryOperationsAPI = {
+  getOperations: (params) => api.get('/machinery-operations/operations', { params }),
+  createOperation: (data) => api.post('/machinery-operations/operation', data),
+  updateOperation: (data) => api.post('/machinery-operations/operation', data),
+  deleteOperation: (data) => api.post('/machinery-operations/operation', data),
+};
+
+export const mfaManagementAPI = {
+  getDevices: (params) => api.get('/mfa-management/devices', { params }),
+  createDevice: (data) => api.post('/mfa-management/device', data),
+  updateDevice: (data) => api.post('/mfa-management/device', data),
+  deleteDevice: (data) => api.post('/mfa-management/device', data),
+};
+
+export const micronutrientAPI = {
+  getItems: (params) => api.get('/micronutrient/items', { params }),
+  createItem: (data) => api.post('/micronutrient/item', data),
+  updateItem: (data) => api.post('/micronutrient/item', data),
+  deleteItem: (data) => api.post('/micronutrient/item', data),
+};
+
+export const mobilityRidesAPI = {
+};
+
+export const organicInputAPI = {
+  getItems: (params) => api.get('/organic-input/items', { params }),
+  createItem: (data) => api.post('/organic-input/item', data),
+  updateItem: (data) => api.post('/organic-input/item', data),
+  deleteItem: (data) => api.post('/organic-input/item', data),
+};
+
+export const permissionManagementAPI = {
+  getPermissions: (params) => api.get('/permission-management/permissions', { params }),
+  createPermission: (data) => api.post('/permission-management/permission', data),
+  updatePermission: (data) => api.post('/permission-management/permission', data),
+  deletePermission: (data) => api.post('/permission-management/permission', data),
+};
+
+export const pesticideInventoryAPI = {
+  getItems: (params) => api.get('/pesticide-inventory/items', { params }),
+  createItem: (data) => api.post('/pesticide-inventory/item', data),
+  updateItem: (data) => api.post('/pesticide-inventory/item', data),
+  deleteItem: (data) => api.post('/pesticide-inventory/item', data),
+};
+
+export const pigFarmingAPI = {
+  getAnimals: (params) => api.get('/pig-farming/animals', { params }),
+  createAnimal: (data) => api.post('/pig-farming/animal', data),
+  updateAnimal: (data) => api.post('/pig-farming/animal', data),
+  deleteAnimal: (data) => api.post('/pig-farming/animal', data),
+};
+
+export const polyhouseAPI = {
+  getRecords: (params) => api.get('/polyhouse/records', { params }),
+  createRecord: (data) => api.post('/polyhouse/record', data),
+  updateRecord: (data) => api.post('/polyhouse/record', data),
+  deleteRecord: (data) => api.post('/polyhouse/record', data),
+};
+
+export const poultryManagementAPI = {
+  getBatches: (params) => api.get('/poultry-management/batches', { params }),
+  createBatch: (data) => api.post('/poultry-management/batch', data),
+  updateBatch: (data) => api.post('/poultry-management/batch', data),
+  deleteBatch: (data) => api.post('/poultry-management/batch', data),
+};
+
+export const precisionHorticultureAPI = {
+  getReadings: (params) => api.get('/precision-horticulture/readings', { params }),
+  createReading: (data) => api.post('/precision-horticulture/reading', data),
+  updateReading: (data) => api.post('/precision-horticulture/reading', data),
+  deleteReading: (data) => api.post('/precision-horticulture/reading', data),
+};
+
+export const preventiveMaintenanceAPI = {
+  getRecords: (params) => api.get('/preventive-maintenance/records', { params }),
+  createRecord: (data) => api.post('/preventive-maintenance/record', data),
+  updateRecord: (data) => api.post('/preventive-maintenance/record', data),
+  deleteRecord: (data) => api.post('/preventive-maintenance/record', data),
+};
+
+export const procurementSubscriptionAPI = {
+  getStatistics: (params) => api.get('/procurement-subscription/statistics', { params }),
+};
+
+export const protectedCultivationAPI = {
+  getStructures: (params) => api.get('/protected-cultivation/structures', { params }),
+  createStructure: (data) => api.post('/protected-cultivation/structure', data),
+  updateStructure: (data) => api.post('/protected-cultivation/structure', data),
+  deleteStructure: (data) => api.post('/protected-cultivation/structure', data),
+};
+
+export const rainwaterHarvestingAPI = {
+  designSystem: (data) => api.post('/rainwater-harvesting/design-system', data),
+  monitorCollection: (data) => api.post('/rainwater-harvesting/collection', data),
+  calculateBudget: (params) => api.get('/rainwater-harvesting/budget', { params }),
+  manageStorage: (data) => api.post('/rainwater-harvesting/manage-storage', data),
+};
+
+export const rainwaterStructuresAPI = {
+  list: (params) => api.get('/rainwater-structures/list', { params }),
+  create: (data) => api.post('/rainwater-structures/create', data),
+  update: (data) => api.post('/rainwater-structures/update', data),
+  remove: (data) => api.post('/rainwater-structures/remove', data),
+};
+
+export const renewableEnergyAPI = {
+  getStatistics: (params) => api.get('/renewable-energy/statistics', { params }),
+};
+
+export const ruralEnterpriseAPI = {
+  getStatistics: (params) => api.get('/rural-enterprise/statistics', { params }),
+};
+
+export const ruralFinanceAPI = {
+};
+
+export const sessionManagementAPI = {
+  getSessions: (params) => api.get('/session-management/sessions', { params }),
+  updateSession: (data) => api.post('/session-management/session', data),
+  deleteSession: (data) => api.post('/session-management/session', data),
+};
+
+export const sharedInfrastructureAPI = {
+};
+
+export const sheepFarmingAPI = {
+  getAnimals: (params) => api.get('/sheep-farming/animals', { params }),
+  createAnimal: (data) => api.post('/sheep-farming/animal', data),
+  updateAnimal: (data) => api.post('/sheep-farming/animal', data),
+  deleteAnimal: (data) => api.post('/sheep-farming/animal', data),
+};
+
+export const soilMappingAPI = {
+  getZones: (params) => api.get('/soil-mapping/zones', { params }),
+  createZone: (data) => api.post('/soil-mapping/zone', data),
+  updateZone: (data) => api.post('/soil-mapping/zone', data),
+  deleteZone: (data) => api.post('/soil-mapping/zone', data),
+};
+
+export const sparePartsAPI = {
+  getParts: (params) => api.get('/spare-parts/parts', { params }),
+  createPart: (data) => api.post('/spare-parts/part', data),
+};
+
+export const ssoAPI = {
+  getProviders: (params) => api.get('/sso/providers', { params }),
+  createProvider: (data) => api.post('/sso/provider', data),
+  updateProvider: (data) => api.post('/sso/provider', data),
+  deleteProvider: (data) => api.post('/sso/provider', data),
+};
+
+export const surveyManagementAPI = {
+  getSurveys: (params) => api.get('/survey-management/surveys', { params }),
+  createSurvey: (data) => api.post('/survey-management/survey', data),
+  updateSurvey: (data) => api.post('/survey-management/survey', data),
+  deleteSurvey: (data) => api.post('/survey-management/survey', data),
+};
+
+export const vegetableProductionAPI = {
+  getRecords: (params) => api.get('/vegetable-production/records', { params }),
+  createRecord: (data) => api.post('/vegetable-production/record', data),
+  updateRecord: (data) => api.post('/vegetable-production/record', data),
+  deleteRecord: (data) => api.post('/vegetable-production/record', data),
+};
+
+export const villageProfileAPI = {
+  searchVillages: (params) => api.get('/village-profile/villages', { params }),
+};
+
+export const waterAnalyticsAPI = {
+  generateUsageAnalytics: (data) => api.post('/water-analytics/usage-analytics', data),
+  createDashboard: (data) => api.post('/water-analytics/dashboard', data),
+  generatePrediction: (data) => api.post('/water-analytics/prediction', data),
+  comparePerformance: (data) => api.post('/water-analytics/compare-performance', data),
+};
+
+export const waterAnalyticsRecordsAPI = {
+  list: (params) => api.get('/water-analytics-records/list', { params }),
+  create: (data) => api.post('/water-analytics-records/create', data),
+  update: (data) => api.post('/water-analytics-records/update', data),
+  remove: (data) => api.post('/water-analytics-records/remove', data),
+};
+
+export const waterBudgetRecordsAPI = {
+  list: (params) => api.get('/water-budget-records/list', { params }),
+  create: (data) => api.post('/water-budget-records/create', data),
+  update: (data) => api.post('/water-budget-records/update', data),
+  remove: (data) => api.post('/water-budget-records/remove', data),
+};
+
+export const waterBudgetingAPI = {
+  createBudget: (data) => api.post('/water-budgeting/budget', data),
+  trackUsage: (data) => api.post('/water-budgeting/usage', data),
+  optimizeAllocation: (data) => api.post('/water-budgeting/allocation', data),
+  generateReport: (data) => api.post('/water-budgeting/report', data),
+};
+
+export const waterQualityAPI = {
+  recordMeasurement: (data) => api.post('/water-quality/measurement', data),
+  getComplianceReport: (params) => api.get('/water-quality/compliance-report', { params }),
+  monitorQuality: (data) => api.post('/water-quality/quality', data),
+  getTreatmentRecommendations: (params) => api.get('/water-quality/treatment-recommendations', { params }),
+};
+
+export const waterQualityRecordsAPI = {
+  list: (params) => api.get('/water-quality-records/list', { params }),
+  create: (data) => api.post('/water-quality-records/create', data),
+  update: (data) => api.post('/water-quality-records/update', data),
+  remove: (data) => api.post('/water-quality-records/remove', data),
+};
+
+export const waterResourceMappingAPI = {
+  getResources: (params) => api.get('/water-resource-mapping/resources', { params }),
+  createResource: (data) => api.post('/water-resource-mapping/resource', data),
+  updateResource: (data) => api.post('/water-resource-mapping/resource', data),
+  deleteResource: (data) => api.post('/water-resource-mapping/resource', data),
+};
+
+export const watershedManagementAPI = {
+  createPlan: (data) => api.post('/watershed-management/plan', data),
+  monitorHealth: (data) => api.post('/watershed-management/health', data),
+  implementConservation: (data) => api.post('/watershed-management/implement-conservation', data),
+  generateReport: (data) => api.post('/watershed-management/report', data),
+};
+
+export const watershedRecordsAPI = {
+  list: (params) => api.get('/watershed-records/list', { params }),
+  create: (data) => api.post('/watershed-records/create', data),
+  update: (data) => api.post('/watershed-records/update', data),
+  remove: (data) => api.post('/watershed-records/remove', data),
+};
+

@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { getPostgreSQL } = require('../database');
+const { getPostgreSQL } = require('../database/connection');
 
 function id() { return crypto.randomUUID(); }
 

@@ -8,7 +8,7 @@
  *
  * (M11) Split from the former single-file services/aiService.js into this
  * directory, purely for code organization - behavior is unchanged. Node
- * module resolution treats `require('./services/aiService')` as
+ * module resolution treats `require('../legacy/aiService')` as
  * `./services/aiService.js` OR `./services/aiService/index.js`, whichever
  * exists, so every existing caller anywhere in the codebase continues to
  * resolve here identically, unchanged.

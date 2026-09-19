@@ -1,4 +1,4 @@
-const { getPostgreSQL }=require('../database');
+const { getPostgreSQL }=require('../database/connection');
 const crypto=require('crypto');
 class ERPControlPlaneService{
  constructor(){this.db=getPostgreSQL();}

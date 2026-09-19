@@ -1,4 +1,4 @@
-const { getPostgreSQL } = require('../database');
+const { getPostgreSQL } = require('../database/connection');
 
 class M051M100DomainIntelligenceService {
  constructor(){this.db=getPostgreSQL();}

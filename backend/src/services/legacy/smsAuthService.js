@@ -297,7 +297,7 @@ async function verifySMSOTP(phoneNumber, otp) {
     );
 
     // Generate tokens
-    const authService = require('../../dual-use/authService');
+    const authService = require('../dual-use/authService');
     const accessToken = authService.generateAccessToken(user);
     const refreshToken = authService.generateRefreshToken(user);
 
@@ -421,7 +421,7 @@ async function completePhoneRegistration(phoneNumber, otp) {
 
     // Create user
     const userData = JSON.parse(registration.user_data);
-    const authService = require('../../dual-use/authService');
+    const authService = require('../dual-use/authService');
 
     const user = await authService.registerUser({
       ...userData,
