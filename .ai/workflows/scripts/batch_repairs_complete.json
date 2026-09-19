@@ -1,0 +1,17 @@
+{
+  "middleware": [],
+  "services": [
+    "advancedServiceGenerator.js",
+    "websocketService.js"
+  ],
+  "env": [
+    "Missing: NODE_ENV",
+    "Missing: DATABASE_URL",
+    "Missing: REDIS_URL",
+    "Missing: JWT_SECRET"
+  ],
+  "routes": [
+    "17 routes mounted"
+  ],
+  "total": 2
+}
