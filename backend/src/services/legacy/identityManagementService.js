@@ -22,6 +22,7 @@
 'use strict';
 
 const pool = require('../../database/pool');
+const { withTransaction } = require('../../core/withTransaction');
 const { createCrudService } = require('./resourceCrudFactory');
 
 const permissionManagement = createCrudService('identity_permissions', {
@@ -62,28 +63,30 @@ const sessionManagement = {
     const limitNum = Math.min(200, Math.max(1, parseInt(limit, 10) || 20));
     const offset = (pageNum - 1) * limitNum;
 
-    const totalRes = await pool.query('SELECT COUNT(*) FROM sessions');
-    const total = parseInt(totalRes.rows[0].count, 10);
+    return await withTransaction(async (client) => {
+      const totalRes = await client.query('SELECT COUNT(*) FROM sessions');
+      const total = parseInt(totalRes.rows[0].count, 10);
 
-    const res = await pool.query(
-      `SELECT s.id, u.email AS user_identifier, s.user_agent AS device, s.ip_address,
-              s.created_at AS login_time, s.expires_at, s.is_active, s.invalidated_at,
-              CASE
-                WHEN s.invalidated_at IS NOT NULL THEN 'Terminated'
-                WHEN s.expires_at <= NOW() THEN 'Expired'
-                WHEN s.is_active THEN 'Active'
-                ELSE 'Terminated'
-              END AS status
-       FROM sessions s
-       LEFT JOIN users u ON u.id = s.user_id
-       ORDER BY s.created_at DESC
-       LIMIT $1 OFFSET $2`,
-      [limitNum, offset],
-    );
-    let items = res.rows.map((r) => ({ ...r, last_active: null }));
-    if (status) items = items.filter((r) => r.status === status);
+      const res = await client.query(
+        `SELECT s.id, u.email AS user_identifier, s.user_agent AS device, s.ip_address,
+                s.created_at AS login_time, s.expires_at, s.is_active, s.invalidated_at,
+                CASE
+                  WHEN s.invalidated_at IS NOT NULL THEN 'Terminated'
+                  WHEN s.expires_at <= NOW() THEN 'Expired'
+                  WHEN s.is_active THEN 'Active'
+                  ELSE 'Terminated'
+                END AS status
+         FROM sessions s
+         LEFT JOIN users u ON u.id = s.user_id
+         ORDER BY s.created_at DESC
+         LIMIT $1 OFFSET $2`,
+        [limitNum, offset],
+      );
+      let items = res.rows.map((r) => ({ ...r, last_active: null }));
+      if (status) items = items.filter((r) => r.status === status);
 
-    return { items, pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.max(1, Math.ceil(total / limitNum)) } };
+      return { items, pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.max(1, Math.ceil(total / limitNum)) } };
+    }, { name: 'sessionManagement.list', isolation: 'read committed' });
   },
 
   async get(id) {

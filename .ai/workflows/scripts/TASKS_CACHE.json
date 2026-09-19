@@ -1,0 +1,53 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Wire the 6 genuinely-orphaned backend services — ✅ DONE"
+    },
+    {
+      "id": 2,
+      "title": "The 7 \"Domain: TBD\" modules — ✅ DONE (turned out not to be skeletons at all)"
+    },
+    {
+      "id": 3,
+      "title": "Build the 2 genuinely-absent modules — ✅ DONE (also not actually absent)"
+    },
+    {
+      "id": 4,
+      "title": "BR-08 unwrapped transactions — PHASE 2 READY FOR MANUAL WRAPPING (2026-09-19)"
+    },
+    {
+      "id": 5,
+      "title": "6 ERP domains with no proactive AI agent — ✅ DONE"
+    },
+    {
+      "id": 6,
+      "title": "FOLU / NE organic-scheme tracking exposed to frontend — ✅ DONE"
+    },
+    {
+      "id": 7,
+      "title": "PWA + responsive audit — PWA already real; fixed 2 real mobile-overflow bugs"
+    },
+    {
+      "id": 8,
+      "title": "\"Replace all generic to professional\" sweep — 12 modules, DONE"
+    },
+    {
+      "id": 9,
+      "title": "NE Variety Directory + AI image-gen pipeline — mostly already done, closed the one real gap"
+    },
+    {
+      "id": 10,
+      "title": "AI dietitian/naturopath layer — found already 80% built, wired the missing 20%"
+    },
+    {
+      "id": 11,
+      "title": "Systematic \"zero route wiring\" sweep + duplicate-route correction"
+    },
+    {
+      "id": 12,
+      "title": "NE Harvest visual redesign + marketplace seeding (2026-08-30)"
+    }
+  ],
+  "count": 12
+}

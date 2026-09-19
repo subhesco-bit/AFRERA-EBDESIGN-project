@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-09-19T14:15:56.842Z",
+  "backend": {
+    "modules": [
+      "M001",
+      "M001_PLATFORM_CORE",
+      "M002",
+      "M002_USER_MANAGEMENT",
+      "M003",
+      "M003_ORGANIZATION",
+      "M004",
+      "M004_ROLE_MANAGEMENT",
+      "M005",
+      "M005_PERMISSION_MANAGEMENT"
+    ],
+    "servicesCount": 304,
+    "routesCount": 250,
+    "databaseMigrationsCount": 434
+  },
+  "frontend": {
+    "pagesCount": 231,
+    "componentsCount": 29
+  }
+}

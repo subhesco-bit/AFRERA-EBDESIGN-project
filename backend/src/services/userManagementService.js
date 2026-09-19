@@ -6,6 +6,7 @@
 
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
+const { withTransaction } = require('../core/withTransaction');
 const aiGateway = require('./aiGatewayService');
 const analytics = require('./analyticsService');
 
@@ -82,61 +83,63 @@ class UserManagementService {
   async getUsers(filters = {}, pagination = {}) {
     try {
       const pg = getPostgreSQL();
-      
+
       const { role, status, search } = filters;
       const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
-      
+
       const offset = (page - 1) * limit;
-      
-      let query = `
-        SELECT u.*, 
-               COALESCE(json_agg(DISTINCT r.name) FILTER (WHERE r.name IS NOT NULL), '[]') as roles
-        FROM users u
-        LEFT JOIN user_roles ur ON u.id = ur.user_id
-        LEFT JOIN roles r ON ur.role_id = r.id
-        WHERE 1=1
-      `;
-      
-      const params = [];
-      let paramCount = 0;
-      
-      if (role) {
-        paramCount++;
-        query += ` AND u.role = $${paramCount}`;
-        params.push(role);
-      }
-      
-      if (status) {
-        paramCount++;
-        query += ` AND u.status = $${paramCount}`;
-        params.push(status);
-      }
-      
-      if (search) {
-        paramCount++;
-        query += ` AND (u.name ILIKE $${paramCount} OR u.email ILIKE $${paramCount})`;
-        params.push(`%${search}%`);
-      }
-      
-      query += ` GROUP BY u.id ORDER BY u.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
-      params.push(limit, offset);
-      
-      const result = await pg.query(query, params);
-      
-      // Get total count
-      const countQuery = query.replace(/SELECT u\.\*,.*?GROUP BY u\.id.*?ORDER BY u\.\w+ \w+ LIMIT \d+ OFFSET \d+/, 'SELECT COUNT(DISTINCT u.id)');
-      const countResult = await pg.query(countQuery, params.slice(0, paramCount));
-      const total = parseInt(countResult.rows[0].count);
-      
-      return {
-        users: result.rows,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit)
+
+      return await withTransaction(async (client) => {
+        let query = `
+          SELECT u.*,
+                 COALESCE(json_agg(DISTINCT r.name) FILTER (WHERE r.name IS NOT NULL), '[]') as roles
+          FROM users u
+          LEFT JOIN user_roles ur ON u.id = ur.user_id
+          LEFT JOIN roles r ON ur.role_id = r.id
+          WHERE 1=1
+        `;
+
+        const params = [];
+        let paramCount = 0;
+
+        if (role) {
+          paramCount++;
+          query += ` AND u.role = $${paramCount}`;
+          params.push(role);
         }
-      };
+
+        if (status) {
+          paramCount++;
+          query += ` AND u.status = $${paramCount}`;
+          params.push(status);
+        }
+
+        if (search) {
+          paramCount++;
+          query += ` AND (u.name ILIKE $${paramCount} OR u.email ILIKE $${paramCount})`;
+          params.push(`%${search}%`);
+        }
+
+        query += ` GROUP BY u.id ORDER BY u.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+        params.push(limit, offset);
+
+        const result = await client.query(query, params);
+
+        // Get total count
+        const countQuery = query.replace(/SELECT u\.\*,.*?GROUP BY u\.id.*?ORDER BY u\.\w+ \w+ LIMIT \d+ OFFSET \d+/, 'SELECT COUNT(DISTINCT u.id)');
+        const countResult = await client.query(countQuery, params.slice(0, paramCount));
+        const total = parseInt(countResult.rows[0].count);
+
+        return {
+          users: result.rows,
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit)
+          }
+        };
+      }, { name: 'getUsers', isolation: 'read committed' });
     } catch (error) {
       logger.error('Error getting users:', error);
       throw error;

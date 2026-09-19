@@ -1,0 +1,25 @@
+{
+  "routeFilesSnapshot": [
+    "advancedAnalyticsRoutes.js",
+    "advancedFeatures.js",
+    "advancedSearchRoutes.js",
+    "agriculturalIntelligenceRoutes.js",
+    "aiAgentRoutes.js",
+    "aiApprovalRoutes.js",
+    "aiBackboneRoutes.js",
+    "aiBrainRoutes.js",
+    "aiCollaborationRoutes.js",
+    "aiDomainAdapterRoutes.js",
+    "aiGatewayRoutes.js",
+    "aiGovernanceControlRoutes.js",
+    "aiOperationIntelligenceRoutes.js",
+    "aiSelfHealingRoutes.js",
+    "analyticsReportRoutes.js",
+    "animalHealthRoutes.js",
+    "apiCompatibilityRoutes.js",
+    "apiWarningRoutes.js",
+    "ar.js",
+    "assetAccountingRoutes.js"
+  ],
+  "buildDate": "2026-09-19T14:15:56.911Z"
+}

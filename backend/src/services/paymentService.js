@@ -6,6 +6,7 @@
 
 const crypto = require('crypto');
 const { getPostgreSQL } = require('../database/connection');
+const { withTransaction } = require('../core/withTransaction');
 const cacheService = require('./cacheService');
 
 const stripe = process.env.STRIPE_SECRET_KEY ?
@@ -175,19 +176,22 @@ class PaymentService {
         throw new Error('Insufficient balance');
       }
 
-      // Debit from user
-      await database().query(
-        'UPDATE wallets SET balance = balance - $1 WHERE user_id = $2',
-        [amount, fromUserId],
-      );
+      // Wrap debit/credit in transaction (atomic double-entry)
+      await withTransaction(async (client) => {
+        // Debit from user
+        await client.query(
+          'UPDATE wallets SET balance = balance - $1 WHERE user_id = $2',
+          [amount, fromUserId],
+        );
 
-      // Credit to user
-      await database().query(
-        'UPDATE wallets SET balance = balance + $1 WHERE user_id = $2',
-        [amount, toUserId],
-      );
+        // Credit to user
+        await client.query(
+          'UPDATE wallets SET balance = balance + $1 WHERE user_id = $2',
+          [amount, toUserId],
+        );
+      }, { name: 'transferFunds' });
 
-      // Record transactions
+      // Record transactions (after atomic transfer)
       await this.recordTransaction(fromUserId, -amount, 'transfer', `transfer-${Date.now()}`);
       await this.recordTransaction(toUserId, amount, 'transfer', `transfer-${Date.now()}`);
 

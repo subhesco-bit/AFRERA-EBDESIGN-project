@@ -4,6 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
+const { withTransaction } = require('../../core/withTransaction');
 
 class BulkOrderService {
   constructor() {
@@ -29,48 +30,50 @@ class BulkOrderService {
     } = requestData;
 
     try {
-      // Get product details
-      const productQuery = `
-        SELECT * FROM products WHERE id = $1
-      `;
-      const productResult = await this.pool.query(productQuery, [productId]);
-      const product = productResult.rows[0];
+      return await withTransaction(async (client) => {
+        // Get product details
+        const productQuery = `
+          SELECT * FROM products WHERE id = $1
+        `;
+        const productResult = await client.query(productQuery, [productId]);
+        const product = productResult.rows[0];
 
-      if (!product) {
-        throw new Error('Product not found');
-      }
+        if (!product) {
+          throw new Error('Product not found');
+        }
 
-      // Calculate estimated total
-      const estimatedTotal = quantity * (budgetPerUnit || product.price);
+        // Calculate estimated total
+        const estimatedTotal = quantity * (budgetPerUnit || product.price);
 
-      const query = `
-        INSERT INTO bulk_orders 
-        (user_id, product_id, quantity, expected_delivery_date, delivery_location,
-         special_requirements, budget_per_unit, estimated_total, contact_person,
-         contact_phone, contact_email, status)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'pending')
-        RETURNING *
-      `;
+        const query = `
+          INSERT INTO bulk_orders
+          (user_id, product_id, quantity, expected_delivery_date, delivery_location,
+           special_requirements, budget_per_unit, estimated_total, contact_person,
+           contact_phone, contact_email, status)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'pending')
+          RETURNING *
+        `;
 
-      const result = await this.pool.query(query, [
-        userId,
-        productId,
-        quantity,
-        expectedDeliveryDate,
-        deliveryLocation,
-        specialRequirements,
-        budgetPerUnit,
-        estimatedTotal,
-        contactPerson,
-        contactPhone,
-        contactEmail
-      ]);
+        const result = await client.query(query, [
+          userId,
+          productId,
+          quantity,
+          expectedDeliveryDate,
+          deliveryLocation,
+          specialRequirements,
+          budgetPerUnit,
+          estimatedTotal,
+          contactPerson,
+          contactPhone,
+          contactEmail
+        ]);
 
-      logger.info(`Bulk order request created: ${result.rows[0].id}`);
-      return {
-        ...result.rows[0],
-        productDetails: product
-      };
+        logger.info(`Bulk order request created: ${result.rows[0].id}`);
+        return {
+          ...result.rows[0],
+          productDetails: product
+        };
+      }, { name: 'createBulkOrderRequest' });
     } catch (error) {
       logger.error('Error creating bulk order request', { error: error.message, stack: error.stack });
       throw error;
@@ -338,55 +341,59 @@ class BulkOrderService {
    */
   async convertQuotationToOrder(quotation) {
     try {
-      // Get bulk order details
-      const bulkOrderQuery = `
-        SELECT * FROM bulk_orders WHERE id = $1
-      `;
-      const bulkOrderResult = await this.pool.query(bulkOrderQuery, [quotation.bulk_order_id]);
-      const bulkOrder = bulkOrderResult.rows[0];
+      const order = await withTransaction(async (client) => {
+        // Get bulk order details
+        const bulkOrderQuery = `
+          SELECT * FROM bulk_orders WHERE id = $1
+        `;
+        const bulkOrderResult = await client.query(bulkOrderQuery, [quotation.bulk_order_id]);
+        const bulkOrder = bulkOrderResult.rows[0];
 
-      // Create order
-      const orderQuery = `
-        INSERT INTO orders 
-        (user_id, total_amount, gst_amount, status, order_type, delivery_location,
-         contact_person, contact_phone, contact_email, special_requirements)
-        VALUES ($1, $2, 0, 'confirmed', 'bulk', $3, $4, $5, $6, $7)
-        RETURNING *
-      `;
+        // Create order
+        const orderQuery = `
+          INSERT INTO orders
+          (user_id, total_amount, gst_amount, status, order_type, delivery_location,
+           contact_person, contact_phone, contact_email, special_requirements)
+          VALUES ($1, $2, 0, 'confirmed', 'bulk', $3, $4, $5, $6, $7)
+          RETURNING *
+        `;
 
-      const orderResult = await this.pool.query(orderQuery, [
-        bulkOrder.user_id,
-        quotation.total_price,
-        bulkOrder.delivery_location,
-        bulkOrder.contact_person,
-        bulkOrder.contact_phone,
-        bulkOrder.contact_email,
-        bulkOrder.special_requirements
-      ]);
+        const orderResult = await client.query(orderQuery, [
+          bulkOrder.user_id,
+          quotation.total_price,
+          bulkOrder.delivery_location,
+          bulkOrder.contact_person,
+          bulkOrder.contact_phone,
+          bulkOrder.contact_email,
+          bulkOrder.special_requirements
+        ]);
 
-      const order = orderResult.rows[0];
+        const orderData = orderResult.rows[0];
 
-      // Add order item
-      const itemQuery = `
-        INSERT INTO order_items 
-        (order_id, product_id, quantity, unit_price, total_price)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING *
-      `;
+        // Add order item
+        const itemQuery = `
+          INSERT INTO order_items
+          (order_id, product_id, quantity, unit_price, total_price)
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING *
+        `;
 
-      await this.pool.query(itemQuery, [
-        order.id,
-        bulkOrder.product_id,
-        bulkOrder.quantity,
-        quotation.price_per_unit,
-        quotation.total_price
-      ]);
+        await client.query(itemQuery, [
+          orderData.id,
+          bulkOrder.product_id,
+          bulkOrder.quantity,
+          quotation.price_per_unit,
+          quotation.total_price
+        ]);
 
-      // Update bulk order status
-      await this.updateBulkOrderStatus(bulkOrder.id, 'confirmed', null);
+        return { orderData, bulkOrderId: bulkOrder.id };
+      }, { name: 'convertQuotationToOrder' });
 
-      logger.info(`Bulk order ${bulkOrder.id} converted to order ${order.id}`);
-      return order;
+      // Update bulk order status (after transaction)
+      await this.updateBulkOrderStatus(order.bulkOrderId, 'confirmed', null);
+
+      logger.info(`Bulk order ${order.bulkOrderId} converted to order ${order.orderData.id}`);
+      return order.orderData;
     } catch (error) {
       logger.error('Error converting quotation to order', { error: error.message, stack: error.stack });
       throw error;
