@@ -1,0 +1,35 @@
+{
+  "wrapped": [
+    {
+      "file": "src\\services\\paymentService.js",
+      "func": "transferFunds"
+    },
+    {
+      "file": "src\\services\\legacy\\identityManagementService.js",
+      "func": "list"
+    },
+    {
+      "file": "src\\services\\userManagementService.js",
+      "func": "getUsers"
+    },
+    {
+      "file": "src\\services\\commerce\\bulkOrderService.js",
+      "func": "createBulkOrderRequest"
+    },
+    {
+      "file": "src\\services\\commerce\\bulkOrderService.js",
+      "func": "convertQuotationToOrder"
+    },
+    {
+      "file": "src\\services\\legacy\\bulkOrderService.js",
+      "func": "createBulkOrderRequest"
+    },
+    {
+      "file": "src\\services\\legacy\\bulkOrderService.js",
+      "func": "convertQuotationToOrder"
+    }
+  ],
+  "failed": [],
+  "skipped": [],
+  "total": 7
+}
