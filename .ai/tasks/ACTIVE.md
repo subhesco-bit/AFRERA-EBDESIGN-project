@@ -210,30 +210,36 @@ no bugs — its static lookup tables are legitimate fixed config, not
 fabricated data. Verified: both `node -c` clean, backend boots clean with
 both loaded.
 
-### 4. BR-08 unwrapped transactions — ANALYSIS COMPLETE, WRAPPING IN PROGRESS (2026-09-19)
+### 4. BR-08 unwrapped transactions — PHASE 2 READY FOR MANUAL WRAPPING (2026-09-19)
 
-Found and categorized 405 files with 2+ query/execute calls (41 real, 364 likely false positives from heuristic).
-Committed two batch-analysis scripts to `.ai/workflows/scripts/`:
-- `find_unwrapped_transactions.js`: scans all backend services, categorizes by directive type (money 4, identity 9, sync 11, lifecycle 3, other 378)
-- `analyze_transaction_patterns.js`: identifies specific async functions with unwrapped multi-statements and their line numbers
-- Results in `transaction_analysis.json`: 5 high-priority files, 44 low-risk
+**Phase 1 (Analysis) — COMPLETE**
+Found and categorized 405 files with 2+ query/execute calls using batch scripts:
+- `find_unwrapped_transactions.js`: categorizes by directive type (money 4, identity 9, sync 11, lifecycle 3, other 378)
+- `analyze_transaction_patterns.js`: identifies specific async functions with line numbers
+- Results in `transaction_analysis.json`: 5 high-priority files, 7 functions total
 
-**High-priority functions to wrap (money/identity/sync/lifecycle):**
-1. `src/services/paymentService.js`: `transferFunds()` line 170 (2 queries)
-2. `src/services/legacy/identityManagementService.js`: `list()` line 60 (2 queries)
-3. `src/services/userManagementService.js`: `getUsers()` line 82 (2 queries)
-4. `src/services/commerce/bulkOrderService.js`: `createBulkOrderRequest()` + `convertQuotationToOrder()` (2+3 queries)
-5. `src/services/legacy/bulkOrderService.js`: `createBulkOrderRequest()` + `convertQuotationToOrder()` (2+3 queries)
+**Phase 2 (Wrapping) — READY FOR IMPLEMENTATION**
+Manual wrapping guide created: `.ai/workflows/scripts/BR08_MANUAL_WRAPPING_GUIDE.md`
+- Why manual: Automated script caused function signature duplication; only 7 functions, so manual review is safer
+- **7 high-priority functions to wrap** (all in guide with line numbers, risk assessment, before/after patterns):
+  1. `src/services/paymentService.js` :: `transferFunds()` [MONEY]
+  2. `src/services/commerce/bulkOrderService.js` :: `createBulkOrderRequest()` [LIFECYCLE]
+  3. `src/services/commerce/bulkOrderService.js` :: `convertQuotationToOrder()` [LIFECYCLE]
+  4. `src/services/legacy/bulkOrderService.js` :: `createBulkOrderRequest()` [LIFECYCLE]
+  5. `src/services/legacy/bulkOrderService.js` :: `convertQuotationToOrder()` [LIFECYCLE]
+  6. `src/services/legacy/identityManagementService.js` :: `list()` [IDENTITY]
+  7. `src/services/userManagementService.js` :: `getUsers()` [IDENTITY]
 
-**Next phase (batch wrapping script):**
-Per the Batch Repair Orchestration Model (`.ai/workflows/BATCH_REPAIR_ORCHESTRATION.md`):
-1. Read each function from `transaction_analysis.json`
-2. Load the source file + line range
-3. Wrap the multi-statement code in `withTransaction(async () => { ... })`
-4. Verify syntax + boot-test
-5. Report results (wrapped/failed/skipped)
+**How to wrap (from guide):**
+1. Open each file, find the function
+2. Replace `this.pool.query()` calls with `client.query()` inside `withTransaction(async (client) => {...})`
+3. Verify: `node -c src/services/XXX.js` and `timeout 8 node -e "require('./src/index.js')"`
+4. Import check: Ensure `withTransaction` is imported from `core/withTransaction.js`
 
-Note: The directive's PART 8.3 rule states wrapping is NOT a blanket auto-fix — each function should be reviewed for whether transactions are actually needed (i.e., are the queries logically dependent, or is failure isolation acceptable?). The batch script will identify sites; human judgment will finalize each wrap decision.
+**Next phase (Phase 3 - Residuals):**
+After wrapping: verify boot, commit with counts, flag any failures for manual review.
+
+Note: Per directive PART 8.3, this is NOT a blanket auto-fix — guide includes risk assessment for each function so reviewer can judge whether transactions are actually needed.
 
 ### 5. 6 ERP domains with no proactive AI agent — ✅ DONE
 Added 6 real, honest, rule-based agents to `core/erpAgents.js`'s AGENTS array,
