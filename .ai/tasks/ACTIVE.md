@@ -210,13 +210,30 @@ no bugs — its static lookup tables are legitimate fixed config, not
 fabricated data. Verified: both `node -c` clean, backend boots clean with
 both loaded.
 
-### 4. BR-08 unwrapped transactions — NOT STARTED
-20 (directive) to 46 (docs/registry) multi-statement writes with no
-transaction wrapper. Helper already exists (`core/withTransaction.js`).
-Needs finding the actual call sites (directive PART 8.3 categorizes them:
-money 4, identity 4, sync 4, lifecycle 7, other 1) and wrapping each —
-explicitly NOT a blanket auto-fix, each needs judgment per the directive's
-own standing rule.
+### 4. BR-08 unwrapped transactions — ANALYSIS COMPLETE, WRAPPING IN PROGRESS (2026-09-19)
+
+Found and categorized 405 files with 2+ query/execute calls (41 real, 364 likely false positives from heuristic).
+Committed two batch-analysis scripts to `.ai/workflows/scripts/`:
+- `find_unwrapped_transactions.js`: scans all backend services, categorizes by directive type (money 4, identity 9, sync 11, lifecycle 3, other 378)
+- `analyze_transaction_patterns.js`: identifies specific async functions with unwrapped multi-statements and their line numbers
+- Results in `transaction_analysis.json`: 5 high-priority files, 44 low-risk
+
+**High-priority functions to wrap (money/identity/sync/lifecycle):**
+1. `src/services/paymentService.js`: `transferFunds()` line 170 (2 queries)
+2. `src/services/legacy/identityManagementService.js`: `list()` line 60 (2 queries)
+3. `src/services/userManagementService.js`: `getUsers()` line 82 (2 queries)
+4. `src/services/commerce/bulkOrderService.js`: `createBulkOrderRequest()` + `convertQuotationToOrder()` (2+3 queries)
+5. `src/services/legacy/bulkOrderService.js`: `createBulkOrderRequest()` + `convertQuotationToOrder()` (2+3 queries)
+
+**Next phase (batch wrapping script):**
+Per the Batch Repair Orchestration Model (`.ai/workflows/BATCH_REPAIR_ORCHESTRATION.md`):
+1. Read each function from `transaction_analysis.json`
+2. Load the source file + line range
+3. Wrap the multi-statement code in `withTransaction(async () => { ... })`
+4. Verify syntax + boot-test
+5. Report results (wrapped/failed/skipped)
+
+Note: The directive's PART 8.3 rule states wrapping is NOT a blanket auto-fix — each function should be reviewed for whether transactions are actually needed (i.e., are the queries logically dependent, or is failure isolation acceptable?). The batch script will identify sites; human judgment will finalize each wrap decision.
 
 ### 5. 6 ERP domains with no proactive AI agent — ✅ DONE
 Added 6 real, honest, rule-based agents to `core/erpAgents.js`'s AGENTS array,
