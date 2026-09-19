@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const insurancePremiumService = require('./insurancePremiumService');
+const insurancePremiumService = require('../legacy/insurancePremiumService');
 
 class InsurancePolicyIssuanceService {
   constructor() {

@@ -1,0 +1,11 @@
+'use strict';
+const svc=require('../src/services/enterprisePromotion541Service');
+
+describe('M001-M541 enterprise promotion standard',()=>{
+ test('covers exactly 541 modules',()=>{const all=svc.portfolio();expect(all).toHaveLength(541);expect(all[0].code).toBe('M001');expect(all[540].code).toBe('M541');});
+ test('all modules receive the same enterprise control depth',()=>{for(const p of svc.portfolio()){expect(p.pages.length).toBeGreaterThanOrEqual(8);expect(p.workflow).toEqual(['capture','validate','enrich','risk_assess','review','approve','execute','verify','measure']);expect(p.visualizations.length).toBeGreaterThanOrEqual(4);expect(p.middleware).toContain('field_level_authorization');expect(p.erpControls).toContain('cross_module_reconciliation');expect(p.erpControls).toContain('financial_traceability');expect(p.uxStandards).toContain('accessible');expect(p.uxStandards).toContain('mobile_field_mode');expect(p.decisionControls).toContain('segregation_of_duties');expect(p.ai.authoritative).toBe(false);expect(p.ai.requirements).toContain('insufficient_data_response');expect(p.ai.requirements).toContain('tool_call_audit');expect(p.digitalTwin.enabled).toBe(true);expect(p.knowledgeGraph.enabled).toBe(true);expect(p.certification).toContain('e2e');}}
+ test('maturity depends on implementation depth, not file presence',()=>{const p=svc.profile('M150');expect(p.maturity.coreBytes).toBeLessThan(2000);expect(p.maturity.state).toBe('promotion_required');expect(p.promotionGaps).toContain('domain_implementation_depth_below_standard');});
+ test('preserves physical authoritative modules where present',()=>{const p=svc.profile('M051');expect(p.physicalModule).toBe(true);expect(p.maturity.files['service.js'].exists).toBe(true);expect(p.implementationMode).toMatch(/bespoke/);});
+ test('restricts biological interoperability to legitimate domain families',()=>{for(const p of svc.portfolio()){if(p.interoperability.applicable){expect(p.interoperability.scope.length).toBeGreaterThan(0);expect(p.interoperability.humanClinical).toBe(false);}else expect(p.interoperability.scope).toHaveLength(0);}});
+ test('rejects modules outside requested promotion range',()=>{expect(()=>svc.profile('M542')).toThrow();expect(()=>svc.profile('M550')).toThrow();});
+});

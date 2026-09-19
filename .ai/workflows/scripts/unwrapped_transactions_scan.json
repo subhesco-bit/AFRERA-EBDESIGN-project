@@ -1,0 +1,3257 @@
+{
+  "byCategory": {
+    "money": [
+      {
+        "file": "src\\services\\finance\\offlinePaymentService.js",
+        "queryCount": 21
+      },
+      {
+        "file": "src\\services\\legacy\\offlinePaymentService.js",
+        "queryCount": 21
+      },
+      {
+        "file": "src\\services\\paymentGatewayService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\paymentService.js",
+        "queryCount": 7
+      }
+    ],
+    "identity": [
+      {
+        "file": "src\\services\\authService\\oauth.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\authService\\userAuth.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\digitalProductPassportService\\coreIdentity.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\dual-use\\authService.js",
+        "queryCount": 23
+      },
+      {
+        "file": "src\\services\\indiaErpAccountingService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\identityManagementService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\smsAuthService.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\services\\platform\\smsAuthService.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\services\\userManagementService.js",
+        "queryCount": 10
+      }
+    ],
+    "sync": [
+      {
+        "file": "src\\routes\\m001m050ProductionIntegrationRoutes.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\enterpriseIntegrationService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\iotIntegrationService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\completeERPIntegrationService.js",
+        "queryCount": 25
+      },
+      {
+        "file": "src\\services\\legacy\\ecommerceIntegrationService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\iotIntegrationService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\legacy\\offlineSyncService.js",
+        "queryCount": 26
+      },
+      {
+        "file": "src\\services\\legacy\\wearableIntegrationService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\logistics\\iotIntegrationService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\offlineSyncService.js",
+        "queryCount": 26
+      },
+      {
+        "file": "src\\services\\platform\\offlineSyncService.js",
+        "queryCount": 26
+      }
+    ],
+    "lifecycle": [
+      {
+        "file": "src\\services\\commerce\\bulkOrderService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\digitalProductPassportService\\lifecycle.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\bulkOrderService.js",
+        "queryCount": 15
+      }
+    ],
+    "other": [
+      {
+        "file": "src\\controllers\\ecommerceController.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\core\\ai\\aiAuditLogger.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\core\\aiOrchestrator.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\core\\businessCell.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\core\\claudeAICoordinator.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\core\\configRegistry.js",
+        "queryCount": 18
+      },
+      {
+        "file": "src\\core\\disruptionRoutingAgent.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\core\\enhancedServiceFramework.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\core\\moduleRegistry.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\core\\nervousSystem.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\core\\outcomeResolver.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\core\\outcomeSink.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\core\\serviceAuditAndEnhancement.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\database\\backup\\backup_manager.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\database\\connection.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\database\\initializeDB.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\database\\monitoring\\database_monitor.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\database\\optimization\\query_optimizer.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\database\\schema_migrations.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\database\\security\\database_security.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\database\\seed.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\database\\seed_economic.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\middleware\\ownership.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\modules\\M001_PLATFORM_CORE\\backend\\service.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\modules\\M002\\service.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\modules\\M002_USER_MANAGEMENT\\backend\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M003\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M003_ORGANIZATION\\backend\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M004\\service.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\modules\\M004_ROLE_MANAGEMENT\\backend\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M005\\service.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\modules\\M005_PERMISSION_MANAGEMENT\\backend\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M006\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M007\\service.js",
+        "queryCount": 17
+      },
+      {
+        "file": "src\\modules\\M008\\service.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\modules\\M009\\service.js",
+        "queryCount": 18
+      },
+      {
+        "file": "src\\modules\\M010\\service.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\modules\\M012\\service.js",
+        "queryCount": 17
+      },
+      {
+        "file": "src\\modules\\M013\\service.js",
+        "queryCount": 17
+      },
+      {
+        "file": "src\\modules\\M014\\service.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\modules\\M015\\service.js",
+        "queryCount": 26
+      },
+      {
+        "file": "src\\modules\\M016\\service.js",
+        "queryCount": 17
+      },
+      {
+        "file": "src\\modules\\M017\\service.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\modules\\M018\\service.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\modules\\M019\\service.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\modules\\M020\\service.js",
+        "queryCount": 17
+      },
+      {
+        "file": "src\\modules\\M021\\service.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\modules\\M022\\service.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\modules\\M023\\service.js",
+        "queryCount": 30
+      },
+      {
+        "file": "src\\modules\\M024\\service.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\modules\\M025\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M026\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M027\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M028\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M029\\service.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\modules\\M030\\service.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\modules\\M031\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M032\\service.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\modules\\M033\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M036\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M040\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M041\\service.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\modules\\M042\\service.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\modules\\M043\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M044\\service.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\modules\\M045\\service.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\modules\\M046\\service.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\modules\\M047\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M048\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M050\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M051\\service.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\modules\\M052\\service.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\modules\\M053\\service.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\modules\\M054\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M055\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M056\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M057\\service.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\modules\\M058\\service.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\modules\\M059\\service.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\modules\\M060\\service.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\modules\\M069\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M071\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M072\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M073\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M074\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M075\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M076\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M077\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M078\\service.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\modules\\M079\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M080\\service.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\modules\\M081\\service.js",
+        "queryCount": 21
+      },
+      {
+        "file": "src\\modules\\M082\\service.js",
+        "queryCount": 17
+      },
+      {
+        "file": "src\\modules\\M083\\service.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\modules\\M084\\service.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\modules\\M085\\service.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\modules\\M086\\service.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\modules\\M087\\service.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\modules\\M090\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M091\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M092\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M093\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M094\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M098\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M099\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M100\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M101\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M102\\service.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\modules\\M103\\service.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\modules\\M104\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M105\\service.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\modules\\M106\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M107\\service.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\modules\\M108\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M109\\service.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\modules\\M110\\service.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\modules\\M111\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M114\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M115\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M117\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M118\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M119\\service.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M120\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M122\\service.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\modules\\M123\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M124\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M125\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M126\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M127\\service.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\modules\\M128\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M132\\service.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\modules\\M137\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M139\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M141\\service.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\modules\\M144\\service.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\modules\\M148\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M149\\service.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\modules\\M400_AI_BACKBONE\\backend\\service.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\modules\\M645100_LIBRARYKNOWLEDGE\\api\\routes.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\modules\\M645100_LIBRARYKNOWLEDGE\\backend\\service.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\modules\\shared\\createRegistryService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\modules\\TEMPLATES\\MODULE_TEMPLATE\\backend\\routes.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\modules\\TEMPLATES\\MODULE_TEMPLATE\\backend\\service.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\routes\\finance\\gstRoutes.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\routes\\gstRoutes.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\routes\\healthRoutes.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\routes\\logistics\\coldStorageRoutes.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\routes\\logistics\\geofencingRoutes.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\routes\\logistics\\trackDartRoutes.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\routes\\neVarietiesRoutes.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\routes\\trackDartRoutes.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\routes\\unifiedLedgerRoutes.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\advancedAIService\\fraudDetection.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\advancedAIService\\priceOptimization.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\advancedAIService\\recommendations.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\advancedAnalyticsService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\advancedSearchService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\advancedServiceGenerator.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\advancedVoiceAI.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\agriculture\\biodiversityService.js",
+        "queryCount": 18
+      },
+      {
+        "file": "src\\services\\agriculture\\cropPlanningService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\agriculture\\indigenousKnowledgeService.js",
+        "queryCount": 19
+      },
+      {
+        "file": "src\\services\\agriculture\\landRecordsService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\agriculture\\regionalVarietyService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\agriculture\\seedVaultService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\agriculture\\weatherService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\ai\\advancedVoiceAI.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\ai\\aiAgentService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\ai\\aiCopilotService.js",
+        "queryCount": 19
+      },
+      {
+        "file": "src\\services\\ai\\knowledgeGraphService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\ai\\omnichannelAIService.js",
+        "queryCount": 17
+      },
+      {
+        "file": "src\\services\\ai\\predictiveAnalyticsService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\aiApprovalService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\aiEventOrchestratorService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\aiFeedbackService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\aiSelfHealingResilienceService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\aiService\\creditRisk.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\aiService\\demandForecasting.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\apiWarningService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\auditService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\authService\\tokens.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\authService\\twoFactor.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\batchProcessingService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\blockchainVerificationService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\boundedAutonomyService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\claude\\aiCollaborationService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\claude\\enhancedLibraryKnowledgeService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\commerce\\arVrService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\commerce\\buyingClubService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\commerce\\dprGenerationService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\commerce\\equipmentExchangeService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\commerce\\giIntelligenceService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\commerce\\institutionalProcurementService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\commerce\\machineryAccessService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\commerce\\marketIntelligenceService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\commerce\\productService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\commerce\\rfqService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\dataValidationService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\digitalProductPassportService\\impact.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\digitalProductPassportService\\provenance.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\digitalProductPassportService\\qrAndPassport.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\digitalProductPassportService\\quality.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\digitalTwinService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\dual-use\\platformCoreService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\e2eVerificationService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\endToEndFlowService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\erpControlPlaneService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\etlService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\farmerHealthService.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\services\\farmerKycService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\farmerVerificationService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\finance\\dynamicPricingService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\finance\\gstService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\finance\\insurancePolicyIssuanceService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\finance\\insuranceService.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\services\\finance\\revenueService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\food\\consumerHealthService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\food\\foodIntelligenceService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\food\\foodSafetyService.js",
+        "queryCount": 21
+      },
+      {
+        "file": "src\\services\\food\\nutritionIntelligenceService.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\services\\formService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\gapClosureOperationalService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\jobQueueService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\labourService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\legacy\\advancedAIService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\legacy\\advancedFeaturesService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\aiAdvisoryService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\legacy\\aiAgenticCompanionService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\aiCopilotService.js",
+        "queryCount": 19
+      },
+      {
+        "file": "src\\services\\legacy\\aiOrchestrationService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\legacy\\analyticsMonitoringService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\animalHealthService.js",
+        "queryCount": 26
+      },
+      {
+        "file": "src\\services\\legacy\\apicultureService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\arVrService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\auditService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\legacy\\biodiversityService.js",
+        "queryCount": 18
+      },
+      {
+        "file": "src\\services\\legacy\\blockchainTraceabilityService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\buyingClubService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\legacy\\civilDisruptionService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\commerceRulesService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\legacy\\companyService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\complianceService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\comprehensiveERPService.js",
+        "queryCount": 61
+      },
+      {
+        "file": "src\\services\\legacy\\consumerHealthService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\legacy\\conversationalAIService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\costControlService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\legacy\\costService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\legacy\\cropPlanningService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\cropValueResearchService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\dairyService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\legacy\\defenseFitnessPrepService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\demandService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\legacy\\digitalProductPassportService.js",
+        "queryCount": 36
+      },
+      {
+        "file": "src\\services\\legacy\\digitalTwinService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\dprGenerationService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\legacy\\dynamicPricingService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\ecommerceAIService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\ecommerceBusinessSalesService.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\services\\legacy\\ecommerceERPService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\ecommerceMarketingService.js",
+        "queryCount": 20
+      },
+      {
+        "file": "src\\services\\legacy\\ecommerceService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\legacy\\enterpriseMemoryService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\equipmentExchangeService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\erpService.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\services\\legacy\\experienceLayerService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\legacy\\farmerValueService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\legacy\\fisheriesService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\foluBenchmarkService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\legacy\\foodIntelligenceService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\legacy\\foodSafetyService.js",
+        "queryCount": 21
+      },
+      {
+        "file": "src\\services\\legacy\\forestryService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\formService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\geofencingService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\legacy\\giIntelligenceService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\legacy\\glutWarningService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\legacy\\goatService.js",
+        "queryCount": 28
+      },
+      {
+        "file": "src\\services\\legacy\\governanceService.js",
+        "queryCount": 23
+      },
+      {
+        "file": "src\\services\\legacy\\governmentSchemeService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\householdEconomyService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\hrService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\legacy\\indigenousKnowledgeService.js",
+        "queryCount": 19
+      },
+      {
+        "file": "src\\services\\legacy\\institutionalProcurementService.js",
+        "queryCount": 20
+      },
+      {
+        "file": "src\\services\\legacy\\insuranceFraudDetectionService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\insurancePolicyIssuanceService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\insurancePremiumService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\legacy\\insuranceService.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\services\\legacy\\iotSensorService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\legacy\\knowledgeGraphService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\laboratoryERPService.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\services\\legacy\\landRecordsService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\legacy\\libraryKnowledgeService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\logisticsEnhancementService.js",
+        "queryCount": 29
+      },
+      {
+        "file": "src\\services\\legacy\\logisticsService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\machineryAccessService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\marketAccessService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\marketDataService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\marketIntelligenceService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\mobilityRidesService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\multilingualService.js",
+        "queryCount": 24
+      },
+      {
+        "file": "src\\services\\legacy\\mushroomService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\nutrientValueSalesService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\nutritionIntelligenceService.js",
+        "queryCount": 23
+      },
+      {
+        "file": "src\\services\\legacy\\omnichannelAIService.js",
+        "queryCount": 17
+      },
+      {
+        "file": "src\\services\\legacy\\organicTraceabilityService.js",
+        "queryCount": 20
+      },
+      {
+        "file": "src\\services\\legacy\\organizationManagementService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\pigService.js",
+        "queryCount": 28
+      },
+      {
+        "file": "src\\services\\legacy\\platformConfigurationService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\legacy\\platformTelemetryService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\poultryService.js",
+        "queryCount": 26
+      },
+      {
+        "file": "src\\services\\legacy\\predictiveAnalyticsService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\legacy\\procurementSubscriptionService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\productMediaAIService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\productReviewService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\productService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\legacy\\projectSystemsService.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\services\\legacy\\recipeIntelligenceService.js",
+        "queryCount": 11
+      },
+      {
+        "file": "src\\services\\legacy\\recoveredFinanceService.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\services\\legacy\\regionalVarietyService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\renewableEnergyService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\resourceCrudFactory.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\returnLoadBoardService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\legacy\\revenueService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\legacy\\rfqService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\legacy\\riskPricingService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\roleManagementService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\ruralEnterpriseService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\legacy\\ruralFinanceService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\seedVaultService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\sellerRankingService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\legacy\\sericultureService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\sharedInfraService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\legacy\\sharedInfrastructureService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\sheepService.js",
+        "queryCount": 29
+      },
+      {
+        "file": "src\\services\\legacy\\shelfLifeService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\tenantManagementService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\legacy\\valueCommerceService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\legacy\\vermicompostService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\legacy\\villageProfileService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\legacy\\voiceAIService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\legacy\\weatherService.js",
+        "queryCount": 16
+      },
+      {
+        "file": "src\\services\\legacy\\whatsappService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\logistics\\blockchainTraceabilityService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\logistics\\freightPoolingService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\logistics\\logisticsEnhancementService.js",
+        "queryCount": 27
+      },
+      {
+        "file": "src\\services\\logistics\\logisticsService.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\services\\m001m050EnterpriseProductService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\m051m100AgricultureProductionService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\machineryVillageOpsService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\masterDataIntelligenceService.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\services\\mfaService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\notificationService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\platform\\advancedFeaturesService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\platform\\analyticsMonitoringService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\platform\\auditService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\platform\\backupService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\platform\\complianceService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\platform\\enterpriseMemoryService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\platform\\erpService.js",
+        "queryCount": 13
+      },
+      {
+        "file": "src\\services\\platform\\experienceLayerService.js",
+        "queryCount": 14
+      },
+      {
+        "file": "src\\services\\platform\\formService.js",
+        "queryCount": 8
+      },
+      {
+        "file": "src\\services\\platform\\governanceService.js",
+        "queryCount": 22
+      },
+      {
+        "file": "src\\services\\platform\\laboratoryERPService.js",
+        "queryCount": 15
+      },
+      {
+        "file": "src\\services\\platform\\multilingualService.js",
+        "queryCount": 24
+      },
+      {
+        "file": "src\\services\\platform\\sharedInfrastructureService.js",
+        "queryCount": 6
+      },
+      {
+        "file": "src\\services\\platform\\whatsappService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\platformCoreService.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\services\\predictiveIntelligenceService.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\services\\productionExampleService.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\services\\productService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\services\\publicDataExtractorService.js",
+        "queryCount": 7
+      },
+      {
+        "file": "src\\services\\soilNutrientLandService.js",
+        "queryCount": 9
+      },
+      {
+        "file": "src\\services\\vendorProcurementService.js",
+        "queryCount": 12
+      },
+      {
+        "file": "src\\services\\waterIrrigationService.js",
+        "queryCount": 10
+      },
+      {
+        "file": "src\\tests\\aiGatewayService.test.js",
+        "queryCount": 2
+      },
+      {
+        "file": "src\\tests\\farmerPortal.test.js",
+        "queryCount": 4
+      },
+      {
+        "file": "src\\tests\\insurance.test.js",
+        "queryCount": 3
+      },
+      {
+        "file": "src\\tests\\marketplace.test.js",
+        "queryCount": 5
+      },
+      {
+        "file": "src\\__tests__\\organizationManagementRoutes.test.js",
+        "queryCount": 2
+      }
+    ]
+  },
+  "byFile": {
+    "src\\controllers\\ecommerceController.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\core\\ai\\aiAuditLogger.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\core\\aiOrchestrator.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\core\\businessCell.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\core\\claudeAICoordinator.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\core\\configRegistry.js": {
+      "queries": 18,
+      "category": "other"
+    },
+    "src\\core\\disruptionRoutingAgent.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\core\\enhancedServiceFramework.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\core\\moduleRegistry.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\core\\nervousSystem.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\core\\outcomeResolver.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\core\\outcomeSink.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\core\\serviceAuditAndEnhancement.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\database\\backup\\backup_manager.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\database\\connection.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\database\\initializeDB.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\database\\monitoring\\database_monitor.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\database\\optimization\\query_optimizer.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\database\\schema_migrations.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\database\\security\\database_security.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\database\\seed.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\database\\seed_economic.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\middleware\\ownership.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\modules\\M001_PLATFORM_CORE\\backend\\service.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\modules\\M002\\service.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\modules\\M002_USER_MANAGEMENT\\backend\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M003\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M003_ORGANIZATION\\backend\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M004\\service.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\modules\\M004_ROLE_MANAGEMENT\\backend\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M005\\service.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\modules\\M005_PERMISSION_MANAGEMENT\\backend\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M006\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M007\\service.js": {
+      "queries": 17,
+      "category": "other"
+    },
+    "src\\modules\\M008\\service.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\modules\\M009\\service.js": {
+      "queries": 18,
+      "category": "other"
+    },
+    "src\\modules\\M010\\service.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\modules\\M012\\service.js": {
+      "queries": 17,
+      "category": "other"
+    },
+    "src\\modules\\M013\\service.js": {
+      "queries": 17,
+      "category": "other"
+    },
+    "src\\modules\\M014\\service.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\modules\\M015\\service.js": {
+      "queries": 26,
+      "category": "other"
+    },
+    "src\\modules\\M016\\service.js": {
+      "queries": 17,
+      "category": "other"
+    },
+    "src\\modules\\M017\\service.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\modules\\M018\\service.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\modules\\M019\\service.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\modules\\M020\\service.js": {
+      "queries": 17,
+      "category": "other"
+    },
+    "src\\modules\\M021\\service.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\modules\\M022\\service.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\modules\\M023\\service.js": {
+      "queries": 30,
+      "category": "other"
+    },
+    "src\\modules\\M024\\service.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\modules\\M025\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M026\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M027\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M028\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M029\\service.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\modules\\M030\\service.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\modules\\M031\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M032\\service.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\modules\\M033\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M036\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M040\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M041\\service.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\modules\\M042\\service.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\modules\\M043\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M044\\service.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\modules\\M045\\service.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\modules\\M046\\service.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\modules\\M047\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M048\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M050\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M051\\service.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\modules\\M052\\service.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\modules\\M053\\service.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\modules\\M054\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M055\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M056\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M057\\service.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\modules\\M058\\service.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\modules\\M059\\service.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\modules\\M060\\service.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\modules\\M069\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M071\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M072\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M073\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M074\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M075\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M076\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M077\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M078\\service.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\modules\\M079\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M080\\service.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\modules\\M081\\service.js": {
+      "queries": 21,
+      "category": "other"
+    },
+    "src\\modules\\M082\\service.js": {
+      "queries": 17,
+      "category": "other"
+    },
+    "src\\modules\\M083\\service.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\modules\\M084\\service.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\modules\\M085\\service.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\modules\\M086\\service.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\modules\\M087\\service.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\modules\\M090\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M091\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M092\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M093\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M094\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M098\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M099\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M100\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M101\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M102\\service.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\modules\\M103\\service.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\modules\\M104\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M105\\service.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\modules\\M106\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M107\\service.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\modules\\M108\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M109\\service.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\modules\\M110\\service.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\modules\\M111\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M114\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M115\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M117\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M118\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M119\\service.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M120\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M122\\service.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\modules\\M123\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M124\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M125\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M126\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M127\\service.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\modules\\M128\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M132\\service.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\modules\\M137\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M139\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M141\\service.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\modules\\M144\\service.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\modules\\M148\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M149\\service.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\modules\\M400_AI_BACKBONE\\backend\\service.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\modules\\M645100_LIBRARYKNOWLEDGE\\api\\routes.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\modules\\M645100_LIBRARYKNOWLEDGE\\backend\\service.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\modules\\shared\\createRegistryService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\modules\\TEMPLATES\\MODULE_TEMPLATE\\backend\\routes.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\modules\\TEMPLATES\\MODULE_TEMPLATE\\backend\\service.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\routes\\finance\\gstRoutes.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\routes\\gstRoutes.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\routes\\healthRoutes.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\routes\\logistics\\coldStorageRoutes.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\routes\\logistics\\geofencingRoutes.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\routes\\logistics\\trackDartRoutes.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\routes\\m001m050ProductionIntegrationRoutes.js": {
+      "queries": 2,
+      "category": "sync"
+    },
+    "src\\routes\\neVarietiesRoutes.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\routes\\trackDartRoutes.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\routes\\unifiedLedgerRoutes.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\advancedAIService\\fraudDetection.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\advancedAIService\\priceOptimization.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\advancedAIService\\recommendations.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\advancedAnalyticsService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\advancedSearchService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\advancedServiceGenerator.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\advancedVoiceAI.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\agriculture\\biodiversityService.js": {
+      "queries": 18,
+      "category": "other"
+    },
+    "src\\services\\agriculture\\cropPlanningService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\agriculture\\indigenousKnowledgeService.js": {
+      "queries": 19,
+      "category": "other"
+    },
+    "src\\services\\agriculture\\landRecordsService.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\services\\agriculture\\regionalVarietyService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\agriculture\\seedVaultService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\agriculture\\weatherService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\ai\\advancedVoiceAI.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\ai\\aiAgentService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\ai\\aiCopilotService.js": {
+      "queries": 19,
+      "category": "other"
+    },
+    "src\\services\\ai\\knowledgeGraphService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\ai\\omnichannelAIService.js": {
+      "queries": 17,
+      "category": "other"
+    },
+    "src\\services\\ai\\predictiveAnalyticsService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\aiApprovalService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\aiEventOrchestratorService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\aiFeedbackService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\aiSelfHealingResilienceService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\aiService\\creditRisk.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\aiService\\demandForecasting.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\apiWarningService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\auditService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\authService\\oauth.js": {
+      "queries": 4,
+      "category": "identity"
+    },
+    "src\\services\\authService\\tokens.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\authService\\twoFactor.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\authService\\userAuth.js": {
+      "queries": 11,
+      "category": "identity"
+    },
+    "src\\services\\batchProcessingService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\blockchainVerificationService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\boundedAutonomyService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\claude\\aiCollaborationService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\claude\\enhancedLibraryKnowledgeService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\commerce\\arVrService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\commerce\\bulkOrderService.js": {
+      "queries": 14,
+      "category": "lifecycle"
+    },
+    "src\\services\\commerce\\buyingClubService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\commerce\\dprGenerationService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\commerce\\equipmentExchangeService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\commerce\\giIntelligenceService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\commerce\\institutionalProcurementService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\commerce\\machineryAccessService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\commerce\\marketIntelligenceService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\commerce\\productService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\commerce\\rfqService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\dataValidationService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\digitalProductPassportService\\coreIdentity.js": {
+      "queries": 4,
+      "category": "identity"
+    },
+    "src\\services\\digitalProductPassportService\\impact.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\digitalProductPassportService\\lifecycle.js": {
+      "queries": 4,
+      "category": "lifecycle"
+    },
+    "src\\services\\digitalProductPassportService\\provenance.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\digitalProductPassportService\\qrAndPassport.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\digitalProductPassportService\\quality.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\digitalTwinService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\dual-use\\authService.js": {
+      "queries": 23,
+      "category": "identity"
+    },
+    "src\\services\\dual-use\\platformCoreService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\e2eVerificationService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\endToEndFlowService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\enterpriseIntegrationService.js": {
+      "queries": 7,
+      "category": "sync"
+    },
+    "src\\services\\erpControlPlaneService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\etlService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\farmerHealthService.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\services\\farmerKycService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\farmerVerificationService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\finance\\dynamicPricingService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\finance\\gstService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\finance\\insurancePolicyIssuanceService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\finance\\insuranceService.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\services\\finance\\offlinePaymentService.js": {
+      "queries": 21,
+      "category": "money"
+    },
+    "src\\services\\finance\\revenueService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\food\\consumerHealthService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\food\\foodIntelligenceService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\food\\foodSafetyService.js": {
+      "queries": 21,
+      "category": "other"
+    },
+    "src\\services\\food\\nutritionIntelligenceService.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\services\\formService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\gapClosureOperationalService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\indiaErpAccountingService.js": {
+      "queries": 10,
+      "category": "identity"
+    },
+    "src\\services\\iotIntegrationService.js": {
+      "queries": 8,
+      "category": "sync"
+    },
+    "src\\services\\jobQueueService.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\services\\labourService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\legacy\\advancedAIService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\legacy\\advancedFeaturesService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\legacy\\aiAdvisoryService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\legacy\\aiAgenticCompanionService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\legacy\\aiCopilotService.js": {
+      "queries": 19,
+      "category": "other"
+    },
+    "src\\services\\legacy\\aiOrchestrationService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\legacy\\analyticsMonitoringService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\legacy\\animalHealthService.js": {
+      "queries": 26,
+      "category": "other"
+    },
+    "src\\services\\legacy\\apicultureService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\arVrService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\legacy\\auditService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\legacy\\biodiversityService.js": {
+      "queries": 18,
+      "category": "other"
+    },
+    "src\\services\\legacy\\blockchainTraceabilityService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\legacy\\bulkOrderService.js": {
+      "queries": 15,
+      "category": "lifecycle"
+    },
+    "src\\services\\legacy\\buyingClubService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\legacy\\civilDisruptionService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\commerceRulesService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\legacy\\companyService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\legacy\\completeERPIntegrationService.js": {
+      "queries": 25,
+      "category": "sync"
+    },
+    "src\\services\\legacy\\complianceService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\legacy\\comprehensiveERPService.js": {
+      "queries": 61,
+      "category": "other"
+    },
+    "src\\services\\legacy\\consumerHealthService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\legacy\\conversationalAIService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\legacy\\costControlService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\legacy\\costService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\legacy\\cropPlanningService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\cropValueResearchService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\legacy\\dairyService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\legacy\\defenseFitnessPrepService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\legacy\\demandService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\legacy\\digitalProductPassportService.js": {
+      "queries": 36,
+      "category": "other"
+    },
+    "src\\services\\legacy\\digitalTwinService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\dprGenerationService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\legacy\\dynamicPricingService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\legacy\\ecommerceAIService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\legacy\\ecommerceBusinessSalesService.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\services\\legacy\\ecommerceERPService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\legacy\\ecommerceIntegrationService.js": {
+      "queries": 16,
+      "category": "sync"
+    },
+    "src\\services\\legacy\\ecommerceMarketingService.js": {
+      "queries": 20,
+      "category": "other"
+    },
+    "src\\services\\legacy\\ecommerceService.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\services\\legacy\\enterpriseMemoryService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\equipmentExchangeService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\erpService.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\services\\legacy\\experienceLayerService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\legacy\\farmerValueService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\legacy\\fisheriesService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\foluBenchmarkService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\legacy\\foodIntelligenceService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\legacy\\foodSafetyService.js": {
+      "queries": 21,
+      "category": "other"
+    },
+    "src\\services\\legacy\\forestryService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\formService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\legacy\\geofencingService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\legacy\\giIntelligenceService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\legacy\\glutWarningService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\legacy\\goatService.js": {
+      "queries": 28,
+      "category": "other"
+    },
+    "src\\services\\legacy\\governanceService.js": {
+      "queries": 23,
+      "category": "other"
+    },
+    "src\\services\\legacy\\governmentSchemeService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\householdEconomyService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\legacy\\hrService.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\services\\legacy\\identityManagementService.js": {
+      "queries": 5,
+      "category": "identity"
+    },
+    "src\\services\\legacy\\indigenousKnowledgeService.js": {
+      "queries": 19,
+      "category": "other"
+    },
+    "src\\services\\legacy\\institutionalProcurementService.js": {
+      "queries": 20,
+      "category": "other"
+    },
+    "src\\services\\legacy\\insuranceFraudDetectionService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\legacy\\insurancePolicyIssuanceService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\legacy\\insurancePremiumService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\legacy\\insuranceService.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\services\\legacy\\iotIntegrationService.js": {
+      "queries": 11,
+      "category": "sync"
+    },
+    "src\\services\\legacy\\iotSensorService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\legacy\\knowledgeGraphService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\legacy\\laboratoryERPService.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\services\\legacy\\landRecordsService.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\services\\legacy\\libraryKnowledgeService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\legacy\\logisticsEnhancementService.js": {
+      "queries": 29,
+      "category": "other"
+    },
+    "src\\services\\legacy\\logisticsService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\legacy\\machineryAccessService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\marketAccessService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\marketDataService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\marketIntelligenceService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\mobilityRidesService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\multilingualService.js": {
+      "queries": 24,
+      "category": "other"
+    },
+    "src\\services\\legacy\\mushroomService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\nutrientValueSalesService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\legacy\\nutritionIntelligenceService.js": {
+      "queries": 23,
+      "category": "other"
+    },
+    "src\\services\\legacy\\offlinePaymentService.js": {
+      "queries": 21,
+      "category": "money"
+    },
+    "src\\services\\legacy\\offlineSyncService.js": {
+      "queries": 26,
+      "category": "sync"
+    },
+    "src\\services\\legacy\\omnichannelAIService.js": {
+      "queries": 17,
+      "category": "other"
+    },
+    "src\\services\\legacy\\organicTraceabilityService.js": {
+      "queries": 20,
+      "category": "other"
+    },
+    "src\\services\\legacy\\organizationManagementService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\pigService.js": {
+      "queries": 28,
+      "category": "other"
+    },
+    "src\\services\\legacy\\platformConfigurationService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\legacy\\platformTelemetryService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\legacy\\poultryService.js": {
+      "queries": 26,
+      "category": "other"
+    },
+    "src\\services\\legacy\\predictiveAnalyticsService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\legacy\\procurementSubscriptionService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\legacy\\productMediaAIService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\legacy\\productReviewService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\legacy\\productService.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\services\\legacy\\projectSystemsService.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\services\\legacy\\recipeIntelligenceService.js": {
+      "queries": 11,
+      "category": "other"
+    },
+    "src\\services\\legacy\\recoveredFinanceService.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\services\\legacy\\regionalVarietyService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\renewableEnergyService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\resourceCrudFactory.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\returnLoadBoardService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\legacy\\revenueService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\legacy\\rfqService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\legacy\\riskPricingService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\roleManagementService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\legacy\\ruralEnterpriseService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\legacy\\ruralFinanceService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\seedVaultService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\legacy\\sellerRankingService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\legacy\\sericultureService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\sharedInfraService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\legacy\\sharedInfrastructureService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\sheepService.js": {
+      "queries": 29,
+      "category": "other"
+    },
+    "src\\services\\legacy\\shelfLifeService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\legacy\\smsAuthService.js": {
+      "queries": 13,
+      "category": "identity"
+    },
+    "src\\services\\legacy\\tenantManagementService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\legacy\\valueCommerceService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\legacy\\vermicompostService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\legacy\\villageProfileService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\legacy\\voiceAIService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\legacy\\wearableIntegrationService.js": {
+      "queries": 9,
+      "category": "sync"
+    },
+    "src\\services\\legacy\\weatherService.js": {
+      "queries": 16,
+      "category": "other"
+    },
+    "src\\services\\legacy\\whatsappService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\logistics\\blockchainTraceabilityService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\logistics\\freightPoolingService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\logistics\\iotIntegrationService.js": {
+      "queries": 11,
+      "category": "sync"
+    },
+    "src\\services\\logistics\\logisticsEnhancementService.js": {
+      "queries": 27,
+      "category": "other"
+    },
+    "src\\services\\logistics\\logisticsService.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\services\\m001m050EnterpriseProductService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\m051m100AgricultureProductionService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\machineryVillageOpsService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\masterDataIntelligenceService.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\services\\mfaService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\notificationService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\offlineSyncService.js": {
+      "queries": 26,
+      "category": "sync"
+    },
+    "src\\services\\paymentGatewayService.js": {
+      "queries": 4,
+      "category": "money"
+    },
+    "src\\services\\paymentService.js": {
+      "queries": 7,
+      "category": "money"
+    },
+    "src\\services\\platform\\advancedFeaturesService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\platform\\analyticsMonitoringService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\platform\\auditService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\platform\\backupService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\platform\\complianceService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\platform\\enterpriseMemoryService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\platform\\erpService.js": {
+      "queries": 13,
+      "category": "other"
+    },
+    "src\\services\\platform\\experienceLayerService.js": {
+      "queries": 14,
+      "category": "other"
+    },
+    "src\\services\\platform\\formService.js": {
+      "queries": 8,
+      "category": "other"
+    },
+    "src\\services\\platform\\governanceService.js": {
+      "queries": 22,
+      "category": "other"
+    },
+    "src\\services\\platform\\laboratoryERPService.js": {
+      "queries": 15,
+      "category": "other"
+    },
+    "src\\services\\platform\\multilingualService.js": {
+      "queries": 24,
+      "category": "other"
+    },
+    "src\\services\\platform\\offlineSyncService.js": {
+      "queries": 26,
+      "category": "sync"
+    },
+    "src\\services\\platform\\sharedInfrastructureService.js": {
+      "queries": 6,
+      "category": "other"
+    },
+    "src\\services\\platform\\smsAuthService.js": {
+      "queries": 13,
+      "category": "identity"
+    },
+    "src\\services\\platform\\whatsappService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\platformCoreService.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\services\\predictiveIntelligenceService.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\services\\productionExampleService.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\services\\productService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\services\\publicDataExtractorService.js": {
+      "queries": 7,
+      "category": "other"
+    },
+    "src\\services\\soilNutrientLandService.js": {
+      "queries": 9,
+      "category": "other"
+    },
+    "src\\services\\userManagementService.js": {
+      "queries": 10,
+      "category": "identity"
+    },
+    "src\\services\\vendorProcurementService.js": {
+      "queries": 12,
+      "category": "other"
+    },
+    "src\\services\\waterIrrigationService.js": {
+      "queries": 10,
+      "category": "other"
+    },
+    "src\\tests\\aiGatewayService.test.js": {
+      "queries": 2,
+      "category": "other"
+    },
+    "src\\tests\\farmerPortal.test.js": {
+      "queries": 4,
+      "category": "other"
+    },
+    "src\\tests\\insurance.test.js": {
+      "queries": 3,
+      "category": "other"
+    },
+    "src\\tests\\marketplace.test.js": {
+      "queries": 5,
+      "category": "other"
+    },
+    "src\\__tests__\\organizationManagementRoutes.test.js": {
+      "queries": 2,
+      "category": "other"
+    }
+  },
+  "total": 405
+}

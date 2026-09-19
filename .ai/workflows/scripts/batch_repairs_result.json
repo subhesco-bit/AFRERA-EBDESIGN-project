@@ -1,0 +1,25 @@
+{
+  "fixed": [
+    {
+      "file": "advancedServiceGenerator.js",
+      "type": "io-fallback"
+    },
+    {
+      "file": "websocketService.js",
+      "type": "io-fallback"
+    }
+  ],
+  "failed": [
+    {
+      "type": "boot-test",
+      "error": "2026-09-19 19:28:19:2819 [\u001b[33mwarn\u001b[39m]: \u001b[33mJWT_SECRET not set - using a random per-process secr"
+    }
+  ],
+  "skipped": [],
+  "stats": {
+    "middlewareFixed": 0,
+    "ioFixed": 2,
+    "envFixed": 3,
+    "serviceFixed": 0
+  }
+}

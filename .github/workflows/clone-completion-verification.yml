@@ -1,0 +1,40 @@
+name: Clone Completion Verification
+on:
+  push:
+    branches:
+      - 'chatgpt-clone/**'
+  pull_request:
+    branches:
+      - 'chatgpt-clone/**'
+      - main
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Backend install
+        working-directory: backend
+        run: npm ci
+      - name: Backend lint
+        working-directory: backend
+        run: npm run lint
+      - name: Backend tests
+        working-directory: backend
+        run: npm test -- --runInBand
+      - name: Frontend install
+        working-directory: frontend
+        run: npm ci
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build
+      - name: Frontend lint
+        working-directory: frontend
+        run: npm run lint

@@ -1,0 +1,1463 @@
+{
+  "byFile": {
+    "src\\services\\paymentService.js": [
+      {
+        "name": "transferFunds",
+        "line": 170,
+        "endLine": 199,
+        "queryCount": 2,
+        "category": "money"
+      }
+    ],
+    "src\\services\\legacy\\identityManagementService.js": [
+      {
+        "name": "list",
+        "line": 60,
+        "endLine": 87,
+        "queryCount": 2,
+        "category": "identity"
+      }
+    ],
+    "src\\services\\userManagementService.js": [
+      {
+        "name": "getUsers",
+        "line": 82,
+        "endLine": 144,
+        "queryCount": 2,
+        "category": "identity"
+      }
+    ],
+    "src\\services\\commerce\\bulkOrderService.js": [
+      {
+        "name": "createBulkOrderRequest",
+        "line": 18,
+        "endLine": 78,
+        "queryCount": 2,
+        "category": "lifecycle"
+      },
+      {
+        "name": "convertQuotationToOrder",
+        "line": 339,
+        "endLine": 394,
+        "queryCount": 3,
+        "category": "lifecycle"
+      }
+    ],
+    "src\\services\\legacy\\bulkOrderService.js": [
+      {
+        "name": "createBulkOrderRequest",
+        "line": 18,
+        "endLine": 78,
+        "queryCount": 2,
+        "category": "lifecycle"
+      },
+      {
+        "name": "convertQuotationToOrder",
+        "line": 356,
+        "endLine": 411,
+        "queryCount": 3,
+        "category": "lifecycle"
+      }
+    ],
+    "src\\core\\configRegistry.js": [
+      {
+        "name": "initialize",
+        "line": 23,
+        "endLine": 101,
+        "queryCount": 5,
+        "category": "other"
+      }
+    ],
+    "src\\core\\enhancedServiceFramework.js": [
+      {
+        "name": "queryWithPrefetch",
+        "line": 154,
+        "endLine": 173,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\database\\backup\\backup_manager.js": [
+      {
+        "name": "recordBackupMetadata",
+        "line": 494,
+        "endLine": 523,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\database\\monitoring\\database_monitor.js": [
+      {
+        "name": "createMonitoringTables",
+        "line": 104,
+        "endLine": 178,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "trackSlowQuery",
+        "line": 288,
+        "endLine": 331,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "collectPerformanceMetrics",
+        "line": 421,
+        "endLine": 458,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\database\\security\\database_security.js": [
+      {
+        "name": "createAuditTables",
+        "line": 250,
+        "endLine": 315,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "setUserContext",
+        "line": 580,
+        "endLine": 588,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "clearUserContext",
+        "line": 593,
+        "endLine": 601,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "getSecurityStatistics",
+        "line": 652,
+        "endLine": 691,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ],
+    "src\\modules\\M001_PLATFORM_CORE\\backend\\service.js": [
+      {
+        "name": "initializeDatabase",
+        "line": 52,
+        "endLine": 111,
+        "queryCount": 4,
+        "category": "other"
+      },
+      {
+        "name": "getStats",
+        "line": 389,
+        "endLine": 433,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\modules\\M013\\service.js": [
+      {
+        "name": "listAuthorizations",
+        "line": 23,
+        "endLine": 59,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "assignRole",
+        "line": 341,
+        "endLine": 371,
+        "queryCount": 3,
+        "category": "other"
+      },
+      {
+        "name": "getAuthorizationAuditLog",
+        "line": 382,
+        "endLine": 418,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\modules\\M132\\service.js": [
+      {
+        "name": "listPonds",
+        "line": 16,
+        "endLine": 56,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\modules\\M144\\service.js": [
+      {
+        "name": "listGreenhouses",
+        "line": 16,
+        "endLine": 60,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\modules\\M400_AI_BACKBONE\\backend\\service.js": [
+      {
+        "name": "initializeDatabase",
+        "line": 160,
+        "endLine": 220,
+        "queryCount": 4,
+        "category": "other"
+      }
+    ],
+    "src\\modules\\M645100_LIBRARYKNOWLEDGE\\backend\\service.js": [
+      {
+        "name": "syncToDatabase",
+        "line": 275,
+        "endLine": 320,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\advancedSearchService.js": [
+      {
+        "name": "advancedSearch",
+        "line": 24,
+        "endLine": 145,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "getAvailableFilters",
+        "line": 250,
+        "endLine": 315,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ],
+    "src\\services\\advancedServiceGenerator.js": [
+      {
+        "name": "listItems",
+        "line": 21,
+        "endLine": 37,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\agriculture\\cropPlanningService.js": [
+      {
+        "name": "createCropPlan",
+        "line": 18,
+        "endLine": 85,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\agriculture\\landRecordsService.js": [
+      {
+        "name": "getFarmerLandRecords",
+        "line": 75,
+        "endLine": 134,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "syncWithGovernmentLandRecords",
+        "line": 279,
+        "endLine": 345,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\agriculture\\seedVaultService.js": [
+      {
+        "name": "updateSeed",
+        "line": 47,
+        "endLine": 70,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "recordUsage",
+        "line": 82,
+        "endLine": 93,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\claude\\aiCollaborationService.js": [
+      {
+        "name": "syncWorkToDatabase",
+        "line": 134,
+        "endLine": 174,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\claude\\enhancedLibraryKnowledgeService.js": [
+      {
+        "name": "syncToDatabase",
+        "line": 550,
+        "endLine": 698,
+        "queryCount": 6,
+        "category": "other"
+      }
+    ],
+    "src\\services\\commerce\\dprGenerationService.js": [
+      {
+        "name": "_getCropPlan",
+        "line": 69,
+        "endLine": 82,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "_getLatestMandiPrice",
+        "line": 85,
+        "endLine": 109,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\dual-use\\platformCoreService.js": [
+      {
+        "name": "getPlatformStats",
+        "line": 96,
+        "endLine": 122,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\gapClosureOperationalService.js": [
+      {
+        "name": "villageReadiness",
+        "line": 11,
+        "endLine": 24,
+        "queryCount": 7,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\advancedFeaturesService.js": [
+      {
+        "name": "executeVoiceIntent",
+        "line": 410,
+        "endLine": 432,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\aiAgenticCompanionService.js": [
+      {
+        "name": "loadKnowledgeBase",
+        "line": 40,
+        "endLine": 84,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\analyticsMonitoringService.js": [
+      {
+        "name": "getHistoricalAnalytics",
+        "line": 208,
+        "endLine": 274,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\cropPlanningService.js": [
+      {
+        "name": "createCropPlan",
+        "line": 18,
+        "endLine": 85,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\dprGenerationService.js": [
+      {
+        "name": "_getCropPlan",
+        "line": 69,
+        "endLine": 82,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "_getLatestMandiPrice",
+        "line": 85,
+        "endLine": 109,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\foluBenchmarkService.js": [
+      {
+        "name": "ruralLivelihoodsIndicator",
+        "line": 120,
+        "endLine": 149,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\geofencingService.js": [
+      {
+        "name": "_evaluateAndRecord",
+        "line": 129,
+        "endLine": 204,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\hrService.js": [
+      {
+        "name": "predictEmployeeAttrition",
+        "line": 132,
+        "endLine": 219,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "optimizeShiftSchedule",
+        "line": 224,
+        "endLine": 295,
+        "queryCount": 3,
+        "category": "other"
+      },
+      {
+        "name": "analyzeEmployeeSentiment",
+        "line": 300,
+        "endLine": 392,
+        "queryCount": 3,
+        "category": "other"
+      },
+      {
+        "name": "recommendTraining",
+        "line": 397,
+        "endLine": 472,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\iotSensorService.js": [
+      {
+        "name": "ingestSensorData",
+        "line": 153,
+        "endLine": 220,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\landRecordsService.js": [
+      {
+        "name": "getFarmerLandRecords",
+        "line": 75,
+        "endLine": 134,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "syncWithGovernmentLandRecords",
+        "line": 279,
+        "endLine": 354,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\libraryKnowledgeService.js": [
+      {
+        "name": "syncToDatabase",
+        "line": 106,
+        "endLine": 187,
+        "queryCount": 4,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\logisticsEnhancementService.js": [
+      {
+        "name": "getMaintenanceDueList",
+        "line": 167,
+        "endLine": 249,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "updateTracking",
+        "line": 252,
+        "endLine": 279,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "getShipmentTrail",
+        "line": 777,
+        "endLine": 803,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\platformConfigurationService.js": [
+      {
+        "name": "applyOptimizedConfiguration",
+        "line": 92,
+        "endLine": 141,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "rollbackConfiguration",
+        "line": 342,
+        "endLine": 378,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\productReviewService.js": [
+      {
+        "name": "createReview",
+        "line": 18,
+        "endLine": 62,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "getProductReviews",
+        "line": 67,
+        "endLine": 152,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "markReviewHelpful",
+        "line": 229,
+        "endLine": 275,
+        "queryCount": 5,
+        "category": "other"
+      }
+    ],
+    "src\\services\\legacy\\seedVaultService.js": [
+      {
+        "name": "updateSeed",
+        "line": 47,
+        "endLine": 70,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "recordUsage",
+        "line": 82,
+        "endLine": 93,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\logistics\\freightPoolingService.js": [
+      {
+        "name": "getPoolWindow",
+        "line": 67,
+        "endLine": 93,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "joinPoolWindow",
+        "line": 96,
+        "endLine": 127,
+        "queryCount": 4,
+        "category": "other"
+      }
+    ],
+    "src\\services\\logistics\\logisticsEnhancementService.js": [
+      {
+        "name": "updateTracking",
+        "line": 143,
+        "endLine": 170,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "getShipmentTrail",
+        "line": 691,
+        "endLine": 717,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\machineryVillageOpsService.js": [
+      {
+        "name": "getMachineryVillageDashboard",
+        "line": 346,
+        "endLine": 383,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ],
+    "src\\services\\platform\\advancedFeaturesService.js": [
+      {
+        "name": "executeVoiceIntent",
+        "line": 410,
+        "endLine": 430,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\productionExampleService.js": [
+      {
+        "name": "deleteResource",
+        "line": 142,
+        "endLine": 172,
+        "queryCount": 2,
+        "category": "other"
+      }
+    ],
+    "src\\services\\soilNutrientLandService.js": [
+      {
+        "name": "processSoilAnalysis",
+        "line": 106,
+        "endLine": 164,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "getSoilNutrientLandDashboard",
+        "line": 364,
+        "endLine": 401,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ],
+    "src\\services\\vendorProcurementService.js": [
+      {
+        "name": "getVendorProfile",
+        "line": 108,
+        "endLine": 143,
+        "queryCount": 3,
+        "category": "other"
+      },
+      {
+        "name": "evaluateVendorPerformance",
+        "line": 276,
+        "endLine": 337,
+        "queryCount": 2,
+        "category": "other"
+      },
+      {
+        "name": "getProcurementDashboard",
+        "line": 386,
+        "endLine": 423,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ],
+    "src\\services\\waterIrrigationService.js": [
+      {
+        "name": "getWaterManagementDashboard",
+        "line": 448,
+        "endLine": 486,
+        "queryCount": 3,
+        "category": "other"
+      }
+    ]
+  },
+  "needsWrapping": [
+    {
+      "file": "src\\services\\paymentService.js",
+      "category": "money",
+      "funcs": [
+        {
+          "name": "transferFunds",
+          "line": 170,
+          "endLine": 199,
+          "queryCount": 2,
+          "category": "money"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\identityManagementService.js",
+      "category": "identity",
+      "funcs": [
+        {
+          "name": "list",
+          "line": 60,
+          "endLine": 87,
+          "queryCount": 2,
+          "category": "identity"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\userManagementService.js",
+      "category": "identity",
+      "funcs": [
+        {
+          "name": "getUsers",
+          "line": 82,
+          "endLine": 144,
+          "queryCount": 2,
+          "category": "identity"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\commerce\\bulkOrderService.js",
+      "category": "lifecycle",
+      "funcs": [
+        {
+          "name": "createBulkOrderRequest",
+          "line": 18,
+          "endLine": 78,
+          "queryCount": 2,
+          "category": "lifecycle"
+        },
+        {
+          "name": "convertQuotationToOrder",
+          "line": 339,
+          "endLine": 394,
+          "queryCount": 3,
+          "category": "lifecycle"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\bulkOrderService.js",
+      "category": "lifecycle",
+      "funcs": [
+        {
+          "name": "createBulkOrderRequest",
+          "line": 18,
+          "endLine": 78,
+          "queryCount": 2,
+          "category": "lifecycle"
+        },
+        {
+          "name": "convertQuotationToOrder",
+          "line": 356,
+          "endLine": 411,
+          "queryCount": 3,
+          "category": "lifecycle"
+        }
+      ]
+    }
+  ],
+  "ambiguous": [],
+  "lowRisk": [
+    {
+      "file": "src\\core\\configRegistry.js",
+      "funcs": [
+        {
+          "name": "initialize",
+          "line": 23,
+          "endLine": 101,
+          "queryCount": 5,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\core\\enhancedServiceFramework.js",
+      "funcs": [
+        {
+          "name": "queryWithPrefetch",
+          "line": 154,
+          "endLine": 173,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\database\\backup\\backup_manager.js",
+      "funcs": [
+        {
+          "name": "recordBackupMetadata",
+          "line": 494,
+          "endLine": 523,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\database\\monitoring\\database_monitor.js",
+      "funcs": [
+        {
+          "name": "createMonitoringTables",
+          "line": 104,
+          "endLine": 178,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "trackSlowQuery",
+          "line": 288,
+          "endLine": 331,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "collectPerformanceMetrics",
+          "line": 421,
+          "endLine": 458,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\database\\security\\database_security.js",
+      "funcs": [
+        {
+          "name": "createAuditTables",
+          "line": 250,
+          "endLine": 315,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "setUserContext",
+          "line": 580,
+          "endLine": 588,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "clearUserContext",
+          "line": 593,
+          "endLine": 601,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "getSecurityStatistics",
+          "line": 652,
+          "endLine": 691,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\modules\\M001_PLATFORM_CORE\\backend\\service.js",
+      "funcs": [
+        {
+          "name": "initializeDatabase",
+          "line": 52,
+          "endLine": 111,
+          "queryCount": 4,
+          "category": "other"
+        },
+        {
+          "name": "getStats",
+          "line": 389,
+          "endLine": 433,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\modules\\M013\\service.js",
+      "funcs": [
+        {
+          "name": "listAuthorizations",
+          "line": 23,
+          "endLine": 59,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "assignRole",
+          "line": 341,
+          "endLine": 371,
+          "queryCount": 3,
+          "category": "other"
+        },
+        {
+          "name": "getAuthorizationAuditLog",
+          "line": 382,
+          "endLine": 418,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\modules\\M132\\service.js",
+      "funcs": [
+        {
+          "name": "listPonds",
+          "line": 16,
+          "endLine": 56,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\modules\\M144\\service.js",
+      "funcs": [
+        {
+          "name": "listGreenhouses",
+          "line": 16,
+          "endLine": 60,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\modules\\M400_AI_BACKBONE\\backend\\service.js",
+      "funcs": [
+        {
+          "name": "initializeDatabase",
+          "line": 160,
+          "endLine": 220,
+          "queryCount": 4,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\modules\\M645100_LIBRARYKNOWLEDGE\\backend\\service.js",
+      "funcs": [
+        {
+          "name": "syncToDatabase",
+          "line": 275,
+          "endLine": 320,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\advancedSearchService.js",
+      "funcs": [
+        {
+          "name": "advancedSearch",
+          "line": 24,
+          "endLine": 145,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "getAvailableFilters",
+          "line": 250,
+          "endLine": 315,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\advancedServiceGenerator.js",
+      "funcs": [
+        {
+          "name": "listItems",
+          "line": 21,
+          "endLine": 37,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\agriculture\\cropPlanningService.js",
+      "funcs": [
+        {
+          "name": "createCropPlan",
+          "line": 18,
+          "endLine": 85,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\agriculture\\landRecordsService.js",
+      "funcs": [
+        {
+          "name": "getFarmerLandRecords",
+          "line": 75,
+          "endLine": 134,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "syncWithGovernmentLandRecords",
+          "line": 279,
+          "endLine": 345,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\agriculture\\seedVaultService.js",
+      "funcs": [
+        {
+          "name": "updateSeed",
+          "line": 47,
+          "endLine": 70,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "recordUsage",
+          "line": 82,
+          "endLine": 93,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\claude\\aiCollaborationService.js",
+      "funcs": [
+        {
+          "name": "syncWorkToDatabase",
+          "line": 134,
+          "endLine": 174,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\claude\\enhancedLibraryKnowledgeService.js",
+      "funcs": [
+        {
+          "name": "syncToDatabase",
+          "line": 550,
+          "endLine": 698,
+          "queryCount": 6,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\commerce\\dprGenerationService.js",
+      "funcs": [
+        {
+          "name": "_getCropPlan",
+          "line": 69,
+          "endLine": 82,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "_getLatestMandiPrice",
+          "line": 85,
+          "endLine": 109,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\dual-use\\platformCoreService.js",
+      "funcs": [
+        {
+          "name": "getPlatformStats",
+          "line": 96,
+          "endLine": 122,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\gapClosureOperationalService.js",
+      "funcs": [
+        {
+          "name": "villageReadiness",
+          "line": 11,
+          "endLine": 24,
+          "queryCount": 7,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\advancedFeaturesService.js",
+      "funcs": [
+        {
+          "name": "executeVoiceIntent",
+          "line": 410,
+          "endLine": 432,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\aiAgenticCompanionService.js",
+      "funcs": [
+        {
+          "name": "loadKnowledgeBase",
+          "line": 40,
+          "endLine": 84,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\analyticsMonitoringService.js",
+      "funcs": [
+        {
+          "name": "getHistoricalAnalytics",
+          "line": 208,
+          "endLine": 274,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\cropPlanningService.js",
+      "funcs": [
+        {
+          "name": "createCropPlan",
+          "line": 18,
+          "endLine": 85,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\dprGenerationService.js",
+      "funcs": [
+        {
+          "name": "_getCropPlan",
+          "line": 69,
+          "endLine": 82,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "_getLatestMandiPrice",
+          "line": 85,
+          "endLine": 109,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\foluBenchmarkService.js",
+      "funcs": [
+        {
+          "name": "ruralLivelihoodsIndicator",
+          "line": 120,
+          "endLine": 149,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\geofencingService.js",
+      "funcs": [
+        {
+          "name": "_evaluateAndRecord",
+          "line": 129,
+          "endLine": 204,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\hrService.js",
+      "funcs": [
+        {
+          "name": "predictEmployeeAttrition",
+          "line": 132,
+          "endLine": 219,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "optimizeShiftSchedule",
+          "line": 224,
+          "endLine": 295,
+          "queryCount": 3,
+          "category": "other"
+        },
+        {
+          "name": "analyzeEmployeeSentiment",
+          "line": 300,
+          "endLine": 392,
+          "queryCount": 3,
+          "category": "other"
+        },
+        {
+          "name": "recommendTraining",
+          "line": 397,
+          "endLine": 472,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\iotSensorService.js",
+      "funcs": [
+        {
+          "name": "ingestSensorData",
+          "line": 153,
+          "endLine": 220,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\landRecordsService.js",
+      "funcs": [
+        {
+          "name": "getFarmerLandRecords",
+          "line": 75,
+          "endLine": 134,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "syncWithGovernmentLandRecords",
+          "line": 279,
+          "endLine": 354,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\libraryKnowledgeService.js",
+      "funcs": [
+        {
+          "name": "syncToDatabase",
+          "line": 106,
+          "endLine": 187,
+          "queryCount": 4,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\logisticsEnhancementService.js",
+      "funcs": [
+        {
+          "name": "getMaintenanceDueList",
+          "line": 167,
+          "endLine": 249,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "updateTracking",
+          "line": 252,
+          "endLine": 279,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "getShipmentTrail",
+          "line": 777,
+          "endLine": 803,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\platformConfigurationService.js",
+      "funcs": [
+        {
+          "name": "applyOptimizedConfiguration",
+          "line": 92,
+          "endLine": 141,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "rollbackConfiguration",
+          "line": 342,
+          "endLine": 378,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\productReviewService.js",
+      "funcs": [
+        {
+          "name": "createReview",
+          "line": 18,
+          "endLine": 62,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "getProductReviews",
+          "line": 67,
+          "endLine": 152,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "markReviewHelpful",
+          "line": 229,
+          "endLine": 275,
+          "queryCount": 5,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\legacy\\seedVaultService.js",
+      "funcs": [
+        {
+          "name": "updateSeed",
+          "line": 47,
+          "endLine": 70,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "recordUsage",
+          "line": 82,
+          "endLine": 93,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\logistics\\freightPoolingService.js",
+      "funcs": [
+        {
+          "name": "getPoolWindow",
+          "line": 67,
+          "endLine": 93,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "joinPoolWindow",
+          "line": 96,
+          "endLine": 127,
+          "queryCount": 4,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\logistics\\logisticsEnhancementService.js",
+      "funcs": [
+        {
+          "name": "updateTracking",
+          "line": 143,
+          "endLine": 170,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "getShipmentTrail",
+          "line": 691,
+          "endLine": 717,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\machineryVillageOpsService.js",
+      "funcs": [
+        {
+          "name": "getMachineryVillageDashboard",
+          "line": 346,
+          "endLine": 383,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\platform\\advancedFeaturesService.js",
+      "funcs": [
+        {
+          "name": "executeVoiceIntent",
+          "line": 410,
+          "endLine": 430,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\productionExampleService.js",
+      "funcs": [
+        {
+          "name": "deleteResource",
+          "line": 142,
+          "endLine": 172,
+          "queryCount": 2,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\soilNutrientLandService.js",
+      "funcs": [
+        {
+          "name": "processSoilAnalysis",
+          "line": 106,
+          "endLine": 164,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "getSoilNutrientLandDashboard",
+          "line": 364,
+          "endLine": 401,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\vendorProcurementService.js",
+      "funcs": [
+        {
+          "name": "getVendorProfile",
+          "line": 108,
+          "endLine": 143,
+          "queryCount": 3,
+          "category": "other"
+        },
+        {
+          "name": "evaluateVendorPerformance",
+          "line": 276,
+          "endLine": 337,
+          "queryCount": 2,
+          "category": "other"
+        },
+        {
+          "name": "getProcurementDashboard",
+          "line": 386,
+          "endLine": 423,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    },
+    {
+      "file": "src\\services\\waterIrrigationService.js",
+      "funcs": [
+        {
+          "name": "getWaterManagementDashboard",
+          "line": 448,
+          "endLine": 486,
+          "queryCount": 3,
+          "category": "other"
+        }
+      ]
+    }
+  ]
+}

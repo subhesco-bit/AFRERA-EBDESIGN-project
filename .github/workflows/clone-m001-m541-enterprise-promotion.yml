@@ -1,0 +1,42 @@
+name: Clone M001-M541 Enterprise Promotion Gate
+on:
+  push:
+    branches: [chatgpt-clone/main-reconciliation-phase-1]
+  workflow_dispatch:
+jobs:
+  enterprise-promotion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Align npm runtime
+        run: npm install --global npm@12
+      - name: Backend install
+        working-directory: backend
+        run: npm ci
+      - name: Uniform M001-M541 contract tests
+        working-directory: backend
+        run: npx jest tests/m001-m541-enterprise-promotion.test.js tests/m051-m150-enterprise-promotion.test.js tests/m001-m550-enterprise-runtime.test.js tests/backend-module-live-wiring.test.js --runInBand
+      - name: Migration preflight
+        working-directory: backend
+        run: node src/database/migration_preflight.js --json
+      - name: Live module wiring audit
+        run: node tools/module-live-wiring-audit.js
+      - name: Physical 790-page audit
+        run: node tools/physical-enterprise-page-audit.js
+      - name: Page estate governance audit
+        run: node tools/enterprise-page-estate-audit.js
+      - name: Page live wiring audit
+        run: node tools/page-live-wiring-audit.js
+      - name: Project-wide readiness audit
+        run: node tools/project-perfection-audit.js
+      - name: Frontend install
+        working-directory: frontend
+        run: npm ci
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build

@@ -6,7 +6,7 @@
  *
  * (M11) Split from the former single-file services/digitalProductPassportService.js
  * into this directory, purely for code organization - behavior is unchanged.
- * Node module resolution treats `require('./services/digitalProductPassportService')`
+ * Node module resolution treats `require('../legacy/digitalProductPassportService')`
  * as `./services/digitalProductPassportService.js` OR
  * `./services/digitalProductPassportService/index.js`, whichever exists, so
  * every existing caller anywhere in the codebase continues to resolve here

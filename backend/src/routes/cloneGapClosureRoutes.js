@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+const service = require('../services/cloneGapClosureService');
+const { authMiddleware } = require('../middleware/auth');
+router.use(authMiddleware);
+router.post('/finance/journal', async (req,res,next)=>{try{res.status(201).json({success:true,journal_id:await service.createJournal(req.body)});}catch(e){next(e);}});
+router.post('/events', async (req,res,next)=>{try{res.status(201).json({success:true,event:await service.enqueueEvent(req.body)});}catch(e){next(e);}});
+router.post('/verification/evidence', async (req,res,next)=>{try{res.status(201).json({success:true,evidence:await service.recordVerification(req.body)});}catch(e){next(e);}});
+router.post('/master-data/canonicalize', async (req,res,next)=>{try{res.json({success:true,record:await service.reconcileEntity(req.body)});}catch(e){next(e);}});
+module.exports=router;

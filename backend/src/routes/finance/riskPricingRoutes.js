@@ -25,7 +25,7 @@
 const express = require('express');
 
 const router = express.Router();
-const risk = require('../../services/finance/riskPricingService');
+const risk = require('../../services/legacy/riskPricingService');
 const { authMiddleware } = require('../../middleware/auth');
 
 /** Shared error shape. 400 for bad input, 500 only for genuine faults. */

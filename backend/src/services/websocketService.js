@@ -1,3 +1,5 @@
+
+const getIO = () => global.appIO || { emit: () => {} };
 /**
  * WebSocket Service for Real-time Updates
  * Enhanced Socket.IO integration for live data synchronization

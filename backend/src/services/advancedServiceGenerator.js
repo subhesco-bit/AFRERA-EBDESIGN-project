@@ -1,3 +1,5 @@
+
+const getIO = () => global.appIO || { emit: () => {} };
 ﻿// Advanced Futuristic Module Service Generator
 // This pattern can be applied to transform skeleton modules into launch-ready advanced implementations
 
