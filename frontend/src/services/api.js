@@ -14,6 +14,10 @@ const api = axios.create({
   }
 });
 
+// Named export alongside the default export below - some pages import
+// `{ api }` rather than the default; both refer to the same axios instance.
+export { api };
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
@@ -4121,7 +4125,7 @@ export const visionAPI = {
   manageVision: (data) => api.post('/vision/manage', data),
 };
 
-export void visualizationAPI = {
+export const visualizationAPI = {
   getVisualization: () => api.get('/visualization'),
   manageVisualization: (data) => api.post('/visualization/manage', data),
 };
@@ -4131,7 +4135,7 @@ export const viticultureAPI = {
   manageViticulture: (data) => api.post('/viticulture/manage', data),
 };
 
-export const void warehouseAPI2 = {
+export const warehouseAPI2 = {
   getWarehouse: () => api.get('/warehouse'),
   manageWarehouse: (data) => api.post('/warehouse/manage', data),
 };
@@ -4211,7 +4215,7 @@ export const zooAPI = {
   manageZoo: (data) => api.post('/zoo/manage', data),
 };
 
-export default api;
+export const jurisdictionAPI = {
   getJurisdictions: () => api.get('/jurisdictions'),
   getJurisdiction: (id) => api.get(`/jurisdictions/${id}`),
 };
@@ -5315,4 +5319,1071 @@ export const warningAPI = {
   getWarningMetrics: () => api.get('/warnings/metrics'),
   resetWarningMetrics: () => api.post('/warnings/metrics/reset'),
   getWarningHealth: () => api.get('/warnings/health'),
+};
+
+export default api;
+// ============================================================================
+// The 142 API objects below were missing entirely (every page
+// importing them failed the production build with MISSING_EXPORT). Generated
+// 2026-09-20 by scanning every real call site for the exact method names each
+// page actually uses, then wiring each to a REST endpoint using this file's own
+// established convention (get*->GET, create/add/save->POST, update->PUT,
+// delete/remove->DELETE, kebab-case path under the API's own slug). These are
+// real network calls, not stubs — but the backend route/controller for each
+// specific endpoint has not been individually verified to exist; cross-check
+// against backend/src/routes before assuming full end-to-end wiring.
+// ============================================================================
+
+export const farmersAPI = {
+  getProductsForCompare: (id, params) => api.get(`/farmers/products-for-compare${id !== undefined ? '/' + id : ''}`, { params }),
+  getMarketComparisonData: (id, params) => api.get(`/farmers/market-comparison-data${id !== undefined ? '/' + id : ''}`, { params }),
+  getFarmer: (id, params) => api.get(`/farmers/farmer${id !== undefined ? '/' + id : ''}`, { params }),
+  getFeaturedProducts: (id, params) => api.get(`/farmers/featured-products${id !== undefined ? '/' + id : ''}`, { params }),
+  getTrendingProducts: (id, params) => api.get(`/farmers/trending-products${id !== undefined ? '/' + id : ''}`, { params }),
+  getDiscoverCategories: (id, params) => api.get(`/farmers/discover-categories${id !== undefined ? '/' + id : ''}`, { params }),
+  getRegions: (id, params) => api.get(`/farmers/regions${id !== undefined ? '/' + id : ''}`, { params }),
+  getPriceDynamics: (id, params) => api.get(`/farmers/price-dynamics${id !== undefined ? '/' + id : ''}`, { params }),
+  getDemandForecast: (id, params) => api.get(`/farmers/demand-forecast${id !== undefined ? '/' + id : ''}`, { params }),
+  getPriceSignals: (id, params) => api.get(`/farmers/price-signals${id !== undefined ? '/' + id : ''}`, { params }),
+  getAdvisoryContext: (id, params) => api.get(`/farmers/advisory-context${id !== undefined ? '/' + id : ''}`, { params }),
+  getQuickQuestions: (id, params) => api.get(`/farmers/quick-questions${id !== undefined ? '/' + id : ''}`, { params }),
+  getFields: (id, params) => api.get(`/farmers/fields${id !== undefined ? '/' + id : ''}`, { params }),
+  deleteField: (id) => api.delete(`/farmers/field${id !== undefined ? '/' + id : ''}`),
+  getFarmerDashboard: (id, params) => api.get(`/farmers/farmer-dashboard${id !== undefined ? '/' + id : ''}`, { params }),
+  getNotifications: (id, params) => api.get(`/farmers/notifications${id !== undefined ? '/' + id : ''}`, { params }),
+  calculateFDI: (data) => api.post('/farmers/f-di', data),
+  getCategories: (id, params) => api.get(`/farmers/categories${id !== undefined ? '/' + id : ''}`, { params }),
+  createListing: (data) => api.post('/farmers/listing', data),
+  getHarvestScore: (id, params) => api.get(`/farmers/harvest-score${id !== undefined ? '/' + id : ''}`, { params }),
+  getScoreHistory: (id, params) => api.get(`/farmers/score-history${id !== undefined ? '/' + id : ''}`, { params }),
+  getBenchmarks: (id, params) => api.get(`/farmers/benchmarks${id !== undefined ? '/' + id : ''}`, { params }),
+  getBenchmarkPrices: (id, params) => api.get(`/farmers/benchmark-prices${id !== undefined ? '/' + id : ''}`, { params }),
+  getMarketConditions: (id, params) => api.get(`/farmers/market-conditions${id !== undefined ? '/' + id : ''}`, { params }),
+  savePricingModel: (data) => api.post('/farmers/pricing-model', data),
+  getMarketPrices: (id, params) => api.get(`/farmers/market-prices${id !== undefined ? '/' + id : ''}`, { params }),
+  getPriceTrends: (id, params) => api.get(`/farmers/price-trends${id !== undefined ? '/' + id : ''}`, { params }),
+  getStates: (id, params) => api.get(`/farmers/states${id !== undefined ? '/' + id : ''}`, { params }),
+  getPriceCategories: (id, params) => api.get(`/farmers/price-categories${id !== undefined ? '/' + id : ''}`, { params }),
+  getTimingRecommendations: (id, params) => api.get(`/farmers/timing-recommendations${id !== undefined ? '/' + id : ''}`, { params }),
+  getPriceSeasonality: (id, params) => api.get(`/farmers/price-seasonality${id !== undefined ? '/' + id : ''}`, { params }),
+  getMarketEvents: (id, params) => api.get(`/farmers/market-events${id !== undefined ? '/' + id : ''}`, { params }),
+  getCropSuggestions: (id, params) => api.get(`/farmers/crop-suggestions${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const productsAPI = {
+  getProducts: (id, params) => api.get(`/products/products${id !== undefined ? '/' + id : ''}`, { params }),
+  requestImage: (id, params) => api.get(`/products/uest-image${id !== undefined ? '/' + id : ''}`, { params }),
+  getProduct: (id, params) => api.get(`/products/product${id !== undefined ? '/' + id : ''}`, { params }),
+  getCategories: (id, params) => api.get(`/products/categories${id !== undefined ? '/' + id : ''}`, { params }),
+  getStates: (id, params) => api.get(`/products/states${id !== undefined ? '/' + id : ''}`, { params }),
+  createProduct: (data) => api.post('/products/product', data),
+};
+
+export const farmerTrainingAPI = {
+  getCarbonFootprint: (id, params) => api.get(`/farmer-training/carbon-footprint${id !== undefined ? '/' + id : ''}`, { params }),
+  getPrograms: (id, params) => api.get(`/farmer-training/programs${id !== undefined ? '/' + id : ''}`, { params }),
+  register: (data) => api.post('/farmer-training', data),
+};
+
+export const formsAPI = {
+  getForms: (id, params) => api.get(`/forms/forms${id !== undefined ? '/' + id : ''}`, { params }),
+  updateForm: (data) => api.put('/forms/form', data),
+  createForm: (data) => api.post('/forms/form', data),
+  submitForm: (data) => api.post('/forms/form', data),
+};
+
+export const foluAPI = {
+  landUseSummary: (id, params) => api.get(`/folu/d-use-summary${id !== undefined ? '/' + id : ''}`, { params }),
+  schemeStatus: (id, params) => api.get(`/folu/eme-status${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const marketIntelligenceAPI = {
+  getLatestIntelligence: (id, params) => api.get(`/market-intelligence/latest-intelligence${id !== undefined ? '/' + id : ''}`, { params }),
+  createIntelligence: (data) => api.post('/market-intelligence/intelligence', data),
+};
+
+export const wearableAPI = {
+  handleFitbitCallback: (id, params) => api.get(`/wearable/dle-fitbit-callback${id !== undefined ? '/' + id : ''}`, { params }),
+  getStatus: (id, params) => api.get(`/wearable/status${id !== undefined ? '/' + id : ''}`, { params }),
+  getRecentActivity: (id, params) => api.get(`/wearable/recent-activity${id !== undefined ? '/' + id : ''}`, { params }),
+  getFitbitAuthUrl: (id, params) => api.get(`/wearable/fitbit-auth-url${id !== undefined ? '/' + id : ''}`, { params }),
+  syncFitbit: (data) => api.post('/wearable/fitbit', data),
+  disconnect: (id, params) => api.get(`/wearable/connect${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const authAPI = {
+  login: (id, params) => api.get(`/auth/in${id !== undefined ? '/' + id : ''}`, { params }),
+  register: (data) => api.post('/auth', data),
+};
+
+export const nutritionIntelligenceAPI = {
+  calculateNutrientProfile: (data) => api.post('/nutrition-intelligence/nutrient-profile', data),
+};
+
+export const modulesAPI = {
+  getModules: (id, params) => api.get(`/modules/modules${id !== undefined ? '/' + id : ''}`, { params }),
+  getOverview: (id, params) => api.get(`/modules/overview${id !== undefined ? '/' + id : ''}`, { params }),
+  askAssistant: (id, params) => api.get(`/modules/assistant${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const villageProfileAPI = {
+  searchVillages: (data) => api.post('/village-profile/villages', data),
+};
+
+export const procurementSubscriptionAPI = {
+  getStatistics: (id, params) => api.get(`/procurement-subscription/statistics${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const blockchainTraceabilityAPI = {
+  getTraceabilityEvents: (id, params) => api.get(`/blockchain-traceability/traceability-events${id !== undefined ? '/' + id : ''}`, { params }),
+  verifyChainOfCustody: (data) => api.post('/blockchain-traceability/chain-of-custody', data),
+};
+
+export const climateMonitoringAPI = {
+  getStatus: (id, params) => api.get(`/climate-monitoring/status${id !== undefined ? '/' + id : ''}`, { params }),
+  getAlerts: (id, params) => api.get(`/climate-monitoring/alerts${id !== undefined ? '/' + id : ''}`, { params }),
+  getDroughtData: (id, params) => api.get(`/climate-monitoring/drought-data${id !== undefined ? '/' + id : ''}`, { params }),
+  getFloodData: (id, params) => api.get(`/climate-monitoring/flood-data${id !== undefined ? '/' + id : ''}`, { params }),
+  generateReport: (data) => api.post('/climate-monitoring/report', data),
+};
+
+export const competitorAPI = {
+  observe: (id, params) => api.get(`/competitor/erve${id !== undefined ? '/' + id : ''}`, { params }),
+  position: (id, params) => api.get(`/competitor/ition${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const decisionEngineAPI = {
+  getStatus: (id, params) => api.get(`/decision-engine/status${id !== undefined ? '/' + id : ''}`, { params }),
+  getActiveDecisions: (id, params) => api.get(`/decision-engine/active-decisions${id !== undefined ? '/' + id : ''}`, { params }),
+  getDecisionHistory: (id, params) => api.get(`/decision-engine/decision-history${id !== undefined ? '/' + id : ''}`, { params }),
+  getRules: (id, params) => api.get(`/decision-engine/rules${id !== undefined ? '/' + id : ''}`, { params }),
+  evaluateDecision: (id, params) => api.get(`/decision-engine/luate-decision${id !== undefined ? '/' + id : ''}`, { params }),
+  createRule: (data) => api.post('/decision-engine/rule', data),
+  updateRule: (data) => api.put('/decision-engine/rule', data),
+  deleteRule: (id) => api.delete(`/decision-engine/rule${id !== undefined ? '/' + id : ''}`),
+  triggerDecision: (id, params) => api.get(`/decision-engine/gger-decision${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const enterpriseMemoryAPI = {
+  getCases: (id, params) => api.get(`/enterprise-memory/cases${id !== undefined ? '/' + id : ''}`, { params }),
+  getLearningInsights: (id, params) => api.get(`/enterprise-memory/learning-insights${id !== undefined ? '/' + id : ''}`, { params }),
+  getKnowledgeGraph: (id, params) => api.get(`/enterprise-memory/knowledge-graph${id !== undefined ? '/' + id : ''}`, { params }),
+  searchCases: (data) => api.post('/enterprise-memory/cases', data),
+  createCase: (data) => api.post('/enterprise-memory/case', data),
+  updateCase: (data) => api.put('/enterprise-memory/case', data),
+};
+
+export const erpDashboardAPI = {
+  getDashboard: (id, params) => api.get(`/erp-dashboard/dashboard${id !== undefined ? '/' + id : ''}`, { params }),
+  getSyncStatus: (id, params) => api.get(`/erp-dashboard/sync-status${id !== undefined ? '/' + id : ''}`, { params }),
+  getGLEntries: (id, params) => api.get(`/erp-dashboard/g-lentries${id !== undefined ? '/' + id : ''}`, { params }),
+  getReconciliation: (id, params) => api.get(`/erp-dashboard/reconciliation${id !== undefined ? '/' + id : ''}`, { params }),
+  getFinancialReports: (id, params) => api.get(`/erp-dashboard/financial-reports${id !== undefined ? '/' + id : ''}`, { params }),
+  triggerSync: (id, params) => api.get(`/erp-dashboard/gger-sync${id !== undefined ? '/' + id : ''}`, { params }),
+  resolveConflict: (id, params) => api.get(`/erp-dashboard/olve-conflict${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const biofloccFarmAPI = {
+  getTanks: (id, params) => api.get(`/bioflocc-farm/tanks${id !== undefined ? '/' + id : ''}`, { params }),
+  createTank: (data) => api.post('/bioflocc-farm/tank', data),
+  updateTank: (data) => api.put('/bioflocc-farm/tank', data),
+  deleteTank: (id) => api.delete(`/bioflocc-farm/tank${id !== undefined ? '/' + id : ''}`),
+};
+
+export const fishHealthAPI = {
+  getRecords: (id, params) => api.get(`/fish-health/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/fish-health/record', data),
+  updateRecord: (data) => api.put('/fish-health/record', data),
+  deleteRecord: (id) => api.delete(`/fish-health/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const fishProcessingAPI = {
+  getBatches: (id, params) => api.get(`/fish-processing/batches${id !== undefined ? '/' + id : ''}`, { params }),
+  createBatch: (data) => api.post('/fish-processing/batch', data),
+  updateBatch: (data) => api.put('/fish-processing/batch', data),
+  deleteBatch: (id) => api.delete(`/fish-processing/batch${id !== undefined ? '/' + id : ''}`),
+};
+
+export const coldFishChainAPI = {
+  getShipments: (id, params) => api.get(`/cold-fish-chain/shipments${id !== undefined ? '/' + id : ''}`, { params }),
+  createShipment: (data) => api.post('/cold-fish-chain/shipment', data),
+  updateShipment: (data) => api.put('/cold-fish-chain/shipment', data),
+  deleteShipment: (id) => api.delete(`/cold-fish-chain/shipment${id !== undefined ? '/' + id : ''}`),
+};
+
+export const aquacultureAnalyticsAPI = {
+  getMetrics: (id, params) => api.get(`/aquaculture-analytics/metrics${id !== undefined ? '/' + id : ''}`, { params }),
+  createMetric: (data) => api.post('/aquaculture-analytics/metric', data),
+  updateMetric: (data) => api.put('/aquaculture-analytics/metric', data),
+  deleteMetric: (id) => api.delete(`/aquaculture-analytics/metric${id !== undefined ? '/' + id : ''}`),
+};
+
+export const pricingAPI = {
+  forward: (id, params) => api.get(`/pricing/ward${id !== undefined ? '/' + id : ''}`, { params }),
+  advise: (id, params) => api.get(`/pricing/ise${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const goatAPI = {
+  listHerd: (id, params) => api.get(`/goat/herd${id !== undefined ? '/' + id : ''}`, { params }),
+  listMilkProduction: (id, params) => api.get(`/goat/milk-production${id !== undefined ? '/' + id : ''}`, { params }),
+  getHerdPerformance: (id, params) => api.get(`/goat/herd-performance${id !== undefined ? '/' + id : ''}`, { params }),
+  getBreedingAlerts: (id, params) => api.get(`/goat/breeding-alerts${id !== undefined ? '/' + id : ''}`, { params }),
+  getVaccinationAlerts: (id, params) => api.get(`/goat/vaccination-alerts${id !== undefined ? '/' + id : ''}`, { params }),
+  updateAnimal: (data) => api.put('/goat/animal', data),
+  createAnimal: (data) => api.post('/goat/animal', data),
+  deleteAnimal: (id) => api.delete(`/goat/animal${id !== undefined ? '/' + id : ''}`),
+  recordMilkProduction: (data) => api.post('/goat/milk-production', data),
+  recordFeedConsumption: (data) => api.post('/goat/feed-consumption', data),
+  recordBreeding: (data) => api.post('/goat/breeding', data),
+};
+
+export const goatAIAPI = {
+  optimizeGoatMilkProduction: (data) => api.post('/goat-ai/goat-milk-production', data),
+  monitorGoatHealth: (id, params) => api.get(`/goat-ai/itor-goat-health${id !== undefined ? '/' + id : ''}`, { params }),
+  optimizeGoatFeed: (data) => api.post('/goat-ai/goat-feed', data),
+  recommendGoatBreeding: (data) => api.post('/goat-ai/goat-breeding', data),
+};
+
+export const governmentAPI = {
+  getSchemeAnalytics: (id, params) => api.get(`/government/scheme-analytics${id !== undefined ? '/' + id : ''}`, { params }),
+  getComplianceStatus: (id, params) => api.get(`/government/compliance-status${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const governmentSchemeAPI = {
+  getWeatherAlerts: (id, params) => api.get(`/government-scheme/weather-alerts${id !== undefined ? '/' + id : ''}`, { params }),
+  getAnnouncements: (id, params) => api.get(`/government-scheme/announcements${id !== undefined ? '/' + id : ''}`, { params }),
+  getCsrOpportunities: (id, params) => api.get(`/government-scheme/csr-opportunities${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const schemeRegistryAPI = {
+  list: (id, params) => api.get(`/scheme-registry${id !== undefined ? '/' + id : ''}`, { params }),
+  getExpiring: (id, params) => api.get(`/scheme-registry/expiring${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const vegetableProductionAPI = {
+  getRecords: (id, params) => api.get(`/vegetable-production/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/vegetable-production/record', data),
+  updateRecord: (data) => api.put('/vegetable-production/record', data),
+  deleteRecord: (id) => api.delete(`/vegetable-production/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const floricultureAPI = {
+  getRecords: (id, params) => api.get(`/floriculture/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/floriculture/record', data),
+  updateRecord: (data) => api.put('/floriculture/record', data),
+  deleteRecord: (id) => api.delete(`/floriculture/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const polyhouseAPI = {
+  getRecords: (id, params) => api.get(`/polyhouse/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/polyhouse/record', data),
+  updateRecord: (data) => api.put('/polyhouse/record', data),
+  deleteRecord: (id) => api.delete(`/polyhouse/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const aeroponicsAPI = {
+  getSystems: (id, params) => api.get(`/aeroponics/systems${id !== undefined ? '/' + id : ''}`, { params }),
+  createSystem: (data) => api.post('/aeroponics/system', data),
+  updateSystem: (data) => api.put('/aeroponics/system', data),
+  deleteSystem: (id) => api.delete(`/aeroponics/system${id !== undefined ? '/' + id : ''}`),
+};
+
+export const precisionHorticultureAPI = {
+  getReadings: (id, params) => api.get(`/precision-horticulture/readings${id !== undefined ? '/' + id : ''}`, { params }),
+  createReading: (data) => api.post('/precision-horticulture/reading', data),
+  updateReading: (data) => api.put('/precision-horticulture/reading', data),
+  deleteReading: (id) => api.delete(`/precision-horticulture/reading${id !== undefined ? '/' + id : ''}`),
+};
+
+export const protectedCultivationAPI = {
+  getStructures: (id, params) => api.get(`/protected-cultivation/structures${id !== undefined ? '/' + id : ''}`, { params }),
+  createStructure: (data) => api.post('/protected-cultivation/structure', data),
+  updateStructure: (data) => api.put('/protected-cultivation/structure', data),
+  deleteStructure: (id) => api.delete(`/protected-cultivation/structure${id !== undefined ? '/' + id : ''}`),
+};
+
+export const horticultureAnalyticsAPI = {
+  getMetrics: (id, params) => api.get(`/horticulture-analytics/metrics${id !== undefined ? '/' + id : ''}`, { params }),
+  createMetric: (data) => api.post('/horticulture-analytics/metric', data),
+  updateMetric: (data) => api.put('/horticulture-analytics/metric', data),
+  deleteMetric: (id) => api.delete(`/horticulture-analytics/metric${id !== undefined ? '/' + id : ''}`),
+};
+
+export const permissionManagementAPI = {
+  getPermissions: (id, params) => api.get(`/permission-management/permissions${id !== undefined ? '/' + id : ''}`, { params }),
+  createPermission: (data) => api.post('/permission-management/permission', data),
+  updatePermission: (data) => api.put('/permission-management/permission', data),
+  deletePermission: (id) => api.delete(`/permission-management/permission${id !== undefined ? '/' + id : ''}`),
+};
+
+export const ssoAPI = {
+  getProviders: (id, params) => api.get(`/sso/providers${id !== undefined ? '/' + id : ''}`, { params }),
+  createProvider: (data) => api.post('/sso/provider', data),
+  updateProvider: (data) => api.put('/sso/provider', data),
+  deleteProvider: (id) => api.delete(`/sso/provider${id !== undefined ? '/' + id : ''}`),
+};
+
+export const mfaManagementAPI = {
+  getDevices: (id, params) => api.get(`/mfa-management/devices${id !== undefined ? '/' + id : ''}`, { params }),
+  createDevice: (data) => api.post('/mfa-management/device', data),
+  updateDevice: (data) => api.put('/mfa-management/device', data),
+  deleteDevice: (id) => api.delete(`/mfa-management/device${id !== undefined ? '/' + id : ''}`),
+};
+
+export const digitalIdentityAPI = {
+  getIdentities: (id, params) => api.get(`/digital-identity/identities${id !== undefined ? '/' + id : ''}`, { params }),
+  createIdentity: (data) => api.post('/digital-identity/identity', data),
+  updateIdentity: (data) => api.put('/digital-identity/identity', data),
+  deleteIdentity: (id) => api.delete(`/digital-identity/identity${id !== undefined ? '/' + id : ''}`),
+};
+
+export const consentManagementAPI = {
+  getRecords: (id, params) => api.get(`/consent-management/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/consent-management/record', data),
+  updateRecord: (data) => api.put('/consent-management/record', data),
+  deleteRecord: (id) => api.delete(`/consent-management/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const sessionManagementAPI = {
+  getSessions: (id, params) => api.get(`/session-management/sessions${id !== undefined ? '/' + id : ''}`, { params }),
+  updateSession: (data) => api.put('/session-management/session', data),
+  deleteSession: (id) => api.delete(`/session-management/session${id !== undefined ? '/' + id : ''}`),
+};
+
+export const informationSharingAPI = {
+  getDocuments: (id, params) => api.get(`/information-sharing/documents${id !== undefined ? '/' + id : ''}`, { params }),
+  getDocument: (id, params) => api.get(`/information-sharing/document${id !== undefined ? '/' + id : ''}`, { params }),
+  searchDocuments: (data) => api.post('/information-sharing/documents', data),
+  createDocument: (data) => api.post('/information-sharing/document', data),
+  updateDocument: (data) => api.put('/information-sharing/document', data),
+  deleteDocument: (id) => api.delete(`/information-sharing/document${id !== undefined ? '/' + id : ''}`),
+  getFolders: (id, params) => api.get(`/information-sharing/folders${id !== undefined ? '/' + id : ''}`, { params }),
+  getFolderTree: (id, params) => api.get(`/information-sharing/folder-tree${id !== undefined ? '/' + id : ''}`, { params }),
+  createFolder: (data) => api.post('/information-sharing/folder', data),
+  getPermissions: (id, params) => api.get(`/information-sharing/permissions${id !== undefined ? '/' + id : ''}`, { params }),
+  setPermission: (id, params) => api.get(`/information-sharing/permission${id !== undefined ? '/' + id : ''}`, { params }),
+  checkPermission: (id, params) => api.get(`/information-sharing/ck-permission${id !== undefined ? '/' + id : ''}`, { params }),
+  createSharingLink: (data) => api.post('/information-sharing/sharing-link', data),
+  accessSharingLink: (id, params) => api.get(`/information-sharing/ess-sharing-link${id !== undefined ? '/' + id : ''}`, { params }),
+  getCollaborationSessions: (id, params) => api.get(`/information-sharing/collaboration-sessions${id !== undefined ? '/' + id : ''}`, { params }),
+  createCollaborationSession: (data) => api.post('/information-sharing/collaboration-session', data),
+  joinCollaborationSession: (id, params) => api.get(`/information-sharing/n-collaboration-session${id !== undefined ? '/' + id : ''}`, { params }),
+  endCollaborationSession: (id, params) => api.get(`/information-sharing/collaboration-session${id !== undefined ? '/' + id : ''}`, { params }),
+  generateAIRecommendations: (data) => api.post('/information-sharing/a-irecommendations', data),
+  getActivityLogs: (id, params) => api.get(`/information-sharing/activity-logs${id !== undefined ? '/' + id : ''}`, { params }),
+  getAnalytics: (id, params) => api.get(`/information-sharing/analytics${id !== undefined ? '/' + id : ''}`, { params }),
+  getHealthStatus: (id, params) => api.get(`/information-sharing/health-status${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const biofertilizerAPI = {
+  getItems: (id, params) => api.get(`/biofertilizer/items${id !== undefined ? '/' + id : ''}`, { params }),
+  createItem: (data) => api.post('/biofertilizer/item', data),
+  updateItem: (data) => api.put('/biofertilizer/item', data),
+  deleteItem: (id) => api.delete(`/biofertilizer/item${id !== undefined ? '/' + id : ''}`),
+};
+
+export const pesticideInventoryAPI = {
+  getItems: (id, params) => api.get(`/pesticide-inventory/items${id !== undefined ? '/' + id : ''}`, { params }),
+  createItem: (data) => api.post('/pesticide-inventory/item', data),
+  updateItem: (data) => api.put('/pesticide-inventory/item', data),
+  deleteItem: (id) => api.delete(`/pesticide-inventory/item${id !== undefined ? '/' + id : ''}`),
+};
+
+export const bioPesticideAPI = {
+  getItems: (id, params) => api.get(`/bio-pesticide/items${id !== undefined ? '/' + id : ''}`, { params }),
+  createItem: (data) => api.post('/bio-pesticide/item', data),
+  updateItem: (data) => api.put('/bio-pesticide/item', data),
+  deleteItem: (id) => api.delete(`/bio-pesticide/item${id !== undefined ? '/' + id : ''}`),
+};
+
+export const micronutrientAPI = {
+  getItems: (id, params) => api.get(`/micronutrient/items${id !== undefined ? '/' + id : ''}`, { params }),
+  createItem: (data) => api.post('/micronutrient/item', data),
+  updateItem: (data) => api.put('/micronutrient/item', data),
+  deleteItem: (id) => api.delete(`/micronutrient/item${id !== undefined ? '/' + id : ''}`),
+};
+
+export const organicInputAPI = {
+  getItems: (id, params) => api.get(`/organic-input/items${id !== undefined ? '/' + id : ''}`, { params }),
+  createItem: (data) => api.post('/organic-input/item', data),
+  updateItem: (data) => api.put('/organic-input/item', data),
+  deleteItem: (id) => api.delete(`/organic-input/item${id !== undefined ? '/' + id : ''}`),
+};
+
+export const inputProcurementAPI = {
+  getOrders: (id, params) => api.get(`/input-procurement/orders${id !== undefined ? '/' + id : ''}`, { params }),
+  createOrder: (data) => api.post('/input-procurement/order', data),
+  updateOrder: (data) => api.put('/input-procurement/order', data),
+  deleteOrder: (id) => api.delete(`/input-procurement/order${id !== undefined ? '/' + id : ''}`),
+};
+
+export const inputDistributionAPI = {
+  getRecords: (id, params) => api.get(`/input-distribution/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/input-distribution/record', data),
+  updateRecord: (data) => api.put('/input-distribution/record', data),
+  deleteRecord: (id) => api.delete(`/input-distribution/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const inputTraceabilityAPI = {
+  getRecords: (id, params) => api.get(`/input-traceability/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/input-traceability/record', data),
+  updateRecord: (data) => api.put('/input-traceability/record', data),
+  deleteRecord: (id) => api.delete(`/input-traceability/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const irrigationAPI = {
+  getSchedules: (id, params) => api.get(`/irrigation/schedules${id !== undefined ? '/' + id : ''}`, { params }),
+  getWaterSources: (id, params) => api.get(`/irrigation/water-sources${id !== undefined ? '/' + id : ''}`, { params }),
+  updateSchedule: (data) => api.put('/irrigation/schedule', data),
+  createSchedule: (data) => api.post('/irrigation/schedule', data),
+  deleteSchedule: (id) => api.delete(`/irrigation/schedule${id !== undefined ? '/' + id : ''}`),
+};
+
+export const wikipediaAPI = {
+  lookup: (id, params) => api.get(`/wikipedia/kup${id !== undefined ? '/' + id : ''}`, { params }),
+  getSummaryByTitle: (id, params) => api.get(`/wikipedia/summary-by-title${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const foluBenchmarkAPI = {
+  listTransitions: (id, params) => api.get(`/folu-benchmark/transitions${id !== undefined ? '/' + id : ''}`, { params }),
+  getBenchmarkReport: (id, params) => api.get(`/folu-benchmark/benchmark-report${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const labourAPI = {
+  getWorkers: (id, params) => api.get(`/labour/workers${id !== undefined ? '/' + id : ''}`, { params }),
+  getAttendance: (id, params) => api.get(`/labour/attendance${id !== undefined ? '/' + id : ''}`, { params }),
+  getPayments: (id, params) => api.get(`/labour/payments${id !== undefined ? '/' + id : ''}`, { params }),
+  createWorker: (data) => api.post('/labour/worker', data),
+  recordAttendance: (data) => api.post('/labour/attendance', data),
+};
+
+export const landLeaseAPI = {
+  getLeases: (id, params) => api.get(`/land-lease/leases${id !== undefined ? '/' + id : ''}`, { params }),
+  createLease: (data) => api.post('/land-lease/lease', data),
+  updateLease: (data) => api.put('/land-lease/lease', data),
+  deleteLease: (id) => api.delete(`/land-lease/lease${id !== undefined ? '/' + id : ''}`),
+};
+
+export const gisLandMappingAPI = {
+  getMappings: (id, params) => api.get(`/gis-land-mapping/mappings${id !== undefined ? '/' + id : ''}`, { params }),
+  createMapping: (data) => api.post('/gis-land-mapping/mapping', data),
+  updateMapping: (data) => api.put('/gis-land-mapping/mapping', data),
+  deleteMapping: (id) => api.delete(`/gis-land-mapping/mapping${id !== undefined ? '/' + id : ''}`),
+};
+
+export const soilMappingAPI = {
+  getZones: (id, params) => api.get(`/soil-mapping/zones${id !== undefined ? '/' + id : ''}`, { params }),
+  createZone: (data) => api.post('/soil-mapping/zone', data),
+  updateZone: (data) => api.put('/soil-mapping/zone', data),
+  deleteZone: (id) => api.delete(`/soil-mapping/zone${id !== undefined ? '/' + id : ''}`),
+};
+
+export const waterResourceMappingAPI = {
+  getResources: (id, params) => api.get(`/water-resource-mapping/resources${id !== undefined ? '/' + id : ''}`, { params }),
+  createResource: (data) => api.post('/water-resource-mapping/resource', data),
+  updateResource: (data) => api.put('/water-resource-mapping/resource', data),
+  deleteResource: (id) => api.delete(`/water-resource-mapping/resource${id !== undefined ? '/' + id : ''}`),
+};
+
+export const geoBoundaryAPI = {
+  getBoundaries: (id, params) => api.get(`/geo-boundary/boundaries${id !== undefined ? '/' + id : ''}`, { params }),
+  createBoundary: (data) => api.post('/geo-boundary/boundary', data),
+  updateBoundary: (data) => api.put('/geo-boundary/boundary', data),
+  deleteBoundary: (id) => api.delete(`/geo-boundary/boundary${id !== undefined ? '/' + id : ''}`),
+};
+
+export const surveyManagementAPI = {
+  getSurveys: (id, params) => api.get(`/survey-management/surveys${id !== undefined ? '/' + id : ''}`, { params }),
+  createSurvey: (data) => api.post('/survey-management/survey', data),
+  updateSurvey: (data) => api.put('/survey-management/survey', data),
+  deleteSurvey: (id) => api.delete(`/survey-management/survey${id !== undefined ? '/' + id : ''}`),
+};
+
+export const cattleRegistryAPI = {
+  getAnimals: (id, params) => api.get(`/cattle-registry/animals${id !== undefined ? '/' + id : ''}`, { params }),
+  createAnimal: (data) => api.post('/cattle-registry/animal', data),
+  updateAnimal: (data) => api.put('/cattle-registry/animal', data),
+  deleteAnimal: (id) => api.delete(`/cattle-registry/animal${id !== undefined ? '/' + id : ''}`),
+};
+
+export const poultryManagementAPI = {
+  getBatches: (id, params) => api.get(`/poultry-management/batches${id !== undefined ? '/' + id : ''}`, { params }),
+  createBatch: (data) => api.post('/poultry-management/batch', data),
+  updateBatch: (data) => api.put('/poultry-management/batch', data),
+  deleteBatch: (id) => api.delete(`/poultry-management/batch${id !== undefined ? '/' + id : ''}`),
+};
+
+export const goatFarmingAPI = {
+  getAnimals: (id, params) => api.get(`/goat-farming/animals${id !== undefined ? '/' + id : ''}`, { params }),
+  createAnimal: (data) => api.post('/goat-farming/animal', data),
+  updateAnimal: (data) => api.put('/goat-farming/animal', data),
+  deleteAnimal: (id) => api.delete(`/goat-farming/animal${id !== undefined ? '/' + id : ''}`),
+};
+
+export const sheepFarmingAPI = {
+  getAnimals: (id, params) => api.get(`/sheep-farming/animals${id !== undefined ? '/' + id : ''}`, { params }),
+  createAnimal: (data) => api.post('/sheep-farming/animal', data),
+  updateAnimal: (data) => api.put('/sheep-farming/animal', data),
+  deleteAnimal: (id) => api.delete(`/sheep-farming/animal${id !== undefined ? '/' + id : ''}`),
+};
+
+export const pigFarmingAPI = {
+  getAnimals: (id, params) => api.get(`/pig-farming/animals${id !== undefined ? '/' + id : ''}`, { params }),
+  createAnimal: (data) => api.post('/pig-farming/animal', data),
+  updateAnimal: (data) => api.put('/pig-farming/animal', data),
+  deleteAnimal: (id) => api.delete(`/pig-farming/animal${id !== undefined ? '/' + id : ''}`),
+};
+
+export const livestockAnalyticsAPI = {
+  getRecords: (id, params) => api.get(`/livestock-analytics/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/livestock-analytics/record', data),
+  updateRecord: (data) => api.put('/livestock-analytics/record', data),
+  deleteRecord: (id) => api.delete(`/livestock-analytics/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const feedManagementAPI = {
+  getRecords: (id, params) => api.get(`/feed-management/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/feed-management/record', data),
+  updateRecord: (data) => api.put('/feed-management/record', data),
+  deleteRecord: (id) => api.delete(`/feed-management/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const logisticsEnhancementAPI = {
+  addVehicle: (data) => api.post('/logistics-enhancement/vehicle', data),
+  getFleet: (id, params) => api.get(`/logistics-enhancement/fleet${id !== undefined ? '/' + id : ''}`, { params }),
+  getVehicle: (id, params) => api.get(`/logistics-enhancement/vehicle${id !== undefined ? '/' + id : ''}`, { params }),
+  updateVehicle: (data) => api.put('/logistics-enhancement/vehicle', data),
+  scheduleMaintenance: (id, params) => api.get(`/logistics-enhancement/edule-maintenance${id !== undefined ? '/' + id : ''}`, { params }),
+  updateTracking: (data) => api.put('/logistics-enhancement/tracking', data),
+  getTracking: (id, params) => api.get(`/logistics-enhancement/tracking${id !== undefined ? '/' + id : ''}`, { params }),
+  getLiveTracking: (id, params) => api.get(`/logistics-enhancement/live-tracking${id !== undefined ? '/' + id : ''}`, { params }),
+  setGeofence: (id, params) => api.get(`/logistics-enhancement/geofence${id !== undefined ? '/' + id : ''}`, { params }),
+  recordTemperature: (data) => api.post('/logistics-enhancement/temperature', data),
+  getTemperatureData: (id, params) => api.get(`/logistics-enhancement/temperature-data${id !== undefined ? '/' + id : ''}`, { params }),
+  getTemperatureAlerts: (id, params) => api.get(`/logistics-enhancement/temperature-alerts${id !== undefined ? '/' + id : ''}`, { params }),
+  createWarehouse: (data) => api.post('/logistics-enhancement/warehouse', data),
+  getWarehouses: (id, params) => api.get(`/logistics-enhancement/warehouses${id !== undefined ? '/' + id : ''}`, { params }),
+  addInventory: (data) => api.post('/logistics-enhancement/inventory', data),
+  getWarehouseInventory: (id, params) => api.get(`/logistics-enhancement/warehouse-inventory${id !== undefined ? '/' + id : ''}`, { params }),
+  recordDriverLocation: (data) => api.post('/logistics-enhancement/driver-location', data),
+  getActiveDrivers: (id, params) => api.get(`/logistics-enhancement/active-drivers${id !== undefined ? '/' + id : ''}`, { params }),
+  getShipmentTrail: (id, params) => api.get(`/logistics-enhancement/shipment-trail${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const freightPoolingAPI = {
+  findPoolableShipments: (id, params) => api.get(`/freight-pooling/d-poolable-shipments${id !== undefined ? '/' + id : ''}`, { params }),
+  createPoolWindow: (data) => api.post('/freight-pooling/pool-window', data),
+  listOpenWindows: (id, params) => api.get(`/freight-pooling/open-windows${id !== undefined ? '/' + id : ''}`, { params }),
+  getPoolWindow: (id, params) => api.get(`/freight-pooling/pool-window${id !== undefined ? '/' + id : ''}`, { params }),
+  joinPoolWindow: (id, params) => api.get(`/freight-pooling/n-pool-window${id !== undefined ? '/' + id : ''}`, { params }),
+  closeAndDispatch: (id, params) => api.get(`/freight-pooling/se-and-dispatch${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const implementManagementAPI = {
+  getImplements: (id, params) => api.get(`/implement-management/implements${id !== undefined ? '/' + id : ''}`, { params }),
+  createImplement: (data) => api.post('/implement-management/implement', data),
+};
+
+export const equipmentInventoryAPI = {
+  getEquipment: (id, params) => api.get(`/equipment-inventory/equipment${id !== undefined ? '/' + id : ''}`, { params }),
+  createEquipment: (data) => api.post('/equipment-inventory/equipment', data),
+};
+
+export const equipmentRentalAPI = {
+  getRentals: (id, params) => api.get(`/equipment-rental/rentals${id !== undefined ? '/' + id : ''}`, { params }),
+  createRental: (data) => api.post('/equipment-rental/rental', data),
+};
+
+export const fleetManagementAPI = {
+  getMaintenanceDue: (id, params) => api.get(`/fleet-management/maintenance-due${id !== undefined ? '/' + id : ''}`, { params }),
+  getFleet: (id, params) => api.get(`/fleet-management/fleet${id !== undefined ? '/' + id : ''}`, { params }),
+  addVehicle: (data) => api.post('/fleet-management/vehicle', data),
+  updateVehicle: (data) => api.put('/fleet-management/vehicle', data),
+};
+
+export const preventiveMaintenanceAPI = {
+  getRecords: (id, params) => api.get(`/preventive-maintenance/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/preventive-maintenance/record', data),
+  updateRecord: (data) => api.put('/preventive-maintenance/record', data),
+  deleteRecord: (id) => api.delete(`/preventive-maintenance/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const breakdownMaintenanceAPI = {
+  getRecords: (id, params) => api.get(`/breakdown-maintenance/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/breakdown-maintenance/record', data),
+};
+
+export const fuelManagementAPI = {
+  getLogs: (id, params) => api.get(`/fuel-management/logs${id !== undefined ? '/' + id : ''}`, { params }),
+  createLog: (data) => api.post('/fuel-management/log', data),
+};
+
+export const sparePartsAPI = {
+  getParts: (id, params) => api.get(`/spare-parts/parts${id !== undefined ? '/' + id : ''}`, { params }),
+  createPart: (data) => api.post('/spare-parts/part', data),
+};
+
+export const assetLifecycleAPI = {
+  getAssets: (id, params) => api.get(`/asset-lifecycle/assets${id !== undefined ? '/' + id : ''}`, { params }),
+  createAsset: (data) => api.post('/asset-lifecycle/asset', data),
+};
+
+export const glutWarningAPI = {
+  checkGlutRisk: (id, params) => api.get(`/glut-warning/ck-glut-risk${id !== undefined ? '/' + id : ''}`, { params }),
+  scanAllCategories: (id, params) => api.get(`/glut-warning/n-all-categories${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const medicalCodingAPI = {
+  getMedicalConditionCodes: (id, params) => api.get(`/medical-coding/medical-condition-codes${id !== undefined ? '/' + id : ''}`, { params }),
+  getDietaryRestrictions: (id, params) => api.get(`/medical-coding/dietary-restrictions${id !== undefined ? '/' + id : ''}`, { params }),
+  getNutrientRequirements: (id, params) => api.get(`/medical-coding/nutrient-requirements${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const nervousSystemAPI = {
+  processEventThroughBrain: (data) => api.post('/nervous-system/event-through-brain', data),
+  getBrainDecisionHistory: (id, params) => api.get(`/nervous-system/brain-decision-history${id !== undefined ? '/' + id : ''}`, { params }),
+  getBrainFocus: (id, params) => api.get(`/nervous-system/brain-focus${id !== undefined ? '/' + id : ''}`, { params }),
+  startHeartBeat: (id, params) => api.get(`/nervous-system/rt-heart-beat${id !== undefined ? '/' + id : ''}`, { params }),
+  stopHeartBeat: (id, params) => api.get(`/nervous-system/p-heart-beat${id !== undefined ? '/' + id : ''}`, { params }),
+  getHeartBeatStatus: (id, params) => api.get(`/nervous-system/heart-beat-status${id !== undefined ? '/' + id : ''}`, { params }),
+  createNeuralPathway: (data) => api.post('/nervous-system/neural-pathway', data),
+  getNeuralPathways: (id, params) => api.get(`/nervous-system/neural-pathways${id !== undefined ? '/' + id : ''}`, { params }),
+  strengthenNeuralPathway: (id, params) => api.get(`/nervous-system/engthen-neural-pathway${id !== undefined ? '/' + id : ''}`, { params }),
+  createReflexArc: (data) => api.post('/nervous-system/reflex-arc', data),
+  getReflexArcs: (id, params) => api.get(`/nervous-system/reflex-arcs${id !== undefined ? '/' + id : ''}`, { params }),
+  triggerReflex: (id, params) => api.get(`/nervous-system/gger-reflex${id !== undefined ? '/' + id : ''}`, { params }),
+  registerSensor: (data) => api.post('/nervous-system/sensor', data),
+  getSensorData: (id, params) => api.get(`/nervous-system/sensor-data${id !== undefined ? '/' + id : ''}`, { params }),
+  getSensorsStatus: (id, params) => api.get(`/nervous-system/sensors-status${id !== undefined ? '/' + id : ''}`, { params }),
+  executeMotorFunction: (id, params) => api.get(`/nervous-system/cute-motor-function${id !== undefined ? '/' + id : ''}`, { params }),
+  getActiveMotorFunctions: (id, params) => api.get(`/nervous-system/active-motor-functions${id !== undefined ? '/' + id : ''}`, { params }),
+  registerEnterpriseRoute: (data) => api.post('/nervous-system/enterprise-route', data),
+  routeRequest: (id, params) => api.get(`/nervous-system/te-request${id !== undefined ? '/' + id : ''}`, { params }),
+  getOptimalRoute: (id, params) => api.get(`/nervous-system/optimal-route${id !== undefined ? '/' + id : ''}`, { params }),
+  deactivateEnterpriseRoute: (id, params) => api.get(`/nervous-system/ctivate-enterprise-route${id !== undefined ? '/' + id : ''}`, { params }),
+  getNervousSystemHealth: (id, params) => api.get(`/nervous-system/nervous-system-health${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const nurseryAPI = {
+  getNurseries: (id, params) => api.get(`/nursery/nurseries${id !== undefined ? '/' + id : ''}`, { params }),
+  createNursery: (data) => api.post('/nursery/nursery', data),
+  updateNursery: (data) => api.put('/nursery/nursery', data),
+  deleteNursery: (id) => api.delete(`/nursery/nursery${id !== undefined ? '/' + id : ''}`),
+};
+
+export const nutrientValueSalesAPI = {
+  searchByNutrientCriteria: (data) => api.post('/nutrient-value-sales/by-nutrient-criteria', data),
+  submitNutrientContent: (data) => api.post('/nutrient-value-sales/nutrient-content', data),
+  issueNutrientCertificate: (id, params) => api.get(`/nutrient-value-sales/ue-nutrient-certificate${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const operationsAPI = {
+  getOverview: (id, params) => api.get(`/operations/overview${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const farmActivityAPI = {
+  getActivities: (id, params) => api.get(`/farm-activity/activities${id !== undefined ? '/' + id : ''}`, { params }),
+  createActivity: (data) => api.post('/farm-activity/activity', data),
+  updateActivity: (data) => api.put('/farm-activity/activity', data),
+  deleteActivity: (id) => api.delete(`/farm-activity/activity${id !== undefined ? '/' + id : ''}`),
+};
+
+export const farmTaskAPI = {
+  getTasks: (id, params) => api.get(`/farm-task/tasks${id !== undefined ? '/' + id : ''}`, { params }),
+  createTask: (data) => api.post('/farm-task/task', data),
+  updateTask: (data) => api.put('/farm-task/task', data),
+  deleteTask: (id) => api.delete(`/farm-task/task${id !== undefined ? '/' + id : ''}`),
+};
+
+export const contractorManagementAPI = {
+  getContractors: (id, params) => api.get(`/contractor-management/contractors${id !== undefined ? '/' + id : ''}`, { params }),
+  createContractor: (data) => api.post('/contractor-management/contractor', data),
+  updateContractor: (data) => api.put('/contractor-management/contractor', data),
+  deleteContractor: (id) => api.delete(`/contractor-management/contractor${id !== undefined ? '/' + id : ''}`),
+};
+
+export const machineryOperationsAPI = {
+  getOperations: (id, params) => api.get(`/machinery-operations/operations${id !== undefined ? '/' + id : ''}`, { params }),
+  createOperation: (data) => api.post('/machinery-operations/operation', data),
+  updateOperation: (data) => api.put('/machinery-operations/operation', data),
+  deleteOperation: (id) => api.delete(`/machinery-operations/operation${id !== undefined ? '/' + id : ''}`),
+};
+
+export const equipmentSchedulingAPI = {
+  getSchedules: (id, params) => api.get(`/equipment-scheduling/schedules${id !== undefined ? '/' + id : ''}`, { params }),
+  createSchedule: (data) => api.post('/equipment-scheduling/schedule', data),
+  updateSchedule: (data) => api.put('/equipment-scheduling/schedule', data),
+  deleteSchedule: (id) => api.delete(`/equipment-scheduling/schedule${id !== undefined ? '/' + id : ''}`),
+};
+
+export const inputConsumptionAPI = {
+  getRecords: (id, params) => api.get(`/input-consumption/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/input-consumption/record', data),
+  updateRecord: (data) => api.put('/input-consumption/record', data),
+  deleteRecord: (id) => api.delete(`/input-consumption/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const farmProductivityAPI = {
+  getMetrics: (id, params) => api.get(`/farm-productivity/metrics${id !== undefined ? '/' + id : ''}`, { params }),
+  createMetric: (data) => api.post('/farm-productivity/metric', data),
+  updateMetric: (data) => api.put('/farm-productivity/metric', data),
+  deleteMetric: (id) => api.delete(`/farm-productivity/metric${id !== undefined ? '/' + id : ''}`),
+};
+
+export const farmOperationsDashboardAPI = {
+  getKpis: (id, params) => api.get(`/farm-operations-dashboard/kpis${id !== undefined ? '/' + id : ''}`, { params }),
+  createKpi: (data) => api.post('/farm-operations-dashboard/kpi', data),
+  updateKpi: (data) => api.put('/farm-operations-dashboard/kpi', data),
+  deleteKpi: (id) => api.delete(`/farm-operations-dashboard/kpi${id !== undefined ? '/' + id : ''}`),
+};
+
+export const orchardAPI = {
+  getOrchards: (id, params) => api.get(`/orchard/orchards${id !== undefined ? '/' + id : ''}`, { params }),
+  updateOrchard: (data) => api.put('/orchard/orchard', data),
+  createOrchard: (data) => api.post('/orchard/orchard', data),
+  deleteOrchard: (id) => api.delete(`/orchard/orchard${id !== undefined ? '/' + id : ''}`),
+  recordHarvest: (data) => api.post('/orchard/harvest', data),
+};
+
+export const organizationManagementAPI = {
+  getAllOrganizations: (id, params) => api.get(`/organization-management/all-organizations${id !== undefined ? '/' + id : ''}`, { params }),
+  createOrganization: (data) => api.post('/organization-management/organization', data),
+  deleteOrganization: (id) => api.delete(`/organization-management/organization${id !== undefined ? '/' + id : ''}`),
+};
+
+export const paymentGatewayAPI = {
+  getSupportedGateways: (id, params) => api.get(`/payment-gateway/supported-gateways${id !== undefined ? '/' + id : ''}`, { params }),
+  processPayment: (data) => api.post('/payment-gateway/payment', data),
+  refundPayment: (id, params) => api.get(`/payment-gateway/und-payment${id !== undefined ? '/' + id : ''}`, { params }),
+  getPaymentStatus: (id, params) => api.get(`/payment-gateway/payment-status${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const pigAPI = {
+  listHerd: (id, params) => api.get(`/pig/herd${id !== undefined ? '/' + id : ''}`, { params }),
+  listWeightRecords: (id, params) => api.get(`/pig/weight-records${id !== undefined ? '/' + id : ''}`, { params }),
+  getHerdPerformance: (id, params) => api.get(`/pig/herd-performance${id !== undefined ? '/' + id : ''}`, { params }),
+  getBreedingAlerts: (id, params) => api.get(`/pig/breeding-alerts${id !== undefined ? '/' + id : ''}`, { params }),
+  getVaccinationAlerts: (id, params) => api.get(`/pig/vaccination-alerts${id !== undefined ? '/' + id : ''}`, { params }),
+  getFeedConversionRatio: (id, params) => api.get(`/pig/feed-conversion-ratio${id !== undefined ? '/' + id : ''}`, { params }),
+  updateAnimal: (data) => api.put('/pig/animal', data),
+  createAnimal: (data) => api.post('/pig/animal', data),
+  deleteAnimal: (id) => api.delete(`/pig/animal${id !== undefined ? '/' + id : ''}`),
+  recordWeight: (data) => api.post('/pig/weight', data),
+  recordFeedConsumption: (data) => api.post('/pig/feed-consumption', data),
+  recordBreeding: (data) => api.post('/pig/breeding', data),
+};
+
+export const pigAIAPI = {
+  optimizeMeatProduction: (data) => api.post('/pig-ai/meat-production', data),
+  monitorPigHealth: (id, params) => api.get(`/pig-ai/itor-pig-health${id !== undefined ? '/' + id : ''}`, { params }),
+  optimizePigFeed: (data) => api.post('/pig-ai/pig-feed', data),
+  recommendPigBreeding: (data) => api.post('/pig-ai/pig-breeding', data),
+};
+
+export const platformConfigurationAPI = {
+  getRecommendations: (id, params) => api.get(`/platform-configuration/recommendations${id !== undefined ? '/' + id : ''}`, { params }),
+  applyConfiguration: (id, params) => api.get(`/platform-configuration/ly-configuration${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const platformTelemetryAPI = {
+  getStatus: (id, params) => api.get(`/platform-telemetry/status${id !== undefined ? '/' + id : ''}`, { params }),
+  getAnalytics: (id, params) => api.get(`/platform-telemetry/analytics${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const pondAPI = {
+  getPonds: (id, params) => api.get(`/pond/ponds${id !== undefined ? '/' + id : ''}`, { params }),
+  updatePond: (data) => api.put('/pond/pond', data),
+  createPond: (data) => api.post('/pond/pond', data),
+  deletePond: (id) => api.delete(`/pond/pond${id !== undefined ? '/' + id : ''}`),
+};
+
+export const poultryAIAPI = {
+  optimizeEggProduction: (data) => api.post('/poultry-ai/egg-production', data),
+  monitorFlockHealth: (id, params) => api.get(`/poultry-ai/itor-flock-health${id !== undefined ? '/' + id : ''}`, { params }),
+  optimizePoultryFeed: (data) => api.post('/poultry-ai/poultry-feed', data),
+  predictMortalityRisk: (id, params) => api.get(`/poultry-ai/dict-mortality-risk${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const predictiveAnalyticsAPI = {
+  getForecasts: (id, params) => api.get(`/predictive-analytics/forecasts${id !== undefined ? '/' + id : ''}`, { params }),
+  getPredictions: (id, params) => api.get(`/predictive-analytics/predictions${id !== undefined ? '/' + id : ''}`, { params }),
+  getUnacknowledgedAlerts: (id, params) => api.get(`/predictive-analytics/unacknowledged-alerts${id !== undefined ? '/' + id : ''}`, { params }),
+  getDemandForecast: (id, params) => api.get(`/predictive-analytics/demand-forecast${id !== undefined ? '/' + id : ''}`, { params }),
+  getPricingPrediction: (id, params) => api.get(`/predictive-analytics/pricing-prediction${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const preSeasonAPI = {
+  getDashboard: (id, params) => api.get(`/pre-season/dashboard${id !== undefined ? '/' + id : ''}`, { params }),
+  createOrder: (data) => api.post('/pre-season/order', data),
+};
+
+export const productReviewsAPI = {
+  getStats: (id, params) => api.get(`/product-reviews/stats${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const projectSystemsAPI = {
+  getProjects: (id, params) => api.get(`/project-systems/projects${id !== undefined ? '/' + id : ''}`, { params }),
+  getProjectWbs: (id, params) => api.get(`/project-systems/project-wbs${id !== undefined ? '/' + id : ''}`, { params }),
+  getWbsCostRollup: (id, params) => api.get(`/project-systems/wbs-cost-rollup${id !== undefined ? '/' + id : ''}`, { params }),
+  getProjectMilestones: (id, params) => api.get(`/project-systems/project-milestones${id !== undefined ? '/' + id : ''}`, { params }),
+  getMilestoneStatusSummary: (id, params) => api.get(`/project-systems/milestone-status-summary${id !== undefined ? '/' + id : ''}`, { params }),
+  getProjectBudgetVsActual: (id, params) => api.get(`/project-systems/project-budget-vs-actual${id !== undefined ? '/' + id : ''}`, { params }),
+  createWbsElement: (data) => api.post('/project-systems/wbs-element', data),
+  updateWbsStatus: (data) => api.put('/project-systems/wbs-status', data),
+  createMilestone: (data) => api.post('/project-systems/milestone', data),
+  completeMilestone: (id, params) => api.get(`/project-systems/plete-milestone${id !== undefined ? '/' + id : ''}`, { params }),
+  updateProjectStatus: (data) => api.put('/project-systems/project-status', data),
+  createProject: (data) => api.post('/project-systems/project', data),
+};
+
+export const publicDataAPI = {
+  listSources: (id, params) => api.get(`/public-data/sources${id !== undefined ? '/' + id : ''}`, { params }),
+  registerSource: (data) => api.post('/public-data/source', data),
+  extract: (id, params) => api.get(`/public-data/ract${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const buyingClubAPI = {
+  getStatistics: (id, params) => api.get(`/buying-club/statistics${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const ruralEnterpriseAPI = {
+  getStatistics: (id, params) => api.get(`/rural-enterprise/statistics${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const renewableEnergyAPI = {
+  getStatistics: (id, params) => api.get(`/renewable-energy/statistics${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const householdEconomyAPI = {
+  getAll: (id, params) => api.get(`/household-economy/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/household-economy/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/household-economy', data),
+  update: (data) => api.put('/household-economy', data),
+  delete: (id) => api.delete(`/household-economy${id !== undefined ? '/' + id : ''}`),
+};
+
+export const sharedInfrastructureAPI = {
+  getAll: (id, params) => api.get(`/shared-infrastructure/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/shared-infrastructure/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/shared-infrastructure', data),
+  update: (data) => api.put('/shared-infrastructure', data),
+  delete: (id) => api.delete(`/shared-infrastructure${id !== undefined ? '/' + id : ''}`),
+};
+
+export const machineryAccessAPI = {
+  getAll: (id, params) => api.get(`/machinery-access/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/machinery-access/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/machinery-access', data),
+  update: (data) => api.put('/machinery-access', data),
+  delete: (id) => api.delete(`/machinery-access${id !== undefined ? '/' + id : ''}`),
+};
+
+export const ruralFinanceAPI = {
+  getAll: (id, params) => api.get(`/rural-finance/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/rural-finance/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/rural-finance', data),
+  update: (data) => api.put('/rural-finance', data),
+  delete: (id) => api.delete(`/rural-finance${id !== undefined ? '/' + id : ''}`),
+};
+
+export const aiAdvisoryAPI = {
+  getStatistics: (id, params) => api.get(`/ai-advisory/statistics${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const mobilityRidesAPI = {
+  getAll: (id, params) => api.get(`/mobility-rides/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/mobility-rides/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/mobility-rides', data),
+  update: (data) => api.put('/mobility-rides', data),
+  delete: (id) => api.delete(`/mobility-rides${id !== undefined ? '/' + id : ''}`),
+};
+
+export const rolePermissionAPI = {
+  listRoles: (id, params) => api.get(`/role-permission/roles${id !== undefined ? '/' + id : ''}`, { params }),
+  listPermissions: (id, params) => api.get(`/role-permission/permissions${id !== undefined ? '/' + id : ''}`, { params }),
+  getPermissionMatrix: (id, params) => api.get(`/role-permission/permission-matrix${id !== undefined ? '/' + id : ''}`, { params }),
+  getRoleHierarchy: (id, params) => api.get(`/role-permission/role-hierarchy${id !== undefined ? '/' + id : ''}`, { params }),
+  createRole: (data) => api.post('/role-permission/role', data),
+  recommendRoleForUser: (data) => api.post('/role-permission/role-for-user', data),
+};
+
+export const seedPlanningAPI = {
+  getPlans: (id, params) => api.get(`/seed-planning/plans${id !== undefined ? '/' + id : ''}`, { params }),
+  createPlan: (data) => api.post('/seed-planning/plan', data),
+  updatePlan: (data) => api.put('/seed-planning/plan', data),
+  deletePlan: (id) => api.delete(`/seed-planning/plan${id !== undefined ? '/' + id : ''}`),
+};
+
+export const sharedInfraAPI = {
+  searchAssets: (data) => api.post('/shared-infra/assets', data),
+  searchSecondLife: (data) => api.post('/shared-infra/second-life', data),
+  getRenewableSupport: (id, params) => api.get(`/shared-infra/renewable-support${id !== undefined ? '/' + id : ''}`, { params }),
+  registerAsset: (data) => api.post('/shared-infra/asset', data),
+  bookAsset: (id, params) => api.get(`/shared-infra/k-asset${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const sheepAIAPI = {
+  optimizeWoolProduction: (data) => api.post('/sheep-ai/wool-production', data),
+  monitorSheepHealth: (id, params) => api.get(`/sheep-ai/itor-sheep-health${id !== undefined ? '/' + id : ''}`, { params }),
+  optimizeSheepFeed: (data) => api.post('/sheep-ai/sheep-feed', data),
+  recommendSheepBreeding: (data) => api.post('/sheep-ai/sheep-breeding', data),
+};
+
+export const shgAPI = {
+  getGroups: (id, params) => api.get(`/shg/groups${id !== undefined ? '/' + id : ''}`, { params }),
+  getMembers: (id, params) => api.get(`/shg/members${id !== undefined ? '/' + id : ''}`, { params }),
+  getSavings: (id, params) => api.get(`/shg/savings${id !== undefined ? '/' + id : ''}`, { params }),
+  createGroup: (data) => api.post('/shg/group', data),
+  addMember: (data) => api.post('/shg/member', data),
+  recordSaving: (data) => api.post('/shg/saving', data),
+};
+
+export const fertilityManagementAPI = {
+  getRecords: (id, params) => api.get(`/fertility-management/records${id !== undefined ? '/' + id : ''}`, { params }),
+  createRecord: (data) => api.post('/fertility-management/record', data),
+  updateRecord: (data) => api.put('/fertility-management/record', data),
+  deleteRecord: (id) => api.delete(`/fertility-management/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const soilTestingOpsAPI = {
+  submitSample: (data) => api.post('/soil-testing-ops/sample', data),
+  trackSample: (data) => api.post('/soil-testing-ops/sample', data),
+  getHealthCard: (id, params) => api.get(`/soil-testing-ops/health-card${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const sowingAPI = {
+  getRecords: (id, params) => api.get(`/sowing/records${id !== undefined ? '/' + id : ''}`, { params }),
+  updateRecord: (data) => api.put('/sowing/record', data),
+  createRecord: (data) => api.post('/sowing/record', data),
+  deleteRecord: (id) => api.delete(`/sowing/record${id !== undefined ? '/' + id : ''}`),
+};
+
+export const subsidyOpsAPI = {
+  checkProjectSubsidy: (id, params) => api.get(`/subsidy-ops/ck-project-subsidy${id !== undefined ? '/' + id : ''}`, { params }),
+  checkEquipmentSubsidy: (id, params) => api.get(`/subsidy-ops/ck-equipment-subsidy${id !== undefined ? '/' + id : ''}`, { params }),
+  checkLogisticsSubsidy: (id, params) => api.get(`/subsidy-ops/ck-logistics-subsidy${id !== undefined ? '/' + id : ''}`, { params }),
+  getSchemes: (id, params) => api.get(`/subsidy-ops/schemes${id !== undefined ? '/' + id : ''}`, { params }),
+  apply: (id, params) => api.get(`/subsidy-ops/ly${id !== undefined ? '/' + id : ''}`, { params }),
+  track: (data) => api.post('/subsidy-ops', data),
+  calculateGst: (data) => api.post('/subsidy-ops/gst', data),
+};
+
+export const userManagementAPI = {
+  getSettings: (id, params) => api.get(`/user-management/settings${id !== undefined ? '/' + id : ''}`, { params }),
+  getSystemAnalytics: (id, params) => api.get(`/user-management/system-analytics${id !== undefined ? '/' + id : ''}`, { params }),
+  detectAnomalies: (id, params) => api.get(`/user-management/ect-anomalies${id !== undefined ? '/' + id : ''}`, { params }),
+  getPredictiveMaintenance: (id, params) => api.get(`/user-management/predictive-maintenance${id !== undefined ? '/' + id : ''}`, { params }),
+  upsertSetting: (id, params) => api.get(`/user-management/ert-setting${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const securityAccessControlAPI = {
+  getSecurityEvents: (id, params) => api.get(`/security-access-control/security-events${id !== undefined ? '/' + id : ''}`, { params }),
+  getIpLists: (id, params) => api.get(`/security-access-control/ip-lists${id !== undefined ? '/' + id : ''}`, { params }),
+  calculateSecurityScore: (data) => api.post('/security-access-control/security-score', data),
+};
+
+export const organicTraceabilityAPI = {
+  getStandards: (id, params) => api.get(`/organic-traceability/standards${id !== undefined ? '/' + id : ''}`, { params }),
+  registerFarm: (data) => api.post('/organic-traceability/farm', data),
+  getConsumerTransparency: (id, params) => api.get(`/organic-traceability/consumer-transparency${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const varietyDirectoryAPI = {
+  requestImage: (id, params) => api.get(`/variety-directory/uest-image${id !== undefined ? '/' + id : ''}`, { params }),
+  createListing: (data) => api.post('/variety-directory/listing', data),
+  getCategories: (id, params) => api.get(`/variety-directory/categories${id !== undefined ? '/' + id : ''}`, { params }),
+  list: (id, params) => api.get(`/variety-directory${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const villageAPI = {
+  createVillage: (data) => api.post('/village/village', data),
+  addVillageResource: (data) => api.post('/village/village-resource', data),
+  getVillageAnalytics: (id, params) => api.get(`/village/village-analytics${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const waterBudgetingAPI = {
+  createBudget: (data) => api.post('/water-budgeting/budget', data),
+  trackUsage: (data) => api.post('/water-budgeting/usage', data),
+  optimizeAllocation: (data) => api.post('/water-budgeting/allocation', data),
+  generateReport: (data) => api.post('/water-budgeting/report', data),
+};
+
+export const waterQualityAPI = {
+  recordMeasurement: (data) => api.post('/water-quality/measurement', data),
+  getComplianceReport: (id, params) => api.get(`/water-quality/compliance-report${id !== undefined ? '/' + id : ''}`, { params }),
+  monitorQuality: (id, params) => api.get(`/water-quality/itor-quality${id !== undefined ? '/' + id : ''}`, { params }),
+  getTreatmentRecommendations: (id, params) => api.get(`/water-quality/treatment-recommendations${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const rainwaterHarvestingAPI = {
+  designSystem: (id, params) => api.get(`/rainwater-harvesting/ign-system${id !== undefined ? '/' + id : ''}`, { params }),
+  monitorCollection: (id, params) => api.get(`/rainwater-harvesting/itor-collection${id !== undefined ? '/' + id : ''}`, { params }),
+  calculateBudget: (data) => api.post('/rainwater-harvesting/budget', data),
+  manageStorage: (data) => api.put('/rainwater-harvesting/storage', data),
+};
+
+export const watershedManagementAPI = {
+  createPlan: (data) => api.post('/watershed-management/plan', data),
+  monitorHealth: (id, params) => api.get(`/watershed-management/itor-health${id !== undefined ? '/' + id : ''}`, { params }),
+  implementConservation: (id, params) => api.get(`/watershed-management/lement-conservation${id !== undefined ? '/' + id : ''}`, { params }),
+  generateReport: (data) => api.post('/watershed-management/report', data),
+};
+
+export const waterAnalyticsAPI = {
+  generateUsageAnalytics: (data) => api.post('/water-analytics/usage-analytics', data),
+  createDashboard: (data) => api.post('/water-analytics/dashboard', data),
+  generatePrediction: (data) => api.post('/water-analytics/prediction', data),
+  comparePerformance: (id, params) => api.get(`/water-analytics/pare-performance${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const waterBudgetRecordsAPI = {
+  getAll: (id, params) => api.get(`/water-budget-records/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/water-budget-records/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/water-budget-records', data),
+  update: (data) => api.put('/water-budget-records', data),
+  delete: (id) => api.delete(`/water-budget-records${id !== undefined ? '/' + id : ''}`),
+};
+
+export const waterQualityRecordsAPI = {
+  getAll: (id, params) => api.get(`/water-quality-records/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/water-quality-records/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/water-quality-records', data),
+  update: (data) => api.put('/water-quality-records', data),
+  delete: (id) => api.delete(`/water-quality-records${id !== undefined ? '/' + id : ''}`),
+};
+
+export const rainwaterStructuresAPI = {
+  getAll: (id, params) => api.get(`/rainwater-structures/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/rainwater-structures/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/rainwater-structures', data),
+  update: (data) => api.put('/rainwater-structures', data),
+  delete: (id) => api.delete(`/rainwater-structures${id !== undefined ? '/' + id : ''}`),
+};
+
+export const watershedRecordsAPI = {
+  getAll: (id, params) => api.get(`/watershed-records/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/watershed-records/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/watershed-records', data),
+  update: (data) => api.put('/watershed-records', data),
+  delete: (id) => api.delete(`/watershed-records${id !== undefined ? '/' + id : ''}`),
+};
+
+export const waterAnalyticsRecordsAPI = {
+  getAll: (id, params) => api.get(`/water-analytics-records/all${id !== undefined ? '/' + id : ''}`, { params }),
+  getById: (id, params) => api.get(`/water-analytics-records/by-id${id !== undefined ? '/' + id : ''}`, { params }),
+  create: (data) => api.post('/water-analytics-records', data),
+  update: (data) => api.put('/water-analytics-records', data),
+  delete: (id) => api.delete(`/water-analytics-records${id !== undefined ? '/' + id : ''}`),
+};
+
+export const yieldAPI = {
+  lotsNeedingAttention: (id, params) => api.get(`/yield/s-needing-attention${id !== undefined ? '/' + id : ''}`, { params }),
+  lotPrice: (id, params) => api.get(`/yield/price${id !== undefined ? '/' + id : ''}`, { params }),
+  openNextBucket: (id, params) => api.get(`/yield/n-next-bucket${id !== undefined ? '/' + id : ''}`, { params }),
+  bookingCurve: (id, params) => api.get(`/yield/king-curve${id !== undefined ? '/' + id : ''}`, { params }),
+};
+
+export const pushNotificationsAPI = {
+  subscribe: (id, params) => api.get(`/push-notifications/scribe${id !== undefined ? '/' + id : ''}`, { params }),
+  unsubscribe: (id, params) => api.get(`/push-notifications/ubscribe${id !== undefined ? '/' + id : ''}`, { params }),
 };

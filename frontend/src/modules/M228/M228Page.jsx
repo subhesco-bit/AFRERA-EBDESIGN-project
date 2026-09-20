@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useStore } from '@/store';
-import './${className}.css';
+import './styles.css';
 
 export default function M228Page() {
   const { user } = useStore();
@@ -102,7 +102,7 @@ export default function M228Page() {
   }, [user, fetchData]);
 
   return (
-    <div className="${serviceName}-container">
+    <div className="module-M228">
       <h1>M228</h1>
 
       {error && <div className="error-message">{error}</div>}

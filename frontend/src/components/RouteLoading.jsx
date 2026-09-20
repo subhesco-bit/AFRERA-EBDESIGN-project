@@ -154,14 +154,18 @@ export function ProgressiveLoading({ steps = ['Loading', 'Preparing', 'Almost th
  * Route Preloader Component
  * Preloads routes for better performance
  */
+// Statically-analyzed page module map (see src/utils/routePreloader.js for why
+// a runtime-interpolated import() was replaced — it broke the production build).
+const preloadablePages = import.meta.glob('../pages/**/*.jsx');
+
 export function RoutePreloader({ preloadRoutes = [] }) {
   useEffect(() => {
     // Preload routes when idle
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(() => {
         preloadRoutes.forEach((route) => {
-          // Trigger lazy import
-          import(`../pages/${route}.jsx`).catch(() => {
+          const loader = preloadablePages[`../pages/${route}.jsx`];
+          if (loader) loader().catch(() => {
             // Ignore preload errors
           });
         });

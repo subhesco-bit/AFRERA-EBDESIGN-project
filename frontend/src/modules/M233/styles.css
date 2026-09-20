@@ -1,0 +1,10 @@
+/* Styles for M233 - generated scaffold, purpose not yet declared by module.json */
+.module-M233 { max-width: 1100px; margin: 0 auto; padding: 32px 20px; color: #17212b; }
+.module-M233 .error-message { color: #b3261e; background: #fdecea; border: 1px solid #f5c6c2; padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; }
+.module-M233 .search-form, .module-M233 .create-form { display: flex; gap: 10px; align-items: center; margin: 16px 0; flex-wrap: wrap; }
+.module-M233 input[type="text"] { padding: 8px 10px; border: 1px solid #b9c8d0; border-radius: 4px; min-width: 220px; }
+.module-M233 table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+.module-M233 th, .module-M233 td { border: 1px solid #d9e2e8; padding: 8px 12px; text-align: left; }
+.module-M233 .pagination { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+.module-M233 button { background: #087f8c; color: white; border: 0; border-radius: 4px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
+.module-M233 button:disabled { background: #b9c8d0; cursor: not-allowed; }

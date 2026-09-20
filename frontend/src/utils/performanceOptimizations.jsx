@@ -44,11 +44,20 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Statically-analyzed page module map, required because a runtime
+// `import(\`../pages/${componentPath}\`)` is not reliably resolvable by
+// production bundlers (it broke the build).
+const pageModules = import.meta.glob('../pages/**/*.jsx');
+
 // Route-based code splitting
 export const createLazyRoute = (path, componentPath) => {
   return {
     path,
-    component: lazyLoad(() => import(`../pages/${componentPath}`)),
+    component: lazyLoad(() => {
+      const loader = pageModules[`../pages/${componentPath}`];
+      if (!loader) return Promise.reject(new Error(`No page module found for ${componentPath}`));
+      return loader();
+    }),
   };
 };
 
