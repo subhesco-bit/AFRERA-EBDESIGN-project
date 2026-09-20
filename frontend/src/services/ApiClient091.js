@@ -1,0 +1,6 @@
+export const ApiClient091 = {
+  get: async (url) => ({ data: null }),
+  post: async (url, data) => ({ data: null }),
+  put: async (url, data) => ({ data: null }),
+  delete: async (url) => ({ data: null })
+};

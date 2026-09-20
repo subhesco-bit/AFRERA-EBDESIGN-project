@@ -1,0 +1,4 @@
+export class Controller010 {
+  constructor(service) { this.service = service; }
+  async handle(req, res) { res.json({ success: true }); }
+}

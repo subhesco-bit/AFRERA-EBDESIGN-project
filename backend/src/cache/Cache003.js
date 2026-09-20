@@ -1,0 +1,4 @@
+export class Cache3 {
+  async get(key) { return null; }
+  async set(key, value) { return true; }
+}
