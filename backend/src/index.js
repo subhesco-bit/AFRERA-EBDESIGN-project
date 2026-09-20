@@ -575,6 +575,12 @@ async function startup() {
     app.use('/api/qualityassurance', qualityAssurance);
     app.use('/api/projectsystems', projectSystemsRoutes);
     app.use('/api/product', productRoutes);
+    // services/legacy/productService.js is a complete, DB-backed router
+    // (GET/POST/PUT/DELETE, categories/states/search) that was never
+    // mounted anywhere - commerceApi.js's productsAPI already calls
+    // exactly these paths under /api/v1/products, so MarketplacePage.jsx
+    // was 404ing on every real call until this was wired.
+    app.use('/api/v1/products', require('./services/legacy/productService').router);
     app.use('/api/v1/product-reviews', productReviewRoutes);
     app.use('/api/productmediaai', productMediaAIRoutes);
     app.use('/api/publicdata', publicDataRoutes);
@@ -598,6 +604,12 @@ async function startup() {
     app.use('/api/orphaned_services_mount', ORPHANED_SERVICES_MOUNT);
     app.use('/api/organizationmanagement', organizationManagementRoutes);
     app.use('/api/order', orderRoutes);
+    // services/legacy/orderService.js is a complete, DB-backed router
+    // (cart CRUD, checkout, order status, payment, cancel) that was never
+    // mounted anywhere - commerceApi.js's ordersAPI already calls exactly
+    // these paths under /api/v1/orders, so cart/checkout was 404ing on
+    // every real call until this was wired.
+    app.use('/api/v1/orders', require('./services/legacy/orderService').router);
     app.use('/api/operationsroutesupport', operationsRouteSupport.router);
     app.use('/api/operationsmanagement', operationsManagementRoutes);
     app.use('/api/nutritionintelligence', nutritionIntelligenceRoutes);

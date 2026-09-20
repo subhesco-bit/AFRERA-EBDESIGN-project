@@ -348,7 +348,7 @@ async function createOrder(userId, orderData) {
     // ---- end transaction -------------------------------------------------
 
     // Emit WebSocket event
-    const io = require('../../../index').app.get('io');
+    const io = require('../../index').app.get('io');
     if (io) {
       io.to(`user:${userId}`).emit('order_created', {
         order_id: order.id,
@@ -512,7 +512,7 @@ async function updateOrderStatus(orderId, status, notes = null) {
     const order = result.rows[0];
 
     // Emit WebSocket event
-    const io = require('../../../index').app.get('io');
+    const io = require('../../index').app.get('io');
     if (io) {
       io.to(`order:${orderId}`).emit('order_status_updated', {
         order_id: orderId,
@@ -856,6 +856,24 @@ router.post('/:id/payment', authMiddleware, async (req, res) => {
     const isAdmin = req.user.role === 'admin';
     const payment = await processPayment(req.params.id, req.body, isAdmin ? null : req.user.id);
     res.json(payment);
+  } catch (error) {
+    if (error.message === 'Order not found') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
+  }
+});
+
+// Cancel order — ownership enforced the same way as /:id/payment: getOrderById
+// with a userId filter throws "Order not found" for an order that exists but
+// isn't the caller's, so a non-admin can only cancel their own.
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const isAdmin = req.user.role === 'admin';
+    await getOrderById(req.params.id, isAdmin ? null : req.user.id);
+    const order = await updateOrderStatus(req.params.id, 'cancelled', req.body?.notes);
+    res.json(order);
   } catch (error) {
     if (error.message === 'Order not found') {
       res.status(404).json({ error: error.message });
