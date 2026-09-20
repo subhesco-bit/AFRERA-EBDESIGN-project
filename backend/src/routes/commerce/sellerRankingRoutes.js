@@ -7,7 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
-const sellerRankingService = require('../../services/commerce/sellerRankingService');
+const sellerRankingService = require('../../services/legacy/sellerRankingService');
 const { authMiddleware } = require('../../middleware/auth');
 
 router.get('/sellers', async (req, res) => {

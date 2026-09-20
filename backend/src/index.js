@@ -1,3 +1,4 @@
+require('dotenv').config();
 const index = require('./routes/index.js');
 const yieldManagement = require('./routes/yieldManagement.js');
 const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
@@ -202,7 +203,6 @@ const operationalModuleRoutes = require('./routes/operationalModuleRoutes.js');
  * Enables lazy loading, scales to enterprise requirements
  */
 
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
