@@ -509,6 +509,56 @@ untouched by any of the above).
 
 Commits: `ebc873f7` (suites 1–2), `d433d143` (suite 3).
 
+## Full backend suite run + Stripe boot-crash fix + frontend/backend gap audit (2026-09-20) — DONE
+
+Ran the full test suites (`npx jest --watchAll=false`) for both frontend
+and backend in parallel to get real numbers rather than assuming.
+
+**Frontend:** 17/17 suites, 57/57 tests — fully green (see T01 entries
+above for how it got there, plus the 2 UI-gap pages below).
+
+**Backend:** 1133 suites, 355 failing / 774 passing before any fix. Broke
+down the failure log by signature instead of chasing suites one at a
+time: 30 suites shared one root cause — `stripeWebhookRoutes.js`
+constructed the Stripe SDK unconditionally at module load, which throws
+synchronously with no `STRIPE_SECRET_KEY` set, crashing every suite that
+transitively required it. Ported the existing fix from `origin/claude/keen-gates-663i5d`
+(`07567e83`, lazy-init + 503 when unconfigured, matching the Twilio
+graceful-degradation pattern already used elsewhere) — commit `10140de5`.
+Confirmed 0 remaining `"Neither apiKey..."` crashes afterward. Total
+failing-suite count didn't drop (those 30 suites now run for real instead
+of crashing at import, and mostly hit the known "no PostgreSQL running in
+this dev environment" wall from CLAUDE.md's own Known Problems list) —
+this is expected, not a regression. The remaining ~325 failing suites are
+overwhelmingly individual DB-dependent test failures, not a small number
+of systemic root causes like the Stripe one; a full backend-suite fix is
+multi-day work, out of scope for this pass by explicit user agreement.
+
+**Frontend/backend gap audit:** compared 210 mounted backend base paths
+against every frontend API-client call site across all 17 files in
+`frontend/src/services/` (not just `api.js`). A raw first-pass match on
+`api.js` alone found ~168 "orphaned" candidates; matching against every
+service file and manually verifying (checking whether pages call these
+APIs through named objects like `goatAPI.x()`, not just literal
+`api.get(...)`) collapsed that to exactly 2 real, substantial,
+already-built backend features with zero frontend anywhere
+(`landRecordsRoutes.js`, `aiApprovalRoutes.js` — see the commit below) and
+1 live bug (`productReviewRoutes.js` mounted at `/api/productreview`,
+singular, while the frontend calls `/product-reviews`, plural — an
+already-built feature 404ing in production, plus `ProductDetailPage.jsx`
+separately importing 3 of its 4 API objects from the wrong service file
+entirely). Everything else in the raw candidate list was either already
+wired (just missed by a narrow grep) or intentionally backend-internal
+(e.g. `aiCollaborationRoutes.js` is the Devin/Claude agent-handoff
+channel, not a user-facing feature).
+
+Fixed the product-reviews mount + import bugs (`451ebd75`) and built real
+UI for the 2 genuine gaps — `LandRecordsPage.jsx` (`/land-records`) and
+`AIApprovalPage.jsx` (`/ai-approvals`), both wired to the real backend
+contracts (verified field-for-field against the service code) with
+loading/error/empty states, and a rendering test confirming both mount
+and display real API data (`db68c659`).
+
 ---
 
 *This document must be updated after every task completion or status change.*
