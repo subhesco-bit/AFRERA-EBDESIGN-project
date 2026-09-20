@@ -697,6 +697,56 @@ skeleton modules") aren't required by `index.js` or any route file
 either. Not fixing dead code that never executes — stopping the sweep
 here.
 
+**Follow-up: 29 of 54 fake scaffold routes swapped for their real
+`_merged.js` implementations (`116b08b1`).** Systematic check: 112 route
+files under `routes/` are trivial "Route operational" placeholder
+scaffolds; 54 of those are mounted in `index.js` while a same-named
+`<Name>Routes_merged.js` sibling with real logic sits unmounted right
+next to them. Swapped 29 (aiBackboneRoutes, ecommerceRoutes and 5 more
+ecommerce\* variants, farmerRoutes, farmerTrainingRoutes, wikipediaRoutes,
+visionRoutes, and 20 more — see the commit for the full list). Skipped 25
+after real per-file investigation, not just a name match: 15 `_merged.js`
+files turned out to be a *different* fake scaffold (a different
+placeholder string); `libraryRoutes_merged.js` is a generic CRUD template
+never touching the real library system; 3 (`seedVaultRoutes`,
+`trackDartRoutes`, `unifiedAIRoutes`) have their real route registrations
+trapped inside a helper function's body after a `return` (invisible to
+grep/`node -c`, caught via an AST check that verifies every
+`router.<method>()` call is a genuine top-level statement) — they never
+actually register at module load, so swapping would have silently
+dropped working endpoints; 5 (`decisionSupportRoutes`, `rfqRoutes`,
+`pigRoutes`, `poultryRoutes`, `sheepRoutes`) call a `protectRouter`/
+`protectLivestockRouter` helper from a sibling support file that doesn't
+actually export it — confirmed this throws `TypeError: protectRouter is
+not a function` at require time, i.e. swapping would have crashed the
+whole app on boot. Verified: boots clean, `npm test` byte-identical to
+baseline, frontend unaffected.
+
+**Follow-up: `productService`/`orderService` mounted — Marketplace was
+404ing on every real call (`f650042a`).** The same "real router, never
+mounted" pattern extends beyond `_merged.js` siblings: 46
+`services/legacy/*.js` files export a complete, self-contained,
+DB-backed Express `router` that's never `require()`'d by `index.js` at
+all (found via `grep` for `const router = express.Router()` + an
+exported `router` key, cross-referenced against every `legacy/` require
+in `index.js`). Two are unambiguous: `productService.js` and
+`orderService.js` implement exactly the routes `commerceApi.js`'s
+`productsAPI`/`ordersAPI` already call under `/api/v1/products` and
+`/api/v1/orders` — meaning `MarketplacePage.jsx` (rebuilt as "real"
+earlier this session) has been 404ing on every real request this whole
+time. Mounted both. While verifying `orderService.js`'s dependencies
+actually resolve, found and fixed 2 more bugs: `updateOrderStatus()` did
+`require('../../../index')` (one `../` too many, resolves to a
+nonexistent `backend/index.js` instead of the real
+`backend/src/index.js`) — would have thrown on every call, including the
+existing `PUT /:id/status` route; and `ordersAPI.cancelOrder()` had no
+matching `DELETE /:id` route at all (9 of its 10 methods matched, this
+was the one gap) — added it, ownership-enforced the same way as the
+existing `/:id/payment` route. Found and fixed the identical
+`require('../../../index')` bug in `services/legacy/logisticsService.js`
+too (part of the same 46-file follow-up, not yet mounted). The remaining
+~44 unmounted routers are a queued follow-up.
+
 **Follow-up: codebase-wide reachable-destructure audit found one more real
 bug (`6e52fc8d`).** Built a script that boots the real app once, walks
 `require.cache` (so it only examines code the app genuinely loads, not
