@@ -32,7 +32,6 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiBackboneService');
 const { authMiddleware } = require('../../middleware/auth');
 const pool = require('../../database/pool');
 
@@ -185,62 +184,33 @@ async function registerSharedAsset(assetData) {
  */
 async function searchSharedInfrastructure(searchParams) {
   try {
-    const {
-      location,
-      asset_type,
-      category,
-      capacity_required,
-      date_from,
-      date_to,
-      max_rental_rate,
-      state,
-      district,
-    } = searchParams || {};
+    const { location, asset_type } = searchParams || {};
 
-    // AI-powered search and recommendation
-    const aiRequest = {
-      task: 'shared_infrastructure_search',
-      parameters: {
-        location,
-        asset_type,
-        category,
-        capacity_required,
-        date_from,
-        date_to,
-        max_rental_rate,
-        state,
-        district,
-        available_assets: await getAvailableAssets(searchParams),
-        demand_forecast: await getDemandForecast(location, asset_type),
-        pricing_optimization: await getPricingOptimization(asset_type, location),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    // BUG FIX (2026-09-20): this used to route the real, already-fetched
+    // getAvailableAssets() result through `aiAPI.generateRecommendation()`
+    // and return the AI's answer instead - but aiAPI was never a real export
+    // of aiBackboneService.js (only individual provider functions like
+    // callClaudeAI exist there), so this threw a TypeError on every call.
+    // Even fixed, having an LLM invent `available_assets` from scratch
+    // would mean fabricating fake asset listings on top of the real ones
+    // already fetched below - so this now just returns the real, DB-backed
+    // search result directly. demand_forecast/pricing_optimization are
+    // themselves unimplemented stubs (see getDemandForecast/
+    // getPricingOptimization above) - surfaced honestly as empty/null
+    // rather than silently dropped.
+    const availableAssets = await getAvailableAssets(searchParams);
+    const demandForecast = await getDemandForecast(location, asset_type);
+    const pricingOptimization = await getPricingOptimization(asset_type, location);
 
     const results = {
       search_id: generateId(),
       timestamp: new Date().toISOString(),
       search_params: searchParams,
-      available_assets: aiResponse.available_assets.map(asset => ({
-        asset_id: asset.id,
-        asset_name: asset.name,
-        asset_type: asset.type,
-        category: asset.category,
-        location: asset.location,
-        distance: asset.distance,
-        capacity: asset.capacity,
-        specifications: asset.specifications,
-        rental_rate: asset.rental_rate,
-        availability: asset.availability,
-        rating: asset.rating,
-        utilization_rate: asset.utilization_rate,
-        match_score: asset.match_score,
-        recommended: asset.recommended,
-      })),
-      recommendations: aiResponse.recommendations,
-      pricing_insights: aiResponse.pricing_insights,
-      total_results: aiResponse.available_assets.length,
+      available_assets: availableAssets,
+      recommendations: [],
+      pricing_insights: Object.keys(pricingOptimization).length ? pricingOptimization : null,
+      demand_forecast: Object.keys(demandForecast).length ? demandForecast : null,
+      total_results: availableAssets.length,
     };
 
     return results;
@@ -399,19 +369,13 @@ async function listSecondLifeEquipment(equipmentData) {
       inquiries: 0,
     };
 
-    // AI-powered pricing recommendation
-    const aiRequest = {
-      task: 'second_life_equipment_pricing',
-      parameters: {
-        equipment_data: equipmentData,
-        market_data: await getSecondLifeMarketData(equipment_type, category),
-        depreciation_analysis: await calculateDepreciation(equipmentData),
-        demand_forecast: await getEquipmentDemandForecast(equipment_type),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    listing.ai_pricing_recommendation = aiResponse;
+    // AI-powered pricing recommendation is not available: there is no real
+    // `aiAPI.generateRecommendation` (see searchSharedInfrastructure above
+    // for the same finding), and the market_data/depreciation_analysis/
+    // demand_forecast helpers this would have fed it are themselves
+    // unimplemented stubs - nothing real to base a recommendation on.
+    // Surfaced honestly rather than fabricated.
+    listing.ai_pricing_recommendation = null;
 
     // NOTE: no second-life equipment marketplace table exists in the schema
     // (checked 000_base_schema.sql and every migration matching /second.life/i),
@@ -501,19 +465,13 @@ async function listSecondLifeBattery(batteryData) {
       agricultural_applicability: await assessAgriculturalApplicability(batteryData),
     };
 
-    // AI-powered agricultural applicability assessment
-    const aiRequest = {
-      task: 'battery_agricultural_applicability',
-      parameters: {
-        battery_data: batteryData,
-        agricultural_use_cases: ['solar_pumping', 'cold_storage', 'farm_lighting', 'electric_vehicles'],
-        safety_requirements: await getBatterySafetyRequirements(),
-        cost_benefit_analysis: await calculateCostBenefit(batteryData),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    battery.ai_assessment = aiResponse;
+    // AI-powered agricultural applicability assessment is not available -
+    // same finding as searchSharedInfrastructure above: no real
+    // `aiAPI.generateRecommendation`, and the safety_requirements/
+    // cost_benefit_analysis helpers that would have fed it are themselves
+    // unimplemented stubs. Surfaced honestly rather than fabricated -
+    // battery safety data is not something to guess at.
+    battery.ai_assessment = null;
 
     // NOTE: no second-life battery marketplace table exists in the schema
     // (checked 000_base_schema.sql and every migration matching /battery/i —
@@ -533,53 +491,23 @@ async function listSecondLifeBattery(batteryData) {
  */
 async function getRenewablePowerSupport(location, requirements) {
   try {
-    const {
-      power_requirement_kw,
-      application_type, // irrigation, cold_storage, processing, general
-      budget,
-      existing_infrastructure,
-      grid_availability,
-    } = requirements;
-
-    // AI-powered renewable energy recommendation
-    const aiRequest = {
-      task: 'renewable_power_recommendation',
-      parameters: {
-        location,
-        power_requirement_kw,
-        application_type,
-        budget,
-        existing_infrastructure,
-        grid_availability,
-        solar_potential: await getSolarPotential(location),
-        wind_potential: await getWindPotential(location),
-        biomass_availability: await getBiomassAvailability(location),
-        government_schemes: await getRenewableSchemes(location),
-        cost_benefit: await calculateRenewableCostBenefit(requirements),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
+    // AI-powered renewable energy recommendation is not available - same
+    // finding as searchSharedInfrastructure above: no real
+    // `aiAPI.generateRecommendation`, and the solar/wind/biomass-potential,
+    // government-schemes and cost-benefit helpers that would have fed it
+    // are themselves unimplemented stubs. Nothing real to base a solution
+    // recommendation on, so this says so explicitly instead of fabricating
+    // subsidy amounts, payback periods or CO2 figures.
     const recommendations = {
       recommendation_id: generateId(),
       location,
       requirements,
-      recommended_solutions: aiResponse.solutions.map(solution => ({
-        solution_type: solution.type,
-        capacity: solution.capacity,
-        estimated_cost: solution.cost,
-        subsidy_eligible: solution.subsidy_eligible,
-        subsidy_amount: solution.subsidy_amount,
-        payback_period: solution.payback_period,
-        annual_savings: solution.annual_savings,
-        co2_reduction: solution.co2_reduction,
-        implementation_timeline: solution.timeline,
-        confidence: solution.confidence,
-      })),
-      comparison: aiResponse.comparison,
-      government_schemes: aiResponse.schemes,
-      next_steps: aiResponse.next_steps,
+      recommended_solutions: [],
+      comparison: null,
+      government_schemes: [],
+      next_steps: [],
+      configured: false,
+      reason: 'Renewable-energy recommendation is not implemented in this deployment: no AI provider is wired for it, and the underlying solar/wind/biomass-potential and government-scheme data sources are unimplemented stubs.',
       timestamp: new Date().toISOString(),
     };
 
@@ -713,21 +641,6 @@ async function getPricingOptimization(assetType, location) {
   return {};
 }
 
-async function getSecondLifeMarketData(equipmentType, category) {
-  // Get market data
-  return {};
-}
-
-async function calculateDepreciation(equipmentData) {
-  // Calculate depreciation
-  return {};
-}
-
-async function getEquipmentDemandForecast(equipmentType) {
-  // Get demand forecast
-  return {};
-}
-
 async function getSecondLifeListings(searchParams) {
   // No second-life equipment marketplace table exists anywhere in the schema
   // (checked 000_base_schema.sql and every migration matching /second.life/i —
@@ -742,41 +655,6 @@ async function getSecondLifeListings(searchParams) {
 
 async function assessAgriculturalApplicability(batteryData) {
   // Assess applicability
-  return {};
-}
-
-async function getBatterySafetyRequirements() {
-  // Get safety requirements
-  return {};
-}
-
-async function calculateCostBenefit(batteryData) {
-  // Calculate cost benefit
-  return {};
-}
-
-async function getSolarPotential(location) {
-  // Get solar potential
-  return {};
-}
-
-async function getWindPotential(location) {
-  // Get wind potential
-  return {};
-}
-
-async function getBiomassAvailability(location) {
-  // Get biomass availability
-  return {};
-}
-
-async function getRenewableSchemes(location) {
-  // Get renewable energy schemes
-  return [];
-}
-
-async function calculateRenewableCostBenefit(requirements) {
-  // Calculate cost benefit
   return {};
 }
 
