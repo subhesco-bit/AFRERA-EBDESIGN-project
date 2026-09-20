@@ -1818,6 +1818,61 @@ implementation with an added header comment. No route, controller, or
 `index.js` changes were needed - every route continues requiring whatever
 path it already required; only the top-level file's own contents changed.
 
+## Token-saving guidelines extracted + wired into the real OpenAI call path (2026-09-20) — DONE
+
+User asked to "extract token saving guidelines and integrate with openai."
+The guidelines existed only on other, unmerged remote branches
+(`origin/codex/chatgpt-tree-consolidation`, `origin/version/deep`) as
+`.ai/workflows/*.md` methodology docs — never on this branch, and never
+actually wired to a live provider call anywhere in the repo (the OpenAI
+plugin doc described a batch manager + token counter to build; neither
+file existed).
+
+**Extracted** 4 of the guideline docs from `origin/codex/chatgpt-tree-consolidation`
+into `.ai/workflows/` on this branch: `TOKEN_OPTIMIZATION_METHODOLOGY.md`,
+`UNIVERSAL_TOKEN_OPTIMIZATION.md`, `PLUGIN_TOKEN_OPTIMIZATION.md`,
+`OPENAI_PLUGIN_INTEGRATION.md`. Skipped `COMPLETE_TOKEN_OPTIMIZATION_SYSTEM.md`
+/ `COMPREHENSIVE_TOKEN_OPTIMIZATION_FINAL.md` — read both, confirmed they're
+summary wrappers over the four above, not independent content.
+
+**Integrated** the guidance for real (not just documentation) into the
+existing OpenAI call path:
+- New `backend/src/core/ai/tokenOptimizer.js` — applies the methodology's
+  context-compression (truncate an oversized prompt to a fixed token
+  budget, keeping head+tail), max-token capping (never let a caller
+  request more completion tokens than the provider's configured ceiling),
+  and a pre-call budget guard against the existing `aiCostController`
+  hourly/daily spend limits (warns by default; set
+  `AI_TOKEN_BUDGET_ENFORCE=true` to hard-block instead).
+- `backend/src/services/legacy/aiBackboneService.js`'s `callOpenAI()` now
+  runs every request through `tokenOptimizer.optimizeRequest()` before
+  sending it, and records actual billed usage back into
+  `aiCostController.recordCost()` on success (it never had cost tracking
+  wired in before — only per-provider request counts).
+- Deliberately scoped to `callOpenAI` only (matches "integrate with
+  openai"); the other providers (Claude, Gemini, Azure, HuggingFace,
+  Ollama) are untouched.
+
+**Config:** `AI_PROMPT_TOKEN_BUDGET` (default 6000 estimated tokens) caps
+prompt size; `AI_TOKEN_BUDGET_ENFORCE` (default off) switches the cost
+guard from warn-only to hard block.
+
+**Verified:** `backend/src/tests/tokenOptimizer.test.js` (new, 7 cases) +
+existing `backend/src/tests/aiBackboneFailureRetry.test.js` (2 cases, both
+still pass unmodified) + an ad-hoc integration smoke test confirming the
+actual HTTP request body sent to OpenAI has the truncated prompt, the
+capped `max_tokens`, no stray fields, and that `aiCostController`'s token
+counter increments by the response's real `usage.total_tokens` after a
+successful call. `eslint` clean on all 3 touched/added files.
+
+**Not done (out of scope for this pass):** the OpenAI Batch API manager
+and exact tiktoken-based counting the doc also describes — those need a
+real `OPENAI_API_KEY` and the `openai`/`js-tiktoken` packages to exercise
+and verify live, which this session doesn't have. The estimator here is
+character-based (~4 chars/token), documented as an approximation in the
+module's own comments; real billed tokens still come from the provider's
+response, not the estimate.
+
 ---
 
 *This document must be updated after every task completion or status change.*

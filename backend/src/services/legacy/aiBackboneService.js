@@ -14,6 +14,8 @@
 
 const { logger } = require('../../utils/logger');
 const fetch = require('node-fetch');
+const tokenOptimizer = require('../../core/ai/tokenOptimizer');
+const aiCostController = require('../../core/ai/aiCostController');
 
 // ============================================================================
 // AI PROVIDER CONFIGURATIONS
@@ -174,6 +176,12 @@ async function callOpenAI(prompt, options = {}) {
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.openai.total++;
 
+  // Token-saving guidelines (.ai/workflows/OPENAI_PLUGIN_INTEGRATION.md):
+  // truncate oversized prompts, cap max_tokens at the provider ceiling, and
+  // guard the call against the shared AI cost budget before spending it.
+  const { promptTokenBudget, maxTokens: _requestedMaxTokens, ...forwardedOptions } = options;
+  const optimization = tokenOptimizer.optimizeRequest('openai', prompt, options, AI_PROVIDERS.openai);
+
   const maxRetries = 3;
   let retryCount = 0;
 
@@ -190,12 +198,12 @@ async function callOpenAI(prompt, options = {}) {
           messages: [
             {
               role: 'user',
-              content: prompt,
+              content: optimization.prompt,
             },
           ],
-          max_tokens: options.maxTokens || AI_PROVIDERS.openai.maxTokens,
+          max_tokens: optimization.maxTokens,
           temperature: options.temperature || 0.7,
-          ...options,
+          ...forwardedOptions,
         }),
       });
 
@@ -215,6 +223,9 @@ async function callOpenAI(prompt, options = {}) {
 
       aiRequestTracker.successfulRequests++;
       aiRequestTracker.providerStats.openai.success++;
+
+      const billedTokens = data.usage?.total_tokens || optimization.estimatedTotalTokens;
+      aiCostController.recordCost('openai', billedTokens, { model: AI_PROVIDERS.openai.model });
 
       logger.info('OpenAI request successful', {
         model: AI_PROVIDERS.openai.model,
