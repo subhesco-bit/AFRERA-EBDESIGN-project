@@ -1873,6 +1873,38 @@ recording them here specifically so they don't get silently dropped.
    with certainty: no further module-service gaps of this specific kind
    remain anywhere in the 544-module set.
 
+## TODO — systematic controller/service call-resolution audit (2026-09-20, commit `a2fa3b39a`)
+
+Built a scanner (`audit_all_controllers.js` pattern, not saved to the repo
+- recreate from this description if needed) that, for every
+`backend/src/controllers/*.js` and `backend/src/modules/M*/controller.js`
+(371 files), resolves every `<requiredVar>.<method>(` call against the
+actual `require()`'d module's real exports (handling destructuring and
+`require(...).property` chains after two false-positive-fixing passes).
+
+**Real bugs found and fixed:**
+- M013 (authorization/permission service) and M144 (greenhouse management
+  service) controllers called generic `listItems/getItem/createItem/
+  updateItem/deleteItem` names their real, class-based services never
+  exported. Fixed both to the real names (commit `a2fa3b39a`).
+- M144's own test file tested a fictional generic API (search/createBulk/
+  getAll-with-pagination) the real service never had - skipped with an
+  honest documented reason rather than fabricating those capabilities.
+
+**Confirmed false positives (no action needed):** `bulkOrderController`'s
+flag was the scanner matching text inside an already-fixed comment;
+`ecommerceController`'s was a `require(...).getPostgreSQL()` chain the
+scanner doesn't parse; ~30 `logger.error` flags across M0xx modules were
+the `require(...).logger || console` fallback pattern, also unparsed by
+the scanner. M012/M014's `REQUIRE_THROWS` (JWT_SECRET) is the scanner's
+own isolated-process env, not a real bug - dotenv loads at real boot.
+
+**Status: this specific scan is closed** (every one of the 371 controllers
+now accounted for). Not yet done: the same call-resolution audit against
+`backend/src/services/*.js` calling into OTHER services (cross-service
+calls), and the frontend equivalent (component -> API-client call
+resolution) - both would very likely surface the same bug class.
+
 ---
 
 *This document must be updated after every task completion or status change.*
