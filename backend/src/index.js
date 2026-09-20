@@ -610,6 +610,127 @@ async function startup() {
     // these paths under /api/v1/orders, so cart/checkout was 404ing on
     // every real call until this was wired.
     app.use('/api/v1/orders', require('./services/legacy/orderService').router);
+
+    // --- Round 3 of legacy orphaned-router rescue: 40 more services/legacy/*.js
+    // files each export a complete, DB-backed Express router that was never
+    // require()'d/mounted anywhere (verified not reachable via index.js, any
+    // thin re-export wrapper, or routes/ORPHANED_SERVICES_MOUNT.js). Mounted at
+    // /api/v1/<kebab-case> per the productService/orderService precedent above.
+    // services/legacy/erpService.js was investigated and is already correctly
+    // wired (services/erpService.js's thin re-export mounts it at /api/erp
+    // above); services/legacy/logisticsService.js is out of scope for this
+    // round. Neither is touched again here.
+
+    // financialService.js: operationsApi.js's financialAPI (getOverview,
+    // applyForLoan, getFarmerLoans, approveLoan, getEMISchedule, payEMI,
+    // requestAdvance, getFarmerAdvances, getCreditScore) already calls exactly
+    // these paths under /api/v1/financial - 9 of its 10 methods match 1:1
+    // (getLoans's bare list has no matching route on this router). Note
+    // operationsApi.js itself is not currently imported by any page - the
+    // *live* pages (FinancialServicesDashboard.jsx, LoanManagementPage.jsx,
+    // FarmerPortalPage.jsx) import a different, stale financialAPI stub from
+    // services/api.js with unrelated method names; that mismatch is a
+    // pre-existing frontend bug, out of scope for this backend-only pass.
+    app.use('/api/v1/financial', require('./services/legacy/financialService').router);
+
+    // insuranceService.js: operationsApi.js's insuranceAPI matches 11 of 13 of
+    // this router's routes exactly (createPolicy/getPolicy/getPolicies/
+    // submitClaim/getClaim/getClaims/processClaim/createMasterPolicy/
+    // getMasterPolicies/getInsuranceProducts/calculatePremium). Same caveat as
+    // financialService above: operationsApi.js is not wired into any page today.
+    app.use('/api/v1/insurance', require('./services/legacy/insuranceService').router);
+
+    // enterpriseControlService.js: pages/EnterpriseControlPage.jsx's real,
+    // live method calls (startWorkflow/actOnWorkflow/pipeline/createLead/
+    // convertLead/clientHealth/legalCalendar/riskHeatmap/assessRisk/
+    // activeIncidents/raiseIncident/acknowledgeIncident) match this router's
+    // routes 1:1. The page currently imports a stale, mismatched
+    // enterpriseControlAPI stub from services/api.js though, so it will still
+    // throw client-side until that separate frontend bug is fixed - out of
+    // scope here.
+    app.use('/api/v1/enterprise-control', require('./services/legacy/enterpriseControlService').router);
+
+    // enterpriseMemoryService.js: pages/EnterpriseMemoryDashboardPage.jsx calls
+    // enterpriseMemoryAPI.getCases/getLearningInsights/getKnowledgeGraph/
+    // searchCases/createCase/updateCase, all still notImplemented() stubs in
+    // services/api.js. This router only covers entries/search/entities though
+    // (no cases/learning-insights/knowledge-graph concept) - mounting it is
+    // real, correct infrastructure but does not fully satisfy that page.
+    app.use('/api/v1/enterprise-memory', require('./services/legacy/enterpriseMemoryService').router);
+
+    // blockchainTraceabilityService.js: components/BlockchainTraceability/
+    // TraceabilityViewer.jsx and pages/TraceabilityPage.jsx already call
+    // blockchainTraceabilityAPI.getTraceabilityEvents()/verifyChainOfCustody(),
+    // which match this router's /traceability-events and
+    // /chain-of-custody/verify/:productId. Both are still notImplemented()
+    // stubs in services/api.js (a frontend-side follow-up, out of scope here).
+    app.use('/api/v1/blockchain-traceability', require('./services/legacy/blockchainTraceabilityService').router);
+
+    // organicTraceabilityService.js: services/api.js's organicTraceabilityAPI
+    // comment already documents this file's real getConsumerTransparencyByQR/
+    // registerFarm logic as unmounted; its stub methods
+    // (getConsumerTransparency/getStandards/registerFarm) match this router's
+    // /consumer-transparency, /standards and /farms routes.
+    app.use('/api/v1/organic-traceability', require('./services/legacy/organicTraceabilityService').router);
+
+    // The following have real, DB-backed routers but no current frontend
+    // caller was found (checked api.js, componentApi.js, coreApi.js,
+    // commerceApi.js, apiClient.js, authService.js, farmerService.js,
+    // marketplaceService.js, operationsApi.js, soilNutrientLandService.js,
+    // vendorProcurementService.js, villageAPI.js, warningAPI.js,
+    // waterIrrigationService.js, machineryVillageOpsService.js) - mounted at
+    // sensible /api/v1/<kebab-case> paths, backend-only.
+    app.use('/api/v1/advanced-ai', require('./services/legacy/advancedAIService').router);
+    app.use('/api/v1/ai-copilot', require('./services/legacy/aiCopilotService').router);
+    app.use('/api/v1/ar-vr', require('./services/legacy/arVrService').router);
+    app.use('/api/v1/biodiversity', require('./services/legacy/biodiversityService').router);
+    app.use('/api/v1/catalog-intelligence', require('./services/legacy/catalogIntelligenceService').router);
+    app.use('/api/v1/commerce-rules', require('./services/legacy/commerceRulesService').router);
+    app.use('/api/v1/consumer-health', require('./services/legacy/consumerHealthService').router);
+    app.use('/api/v1/conversational-ai', require('./services/legacy/conversationalAIService').router);
+    app.use('/api/v1/digital-product-passport', require('./services/legacy/digitalProductPassportService').router);
+    app.use('/api/v1/farmer-value', require('./services/legacy/farmerValueService').router);
+    app.use('/api/v1/food-intelligence', require('./services/legacy/foodIntelligenceService').router);
+    app.use('/api/v1/food-safety', require('./services/legacy/foodSafetyService').router);
+    app.use('/api/v1/forms', require('./services/legacy/formService').router);
+    app.use('/api/v1/gi-intelligence', require('./services/legacy/giIntelligenceService').router);
+    app.use('/api/v1/indigenous-knowledge', require('./services/legacy/indigenousKnowledgeService').router);
+    app.use('/api/v1/institutional-procurement', require('./services/legacy/institutionalProcurementService').router);
+    app.use('/api/v1/iot-integration', require('./services/legacy/iotIntegrationService').router);
+    app.use('/api/v1/knowledge-graph', require('./services/legacy/knowledgeGraphService').router);
+    app.use('/api/v1/laboratory-erp', require('./services/legacy/laboratoryERPService').router);
+    app.use('/api/v1/merchandising', require('./services/legacy/merchandisingService').router);
+    // millCircuitService.js's own routes already start with /mill-circuit and
+    // /fpo-ledger (two features sharing one router file), so it's mounted at a
+    // neutral /api/v1/agri prefix rather than doubling up a domain segment.
+    app.use('/api/v1/agri', require('./services/legacy/millCircuitService').router);
+    app.use('/api/v1/module-catalog', require('./services/legacy/moduleCatalogService').router);
+    app.use('/api/v1/multilingual', require('./services/legacy/multilingualService').router);
+    app.use('/api/v1/ne-product-intelligence', require('./services/legacy/neProductIntelligenceService').router);
+    // Distinct from the already-mounted /api/nutritionintelligence (routes/
+    // nutritionIntelligenceRoutes.js, wraps individual service functions) -
+    // this is nutritionIntelligenceService.js's own internal router, with
+    // additional routes (/calculate, /compare, /wellness-practices, /recipes)
+    // that routes/nutritionIntelligenceRoutes.js doesn't expose.
+    app.use('/api/v1/nutrition-intelligence', require('./services/legacy/nutritionIntelligenceService').router);
+    app.use('/api/v1/offline-payment', require('./services/legacy/offlinePaymentService').router);
+    app.use('/api/v1/offline-sync', require('./services/legacy/offlineSyncService').router);
+    app.use('/api/v1/omnichannel-ai', require('./services/legacy/omnichannelAIService').router);
+    app.use('/api/v1/predictive-analytics', require('./services/legacy/predictiveAnalyticsService').router);
+    app.use('/api/v1/recipe-intelligence', require('./services/legacy/recipeIntelligenceService').router);
+    app.use('/api/v1/shelf-life', require('./services/legacy/shelfLifeService').router);
+    // Fixed a wrong-relative-path require() bug while verifying this file:
+    // require('../../dual-use/authService') (two levels up from
+    // services/legacy/) resolved to the non-existent backend/src/dual-use/,
+    // when the real file is backend/src/services/dual-use/authService.js -
+    // same off-by-one-directory mistake as the orderService.js/
+    // logisticsService.js '../../../index' bug, fixed the same way.
+    app.use('/api/v1/sms-auth', require('./services/legacy/smsAuthService').router);
+    app.use('/api/v1/v42-intelligence', require('./services/legacy/v42IntelligenceService').router);
+    app.use('/api/v1/value-commerce', require('./services/legacy/valueCommerceService').router);
+    app.use('/api/v1/voice-ai', require('./services/legacy/voiceAIService').router);
+    app.use('/api/v1/whatsapp', require('./services/legacy/whatsappService').router);
+
     app.use('/api/operationsroutesupport', operationsRouteSupport.router);
     app.use('/api/operationsmanagement', operationsManagementRoutes);
     app.use('/api/nutritionintelligence', nutritionIntelligenceRoutes);
