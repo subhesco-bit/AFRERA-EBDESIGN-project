@@ -561,4 +561,59 @@ and display real API data (`db68c659`).
 
 ---
 
+## 2026-09-20 — MISSING_EXPORT build-failure chain closed, `Build Verification` green for the first time
+
+**Root cause:** `npx vite build` (Rolldown) fails the entire production build
+on ANY named import with no matching export — and `frontend/src/services/api.js`
+had accumulated 127 such gaps across `api.js` (125) and `componentApi.js` (2),
+discovered iteratively as each fix revealed the next batch underneath it (the
+build tool only reports a handful of errors per run until the earlier ones
+are cleared). This had been silently failing CI's `Build Verification` /
+`Check Status` gate across ~10 prior pushes on PR #22.
+
+Also found and fixed a real, separate bug while wiring these: this session's
+own earlier `landRecordsAPI`/`aiApprovalAPI`/`erpDashboardAPI`/`goatAPI`
+additions all called their backend routes with plain relative paths (e.g.
+`api.get('/goat/herd')`) against an axios client whose `baseURL` already
+includes `/api/v1`, while those routes are mounted UNVERSIONED directly on
+the Express app (`app.use('/api/goat', goatRoutes)`) — every one of those
+"real" wirings would have silently 404'd in production. Fixed by adding
+`UNVERSIONED_BASE` (mirroring the existing pattern already used in
+`apiClient.js` for `/api/auth`) and rewriting every affected call site.
+
+Of the 127 missing exports: 13 wired to a genuinely real, verified backend
+(including a mid-task discovery — `backend/src/routes/ORPHANED_SERVICES_MOUNT.js`,
+an explicit router that rescues 9 legacy services whose real `setupRoutes()`
+was otherwise never invoked, unlocking `governmentSchemeAPI`/`schemeRegistryAPI`/
+`subsidyOpsAPI`/`soilTestingOpsAPI` for real); 114 honestly stubbed via the
+existing `notImplemented()` helper (never fabricated data) with a one-line
+comment recording what was checked. Several pages' own inline comments
+claiming a real backend ("Backed by the real /modules/m102 endpoint") were
+independently re-verified against the actual mounted route and found stale —
+stubbed despite the comment, discrepancy noted.
+
+Commits: `6d46ff6a` (125 in `api.js`), `0ba1a00b` (final 2 in `componentApi.js`,
+plus a latent `ReferenceError` fix — that file called `api.get/post` without
+ever importing `api`). Verified: `npx vite build` exits 0, `npx eslint` clean,
+`npx jest --watchAll=false` 17/17 suites / 57/57 tests. PR #22's CI is fully
+green (`Build Verification`, `Frontend Tests`, `Lint`, `Security Audit`,
+`Claude AI Integration Test`, `Backend Tests`, `Check Status`) for the first
+time this session.
+
+**Follow-on discovery, in progress:** the same "real `setupRoutes()`, never
+mounted" pattern found 15 MORE orphaned backend services beyond the original
+9 in `ORPHANED_SERVICES_MOUNT.js` (`aiAdvisoryService`, `buyingClubService`,
+`custodyEventRoutes`, `escrowService`, `householdEconomyService`,
+`machineryAccessService`, `marketAccessService`, `marketIntelligenceService`,
+`mobilityRidesService`, `procurementSubscriptionService`,
+`renewableEnergyService`, `ruralEnterpriseService`, `ruralFinanceService`,
+`sharedInfraService`, `villageProfileService`) — independently spot-verified
+3 against their actual route bodies. Notably `escrowService.js` (real, unmounted)
+sits alongside `routes/escrowRoutes.js` (already mounted at `/api/escrow`, but
+a fake "Route operational" scaffold) — the frontend's pre-existing `escrowAPI`
+currently calls the fake one, a live bug. Mounting all 15 + repointing their
+matching frontend objects is in progress as a follow-up task.
+
+---
+
 *This document must be updated after every task completion or status change.*
