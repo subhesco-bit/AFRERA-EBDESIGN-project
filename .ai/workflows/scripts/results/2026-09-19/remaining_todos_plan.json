@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-09-19T14:52:39.727Z",
+  "total_items": 8,
+  "completed": 1,
+  "ready": 7,
+  "total_tokens": 560,
+  "phases": {
+    "A": 310,
+    "B": 230,
+    "C": 20
+  },
+  "todos": {
+    "13": {
+      "name": "NE Harvest visual redesign + marketplace seeding",
+      "tokens": 200,
+      "status": "⏳ READY (design templates exist, seeding via OpenAI batch)",
+      "action": "Queue to OpenAI batch: harvest imagery + market data generation"
+    },
+    "14": {
+      "name": "Module-wiring audit — 19 flagged mismatches",
+      "tokens": 0,
+      "status": "⏳ READY (automated via plugins + patterns)",
+      "action": "Run module verification plugin, apply transaction patterns"
+    },
+    "15": {
+      "name": "Repo-wide disconnected-file audit",
+      "tokens": 0,
+      "status": "✅ DONE (completed in npm/boot repair pass)",
+      "action": "No action needed - all imports fixed"
+    },
+    "16": {
+      "name": "Frontend page coverage (123 → 150)",
+      "tokens": 50,
+      "status": "⏳ READY (Batch 4 - page generator + plugin E2E)",
+      "action": "Generate 27 pages, wire routes, verify"
+    },
+    "17": {
+      "name": "Module registry / Claude AI integration layer",
+      "tokens": 100,
+      "status": "⏳ READY (core/moduleRegistry.js + AI coordinator)",
+      "action": "Wire module discovery, integrate with AI decision engine"
+    },
+    "18": {
+      "name": ".claude/audits/FIXES.md — professional repair queue",
+      "tokens": 50,
+      "status": "⏳ READY (batched fixes from all audits)",
+      "action": "Consolidate audit findings, batch apply fixes"
+    },
+    "19": {
+      "name": "AI orchestration sprawl consolidation",
+      "tokens": 80,
+      "status": "⏳ READY (5 independent systems → unified via core)",
+      "action": "Consolidate into single coordination layer"
+    },
+    "20": {
+      "name": "11 API clients with mounted backend, no page",
+      "tokens": 60,
+      "status": "⏳ READY (generators + plugin routing)",
+      "action": "Generate pages for all 11 orphaned APIs"
+    }
+  }
+}

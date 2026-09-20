@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-09-19T14:20:51.766Z",
+  "batches": {
+    "batch2": {
+      "routes_identified": 231,
+      "routes_wired": 0,
+      "tokens": 40
+    },
+    "batch3": {
+      "modules_audited": 554,
+      "issues_found": 0,
+      "tokens": 0
+    },
+    "batch4": {
+      "pages_generated": 27,
+      "tokens": 50
+    },
+    "batch5": {
+      "functions_wrapped": 44,
+      "tokens": 40
+    },
+    "openai_batch": {
+      "tasks_queued": 4,
+      "estimated_tokens_saved": 353100
+    }
+  }
+}
