@@ -697,6 +697,25 @@ skeleton modules") aren't required by `index.js` or any route file
 either. Not fixing dead code that never executes — stopping the sweep
 here.
 
+**Follow-up: codebase-wide reachable-destructure audit found one more real
+bug (`6e52fc8d`).** Built a script that boots the real app once, walks
+`require.cache` (so it only examines code the app genuinely loads, not
+the ~350-file dead duplicate tree that a naive grep mostly hits), and
+checks every `const { X } = require('./Y')` site against Y's actual
+exports. Found `modules/M0XX/service.js` (the real, schema-backed module
+services — M031 through M144, not the dead duplicate tree) had 16
+reachable call sites doing `const { ..., DatabaseError } = require('../../utils/errors')`
+and `throw new DatabaseError(...)`, but `utils/errors.js` never defined
+that class — every one of those 16 sites was masking its real DB error
+with `TypeError: DatabaseError is not a constructor`. Fixed by adding the
+class (matches the file's existing `AppError` subclass pattern). The
+audit also re-found the M022-M025 `aiAPI` sites (13 more call sites) but
+confirmed them unreachable this time too — their functions get merged
+into `farmerTrainingService.js`'s exports via `Object.assign()`, but
+nothing ever calls them through that merged object; left alone. Verified:
+lint/syntax clean, `npm test` byte-identical to baseline, re-ran the audit
+post-fix and confirmed all 16 findings gone.
+
 ---
 
 *This document must be updated after every task completion or status change.*
