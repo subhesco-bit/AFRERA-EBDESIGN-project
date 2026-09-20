@@ -1857,21 +1857,14 @@ recording them here specifically so they don't get silently dropped.
    the controller needs). This is the single largest concrete "real ERP
    business logic" gap identified so far - a strong candidate for where
    the upcoming backend/ERP audit should start.
-4. **~41 of the original 74 module-service "gap candidates" not
-   individually re-verified.** A batch line-count comparison against
-   `codex/production-reconcile-auth-geo` flagged 74 `backend/src/modules/M*/service.js`
-   files where that branch's version was significantly bigger. Of those,
-   6 were false positives explained by HEAD's `modules/shared/createRegistryService.js`
-   factory (shorter code, same/more real capability) and 33 were confirmed
-   genuine gaps and fixed (commit `1e366ec95`). The remaining ~35 were
-   sampled (2-3 files: M100, M033) and found to already be real/adequate,
-   but **not every one of the ~35 was individually checked** - a fast
-   follow-up would be re-running
-   `compare_module_services_vs_branch.js`-style logic (grep for
-   `createRegistryService` usage vs. the literal `// Add business logic
-   here` stub marker, which is now confirmed to be the only reliable
-   signal) across the full remaining set to close this out with
-   certainty rather than sampling confidence.
+4. ~~**~41 of the original 74 module-service "gap candidates" not
+   individually re-verified.**~~ **RESOLVED same session** - re-ran the
+   check for the literal `// Add business logic here` stub marker (the
+   only reliable signal, confirmed by direct inspection - `module.json`
+   status and line-count are both unreliable) across all 41 remaining
+   candidates (M034-M141 range). Zero matches. This category is closed
+   with certainty: no further module-service gaps of this specific kind
+   remain anywhere in the 544-module set.
 
 ---
 
