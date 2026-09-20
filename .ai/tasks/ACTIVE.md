@@ -652,6 +652,37 @@ suites, all pre-existing Postgres/Redis-dependent, zero new failures),
 (`Build Verification`, `Frontend Tests`, `Lint`, `Security Audit`,
 `Claude AI Integration Test`, `Backend Tests`, `Check Status`).
 
+**Third round (`800ed64c`): same `aiAPI` bug found in 5 more services, 18
+more call sites — one of them live-broken in production.** The
+`sharedInfraService.js` fix above turned out to be one instance of a
+systemic pattern: `farmerTrainingService.js`, `governmentSchemeService.js`,
+`greenhouseService.js`, `preSeasonOrderService.js`, and `subsidyService.js`
+all destructured the same nonexistent `{ aiAPI }` from
+`aiBackboneService.js`. (Ruled out `dynamicPricingService.js`/
+`insuranceClaimsService.js`/`soilTestingService.js` — those import a
+*different*, correctly-real `aiAPI` from `services/aiService/index.js` via
+a `services/legacy/aiService.js` re-export shim; not broken, left alone.)
+
+Highest-value finding: **`subsidyService.js`'s 3 call sites
+(`checkProjectSubsidyEligibility`/`checkEquipmentSubsidyEligibility`/
+`checkLogisticsSubsidyEligibility`) are live-wired** — `api.js`'s
+`subsidyOpsAPI.checkProjectSubsidy`/`checkEquipmentSubsidy`/
+`checkLogisticsSubsidy` (added in the very first MISSING_EXPORT pass this
+session, believed "real" at the time) call these exact endpoints, so every
+real caller was getting a 500. Each was discarding a real, state-filtered
+hardcoded scheme catalog (PMFBY, MIDH, AIF, NESIDS, MOVCDNER,
+NER-LOGISTICS with real subsidy_percentage/max_amount fields) in favor of
+the broken AI call — now returns the real scheme list directly, no
+frontend change needed. `governmentSchemeService.js`'s `getCSROpportunities`
+is also live-wired but was pure stub-on-stub underneath (no real data to
+recover) — now an honest empty/`configured:false` result instead of a
+500. The other ~14 call sites across all 5 files were not currently
+frontend-wired; each fixed the same way (real data surfaced directly where
+it existed, honest null/empty where it didn't) as a backend-correctness
+pass. Deleted 27 now-fully-dead stub helper functions left with no
+caller. Verified the same way as the prior two rounds — all green,
+zero new test failures.
+
 ---
 
 *This document must be updated after every task completion or status change.*
