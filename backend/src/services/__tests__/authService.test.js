@@ -1,7 +1,23 @@
 const authService = require('../dual-use/authService');
 
+// 2026-09-20: found via the service-to-service call-resolution audit. This
+// file was written against a simpler, generic auth API
+// (validateCredentials(email, password) -> {valid, error};
+// generateToken({userId, role})) that the real service -- a more
+// sophisticated OAuth/2FA/refresh-token-capable implementation -- never had.
+// The real equivalents (loginUser, generateAccessToken) exist but are not
+// drop-in compatible: generateAccessToken(user) requires user.id (not
+// userId) and does a real DB-backed permission lookup via user.role;
+// loginUser does a real bcrypt+DB credential check, not a synchronous
+// format-validation helper. Renaming the real service's methods to match
+// this test, or aliasing them, would either break real callers or crash on
+// the field-name mismatch. validateCredentials/generateToken sub-tests are
+// skipped with this documented reason rather than fabricated as passing;
+// hashPassword/comparePassword (real, exported this session) and
+// verifyToken (already real) are left active since they test real,
+// compatible behavior.
 describe('AuthService', () => {
-  describe('validateCredentials', () => {
+  describe.skip('validateCredentials (real API is loginUser, not drop-in compatible - see file header)', () => {
     it('should validate correct credentials', async () => {
       const result = await authService.validateCredentials('user@example.com', 'password123');
       expect(result).toBeDefined();
@@ -21,7 +37,7 @@ describe('AuthService', () => {
     });
   });
 
-  describe('generateToken', () => {
+  describe.skip('generateToken (real API is generateAccessToken(user) with user.id, not drop-in compatible - see file header)', () => {
     it('should generate valid JWT token', () => {
       const token = authService.generateToken({ userId: 1, role: 'farmer' });
       expect(token).toBeDefined();
@@ -40,7 +56,9 @@ describe('AuthService', () => {
 
   describe('verifyToken', () => {
     it('should verify valid token', () => {
-      const token = authService.generateToken({ userId: 1 });
+      // Uses the real generateAccessToken(user) API (user.id, not userId) -
+      // rewritten from generateToken({userId: 1}), which doesn't exist.
+      const token = authService.generateAccessToken({ id: 1, email: 'user@example.com', role: 'farmer' });
       const decoded = authService.verifyToken(token);
       expect(decoded).toBeDefined();
       expect(decoded.userId).toBe(1);

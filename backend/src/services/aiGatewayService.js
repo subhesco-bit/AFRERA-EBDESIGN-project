@@ -112,4 +112,59 @@ async function run({ moduleId, capability, prompt, context = {}, provider, maxTo
   }
 }
 
-module.exports = { run, buildGovernedPrompt, loadLibraryContext, MAX_PROMPT_LENGTH };
+/**
+ * Real health check: reports whether a provider is actually configured, not
+ * a fabricated "healthy" status. Used by platformCoreService.getSystemHealth().
+ */
+async function healthCheck() {
+  const hasProvider = !!(process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY);
+  return {
+    status: hasProvider ? 'configured' : 'not_configured',
+    checkedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * System optimization via the real governed AI gateway. Was called by
+ * platformCoreService.optimizeSystem() but did not exist on this module at
+ * all (every call threw "aiGateway.optimize is not a function"). Returns
+ * the AI's free-text recommendation honestly labeled as such -- it is not
+ * parsed into fabricated structured fields, since the underlying model call
+ * has no guarantee of returning parseable structured data.
+ */
+async function optimize(target, parameters = {}, constraints = {}) {
+  const result = await run({
+    moduleId: 'platform-core',
+    capability: `optimize-${target}`,
+    prompt: `Analyze these system parameters against the given constraints and suggest concrete optimization actions.\nParameters: ${JSON.stringify(parameters)}\nConstraints: ${JSON.stringify(constraints)}`,
+  });
+  return {
+    ...result,
+    recommendations: result.content || null,
+  };
+}
+
+/**
+ * System analysis via the real governed AI gateway. Was called by
+ * platformCoreService.analyzeSystemPerformance() but did not exist on this
+ * module at all. score/bottlenecks/forecast are left null/empty rather than
+ * fabricated -- the AI's free-text response is not reliably parseable into
+ * those structured fields without a schema-constrained provider call this
+ * gateway does not currently make.
+ */
+async function analyze(target, data, analysisType) {
+  const result = await run({
+    moduleId: 'platform-core',
+    capability: `analyze-${target}-${analysisType}`,
+    prompt: `Analyze this ${analysisType} data for ${target} and describe any bottlenecks and recommendations.\nData: ${JSON.stringify(data)}`,
+  });
+  return {
+    ...result,
+    score: null,
+    bottlenecks: [],
+    recommendations: result.content ? [result.content] : [],
+    forecast: {},
+  };
+}
+
+module.exports = { run, buildGovernedPrompt, loadLibraryContext, MAX_PROMPT_LENGTH, healthCheck, optimize, analyze };

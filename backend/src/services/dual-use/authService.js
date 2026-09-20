@@ -1330,4 +1330,6 @@ module.exports = {
   hasPermission,
   generateAccessToken,
   generateRefreshToken,
+  hashPassword,
+  comparePassword,
 };
