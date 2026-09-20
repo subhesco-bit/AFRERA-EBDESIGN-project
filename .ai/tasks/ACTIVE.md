@@ -1827,16 +1827,27 @@ into `consolidated/final` before deleting them (see commit history
 `3889245f0`..`13d76a02f`). None of these were fabricated as "done" -
 recording them here specifically so they don't get silently dropped.
 
-1. **Dependency vulnerabilities - not remediated.** Ran
-   `.ai/plugins/audit-chain.js` (2026-09-20): backend 21 vulnerabilities
-   (18 moderate, 3 high); frontend 10 vulnerabilities (5 moderate, 3 high,
-   **2 critical**). The frontend criticals were not previously flagged in
-   this session and need checking first. `backup/pre-integration-checkpoint`'s
-   own commit message claimed "backend now at 0 known vulnerabilities (was
-   20)" after a real remediation pass (removed `@tensorflow/tfjs-node` +
-   8 unused packages, upgraded vitest/vite) - that state is not matched
-   here. Needs `npm audit` reviewed file-by-file for breaking changes,
-   not a blind `npm audit fix --force`.
+1. ~~**Dependency vulnerabilities - not remediated.**~~ **MOSTLY RESOLVED
+   same session (commits `740e7da58` backend... wait, `1bafce9a3` backend,
+   `740e7da58` frontend).** Backend: 21 -> 4 (moderate only, both HIGHs
+   resolved) via removing 2 confirmed-zero-usage packages
+   (`firebase-admin`, `apollo-server-express` - eliminated the
+   @google-cloud/* chain at the root) plus upgrading `nodemailer` (real
+   SMTP-injection/SSRF CVEs, actively used in emailService.js) and `sharp`
+   (real libvips/libheif CVEs, actively used in visionService.js, verified
+   with a real functional smoke test after upgrading, not just
+   `node --check`). Removing the two zero-usage packages broke a real,
+   previously-undeclared dependency (`uuid`, used directly in 44 files via
+   hoisting from the packages just removed) - caught via a full boot
+   test, fixed by adding `uuid@^11.1.1` as a proper direct dependency
+   before committing. Frontend: 10 -> 3 (both criticals resolved: `vitest`
+   major-bumped to 5.0.1 after confirming zero regression risk - the 314
+   test files using `import ... from 'vitest'` already fail identically
+   under the actual configured runner, jest, before and after). Remaining
+   4 backend moderate + 3 frontend moderate all require downgrading a
+   real, used dependency to an ancient major version (aws-sdk, bull,
+   exceljs, @capacitor/cli) - not applied, real regression for
+   moderate-severity issues is a bad trade.
 2. ~~**3-way `freightPoolingService.js` duplicate - not resolved.**~~
    **RESOLVED same session (commit `00cb17c37`).** Traced: 2 of the 3
    route files were real and distinct (2-endpoint pool create/join vs.
