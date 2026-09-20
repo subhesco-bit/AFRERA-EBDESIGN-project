@@ -683,6 +683,20 @@ pass. Deleted 27 now-fully-dead stub helper functions left with no
 caller. Verified the same way as the prior two rounds — all green,
 zero new test failures.
 
+**Final sweep: confirmed no more *live* instances of the `{ aiAPI }` bug
+remain.** `grep -rln "{ aiAPI }"` across the whole backend turns up ~20
+more matches, but every one is in a confirmed-unreachable duplicate tree:
+`services/finance/`, `services/agriculture/`, `services/commerce/`,
+`services/platform/`, and flat `services/*.js` copies of the same
+service names, all pulled in only by `services/index.js` — which is
+itself required only by `services/productReviewService.js`, whose own
+header comment already says it isn't live (the actually-mounted
+`productReviewRoutes.js` requires `services/legacy/productReviewService.js`
+instead). The `modules/M0XX/service.js` matches (M001-M025 "Tier 1
+skeleton modules") aren't required by `index.js` or any route file
+either. Not fixing dead code that never executes — stopping the sweep
+here.
+
 ---
 
 *This document must be updated after every task completion or status change.*
