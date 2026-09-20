@@ -98,7 +98,13 @@ async function callClaudeAI(prompt, options = {}) {
   // Token-saving guidelines (.ai/workflows/TOKEN_OPTIMIZATION_METHODOLOGY.md):
   // truncate oversized prompts, cap max_tokens at the provider ceiling, and
   // guard the call against the shared AI cost budget before spending it.
-  const { promptTokenBudget, maxTokens: _requestedMaxTokens, ...forwardedOptions } = options;
+  const {
+    promptTokenBudget,
+    maxTokens: _requestedMaxTokens,
+    provider: _requestedProvider,
+    strategy: _requestedStrategy,
+    ...forwardedOptions
+  } = options;
   const optimization = tokenOptimizer.optimizeRequest('claude', prompt, options, AI_PROVIDERS.claude);
 
   const maxRetries = 3;
@@ -189,7 +195,13 @@ async function callOpenAI(prompt, options = {}) {
   // Token-saving guidelines (.ai/workflows/OPENAI_PLUGIN_INTEGRATION.md):
   // truncate oversized prompts, cap max_tokens at the provider ceiling, and
   // guard the call against the shared AI cost budget before spending it.
-  const { promptTokenBudget, maxTokens: _requestedMaxTokens, ...forwardedOptions } = options;
+  const {
+    promptTokenBudget,
+    maxTokens: _requestedMaxTokens,
+    provider: _requestedProvider,
+    strategy: _requestedStrategy,
+    ...forwardedOptions
+  } = options;
   const optimization = tokenOptimizer.optimizeRequest('openai', prompt, options, AI_PROVIDERS.openai);
 
   const maxRetries = 3;

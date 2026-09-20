@@ -66,4 +66,21 @@ describe('AI provider routing strategies', () => {
     expect(result.provider).toBe('claude');
     expect(fetch.mock.calls[0][0]).toContain('api.anthropic.com');
   });
+
+  it('does not leak routing-only fields (provider, strategy) into the Claude/OpenAI request body', async () => {
+    fetch.mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        content: [{ type: 'text', text: 'hi' }],
+        stop_reason: 'end_turn',
+        usage: { input_tokens: 5, output_tokens: 3 },
+      }),
+    });
+
+    await aiBackbone.callAI('test prompt', { provider: 'auto', strategy: 'quality' });
+
+    const body = JSON.parse(fetch.mock.calls[0][1].body);
+    expect(body.provider).toBeUndefined();
+    expect(body.strategy).toBeUndefined();
+  });
 });
