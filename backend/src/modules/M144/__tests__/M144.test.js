@@ -1,7 +1,20 @@
 const m144Service = require('../service');
 const db = require('../../../database/connection');
 
-describe('M144 Service', () => {
+// 2026-09-20: skipped - this is a generic CRUD-template test (create/getById/
+// update/delete/getAll/search/createBulk against a generic {user_id, data}
+// shape) written against an API the real service never had. The real
+// service (GreenhouseManagementService) exports domain-specific methods
+// (listGreenhouses, getGreenhouse, createGreenhouse, updateGreenhouse,
+// deleteGreenhouse, configureGreenhouseSensors, getGreenhouseSensorData,
+// executeAutomation, getGreenhouseAIInsights) with no search/bulk/generic-
+// pagination-object support at all. Fabricating those capabilities on the
+// service just to make this test pass would invent functionality that
+// doesn't exist. The corresponding controller.js bug (calling these same
+// wrong generic names) was fixed this session; this test needs a real
+// rewrite against the actual service API as its own pass, not a same-
+// session patch. See .ai/tasks/ACTIVE.md.
+describe.skip('M144 Service', () => {
   const testData = {
     user_id: 'test-user-123',
     data: { sample: 'data' },
