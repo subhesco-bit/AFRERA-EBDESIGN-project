@@ -1,304 +1,243 @@
-/**
- * Pricing Management Service (M055)
- * Dynamic pricing with AI-powered optimization and demand forecasting
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Create pricing rule with AI-powered optimization
- */
-async function createPricingRule(ruleData) {
-  try {
-    const {
-      product_id,
-      rule_name,
-      rule_type,
-      base_price,
-      conditions,
-      adjustments,
-      metadata,
-    } = ruleData;
+class M055Service {
+  constructor() {
+    this.table = 'fertilizer';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-    const rule = {
-      rule_id: generateId(),
-      product_id,
-      rule_name,
-      rule_type,
-      base_price,
-      conditions,
-      adjustments,
-      status: 'active',
-      created_at: new Date().toISOString(),
-    };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    // AI-powered pricing optimization
-    const aiRequest = {
-      task: 'pricing_optimization',
-      parameters: {
-        rule_data: ruleData,
-        market_data: await getMarketData(product_id),
-        demand_forecast: await getDemandForecast(product_id),
-        competitor_pricing: await getCompetitorPricing(product_id),
-        elasticity_analysis: await analyzePriceElasticity(product_id),
-      },
-    };
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    rule.ai_recommendations = aiResponse;
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-    const result = await pool.query(
-      `INSERT INTO pricing_rules 
-       (rule_id, product_id, rule_name, rule_type, base_price, 
-        conditions, adjustments, status, ai_recommendations, metadata, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING *`,
-      [
-        rule.rule_id,
-        rule.product_id,
-        rule.rule_name,
-        rule.rule_type,
-        rule.base_price,
-        JSON.stringify(rule.conditions),
-        JSON.stringify(rule.adjustments),
-        rule.status,
-        JSON.stringify(rule.ai_recommendations),
-        JSON.stringify(metadata || {}),
-        rule.created_at,
-      ],
-    );
+        validated[field] = value;
+      }
+    }
 
-    logger.info(`Pricing rule created: ${rule.rule_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating pricing rule', { error: error.message, stack: error.stack });
-    throw new Error('Failed to create pricing rule');
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Calculate dynamic price
- */
-async function calculateDynamicPrice(productId, context = {}) {
-  try {
-    const basePrice = await getBasePrice(productId);
-    const applicableRules = await getApplicableRules(productId, context);
-
-    let finalPrice = basePrice;
-    const appliedAdjustments = [];
-
-    for (const rule of applicableRules) {
-      const adjustment = applyRule(rule, basePrice, context);
-      finalPrice += adjustment.amount;
-      appliedAdjustments.push(adjustment);
-    }
-
-    // AI-powered price optimization
-    const aiRequest = {
-      task: 'dynamic_pricing',
-      parameters: {
-        product_id: productId,
-        base_price: basePrice,
-        context,
-        demand: await getCurrentDemand(productId),
-        inventory: await getInventoryLevel(productId),
-        time_factors: await getTimeFactors(),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
-    return {
-      product_id: productId,
-      base_price: basePrice,
-      final_price: finalPrice,
-      applied_rules: applicableRules,
-      adjustments: appliedAdjustments,
-      ai_optimization: aiResponse,
-      calculated_at: new Date().toISOString(),
-    };
-  } catch (error) {
-    logger.error('Error calculating dynamic price', { error: error.message });
-    throw new Error('Failed to calculate dynamic price');
-  }
-}
-
-/**
- * List pricing rules
- */
-async function listPricingRules({ page = 1, limit = 20, productId = null, status = null } = {}) {
-  try {
-    const offset = (page - 1) * limit;
-
-    let countQuery = 'SELECT COUNT(*) FROM pricing_rules';
-    const countParams = [];
-    const conditions = [];
-
-    if (productId) {
-      conditions.push(`product_id = $${ conditions.length + 1}`);
-      countParams.push(productId);
-    }
-    if (status) {
-      conditions.push(`status = $${ conditions.length + 1}`);
-      countParams.push(status);
-    }
-
-    if (conditions.length > 0) {
-      countQuery += ` WHERE ${ conditions.join(' AND ')}`;
-    }
-
-    const totalRes = await pool.query(countQuery, countParams);
-    const total = parseInt(totalRes.rows[0].count || '0');
-
-    let dataQuery = 'SELECT * FROM pricing_rules';
-    const dataParams = [...countParams];
-
-    if (conditions.length > 0) {
-      dataQuery += ` WHERE ${ conditions.join(' AND ')}`;
-    }
-
-    dataQuery += ` ORDER BY created_at DESC LIMIT $${ dataParams.length + 1 } OFFSET $${ dataParams.length + 2}`;
-    dataParams.push(limit, offset);
-
-    const res = await pool.query(dataQuery, dataParams);
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-  } catch (error) {
-    logger.error('Error listing pricing rules', { error: error.message });
-    throw new Error('Failed to list pricing rules');
-  }
-}
-
-/**
- * Update pricing rule
- */
-async function updatePricingRule(ruleId, updates) {
-  try {
-    const { rule_name, rule_type, base_price, conditions, adjustments, status, metadata } = updates;
-
-    const result = await pool.query(
-      `UPDATE pricing_rules 
-       SET rule_name = COALESCE($1, rule_name),
-           rule_type = COALESCE($2, rule_type),
-           base_price = COALESCE($3, base_price),
-           conditions = COALESCE($4, conditions::jsonb),
-           adjustments = COALESCE($5, adjustments::jsonb),
-           status = COALESCE($6, status),
-           metadata = COALESCE($7, metadata::jsonb),
-           updated_at = NOW()
-       WHERE rule_id = $8
-       RETURNING *`,
-      [
-        rule_name, rule_type, base_price,
-        conditions ? JSON.stringify(conditions) : null,
-        adjustments ? JSON.stringify(adjustments) : null,
-        status,
-        metadata ? JSON.stringify(metadata) : null,
-        ruleId,
-      ],
-    );
-    return result.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating pricing rule', { error: error.message });
-    throw new Error('Failed to update pricing rule');
-  }
-}
-
-/**
- * Delete pricing rule
- */
-async function deletePricingRule(ruleId) {
-  try {
-    const res = await pool.query('DELETE FROM pricing_rules WHERE rule_id = $1 RETURNING rule_id', [ruleId]);
-    return Boolean(res.rows[0]);
-  } catch (error) {
-    logger.error('Error deleting pricing rule', { error: error.message });
-    throw new Error('Failed to delete pricing rule');
-  }
-}
-
-// Helper functions
-function generateId() {
-  return `PR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getMarketData(productId) {
-  return {
-    average_price: 100,
-    price_range: { min: 80, max: 120 },
-    demand_level: 'high',
-  };
-}
-
-async function getDemandForecast(productId) {
-  return {
-    forecast: 'increasing',
-    confidence: 0.8,
-    time_horizon: '30_days',
-  };
-}
-
-async function getCompetitorPricing(productId) {
-  return [
-    { competitor: 'A', price: 95 },
-    { competitor: 'B', price: 105 },
-    { competitor: 'C', price: 110 },
-  ];
-}
-
-async function analyzePriceElasticity(productId) {
-  return {
-    elasticity: -1.5,
-    sensitivity: 'high',
-    optimal_price_point: 102,
-  };
-}
-
-async function getBasePrice(productId) {
-  const res = await pool.query('SELECT price FROM products WHERE product_id = $1', [productId]);
-  return res.rows[0]?.price || 0;
-}
-
-async function getApplicableRules(productId, context) {
-  const res = await pool.query(
-    'SELECT * FROM pricing_rules WHERE product_id = $1 AND status = $2',
-    [productId, 'active'],
-  );
-  return res.rows;
-}
-
-function applyRule(rule, basePrice, context) {
-  return {
-    rule_id: rule.rule_id,
-    rule_name: rule.rule_name,
-    amount: basePrice * 0.1,
-    type: 'percentage',
-  };
-}
-
-async function getCurrentDemand(productId) {
-  return { level: 'high', trend: 'increasing' };
-}
-
-async function getInventoryLevel(productId) {
-  const res = await pool.query('SELECT quantity FROM products WHERE product_id = $1', [productId]);
-  return res.rows[0]?.quantity || 0;
-}
-
-async function getTimeFactors() {
-  return {
-    hour: new Date().getHours(),
-    day_of_week: new Date().getDay(),
-    season: 'monsoon',
-  };
-}
-
-module.exports = {
-  createPricingRule,
-  calculateDynamicPrice,
-  listPricingRules,
-  updatePricingRule,
-  deletePricingRule,
-};
-
+module.exports = new M055Service();

@@ -1,4 +1,9 @@
+// Load environment variables FIRST, before any other requires
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+
 const index = require('./routes/index.js');
+const devinRoutes = require('./routes/devinRoutes');
 const yieldManagement = require('./routes/yieldManagement.js');
 const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
 const weatherRoutes = require('./routes/weatherRoutes.js');
@@ -192,6 +197,18 @@ const advancedSearchRoutes = require('./routes/advancedSearchRoutes.js');
 const advancedFeatures = require('./routes/advancedFeatures.js');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
+const aiModelsRoutes = require('./routes/aiModelsRoutes.js');
+const aiTrainingEvaluationRoutes = require('./routes/aiTrainingEvaluationRoutes.js');
+const infrastructureMonitoringRoutes = require('./routes/infrastructureMonitoringRoutes.js');
+const gdprComplianceRoutes = require('./routes/gdprComplianceRoutes.js');
+const productImageAutoGenerationRoutes = require('./routes/productImageAutoGenerationRoutes');
+const aiImageGenerationEnhancedRoutes = require('./routes/aiImageGenerationEnhancedRoutes');
+const ecommerceImageIntegrationRoutes = require('./routes/ecommerceImageIntegrationRoutes');
+const farmerImagePortalRoutes = require('./routes/farmerImagePortalRoutes');
+const integrationStatusRoutes = require('./routes/integrationStatusRoutes');
+const endpointMismatchFixer = require('./routes/ENDPOINT_MISMATCH_FIXER');
+const stripeWebhookRoutes = require('./routes/stripeWebhookRoutes');
+
 /**
  * EBDESIGN Platform Backend - Main Entry Point
  * Auto-Discovery Architecture: Supports 200K+ services & routes
@@ -200,7 +217,6 @@ const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
  * Enables lazy loading, scales to enterprise requirements
  */
 
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -232,7 +248,9 @@ const {
   contentNegotiation
 } = require('./middleware/apiResponseStandardizer');
 const mfaMiddleware = require('./middleware/dual-use/mfaMiddleware');
+const { autoGenerateOnPageViewMiddleware, triggerAutoGenAfterCreateMiddleware } = require('./middleware/productImageAutoGenerationHooks');
 const loggingService = require('./services/loggingService');
+const productImageAutoGenerationService = require('./services/productImageAutoGenerationService');
 const libraryKnowledgeService = require('./services/libraryKnowledgeService');
 const websocketService = require('./services/websocketService');
 const { initializeAI } = require('./core/ai');
@@ -283,6 +301,13 @@ app.use(routeMonitoring);
 // Security enhancements
 app.use(securityHeaders);
 app.use(rateLimit);
+
+// Auto Image Generation Middleware
+if (process.env.AUTO_IMAGE_GENERATION === 'true') {
+  app.use(autoGenerateOnPageViewMiddleware);
+  app.use(triggerAutoGenAfterCreateMiddleware);
+  logger.info('🎨 Auto-generation middleware enabled');
+}
 
 // ============================================================================
 // STARTUP SEQUENCE
@@ -506,6 +531,14 @@ async function startup() {
     app.use('/api/unifiedai', unifiedAIRoutes);
     app.use('/api/ai', unifiedAIRoutes);
     app.use('/api/v1/ai', unifiedAIRoutes);
+    app.use('/api/ai/models', aiModelsRoutes);
+    app.use('/api/ai/training', aiTrainingEvaluationRoutes);
+    app.use('/api/v1/ai/models', aiModelsRoutes);
+    app.use('/api/v1/ai/training', aiTrainingEvaluationRoutes);
+    app.use('/api/monitoring', infrastructureMonitoringRoutes);
+    app.use('/api/v1/monitoring', infrastructureMonitoringRoutes);
+    app.use('/api/gdpr', gdprComplianceRoutes);
+    app.use('/api/v1/gdpr', gdprComplianceRoutes);
     app.use('/api/unifiedaigateway', unifiedAIGateway);
     app.use('/api/transaction', transactionRoutes);
     app.use('/api/trackdart', trackDartRoutes);
@@ -677,6 +710,7 @@ async function startup() {
     app.use('/api/aioperationintelligence', aiOperationIntelligenceRoutes);
     app.use('/api/aigateway', aiGatewayRoutes);
     app.use('/api/aicollaboration', aiCollaborationRoutes);
+    app.use('/api/devin', devinRoutes);
     app.use('/api/aibrain', aiBrainRoutes);
     app.use('/api/aibackbone', aiBackboneRoutes);
     app.use('/api/aiapproval', aiApprovalRoutes);
@@ -692,6 +726,26 @@ async function startup() {
 
     app.use('/health', healthRoutes);
     logger.info('✅ Health check routes mounted at /health');
+
+    // Auto Image Generation Routes
+    app.use('/api/auto-generation', productImageAutoGenerationRoutes);
+    app.use('/api/ai/images', aiImageGenerationEnhancedRoutes);
+    app.use('/api/commerce/images', ecommerceImageIntegrationRoutes);
+    app.use('/api/farmer/images', farmerImagePortalRoutes);
+    logger.info('🎨 Auto image generation routes mounted');
+
+    // Integration Status Dashboard - Project Visibility
+    app.use('/api/status', integrationStatusRoutes);
+    logger.info('📊 Integration status routes mounted at /api/status');
+
+    // BLOCKER FIXES
+    // Blocker 3: Endpoint Mismatch Fixer
+    app.use('/api/debug', endpointMismatchFixer);
+    logger.info('🔧 Endpoint mismatch fixer mounted at /api/debug');
+
+    // Blocker 4: Stripe Webhook Handler
+    app.use('/api', stripeWebhookRoutes);
+    logger.info('💳 Stripe webhook handler mounted at /api/stripe-webhook');
 
     // Standardized error handling must follow every route registration.
     app.use(standardizeErrorResponse);

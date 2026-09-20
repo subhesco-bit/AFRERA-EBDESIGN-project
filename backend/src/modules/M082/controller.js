@@ -1,153 +1,109 @@
-﻿/**
- * Controller for Business Metrics & KPIs Tracking (M082)
- * Handles HTTP requests for KPI operations
- */
+const m082Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const kpiService = require('./service');
+class M082Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const createKPIDefinition = async (req, res) => {
-  try {
-    const kpi = await kpiService.createKPIDefinition(req.body);
-    res.status(201).json({ success: true, data: kpi });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
+      const result = await m082Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
 
-const getKPIDefinition = async (req, res) => {
-  try {
-    const kpi = await kpiService.getKPIDefinition(req.params.id);
-    if (!kpi) {
-      return res.status(404).json({ success: false, error: 'KPI definition not found' });
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
     }
-    res.status(200).json({ success: true, data: kpi });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const listKPIDefinitions = async (req, res) => {
-  try {
-    const kpis = await kpiService.listKPIDefinitions(req.query);
-    res.status(200).json({ success: true, data: kpis });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m082Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
   }
-};
 
-const recordKPIMeasurement = async (req, res) => {
-  try {
-    const measurement = await kpiService.recordKPIMeasurement(req.body);
-    res.status(201).json({ success: true, data: measurement });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m082Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const getKPIMeasurements = async (req, res) => {
-  try {
-    const measurements = await kpiService.getKPIMeasurements(req.params.id, req.query);
-    res.status(200).json({ success: true, data: measurements });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m082Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const setKPITarget = async (req, res) => {
-  try {
-    const target = await kpiService.setKPITarget(req.body);
-    res.status(201).json({ success: true, data: target });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m082Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
   }
-};
 
-const getKPITargets = async (req, res) => {
-  try {
-    const targets = await kpiService.getKPITargets(req.params.id, req.query);
-    res.status(200).json({ success: true, data: targets });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m082Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
   }
-};
 
-const calculateKPIScore = async (req, res) => {
-  try {
-    const { entity_id, entity_type, period_type, period_start, period_end } = req.body;
-    const score = await kpiService.calculateKPIScore(entity_id, entity_type, period_type, period_start, period_end);
-    res.status(200).json({ success: true, data: score });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m082Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
-};
+}
 
-const createKPIAlert = async (req, res) => {
-  try {
-    const alert = await kpiService.createKPIAlert(req.body);
-    res.status(201).json({ success: true, data: alert });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getKPIAlerts = async (req, res) => {
-  try {
-    const alerts = await kpiService.getKPIAlerts(req.params.id);
-    res.status(200).json({ success: true, data: alerts });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const addBenchmark = async (req, res) => {
-  try {
-    const benchmark = await kpiService.addBenchmark(req.body);
-    res.status(201).json({ success: true, data: benchmark });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getBenchmarks = async (req, res) => {
-  try {
-    const benchmarks = await kpiService.getBenchmarks(req.params.id);
-    res.status(200).json({ success: true, data: benchmarks });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const addDimension = async (req, res) => {
-  try {
-    const dimension = await kpiService.addDimension(req.body);
-    res.status(201).json({ success: true, data: dimension });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getDimensions = async (req, res) => {
-  try {
-    const dimensions = await kpiService.getDimensions(req.params.id);
-    res.status(200).json({ success: true, data: dimensions });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  createKPIDefinition,
-  getKPIDefinition,
-  listKPIDefinitions,
-  recordKPIMeasurement,
-  getKPIMeasurements,
-  setKPITarget,
-  getKPITargets,
-  calculateKPIScore,
-  createKPIAlert,
-  getKPIAlerts,
-  addBenchmark,
-  getBenchmarks,
-  addDimension,
-  getDimensions,
-};
+module.exports = new M082Controller();

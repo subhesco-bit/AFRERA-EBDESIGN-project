@@ -1,90 +1,243 @@
-/**
- * Discount Management Service (M059)
- * Discount and promotion management with AI-powered optimization
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-async function createDiscount(discountData) {
-  try {
-    const { name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products } = discountData;
-    const discount = {
-      discount_id: generateId(),
-      name,
-      discount_type,
-      value,
-      min_purchase,
-      max_discount,
-      start_date,
-      end_date,
-      applicable_products,
-      status: 'active',
-      created_at: new Date().toISOString(),
-    };
+class M059Service {
+  constructor() {
+    this.table = 'agri_finance';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-    const aiRequest = {
-      task: 'discount_optimization',
-      parameters: { discount_data: discountData, historical_data: await getHistoricalSalesData() },
-    };
-    discount.ai_recommendations = await aiAPI.generateRecommendation(aiRequest);
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    const result = await pool.query(
-      `INSERT INTO discounts (discount_id, name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products, status, ai_recommendations, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
-      [discount.discount_id, discount.name, discount.discount_type, discount.value, discount.min_purchase, discount.max_discount, discount.start_date, discount.end_date, JSON.stringify(discount.applicable_products), discount.status, JSON.stringify(discount.ai_recommendations), discount.created_at],
-    );
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    logger.info(`Discount created: ${discount.discount_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating discount', { error: error.message });
-    throw new Error('Failed to create discount');
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
+
+        validated[field] = value;
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-async function getDiscount(discountId) {
-  try {
-    const res = await pool.query('SELECT * FROM discounts WHERE discount_id = $1', [discountId]);
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error getting discount', { error: error.message });
-    throw new Error('Failed to get discount');
-  }
-}
-
-async function updateDiscount(discountId, updates) {
-  try {
-    const { name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products, status } = updates;
-    const res = await pool.query(
-      'UPDATE discounts SET name = COALESCE($1, name), discount_type = COALESCE($2, discount_type), value = COALESCE($3, value), min_purchase = COALESCE($4, min_purchase), max_discount = COALESCE($5, max_discount), start_date = COALESCE($6, start_date), end_date = COALESCE($7, end_date), applicable_products = COALESCE($8, applicable_products::jsonb), status = COALESCE($9, status), updated_at = NOW() WHERE discount_id = $10 RETURNING *',
-      [name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products ? JSON.stringify(applicable_products) : null, status, discountId],
-    );
-    return res.rows[0] || null;
-  } catch (error) {
-    logger.error('Error updating discount', { error: error.message });
-    throw new Error('Failed to update discount');
-  }
-}
-
-async function deleteDiscount(discountId) {
-  try {
-    const res = await pool.query('DELETE FROM discounts WHERE discount_id = $1 RETURNING discount_id', [discountId]);
-    return Boolean(res.rows[0]);
-  } catch (error) {
-    logger.error('Error deleting discount', { error: error.message });
-    throw new Error('Failed to delete discount');
-  }
-}
-
-function generateId() {
-  return `DISC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getHistoricalSalesData() {
-  return { average_order_value: 5000, conversion_rate: 0.05 };
-}
-
-module.exports = { createDiscount, getDiscount, updateDiscount, deleteDiscount };
-
+module.exports = new M059Service();

@@ -1,26 +1,68 @@
-// Express routes for Alert Management (M087)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// Rules. Notifications/escalations/suppressions take rule_id in the body
-// (see controller.js), not a :id param - kept flat to match that contract.
-router.post('/rules', authMiddleware, requireRole('admin'), controller.createAlertRule);
-router.post('/notifications', authMiddleware, requireRole('admin'), controller.addNotification);
-router.post('/escalations', authMiddleware, requireRole('admin'), controller.addEscalation);
-router.post('/suppressions', authMiddleware, requireRole('admin'), controller.createSuppression);
+/**
+ * M087 Routes
+ * Base path: /api/m087
+ */
 
-// Incidents
-router.post('/incidents', authMiddleware, controller.createIncident);
-router.get('/incidents', authMiddleware, controller.getIncidents);
-router.post('/incidents/:id/acknowledge', authMiddleware, controller.acknowledgeIncident);
-router.post('/incidents/:id/resolve', authMiddleware, controller.resolveIncident);
+// Middleware
+router.use(authenticate);
 
-// Maintenance windows
-router.post('/maintenance-windows', authMiddleware, requireRole('admin'), controller.createMaintenanceWindow);
+/**
+ * @route   GET /api/m087
+ * @desc    Get all m087 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
 
-// Statistics
-router.post('/statistics', authMiddleware, controller.calculateAlertStatistics);
+/**
+ * @route   POST /api/m087/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m087/search
+ * @desc    Search m087 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m087
+ * @desc    Create new m087
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m087/:id
+ * @desc    Get m087 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m087/:id
+ * @desc    Update m087
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m087/:id
+ * @desc    Delete (soft delete) m087
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

@@ -3,6 +3,8 @@ const router = express.Router();
 const priceForecastingService = require('../services/priceForecastingService');
 const { authMiddleware: authenticateToken } = require('../middleware/auth');
 const logger = require('../utils/logger');
+const { authMiddleware: authenticate } = require('../middleware/auth');
+
 
 router.get('/products/:id/price-forecast', async (req, res, next) => {
   try {

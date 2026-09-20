@@ -1,447 +1,243 @@
-/**
- * Implement Management Service (M102)
- * Agricultural implement inventory, maintenance, and usage tracking
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Register agricultural implement
- */
-async function registerImplement(implementData) {
-  try {
-    const {
-      farmer_id,
-      implement_id,
-      implement_type,
-      brand,
-      model,
-      year,
-      serial_number,
-      width,
-      working_width,
-      compatible_tractor_hp,
-      purchase_date,
-      location,
-      state,
-      district,
-      condition,
-      status,
-    } = implementData;
+class M102Service {
+  constructor() {
+    this.table = 'advanced_analytics';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-    const implement = {
-      implement_registry_id: generateId(),
-      implement_id,
-      farmer_id,
-      implement_type,
-      brand,
-      model,
-      year,
-      serial_number,
-      width,
-      working_width,
-      compatible_tractor_hp,
-      purchase_date,
-      location,
-      state,
-      district,
-      condition: condition || 'good',
-      status: status || 'active',
-      created_at: new Date().toISOString(),
-    };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    // AI-powered implement optimization
-    const aiRequest = {
-      task: 'implement_optimization',
-      parameters: {
-        implement_data: implementData,
-        type_specifics: await getImplementTypeSpecifics(implement_type),
-        regional_suitability: await getRegionalSuitability(state, district, implement_type),
-        maintenance_requirements: await getMaintenanceRequirements(implement_type, brand),
-        usage_recommendations: await getUsageRecommendations(implement_type, working_width),
-      },
-    };
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    implement.ai_recommendations = aiResponse;
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-    const result = await pool.query(
-      `INSERT INTO implement_registry 
-       (implement_registry_id, implement_id, farmer_id, implement_type, brand, model, 
-        year, serial_number, width, working_width, compatible_tractor_hp, purchase_date, 
-        location, state, district, condition, status, ai_recommendations, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
-       RETURNING *`,
-      [
-        implement.implement_registry_id,
-        implement.implement_id,
-        implement.farmer_id,
-        implement.implement_type,
-        implement.brand,
-        implement.model,
-        implement.year,
-        implement.serial_number,
-        implement.width,
-        implement.working_width,
-        implement.compatible_tractor_hp,
-        implement.purchase_date,
-        implement.location,
-        implement.state,
-        implement.district,
-        implement.condition,
-        implement.status,
-        JSON.stringify(implement.ai_recommendations),
-        implement.created_at,
-      ],
-    );
+        validated[field] = value;
+      }
+    }
 
-    logger.info(`Implement registered: ${implement.implement_registry_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error registering implement', { error: error.message, stack: error.stack });
-    throw new Error('Failed to register implement');
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Update implement maintenance
- */
-async function updateImplementMaintenance(registryId, maintenanceData) {
-  try {
-    const {
-      maintenance_type,
-      service_date,
-      parts_replaced,
-      labor_cost,
-      parts_cost,
-      service_center,
-      condition_after,
-      next_service_date,
-      notes,
-    } = maintenanceData;
-
-    const maintenanceRecord = {
-      record_id: generateId(),
-      registry_id: registryId,
-      maintenance_type,
-      service_date,
-      parts_replaced,
-      labor_cost,
-      parts_cost,
-      service_center,
-      condition_after,
-      next_service_date,
-      notes,
-      recorded_at: new Date().toISOString(),
-    };
-
-    // AI-powered maintenance analysis
-    const aiRequest = {
-      task: 'implement_maintenance_analysis',
-      parameters: {
-        registry_id: registryId,
-        maintenance_data: maintenanceData,
-        maintenance_history: await getImplementMaintenanceHistory(registryId),
-        wear_patterns: await analyzeWearPatterns(registryId),
-        implement_specs: await getImplementSpecs(registryId),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    maintenanceRecord.ai_analysis = aiResponse;
-
-    await pool.query(
-      `UPDATE implement_registry 
-       SET condition = $1, updated_at = CURRENT_TIMESTAMP
-       WHERE implement_registry_id = $2`,
-      [condition_after, registryId],
-    );
-
-    await pool.query(
-      `INSERT INTO implement_maintenance_records 
-       (record_id, registry_id, maintenance_type, service_date, parts_replaced, 
-        labor_cost, parts_cost, service_center, condition_after, next_service_date, 
-        notes, ai_analysis, recorded_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-      [
-        maintenanceRecord.record_id,
-        registryId,
-        maintenance_type,
-        service_date,
-        JSON.stringify(parts_replaced),
-        labor_cost,
-        parts_cost,
-        service_center,
-        condition_after,
-        next_service_date,
-        notes,
-        JSON.stringify(maintenanceRecord.ai_analysis),
-        maintenanceRecord.recorded_at,
-      ],
-    );
-
-    logger.info(`Implement maintenance updated: ${registryId}`);
-    return maintenanceRecord;
-  } catch (error) {
-    logger.error('Error updating implement maintenance', { error: error.message, stack: error.stack });
-    throw new Error('Failed to update implement maintenance');
-  }
-}
-
-/**
- * Track implement usage
- */
-async function trackImplementUsage(registryId, period) {
-  try {
-    const usage = {
-      tracking_id: generateId(),
-      registry_id: registryId,
-      period,
-      timestamp: new Date().toISOString(),
-      field_hours: await getFieldHours(registryId, period),
-      area_covered: await getAreaCovered(registryId, period),
-      efficiency_metrics: await getEfficiencyMetrics(registryId, period),
-      wear_analysis: await analyzeWear(registryId, period),
-      recommendations: await generateUsageRecommendations(registryId, period),
-    };
-
-    return usage;
-  } catch (error) {
-    logger.error('Error tracking implement usage', { error: error.message, stack: error.stack });
-    throw new Error('Failed to track implement usage');
-  }
-}
-
-/**
- * Generate implement report
- */
-async function generateImplementReport(farmerId, reportType) {
-  try {
-    const report = {
-      report_id: generateId(),
-      farmer_id: farmerId,
-      report_type: reportType,
-      generated_at: new Date().toISOString(),
-      implement_count: await getImplementCount(farmerId),
-      type_distribution: await getTypeDistribution(farmerId),
-      condition_summary: await getConditionSummary(farmerId),
-      utilization_metrics: await getUtilizationMetrics(farmerId),
-      maintenance_costs: await getMaintenanceCosts(farmerId),
-      recommendations: await generateFarmerRecommendations(farmerId),
-    };
-
-    return report;
-  } catch (error) {
-    logger.error('Error generating implement report', { error: error.message, stack: error.stack });
-    throw new Error('Failed to generate implement report');
-  }
-}
-
-function generateId() {
-  return `IMP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getImplementTypeSpecifics(implementType) {
-  const specifics = {
-    plow: { optimal_depth: '15-25cm', soil_type: 'all', speed: '3-5 km/h' },
-    harrow: { optimal_depth: '5-15cm', soil_type: 'all', speed: '5-8 km/h' },
-    cultivator: { optimal_depth: '5-15cm', soil_type: 'all', speed: '4-6 km/h' },
-    seeder: { optimal_depth: '2-5cm', soil_type: 'prepared', speed: '4-6 km/h' },
-  };
-  return specifics[implementType] || {};
-}
-
-async function getRegionalSuitability(state, district, implementType) {
-  return {
-    soil_compatibility: 'high',
-    crop_suitability: ['wheat', 'rice', 'maize'],
-    seasonal_relevance: ['kharif', 'rabi'],
-  };
-}
-
-async function getMaintenanceRequirements(implementType, brand) {
-  return [
-    { part: 'blades', replacement_interval: '200_hours', condition: 'check' },
-    { part: 'bearings', replacement_interval: '500_hours', condition: 'grease' },
-    { part: 'hitch', replacement_interval: '1000_hours', condition: 'inspect' },
-  ];
-}
-
-async function getUsageRecommendations(implementType, workingWidth) {
-  return {
-    optimal_tractor_hp: workingWidth * 15,
-    recommended_speed: '5 km/h',
-    field_conditions: 'dry soil',
-  };
-}
-
-async function getImplementMaintenanceHistory(registryId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM implement_maintenance_records WHERE registry_id = $1 ORDER BY service_date DESC LIMIT 10',
-      [registryId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function analyzeWearPatterns(registryId) {
-  return {
-    blade_wear: 'moderate',
-    bearing_wear: 'low',
-    structural_wear: 'minimal',
-  };
-}
-
-async function getImplementSpecs(registryId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM implement_registry WHERE implement_registry_id = $1',
-      [registryId],
-    );
-    return result.rows[0] || {};
-  } catch (error) {
-    return {};
-  }
-}
-
-async function getFieldHours(registryId, period) {
-  return {
-    total_hours: 120,
-    average_daily: 4,
-    peak_hours: 8,
-  };
-}
-
-async function getAreaCovered(registryId, period) {
-  return {
-    total_hectares: 60,
-    hectares_per_hour: 0.5,
-    efficiency_rating: 'good',
-  };
-}
-
-async function getEfficiencyMetrics(registryId, period) {
-  return {
-    fuel_efficiency: 'optimal',
-    time_efficiency: 85,
-    quality_rating: 'excellent',
-  };
-}
-
-async function analyzeWear(registryId, period) {
-  return {
-    overall_wear: 'moderate',
-    critical_components: [],
-    replacement_needed: false,
-  };
-}
-
-async function generateUsageRecommendations(registryId, period) {
-  return [
-    'Schedule blade sharpening',
-    'Check bearing lubrication',
-    'Inspect hitch points',
-  ];
-}
-
-async function getImplementCount(farmerId) {
-  try {
-    const result = await pool.query(
-      'SELECT COUNT(*) as count FROM implement_registry WHERE farmer_id = $1',
-      [farmerId],
-    );
-    return result.rows[0]?.count || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-async function getTypeDistribution(farmerId) {
-  try {
-    const result = await pool.query(
-      'SELECT implement_type, COUNT(*) as count FROM implement_registry WHERE farmer_id = $1 GROUP BY implement_type',
-      [farmerId],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function getConditionSummary(farmerId) {
-  return {
-    excellent: 40,
-    good: 45,
-    fair: 10,
-    poor: 5,
-  };
-}
-
-async function getUtilizationMetrics(farmerId) {
-  return {
-    average_utilization: 75,
-    peak_utilization: 90,
-    idle_time: 25,
-  };
-}
-
-async function getMaintenanceCosts(farmerId) {
-  return {
-    total_cost: 25000,
-    parts_cost: 15000,
-    labor_cost: 10000,
-    cost_per_hectare: 416,
-  };
-}
-
-async function generateFarmerRecommendations(farmerId) {
-  return [
-    'Implement preventive maintenance schedule',
-    'Monitor wear patterns regularly',
-    'Optimize implement selection for field conditions',
-  ];
-}
-
-/**
- * List implements. No list route existed at all before this (2026-08-24) -
- * the module had register/update/usage/report but no way to browse the
- * registry, which is what a real inventory UI needs first.
- */
-async function listImplements({ page = 1, limit = 20, farmer_id = null, status = null } = {}) {
-  const offset = (Number(page) - 1) * Number(limit);
-  const conditions = [];
-  const params = [];
-  if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
-  if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-
-  const totalRes = await pool.query(`SELECT COUNT(*) FROM implement_registry ${where}`, params);
-  const total = parseInt(totalRes.rows[0].count, 10);
-
-  const listParams = [...params, limit, offset];
-  const res = await pool.query(
-    `SELECT * FROM implement_registry ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams,
-  );
-  return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
-}
-
-async function getImplement(id) {
-  const res = await pool.query('SELECT * FROM implement_registry WHERE implement_registry_id = $1', [id]);
-  return res.rows[0] || null;
-}
-
-module.exports = {
-  listImplements,
-  getImplement,
-  registerImplement,
-  updateImplementMaintenance,
-  trackImplementUsage,
-  generateImplementReport,
-};
-
+module.exports = new M102Service();

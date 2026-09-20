@@ -1,12 +1,20 @@
-const router = require('express').Router();
-const soilHealthService = require('../services/soilHealthService');
-const auth = require('../middleware/auth');
+/**
+ * soil Health Routes
+ * Placeholder route module
+ */
 
-router.post('/farms/:farmId/soil-test', auth, async (req, res) => {
-  try {
-    const result = await soilHealthService.recordSoilTest(req.params.farmId, req.body.ph, req.body.nitrogen, req.body.phosphorus, req.body.potassium);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'soilHealth',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

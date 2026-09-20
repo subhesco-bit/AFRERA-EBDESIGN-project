@@ -1,85 +1,109 @@
-﻿/**
- * Controller for Order Management (M053)
- * Handles HTTP requests for order operations
- */
+const m053Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const orderService = require('./service');
+class M053Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const createOrder = async (req, res) => {
-  try {
-    const order = await orderService.createOrder(req.body);
-    res.status(201).json({ success: true, data: order });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
+      const result = await m053Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
 
-const listOrders = async (req, res) => {
-  try {
-    const orders = await orderService.listOrders(req.query);
-    res.status(200).json({ success: true, data: orders });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getOrder = async (req, res) => {
-  try {
-    const order = await orderService.getOrder(req.params.id);
-    if (!order) {
-      return res.status(404).json({ success: false, error: 'Order not found' });
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
     }
-    res.status(200).json({ success: true, data: order });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const updateOrderStatus = async (req, res) => {
-  try {
-    const order = await orderService.updateOrderStatus(req.params.id, req.body.status, req.body.notes);
-    if (!order) {
-      return res.status(404).json({ success: false, error: 'Order not found' });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m053Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
     }
-    res.status(200).json({ success: true, data: order });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
-};
 
-const cancelOrder = async (req, res) => {
-  try {
-    const order = await orderService.cancelOrder(req.params.id, req.body.reason);
-    res.status(200).json({ success: true, data: order });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m053Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const processPayment = async (req, res) => {
-  try {
-    const payment = await orderService.processPayment(req.params.id, req.body);
-    res.status(201).json({ success: true, data: payment });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m053Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const trackOrder = async (req, res) => {
-  try {
-    const tracking = await orderService.trackOrder(req.params.id);
-    res.status(200).json({ success: true, data: tracking });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m053Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
   }
-};
 
-module.exports = {
-  createOrder,
-  listOrders,
-  getOrder,
-  updateOrderStatus,
-  cancelOrder,
-  processPayment,
-  trackOrder,
-};
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m053Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m053Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
+  }
+}
+
+module.exports = new M053Controller();

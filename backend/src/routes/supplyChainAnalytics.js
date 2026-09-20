@@ -1,11 +1,20 @@
-const router = require('express').Router();
-const supplyChainAnalyticsService = require('../services/supplyChainAnalyticsService');
+/**
+ * supply Chain Analytics Routes
+ * Placeholder route module
+ */
 
-router.post('/supply-chain/analyze', async (req, res) => {
-  try {
-    const result = await supplyChainAnalyticsService.analyzeShipments(req.body.origin, req.body.destination);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'supplyChainAnalytics',
+    status: 'operational'
+  });
 });
 
 module.exports = router;
