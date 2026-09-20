@@ -95,6 +95,12 @@ async function callClaudeAI(prompt, options = {}) {
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.claude.total++;
 
+  // Token-saving guidelines (.ai/workflows/TOKEN_OPTIMIZATION_METHODOLOGY.md):
+  // truncate oversized prompts, cap max_tokens at the provider ceiling, and
+  // guard the call against the shared AI cost budget before spending it.
+  const { promptTokenBudget, maxTokens: _requestedMaxTokens, ...forwardedOptions } = options;
+  const optimization = tokenOptimizer.optimizeRequest('claude', prompt, options, AI_PROVIDERS.claude);
+
   const maxRetries = 3;
   let retryCount = 0;
 
@@ -109,14 +115,14 @@ async function callClaudeAI(prompt, options = {}) {
         },
         body: JSON.stringify({
           model: options.model || AI_PROVIDERS.claude.model,
-          max_tokens: options.maxTokens || AI_PROVIDERS.claude.maxTokens,
+          max_tokens: optimization.maxTokens,
           messages: [
             {
               role: 'user',
-              content: prompt,
+              content: optimization.prompt,
             },
           ],
-          ...options,
+          ...forwardedOptions,
         }),
       });
 
@@ -136,6 +142,10 @@ async function callClaudeAI(prompt, options = {}) {
 
       aiRequestTracker.successfulRequests++;
       aiRequestTracker.providerStats.claude.success++;
+
+      const billedTokens =
+        (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0) || optimization.estimatedTotalTokens;
+      aiCostController.recordCost('claude', billedTokens, { model: AI_PROVIDERS.claude.model });
 
       logger.info('Claude AI request successful', {
         model: AI_PROVIDERS.claude.model,
