@@ -1,0 +1,4 @@
+id,card_id,name,service,status,size_mb,location,date,quality
+1,1,core_auth,auth,active,2.3,_EBDESIGN_LIBRARY_CLEAN/,2026-09-20,professional
+2,2,core_database,database,active,1.8,_EBDESIGN_LIBRARY_CLEAN/,2026-09-20,professional
+3,3,core_cache,cache,active,0.9,_EBDESIGN_LIBRARY_CLEAN/,2026-09-20,professional
