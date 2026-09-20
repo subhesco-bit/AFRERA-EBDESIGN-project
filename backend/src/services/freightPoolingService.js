@@ -1,32 +1,20 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+/**
+ * freightPoolingService (thin wrapper)
+ *
+ * (2026-09-20) 3-way duplicate remediation: this top-level copy (32 lines,
+ * db('freight_pools').insert()-style) has ZERO live callers - only reachable
+ * through the dead backend/src/services/index.js barrel (itself never
+ * required by index.js). backend/src/services/legacy/freightPoolingService.js
+ * is the confirmed-live copy, mounted via routes/freightPoolingRoutes.js at
+ * /api/freightpooling and wired to frontend/src/services/api.js's
+ * freightPoolingAPI. It is also the more correct implementation: it wraps
+ * pool-window joins in a transaction with row-level locking
+ * (withTransaction + `FOR UPDATE`) to prevent two concurrent joins from
+ * overfilling the same vehicle capacity - a race this copy never guarded
+ * against. Collapsed to a re-export per the erpService.js precedent rather
+ * than kept as a third, independently-drifting copy.
+ */
 
-class FreightPoolingService {
-  async createFreightPool(data) {
-  // Validate inputs
-    if (!data) throw new Error('Missing required parameter');
+'use strict';
 
-    try {
-      const id = require('uuid').v4();
-      await db('freight_pools').insert({
-        id, origin: data.origin, destination: data.destination,
-        status: 'open', created_at: new Date(),
-      });
-      logger.info(`Freight pool created: ${id}`);
-      return { pool_id: id, status: 'open' };
-    } catch (error) { logger.error(`Create pool failed: ${error.message}`); throw error; }
-  }
-
-  async joinFreightPool(poolId, shipmentId) {
-    try {
-      await db('freight_shipments').insert({
-        id: require('uuid').v4(), freight_pool_id: poolId,
-        shipment_id: shipmentId, created_at: new Date(),
-      });
-      logger.info(`Shipment joined pool: ${poolId}`);
-      return { pool_id: poolId, shipment_id: shipmentId, status: 'joined' };
-    } catch (error) { logger.error(`Join pool failed: ${error.message}`); throw error; }
-  }
-}
-
-module.exports = new FreightPoolingService();
+module.exports = require('./legacy/freightPoolingService.js');

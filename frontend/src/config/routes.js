@@ -205,6 +205,8 @@ const SoilManagementPage = lazy(() => import('../pages/SoilManagementPage'));
 const WaterManagementPage = lazy(() => import('../pages/WaterManagementPage'));
 const SubsidyManagementPage = lazy(() => import('../pages/SubsidyManagementPage'));
 const BulkOrderPage = lazy(() => import('../pages/BulkOrderPage'));
+const LandRecordsPage = lazy(() => import('../pages/LandRecordsPage'));
+const AIApprovalPage = lazy(() => import('../pages/AIApprovalPage'));
 const EcommerceMarketplacePage = lazy(() => import('../pages/EcommerceMarketplacePage'));
 const EcommerceIntegrationPage = lazy(() => import('../pages/EcommerceIntegrationPage'));
 const CompleteERPIntegrationPage = lazy(() => import('../pages/CompleteERPIntegrationPage'));
@@ -1910,6 +1912,22 @@ export const managementRoutes = [
     title: 'Bulk Orders - AFRERA',
     description: 'Request wholesale quantities and manage supplier quotations',
     keywords: 'bulk, wholesale, orders, quotations',
+    transition: 'fade',
+  },
+  {
+    path: '/land-records',
+    component: LandRecordsPage,
+    title: 'Land Records - AFRERA',
+    description: 'Register and verify your land parcels, and sync with government land records',
+    keywords: 'land, records, survey, khasra, verification',
+    transition: 'fade',
+  },
+  {
+    path: '/ai-approvals',
+    component: AIApprovalPage,
+    title: 'AI Proposal Approval - AFRERA',
+    description: 'Human review queue for AI-suggested changes across the platform',
+    keywords: 'ai, approval, proposal, review, governance',
     transition: 'fade',
   },
   {

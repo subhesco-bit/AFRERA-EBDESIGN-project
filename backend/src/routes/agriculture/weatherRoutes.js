@@ -7,7 +7,6 @@ const express = require('express');
 const router = express.Router();
 const w = require('../../services/agriculture/weatherService');
 const { authMiddleware } = require('../../middleware/auth');
-const { authMiddleware: authenticate } = require('../middleware/auth');
 
 const fail = (res, e) => res.status(/required|must|Unknown/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });
@@ -20,6 +19,15 @@ router.get('/for-arp', async (req, res) => {
     const { state, district, days } = req.query;
     if (!state || !district) throw new Error('state and district are required');
     res.json({ success: true, data: await w.weatherForArp({ state, district, days: Number(days) || 120 }) });
+  } catch (e) { fail(res, e); }
+});
+router.get('/alerts', async (req, res) => {
+  try {
+    const { state, includeCancelled, limit } = req.query;
+    res.json({
+      success: true,
+      data: await w.listAlerts({ state, includeCancelled: includeCancelled === 'true', limit: Number(limit) || 50 }),
+    });
   } catch (e) { fail(res, e); }
 });
 router.get('/alerts/active', async (req, res) => {

@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { authAPI } from '../services/api';
+// services/api.js never defines authAPI (it's a 5000+ line grab-bag of
+// hundreds of other API objects) - the real, matching implementation lives
+// in services/coreApi.js, which was itself never imported anywhere until
+// this fix. Importing from '../services/api' made this page crash on
+// render (authAPI was undefined) for every real user hitting /login.
+import { authAPI } from '../services/coreApi';
 import { useAuthStore, demoAccounts } from '../store/authStore';
 import toast from 'react-hot-toast';
 import { LogIn, Eye, EyeOff, ShieldCheck, Store, UserRound, Landmark } from 'lucide-react';

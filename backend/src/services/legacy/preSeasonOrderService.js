@@ -4,7 +4,6 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiBackboneService');
 const { socketServer } = require('../../websocket');
 const { authMiddleware } = require('../../middleware/auth');
 const { createEscrowTransaction } = require('./escrowService');
@@ -49,22 +48,19 @@ async function createPreSeasonOrder(orderData) {
       expires_at: calculateExpiryDate(contract_duration),
     };
 
-    // AI-powered order validation and pricing
-    const aiRequest = {
-      task: 'pre_season_order_validation',
-      parameters: {
-        order_data: orderData,
-        market_conditions: await getMarketConditions(product_category),
-        demand_forecast: await getDemandForecast(product_category, delivery_date),
-        price_trends: await getPriceTrends(product_category),
-        farmer_availability: await getFarmerAvailability(product_category, delivery_location),
-        logistics_costs: await getLogisticsCosts(delivery_location),
-        seasonality_factors: await getSeasonalityFactors(product_category),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    order.ai_validation = aiResponse;
+    // BUG FIX (2026-09-20): this routed orderData plus market_conditions/
+    // demand_forecast/price_trends/farmer_availability/logistics_costs/
+    // seasonality_factors through aiAPI.generateRecommendation() for order
+    // validation - but aiAPI was never a real export of
+    // aiBackboneService.js (see sharedInfraService.js 6005e08c for the same
+    // finding), so this threw a TypeError on every call. Every one of those
+    // inputs is itself an unimplemented stub (getMarketConditions,
+    // getDemandForecast, getPriceTrends, getFarmerAvailability,
+    // getLogisticsCosts, getSeasonalityFactors all just return {}) - there
+    // is no real data anywhere in this path. The order itself is built
+    // directly from the real orderData above (not discarded); only the
+    // AI-validation add-on is surfaced honestly rather than fabricated.
+    order.ai_validation = null;
 
     // Set up escrow if required
     if (escrow_required) {
@@ -113,23 +109,20 @@ async function submitBid(bidData) {
       submitted_at: new Date().toISOString(),
     };
 
-    // AI-powered bid evaluation
-    const aiRequest = {
-      task: 'bid_evaluation',
-      parameters: {
-        bid_data: bidData,
-        order_details: await getPreSeasonOrder(order_id),
-        farmer_profile: await getFarmerProfile(farmer_id),
-        farmer_history: await getFarmerPerformanceHistory(farmer_id),
-        quality_assessment: await assessQualityPotential(expected_quality, certifications),
-        logistics_feasibility: await assessLogisticsFeasibility(location, bidData.order_id),
-        risk_assessment: await assessFarmerRisk(farmer_id),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    bid.ai_evaluation = aiResponse;
-    bid.match_score = aiResponse.match_score;
+    // BUG FIX (2026-09-20): this routed bidData plus order_details/
+    // farmer_profile/farmer_history/quality_assessment/
+    // logistics_feasibility/risk_assessment through
+    // aiAPI.generateRecommendation() for a bid evaluation and match_score -
+    // but aiAPI was never a real export of aiBackboneService.js (see
+    // sharedInfraService.js 6005e08c for the same finding), so this threw a
+    // TypeError on every call. Every one of those inputs is itself an
+    // unimplemented stub (getPreSeasonOrder, getFarmerProfile,
+    // getFarmerPerformanceHistory, assessQualityPotential,
+    // assessLogisticsFeasibility, assessFarmerRisk all just return {}/[]) -
+    // there is no real data anywhere in this path. Surfaced honestly rather
+    // than fabricating an evaluation or match score.
+    bid.ai_evaluation = null;
+    bid.match_score = null;
 
     // Notify buyer
     const order = await getPreSeasonOrder(order_id);
@@ -155,51 +148,31 @@ async function submitBid(bidData) {
  */
 async function selectWinningBid(orderId, selectionCriteria) {
   try {
-    const order = await getPreSeasonOrder(orderId);
-    const bids = await getOrderBids(orderId);
-
-    // AI-powered bid selection
-    const aiRequest = {
-      task: 'bid_selection',
-      parameters: {
-        order_details: order,
-        available_bids: bids,
-        selection_criteria: selectionCriteria,
-        optimization_objectives: await getOptimizationObjectives(order.buyer_id),
-        risk_tolerance: await getRiskTolerance(order.buyer_id),
-        quality_requirements: order.quality_specifications,
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
+    // BUG FIX (2026-09-20): this routed the order/bids/selectionCriteria
+    // through aiAPI.generateRecommendation() to have the AI choose
+    // selected_bids and compute total_cost/weighted_average_price - but
+    // aiAPI was never a real export of aiBackboneService.js (see
+    // sharedInfraService.js 6005e08c for the same finding), so this threw a
+    // TypeError on every call. getPreSeasonOrder() and getOrderBids() are
+    // themselves unimplemented stubs (return {}/[]) - there is no real
+    // order or bid data anywhere in this path, so there is nothing for a
+    // selection algorithm to select from. Surfaced honestly rather than
+    // fabricating a winning-bid selection.
     const selection = {
       selection_id: generateId(),
       order_id: orderId,
-      selected_bids: aiResponse.selected_bids,
-      total_quantity: aiResponse.total_quantity,
-      weighted_average_price: aiResponse.weighted_average_price,
-      total_cost: aiResponse.total_cost,
-      selection_rationale: aiResponse.rationale,
-      risk_factors: aiResponse.risk_factors,
-      recommendations: aiResponse.recommendations,
-      confidence: aiResponse.confidence,
+      selection_criteria: selectionCriteria,
+      selected_bids: [],
+      total_quantity: null,
+      weighted_average_price: null,
+      total_cost: null,
+      selection_rationale: null,
+      risk_factors: [],
+      recommendations: [],
+      configured: false,
+      reason: 'Bid selection is not implemented in this deployment: no AI provider is wired for it, and no real order or bid data source exists to select from.',
       selected_at: new Date().toISOString(),
     };
-
-    // Update order status
-    order.status = 'bid_selected';
-    order.selection = selection;
-
-    // Notify selected farmers
-    for (const selectedBid of selection.selected_bids) {
-      socketServer.sendNotification(selectedBid.farmer_id, {
-        type: 'bid_selected',
-        order_id: orderId,
-        bid_id: selectedBid.bid_id,
-        message: 'Your bid has been selected',
-      });
-    }
 
     logger.info(`Winning bid selected for order ${orderId}`);
     return selection;
@@ -247,20 +220,19 @@ async function createContractAgreement(agreementData) {
       escrow_setup: await setupContractEscrow(agreementData),
     };
 
-    // AI-powered contract optimization
-    const aiRequest = {
-      task: 'contract_optimization',
-      parameters: {
-        agreement_data: agreementData,
-        legal_compliance: await getLegalRequirements(),
-        industry_standards: await getIndustryStandards(product_details.category),
-        risk_mitigation: await assessContractRisks(agreementData),
-        market_conditions: await getMarketConditions(product_details.category),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    agreement.ai_recommendations = aiResponse;
+    // BUG FIX (2026-09-20): this routed agreementData plus legal_compliance/
+    // industry_standards/risk_mitigation/market_conditions through
+    // aiAPI.generateRecommendation() for contract optimization
+    // recommendations - but aiAPI was never a real export of
+    // aiBackboneService.js (see sharedInfraService.js 6005e08c for the same
+    // finding), so this threw a TypeError on every call. Every one of those
+    // inputs is itself an unimplemented stub (getLegalRequirements,
+    // getIndustryStandards, assessContractRisks, getMarketConditions all
+    // just return {}) - there is no real data anywhere in this path. The
+    // agreement itself is stored directly from the real agreementData above
+    // (not affected); only the AI-recommendations add-on is surfaced
+    // honestly rather than fabricated.
+    agreement.ai_recommendations = null;
 
     logger.info(`Contract agreement created: ${agreement.agreement_id}`);
     return agreement;
@@ -295,25 +267,23 @@ async function updateContractMilestone(contractId, milestoneData) {
       updated_at: new Date().toISOString(),
     };
 
-    // AI-powered milestone validation
-    const aiRequest = {
-      task: 'milestone_validation',
-      parameters: {
-        milestone_data: milestoneData,
-        contract_details: await getContractDetails(contractId),
-        quality_standards: await getQualityStandards(contractId),
-        satellite_imagery: await getSatelliteImagery(contractId, milestone_type),
-        weather_data: await getWeatherData(contractId, completion_date),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    milestone.ai_validation = aiResponse;
-
-    // Trigger escrow release if applicable
-    if (status === 'completed' && aiResponse.escrow_release_eligible) {
-      await releaseEscrowPayment(contractId, milestone_id);
-    }
+    // BUG FIX (2026-09-20): this routed milestoneData plus contract_details/
+    // quality_standards/satellite_imagery/weather_data through
+    // aiAPI.generateRecommendation() for milestone validation AND used its
+    // (never-real) escrow_release_eligible field to auto-trigger an escrow
+    // payout - but aiAPI was never a real export of aiBackboneService.js
+    // (see sharedInfraService.js 6005e08c for the same finding), so this
+    // threw a TypeError on every call, before that trigger could ever fire.
+    // Every AI-request input is itself an unimplemented stub
+    // (getContractDetails, getQualityStandards, getSatelliteImagery,
+    // getWeatherData all just return {}) - there is no real data anywhere in
+    // this path, and no real way to determine escrow eligibility now that
+    // aiResponse.escrow_release_eligible is gone. The milestone itself is
+    // stored directly from the real milestoneData above (not affected); the
+    // AI-validation and auto-release trigger are surfaced/removed honestly
+    // rather than fabricated (releaseEscrowPayment is itself a documented
+    // not-implemented stub - see its FIXED 2026-08-15 comment below).
+    milestone.ai_validation = null;
 
     // Notify stakeholders
     const contract = await getContractDetails(contractId);
@@ -421,36 +391,6 @@ function calculateExpiryDate(duration) {
   return new Date(Date.now() + duration * 24 * 60 * 60 * 1000).toISOString();
 }
 
-async function getMarketConditions(category) {
-  // Get market conditions
-  return {};
-}
-
-async function getDemandForecast(category, date) {
-  // Get demand forecast
-  return {};
-}
-
-async function getPriceTrends(category) {
-  // Get price trends
-  return {};
-}
-
-async function getFarmerAvailability(category, location) {
-  // Get farmer availability
-  return {};
-}
-
-async function getLogisticsCosts(location) {
-  // Get logistics costs
-  return {};
-}
-
-async function getSeasonalityFactors(category) {
-  // Get seasonality factors
-  return {};
-}
-
 // FIXED 2026-08-15: previously fabricated a fake escrow_id and reported
 // the full order value as "held" — no funds were ever moved anywhere.
 // Setup real escrow transaction for order
@@ -495,46 +435,6 @@ async function getPreSeasonOrder(orderId) {
   return {};
 }
 
-async function getFarmerProfile(farmerId) {
-  // Get farmer profile
-  return {};
-}
-
-async function getFarmerPerformanceHistory(farmerId) {
-  // Get performance history
-  return [];
-}
-
-async function assessQualityPotential(quality, certifications) {
-  // Assess quality potential
-  return {};
-}
-
-async function assessLogisticsFeasibility(location, orderId) {
-  // Assess logistics feasibility
-  return {};
-}
-
-async function assessFarmerRisk(farmerId) {
-  // Assess farmer risk
-  return {};
-}
-
-async function getOrderBids(orderId) {
-  // Get order bids
-  return [];
-}
-
-async function getOptimizationObjectives(buyerId) {
-  // Get optimization objectives
-  return {};
-}
-
-async function getRiskTolerance(buyerId) {
-  // Get risk tolerance
-  return {};
-}
-
 // FIXED 2026-08-15: previously returned {} silently — callers destructuring
 // an escrow_id or amount off this got `undefined` with no indication
 // nothing real happened. See setupEscrow() above for the full reasoning.
@@ -543,38 +443,8 @@ async function setupContractEscrow(agreementData) {
   return { escrow_id: null, amount: null, status: 'not_implemented', reason: 'No real escrow fund-holding is implemented for contract farming agreements.' };
 }
 
-async function getLegalRequirements() {
-  // Get legal requirements
-  return {};
-}
-
-async function getIndustryStandards(category) {
-  // Get industry standards
-  return {};
-}
-
-async function assessContractRisks(agreementData) {
-  // Assess contract risks
-  return {};
-}
-
 async function getContractDetails(contractId) {
   // Get contract details
-  return {};
-}
-
-async function getQualityStandards(contractId) {
-  // Get quality standards
-  return {};
-}
-
-async function getSatelliteImagery(contractId, milestoneType) {
-  // Get satellite imagery
-  return {};
-}
-
-async function getWeatherData(contractId, date) {
-  // Get weather data
   return {};
 }
 

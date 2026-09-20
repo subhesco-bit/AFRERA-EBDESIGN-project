@@ -116,6 +116,11 @@ async function getFallbackUserByEmail(email) {
   return store.users.find((user) => user.email === email.toLowerCase());
 }
 
+async function getFallbackUserById(id) {
+  const store = await readAuthStore();
+  return store.users.find((user) => user.id === id);
+}
+
 function getUserPasswordHash(user) {
   return user.password_hash || user.password || user.passwordHash || user.passwordhash || null;
 }
@@ -583,7 +588,11 @@ async function refreshAccessToken(refreshToken) {
     const pg = getPostgreSQL();
     if (!pg) {
       assertFallbackAuthStoreAllowed();
-      const user = await getFallbackUserByEmail(payload.email || '');
+      // generateRefreshToken() payload only carries {userId, tokenType} -
+      // there is no payload.email on a refresh token (unlike an access
+      // token). Looking up by email here always missed and refresh always
+      // failed with "User not found" in fallback (no-Postgres) mode.
+      const user = await getFallbackUserById(payload.userId);
       if (!user) {
         throw new Error('User not found');
       }

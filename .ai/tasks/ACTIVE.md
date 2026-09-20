@@ -89,4 +89,717 @@
 
 ---
 
-**Next Sync:** 2026-09-11 18:00 UTC
+## 2026-09-08 — Module-schema gap closure, batch 1 (58-broken-module cleanup)
+
+**Task:** AUDIT_DB.md (refresh pass) Finding 4 said 58 of 150 `M0XX` modules
+have real, reachable `pg.query()`/`pool.query()` calls against tables that
+don't exist anywhere in `migrations/`. This session worked through that
+list module by module (read each `service.js`'s actual column lists,
+cross-referenced against every migration file for both table existence
+*and* column-level/type-level collisions - not just "does a table with
+this name exist somewhere").
+
+### Correction to the audit's "58" count
+
+A systematic re-check of all schema-less modules with real queries found
+**61** candidates (audit said "≥58, sampled"), which break down as:
+
+- **21 already fully fixed, no new migration needed.** These are the
+  generic "40-line CRUD template" modules (`tableName = '<prefix>_m0XX_items'`,
+  columns `id`/`data`/`created_at`/`updated_at` only): M040, M047, M048,
+  M050, M090, M091, M093, M094, M098, M099, M100, M106, M111, M114, M115,
+  M117, M120, M137, M139, M148, M149. **`backend/src/database/migrations/3000_M0XX_generated.sql`
+  already exists for every one of these (in fact for all 150 modules) and
+  creates exactly that generic shape.** Verified column-for-column against
+  each service.js. The audit's static grep missed these because it checked
+  for a *named* schema file per module, not the separately-numbered
+  `3000_` generated migrations.
+- **19 more already fine for the same reason but with real, non-generic
+  table names** (not the `_items` template, but still already covered by
+  an existing dedicated migration with matching columns, verified by
+  direct read of both sides): M026, M027, M028, M029, M030, M033, M036,
+  M043, M046, M069, M072, M092, M110, M118, M119, M132, M141. No action
+  needed.
+- **11 genuinely broken, fixed this session** (real column lists with no
+  matching CREATE TABLE anywhere, or colliding with an earlier,
+  incompatible same-named table): **M006, M008, M009, M014, M021, M044,
+  M045, M071, M073, M074, M075, M144.**
+- **0 remaining unaddressed** from the original 61-candidate list — every
+  one was individually verified this session (either already fine, or
+  fixed below). The audit's other ~42 "inert stub" modules (queries=0)
+  were spot-checked (not exhaustively) and left untouched per the task
+  brief.
+
+### New migration file
+
+`backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_module_schema_gaps_batch1.sql`
+(40 z's — longer than any prior `9999_zzz...` file, so it sorts and runs
+last; this matters because several of its `ALTER TABLE`s target tables
+only created by other `9999_zzz...` migrations). Contents, by module:
+
+- **M006 (System Administration) + M008 (Audit & Compliance):**
+  `audit_logs` ALTER — added `entity`, `details`, `block_hash`,
+  `previous_hash` (M008 also needs blockchain-style hash chaining). Real
+  winning `audit_logs` definition is `000_base_schema.sql` (collides with
+  4 other files: `001_skeleton_complete_schema.sql`,
+  `014_audit_system.sql`, `014_platform_foundation_modules.sql`,
+  `1002_system_administration.sql` — all lose). `created_at`/`status`
+  turned out to already exist on the real table via
+  `014_audit_system.sql`'s own earlier ALTER (not added again except as a
+  harmless idempotent no-op).
+  New table: `compliance_rules` (M008).
+- **M009 (Security & Access Control):** `security_events` ALTER — added
+  `severity`, `user_agent`, `blocked` (no collision, single definition in
+  `9999_zzzzzzzzzzzzzzz_m012_session_security_schema.sql`, safe to ALTER
+  directly). New tables: `access_policies`, `ip_lists` (unique on
+  `list_type, ip_address` to match the module's `ON CONFLICT`),
+  `rate_limits`.
+- **M014 (Single Sign-On):** `sso_providers` ALTER — added
+  `client_secret`, `auth_url`, `token_url`, `user_info_url`,
+  `saml_config`, `scopes`, `is_active` (no collision, single definition in
+  `9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql`).
+  New tables: `oauth_states`, `sso_events`, `user_sso_mappings` (unique on
+  `user_id, provider`).
+- **M021 (Farmer Registration):** `farmers` ALTER — added `name`, `email`,
+  `phone`, `date_of_birth`, `gender`, `address`, `land_size`,
+  `primary_crop`, `skills`, `education`, `farming_experience`, `verified`.
+  See "critical pipeline-halt bugs" below — this was the big one.
+- **M044 (Crop Variety) + M045 (Seed Planning):** `crop_varieties` ALTER —
+  added `crop_name`, `variety_name`, `characteristics`, `seed_source`,
+  `maturity_days`, `yield_potential`, `disease_resistance`,
+  `drought_tolerance`, `notes`, `status`, `updated_at`. New tables:
+  `variety_performance` (M044), `seed_suppliers`, `seed_plans` (M045 —
+  distinct from the pre-existing, differently-named `seed_planning_plans`
+  table used by `cropManagementService.js`, no collision).
+- **M071/M073/M074/M075 (Dairy/Goat/Sheep/Pig management):** four new,
+  structurally near-identical herd tables (`dairy_herds`, `goat_herds`,
+  `sheep_flocks`, `pig_herds`, all `farm_id UUID REFERENCES farms(id)`)
+  plus `milk_quality` (M071 only).
+- **M144 (Greenhouse Management):** `greenhouses` ALTER — added `status`,
+  `automation_config` (no collision with its winning definition in
+  `014_horticulture_module.sql`; a later duplicate in
+  `3017_phase4_greenhouse.sql` only re-declares `farmer_id`, which already
+  matches, so it's a harmless no-op, not a bug). New tables:
+  `greenhouse_sensors`, `greenhouse_sensor_readings`,
+  `greenhouse_automation_rules`.
+
+All new tables/columns were reverse-engineered directly from each
+service.js's actual `INSERT`/`SELECT`/`UPDATE` column lists — nothing
+speculative. Every FK's target PK type was checked directly (`farmers.id`
+UUID, `farms.id` UUID, `crop_varieties.id` SERIAL/INTEGER,
+`crop_registrations.id` UUID, `greenhouses.id` SERIAL/INTEGER, `users.id`
+UUID) before typing the FK column to match.
+
+### Two critical, pre-existing pipeline-halting bugs found and fixed (NOT part of the 58/61 count — these would have blocked the ENTIRE migration run, including all 44 already-folded 9500-9543 migrations, long before reaching any M0XX fix)
+
+Both are the same failure class: a losing side of a table-name collision
+(`CREATE TABLE IF NOT EXISTS X` that's a silent no-op because an earlier
+file already created `X` with different columns) followed by
+`CREATE INDEX ... ON X(<column that only exists in the losing definition>)`.
+`migrate.js` has no defense against this — on any migration failure it
+archives the file, writes a repair template, and **throws**, which stops
+every subsequent file in the sorted run from ever executing (see
+`migrate.js` lines ~130-141). Static analysis only (no Postgres running in
+this environment) — found by tracing exactly which `CREATE TABLE` wins
+each collision and checking every index against *that* table's real
+columns, not the file's own (losing) `CREATE TABLE` block.
+
+1. **`backend/src/database/migrations/3021_m021_farmer_registration.sql`**
+   — `CREATE INDEX idx_farmers_email ON farmers(email)` and
+   `idx_farmers_primary_crop ON farmers(primary_crop)`, where `farmers`
+   actually resolves to `000_base_schema.sql`'s UUID-keyed,
+   FDI-scoring-shaped table (no `email`/`primary_crop` columns) because
+   `000` sorts before `3021`. This file's own `farmers` CREATE (a
+   different, `id SERIAL` shape) is dead on arrival. **Fixed:** removed
+   both broken index lines from `3021` (left a dated comment explaining
+   why), re-added as `idx_farmers_email_m021` /
+   `idx_farmers_primary_crop_m021` in the new batch-1 migration, which
+   runs after the ALTER that actually adds those columns. `farmer_verifications`/
+   `farmer_onboarding` (the other two tables `3021` defines) were NOT
+   affected — nothing else declares those names, so they're real, and
+   both already correctly FK to `farmers(id)` as UUID.
+2. **`backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql`**
+   — `CREATE INDEX idx_crop_varieties_crop ON crop_varieties(crop_name)`,
+   where `crop_varieties` actually resolves to
+   `001_skeleton_complete_schema.sql`'s `id SERIAL` / `code`/`name`/
+   `description` shape (no `crop_name`) because `001` sorts before this
+   file. **Fixed:** removed the broken index line (dated comment left in
+   place), re-added as `idx_crop_varieties_crop_name` in the new batch-1
+   migration.
+
+**These two fixes were necessary for the batch-1 migration (or anything
+after it) to ever have a chance of running on a real database** — without
+them, `migrate.js` would halt at `3021` (or, once past that, at the crop
+management file) regardless of anything else in this session's work.
+Given the number of `9999_zzz...` migrations that already exist in this
+tree, it's likely there are more instances of this same failure class
+still undiscovered — worth a dedicated pass (grep every collided table's
+losing-side `CREATE INDEX` statements against the actual winning column
+list) rather than assuming these were the only two.
+
+### Verification method (per task brief — static only, no `npm run migrate` run)
+
+For every table touched: (a) grepped **all** migration files for
+`CREATE TABLE IF NOT EXISTS <name>`, not just the obvious ones, to find
+every collision; (b) for a collision, determined the winner by filename
+sort order (matching `migrate.js`'s `fs.readdirSync(...).sort()`); (c)
+read the winning table's actual column list; (d) diffed that against the
+consuming service.js's real `INSERT`/`SELECT`/`UPDATE`/`ON CONFLICT`
+column references; (e) for every FK added, grepped the referenced table's
+own `CREATE TABLE` to confirm the PK type (UUID vs SERIAL/INTEGER) before
+typing the FK column. Parenthesis-balance and CREATE/ALTER statement
+counts were also mechanically checked on the new file (204/204 parens,
+23 CREATE TABLE, 28 ALTER TABLE).
+
+### Not done / follow-up for a future session
+
+- The ~42 "inert stub" modules (zero real queries) were spot-checked, not
+  exhaustively re-verified one by one — per the task brief these are
+  intentionally out of scope, but a future pass should confirm the exact
+  count/list if that number matters for planning.
+- **Recommended follow-up scan**: search every other `9999_zzz...`
+  migration (and any other file past `014_audit_system.sql`'s already-hardened
+  pattern) for the same "index on a column that only exists in a losing
+  collision side" bug class found twice above. Two instances were found
+  by manually tracing this session's own 11 touched tables; there was no
+  time in this pass to check the other ~100+ tables the full migration
+  tree declares.
+- This migration has **not been run against a real Postgres instance**
+  (none available in this dev environment) — per the task brief, this is
+  static SQL authoring + verification only. Must be run in CI or a real
+  DB before trusting it fully.
+
+**Files touched:** `backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_module_schema_gaps_batch1.sql`
+(new), `backend/src/database/migrations/3021_m021_farmer_registration.sql`
+(2 broken index lines removed, comment added), `backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql`
+(1 broken index line removed, comment added). No other migration file,
+`migrate.js`, or module `service.js` was modified.
+
+---
+
+## services/ vs services/legacy/ duplicate remediation (2026-09-08)
+
+Continuation of the pattern started by `services/productReviewService.js`
+(see AUDIT_CODE.md Finding 1: ~163 same-basename pairs across
+`backend/src/services/*.js` and `backend/src/services/legacy/*.js`, plus a
+handful of third `services/<domain>/` copies).
+
+### Method
+Built a small reachability analyzer (not committed - scratch tooling,
+deleted after use) that: (1) parses `backend/src/index.js` for every
+`app.use(...)` and `mountRoute(...)` call, resolving both inline
+`require()`s and every var/destructured-require assignment (handles the
+`const { a, b } = require(...)` batches used for the farm/water/soil/etc.
+route groups); (2) BFS-walks the local `require()` graph from those mounted
+files; (3) for each of the 163 basenames, checks whether
+`services/<name>.js`, `services/legacy/<name>.js`, and any
+`services/<domain>/<name>.js` fall inside that reachable set. Cross-checked
+every result against direct `grep -rn "require(...<name>...)"` before
+acting - the analyzer's job was to separate "a route file requires this" (audit's
+apparent bar) from "and that route file is actually mounted" (the real bar).
+
+### Key correction to AUDIT_CODE.md Finding 1
+The audit named `aiGatewayService.js`, `analyticsService.js`, and
+`aiBackboneService.js` as "confirmed live-and-drifted" (both copies alive
+at once). Direct verification found this was **not accurate for two of the
+three**, and partially accurate for the third in a different way than
+described:
+- **aiBackboneService.js**: top-level (797 lines) has **zero** live callers
+  anywhere in the repo (not even tests) - it's a stale, strictly-smaller
+  earlier version of `legacy/aiBackboneService.js` (7,051 lines, confirmed
+  superset: same function names/signatures plus Ollama support and much
+  more). Collapsed top → legacy.
+- **analyticsService.js**: top-level and legacy are byte-identical modulo
+  require-path depth. Top-level has zero live callers. Collapsed top →
+  legacy. Bonus finding: a **third**, genuinely different copy at
+  `services/platform/analyticsService.js` (express-router-shaped, exports
+  `buildPipelineInsights`) is what `tests/analyticsService.test.js` actually
+  needs but the test requires `../services/analyticsService` instead - a
+  pre-existing test/path mismatch, left unfixed (out of this task's scope,
+  flagged here for whoever owns test health next).
+- **aiGatewayService.js**: this is the one pair that genuinely fits the
+  audit's "two live, drifted implementations of the same concept" framing
+  in spirit, except **neither copy is actually reachable from a mounted
+  route** (verified - no route file requires either path). More
+  importantly, they are not drifted copies of the same concept at all: the
+  top-level file is a small, separately-tested "governed AI gateway"
+  (`run`/`buildGovernedPrompt`/`loadLibraryContext`, layers library-context
+  guardrails on top of `legacy/aiBackboneService.js`, exercised by
+  `tests/aiGatewayService.test.js` and `tests/aiDomainAdapterService.test.js`)
+  while `legacy/aiGatewayService.js` is an unrelated 421-line class-based
+  AI/ML prediction hub. **Left unmerged** per the "genuinely different
+  features, don't force a merge" rule - added a collision-explaining
+  comment to both files instead.
+- Same false-positive pattern found independently for **`farmerService.js`**
+  (audit implied `routes/farmerRoutes.js` (legacy) and
+  `routes/agriculture/farmerRoutes.js` (agriculture/ domain copy) were both
+  live) - `routes/agriculture/farmerRoutes.js` is never required by
+  `index.js` at all, so only the legacy copy is actually live. Not
+  collapsed (see "Not yet collapsed" below - the domain copy is
+  meaningfully drifted, ~180 diff lines, needs a real read before touching).
+
+**Takeaway for future passes**: audit tooling that greps "route file X
+requires service Y" without confirming X is `app.use()`d in `index.js`
+will systematically over-report "live" pairs. Every one of this session's
+BFS-confirmed-dead classifications was cross-checked with a direct
+`grep -rn require` before any file was touched.
+
+### Files collapsed to `module.exports = require('./legacy/<name>')` (dead top-level copy → confirmed-live legacy copy)
+152 files via a scripted pass (all zero-live-caller, verified via the
+reachability BFS) plus 6 handled individually with pair-specific comments
+because they needed a closer read first:
+`aiBackboneService.js`, `analyticsService.js`, `productService.js`,
+`formService.js`, `completeERPIntegrationService.js`,
+`comprehensiveERPService.js`, `ecommerceBusinessSalesService.js`,
+`ecommerceIntegrationService.js`.
+(`productReviewService.js` was already done in a prior session - left
+untouched.) Full list of the 152 scripted ones is reconstructable via
+`git diff --stat -- backend/src/services` (excludes `services/legacy/**`
+and the domain folders) since every collapsed file is now a ~20-line
+wrapper with a dated explanatory comment. `node -c` passed on all touched
+files; spot-required 6 of the collapsed files directly in a live Node
+process (`riskPricingService.js`, `insurancePolicyIssuanceService.js`,
+`marketAccessService.js`, `animalHealthService.js`, +2) - all loaded
+cleanly (the only runtime noise was the pre-existing, expected
+"PostgreSQL connection failed → fallback mode" warning, since no DB is
+running in this dev environment - not caused by this change).
+
+### Reversed-direction case
+- **`services/legacy/libraryKnowledgeService.js`**: here the *legacy* copy
+  was the dead one. Top-level `services/libraryKnowledgeService.js` is a
+  live 23-line compatibility wrapper delegating to
+  `modules/M645100_LIBRARYKNOWLEDGE/backend/service.js`'s singleton,
+  required by `routes/libraryRoutes.js` (mounted at `/api/v1/library`).
+  The legacy copy (346-line fs/crypto/Postgres content-hashing catalog) was
+  only required by `routes/claude/libraryRoutes.js`, which `index.js` never
+  mounts. Collapsed legacy → top.
+
+### Left unmerged, documented instead (genuinely different features sharing a basename)
+- `services/aiGatewayService.js` / `services/legacy/aiGatewayService.js` -
+  see above. Comment added to both files.
+
+### Not yet reconciled — flagged for a future session
+- `services/agriculture/farmerService.js` vs `services/legacy/farmerService.js`
+  - ~180 diff lines, meaningfully drifted, dead (unmounted route), not
+    read closely enough this pass to safely collapse either direction.
+- `services/commerce/productService.js` vs `services/legacy/productService.js`
+  - ~194 diff lines, same situation as above.
+- `services/platform/analyticsService.js` vs `services/platform/formService.js`
+  - Both are express-router-shaped and structurally unlike their
+    same-named top-level/legacy siblings (different exports, different
+    dependencies) - likely genuinely different features per-file, not
+    verified in depth. Currently dead (no live caller other than another
+    dead file, `services/agriculture/agriculturalIntelligenceService.js`).
+    Left untouched; do not collapse without reading both fully first.
+- `backend/src/services/index.js` and `frontend/src/services/index.js`
+  (the dead barrel files) - re-confirmed zero callers this pass, matching
+  the audit. Not deleted (out of this task's explicit scope: "collapse
+  duplicates," not "delete the barrel" - the audit recommends deletion,
+  but that's a separate, smaller follow-up someone should explicitly
+  decide on).
+- The remaining ~89 `services/<domain>/*.js` third copies noted in the
+  audit's basename overlap with `services/legacy/` were **not**
+  individually triaged this pass (only the handful that intersected the
+  163 top-vs-legacy basenames above were touched). A future pass should
+  run the same reachability BFS against the full domain-folder set.
+
+**Files touched this pass:** 158 files under `backend/src/services/` (152
+scripted collapses + 6 hand-written), all `.js`, all now either a thin
+re-export wrapper or (for the 2 `aiGatewayService.js` files) an unchanged
+implementation with an added header comment. No route, controller, or
+`index.js` changes were needed - every route continues requiring whatever
+path it already required; only the top-level file's own contents changed.
+
+## Token-saving guidelines extracted + wired into the real OpenAI call path (2026-09-20) — DONE
+
+User asked to "extract token saving guidelines and integrate with openai."
+The guidelines existed only on other, unmerged remote branches
+(`origin/codex/chatgpt-tree-consolidation`, `origin/version/deep`) as
+`.ai/workflows/*.md` methodology docs — never on this branch, and never
+actually wired to a live provider call anywhere in the repo (the OpenAI
+plugin doc described a batch manager + token counter to build; neither
+file existed).
+
+**Extracted** 4 of the guideline docs from `origin/codex/chatgpt-tree-consolidation`
+into `.ai/workflows/` on this branch: `TOKEN_OPTIMIZATION_METHODOLOGY.md`,
+`UNIVERSAL_TOKEN_OPTIMIZATION.md`, `PLUGIN_TOKEN_OPTIMIZATION.md`,
+`OPENAI_PLUGIN_INTEGRATION.md`. Skipped `COMPLETE_TOKEN_OPTIMIZATION_SYSTEM.md`
+/ `COMPREHENSIVE_TOKEN_OPTIMIZATION_FINAL.md` — read both, confirmed they're
+summary wrappers over the four above, not independent content.
+
+**Integrated** the guidance for real (not just documentation) into the
+existing OpenAI call path:
+- New `backend/src/core/ai/tokenOptimizer.js` — applies the methodology's
+  context-compression (truncate an oversized prompt to a fixed token
+  budget, keeping head+tail), max-token capping (never let a caller
+  request more completion tokens than the provider's configured ceiling),
+  and a pre-call budget guard against the existing `aiCostController`
+  hourly/daily spend limits (warns by default; set
+  `AI_TOKEN_BUDGET_ENFORCE=true` to hard-block instead).
+- `backend/src/services/legacy/aiBackboneService.js`'s `callOpenAI()` now
+  runs every request through `tokenOptimizer.optimizeRequest()` before
+  sending it, and records actual billed usage back into
+  `aiCostController.recordCost()` on success (it never had cost tracking
+  wired in before — only per-provider request counts).
+- Deliberately scoped to `callOpenAI` only (matches "integrate with
+  openai"); the other providers (Claude, Gemini, Azure, HuggingFace,
+  Ollama) are untouched.
+
+**Config:** `AI_PROMPT_TOKEN_BUDGET` (default 6000 estimated tokens) caps
+prompt size; `AI_TOKEN_BUDGET_ENFORCE` (default off) switches the cost
+guard from warn-only to hard block.
+
+**Verified:** `backend/src/tests/tokenOptimizer.test.js` (new, 7 cases) +
+existing `backend/src/tests/aiBackboneFailureRetry.test.js` (2 cases, both
+still pass unmodified) + an ad-hoc integration smoke test confirming the
+actual HTTP request body sent to OpenAI has the truncated prompt, the
+capped `max_tokens`, no stray fields, and that `aiCostController`'s token
+counter increments by the response's real `usage.total_tokens` after a
+successful call. `eslint` clean on all 3 touched/added files.
+
+**Not done (out of scope for this pass):** the OpenAI Batch API manager
+and exact tiktoken-based counting the doc also describes — those need a
+real `OPENAI_API_KEY` and the `openai`/`js-tiktoken` packages to exercise
+and verify live, which this session doesn't have. The estimator here is
+character-based (~4 chars/token), documented as an approximation in the
+module's own comments; real billed tokens still come from the provider's
+response, not the estimate.
+
+## T01 — repair all 3 failing frontend test suites (2026-09-20) — DONE
+
+Following `origin/codex/chatgpt-tree-consolidation`'s `.ai/migration/CRITICAL_PATH_TODO.md`
+Wave 1 item T01. Frontend suite was 49/52 tests across 13/16 suites at
+session start; all 16/16 suites (55/55 tests) now pass.
+
+1. **`MarketplacePage.test.jsx`** — `MarketplacePage.jsx` was a 2-line
+   placeholder stub. Replaced with a real listing page wired to the
+   existing `productsAPI.getProducts`/`ordersAPI.addToCart`, with search,
+   pagination, and loading/error/empty states.
+2. **`TrainingTraceabilityPages.test.jsx`** — the two pages under test were
+   already real and correct, but crashed on render because `ui/card.jsx`
+   and `ui/button.jsx` only had default exports while every consumer
+   (these 2 pages, ~500 other call sites per PR #21's audit) imports them
+   as named exports. Added real named exports (`Card`/`CardHeader`/
+   `CardTitle`/`CardDescription`/`CardContent`/`CardFooter`, `Button`)
+   alongside the existing defaults — additive only. Also fixed `Button`
+   silently dropping every prop except `children` (no `onClick`,
+   `disabled`, `type` ever reached the DOM node) and mapped the
+   `variant`/`size` props already used across the app to real classes.
+3. **`criticalModules.test.jsx`** (M084 "Disaster Alerts") — a module-
+   numbering collision: `frontend/src/modules/M084/M084Page.jsx` was an
+   unfilled code-generator template (`${className}` never substituted,
+   imported a nonexistent `@/store`); `backend/src/modules/M084/` is a
+   same-numbered but unrelated "Trend Analysis" scaffold. The real
+   disaster-alerts implementation already existed — migration 057's
+   `climate_alerts` table, `weatherService.js`'s `raiseAlert`/
+   `activeDispatchBlocks`/`dispatchCheck` — but its route file
+   (`routes/agriculture/weatherRoutes.js`) crashed at require time on a
+   bad, unused import path, so `index.js` mounted a "Route operational"
+   scaffold at `/api/weather` instead (the same scaffold-swap pattern PR
+   #21 found repeatedly for order/product/iotIntegration). Fixed the
+   import, added `weatherService.listAlerts()` (raiseAlert existed but
+   nothing could list what it wrote) + `GET /alerts`, swapped `index.js`
+   to mount the real route file at the same path, and rewrote
+   `M084Page.jsx` against the real `GET`/`POST /weather/alerts` endpoints.
+
+**Left alone, confirmed pre-existing and out of scope:** `backend/src/tests/m084Routes.test.js`
+(a different test, for the unrelated `modules/M084/` scaffold — fails
+independently on a nonexistent `middleware/validationMiddleware` import,
+untouched by any of the above).
+
+Commits: `ebc873f7` (suites 1–2), `d433d143` (suite 3).
+
+## Full backend suite run + Stripe boot-crash fix + frontend/backend gap audit (2026-09-20) — DONE
+
+Ran the full test suites (`npx jest --watchAll=false`) for both frontend
+and backend in parallel to get real numbers rather than assuming.
+
+**Frontend:** 17/17 suites, 57/57 tests — fully green (see T01 entries
+above for how it got there, plus the 2 UI-gap pages below).
+
+**Backend:** 1133 suites, 355 failing / 774 passing before any fix. Broke
+down the failure log by signature instead of chasing suites one at a
+time: 30 suites shared one root cause — `stripeWebhookRoutes.js`
+constructed the Stripe SDK unconditionally at module load, which throws
+synchronously with no `STRIPE_SECRET_KEY` set, crashing every suite that
+transitively required it. Ported the existing fix from `origin/claude/keen-gates-663i5d`
+(`07567e83`, lazy-init + 503 when unconfigured, matching the Twilio
+graceful-degradation pattern already used elsewhere) — commit `10140de5`.
+Confirmed 0 remaining `"Neither apiKey..."` crashes afterward. Total
+failing-suite count didn't drop (those 30 suites now run for real instead
+of crashing at import, and mostly hit the known "no PostgreSQL running in
+this dev environment" wall from CLAUDE.md's own Known Problems list) —
+this is expected, not a regression. The remaining ~325 failing suites are
+overwhelmingly individual DB-dependent test failures, not a small number
+of systemic root causes like the Stripe one; a full backend-suite fix is
+multi-day work, out of scope for this pass by explicit user agreement.
+
+**Frontend/backend gap audit:** compared 210 mounted backend base paths
+against every frontend API-client call site across all 17 files in
+`frontend/src/services/` (not just `api.js`). A raw first-pass match on
+`api.js` alone found ~168 "orphaned" candidates; matching against every
+service file and manually verifying (checking whether pages call these
+APIs through named objects like `goatAPI.x()`, not just literal
+`api.get(...)`) collapsed that to exactly 2 real, substantial,
+already-built backend features with zero frontend anywhere
+(`landRecordsRoutes.js`, `aiApprovalRoutes.js` — see the commit below) and
+1 live bug (`productReviewRoutes.js` mounted at `/api/productreview`,
+singular, while the frontend calls `/product-reviews`, plural — an
+already-built feature 404ing in production, plus `ProductDetailPage.jsx`
+separately importing 3 of its 4 API objects from the wrong service file
+entirely). Everything else in the raw candidate list was either already
+wired (just missed by a narrow grep) or intentionally backend-internal
+(e.g. `aiCollaborationRoutes.js` is the Devin/Claude agent-handoff
+channel, not a user-facing feature).
+
+Fixed the product-reviews mount + import bugs (`451ebd75`) and built real
+UI for the 2 genuine gaps — `LandRecordsPage.jsx` (`/land-records`) and
+`AIApprovalPage.jsx` (`/ai-approvals`), both wired to the real backend
+contracts (verified field-for-field against the service code) with
+loading/error/empty states, and a rendering test confirming both mount
+and display real API data (`db68c659`).
+
+---
+
+## 2026-09-20 — MISSING_EXPORT build-failure chain closed, `Build Verification` green for the first time
+
+**Root cause:** `npx vite build` (Rolldown) fails the entire production build
+on ANY named import with no matching export — and `frontend/src/services/api.js`
+had accumulated 127 such gaps across `api.js` (125) and `componentApi.js` (2),
+discovered iteratively as each fix revealed the next batch underneath it (the
+build tool only reports a handful of errors per run until the earlier ones
+are cleared). This had been silently failing CI's `Build Verification` /
+`Check Status` gate across ~10 prior pushes on PR #22.
+
+Also found and fixed a real, separate bug while wiring these: this session's
+own earlier `landRecordsAPI`/`aiApprovalAPI`/`erpDashboardAPI`/`goatAPI`
+additions all called their backend routes with plain relative paths (e.g.
+`api.get('/goat/herd')`) against an axios client whose `baseURL` already
+includes `/api/v1`, while those routes are mounted UNVERSIONED directly on
+the Express app (`app.use('/api/goat', goatRoutes)`) — every one of those
+"real" wirings would have silently 404'd in production. Fixed by adding
+`UNVERSIONED_BASE` (mirroring the existing pattern already used in
+`apiClient.js` for `/api/auth`) and rewriting every affected call site.
+
+Of the 127 missing exports: 13 wired to a genuinely real, verified backend
+(including a mid-task discovery — `backend/src/routes/ORPHANED_SERVICES_MOUNT.js`,
+an explicit router that rescues 9 legacy services whose real `setupRoutes()`
+was otherwise never invoked, unlocking `governmentSchemeAPI`/`schemeRegistryAPI`/
+`subsidyOpsAPI`/`soilTestingOpsAPI` for real); 114 honestly stubbed via the
+existing `notImplemented()` helper (never fabricated data) with a one-line
+comment recording what was checked. Several pages' own inline comments
+claiming a real backend ("Backed by the real /modules/m102 endpoint") were
+independently re-verified against the actual mounted route and found stale —
+stubbed despite the comment, discrepancy noted.
+
+Commits: `6d46ff6a` (125 in `api.js`), `0ba1a00b` (final 2 in `componentApi.js`,
+plus a latent `ReferenceError` fix — that file called `api.get/post` without
+ever importing `api`). Verified: `npx vite build` exits 0, `npx eslint` clean,
+`npx jest --watchAll=false` 17/17 suites / 57/57 tests. PR #22's CI is fully
+green (`Build Verification`, `Frontend Tests`, `Lint`, `Security Audit`,
+`Claude AI Integration Test`, `Backend Tests`, `Check Status`) for the first
+time this session.
+
+**Follow-on: 15 more orphaned services mounted (`72675499`).** The same "real
+`setupRoutes()`, never mounted" pattern found 15 MORE orphaned backend
+services beyond the original 9 in `ORPHANED_SERVICES_MOUNT.js`
+(`aiAdvisoryService`, `buyingClubService`, `custodyEventRoutes`,
+`escrowService`, `householdEconomyService`, `machineryAccessService`,
+`marketAccessService`, `marketIntelligenceService`, `mobilityRidesService`,
+`procurementSubscriptionService`, `renewableEnergyService`,
+`ruralEnterpriseService`, `ruralFinanceService`, `sharedInfraService`,
+`villageProfileService`) — all 15 now mounted, boot-verified with 15 new
+"✅ ... mounted" log lines and zero unhandled exceptions. `sharedInfraService.js`
+was kept deliberately distinct from the already-mounted, similarly-named
+`sharedInfrastructureService.js` (different tables/features, confirmed by
+reading both fully).
+
+Frontend: 10 of the 15 wired to their now-real endpoints via the existing
+`ORPHANED_BASE` constant in `api.js`. Two were live-bug fixes from wrong
+wiring: `escrowAPI` previously called the fake `routes/escrowRoutes.js`
+scaffold at `/api/escrow` (and didn't even define the `list`/`release`/
+`refund` methods `EscrowPage.jsx` actually calls) — repointed to the real,
+now-mounted `escrowService.js` endpoints. `marketAccessAPI` had the same
+dead-path bug, fixed the same way. Also added `custodyAPI` to
+`componentApi.js` — `CustodyChainViewer.jsx` already imported it but it had
+never been exported there (a silent `undefined`, would throw at render
+time). `householdEconomyAPI`/`machineryAccessAPI`/`ruralFinanceAPI` stay
+honest `notImplemented()` stubs — their real services only expose a
+get-by-village summary, no generic statistics endpoint a page calls.
+
+**Second bug found while independently verifying the above (`6005e08c`):**
+`sharedInfraService.js` (backing the routed `/shared-infra` page) destructured
+`{ aiAPI }` from `aiBackboneService.js`, which exports no such thing — all 4
+of its "AI-powered recommendation" call sites threw a `TypeError` on every
+request, including the 2 methods `SharedInfraPage.jsx` actually calls
+(`searchAssets`, `getRenewableSupport`). Fixed per-case rather than papering
+over with a speculative LLM shim: `searchSharedInfrastructure` was silently
+discarding its own already-fetched, real DB query result and asking the
+(nonexistent) AI to invent the asset list instead — now returns the real
+data directly, so this endpoint actually works end-to-end for the first
+time. The other 3 call sites (`listSecondLifeEquipment`,
+`listSecondLifeBattery`, `getRenewablePowerSupport`) had no real data
+anywhere underneath them either (their own inputs were unimplemented stubs
+too) — now return honest `null`/empty/`configured: false` results instead
+of crashing, and the 10 now-fully-dead helper stub functions that only fed
+the broken AI call were deleted.
+
+Both rounds verified: backend boots clean (24/24 orphaned-service mounts
+logged), `npm test` byte-identical to baseline (355 failed / 775 passed
+suites, all pre-existing Postgres/Redis-dependent, zero new failures),
+`npx vite build` exit 0, `npx eslint` clean, `npx jest --watchAll=false`
+17/17 suites / 57/57 tests. PR #22's CI green on both commits
+(`Build Verification`, `Frontend Tests`, `Lint`, `Security Audit`,
+`Claude AI Integration Test`, `Backend Tests`, `Check Status`).
+
+**Third round (`800ed64c`): same `aiAPI` bug found in 5 more services, 18
+more call sites — one of them live-broken in production.** The
+`sharedInfraService.js` fix above turned out to be one instance of a
+systemic pattern: `farmerTrainingService.js`, `governmentSchemeService.js`,
+`greenhouseService.js`, `preSeasonOrderService.js`, and `subsidyService.js`
+all destructured the same nonexistent `{ aiAPI }` from
+`aiBackboneService.js`. (Ruled out `dynamicPricingService.js`/
+`insuranceClaimsService.js`/`soilTestingService.js` — those import a
+*different*, correctly-real `aiAPI` from `services/aiService/index.js` via
+a `services/legacy/aiService.js` re-export shim; not broken, left alone.)
+
+Highest-value finding: **`subsidyService.js`'s 3 call sites
+(`checkProjectSubsidyEligibility`/`checkEquipmentSubsidyEligibility`/
+`checkLogisticsSubsidyEligibility`) are live-wired** — `api.js`'s
+`subsidyOpsAPI.checkProjectSubsidy`/`checkEquipmentSubsidy`/
+`checkLogisticsSubsidy` (added in the very first MISSING_EXPORT pass this
+session, believed "real" at the time) call these exact endpoints, so every
+real caller was getting a 500. Each was discarding a real, state-filtered
+hardcoded scheme catalog (PMFBY, MIDH, AIF, NESIDS, MOVCDNER,
+NER-LOGISTICS with real subsidy_percentage/max_amount fields) in favor of
+the broken AI call — now returns the real scheme list directly, no
+frontend change needed. `governmentSchemeService.js`'s `getCSROpportunities`
+is also live-wired but was pure stub-on-stub underneath (no real data to
+recover) — now an honest empty/`configured:false` result instead of a
+500. The other ~14 call sites across all 5 files were not currently
+frontend-wired; each fixed the same way (real data surfaced directly where
+it existed, honest null/empty where it didn't) as a backend-correctness
+pass. Deleted 27 now-fully-dead stub helper functions left with no
+caller. Verified the same way as the prior two rounds — all green,
+zero new test failures.
+
+**Final sweep: confirmed no more *live* instances of the `{ aiAPI }` bug
+remain.** `grep -rln "{ aiAPI }"` across the whole backend turns up ~20
+more matches, but every one is in a confirmed-unreachable duplicate tree:
+`services/finance/`, `services/agriculture/`, `services/commerce/`,
+`services/platform/`, and flat `services/*.js` copies of the same
+service names, all pulled in only by `services/index.js` — which is
+itself required only by `services/productReviewService.js`, whose own
+header comment already says it isn't live (the actually-mounted
+`productReviewRoutes.js` requires `services/legacy/productReviewService.js`
+instead). The `modules/M0XX/service.js` matches (M001-M025 "Tier 1
+skeleton modules") aren't required by `index.js` or any route file
+either. Not fixing dead code that never executes — stopping the sweep
+here.
+
+**Follow-up: 29 of 54 fake scaffold routes swapped for their real
+`_merged.js` implementations (`116b08b1`).** Systematic check: 112 route
+files under `routes/` are trivial "Route operational" placeholder
+scaffolds; 54 of those are mounted in `index.js` while a same-named
+`<Name>Routes_merged.js` sibling with real logic sits unmounted right
+next to them. Swapped 29 (aiBackboneRoutes, ecommerceRoutes and 5 more
+ecommerce\* variants, farmerRoutes, farmerTrainingRoutes, wikipediaRoutes,
+visionRoutes, and 20 more — see the commit for the full list). Skipped 25
+after real per-file investigation, not just a name match: 15 `_merged.js`
+files turned out to be a *different* fake scaffold (a different
+placeholder string); `libraryRoutes_merged.js` is a generic CRUD template
+never touching the real library system; 3 (`seedVaultRoutes`,
+`trackDartRoutes`, `unifiedAIRoutes`) have their real route registrations
+trapped inside a helper function's body after a `return` (invisible to
+grep/`node -c`, caught via an AST check that verifies every
+`router.<method>()` call is a genuine top-level statement) — they never
+actually register at module load, so swapping would have silently
+dropped working endpoints; 5 (`decisionSupportRoutes`, `rfqRoutes`,
+`pigRoutes`, `poultryRoutes`, `sheepRoutes`) call a `protectRouter`/
+`protectLivestockRouter` helper from a sibling support file that doesn't
+actually export it — confirmed this throws `TypeError: protectRouter is
+not a function` at require time, i.e. swapping would have crashed the
+whole app on boot. Verified: boots clean, `npm test` byte-identical to
+baseline, frontend unaffected.
+
+**Follow-up: `productService`/`orderService` mounted — Marketplace was
+404ing on every real call (`f650042a`).** The same "real router, never
+mounted" pattern extends beyond `_merged.js` siblings: 46
+`services/legacy/*.js` files export a complete, self-contained,
+DB-backed Express `router` that's never `require()`'d by `index.js` at
+all (found via `grep` for `const router = express.Router()` + an
+exported `router` key, cross-referenced against every `legacy/` require
+in `index.js`). Two are unambiguous: `productService.js` and
+`orderService.js` implement exactly the routes `commerceApi.js`'s
+`productsAPI`/`ordersAPI` already call under `/api/v1/products` and
+`/api/v1/orders` — meaning `MarketplacePage.jsx` (rebuilt as "real"
+earlier this session) has been 404ing on every real request this whole
+time. Mounted both. While verifying `orderService.js`'s dependencies
+actually resolve, found and fixed 2 more bugs: `updateOrderStatus()` did
+`require('../../../index')` (one `../` too many, resolves to a
+nonexistent `backend/index.js` instead of the real
+`backend/src/index.js`) — would have thrown on every call, including the
+existing `PUT /:id/status` route; and `ordersAPI.cancelOrder()` had no
+matching `DELETE /:id` route at all (9 of its 10 methods matched, this
+was the one gap) — added it, ownership-enforced the same way as the
+existing `/:id/payment` route. Found and fixed the identical
+`require('../../../index')` bug in `services/legacy/logisticsService.js`
+too (part of the same 46-file follow-up, not yet mounted). The remaining
+~44 unmounted routers are a queued follow-up.
+
+**Follow-up round 3: 40 more orphaned services/legacy/*.js routers mounted
+(`dbaacd3c`).** Same sweep extended to the full remaining candidate list
+(minus productService/orderService already handled, minus erpService
+already correctly wired via a thin shim, minus logisticsService left
+out of scope). 40 mounted at `/api/v1/<kebab-case-domain>` in
+`index.js`, each individually verified (require resolves cleanly,
+`router.stack.length` matches the source's `router.<method>(` count -
+catching the same CRLF-dead-code trap class found in round 2 - no
+crash). 6 have a documented, verifiable frontend match
+(financialService, insuranceService, enterpriseControlService,
+enterpriseMemoryService, blockchainTraceabilityService,
+organicTraceabilityService); the other 34 are backend-only with no
+current caller (checked against all 17 frontend service files, not just
+api.js). Found and fixed one more instance of the
+"one-directory-too-many relative require" bug class:
+`services/legacy/smsAuthService.js` did
+`require('../../dual-use/authService')` (resolves to nonexistent
+`backend/src/dual-use/`) instead of `require('../dual-use/authService')`
+(the real `services/dual-use/authService.js`).
+
+**Important caveat surfaced by this round, not yet acted on:** for the 6
+services with a "frontend match," the actual `services/api.js`/
+`componentApi.js` export the real page imports is itself wrong or
+missing - different method names than the real router, or (matching an
+earlier finding this session about confirmed-unreachable orphaned
+components) not exported at all in a few cases. Mounting the real
+backend router does NOT silently fix these the way it did for
+productService/orderService - the frontend side needs its own separate
+fix, not yet scoped.
+
+Verified (this round): `node --check`/`npx eslint` clean, backend boots
+clean, `npm test` byte-identical to baseline (355 failed / 775 passed
+suites), frontend build/tests unaffected.
+
+**Follow-up: codebase-wide reachable-destructure audit found one more real
+bug (`6e52fc8d`).** Built a script that boots the real app once, walks
+`require.cache` (so it only examines code the app genuinely loads, not
+the ~350-file dead duplicate tree that a naive grep mostly hits), and
+checks every `const { X } = require('./Y')` site against Y's actual
+exports. Found `modules/M0XX/service.js` (the real, schema-backed module
+services — M031 through M144, not the dead duplicate tree) had 16
+reachable call sites doing `const { ..., DatabaseError } = require('../../utils/errors')`
+and `throw new DatabaseError(...)`, but `utils/errors.js` never defined
+that class — every one of those 16 sites was masking its real DB error
+with `TypeError: DatabaseError is not a constructor`. Fixed by adding the
+class (matches the file's existing `AppError` subclass pattern). The
+audit also re-found the M022-M025 `aiAPI` sites (13 more call sites) but
+confirmed them unreachable this time too — their functions get merged
+into `farmerTrainingService.js`'s exports via `Object.assign()`, but
+nothing ever calls them through that merged object; left alone. Verified:
+lint/syntax clean, `npm test` byte-identical to baseline, re-ran the audit
+post-fix and confirmed all 16 findings gone.
+
+---
+
+*This document must be updated after every task completion or status change.*

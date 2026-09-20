@@ -14,6 +14,8 @@
 
 const { logger } = require('../../utils/logger');
 const fetch = require('node-fetch');
+const tokenOptimizer = require('../../core/ai/tokenOptimizer');
+const aiCostController = require('../../core/ai/aiCostController');
 
 // ============================================================================
 // AI PROVIDER CONFIGURATIONS
@@ -93,6 +95,18 @@ async function callClaudeAI(prompt, options = {}) {
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.claude.total++;
 
+  // Token-saving guidelines (.ai/workflows/TOKEN_OPTIMIZATION_METHODOLOGY.md):
+  // truncate oversized prompts, cap max_tokens at the provider ceiling, and
+  // guard the call against the shared AI cost budget before spending it.
+  const {
+    promptTokenBudget,
+    maxTokens: _requestedMaxTokens,
+    provider: _requestedProvider,
+    strategy: _requestedStrategy,
+    ...forwardedOptions
+  } = options;
+  const optimization = tokenOptimizer.optimizeRequest('claude', prompt, options, AI_PROVIDERS.claude);
+
   const maxRetries = 3;
   let retryCount = 0;
 
@@ -107,14 +121,14 @@ async function callClaudeAI(prompt, options = {}) {
         },
         body: JSON.stringify({
           model: options.model || AI_PROVIDERS.claude.model,
-          max_tokens: options.maxTokens || AI_PROVIDERS.claude.maxTokens,
+          max_tokens: optimization.maxTokens,
           messages: [
             {
               role: 'user',
-              content: prompt,
+              content: optimization.prompt,
             },
           ],
-          ...options,
+          ...forwardedOptions,
         }),
       });
 
@@ -134,6 +148,10 @@ async function callClaudeAI(prompt, options = {}) {
 
       aiRequestTracker.successfulRequests++;
       aiRequestTracker.providerStats.claude.success++;
+
+      const billedTokens =
+        (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0) || optimization.estimatedTotalTokens;
+      aiCostController.recordCost('claude', billedTokens, { model: AI_PROVIDERS.claude.model });
 
       logger.info('Claude AI request successful', {
         model: AI_PROVIDERS.claude.model,
@@ -174,6 +192,18 @@ async function callOpenAI(prompt, options = {}) {
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.openai.total++;
 
+  // Token-saving guidelines (.ai/workflows/OPENAI_PLUGIN_INTEGRATION.md):
+  // truncate oversized prompts, cap max_tokens at the provider ceiling, and
+  // guard the call against the shared AI cost budget before spending it.
+  const {
+    promptTokenBudget,
+    maxTokens: _requestedMaxTokens,
+    provider: _requestedProvider,
+    strategy: _requestedStrategy,
+    ...forwardedOptions
+  } = options;
+  const optimization = tokenOptimizer.optimizeRequest('openai', prompt, options, AI_PROVIDERS.openai);
+
   const maxRetries = 3;
   let retryCount = 0;
 
@@ -190,12 +220,12 @@ async function callOpenAI(prompt, options = {}) {
           messages: [
             {
               role: 'user',
-              content: prompt,
+              content: optimization.prompt,
             },
           ],
-          max_tokens: options.maxTokens || AI_PROVIDERS.openai.maxTokens,
+          max_tokens: optimization.maxTokens,
           temperature: options.temperature || 0.7,
-          ...options,
+          ...forwardedOptions,
         }),
       });
 
@@ -215,6 +245,9 @@ async function callOpenAI(prompt, options = {}) {
 
       aiRequestTracker.successfulRequests++;
       aiRequestTracker.providerStats.openai.success++;
+
+      const billedTokens = data.usage?.total_tokens || optimization.estimatedTotalTokens;
+      aiCostController.recordCost('openai', billedTokens, { model: AI_PROVIDERS.openai.model });
 
       logger.info('OpenAI request successful', {
         model: AI_PROVIDERS.openai.model,
@@ -557,10 +590,24 @@ async function callOllamaAI(prompt, options = {}) {
 // ============================================================================
 
 /**
+ * Order a list of providers for the multi-provider fallback chain.
+ * 'quality' (default) keeps the original fixed preference order.
+ * 'cost' sorts by COST_RATES ascending, so a request that doesn't need a
+ * specific model spreads load toward whichever configured provider is
+ * currently cheapest, instead of always hammering the same one.
+ */
+function orderProvidersByStrategy(providers, strategy) {
+  if (strategy === 'cost') {
+    return [...providers].sort((a, b) => aiCostController.getCostRate(a) - aiCostController.getCostRate(b));
+  }
+  return providers;
+}
+
+/**
  * Unified AI call function with automatic provider selection
  */
 async function callAI(prompt, options = {}) {
-  const provider = options.provider || getPreferredProvider();
+  const provider = options.provider || getPreferredProvider(options.strategy);
 
   switch (provider) {
     case 'claude':
@@ -576,16 +623,17 @@ async function callAI(prompt, options = {}) {
     case 'ollama':
       return await callOllamaAI(prompt, options);
     default: {
-      // Try providers in order of preference
-      const providers = ['claude', 'openai', 'gemini', 'azure', 'huggingface', 'ollama'];
+      // 'auto' (or any unrecognized provider): try every enabled provider,
+      // ordered per options.strategy, falling through on failure.
+      const preferenceOrder = ['claude', 'openai', 'gemini', 'azure', 'huggingface', 'ollama'];
+      const enabled = preferenceOrder.filter(p => AI_PROVIDERS[p].enabled);
+      const providers = orderProvidersByStrategy(enabled, options.strategy);
       for (const p of providers) {
-        if (AI_PROVIDERS[p].enabled) {
-          try {
-            return await callAI(prompt, { ...options, provider: p });
-          } catch (error) {
-            logger.warn(`Provider ${p} failed, trying next`, { error: error.message });
-            continue;
-          }
+        try {
+          return await callAI(prompt, { ...options, provider: p });
+        } catch (error) {
+          logger.warn(`Provider ${p} failed, trying next`, { error: error.message });
+          continue;
         }
       }
       throw new Error('No AI provider is available or configured');
@@ -594,9 +642,20 @@ async function callAI(prompt, options = {}) {
 }
 
 /**
- * Get preferred AI provider based on configuration
+ * Get preferred AI provider based on configuration and selection strategy.
+ * strategy: 'quality' (default) keeps the original fixed preference order;
+ * 'cost' picks the cheapest currently-enabled provider (via
+ * aiCostController.findCheapestProvider), so work distributes toward
+ * whichever provider is most efficient right now instead of always the
+ * same one.
  */
-function getPreferredProvider() {
+function getPreferredProvider(strategy) {
+  const enabled = Object.keys(AI_PROVIDERS).filter(p => AI_PROVIDERS[p].enabled);
+
+  if (strategy === 'cost' && enabled.length > 0) {
+    return aiCostController.findCheapestProvider(enabled);
+  }
+
   if (AI_PROVIDERS.claude.enabled) return 'claude';
   if (AI_PROVIDERS.openai.enabled) return 'openai';
   if (AI_PROVIDERS.gemini.enabled) return 'gemini';

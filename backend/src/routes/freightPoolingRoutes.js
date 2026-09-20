@@ -1,5 +1,6 @@
 /**
- * Full-Truck Window (freight pooling) Routes. See services/freightPoolingService.js.
+ * Full-Truck Window (freight pooling) Routes. See
+ * services/legacy/freightPoolingService.js.
  */
 
 const express = require('express');

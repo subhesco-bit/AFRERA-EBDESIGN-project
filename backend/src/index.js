@@ -5,15 +5,15 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 const index = require('./routes/index.js');
 const devinRoutes = require('./routes/devinRoutes');
 const yieldManagement = require('./routes/yieldManagement.js');
-const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
-const weatherRoutes = require('./routes/weatherRoutes.js');
+const wikipediaRoutes = require('./routes/wikipediaRoutes_merged.js');
+const weatherRoutes = require('./routes/agriculture/weatherRoutes.js');
 const weatherAdvisory = require('./routes/weatherAdvisory.js');
 const wearableIntegrationRoutes = require('./routes/wearableIntegrationRoutes.js');
 const waterManagementRoutes = require('./routes/waterManagementRoutes.js');
 const warehouseManagement = require('./routes/warehouseManagement.js');
 const walletRoutes = require('./routes/walletRoutes.js');
 const vr = require('./routes/vr.js');
-const visionRoutes = require('./routes/visionRoutes.js');
+const visionRoutes = require('./routes/visionRoutes_merged.js');
 const videoAnalytics = require('./routes/videoAnalytics.js');
 const vendorRoutes = require('./routes/vendorRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
@@ -35,18 +35,18 @@ const sellerRankingRoutes = require('./routes/sellerRankingRoutes.js');
 const seedVaultRoutes = require('./routes/seedVaultRoutes.js');
 const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes.js');
 const roleManagementRoutes = require('./routes/roleManagementRoutes.js');
-const riskPricingRoutes = require('./routes/riskPricingRoutes.js');
+const riskPricingRoutes = require('./routes/riskPricingRoutes_merged.js');
 const riskAssessment = require('./routes/riskAssessment.js');
 const rfqRoutes = require('./routes/rfqRoutes.js');
-const revenueRoutes = require('./routes/revenueRoutes.js');
-const returnLoadBoardRoutes = require('./routes/returnLoadBoardRoutes.js');
+const revenueRoutes = require('./routes/revenueRoutes_merged.js');
+const returnLoadBoardRoutes = require('./routes/returnLoadBoardRoutes_merged.js');
 const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes.js');
-const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes.js');
+const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes_merged.js');
 const neVarietiesRoutes = require('./routes/neVarietiesRoutes.js');
-const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes.js');
+const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes_merged.js');
 const realtimeMonitoringRoutes = require('./routes/realtimeMonitoringRoutes.js');
 const qualityAssurance = require('./routes/qualityAssurance.js');
-const projectSystemsRoutes = require('./routes/projectSystemsRoutes.js');
+const projectSystemsRoutes = require('./routes/projectSystemsRoutes_merged.js');
 const productRoutes = require('./routes/productRoutes.js');
 const productReviewRoutes = require('./routes/productReviewRoutes.js');
 const productMediaAIRoutes = require('./routes/productMediaAIRoutes.js');
@@ -58,7 +58,7 @@ const predictiveIntelligenceRoutes = require('./routes/predictiveIntelligenceRou
 const predictiveAnalytics = require('./routes/predictiveAnalytics.js');
 const poultryRoutes = require('./routes/poultryRoutes.js');
 const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes.js');
-const platformCoreRoutes = require('./routes/platformCoreRoutes.js');
+const platformCoreRoutes = require('./routes/platformCoreRoutes_merged.js');
 const platformConfigurationRoutes = require('./routes/platformConfigurationRoutes.js');
 const pigRoutes = require('./routes/pigRoutes.js');
 const phase9 = require('./routes/phase9.js');
@@ -74,12 +74,12 @@ const orderRoutes = require('./routes/orderRoutes.js');
 const operationsRouteSupport = require('./routes/operationsRouteSupport.js');
 const operationsManagementRoutes = require('./routes/operationsManagementRoutes.js');
 const nutritionIntelligenceRoutes = require('./routes/nutritionIntelligenceRoutes.js');
-const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes.js');
+const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes_merged.js');
 const nlp = require('./routes/nlp.js');
-const nervousSystemRoutes = require('./routes/nervousSystemRoutes.js');
+const nervousSystemRoutes = require('./routes/nervousSystemRoutes_merged.js');
 const mlOptimization = require('./routes/mlOptimization.js');
 const marketplaceEnhancements = require('./routes/marketplaceEnhancements.js');
-const marketDataRoutes = require('./routes/marketDataRoutes.js');
+const marketDataRoutes = require('./routes/marketDataRoutes_merged.js');
 const marketAnalytics = require('./routes/marketAnalytics.js');
 const m400AiBackboneRoutes = require('./routes/m400AiBackboneRoutes.js');
 const logisticsEnhancements = require('./routes/logisticsEnhancements.js');
@@ -106,19 +106,24 @@ const gstRoutes = require('./routes/gstRoutes.js');
 const greenhouse = require('./routes/greenhouse.js');
 const governanceModule = require('./routes/governanceModule.js');
 const goatRoutes = require('./routes/goatRoutes.js');
-const glutWarningRoutes = require('./routes/glutWarningRoutes.js');
+// 2026-09-16: services/legacy/fisheriesManagementService.js had 9 real
+// createCrudService(...) objects with no router at all.
+const fisheriesRegistryRoutes = require('./routes/fisheriesRegistryRoutes.js');
+// 2026-09-15: was a 38-line 'Route operational' scaffold. glutWarningRoutes_merged.js
+// is a real glut-risk check/scan implementation with its own router.
+const glutWarningRoutes = require('./routes/glutWarningRoutes_merged.js');
 const geofencingRoutes = require('./routes/geofencingRoutes.js');
 const freightPoolingRoutes = require('./routes/freightPoolingRoutes.js');
 const freightPooling = require('./routes/freightPooling.js');
 const foodRoutes = require('./routes/foodRoutes.js');
-const foluRoutes = require('./routes/foluRoutes.js');
-const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes.js');
+const foluRoutes = require('./routes/foluRoutes_merged.js');
+const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes_merged.js');
 const fisheriesManagementRoutes = require('./routes/fisheriesManagementRoutes.js');
 const financialAnalytics = require('./routes/financialAnalytics.js');
 const fertilizerRoutes = require('./routes/fertilizerRoutes.js');
 const farmerValueRoutes = require('./routes/farmerValueRoutes.js');
-const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes.js');
-const farmerRoutes = require('./routes/farmerRoutes.js');
+const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes_merged.js');
+const farmerRoutes = require('./routes/farmerRoutes_merged.js');
 const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements.js');
 const farmerHealthRoutes = require('./routes/farmerHealthRoutes.js');
 const farmerFamilyRoutes = require('./routes/farmerFamilyRoutes.js');
@@ -132,16 +137,16 @@ const enterpriseIntegrationRoutes = require('./routes/enterpriseIntegrationRoute
 const enterpriseAIRoutes = require('./routes/enterpriseAIRoutes.js');
 const engineeringProjectRoutes = require('./routes/engineeringProjectRoutes.js');
 const energyRoutes = require('./routes/energyRoutes.js');
-const ecommerceRoutes = require('./routes/ecommerceRoutes.js');
-const ecommerceMarketingRoutes = require('./routes/ecommerceMarketingRoutes.js');
-const ecommerceIntegrationRoutes = require('./routes/ecommerceIntegrationRoutes.js');
-const ecommerceERPRoutes = require('./routes/ecommerceERPRoutes.js');
-const ecommerceBusinessSalesRoutes = require('./routes/ecommerceBusinessSalesRoutes.js');
-const ecommerceAIRoutes = require('./routes/ecommerceAIRoutes.js');
-const dprGenerationRoutes = require('./routes/dprGenerationRoutes.js');
+const ecommerceRoutes = require('./routes/ecommerceRoutes_merged.js');
+const ecommerceMarketingRoutes = require('./routes/ecommerceMarketingRoutes_merged.js');
+const ecommerceIntegrationRoutes = require('./routes/ecommerceIntegrationRoutes_merged.js');
+const ecommerceERPRoutes = require('./routes/ecommerceERPRoutes_merged.js');
+const ecommerceBusinessSalesRoutes = require('./routes/ecommerceBusinessSalesRoutes_merged.js');
+const ecommerceAIRoutes = require('./routes/ecommerceAIRoutes_merged.js');
+const dprGenerationRoutes = require('./routes/dprGenerationRoutes_merged.js');
 const digitalTwinRoutes = require('./routes/digitalTwinRoutes.js');
 const dietTherapyRoutes = require('./routes/dietTherapyRoutes.js');
-const demandRoutes = require('./routes/demandRoutes.js');
+const demandRoutes = require('./routes/demandRoutes_merged.js');
 const defenseFitnessPrepRoutes = require('./routes/defenseFitnessPrepRoutes.js');
 const decisionSupportRoutes = require('./routes/decisionSupportRoutes.js');
 const dataVisualization = require('./routes/dataVisualization.js');
@@ -158,7 +163,7 @@ const comprehensiveERPRoutes = require('./routes/comprehensiveERPRoutes.js');
 const complianceTracking = require('./routes/complianceTracking.js');
 const complianceRoutes = require('./routes/complianceRoutes.js');
 const completeERPIntegrationRoutes = require('./routes/completeERPIntegrationRoutes.js');
-const completeAIIntegrationRoutes = require('./routes/completeAIIntegrationRoutes.js');
+const completeAIIntegrationRoutes = require('./routes/completeAIIntegrationRoutes_merged.js');
 const companyRoutes = require('./routes/companyRoutes.js');
 const communityManagementRoutes = require('./routes/communityManagementRoutes.js');
 const coldStorageRoutes = require('./routes/coldStorageRoutes.js');
@@ -184,12 +189,12 @@ const ar = require('./routes/ar.js');
 const apiCompatibilityRoutes = require('./routes/apiCompatibilityRoutes.js');
 const animalHealthRoutes = require('./routes/animalHealthRoutes.js');
 const analyticsReportRoutes = require('./routes/analyticsReportRoutes.js');
-const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes.js');
-const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes.js');
+const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes_merged.js');
+const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes_merged.js');
 const aiGatewayRoutes = require('./routes/aiGatewayRoutes.js');
 const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes.js');
-const aiBrainRoutes = require('./routes/aiBrainRoutes.js');
-const aiBackboneRoutes = require('./routes/aiBackboneRoutes.js');
+const aiBrainRoutes = require('./routes/aiBrainRoutes_merged.js');
+const aiBackboneRoutes = require('./routes/aiBackboneRoutes_merged.js');
 const aiApprovalRoutes = require('./routes/aiApprovalRoutes.js');
 const aiAgentRoutes = require('./routes/aiAgentRoutes.js');
 const agriculturalIntelligenceRoutes = require('./routes/agriculturalIntelligenceRoutes.js');
@@ -537,6 +542,22 @@ async function startup() {
     app.use('/api/v1/ai/training', aiTrainingEvaluationRoutes);
     app.use('/api/monitoring', infrastructureMonitoringRoutes);
     app.use('/api/v1/monitoring', infrastructureMonitoringRoutes);
+    // routes/dual-use/mfaRoutes.js is real (TOTP secret/QR/backup-code
+    // generation via services/dual-use/mfaService.js, real crypto), never
+    // mounted anywhere - MFASetupPage.jsx's mfaAPI.setup()/verify() calls
+    // have been 404ing. Mounted at the path the route file's own comments
+    // document (/api/v1/mfa/setup etc). Known gap, not fixed here: MFA
+    // persistence is itself a stub (enableMFA()/isMFAEnabled() never touch
+    // the database - 3 different, mutually conflicting mfa_secrets schema
+    // migrations exist, so picking one is a separate, riskier fix) - setup
+    // generates a real QR code but the secret isn't saved, so /verify will
+    // honestly report "MFA not enabled" rather than silently fabricate a
+    // pass.
+    app.use('/api/v1/mfa', require('./routes/dual-use/mfaRoutes.js'));
+    // services/legacy/logisticsService.js (shipments/vehicles/drivers CRUD +
+    // tracking) is real and never mounted - SupplyChainAnalyticsPage.jsx's
+    // logisticsAPI.getShipments() already expects this domain.
+    app.use('/api/v1/logistics', require('./services/legacy/logisticsService').router);
     app.use('/api/gdpr', gdprComplianceRoutes);
     app.use('/api/v1/gdpr', gdprComplianceRoutes);
     app.use('/api/unifiedaigateway', unifiedAIGateway);
@@ -570,7 +591,13 @@ async function startup() {
     app.use('/api/qualityassurance', qualityAssurance);
     app.use('/api/projectsystems', projectSystemsRoutes);
     app.use('/api/product', productRoutes);
-    app.use('/api/productreview', productReviewRoutes);
+    // services/legacy/productService.js is a complete, DB-backed router
+    // (GET/POST/PUT/DELETE, categories/states/search) that was never
+    // mounted anywhere - commerceApi.js's productsAPI already calls
+    // exactly these paths under /api/v1/products, so MarketplacePage.jsx
+    // was 404ing on every real call until this was wired.
+    app.use('/api/v1/products', require('./services/legacy/productService').router);
+    app.use('/api/v1/product-reviews', productReviewRoutes);
     app.use('/api/productmediaai', productMediaAIRoutes);
     app.use('/api/publicdata', publicDataRoutes);
     app.use('/api/productcertifications', productCertifications);
@@ -593,6 +620,133 @@ async function startup() {
     app.use('/api/orphaned_services_mount', ORPHANED_SERVICES_MOUNT);
     app.use('/api/organizationmanagement', organizationManagementRoutes);
     app.use('/api/order', orderRoutes);
+    // services/legacy/orderService.js is a complete, DB-backed router
+    // (cart CRUD, checkout, order status, payment, cancel) that was never
+    // mounted anywhere - commerceApi.js's ordersAPI already calls exactly
+    // these paths under /api/v1/orders, so cart/checkout was 404ing on
+    // every real call until this was wired.
+    app.use('/api/v1/orders', require('./services/legacy/orderService').router);
+
+    // --- Round 3 of legacy orphaned-router rescue: 40 more services/legacy/*.js
+    // files each export a complete, DB-backed Express router that was never
+    // require()'d/mounted anywhere (verified not reachable via index.js, any
+    // thin re-export wrapper, or routes/ORPHANED_SERVICES_MOUNT.js). Mounted at
+    // /api/v1/<kebab-case> per the productService/orderService precedent above.
+    // services/legacy/erpService.js was investigated and is already correctly
+    // wired (services/erpService.js's thin re-export mounts it at /api/erp
+    // above); services/legacy/logisticsService.js is out of scope for this
+    // round. Neither is touched again here.
+
+    // financialService.js: operationsApi.js's financialAPI (getOverview,
+    // applyForLoan, getFarmerLoans, approveLoan, getEMISchedule, payEMI,
+    // requestAdvance, getFarmerAdvances, getCreditScore) already calls exactly
+    // these paths under /api/v1/financial - 9 of its 10 methods match 1:1
+    // (getLoans's bare list has no matching route on this router). Note
+    // operationsApi.js itself is not currently imported by any page - the
+    // *live* pages (FinancialServicesDashboard.jsx, LoanManagementPage.jsx,
+    // FarmerPortalPage.jsx) import a different, stale financialAPI stub from
+    // services/api.js with unrelated method names; that mismatch is a
+    // pre-existing frontend bug, out of scope for this backend-only pass.
+    app.use('/api/v1/financial', require('./services/legacy/financialService').router);
+
+    // insuranceService.js: operationsApi.js's insuranceAPI matches 11 of 13 of
+    // this router's routes exactly (createPolicy/getPolicy/getPolicies/
+    // submitClaim/getClaim/getClaims/processClaim/createMasterPolicy/
+    // getMasterPolicies/getInsuranceProducts/calculatePremium). Same caveat as
+    // financialService above: operationsApi.js is not wired into any page today.
+    app.use('/api/v1/insurance', require('./services/legacy/insuranceService').router);
+
+    // enterpriseControlService.js: pages/EnterpriseControlPage.jsx's real,
+    // live method calls (startWorkflow/actOnWorkflow/pipeline/createLead/
+    // convertLead/clientHealth/legalCalendar/riskHeatmap/assessRisk/
+    // activeIncidents/raiseIncident/acknowledgeIncident) match this router's
+    // routes 1:1. The page currently imports a stale, mismatched
+    // enterpriseControlAPI stub from services/api.js though, so it will still
+    // throw client-side until that separate frontend bug is fixed - out of
+    // scope here.
+    app.use('/api/v1/enterprise-control', require('./services/legacy/enterpriseControlService').router);
+
+    // enterpriseMemoryService.js: pages/EnterpriseMemoryDashboardPage.jsx calls
+    // enterpriseMemoryAPI.getCases/getLearningInsights/getKnowledgeGraph/
+    // searchCases/createCase/updateCase, all still notImplemented() stubs in
+    // services/api.js. This router only covers entries/search/entities though
+    // (no cases/learning-insights/knowledge-graph concept) - mounting it is
+    // real, correct infrastructure but does not fully satisfy that page.
+    app.use('/api/v1/enterprise-memory', require('./services/legacy/enterpriseMemoryService').router);
+
+    // blockchainTraceabilityService.js: components/BlockchainTraceability/
+    // TraceabilityViewer.jsx and pages/TraceabilityPage.jsx already call
+    // blockchainTraceabilityAPI.getTraceabilityEvents()/verifyChainOfCustody(),
+    // which match this router's /traceability-events and
+    // /chain-of-custody/verify/:productId. Both are still notImplemented()
+    // stubs in services/api.js (a frontend-side follow-up, out of scope here).
+    app.use('/api/v1/blockchain-traceability', require('./services/legacy/blockchainTraceabilityService').router);
+
+    // organicTraceabilityService.js: services/api.js's organicTraceabilityAPI
+    // comment already documents this file's real getConsumerTransparencyByQR/
+    // registerFarm logic as unmounted; its stub methods
+    // (getConsumerTransparency/getStandards/registerFarm) match this router's
+    // /consumer-transparency, /standards and /farms routes.
+    app.use('/api/v1/organic-traceability', require('./services/legacy/organicTraceabilityService').router);
+
+    // The following have real, DB-backed routers but no current frontend
+    // caller was found (checked api.js, componentApi.js, coreApi.js,
+    // commerceApi.js, apiClient.js, authService.js, farmerService.js,
+    // marketplaceService.js, operationsApi.js, soilNutrientLandService.js,
+    // vendorProcurementService.js, villageAPI.js, warningAPI.js,
+    // waterIrrigationService.js, machineryVillageOpsService.js) - mounted at
+    // sensible /api/v1/<kebab-case> paths, backend-only.
+    app.use('/api/v1/advanced-ai', require('./services/legacy/advancedAIService').router);
+    app.use('/api/v1/ai-copilot', require('./services/legacy/aiCopilotService').router);
+    app.use('/api/v1/ar-vr', require('./services/legacy/arVrService').router);
+    app.use('/api/v1/biodiversity', require('./services/legacy/biodiversityService').router);
+    app.use('/api/v1/catalog-intelligence', require('./services/legacy/catalogIntelligenceService').router);
+    app.use('/api/v1/commerce-rules', require('./services/legacy/commerceRulesService').router);
+    app.use('/api/v1/consumer-health', require('./services/legacy/consumerHealthService').router);
+    app.use('/api/v1/conversational-ai', require('./services/legacy/conversationalAIService').router);
+    app.use('/api/v1/digital-product-passport', require('./services/legacy/digitalProductPassportService').router);
+    app.use('/api/v1/farmer-value', require('./services/legacy/farmerValueService').router);
+    app.use('/api/v1/food-intelligence', require('./services/legacy/foodIntelligenceService').router);
+    app.use('/api/v1/food-safety', require('./services/legacy/foodSafetyService').router);
+    app.use('/api/v1/forms', require('./services/legacy/formService').router);
+    app.use('/api/v1/gi-intelligence', require('./services/legacy/giIntelligenceService').router);
+    app.use('/api/v1/indigenous-knowledge', require('./services/legacy/indigenousKnowledgeService').router);
+    app.use('/api/v1/institutional-procurement', require('./services/legacy/institutionalProcurementService').router);
+    app.use('/api/v1/iot-integration', require('./services/legacy/iotIntegrationService').router);
+    app.use('/api/v1/knowledge-graph', require('./services/legacy/knowledgeGraphService').router);
+    app.use('/api/v1/laboratory-erp', require('./services/legacy/laboratoryERPService').router);
+    app.use('/api/v1/merchandising', require('./services/legacy/merchandisingService').router);
+    // millCircuitService.js's own routes already start with /mill-circuit and
+    // /fpo-ledger (two features sharing one router file), so it's mounted at a
+    // neutral /api/v1/agri prefix rather than doubling up a domain segment.
+    app.use('/api/v1/agri', require('./services/legacy/millCircuitService').router);
+    app.use('/api/v1/module-catalog', require('./services/legacy/moduleCatalogService').router);
+    app.use('/api/v1/multilingual', require('./services/legacy/multilingualService').router);
+    app.use('/api/v1/ne-product-intelligence', require('./services/legacy/neProductIntelligenceService').router);
+    // Distinct from the already-mounted /api/nutritionintelligence (routes/
+    // nutritionIntelligenceRoutes.js, wraps individual service functions) -
+    // this is nutritionIntelligenceService.js's own internal router, with
+    // additional routes (/calculate, /compare, /wellness-practices, /recipes)
+    // that routes/nutritionIntelligenceRoutes.js doesn't expose.
+    app.use('/api/v1/nutrition-intelligence', require('./services/legacy/nutritionIntelligenceService').router);
+    app.use('/api/v1/offline-payment', require('./services/legacy/offlinePaymentService').router);
+    app.use('/api/v1/offline-sync', require('./services/legacy/offlineSyncService').router);
+    app.use('/api/v1/omnichannel-ai', require('./services/legacy/omnichannelAIService').router);
+    app.use('/api/v1/predictive-analytics', require('./services/legacy/predictiveAnalyticsService').router);
+    app.use('/api/v1/recipe-intelligence', require('./services/legacy/recipeIntelligenceService').router);
+    app.use('/api/v1/shelf-life', require('./services/legacy/shelfLifeService').router);
+    // Fixed a wrong-relative-path require() bug while verifying this file:
+    // require('../../dual-use/authService') (two levels up from
+    // services/legacy/) resolved to the non-existent backend/src/dual-use/,
+    // when the real file is backend/src/services/dual-use/authService.js -
+    // same off-by-one-directory mistake as the orderService.js/
+    // logisticsService.js '../../../index' bug, fixed the same way.
+    app.use('/api/v1/sms-auth', require('./services/legacy/smsAuthService').router);
+    app.use('/api/v1/v42-intelligence', require('./services/legacy/v42IntelligenceService').router);
+    app.use('/api/v1/value-commerce', require('./services/legacy/valueCommerceService').router);
+    app.use('/api/v1/voice-ai', require('./services/legacy/voiceAIService').router);
+    app.use('/api/v1/whatsapp', require('./services/legacy/whatsappService').router);
+
     app.use('/api/operationsroutesupport', operationsRouteSupport.router);
     app.use('/api/operationsmanagement', operationsManagementRoutes);
     app.use('/api/nutritionintelligence', nutritionIntelligenceRoutes);
@@ -628,6 +782,7 @@ async function startup() {
     app.use('/api/greenhouse', greenhouse);
     app.use('/api/governancemodule', governanceModule);
     app.use('/api/goat', goatRoutes);
+    app.use('/api/fisheries-registry', fisheriesRegistryRoutes);
     app.use('/api/glutwarning', glutWarningRoutes);
     app.use('/api/geofencing', geofencingRoutes);
     app.use('/api/freightpooling', freightPoolingRoutes);
@@ -641,6 +796,7 @@ async function startup() {
     app.use('/api/farmervalue', farmerValueRoutes);
     app.use('/api/farmertraining', farmerTrainingRoutes);
     app.use('/api/farmer', farmerRoutes);
+    app.use('/api/erp', require('./services/erpService').router);
     app.use('/api/farmerportalenhancements', farmerPortalEnhancements);
     app.use('/api/farmerhealth', farmerHealthRoutes);
     app.use('/api/farmerfamily', farmerFamilyRoutes);
