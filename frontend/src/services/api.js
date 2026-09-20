@@ -419,9 +419,19 @@ export const loanAPI = {
   applyForLoan: (data) => api.post('/loans', data),
 };
 
+// insuranceAPI: services/legacy/insuranceService.js is now mounted at
+// /api/v1/insurance. InsuranceManagementPage.jsx's 5 calls (getPolicies/
+// getInsuranceProducts/getClaims/createPolicy/submitClaim) match its real
+// routes; filters+pagination are merged into query params the same way
+// productsAPI.getProducts does elsewhere in this file (the page's own
+// {scope:'mine'} isn't a real backend filter - harmlessly ignored server-side,
+// same as every other filter object passed through this pattern).
 export const insuranceAPI = {
-  getPolicies: () => api.get('/insurance/policies'),
-  createPolicy: (data) => api.post('/insurance/policies', data),
+  getPolicies: (filters, pagination) => api.get(`${UNVERSIONED_BASE}/api/v1/insurance/policies`, { params: { ...filters, ...pagination } }),
+  getInsuranceProducts: () => api.get(`${UNVERSIONED_BASE}/api/v1/insurance/products`),
+  getClaims: (filters, pagination) => api.get(`${UNVERSIONED_BASE}/api/v1/insurance/claims`, { params: { ...filters, ...pagination } }),
+  createPolicy: data => api.post(`${UNVERSIONED_BASE}/api/v1/insurance/policies`, data),
+  submitClaim: data => api.post(`${UNVERSIONED_BASE}/api/v1/insurance/claims`, data),
 };
 
 export const logisticsAPI = {
@@ -2983,14 +2993,43 @@ export const dairyAIAPI = {
 };
 
 // Additional missing exports
+// financialAPI: services/legacy/financialService.js is now mounted at
+// /api/v1/financial. getCreditScore/getOverview match FarmerPortalPage.jsx/
+// FinancialServicesDashboard.jsx's real calls. getOverview's real filters
+// are {from,to,buyerId} (date range + buyer), not the page's "timeRange"
+// preset string - passed through as a generic `range` param rather than
+// invented date math; backend ignores it and returns the unfiltered
+// all-time overview, which is real data, just not time-scoped yet.
+// getLoans() has no matching "list my loans" route (only GET
+// /loans/farmer/:farmerId, which needs an id this page never has) - stays
+// an honest stub; applyForLoan matches POST /loans exactly.
 export const financialAPI = {
-  getFinancialData: () => api.get('/financial'),
-  analyzeFinancials: (data) => api.post('/financial/analyze', data),
+  getOverview: timeRange => api.get(`${UNVERSIONED_BASE}/api/v1/financial/overview`, { params: timeRange ? { range: timeRange } : undefined }),
+  getCreditScore: farmerId => api.get(`${UNVERSIONED_BASE}/api/v1/financial/credit-score/${farmerId}`),
+  getLoans: notImplemented('Financial: list current user\'s loans (backend has no such route)'),
+  applyForLoan: data => api.post(`${UNVERSIONED_BASE}/api/v1/financial/loans`, data),
 };
 
+// enterpriseControlAPI: EnterpriseControlPage.jsx calls 12 methods this
+// object never had (getEnterpriseControl/controlEnterprise were fabricated,
+// unrelated to what the page actually calls - would throw "not a function"
+// at runtime). services/legacy/enterpriseControlService.js is now mounted
+// at /api/v1/enterprise-control (backend/src/index.js) and matches the
+// page's calls 1:1.
 export const enterpriseControlAPI = {
-  getEnterpriseControl: () => api.get('/enterprise-control'),
-  controlEnterprise: (data) => api.post('/enterprise-control/control', data),
+  startWorkflow: data => api.post(`${UNVERSIONED_BASE}/api/v1/enterprise-control/workflow/start`, data),
+  actOnWorkflow: (instanceCode, data) => api.post(`${UNVERSIONED_BASE}/api/v1/enterprise-control/workflow/${instanceCode}/act`, data),
+  pendingWorkflow: () => api.get(`${UNVERSIONED_BASE}/api/v1/enterprise-control/workflow/pending`),
+  createLead: data => api.post(`${UNVERSIONED_BASE}/api/v1/enterprise-control/crm/leads`, data),
+  convertLead: (leadCode, data) => api.post(`${UNVERSIONED_BASE}/api/v1/enterprise-control/crm/leads/${leadCode}/convert`, data),
+  pipeline: () => api.get(`${UNVERSIONED_BASE}/api/v1/enterprise-control/crm/pipeline`),
+  clientHealth: id => api.get(`${UNVERSIONED_BASE}/api/v1/enterprise-control/clients/${id}/health`),
+  legalCalendar: params => api.get(`${UNVERSIONED_BASE}/api/v1/enterprise-control/legal/calendar`, { params }),
+  assessRisk: (riskCode, data) => api.post(`${UNVERSIONED_BASE}/api/v1/enterprise-control/risk/${riskCode}/assess`, data),
+  riskHeatmap: () => api.get(`${UNVERSIONED_BASE}/api/v1/enterprise-control/risk/heatmap`),
+  raiseIncident: data => api.post(`${UNVERSIONED_BASE}/api/v1/enterprise-control/emergency/incidents`, data),
+  acknowledgeIncident: incidentCode => api.post(`${UNVERSIONED_BASE}/api/v1/enterprise-control/emergency/incidents/${incidentCode}/acknowledge`),
+  activeIncidents: () => api.get(`${UNVERSIONED_BASE}/api/v1/enterprise-control/emergency/active`),
 };
 
 export const erpAPI = {
@@ -5651,19 +5690,28 @@ export const varietyDirectoryAPI = {
 // and blockchainVerificationRoutes.js (/api/blockchainverification) are both
 // placeholder scaffolds - no traceability-events/chain-of-custody endpoint
 // exists anywhere in this codebase.
+// blockchainTraceabilityAPI: services/legacy/blockchainTraceabilityService.js
+// is now mounted at /api/v1/blockchain-traceability. TraceabilityPage.jsx's
+// 2 calls match its real GET routes exactly (batch number as a query param).
 export const blockchainTraceabilityAPI = {
-  getTraceabilityEvents: notImplemented('Blockchain traceability events'),
-  verifyChainOfCustody: notImplemented('Blockchain chain-of-custody verification'),
+  getTraceabilityEvents: (productId, batchNumber) =>
+    api.get(`${UNVERSIONED_BASE}/api/v1/blockchain-traceability/traceability-events/${productId}`, { params: batchNumber ? { batch_number: batchNumber } : undefined }),
+  verifyChainOfCustody: (productId, batchNumber) =>
+    api.get(`${UNVERSIONED_BASE}/api/v1/blockchain-traceability/chain-of-custody/verify/${productId}`, { params: batchNumber ? { batch_number: batchNumber } : undefined }),
 };
 
-// enterpriseMemoryAPI: services/enterpriseMemoryService.js exists but is
-// never required/mounted anywhere in backend/src/index.js.
+// enterpriseMemoryAPI: services/legacy/enterpriseMemoryService.js is now
+// mounted at /api/v1/enterprise-memory, but its real router only has 3
+// routes (POST /entries, GET /search, GET /entities/:type/:id) - no
+// cases/learning-insights/knowledge-graph concept exists on the backend.
+// searchCases/createCase map to the real routes; the other 4
+// EnterpriseMemoryDashboardPage.jsx calls stay honest stubs.
 export const enterpriseMemoryAPI = {
   getCases: notImplemented('Enterprise memory case list'),
   getLearningInsights: notImplemented('Enterprise memory learning insights'),
   getKnowledgeGraph: notImplemented('Enterprise memory knowledge graph'),
-  searchCases: notImplemented('Enterprise memory case search'),
-  createCase: notImplemented('Enterprise memory case creation'),
+  searchCases: query => api.get(`${UNVERSIONED_BASE}/api/v1/enterprise-memory/search`, { params: { q: query } }),
+  createCase: data => api.post(`${UNVERSIONED_BASE}/api/v1/enterprise-memory/entries`, data),
   updateCase: notImplemented('Enterprise memory case update'),
 };
 
@@ -5905,13 +5953,13 @@ export const orchardAPI = {
   recordHarvest: notImplemented('Orchard harvest recording'),
 };
 
-// organicTraceabilityAPI: services/legacy/organicTraceabilityService.js has
-// real getConsumerTransparencyByQR/registerFarm logic, but is never
-// required/mounted anywhere in backend/src/index.js.
+// organicTraceabilityAPI: services/legacy/organicTraceabilityService.js is
+// now mounted at /api/v1/organic-traceability - all 3 match real routes
+// (GET /consumer-transparency/qr/:qrCode, GET /standards, POST /farms).
 export const organicTraceabilityAPI = {
-  getConsumerTransparency: notImplemented('Organic traceability: consumer transparency'),
-  getStandards: notImplemented('Organic traceability: standards'),
-  registerFarm: notImplemented('Organic traceability: farm registration'),
+  getConsumerTransparency: qrCode => api.get(`${UNVERSIONED_BASE}/api/v1/organic-traceability/consumer-transparency/qr/${qrCode}`),
+  getStandards: () => api.get(`${UNVERSIONED_BASE}/api/v1/organic-traceability/standards`),
+  registerFarm: data => api.post(`${UNVERSIONED_BASE}/api/v1/organic-traceability/farms`, data),
 };
 
 // organizationManagementAPI: routes/organizationManagementRoutes.js mounted
