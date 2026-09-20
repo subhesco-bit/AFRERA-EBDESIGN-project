@@ -5317,4 +5317,28 @@ export const warningAPI = {
   getWarningHealth: () => api.get('/warnings/health'),
 };
 
+// landRecordsRoutes.js (backend/src/routes/landRecordsRoutes.js) - real,
+// table-backed against land_records (migration 011), mounted at
+// /api/landrecords but never had a frontend caller anywhere.
+export const landRecordsAPI = {
+  addRecord: data => api.post('/landrecords', data),
+  getMyRecords: filters => api.get('/landrecords', { params: filters }),
+  getRecord: recordId => api.get(`/landrecords/${recordId}`),
+  updateRecord: (recordId, data) => api.put(`/landrecords/${recordId}`, data),
+  deleteRecord: recordId => api.delete(`/landrecords/${recordId}`),
+  verifyRecord: (recordId, data) => api.post(`/landrecords/${recordId}/verify`, data),
+  syncWithGovernment: () => api.post('/landrecords/sync-government'),
+  getRegionalStatistics: filters => api.get('/landrecords/regional-statistics', { params: filters }),
+};
+
+// aiApprovalRoutes.js (backend/src/routes/aiApprovalRoutes.js) - real,
+// authenticated proposal/approval workflow (ai_proposals table), mounted
+// at /api/aiapproval but never had a frontend caller anywhere.
+export const aiApprovalAPI = {
+  createProposal: data => api.post('/aiapproval/proposals', data),
+  getProposals: filters => api.get('/aiapproval/proposals', { params: filters }),
+  decideProposal: (proposalId, data) => api.post(`/aiapproval/proposals/${proposalId}/decision`, data),
+  executeProposal: proposalId => api.post(`/aiapproval/proposals/${proposalId}/execute`),
+};
+
 export default api;
