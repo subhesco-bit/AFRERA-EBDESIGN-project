@@ -1916,6 +1916,57 @@ now accounted for). Not yet done: the same call-resolution audit against
 calls), and the frontend equivalent (component -> API-client call
 resolution) - both would very likely surface the same bug class.
 
+## RESOLVED — service-to-service and frontend API-client call-resolution audits (2026-09-20)
+
+Both predicted next-scope items above were completed same session:
+
+**Service-to-service** (commit `ed408afee`): 1275 files scanned, 86 broken
+calls found, 4 real bugs fixed - `aiCollaborationService.logWork` missing
+entirely (crashed 13+ AI services), `smsAuthService.js` off-by-one require
+path (broke SMS login/registration entirely), `authService.js`
+hashPassword/comparePassword existed but weren't exported,
+`aiGatewayService.js` missing healthCheck/optimize/analyze (crashed
+platformCoreService's 3 main operations), `insurancePolicyIssuanceService.js`
+wrong require path. Plus (commit `6b25e28cd`) a genuine feature
+implementation: `nutritionCommerceIntelligenceService.calculateNutritionDensity`
+and `priceObservationQuality` were spec'd by their own test file but never
+implemented - built for real, 6/7 tests now pass. **One honest open
+discrepancy**: `calculateNutritionDensity`'s test expects score 0.75 for a
+specific input; the implemented principled formula (average of
+per-nutrient capped ratios) gives 0.65. Tried several alternative
+weightings looking for one with a real justification that lands on 0.75;
+none did. Left as-is rather than curve-fit an unjustified adjustment -
+whoever specified the original 0.75 expectation should clarify the
+intended weighting.
+
+**Frontend component-to-API-client** (commit `1044ff4ad`): 719 real broken
+calls across 130 API objects in 145 files - the same "generic
+placeholder, not the real methods pages need" pattern as the backend
+audits, now confirmed at the frontend API-client layer. Fixed by
+injecting 665 missing methods into 125 existing objects, creating 5 fully
+missing objects, and hand-fixing 3 componentApi.js objects
+(multilingualAPI/conversationalAIAPI/voiceAIAPI) that real components
+depend on. Re-ran the scanner after fixing: 723 -> 4 (the remaining 4 are
+a confirmed scanner false positive on the real, working `api` axios
+instance export, not an actual gap).
+
+## Still open, not yet done
+
+1. **`marketplace.test.js` real rewrite** - still `describe.skip`'d
+   (2026-08-30 reason: stale schema, external-server integration test).
+   Given no live Postgres exists in this dev environment, a true
+   integration-test fix can't be verified here regardless of how it's
+   written. The verifiable path is converting it to a mocked-DB unit test
+   (same pattern as `nationalMarketplaceListing.test.js`, which does work)
+   - not started yet.
+2. **314 frontend test files using `import ... from 'vitest'`** against a
+   project whose actual configured runner is jest - tracked, not
+   rewritten (see the dependency-remediation commit `740e7da58` for full
+   context).
+3. Remaining backend/frontend moderate npm vulnerabilities (aws-sdk, bull,
+   exceljs, @capacitor/cli's uuid chain) - no clean fix without
+   downgrading a real, used dependency to an ancient major version.
+
 ---
 
 *This document must be updated after every task completion or status change.*
