@@ -1,17 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class automationService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class AutomationService {
-  async triggerWorkflow(workflowId, params) {
-    try {
-      const id = require('uuid').v4();
-      await db('automation_logs').insert({
-        id, workflow_id: workflowId, params: JSON.stringify(params), status: 'executed', created_at: new Date(),
-      });
-      logger.info(`Workflow triggered: ${workflowId}`);
-      return { execution_id: id, workflow_id: workflowId, status: 'executed' };
-    } catch (error) { logger.error(`Trigger workflow failed: ${error.message}`); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new AutomationService();

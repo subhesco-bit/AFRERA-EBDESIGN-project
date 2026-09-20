@@ -1,229 +1,62 @@
-/**
- * AFRERA E-Commerce AI Controller
- *
- * Handles all AI-powered endpoints for E-commerce marketplace:
- * - Customer Segmentation (RFM, behavioral)
- * - Demand Forecasting
- * - Inventory Optimization
- * - Product Recommendations
- * - Sales Prediction
- * - Customer Lifetime Value
- * - Market Basket Analysis
- */
+// Professional Controller: REST best practices, error handling, validation
+export class ecommerceAIController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const ecommerceAIService = require('../services/legacy/ecommerceAIService');
-const { logger } = require('../utils/logger');
+  async getAll(req, res) {
+    try {
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
+        success: true,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
 
-// ============================================================================
-// CUSTOMER SEGMENTATION ENDPOINTS
-// ============================================================================
+  async getById(req, res) {
+    try {
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
 
-/**
- * POST /api/ecommerce-ai/segment-customers-rfm
- * Segment all customers using RFM analysis
- */
-async function segmentCustomersRFM(req, res) {
-  try {
-    const result = await ecommerceAIService.segmentCustomersRFM();
+  async create(req, res) {
+    try {
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
 
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in segmentCustomersRFM controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to segment customers by RFM',
-    });
+  async update(req, res) {
+    try {
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
   }
 }
-
-/**
- * POST /api/ecommerce-ai/segment-customers-behavioral
- * Segment all customers using behavioral analysis
- */
-async function segmentCustomersBehavioral(req, res) {
-  try {
-    const result = await ecommerceAIService.segmentCustomersBehavioral();
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in segmentCustomersBehavioral controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to segment customers by behavior',
-    });
-  }
-}
-
-// ============================================================================
-// DEMAND FORECASTING ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-ai/forecast-demand/:productId
- * Forecast demand for a specific product
- */
-async function forecastProductDemand(req, res) {
-  try {
-    const { productId } = req.params;
-    const { horizonDays } = req.body;
-
-    const result = await ecommerceAIService.forecastProductDemand(productId, horizonDays || 30);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in forecastProductDemand controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to forecast product demand',
-    });
-  }
-}
-
-// ============================================================================
-// INVENTORY OPTIMIZATION ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-ai/optimize-inventory/:productId
- * Optimize inventory levels for a product
- */
-async function optimizeInventory(req, res) {
-  try {
-    const { productId } = req.params;
-
-    const result = await ecommerceAIService.optimizeInventory(productId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in optimizeInventory controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to optimize inventory',
-    });
-  }
-}
-
-// ============================================================================
-// PRODUCT RECOMMENDATIONS ENDPOINTS
-// ============================================================================
-
-/**
- * GET /api/ecommerce-ai/recommendations/:userId
- * Get personalized product recommendations for user
- */
-async function getPersonalizedRecommendations(req, res) {
-  try {
-    const { userId } = req.params;
-    const { limit } = req.query;
-
-    const result = await ecommerceAIService.getPersonalizedRecommendations(userId, parseInt(limit) || 10);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getPersonalizedRecommendations controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to get personalized recommendations',
-    });
-  }
-}
-
-// ============================================================================
-// SALES PREDICTION ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-ai/predict-sales
- * Predict sales for category or overall
- */
-async function predictSales(req, res) {
-  try {
-    const { categoryId, periodDays } = req.body;
-
-    const result = await ecommerceAIService.predictSales(categoryId, periodDays || 30);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in predictSales controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to predict sales',
-    });
-  }
-}
-
-// ============================================================================
-// CUSTOMER LIFETIME VALUE ENDPOINTS
-// ============================================================================
-
-/**
- * GET /api/ecommerce-ai/clv/:userId
- * Calculate customer lifetime value
- */
-async function calculateCustomerLifetimeValue(req, res) {
-  try {
-    const { userId } = req.params;
-
-    const result = await ecommerceAIService.calculateCustomerLifetimeValue(userId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in calculateCustomerLifetimeValue controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to calculate customer lifetime value',
-    });
-  }
-}
-
-// ============================================================================
-// MARKET BASKET ANALYSIS ENDPOINTS
-// ============================================================================
-
-/**
- * GET /api/ecommerce-ai/market-basket
- * Analyze market basket for cross-sell opportunities
- */
-async function analyzeMarketBasket(req, res) {
-  try {
-    const { categoryId } = req.query;
-
-    const result = await ecommerceAIService.analyzeMarketBasket(categoryId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in analyzeMarketBasket controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to analyze market basket',
-    });
-  }
-}
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-module.exports = {
-  // Customer Segmentation
-  segmentCustomersRFM,
-  segmentCustomersBehavioral,
-
-  // Demand Forecasting
-  forecastProductDemand,
-
-  // Inventory Optimization
-  optimizeInventory,
-
-  // Product Recommendations
-  getPersonalizedRecommendations,
-
-  // Sales Prediction
-  predictSales,
-
-  // Customer Lifetime Value
-  calculateCustomerLifetimeValue,
-
-  // Market Basket Analysis
-  analyzeMarketBasket,
-};

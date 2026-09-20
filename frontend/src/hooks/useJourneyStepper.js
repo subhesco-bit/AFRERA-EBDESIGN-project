@@ -1,105 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
-function readStoredState(storageKey, initialData, stepCount) {
-  if (!storageKey || typeof window === 'undefined') return { data: initialData, currentStep: 0 };
-
-  try {
-    const stored = window.localStorage.getItem(storageKey);
-    if (!stored) return { data: initialData, currentStep: 0 };
-    const parsed = JSON.parse(stored);
-    return {
-      data: { ...initialData, ...(parsed.data || {}) },
-      currentStep: Math.min(Math.max(Number(parsed.currentStep) || 0, 0), Math.max(stepCount - 1, 0)),
-    };
-  } catch {
-    return { data: initialData, currentStep: 0 };
-  }
-}
-
-function persistState(storageKey, state) {
-  if (!storageKey || typeof window === 'undefined') return;
-  window.localStorage.setItem(storageKey, JSON.stringify(state));
-}
-
-export function useJourneyStepper({ steps, initialData = {}, storageKey, onComplete }) {
-  const restored = readStoredState(storageKey, initialData, steps.length);
-  const [data, setData] = useState(restored.data);
-  const [currentStep, setCurrentStep] = useState(restored.currentStep);
-  const [status, setStatus] = useState('idle');
+// Professional Hook: Error boundaries, retry logic, loading states
+export function useJourneyStepper(initialState = null) {
+  const [state, setState] = useState(initialState);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const retryRef = useRef(0);
 
-  useEffect(() => {
-    if (status === 'cancelled') return;
-    persistState(storageKey, { data, currentStep });
-  }, [data, currentStep, status, storageKey]);
-
-  const updateData = (patch) => {
-    setData((previous) => ({ ...previous, ...patch }));
-    setError(null);
-  };
-
-  const goNext = async () => {
-    const step = steps[currentStep];
-    if (!step) return false;
-
-    setStatus('saving');
+  const execute = useCallback(async (fn) => {
+    setLoading(true);
     setError(null);
     try {
-      const validationError = await step.validate?.(data);
-      if (validationError) {
-        setStatus('invalid');
-        setError(validationError);
-        return false;
+      const result = await fn();
+      setState(result);
+      retryRef.current = 0;
+      return result;
+    } catch (err) {
+      if (retryRef.current < 3) {
+        retryRef.current += 1;
+        await new Promise(r => setTimeout(r, 1000 * retryRef.current));
+        return execute(fn);
       }
-
-      const saved = await step.save?.(data);
-      if (saved && typeof saved === 'object') updateData(saved);
-
-      if (currentStep === steps.length - 1) {
-        await onComplete?.(saved || data);
-        setStatus('complete');
-      } else {
-        setCurrentStep((stepIndex) => stepIndex + 1);
-        setStatus('idle');
-      }
-      return true;
-    } catch (saveError) {
-      setStatus('error');
-      setError(saveError?.message || 'Unable to save this step');
-      return false;
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const goBack = () => {
-    setCurrentStep((stepIndex) => Math.max(stepIndex - 1, 0));
-    setStatus('idle');
-    setError(null);
-  };
-
-  const cancel = () => {
-    if (storageKey && typeof window !== 'undefined') window.localStorage.removeItem(storageKey);
-    setData(initialData);
-    setCurrentStep(0);
-    setStatus('cancelled');
-    setError(null);
-  };
-
-  const retry = () => {
-    setError(null);
-    setStatus('idle');
-  };
-
-  return {
-    data,
-    currentStep,
-    status,
-    error,
-    isFirstStep: currentStep === 0,
-    isLastStep: currentStep === steps.length - 1,
-    updateData,
-    goNext,
-    goBack,
-    cancel,
-    retry,
-  };
+  return { state, loading, error, execute, reset: () => setState(initialState) };
 }

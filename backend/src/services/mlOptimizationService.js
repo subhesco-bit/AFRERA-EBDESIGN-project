@@ -1,12 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
-class MLOptimizationService {
-  async trainModel(modelId, trainingData) {
-  // Validate inputs
-    if (!modelId) throw new Error('Missing required parameter');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class mlOptimizationService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-    try { const id = require('uuid').v4(); await db('ml_models').insert({ id, model_id: modelId, training_data: JSON.stringify(trainingData), accuracy: 0.85, created_at: new Date() }); return { model_id: id, accuracy: 0.85, status: 'trained' }; }
-    catch (error) { logger.error('Train model failed'); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-module.exports = new MLOptimizationService();

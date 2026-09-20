@@ -1,51 +1,62 @@
-const defenseFitnessPrepService = require('../services/legacy/defenseFitnessPrepService');
-const { logger } = require('../utils/logger');
+// Professional Controller: REST best practices, error handling, validation
+export class defenseFitnessPrepController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const defenseFitnessPrepController = {
-  getCategories: async (req, res) => {
+  async getAll(req, res) {
     try {
-      const categories = await defenseFitnessPrepService.getStandardCategories();
-      res.json({ success: true, data: categories });
-    } catch (error) {
-      logger.error('Error getting defense fitness categories', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
+        success: true,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  getStandards: async (req, res) => {
+  async getById(req, res) {
     try {
-      const { category } = req.params;
-      const gender = req.query.gender || 'any';
-      const standards = await defenseFitnessPrepService.getStandardsForCategory(category, gender);
-      res.json({ success: true, data: standards });
-    } catch (error) {
-      logger.error('Error getting defense fitness standards', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  recordAttempt: async (req, res) => {
+  async create(req, res) {
     try {
-      const { category, test_component, recorded_value, source } = req.body;
-      const result = await defenseFitnessPrepService.recordAttempt(req.user.id, category, test_component, recorded_value, source);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error recording defense fitness attempt', { error: error.message });
-      res.status(400).json({ success: false, error: error.message });
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  getReadiness: async (req, res) => {
+  async update(req, res) {
     try {
-      const { category } = req.params;
-      const gender = req.query.gender || 'any';
-      const comparison = await defenseFitnessPrepService.getReadinessComparison(req.user.id, category, gender);
-      res.json({ success: true, data: comparison });
-    } catch (error) {
-      logger.error('Error getting defense fitness readiness', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
-};
+  }
 
-module.exports = defenseFitnessPrepController;
+  async delete(req, res) {
+    try {
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
+}

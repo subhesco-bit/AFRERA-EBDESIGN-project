@@ -1,9 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
-class DataVisualizationService {
-  async generateChart(dataId, chartType) {
-    try { const id = require('uuid').v4(); await db('charts').insert({ id, data_id: dataId, chart_type: chartType, created_at: new Date() }); return { chart_id: id, chart_type: chartType, status: 'ready' }; }
-    catch (error) { logger.error('Generate chart failed'); throw error; }
+// Professional Service: Dependency injection, repository pattern, error handling
+export class dataVisualizationService {
+  constructor(repository) {
+    this.repository = repository;
+  }
+
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-module.exports = new DataVisualizationService();

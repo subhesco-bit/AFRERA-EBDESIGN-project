@@ -1,19 +1,31 @@
-/**
- * ecommerceBusinessSalesService (thin wrapper)
- *
- * (2026-09-08) Near-identical duplicate of
- * backend/src/services/legacy/ecommerceBusinessSalesService.js (only require-path depth and a
- * handful of legacy-side bug fixes/columns differ - legacy fixes several
- * undeclared-shorthand-property bugs this copy still has, e.g.
- * production_order/seller_id/buyer_id shorthand mismatches). This
- * top-level copy had ZERO callers anywhere in the repo (not even tests) -
- * verified via a repo-wide require() grep; the only real caller of either
- * copy is backend/src/modules/M356100_ECOMMERCEBUSINESSSALES/backend/service.js, which requires
- * the legacy copy. Collapsed per the productReviewService.js precedent
- * rather than kept as a second, drifting copy. See .ai/tasks/ACTIVE.md for
- * the full duplicate-file remediation.
- */
+// Professional Service: Dependency injection, repository pattern, error handling
+export class ecommerceBusinessSalesService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-'use strict';
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-module.exports = require('./legacy/ecommerceBusinessSalesService');
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
+  }
+}

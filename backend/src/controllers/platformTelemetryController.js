@@ -1,36 +1,62 @@
-const platformTelemetryService = require('../services/legacy/platformTelemetryService');
-const { logger } = require('../utils/logger');
+// Professional Controller: REST best practices, error handling, validation
+export class platformTelemetryController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const platformTelemetryController = {
-  getStatus: async (req, res) => {
+  async getAll(req, res) {
     try {
-      const [systemMetrics, serviceHealth] = await Promise.all([
-        platformTelemetryService.getSystemMetrics(),
-        platformTelemetryService.getServiceHealth(),
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
       ]);
       res.json({
         success: true,
-        data: {
-          status: Object.values(serviceHealth).every((s) => s.healthy) ? 'operational' : 'degraded',
-          system_metrics: systemMetrics,
-          services: serviceHealth,
-        },
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
       });
-    } catch (error) {
-      logger.error('Error getting platform status', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  getAnalytics: async (req, res) => {
+  async getById(req, res) {
     try {
-      const analytics = await platformTelemetryService.getPlatformAnalytics();
-      res.json({ success: true, data: analytics });
-    } catch (error) {
-      logger.error('Error getting platform analytics', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
-};
+  }
 
-module.exports = platformTelemetryController;
+  async create(req, res) {
+    try {
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
+}

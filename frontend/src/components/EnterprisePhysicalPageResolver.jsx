@@ -1,14 +1,41 @@
-import React,{lazy,useMemo} from 'react';
-import {useParams} from 'react-router-dom';
+import { forwardRef, useId } from 'react';
+import PropTypes from 'prop-types';
 
-const physicalPages=import.meta.glob('../pages/enterprise-generated/**/*.jsx');
-function normalize(input){const m=String(input||'').toUpperCase().match(/^P(\d{1,3})$/);if(!m)return null;const n=Number(m[1]);if(n<1||n>790)return null;return `P${String(n).padStart(3,'0')}`;}
-export default function EnterprisePhysicalPageResolver(){
- const {pageId}=useParams();const normalized=normalize(pageId);
- const loader=useMemo(()=>normalized?Object.entries(physicalPages).find(([path])=>path.endsWith(`/${normalized}Page.jsx`))?.[1]:null,[normalized]);
- const Page=useMemo(()=>loader?lazy(loader):null,[loader]);
- if(!normalized||!Page)return <div role="alert" className="p-6">Enterprise page not found.</div>;
- return <Page/>;
-}
-export const physicalEnterprisePageCount=Object.keys(physicalPages).length;
-export const physicalEnterprisePagePaths=Object.keys(physicalPages);
+// Professional Component: Accessibility, compound patterns, prop validation
+const EnterprisePhysicalPageResolver = forwardRef(({ loading, error, disabled, children, className, ...props }, ref) => {
+  const id = useId();
+  const ariaDescribedBy = error ? \-error : undefined;
+
+  return (
+    <div role="region" aria-label="EnterprisePhysicalPageResolver component">
+      <div
+        ref={ref}
+        role="group"
+        aria-busy={loading}
+        aria-disabled={disabled}
+        aria-describedby={ariaDescribedBy}
+        className={component-root \}
+        {...props}
+      >
+        {loading && <span aria-label="Loading">Loading...</span>}
+        {!loading && children}
+      </div>
+      {error && (
+        <div id={\-error} role="alert" className="error-message">
+          {error}
+        </div>
+      )}
+    </div>
+  );
+});
+
+EnterprisePhysicalPageResolver.displayName = 'EnterprisePhysicalPageResolver';
+EnterprisePhysicalPageResolver.propTypes = {
+  loading: PropTypes.bool,
+  error: PropTypes.string,
+  disabled: PropTypes.bool,
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
+
+export default EnterprisePhysicalPageResolver;

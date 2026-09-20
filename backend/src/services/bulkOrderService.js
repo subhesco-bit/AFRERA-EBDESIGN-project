@@ -1,25 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
-
-class BulkOrderService {
-  async createBulkOrder(data) {
-    try {
-      const id = require('uuid').v4();
-      await db('bulk_orders').insert({
-        id, buyer_id: data.buyer_id, quantity: data.quantity, total_amount: data.total_amount,
-        status: 'requested', created_at: new Date(),
-      });
-      logger.info(`Bulk order created: ${id}`);
-      return { order_id: id, status: 'requested' };
-    } catch (error) { logger.error(`Create order failed: ${error.message}`); throw error; }
+// Professional Service: Dependency injection, repository pattern, error handling
+export class bulkOrderService {
+  constructor(repository) {
+    this.repository = repository;
   }
 
-  async getQuotations(orderId) {
-    try {
-      const quotations = await db('bulk_quotations').where('bulk_order_id', orderId);
-      return { order_id: orderId, quotations };
-    } catch (error) { logger.error(`Get quotations failed: ${error.message}`); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new BulkOrderService();

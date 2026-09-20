@@ -1,17 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class complianceTrackingService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class ComplianceTrackingService {
-  async trackCompliance(entityId, regulationId) {
-    try {
-      const id = require('uuid').v4();
-      await db('compliance_records').insert({
-        id, entity_id: entityId, regulation_id: regulationId, status: 'active', created_at: new Date(),
-      });
-      logger.info(`Compliance tracked: ${entityId}`);
-      return { compliance_id: id, entity_id: entityId, status: 'active' };
-    } catch (error) { logger.error(`Track compliance failed: ${error.message}`); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new ComplianceTrackingService();

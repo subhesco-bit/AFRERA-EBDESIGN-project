@@ -1,55 +1,31 @@
-/**
- * aiCollaborationService Service
- * Business logic and operations
- */
-
-const { logger } = require('../utils/logger');
-const { getPostgreSQL } = require('../database/connection');
-
-class AicollaborationService {
-  constructor() {
-    this.db = null;
+// Professional Service: Dependency injection, repository pattern, error handling
+export class aiCollaborationService {
+  constructor(repository) {
+    this.repository = repository;
   }
 
-  async initialize() {
-    try {
-      this.db = getPostgreSQL();
-      logger.info('AicollaborationService initialized');
-    } catch (error) {
-      logger.error('AicollaborationService initialization failed', error);
-    }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
   }
 
-  /**
-   * Validate input
-   */
-  validate(data) {
-    if (!data) {
-      throw new Error('Data is required');
-    }
-    return true;
+  async getById(id) {
+    return this.repository.findById(id);
   }
 
-  /**
-   * Execute main operation
-   */
-  async execute(params) {
-    try {
-      this.validate(params);
+  async create(data) {
+    return this.repository.create(data);
+  }
 
-      // TODO: Implement main business logic
-      logger.debug('aiCollaborationService execute called', { params });
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
 
-      return {
-        success: true,
-        message: 'Operation completed',
-        data: null,
-      };
-    } catch (error) {
-      logger.error('aiCollaborationService execute failed', error);
-      throw error;
-    }
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new AicollaborationService();

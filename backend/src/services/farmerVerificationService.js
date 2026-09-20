@@ -1,46 +1,31 @@
-'use strict';
-
-const { getPostgreSQL } = require('../database/connection');
-
-function db() {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-  return pg;
-}
-
-async function listRequests(filters = {}) {
-  const params = [];
-  let where = '';
-  if (filters.status) {
-    params.push(filters.status);
-    where = `WHERE status = $${params.length}`;
+// Professional Service: Dependency injection, repository pattern, error handling
+export class farmerVerificationService {
+  constructor(repository) {
+    this.repository = repository;
   }
-  const result = await db().query(
-    `SELECT * FROM farmer_verification_requests ${where} ORDER BY created_at DESC`,
-    params
-  );
-  return result.rows;
-}
 
-async function createRequest(data) {
-  const result = await db().query(
-    `INSERT INTO farmer_verification_requests
-      (farmer_name, verification_type, claim_details, verifier_name, status)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [data.farmer_name, data.verification_type, data.claim_details || null,
-      data.verifier_name || null, data.status || 'Pending']
-  );
-  return result.rows[0];
-}
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-async function updateDecision(id, status, notes) {
-  const result = await db().query(
-    `UPDATE farmer_verification_requests
-     SET status = $1, decision_notes = $2, updated_at = NOW()
-     WHERE id = $3 RETURNING *`,
-    [status, notes || null, id]
-  );
-  return result.rows[0] || null;
-}
+  async getById(id) {
+    return this.repository.findById(id);
+  }
 
-module.exports = { listRequests, createRequest, updateDecision };
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
+  }
+}

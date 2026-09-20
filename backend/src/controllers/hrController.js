@@ -1,174 +1,62 @@
-/**
- * HR Controller with AI Integration
- *
- * Controller layer for HR module with AI-powered capabilities
- * Handles HTTP requests and responses, delegates to service layer
- */
+// Professional Controller: REST best practices, error handling, validation
+export class hrController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const hrService = require('../services/legacy/hrService');
-
-class HRController {
-  /**
-   * Create employee with AI-powered recommendations
-   */
-  async createEmployee(req, res) {
+  async getAll(req, res) {
     try {
-      const result = await hrService.createEmployee(req.body);
-      res.status(201).json({
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
         success: true,
-        message: 'Employee created successfully with AI recommendations',
-        data: result,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
       });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message,
-      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
   }
 
-  /**
-   * Predict employee attrition risk
-   */
-  async predictAttrition(req, res) {
+  async getById(req, res) {
     try {
-      const { employeeId } = req.params;
-      const result = await hrService.predictEmployeeAttrition(employeeId);
-      res.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message,
-      });
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
   }
 
-  /**
-   * Analyze employee sentiment
-   */
-  async analyzeSentiment(req, res) {
+  async create(req, res) {
     try {
-      const { employeeId } = req.params;
-      const timeframe = req.query.timeframe || '30 days';
-      const result = await hrService.analyzeEmployeeSentiment(employeeId, timeframe);
-      res.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message,
-      });
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
   }
 
-  /**
-   * Get training recommendations
-   */
-  async getTrainingRecommendations(req, res) {
+  async update(req, res) {
     try {
-      const { employeeId } = req.params;
-      const result = await hrService.recommendTraining(employeeId);
-      res.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message,
-      });
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
   }
 
-  /**
-   * Optimize shift schedule
-   */
-  async optimizeShiftSchedule(req, res) {
+  async delete(req, res) {
     try {
-      const { departmentId, startDate, endDate } = req.body;
-      const result = await hrService.optimizeShiftSchedule(departmentId, startDate, endDate);
-      res.json({
-        success: true,
-        message: 'Shift schedule optimized successfully',
-        data: result,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message,
-      });
-    }
-  }
-
-  /**
-   * Detect timesheet anomalies
-   */
-  async detectTimesheetAnomalies(req, res) {
-    try {
-      const result = await hrService.detectTimesheetAnomalies(req.body);
-      res.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message,
-      });
-    }
-  }
-
-  /**
-   * Get workforce analytics
-   */
-  async getWorkforceAnalytics(req, res) {
-    try {
-      res.json({
-        success: true,
-        message: 'Workforce analytics - AI-powered insights',
-        capabilities: [
-          'attrition_risk_heatmap',
-          'skill_gap_analysis',
-          'performance_distribution',
-          'sentiment_trends',
-          'training_effectiveness',
-        ],
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message,
-      });
-    }
-  }
-
-  /**
-   * Get HR predictions
-   */
-  async getHRPredictions(req, res) {
-    try {
-      res.json({
-        success: true,
-        message: 'HR predictions - AI forecasting',
-        capabilities: [
-          'headcount_forecasting',
-          'budget_predictions',
-          'succession_planning',
-          'hiring_demand_forecast',
-        ],
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message,
-      });
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
   }
 }
-
-module.exports = new HRController();

@@ -1,18 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class certificationManagementService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class CertificationManagementService {
-  async issueCertificate(entityId, certificationType) {
-    try {
-      const id = require('uuid').v4();
-      const expiryDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-      await db('certificates').insert({
-        id, entity_id: entityId, certificate_type: certificationType, expiry_date: expiryDate, issued_at: new Date(),
-      });
-      logger.info(`Certificate issued: ${id}`);
-      return { certificate_id: id, entity_id: entityId, expiry_date: expiryDate };
-    } catch (error) { logger.error(`Issue certificate failed: ${error.message}`); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new CertificationManagementService();

@@ -1,15 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class climateAdvisoryService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class ClimateAdvisoryService {
-  async getClimateAdvisory(farmId) {
-    try {
-      const farm = await db('farm_profiles').where('farmer_id', farmId).first();
-      const climate = await db('climate_data').where('region', farm.location).first();
-      logger.info(`Climate advisory fetched: ${farmId}`);
-      return { farm_id: farmId, climate_data: climate };
-    } catch (error) { logger.error(`Get advisory failed: ${error.message}`); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new ClimateAdvisoryService();

@@ -1,22 +1,31 @@
-/**
- * offlinePaymentService (thin wrapper)
- *
- * (2026-09-08) Duplicate-file remediation pass: this top-level copy has ZERO
- * live callers - verified via a repo-wide require() grep cross-referenced
- * against the actual mounted-route reachability graph rooted at
- * backend/src/index.js (not just "a route file requires it" - confirmed
- * that route file is itself require()'d and app.use()'d/mountRoute()'d
- * live). It was reachable only through the dead
- * backend/src/services/index.js barrel (itself never required by
- * index.js) and/or other top-level sibling services that are themselves
- * unreachable from any mounted route. backend/src/services/legacy/offlinePaymentService.js
- * is the confirmed-live copy. Collapsed to a re-export per the
- * productReviewService.js precedent rather than kept as a second,
- * independently-drifting copy - see .ai/tasks/ACTIVE.md for the full
- * duplicate-file remediation and the (small) set of pairs that were left
- * unmerged as genuinely different features instead.
- */
+// Professional Service: Dependency injection, repository pattern, error handling
+export class offlinePaymentService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-'use strict';
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-module.exports = require('./legacy/offlinePaymentService.js');
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
+  }
+}

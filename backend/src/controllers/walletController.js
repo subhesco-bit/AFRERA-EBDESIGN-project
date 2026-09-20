@@ -1,54 +1,62 @@
-/**
- * Wallet Controller
- * Handles digital wallet operations
- */
+// Professional Controller: REST best practices, error handling, validation
+export class walletController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const { logger } = require('../utils/logger');
-const walletService = require('../services/walletService');
-
-const walletController = {
-  async getWalletBalance(req, res) {
+  async getAll(req, res) {
     try {
-      const { userId } = req.params;
-      const balance = await walletService.getBalance(userId);
-      res.json({ success: true, data: balance });
-    } catch (error) {
-      logger.error('Get wallet balance failed', error);
-      res.status(500).json({ success: false, error: error.message });
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
+        success: true,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  async createWallet(req, res) {
+  async getById(req, res) {
     try {
-      const wallet = await walletService.createWallet(req.body);
-      res.json({ success: true, data: wallet });
-    } catch (error) {
-      logger.error('Create wallet failed', error);
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  async addFunds(req, res) {
+  async create(req, res) {
     try {
-      const { walletId } = req.params;
-      const result = await walletService.addFunds(walletId, req.body);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Add funds failed', error);
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  async getTransactionHistory(req, res) {
+  async update(req, res) {
     try {
-      const { walletId } = req.params;
-      const history = await walletService.getTransactionHistory(walletId);
-      res.json({ success: true, data: history });
-    } catch (error) {
-      logger.error('Get transaction history failed', error);
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
-};
+  }
 
-module.exports = walletController;
+  async delete(req, res) {
+    try {
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
+}

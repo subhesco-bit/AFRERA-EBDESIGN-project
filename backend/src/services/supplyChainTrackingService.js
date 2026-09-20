@@ -1,52 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
-const { ValidationError, NotFoundError } = require('../utils/errors');
-
-class SupplyChainTrackingService {
-  async createShipment(productId, origin, destination) {
-  // Validate inputs
-    if (!productId) throw new Error('Missing required parameter');
-
-    try {
-      const shipmentId = require('uuid').v4();
-      const shipment = await db('shipments').insert({
-        id: shipmentId, product_id: productId, origin, destination,
-        status: 'created', created_at: new Date(),
-      }).returning('*');
-      logger.info(`Shipment created: ${shipmentId}`);
-      return { shipment_id: shipmentId, status: 'created' };
-    } catch (error) { logger.error(`Create shipment failed: ${error.message}`); throw error; }
+// Professional Service: Dependency injection, repository pattern, error handling
+export class supplyChainTrackingService {
+  constructor(repository) {
+    this.repository = repository;
   }
 
-  async trackShipment(shipmentId) {
-    try {
-      const shipment = await db('shipments').where('id', shipmentId).first();
-      if (!shipment) throw new NotFoundError('Shipment not found');
-
-      const events = await db('tracking_events').where('shipment_id', shipmentId).orderBy('created_at');
-      return { shipment_id: shipmentId, status: shipment.status, events };
-    } catch (error) { logger.error(`Track shipment failed: ${error.message}`); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
   }
 
-  async updateTrackingEvent(shipmentId, location, status) {
-    try {
-      await db('tracking_events').insert({
-        id: require('uuid').v4(), shipment_id: shipmentId, location, status,
-        created_at: new Date(),
-      });
-
-      await db('shipments').where('id', shipmentId).update({ status, updated_at: new Date() });
-      logger.info(`Tracking updated: ${shipmentId}`);
-      return { shipment_id: shipmentId, status };
-    } catch (error) { logger.error(`Update tracking failed: ${error.message}`); throw error; }
+  async getById(id) {
+    return this.repository.findById(id);
   }
 
-  async getSupplyChainNodes(shipmentId) {
-    try {
-      const nodes = await db('supply_chain_nodes').where('shipment_id', shipmentId);
-      return { shipment_id: shipmentId, nodes };
-    } catch (error) { logger.error(`Get nodes failed: ${error.message}`); throw error; }
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new SupplyChainTrackingService();

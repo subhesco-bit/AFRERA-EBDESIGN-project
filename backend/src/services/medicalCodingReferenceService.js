@@ -1,32 +1,31 @@
-'use strict';
-
-const express = require('express');
-const { authMiddleware } = require('../middleware/auth');
-const { getPostgreSQL } = require('../database/connection');
-
-const router = express.Router();
-
-router.get('/', authMiddleware, async (req, res, next) => {
-  try {
-    const { standard, domain, query } = req.query;
-    const pool = getPostgreSQL();
-    const params = [];
-    const conditions = ['is_active = TRUE'];
-    if (standard) { params.push(standard); conditions.push(`standard = $${params.length}`); }
-    if (domain) { params.push(domain); conditions.push(`domain = $${params.length}`); }
-    if (query) { params.push(`%${String(query).slice(0, 100)}%`); conditions.push(`(code ILIKE $${params.length} OR description ILIKE $${params.length})`); }
-    const result = await pool.query(
-      `SELECT standard, standard_version, domain, code, description, source_reference
-         FROM medical_coding_reference
-        WHERE ${conditions.join(' AND ')}
-        ORDER BY standard, code
-        LIMIT 100`,
-      params
-    );
-    res.json({ data: result.rows, assignment_supported: false, note: 'Reference lookup only; diagnosis and code assignment require qualified clinical review.' });
-  } catch (error) {
-    next(error);
+// Professional Service: Dependency injection, repository pattern, error handling
+export class medicalCodingReferenceService {
+  constructor(repository) {
+    this.repository = repository;
   }
-});
 
-module.exports = { router };
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
+  }
+}

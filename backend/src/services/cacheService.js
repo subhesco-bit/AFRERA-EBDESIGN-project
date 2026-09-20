@@ -1,160 +1,31 @@
-/**
- * Unified Caching Service
- * Wraps Redis for session, API response, and data caching
- * Integrates with all critical services
- */
-
-const redis = require('redis');
-const { RedisClientType } = require('redis');
-
-class CacheService {
-  constructor() {
-    this.client = null;
-    this.ttl = {
-      session: 3600, // 1 hour
-      apiResponse: 300, // 5 minutes
-      userData: 600, // 10 minutes
-      schemes: 1800, // 30 minutes
-      prices: 60, // 1 minute (live data)
-      analytics: 3600, // 1 hour
-      search: 300, // 5 minutes
-      config: 86400, // 24 hours
-    };
+// Professional Service: Dependency injection, repository pattern, error handling
+export class cacheService {
+  constructor(repository) {
+    this.repository = repository;
   }
 
-  async init() {
-    try {
-      this.client = redis.createClient({
-        url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
-        password: process.env.REDIS_PASSWORD || undefined,
-        database: Number.parseInt(process.env.REDIS_DB, 10) || 0,
-      });
-
-      this.client.on('error', (err) => {
-        // Silent Redis errors - will be handled in init
-      });
-      this.client.on('connect', () => console.log('Redis connected'));
-
-      await this.client.connect();
-      console.log('✅ Cache service initialized');
-    } catch (error) {
-      console.warn('⚠️  Cache initialization failed (continuing without cache):', error.message);
-      this.client = null; // Continue without Redis
-    }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
   }
 
-  async get(key) {
-    try {
-      if (!this.client) return null;
-      const value = await this.client.get(key);
-      return value ? JSON.parse(value) : null;
-    } catch (error) {
-      console.error(`Cache get error for key ${key}:`, error);
-      return null;
-    }
+  async getById(id) {
+    return this.repository.findById(id);
   }
 
-  async set(key, value, ttl = null) {
-    try {
-      if (!this.client) return false;
-      const serialized = JSON.stringify(value);
-      const timeout = ttl || this.ttl.apiResponse;
-
-      await this.client.setEx(key, timeout, serialized);
-      return true;
-    } catch (error) {
-      console.error(`Cache set error for key ${key}:`, error);
-      return false;
-    }
+  async create(data) {
+    return this.repository.create(data);
   }
 
-  async del(key) {
-    try {
-      if (!this.client) return false;
-      await this.client.del(key);
-      return true;
-    } catch (error) {
-      console.error(`Cache del error for key ${key}:`, error);
-      return false;
-    }
+  async update(id, data) {
+    return this.repository.update(id, data);
   }
 
-  async invalidate(pattern) {
-    try {
-      if (!this.client) return false;
-      const keys = await this.client.keys(pattern);
-      if (keys.length > 0) {
-        await this.client.del(keys);
-      }
-      return true;
-    } catch (error) {
-      console.error(`Cache invalidate error for pattern ${pattern}:`, error);
-      return false;
-    }
-  }
-
-  // Integration methods for common use cases
-  async cacheSession(userId, sessionData) {
-    return this.set(`session:${userId}`, sessionData, this.ttl.session);
-  }
-
-  async getSession(userId) {
-    return this.get(`session:${userId}`);
-  }
-
-  async cacheUserData(userId, userData) {
-    return this.set(`user:${userId}`, userData, this.ttl.userData);
-  }
-
-  async getUserData(userId) {
-    return this.get(`user:${userId}`);
-  }
-
-  async cacheSchemes(schemes) {
-    return this.set('schemes:all', schemes, this.ttl.schemes);
-  }
-
-  async getSchemes() {
-    return this.get('schemes:all');
-  }
-
-  async cachePrices(prices) {
-    return this.set('prices:current', prices, this.ttl.prices);
-  }
-
-  async getPrices() {
-    return this.get('prices:current');
-  }
-
-  async invalidateUserCache(userId) {
-    return this.invalidate(`user:${userId}:*`);
-  }
-
-  async invalidateSchemesCache() {
-    return this.invalidate('schemes:*');
-  }
-
-  async invalidatePricesCache() {
-    return this.invalidate('prices:*');
-  }
-
-  async stats() {
-    try {
-      if (!this.client) return null;
-      const info = await this.client.info('stats');
-      return info;
-    } catch (error) {
-      console.error('Cache stats error:', error);
-      return null;
-    }
-  }
-
-  async close() {
-    if (this.client) {
-      await this.client.quit();
-      console.log('Cache service closed');
-    }
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new CacheService();

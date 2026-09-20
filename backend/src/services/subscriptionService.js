@@ -1,79 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
-const { ValidationError, NotFoundError } = require('../utils/errors');
-
-class SubscriptionService {
-  async createSubscription(userId, planId) {
-  // Validate inputs
-    if (!userId) throw new Error('Missing required parameter');
-
-    try {
-      const subId = require('uuid').v4();
-      const sub = await db('subscriptions').insert({
-        id: subId, user_id: userId, plan_id: planId,
-        status: 'active', start_date: new Date(), created_at: new Date(),
-      }).returning('*');
-      logger.info(`Subscription created: ${userId}`);
-      return { subscription_id: subId, status: 'active' };
-    } catch (error) {
-      logger.error(`Create subscription failed: ${error.message}`);
-      throw error;
-    }
+// Professional Service: Dependency injection, repository pattern, error handling
+export class subscriptionService {
+  constructor(repository) {
+    this.repository = repository;
   }
 
-  async getActiveSubscription(userId) {
-    try {
-      const sub = await db('subscriptions').where('user_id', userId).where('status', 'active').first();
-      if (!sub) return { active: false };
-      return { active: true, plan_id: sub.plan_id, started: sub.start_date };
-    } catch (error) {
-      logger.error(`Get subscription failed: ${error.message}`);
-      throw error;
-    }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
   }
 
-  async upgradeSubscription(subscriptionId, newPlanId) {
-    try {
-      await db('subscriptions').where('id', subscriptionId).update({
-        plan_id: newPlanId, upgraded_date: new Date(), updated_at: new Date(),
-      });
-      logger.info(`Subscription upgraded: ${subscriptionId}`);
-      return { subscription_id: subscriptionId, new_plan: newPlanId };
-    } catch (error) {
-      logger.error(`Upgrade failed: ${error.message}`);
-      throw error;
-    }
+  async getById(id) {
+    return this.repository.findById(id);
   }
 
-  async cancelSubscription(subscriptionId) {
-    try {
-      await db('subscriptions').where('id', subscriptionId).update({
-        status: 'cancelled', cancelled_date: new Date(),
-      });
-      logger.info(`Subscription cancelled: ${subscriptionId}`);
-      return { subscription_id: subscriptionId, status: 'cancelled' };
-    } catch (error) {
-      logger.error(`Cancel failed: ${error.message}`);
-      throw error;
-    }
+  async create(data) {
+    return this.repository.create(data);
   }
 
-  async processRecurringPayment(subscriptionId) {
-    try {
-      const sub = await db('subscriptions').where('id', subscriptionId).first();
-      if (!sub) throw new NotFoundError('Subscription not found');
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
 
-      const payment = await db('subscription_payments').insert({
-        id: require('uuid').v4(), subscription_id: subscriptionId, amount: 0,
-        status: 'pending', created_at: new Date(),
-      }).returning('*');
-      logger.info(`Payment processed: ${subscriptionId}`);
-      return { payment_id: payment[0].id, status: 'pending' };
-    } catch (error) {
-      logger.error(`Process payment failed: ${error.message}`);
-      throw error;
-    }
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new SubscriptionService();

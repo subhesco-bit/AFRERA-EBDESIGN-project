@@ -1,22 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class financialAnalyticsService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class FinancialAnalyticsService {
-  async generateFinancialStatement(userId) {
-  // Validate inputs
-    if (!userId) throw new Error('Missing required parameter');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-    try {
-      const orders = await db('orders').where('user_id', userId);
-      const totalRevenue = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
-      const totalOrders = orders.length;
-      const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
-      const statement = { user_id: userId, total_revenue: totalRevenue, total_orders: totalOrders, avg_order_value: avgOrderValue };
-      await db('financial_statements').insert({ id: require('uuid').v4(), user_id: userId, statement_data: JSON.stringify(statement), created_at: new Date() });
-      logger.info(`Financial statement generated: ${userId}`);
-      return statement;
-    } catch (error) { logger.error(`Generate statement failed: ${error.message}`); throw error; }
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new FinancialAnalyticsService();

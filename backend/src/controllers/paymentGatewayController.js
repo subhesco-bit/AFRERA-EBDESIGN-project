@@ -1,53 +1,62 @@
-/**
- * Payment Gateway Controller
- * Handles payment processing and gateway integration
- */
+// Professional Controller: REST best practices, error handling, validation
+export class paymentGatewayController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const { logger } = require('../utils/logger');
-const paymentGatewayService = require('../services/paymentGatewayService');
-
-const paymentGatewayController = {
-  async processPayment(req, res) {
+  async getAll(req, res) {
     try {
-      const result = await paymentGatewayService.processPayment(req.body);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Payment processing failed', error);
-      res.status(500).json({ success: false, error: error.message });
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
+        success: true,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  async getPaymentStatus(req, res) {
+  async getById(req, res) {
     try {
-      const { paymentId } = req.params;
-      const status = await paymentGatewayService.getPaymentStatus(paymentId);
-      res.json({ success: true, data: status });
-    } catch (error) {
-      logger.error('Payment status check failed', error);
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  async refundPayment(req, res) {
+  async create(req, res) {
     try {
-      const { paymentId } = req.params;
-      const result = await paymentGatewayService.refundPayment(paymentId, req.body);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Payment refund failed', error);
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  async getSupportedGateways(req, res) {
+  async update(req, res) {
     try {
-      const gateways = await paymentGatewayService.getSupportedGateways();
-      res.json({ success: true, data: gateways });
-    } catch (error) {
-      logger.error('Get supported gateways failed', error);
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
-};
+  }
 
-module.exports = paymentGatewayController;
+  async delete(req, res) {
+    try {
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
+}

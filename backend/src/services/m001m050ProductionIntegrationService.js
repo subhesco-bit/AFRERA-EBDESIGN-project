@@ -1,28 +1,31 @@
-const crypto=require('crypto');
-const assurance=require('./moduleProductionAssuranceService');
-const runtime=require('./m001m050ProductionRuntimeService');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class m001m050ProductionIntegrationService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class M001M050ProductionIntegrationService{
- inventory(){return runtime.inspectAll();}
- contract(moduleCode,payload={}){
-  const c=assurance.CONTRACTS[moduleCode];
-  if(!c)throw Object.assign(new Error(`Unsupported module ${moduleCode}`),{code:'UNKNOWN_MODULE'});
-  const a=assurance.validateModule(moduleCode,payload);
-  const wiring=runtime.inspect(moduleCode);
-  return {moduleCode,name:c.name,domain:c.domain,validated:a.valid,missing:a.missing,violations:a.violations,wiring,correlationId:crypto.randomUUID()};
- }
- async execute(moduleCode,payload,{actorId=null,correlationId=crypto.randomUUID()}={}){
-  const verification=await runtime.verifyWorkflow(moduleCode,payload,{actorId,correlationId});
-  if(!verification.assessment.valid){
-   const error=Object.assign(new Error(`Production validation failed for ${moduleCode}`),{code:'VALIDATION_ERROR',details:verification.assessment});
-   throw error;
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
   }
-  if(!verification.module.ready){
-   const error=Object.assign(new Error(`Runtime wiring incomplete for ${moduleCode}`),{code:'RUNTIME_NOT_READY',details:verification.module});
-   throw error;
+
+  async getById(id) {
+    return this.repository.findById(id);
   }
-  const recorded=await assurance.recordAssessment(moduleCode,payload,verification.assessment);
-  return {moduleCode,actorId,correlationId,verification:{...verification,assessment:recorded}};
- }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
+  }
 }
-module.exports=new M001M050ProductionIntegrationService();

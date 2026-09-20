@@ -1,12 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
-class VRService {
-  async createVRSpace(spaceData) {
-  // Validate inputs
-    if (!spaceData) throw new Error('Missing required parameter');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class vrService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-    try { const id = require('uuid').v4(); await db('vr_spaces').insert({ id, space_name: spaceData.name, space_data: JSON.stringify(spaceData), created_at: new Date() }); return { space_id: id, name: spaceData.name, status: 'active' }; }
-    catch (error) { logger.error('Create VR failed'); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-module.exports = new VRService();

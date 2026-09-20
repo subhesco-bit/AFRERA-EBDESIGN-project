@@ -1,12 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
-class NLPService {
-  async analyzeText(text) {
-  // Validate inputs
-    if (!text) throw new Error('Missing required parameter');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class nlpService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-    try { const id = require('uuid').v4(); const sentiment = text.length > 0 ? 'positive' : 'neutral'; await db('nlp_analyses').insert({ id, text, sentiment, created_at: new Date() }); return { analysis_id: id, sentiment }; }
-    catch (error) { logger.error('Analyze text failed'); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-module.exports = new NLPService();

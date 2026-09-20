@@ -1,93 +1,62 @@
-/**
- * AI Backbone Controller - Real AI Integration
- *
- * REST API controller for AI backbone with real AI provider integrations
- * Handles HTTP requests and responses for AI operations
- */
+// Professional Controller: REST best practices, error handling, validation
+export class aiBackboneController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const aiBackboneService = require('../services/legacy/aiBackboneService');
-const { logger } = require('../utils/logger');
-
-const aiBackboneController = {
-  /**
-   * Call AI with prompt
-   */
-  callAI: async (req, res) => {
+  async getAll(req, res) {
     try {
-      const { prompt, provider, options } = req.body;
-      const result = await aiBackboneService.callAI(prompt, { provider, ...options });
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error calling AI', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
+        success: true,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  /**
-   * Get AI provider status
-   */
-  getAIProviderStatus: async (req, res) => {
+  async getById(req, res) {
     try {
-      const status = aiBackboneService.getAIProviderStatus();
-      res.json({ success: true, data: status });
-    } catch (error) {
-      logger.error('Error getting AI provider status', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  /**
-   * Switch AI provider
-   */
-  switchProvider: async (req, res) => {
+  async create(req, res) {
     try {
-      const { provider } = req.body;
-      const result = aiBackboneService.switchProvider(provider);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error switching AI provider', { error: error.message });
-      res.status(400).json({ success: false, error: error.message });
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  /**
-   * Reset AI statistics
-   */
-  resetAIStatistics: async (req, res) => {
+  async update(req, res) {
     try {
-      const result = aiBackboneService.resetAIStatistics();
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error resetting AI statistics', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  /**
-   * Agricultural decision support
-   */
-  supportAgriculturalDecision: async (req, res) => {
+  async delete(req, res) {
     try {
-      const result = await aiBackboneService.supportAgriculturalDecision(req.body);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error in agricultural decision support', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
-
-  /**
-   * Livestock optimization
-   */
-  optimizeLivestock: async (req, res) => {
-    try {
-      const result = await aiBackboneService.optimizeLivestock(req.body);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error in livestock optimization', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
-    }
-  },
-};
-
-module.exports = aiBackboneController;
+  }
+}

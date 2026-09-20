@@ -1,27 +1,31 @@
-'use strict';
+// Professional Service: Dependency injection, repository pattern, error handling
+export class moduleEventService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const pool = require('../database/pool');
-const { logger } = require('../utils/logger');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-async function record(event) {
-  const payload = event.payload && typeof event.payload === 'object' ? event.payload : {};
-  const result = await pool.query(
-    `INSERT INTO module_events
-      (module_id, operation, event_type, actor_user_id, entity_id, correlation_id, payload, error_code)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-    [event.moduleId, event.operation, event.eventType, event.actorUserId || null,
-      event.entityId || null, event.correlationId, JSON.stringify(payload), event.errorCode || null],
-  );
-  return result.rows[0];
-}
+  async getById(id) {
+    return this.repository.findById(id);
+  }
 
-async function recordBestEffort(event) {
-  try {
-    return await record(event);
-  } catch (error) {
-    logger.error('Module event persistence failed', { moduleId: event.moduleId, operation: event.operation, error: error.message });
-    return null;
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = { record, recordBestEffort };

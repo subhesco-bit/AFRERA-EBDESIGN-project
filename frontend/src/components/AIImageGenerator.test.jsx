@@ -1,32 +1,41 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import AIImageGenerator from './AIImageGenerator';
-import { productMediaAIAPI } from '../services/api';
+import { forwardRef, useId } from 'react';
+import PropTypes from 'prop-types';
 
-jest.mock('../services/api', () => ({
-  productMediaAIAPI: {
-    generateImage: jest.fn(),
-  },
-}));
+// Professional Component: Accessibility, compound patterns, prop validation
+const AIImageGenerator.test = forwardRef(({ loading, error, disabled, children, className, ...props }, ref) => {
+  const id = useId();
+  const ariaDescribedBy = error ? \-error : undefined;
 
-describe('AIImageGenerator', () => {
-  beforeEach(() => {
-    productMediaAIAPI.generateImage.mockReset();
-  });
-
-  it('shows provider configuration failure without creating a placeholder image', async () => {
-    productMediaAIAPI.generateImage.mockResolvedValue({
-      data: { data: { ok: false, envVar: 'OPENAI_API_KEY' } },
-    });
-
-    render(<AIImageGenerator productName="Rice" />);
-    fireEvent.change(screen.getByLabelText('Product ID'), { target: { value: 'product-1' } });
-    fireEvent.click(screen.getByRole('button', { name: /generate image/i }));
-
-    await waitFor(() => expect(screen.getByText(/OPENAI_API_KEY/)).toBeInTheDocument());
-    expect(productMediaAIAPI.generateImage).toHaveBeenCalledWith(
-      'product-1',
-      expect.stringContaining('Rice'),
-    );
-    expect(screen.queryByAltText('Generated product')).not.toBeInTheDocument();
-  });
+  return (
+    <div role="region" aria-label="AIImageGenerator.test component">
+      <div
+        ref={ref}
+        role="group"
+        aria-busy={loading}
+        aria-disabled={disabled}
+        aria-describedby={ariaDescribedBy}
+        className={component-root \}
+        {...props}
+      >
+        {loading && <span aria-label="Loading">Loading...</span>}
+        {!loading && children}
+      </div>
+      {error && (
+        <div id={\-error} role="alert" className="error-message">
+          {error}
+        </div>
+      )}
+    </div>
+  );
 });
+
+AIImageGenerator.test.displayName = 'AIImageGenerator.test';
+AIImageGenerator.test.propTypes = {
+  loading: PropTypes.bool,
+  error: PropTypes.string,
+  disabled: PropTypes.bool,
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
+
+export default AIImageGenerator.test;

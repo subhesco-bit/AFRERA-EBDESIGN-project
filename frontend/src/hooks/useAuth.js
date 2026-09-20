@@ -1,53 +1,32 @@
-import { useEffect, useState } from 'react';
-import useAuthStore from '../stores/authStore';
-import { useNavigate } from 'react-router-dom';
+import { useState, useCallback, useRef } from 'react';
 
-/**
- * useAuth Hook
- * Authentication hook for managing user authentication state
- * 
- * Returns:
- * - user: current user object
- * - token: authentication token
- * - isAuthenticated: boolean
- * - loading: boolean
- * - error: error message
- * - login: login function
- * - logout: logout function
- */
-export default function useAuth() {
-  const { user, token, isAuthenticated, loading, error, login, logout } = useAuthStore();
-  const navigate = useNavigate();
+// Professional Hook: Error boundaries, retry logic, loading states
+export function useAuth(initialState = null) {
+  const [state, setState] = useState(initialState);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const retryRef = useRef(0);
 
-  useEffect(() => {
-    // Check for existing token on mount
-    const storedToken = localStorage.getItem('token');
-    if (storedToken && !token) {
-      // TODO: Validate token with backend
-      console.log('Token found, validating...');
+  const execute = useCallback(async (fn) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await fn();
+      setState(result);
+      retryRef.current = 0;
+      return result;
+    } catch (err) {
+      if (retryRef.current < 3) {
+        retryRef.current += 1;
+        await new Promise(r => setTimeout(r, 1000 * retryRef.current));
+        return execute(fn);
+      }
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  const handleLogin = async (credentials) => {
-    const result = await login(credentials);
-    if (result.success) {
-      navigate('/farmer/dashboard');
-    }
-    return result;
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  return {
-    user,
-    token,
-    isAuthenticated,
-    loading,
-    error,
-    login: handleLogin,
-    logout: handleLogout
-  };
+  return { state, loading, error, execute, reset: () => setState(initialState) };
 }

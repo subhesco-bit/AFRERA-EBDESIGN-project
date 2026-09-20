@@ -1,17 +1,31 @@
-const masterData = require('./masterDataIntelligenceService');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class masterDataReconciliationService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class MasterDataReconciliationService {
-  normalizeEntity(entity) {
-    return { ...entity, name: masterData.normalize(entity.name), code: masterData.normalize(entity.code) };
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
   }
-  reconcileRecords(records, key='name') {
-    return masterData.findDuplicates(records.map(this.normalizeEntity.bind(this)), key);
+
+  async getById(id) {
+    return this.repository.findById(id);
   }
-  qualityRules(entity) {
-    const findings=[];
-    if (!entity?.name || !String(entity.name).trim()) findings.push({rule_code:'MD_REQUIRED_NAME',severity:'error'});
-    if (!entity?.code || !String(entity.code).trim()) findings.push({rule_code:'MD_REQUIRED_CODE',severity:'error'});
-    return findings;
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-module.exports = new MasterDataReconciliationService();

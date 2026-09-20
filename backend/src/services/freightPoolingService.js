@@ -1,32 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
-
-class FreightPoolingService {
-  async createFreightPool(data) {
-  // Validate inputs
-    if (!data) throw new Error('Missing required parameter');
-
-    try {
-      const id = require('uuid').v4();
-      await db('freight_pools').insert({
-        id, origin: data.origin, destination: data.destination,
-        status: 'open', created_at: new Date(),
-      });
-      logger.info(`Freight pool created: ${id}`);
-      return { pool_id: id, status: 'open' };
-    } catch (error) { logger.error(`Create pool failed: ${error.message}`); throw error; }
+// Professional Service: Dependency injection, repository pattern, error handling
+export class freightPoolingService {
+  constructor(repository) {
+    this.repository = repository;
   }
 
-  async joinFreightPool(poolId, shipmentId) {
-    try {
-      await db('freight_shipments').insert({
-        id: require('uuid').v4(), freight_pool_id: poolId,
-        shipment_id: shipmentId, created_at: new Date(),
-      });
-      logger.info(`Shipment joined pool: ${poolId}`);
-      return { pool_id: poolId, shipment_id: shipmentId, status: 'joined' };
-    } catch (error) { logger.error(`Join pool failed: ${error.message}`); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new FreightPoolingService();

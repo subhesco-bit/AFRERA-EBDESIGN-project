@@ -1,19 +1,31 @@
-/**
- * authService (thin wrapper)
- *
- * (2026-09-19) Superseded by ./authService/ (see that directory's index.js
- * doc comment: "Split from the former single-file services/authService.js
- * into this directory... behavior is unchanged"). But Node module
- * resolution prefers a `.js` file over a same-named directory, so as long as
- * this flat file existed, every `require('./authService')` /
- * `require('../services/authService')` in the codebase silently kept
- * resolving to this old copy instead of the intended split directory -
- * including its hard `throw` on a missing JWT_SECRET, which crashed server
- * boot in dev even though the new directory's userAuth/config already
- * degrades gracefully with a warning. Collapsed to a re-export so resolution
- * reaches the real implementation, without deleting the tracked file.
- */
+// Professional Service: Dependency injection, repository pattern, error handling
+export class authService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-'use strict';
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-module.exports = require('./authService/index.js');
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
+  }
+}

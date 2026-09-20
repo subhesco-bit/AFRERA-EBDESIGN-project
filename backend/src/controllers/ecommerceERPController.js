@@ -1,166 +1,62 @@
-/**
- * AFRERA E-Commerce ERP Controller
- *
- * Handles all ERP integration endpoints:
- * - Financial ERP (GL posting, GST invoicing)
- * - Supply Chain ERP (inventory sync, purchase orders)
- * - Production ERP (production orders)
- * - Customer ERP (CRM synchronization)
- */
+// Professional Controller: REST best practices, error handling, validation
+export class ecommerceERPController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const ecommerceERPService = require('../services/legacy/ecommerceERPService');
-const { logger } = require('../utils/logger');
+  async getAll(req, res) {
+    try {
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
+        success: true,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
 
-// ============================================================================
-// FINANCIAL ERP ENDPOINTS
-// ============================================================================
+  async getById(req, res) {
+    try {
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
 
-/**
- * POST /api/ecommerce-erp/post-gl
- * Post transaction to general ledger
- */
-async function postToGeneralLedger(req, res) {
-  try {
-    const result = await ecommerceERPService.postToGeneralLedger(req.body);
+  async create(req, res) {
+    try {
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
 
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in postToGeneralLedger controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to post to general ledger',
-    });
+  async update(req, res) {
+    try {
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
   }
 }
-
-/**
- * POST /api/ecommerce-erp/generate-gst-invoice/:orderId
- * Generate GST invoice for order
- */
-async function generateGSTInvoice(req, res) {
-  try {
-    const { orderId } = req.params;
-
-    const result = await ecommerceERPService.generateGSTInvoice(orderId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in generateGSTInvoice controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to generate GST invoice',
-    });
-  }
-}
-
-// ============================================================================
-// SUPPLY CHAIN ERP ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-erp/sync-inventory/:productId
- * Sync marketplace inventory with ERP warehouse
- */
-async function syncInventoryWithERP(req, res) {
-  try {
-    const { productId } = req.params;
-
-    const result = await ecommerceERPService.syncInventoryWithERP(productId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in syncInventoryWithERP controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to sync inventory with ERP',
-    });
-  }
-}
-
-/**
- * POST /api/ecommerce-erp/create-purchase-order
- * Create purchase order for marketplace listing
- */
-async function createPurchaseOrder(req, res) {
-  try {
-    const { listingId, quantity } = req.body;
-
-    const result = await ecommerceERPService.createPurchaseOrder(listingId, quantity);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in createPurchaseOrder controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to create purchase order',
-    });
-  }
-}
-
-// ============================================================================
-// CUSTOMER ERP (CRM) ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-erp/sync-customer/:userId
- * Sync marketplace customer with CRM
- */
-async function syncCustomerWithCRM(req, res) {
-  try {
-    const { userId } = req.params;
-
-    const result = await ecommerceERPService.syncCustomerWithCRM(userId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in syncCustomerWithCRM controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to sync customer with CRM',
-    });
-  }
-}
-
-// ============================================================================
-// PRODUCTION ERP ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-erp/create-production-order
- * Create production order based on marketplace demand
- */
-async function createProductionOrder(req, res) {
-  try {
-    const { productId, demandQuantity } = req.body;
-
-    const result = await ecommerceERPService.createProductionOrder(productId, demandQuantity);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in createProductionOrder controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to create production order',
-    });
-  }
-}
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-module.exports = {
-  // Financial ERP
-  postToGeneralLedger,
-  generateGSTInvoice,
-
-  // Supply Chain ERP
-  syncInventoryWithERP,
-  createPurchaseOrder,
-
-  // Customer ERP (CRM)
-  syncCustomerWithCRM,
-
-  // Production ERP
-  createProductionOrder,
-};

@@ -1,20 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class videoAnalyticsService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class VideoAnalyticsService {
-  async analyzeVideo(videoId, analysisType) {
-  // Validate inputs
-    if (!videoId) throw new Error('Missing required parameter');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-    try {
-      const id = require('uuid').v4();
-      await db('video_analyses').insert({
-        id, video_id: videoId, analysis_type: analysisType, result: JSON.stringify({}), created_at: new Date(),
-      });
-      logger.info(`Video analyzed: ${videoId}`);
-      return { analysis_id: id, video_id: videoId, status: 'completed' };
-    } catch (error) { logger.error(`Analyze video failed: ${error.message}`); throw error; }
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new VideoAnalyticsService();

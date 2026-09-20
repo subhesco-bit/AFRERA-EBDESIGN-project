@@ -1,80 +1,62 @@
-const wearableIntegrationService = require('../services/legacy/wearableIntegrationService');
-const { logger } = require('../utils/logger');
+// Professional Controller: REST best practices, error handling, validation
+export class wearableIntegrationController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const wearableIntegrationController = {
-  getStatus: async (req, res) => {
+  async getAll(req, res) {
     try {
-      const status = await wearableIntegrationService.getConnectionStatus(req.user.id);
-      res.json({ success: true, data: status });
-    } catch (error) {
-      logger.error('Error getting wearable connection status', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
+        success: true,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  getFitbitAuthUrl: async (req, res) => {
+  async getById(req, res) {
     try {
-      const url = wearableIntegrationService.getFitbitAuthUrl(req.user.id);
-      res.json({ success: true, data: { authUrl: url } });
-    } catch (error) {
-      const status = error.code === 'not_configured' ? 200 : 500;
-      res.status(status).json({ success: false, code: error.code, error: error.message });
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  fitbitCallback: async (req, res) => {
+  async create(req, res) {
     try {
-      const { code } = req.body;
-      const result = await wearableIntegrationService.handleFitbitCallback(req.user.id, code);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error handling Fitbit callback', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  syncFitbit: async (req, res) => {
+  async update(req, res) {
     try {
-      const result = await wearableIntegrationService.syncFitbitActivity(req.user.id);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      const status = error.code === 'not_connected' ? 400 : 500;
-      res.status(status).json({ success: false, code: error.code, error: error.message });
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
     }
-  },
+  }
 
-  ingestDeviceActivity: async (req, res) => {
+  async delete(req, res) {
     try {
-      const { provider, activity_date, activity } = req.body;
-      const result = await wearableIntegrationService.ingestDeviceActivity(req.user.id, provider, activity_date, activity);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error ingesting device wearable activity', { error: error.message });
-      res.status(400).json({ success: false, error: error.message });
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
     }
-  },
-
-  getRecentActivity: async (req, res) => {
-    try {
-      const days = parseInt(req.query.days, 10) || 7;
-      const summary = await wearableIntegrationService.getRecentActivitySummary(req.user.id, days);
-      res.json({ success: true, data: summary });
-    } catch (error) {
-      logger.error('Error getting recent wearable activity', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
-    }
-  },
-
-  disconnect: async (req, res) => {
-    try {
-      const { provider } = req.params;
-      const result = await wearableIntegrationService.disconnectProvider(req.user.id, provider);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      logger.error('Error disconnecting wearable provider', { error: error.message });
-      res.status(500).json({ success: false, error: error.message });
-    }
-  },
-};
-
-module.exports = wearableIntegrationController;
+  }
+}

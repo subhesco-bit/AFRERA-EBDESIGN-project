@@ -1,21 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class qualityAssuranceService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class QualityAssuranceService {
-  async inspectProduct(productId, inspectionData) {
-  // Validate inputs
-    if (!productId) throw new Error('Missing required parameter');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-    try {
-      const result = inspectionData.quality_score >= 80 ? 'pass' : 'fail';
-      const id = require('uuid').v4();
-      await db('qa_inspections').insert({
-        id, product_id: productId, quality_score: inspectionData.quality_score, result, created_at: new Date(),
-      });
-      logger.info(`QA inspection completed: ${productId}`);
-      return { inspection_id: id, product_id: productId, result };
-    } catch (error) { logger.error(`QA inspection failed: ${error.message}`); throw error; }
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new QualityAssuranceService();

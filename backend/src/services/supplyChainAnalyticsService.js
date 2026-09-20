@@ -1,21 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class supplyChainAnalyticsService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class SupplyChainAnalyticsService {
-  async analyzeShipments(origin, destination) {
-  // Validate inputs
-    if (!origin) throw new Error('Missing required parameter');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-    try {
-      const shipments = await db('shipments').where('origin', origin).andWhere('destination', destination);
-      const avgDeliveryTime = shipments.length ? shipments.reduce((sum, s) => sum + (s.delivery_time || 0), 0) / shipments.length : 0;
-      const totalCost = shipments.reduce((sum, s) => sum + (s.cost || 0), 0);
-      const analysis = { origin, destination, shipment_count: shipments.length, avg_delivery_time: avgDeliveryTime, total_cost: totalCost };
-      await db('supply_chain_analytics').insert({ id: require('uuid').v4(), analysis_data: JSON.stringify(analysis), created_at: new Date() });
-      logger.info(`Supply chain analysis completed: ${origin}-${destination}`);
-      return analysis;
-    } catch (error) { logger.error(`Analyze shipments failed: ${error.message}`); throw error; }
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new SupplyChainAnalyticsService();

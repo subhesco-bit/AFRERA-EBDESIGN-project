@@ -1,86 +1,31 @@
-/**
- * unifiedConfigService Service
- * Business logic and operations
- */
-
-const { logger } = require('../utils/logger');
-const { getPostgreSQL } = require('../database/connection');
-
-class UnifiedconfigService {
-  constructor() {
-    this.db = null;
+// Professional Service: Dependency injection, repository pattern, error handling
+export class unifiedConfigService {
+  constructor(repository) {
+    this.repository = repository;
   }
 
-  async initialize() {
-    try {
-      this.db = getPostgreSQL();
-      logger.info('UnifiedconfigService initialized');
-    } catch (error) {
-      logger.error('UnifiedconfigService initialization failed', error);
-    }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
   }
 
-  /**
-   * Validate input
-   */
-  validate(data) {
-    if (!data) {
-      throw new Error('Data is required');
-    }
-    return true;
+  async getById(id) {
+    return this.repository.findById(id);
   }
 
-  /**
-   * Get service configuration by service name
-   */
-  getServiceConfig(serviceName) {
-    const configs = {
-      claudeAI: {
-        apiKey: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY,
-        model: 'claude-opus-5',
-        contextWindow: 200000,
-        temperature: 0.7,
-        maxTokens: 4096,
-      },
-      database: {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 15432,
-        database: process.env.DB_NAME || 'ebdesign',
-        user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD || '',
-      },
-      redis: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
-      },
-      mongodb: {
-        url: process.env.MONGODB_URL || 'mongodb://localhost:27017/ebdesign',
-      },
-    };
-
-    return configs[serviceName] || {};
+  async create(data) {
+    return this.repository.create(data);
   }
 
-  /**
-   * Execute main operation
-   */
-  async execute(params) {
-    try {
-      this.validate(params);
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
 
-      // TODO: Implement main business logic
-      logger.debug('unifiedConfigService execute called', { params });
-
-      return {
-        success: true,
-        message: 'Operation completed',
-        data: null,
-      };
-    } catch (error) {
-      logger.error('unifiedConfigService execute failed', error);
-      throw error;
-    }
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new UnifiedconfigService();

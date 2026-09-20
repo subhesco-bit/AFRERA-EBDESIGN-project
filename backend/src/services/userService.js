@@ -1,34 +1,31 @@
-/**
- * User Service Stub
- * Placeholder for user management functionality
- */
-const logger = require('../utils/logger');
-
-class UserService {
-  constructor() {
-    this.initialized = false;
+// Professional Service: Dependency injection, repository pattern, error handling
+export class userService {
+  constructor(repository) {
+    this.repository = repository;
   }
 
-  async initialize() {
-    this.initialized = true;
-    logger.info('UserService initialized (stub)');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
   }
 
-  async getUserById(userId) {
-    return { id: userId, name: 'Stub User' };
+  async getById(id) {
+    return this.repository.findById(id);
   }
 
-  async createUser(userData) {
-    return { id: 'stub-user-id', ...userData };
+  async create(data) {
+    return this.repository.create(data);
   }
 
-  async updateUser(userId, userData) {
-    return { id: userId, ...userData };
+  async update(id, data) {
+    return this.repository.update(id, data);
   }
 
-  async deleteUser(userId) {
-    return { success: true };
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new UserService();

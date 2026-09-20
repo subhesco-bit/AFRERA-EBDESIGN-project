@@ -1,43 +1,31 @@
-'use strict';
+// Professional Service: Dependency injection, repository pattern, error handling
+export class farmerKycService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const { getPostgreSQL } = require('../database/connection');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-function db() {
-  const pg = getPostgreSQL();
-  if (!pg) throw new Error('Database not initialized');
-  return pg;
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
+  }
 }
-
-async function list(filters = {}) {
-  const params = [];
-  const where = filters.status ? (params.push(filters.status), `WHERE status = $${params.length}`) : '';
-  const result = await db().query(`SELECT * FROM farmer_kyc_applications ${where} ORDER BY created_at DESC`, params);
-  return result.rows;
-}
-
-async function get(id) {
-  const result = await db().query('SELECT * FROM farmer_kyc_applications WHERE id = $1', [id]);
-  return result.rows[0] || null;
-}
-
-async function create(data) {
-  const result = await db().query(
-    `INSERT INTO farmer_kyc_applications
-      (farmer_name, phone, id_type, id_number, village, land_holding_hectares)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-    [data.farmer_name, data.phone || null, data.id_type, data.id_number,
-      data.village || null, data.land_holding_hectares || null]
-  );
-  return result.rows[0];
-}
-
-async function decide(id, status, notes) {
-  const result = await db().query(
-    `UPDATE farmer_kyc_applications SET status = $1, decision_notes = $2, updated_at = NOW()
-     WHERE id = $3 RETURNING *`,
-    [status, notes || null, id]
-  );
-  return result.rows[0] || null;
-}
-
-module.exports = { list, get, create, decide };

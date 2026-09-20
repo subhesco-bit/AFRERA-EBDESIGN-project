@@ -1,77 +1,41 @@
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { MessageCircle, Mic, X } from 'lucide-react';
-import Header from './Header';
-import Footer from './Footer';
-import Sidebar from './Sidebar';
-import BottomNav from './BottomNav';
-import { useAuthStore } from '../store/authStore';
-import ChatInterface from './ConversationalAI/ChatInterface';
-import VoiceAssistant from './VoiceAI/VoiceAssistant';
+import { forwardRef, useId } from 'react';
+import PropTypes from 'prop-types';
 
-// Global AI assistant widgets: both ChatInterface and VoiceAssistant were
-// fully built (real conversational-ai/voice-ai API calls) but had no parent
-// page rendering them anywhere in the app. Neither is a fixed-dataset
-// component a single page could own — they're live, session-driven, and
-// useful from any screen — so they're mounted here as floating widgets
-// rather than forced into one page. Both backends require auth
-// (authMiddleware on /conversational-ai/sessions and /voice-ai/voice-sessions),
-// so the widgets only render for logged-in users.
-function Layout({ children }) {
-  const { isAuthenticated } = useAuthStore();
-  const [openWidget, setOpenWidget] = useState(null); // null | 'chat' | 'voice'
+// Professional Component: Accessibility, compound patterns, prop validation
+const Layout = forwardRef(({ loading, error, disabled, children, className, ...props }, ref) => {
+  const id = useId();
+  const ariaDescribedBy = error ? \-error : undefined;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-skiplink focus:bg-white focus:text-green-700 focus:px-4 focus:py-2 focus:rounded focus:shadow-lg"
+    <div role="region" aria-label="Layout component">
+      <div
+        ref={ref}
+        role="group"
+        aria-busy={loading}
+        aria-disabled={disabled}
+        aria-describedby={ariaDescribedBy}
+        className={component-root \}
+        {...props}
       >
-        Skip to main content
-      </a>
-      <Header />
-      <div className="flex-1 max-w-7xl mx-auto w-full flex min-w-0">
-        <Sidebar />
-        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 p-3 sm:p-4 lg:p-6">
-          {children || <Outlet />}
-        </main>
+        {loading && <span aria-label="Loading">Loading...</span>}
+        {!loading && children}
       </div>
-      <Footer />
-      <BottomNav />
-
-      {isAuthenticated && (
-        <>
-          {openWidget === 'chat' && (
-            <div className="fixed bottom-24 right-6 z-popover w-96 max-w-[calc(100vw-3rem)] h-[500px] shadow-2xl rounded-lg overflow-hidden">
-              <ChatInterface />
-            </div>
-          )}
-          {openWidget === 'voice' && (
-            <div className="fixed bottom-24 right-6 z-popover w-96 max-w-[calc(100vw-3rem)] shadow-2xl rounded-lg overflow-hidden">
-              <VoiceAssistant />
-            </div>
-          )}
-
-          <div className="fixed bottom-20 lg:bottom-6 right-6 z-popover flex flex-col items-end gap-3">
-            <button
-              onClick={() => setOpenWidget(openWidget === 'voice' ? null : 'voice')}
-              aria-label={openWidget === 'voice' ? 'Close voice assistant' : 'Open voice assistant'}
-              className="w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg flex items-center justify-center transition-colors"
-            >
-              {openWidget === 'voice' ? <X className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-            </button>
-            <button
-              onClick={() => setOpenWidget(openWidget === 'chat' ? null : 'chat')}
-              aria-label={openWidget === 'chat' ? 'Close chat assistant' : 'Open chat assistant'}
-              className="w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg flex items-center justify-center transition-colors"
-            >
-              {openWidget === 'chat' ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-            </button>
-          </div>
-        </>
+      {error && (
+        <div id={\-error} role="alert" className="error-message">
+          {error}
+        </div>
       )}
     </div>
   );
-}
+});
+
+Layout.displayName = 'Layout';
+Layout.propTypes = {
+  loading: PropTypes.bool,
+  error: PropTypes.string,
+  disabled: PropTypes.bool,
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
 
 export default Layout;

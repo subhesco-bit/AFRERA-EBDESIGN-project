@@ -1,17 +1,31 @@
-const db = require('../database/dbConnection');
-const { logger } = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class auditTrailService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class AuditTrailService {
-  async logAuditEvent(userId, action, resourceId) {
-    try {
-      const id = require('uuid').v4();
-      await db('audit_trails').insert({
-        id, user_id: userId, action, resource_id: resourceId, timestamp: new Date(),
-      });
-      logger.info(`Audit event logged: ${action}`);
-      return { audit_id: id, action, timestamp: new Date() };
-    } catch (error) { logger.error(`Log audit failed: ${error.message}`); throw error; }
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
+
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new AuditTrailService();

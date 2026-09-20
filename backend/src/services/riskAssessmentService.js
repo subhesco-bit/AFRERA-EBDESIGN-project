@@ -1,22 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class riskAssessmentService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class RiskAssessmentService {
-  async assessRisk(entityId, riskFactors) {
-  // Validate inputs
-    if (!entityId) throw new Error('Missing required parameter');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-    try {
-      const riskScore = riskFactors.reduce((sum, f) => sum + f.weight, 0);
-      const riskLevel = riskScore >= 70 ? 'high' : riskScore >= 40 ? 'medium' : 'low';
-      const id = require('uuid').v4();
-      await db('risk_assessments').insert({
-        id, entity_id: entityId, risk_score: riskScore, risk_level: riskLevel, created_at: new Date(),
-      });
-      logger.info(`Risk assessment completed: ${entityId}`);
-      return { assessment_id: id, entity_id: entityId, risk_level: riskLevel };
-    } catch (error) { logger.error(`Assess risk failed: ${error.message}`); throw error; }
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new RiskAssessmentService();

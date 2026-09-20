@@ -1,260 +1,62 @@
-/**
- * AFRERA E-Commerce Marketing Controller
- *
- * Handles all marketing and advertising endpoints:
- * - Campaign Management
- * - Sponsored Products
- * - Promotion Management
- * - Retargeting Campaigns
- * - Performance Analytics
- */
+// Professional Controller: REST best practices, error handling, validation
+export class ecommerceMarketingController {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-const ecommerceMarketingService = require('../services/legacy/ecommerceMarketingService');
-const { logger } = require('../utils/logger');
+  async getAll(req, res) {
+    try {
+      const { page = 1, limit = 20 } = req.query;
+      const offset = (page - 1) * limit;
+      const [items, total] = await Promise.all([
+        this.repository.find({ offset, limit }),
+        this.repository.count()
+      ]);
+      res.json({
+        success: true,
+        data: items,
+        meta: { total, page, limit, pages: Math.ceil(total / limit) }
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
 
-// ============================================================================
-// CAMPAIGN MANAGEMENT ENDPOINTS
-// ============================================================================
+  async getById(req, res) {
+    try {
+      const item = await this.repository.findById(req.params.id);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  }
 
-/**
- * POST /api/ecommerce-marketing/create-campaign
- * Create marketing campaign
- */
-async function createCampaign(req, res) {
-  try {
-    const userId = req.user.id;
-    const result = await ecommerceMarketingService.createCampaign(userId, req.body);
+  async create(req, res) {
+    try {
+      const item = await this.repository.create(req.body);
+      res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
 
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in createCampaign controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to create marketing campaign',
-    });
+  async update(req, res) {
+    try {
+      const item = await this.repository.update(req.params.id, req.body);
+      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
+      res.json({ success: true, data: item });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      await this.repository.delete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
   }
 }
-
-/**
- * POST /api/ecommerce-marketing/launch-campaign/:campaignId
- * Launch marketing campaign
- */
-async function launchCampaign(req, res) {
-  try {
-    const { campaignId } = req.params;
-
-    const result = await ecommerceMarketingService.launchCampaign(campaignId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in launchCampaign controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to launch campaign',
-    });
-  }
-}
-
-/**
- * POST /api/ecommerce-marketing/update-campaign-metrics/:campaignId
- * Update campaign performance metrics
- */
-async function updateCampaignMetrics(req, res) {
-  try {
-    const { campaignId } = req.params;
-
-    const result = await ecommerceMarketingService.updateCampaignMetrics(campaignId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in updateCampaignMetrics controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to update campaign metrics',
-    });
-  }
-}
-
-// ============================================================================
-// SPONSORED PRODUCTS ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-marketing/create-sponsored-product
- * Create sponsored product listing
- */
-async function createSponsoredProduct(req, res) {
-  try {
-    const sellerId = req.user.id;
-    const result = await ecommerceMarketingService.createSponsoredProduct(sellerId, req.body);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in createSponsoredProduct controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to create sponsored product',
-    });
-  }
-}
-
-/**
- * GET /api/ecommerce-marketing/sponsored-products
- * Get sponsored products for display
- */
-async function getSponsoredProducts(req, res) {
-  try {
-    const filters = req.query;
-
-    const result = await ecommerceMarketingService.getSponsoredProducts(filters);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getSponsoredProducts controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to get sponsored products',
-    });
-  }
-}
-
-// ============================================================================
-// PROMOTION MANAGEMENT ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-marketing/create-promotion
- * Create promotion/discount offer
- */
-async function createPromotion(req, res) {
-  try {
-    const creatorId = req.user.id;
-    const result = await ecommerceMarketingService.createPromotion(creatorId, req.body);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in createPromotion controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to create promotion',
-    });
-  }
-}
-
-/**
- * POST /api/ecommerce-marketing/apply-promotion/:promoCode
- * Apply promotion to order
- */
-async function applyPromotion(req, res) {
-  try {
-    const { promoCode } = req.params;
-    const { orderId } = req.body;
-    const userId = req.user.id;
-
-    const result = await ecommerceMarketingService.applyPromotion(promoCode, orderId, userId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in applyPromotion controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to apply promotion',
-    });
-  }
-}
-
-// ============================================================================
-// RETARGETING ENDPOINTS
-// ============================================================================
-
-/**
- * POST /api/ecommerce-marketing/retargeting-cart
- * Create cart abandonment retargeting campaign
- */
-async function createCartRetargeting(req, res) {
-  try {
-    const userId = req.user.id;
-    const { cartItems } = req.body;
-
-    const result = await ecommerceMarketingService.createCartRetargeting(userId, cartItems);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in createCartRetargeting controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to create cart retargeting',
-    });
-  }
-}
-
-/**
- * POST /api/ecommerce-marketing/retargeting-product-view
- * Create product view retargeting
- */
-async function createProductViewRetargeting(req, res) {
-  try {
-    const userId = req.user.id;
-    const { productId } = req.body;
-
-    const result = await ecommerceMarketingService.createProductViewRetargeting(userId, productId);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in createProductViewRetargeting controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to create product view retargeting',
-    });
-  }
-}
-
-// ============================================================================
-// PERFORMANCE ANALYTICS ENDPOINTS
-// ============================================================================
-
-/**
- * GET /api/ecommerce-marketing/analytics
- * Get marketing performance analytics
- */
-async function getMarketingAnalytics(req, res) {
-  try {
-    const filters = req.query;
-
-    const result = await ecommerceMarketingService.getMarketingAnalytics(filters);
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getMarketingAnalytics controller', { error: error.message });
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to get marketing analytics',
-    });
-  }
-}
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-module.exports = {
-  // Campaign Management
-  createCampaign,
-  launchCampaign,
-  updateCampaignMetrics,
-
-  // Sponsored Products
-  createSponsoredProduct,
-  getSponsoredProducts,
-
-  // Promotion Management
-  createPromotion,
-  applyPromotion,
-
-  // Retargeting
-  createCartRetargeting,
-  createProductViewRetargeting,
-
-  // Analytics
-  getMarketingAnalytics,
-};

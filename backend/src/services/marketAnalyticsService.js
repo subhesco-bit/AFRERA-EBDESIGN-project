@@ -1,22 +1,31 @@
-const db = require('../database/dbConnection');
-const logger = require('../utils/logger');
+// Professional Service: Dependency injection, repository pattern, error handling
+export class marketAnalyticsService {
+  constructor(repository) {
+    this.repository = repository;
+  }
 
-class MarketAnalyticsService {
-  async analyzeMarket(productId) {
-  // Validate inputs
-    if (!productId) throw new Error('Missing required parameter');
+  async getAll(page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.repository.find({ offset, limit }),
+      this.repository.count()
+    ]);
+    return { items, total, page, limit };
+  }
 
-    try {
-      const prices = await db('price_history').where('product_id', productId).orderBy('created_at', 'desc').limit(30);
-      const avgPrice = prices.length ? prices.reduce((sum, p) => sum + p.price, 0) / prices.length : 0;
-      const maxPrice = prices.length ? Math.max(...prices.map(p => p.price)) : 0;
-      const minPrice = prices.length ? Math.min(...prices.map(p => p.price)) : 0;
-      const analysis = { product_id: productId, avg_price: avgPrice, max_price: maxPrice, min_price: minPrice, volatility: maxPrice - minPrice };
-      await db('market_analytics').insert({ id: require('uuid').v4(), product_id: productId, analysis_data: JSON.stringify(analysis), created_at: new Date() });
-      logger.info(`Market analysis completed: ${productId}`);
-      return analysis;
-    } catch (error) { logger.error(`Analyze market failed: ${error.message}`); throw error; }
+  async getById(id) {
+    return this.repository.findById(id);
+  }
+
+  async create(data) {
+    return this.repository.create(data);
+  }
+
+  async update(id, data) {
+    return this.repository.update(id, data);
+  }
+
+  async delete(id) {
+    return this.repository.delete(id);
   }
 }
-
-module.exports = new MarketAnalyticsService();
