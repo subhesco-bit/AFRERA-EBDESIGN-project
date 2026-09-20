@@ -180,9 +180,18 @@ export const gdprAPI = {
   processRequest: (data) => api.post('/gdpr/request', data),
 };
 
+// mfaAPI: components/MFA/MFASetup.jsx (rendered by the routed
+// MFASetupPage.jsx) calls setup()/verify() - names this object never had
+// (enableMFA/verifyMFA were fabricated, unrelated - would throw "not a
+// function"). routes/dual-use/mfaRoutes.js is now mounted at /api/v1/mfa
+// (real TOTP/QR-code generation); the page's response.data.data.qrCode
+// access matches its real response shape exactly. Known backend gap: MFA
+// persistence itself is a stub (see index.js's mount comment), so
+// verify() will honestly fail until that's fixed - not papered over here.
 export const mfaAPI = {
-  enableMFA: (data) => api.post('/mfa/enable', data),
-  verifyMFA: (data) => api.post('/mfa/verify', data),
+  setup: () => api.post('/mfa/setup'),
+  verify: (userId, token) => api.post('/mfa/verify', { userId, token }),
+  disable: () => api.post('/mfa/disable'),
 };
 
 export const sessionAPI = {
@@ -434,8 +443,12 @@ export const insuranceAPI = {
   submitClaim: data => api.post(`${UNVERSIONED_BASE}/api/v1/insurance/claims`, data),
 };
 
+// logisticsAPI: services/legacy/logisticsService.js is now mounted at
+// /api/v1/logistics (the plain relative path below already resolves there
+// via this axios instance's /api/v1 baseURL). SupplyChainAnalyticsPage.jsx
+// passes (filters, pagination) that getShipments() used to silently drop.
 export const logisticsAPI = {
-  getShipments: () => api.get('/logistics/shipments'),
+  getShipments: (filters, pagination) => api.get('/logistics/shipments', { params: { ...filters, ...pagination } }),
   createShipment: (data) => api.post('/logistics/shipments', data),
 };
 

@@ -542,6 +542,22 @@ async function startup() {
     app.use('/api/v1/ai/training', aiTrainingEvaluationRoutes);
     app.use('/api/monitoring', infrastructureMonitoringRoutes);
     app.use('/api/v1/monitoring', infrastructureMonitoringRoutes);
+    // routes/dual-use/mfaRoutes.js is real (TOTP secret/QR/backup-code
+    // generation via services/dual-use/mfaService.js, real crypto), never
+    // mounted anywhere - MFASetupPage.jsx's mfaAPI.setup()/verify() calls
+    // have been 404ing. Mounted at the path the route file's own comments
+    // document (/api/v1/mfa/setup etc). Known gap, not fixed here: MFA
+    // persistence is itself a stub (enableMFA()/isMFAEnabled() never touch
+    // the database - 3 different, mutually conflicting mfa_secrets schema
+    // migrations exist, so picking one is a separate, riskier fix) - setup
+    // generates a real QR code but the secret isn't saved, so /verify will
+    // honestly report "MFA not enabled" rather than silently fabricate a
+    // pass.
+    app.use('/api/v1/mfa', require('./routes/dual-use/mfaRoutes.js'));
+    // services/legacy/logisticsService.js (shipments/vehicles/drivers CRUD +
+    // tracking) is real and never mounted - SupplyChainAnalyticsPage.jsx's
+    // logisticsAPI.getShipments() already expects this domain.
+    app.use('/api/v1/logistics', require('./services/legacy/logisticsService').router);
     app.use('/api/gdpr', gdprComplianceRoutes);
     app.use('/api/v1/gdpr', gdprComplianceRoutes);
     app.use('/api/unifiedaigateway', unifiedAIGateway);
