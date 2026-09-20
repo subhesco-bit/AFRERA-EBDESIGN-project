@@ -1,195 +1,137 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useStore } from '@/store';
-import './${className}.css';
+import React, { useCallback, useEffect, useState } from 'react';
+import api from '../../services/api';
+import './styles.css';
 
+const ALERT_TYPES = [
+  'heavy_rain', 'flood', 'landslide', 'drought', 'hailstorm',
+  'cold_wave', 'heat_wave', 'cyclone', 'earthquake', 'frost', 'pest_outbreak',
+];
+const SEVERITIES = ['advisory', 'watch', 'warning', 'severe', 'extreme'];
+
+const emptyForm = {
+  alertCode: '', alertType: ALERT_TYPES[0], severity: SEVERITIES[0], state: '',
+  headline: '', detail: '', recommendedAction: '', effectiveFrom: '', effectiveUntil: '',
+};
+
+/**
+ * Real disaster-alert register backed by weatherService's climate_alerts
+ * table (migration 057, M084 · DISASTER ALERTS) via
+ * routes/agriculture/weatherRoutes.js - was an unfilled code-generator
+ * template importing a nonexistent @/store.
+ */
 export default function M084Page() {
-  const { user } = useStore();
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
-  const [formData, setFormData] = useState({});
-  const [searchQuery, setSearchQuery] = useState('');
-  const [editingId, setEditingId] = useState(null);
+  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+  const [form, setForm] = useState(emptyForm);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Fetch data
-  const fetchData = useCallback(async (page = 1) => {
+  const load = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
-      const params = new URLSearchParams({
-        page,
-        limit: pagination.limit,
-        user_id: user?.id,
-      });
-
-      const response = await fetch(`/api/m084?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch');
-
-      const result = await response.json();
-      setData(result.data || []);
-      setPagination(result.pagination || {});
-    } catch (err) {
-      setError(err.message);
+      const response = await api.get('/weather/alerts');
+      const data = response?.data?.data;
+      setAlerts(Array.isArray(data) ? data : data?.alerts || []);
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'Disaster alerts could not be loaded');
     } finally {
       setLoading(false);
     }
-  }, [user, pagination.limit]);
+  }, []);
 
-  // Search
-  const handleSearch = useCallback(async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
+  useEffect(() => { load(); }, [load]);
 
-    setLoading(true);
+  const createAlert = async event => {
+    event.preventDefault();
+    setSubmitting(true);
     try {
-      const response = await fetch(`/api/m084/search?q=${encodeURIComponent(searchQuery)}`);
-      if (!response.ok) throw new Error('Search failed');
-
-      const result = await response.json();
-      setData(result.data || []);
-    } catch (err) {
-      setError(err.message);
+      await api.post('/weather/alerts', form);
+      setMessage('Alert created');
+      setForm(emptyForm);
+      load();
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'Alert could not be created');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
-  }, [searchQuery]);
-
-  // Create/Update
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const method = editingId ? 'PUT' : 'POST';
-      const url = editingId ? `/api/m084/${editingId}` : `/api/m084`;
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user?.id, ...formData }),
-      });
-
-      if (!response.ok) throw new Error('Failed to save');
-
-      setFormData({});
-      setEditingId(null);
-      fetchData(1);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [editingId, formData, user, fetchData]);
-
-  // Delete
-  const handleDelete = useCallback(async (id) => {
-    if (!window.confirm('Delete this record?')) return;
-
-    try {
-      const response = await fetch(`/api/m084/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Delete failed');
-      fetchData(pagination.page);
-    } catch (err) {
-      setError(err.message);
-    }
-  }, [pagination.page, fetchData]);
-
-  // Load data on mount
-  useEffect(() => {
-    if (user?.id) {
-      fetchData(1);
-    }
-  }, [user, fetchData]);
+  };
 
   return (
-    <div className="${serviceName}-container">
-      <h1>M084</h1>
+    <div className="module-M084">
+      <header>
+        <p className="eyebrow">M084 / Climate &amp; weather</p>
+        <h1>Disaster Alerts</h1>
+        <p>Live climate alerts (flood, landslide, cyclone, and more) that can block dispatch through affected districts.</p>
+      </header>
 
-      {error && <div className="error-message">{error}</div>}
-
-      {/* Search Form */}
-      <form onSubmit={handleSearch} className="search-form">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button type="submit" disabled={loading}>Search</button>
-      </form>
-
-      {/* Create/Edit Form */}
-      <form onSubmit={handleSubmit} className="create-form">
-        <h2>{editingId ? 'Edit' : 'Create New'}</h2>
-        <input
-          type="text"
-          placeholder="Enter data..."
-          value={JSON.stringify(formData)}
-          onChange={(e) => {
-            try {
-              setFormData(JSON.parse(e.target.value));
-            } catch {}
-          }}
-        />
-        <button type="submit" disabled={loading}>
-          {editingId ? 'Update' : 'Create'}
-        </button>
-        {editingId && (
-          <button type="button" onClick={() => setEditingId(null)}>
-            Cancel
-          </button>
+      <section className="m084-panel">
+        <h2>Active and recent alerts</h2>
+        {loading && <p aria-busy="true">Loading alerts…</p>}
+        {!loading && alerts.length === 0 && <p role="status">No alerts recorded.</p>}
+        {!loading && alerts.length > 0 && (
+          <ul aria-label="Disaster alerts">
+            {alerts.map(alert => (
+              <li key={alert.id || alert.alert_code}>
+                <strong>{alert.headline}</strong> — {alert.severity} {alert.alert_type}
+                {alert.state ? ` · ${alert.state}` : ''}
+                <p>{alert.recommended_action}</p>
+              </li>
+            ))}
+          </ul>
         )}
-      </form>
+      </section>
 
-      {/* Data List */}
-      {loading && <p>Loading...</p>}
-      {!loading && data.length === 0 && <p>No records found</p>}
-      {!loading && data.length > 0 && (
-        <div>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.id}</td>
-                  <td>{item.status}</td>
-                  <td>{new Date(item.created_at).toLocaleDateString()}</td>
-                  <td>
-                    <button onClick={() => { setEditingId(item.id); setFormData(item); }}>
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(item.id)}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Pagination */}
-          <div className="pagination">
-            <button
-              onClick={() => fetchData(Math.max(1, pagination.page - 1))}
-              disabled={pagination.page === 1}
-            >
-              Previous
-            </button>
-            <span>Page {pagination.page} of {pagination.pages}</span>
-            <button
-              onClick={() => fetchData(pagination.page + 1)}
-              disabled={!pagination.hasMore}
-            >
-              Next
-            </button>
+      <section className="m084-panel">
+        <h2>Raise a new alert</h2>
+        <form onSubmit={createAlert}>
+          <div>
+            <label htmlFor="m084-alert-code">Alert code</label>
+            <input id="m084-alert-code" required value={form.alertCode}
+              onChange={e => setForm({ ...form, alertCode: e.target.value })} />
           </div>
-        </div>
-      )}
+          <div>
+            <label htmlFor="m084-alert-type">Type</label>
+            <select id="m084-alert-type" value={form.alertType}
+              onChange={e => setForm({ ...form, alertType: e.target.value })}>
+              {ALERT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="m084-severity">Severity</label>
+            <select id="m084-severity" value={form.severity}
+              onChange={e => setForm({ ...form, severity: e.target.value })}>
+              {SEVERITIES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="m084-state">State</label>
+            <input id="m084-state" value={form.state}
+              onChange={e => setForm({ ...form, state: e.target.value })} />
+          </div>
+          <div>
+            <label htmlFor="m084-headline">Headline</label>
+            <input id="m084-headline" required value={form.headline}
+              onChange={e => setForm({ ...form, headline: e.target.value })} />
+          </div>
+          <div>
+            <label htmlFor="m084-action">Recommended action</label>
+            <textarea id="m084-action" required value={form.recommendedAction}
+              onChange={e => setForm({ ...form, recommendedAction: e.target.value })} />
+          </div>
+          <div>
+            <label htmlFor="m084-from">Effective from</label>
+            <input id="m084-from" type="datetime-local" required value={form.effectiveFrom}
+              onChange={e => setForm({ ...form, effectiveFrom: e.target.value })} />
+          </div>
+          <div>
+            <label htmlFor="m084-until">Effective until</label>
+            <input id="m084-until" type="datetime-local" required value={form.effectiveUntil}
+              onChange={e => setForm({ ...form, effectiveUntil: e.target.value })} />
+          </div>
+          <button type="submit" disabled={submitting}>{submitting ? 'Creating…' : 'Create alert'}</button>
+        </form>
+        {message && <p role="status">{message}</p>}
+      </section>
     </div>
   );
 }

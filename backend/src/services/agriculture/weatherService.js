@@ -168,6 +168,19 @@ async function raiseAlert(a) {
   return rows[0];
 }
 
+/** All alerts, most recent first. Excludes cancelled ones unless asked for. */
+async function listAlerts({ state, includeCancelled = false, limit = 50 } = {}) {
+  const { rows } = await pool.query(
+    `SELECT * FROM climate_alerts
+      WHERE ($1::text IS NULL OR state = $1)
+        AND ($2::boolean OR cancelled_at IS NULL)
+      ORDER BY issued_at DESC
+      LIMIT $3`,
+    [state ?? null, Boolean(includeCancelled), limit]
+  );
+  return { alerts: rows, count: rows.length };
+}
+
 /** Alerts currently blocking dispatch. Read before routing a consignment. */
 async function activeDispatchBlocks() {
   const { rows } = await pool.query('SELECT * FROM v_active_dispatch_blocks');
@@ -246,6 +259,6 @@ async function coverage() {
 module.exports = {
   recordObservation, weatherForArp,
   recordForecast, scoreForecasts, forecastAccuracy,
-  raiseAlert, activeDispatchBlocks, dispatchCheck,
+  raiseAlert, listAlerts, activeDispatchBlocks, dispatchCheck,
   pestForecast, coverage,
 };
