@@ -1837,26 +1837,33 @@ recording them here specifically so they don't get silently dropped.
    8 unused packages, upgraded vitest/vite) - that state is not matched
    here. Needs `npm audit` reviewed file-by-file for breaking changes,
    not a blind `npm audit fix --force`.
-2. **3-way `freightPoolingService.js` duplicate - not resolved.** Three
-   copies: `backend/src/services/freightPoolingService.js`,
-   `backend/src/services/legacy/freightPoolingService.js`, and a third
-   referenced by `backend/src/routes/freightPoolingRoutes.js`. This
-   session's own live boot log already showed one of the three mounting
-   routes getting skipped ("Path already mounted: /api/v1/freight-pooling,
-   skipping freightPoolingRoutes"). Needs the same live-boot-log +
-   require()-graph liveness tracing this session used elsewhere (see
-   `docs/consolidation-audit/FINAL_CONSOLIDATION_REPORT.md`'s "BR-08 sweep
-   completion" methodology note) before deciding which copy is canonical.
-3. **`comprehensiveERPController.js` - still a scaffold, 46 endpoints,
-   zero real business logic.** Covers General Ledger, Controlling,
-   Materials Management, Sales & Distribution, Production Planning,
-   Quality Management, Plant Maintenance, HR, Project System, Treasury,
-   Asset Management, and Business Intelligence (SAP-standard module map).
-   Backed by `services/legacy/erpService.js` (944 lines - has *some* real
-   content, not fully audited method-by-method against the 46 endpoints
-   the controller needs). This is the single largest concrete "real ERP
-   business logic" gap identified so far - a strong candidate for where
-   the upcoming backend/ERP audit should start.
+2. ~~**3-way `freightPoolingService.js` duplicate - not resolved.**~~
+   **RESOLVED same session (commit `00cb17c37`).** Traced: 2 of the 3
+   route files were real and distinct (2-endpoint pool create/join vs.
+   6-endpoint pooling-windows), both correctly wired to their own real
+   service, but colliding on the same derived mount path — renamed one
+   (`freightPooling.js` -> `freightPoolRoutes.js`) so both are reachable.
+   The 3rd (`routes/logistics/freightPoolingRoutes.js`) was a broken,
+   100% redundant duplicate of the windows file with the wrong service
+   required — archived to `_archive/duplicates/2026-09-20/`. Live boot
+   now shows 768/768 mounted (was 767/768 every prior run this session).
+3. ~~**`comprehensiveERPController.js` - still a scaffold, 46 endpoints,
+   zero real business logic.**~~ **WRONG DIAGNOSIS, CORRECTED AND FIXED
+   same session (commit `00cb17c37`).** This flag was carried over from
+   an earlier investigation done in `.consolidation_work/chatgpt-tree`
+   (a different, less-mature tree) without re-verifying against
+   `consolidated/final` specifically — that was a mistake, caught and
+   fixed. The real business logic already exists and is substantial:
+   `services/legacy/comprehensiveERPService.js`, 1751 lines, all 12
+   SAP-module namespaces with real parameterized-SQL-backed methods. The
+   controller was simply requiring the wrong file
+   (`services/legacy/erpService.js`, an unrelated ERP *sync* service).
+   Verified all 46 controller method calls resolve against the correct
+   service (0 missing) before swapping the require, then proved the fix
+   by direct invocation (before: `TypeError: Cannot read properties of
+   undefined`; after: the real, honest `"Database not initialized"`).
+   **Lesson: don't carry a finding from one tree over to another without
+   re-verifying — this exact mistake already cost one wasted flag.**
 4. ~~**~41 of the original 74 module-service "gap candidates" not
    individually re-verified.**~~ **RESOLVED same session** - re-ran the
    check for the literal `// Add business logic here` stub marker (the
