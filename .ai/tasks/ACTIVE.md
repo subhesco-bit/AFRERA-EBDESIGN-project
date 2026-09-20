@@ -465,6 +465,50 @@ character-based (~4 chars/token), documented as an approximation in the
 module's own comments; real billed tokens still come from the provider's
 response, not the estimate.
 
+## T01 — repair all 3 failing frontend test suites (2026-09-20) — DONE
+
+Following `origin/codex/chatgpt-tree-consolidation`'s `.ai/migration/CRITICAL_PATH_TODO.md`
+Wave 1 item T01. Frontend suite was 49/52 tests across 13/16 suites at
+session start; all 16/16 suites (55/55 tests) now pass.
+
+1. **`MarketplacePage.test.jsx`** — `MarketplacePage.jsx` was a 2-line
+   placeholder stub. Replaced with a real listing page wired to the
+   existing `productsAPI.getProducts`/`ordersAPI.addToCart`, with search,
+   pagination, and loading/error/empty states.
+2. **`TrainingTraceabilityPages.test.jsx`** — the two pages under test were
+   already real and correct, but crashed on render because `ui/card.jsx`
+   and `ui/button.jsx` only had default exports while every consumer
+   (these 2 pages, ~500 other call sites per PR #21's audit) imports them
+   as named exports. Added real named exports (`Card`/`CardHeader`/
+   `CardTitle`/`CardDescription`/`CardContent`/`CardFooter`, `Button`)
+   alongside the existing defaults — additive only. Also fixed `Button`
+   silently dropping every prop except `children` (no `onClick`,
+   `disabled`, `type` ever reached the DOM node) and mapped the
+   `variant`/`size` props already used across the app to real classes.
+3. **`criticalModules.test.jsx`** (M084 "Disaster Alerts") — a module-
+   numbering collision: `frontend/src/modules/M084/M084Page.jsx` was an
+   unfilled code-generator template (`${className}` never substituted,
+   imported a nonexistent `@/store`); `backend/src/modules/M084/` is a
+   same-numbered but unrelated "Trend Analysis" scaffold. The real
+   disaster-alerts implementation already existed — migration 057's
+   `climate_alerts` table, `weatherService.js`'s `raiseAlert`/
+   `activeDispatchBlocks`/`dispatchCheck` — but its route file
+   (`routes/agriculture/weatherRoutes.js`) crashed at require time on a
+   bad, unused import path, so `index.js` mounted a "Route operational"
+   scaffold at `/api/weather` instead (the same scaffold-swap pattern PR
+   #21 found repeatedly for order/product/iotIntegration). Fixed the
+   import, added `weatherService.listAlerts()` (raiseAlert existed but
+   nothing could list what it wrote) + `GET /alerts`, swapped `index.js`
+   to mount the real route file at the same path, and rewrote
+   `M084Page.jsx` against the real `GET`/`POST /weather/alerts` endpoints.
+
+**Left alone, confirmed pre-existing and out of scope:** `backend/src/tests/m084Routes.test.js`
+(a different test, for the unrelated `modules/M084/` scaffold — fails
+independently on a nonexistent `middleware/validationMiddleware` import,
+untouched by any of the above).
+
+Commits: `ebc873f7` (suites 1–2), `d433d143` (suite 3).
+
 ---
 
 *This document must be updated after every task completion or status change.*
