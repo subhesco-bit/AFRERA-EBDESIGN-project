@@ -747,6 +747,40 @@ existing `/:id/payment` route. Found and fixed the identical
 too (part of the same 46-file follow-up, not yet mounted). The remaining
 ~44 unmounted routers are a queued follow-up.
 
+**Follow-up round 3: 40 more orphaned services/legacy/*.js routers mounted
+(`dbaacd3c`).** Same sweep extended to the full remaining candidate list
+(minus productService/orderService already handled, minus erpService
+already correctly wired via a thin shim, minus logisticsService left
+out of scope). 40 mounted at `/api/v1/<kebab-case-domain>` in
+`index.js`, each individually verified (require resolves cleanly,
+`router.stack.length` matches the source's `router.<method>(` count -
+catching the same CRLF-dead-code trap class found in round 2 - no
+crash). 6 have a documented, verifiable frontend match
+(financialService, insuranceService, enterpriseControlService,
+enterpriseMemoryService, blockchainTraceabilityService,
+organicTraceabilityService); the other 34 are backend-only with no
+current caller (checked against all 17 frontend service files, not just
+api.js). Found and fixed one more instance of the
+"one-directory-too-many relative require" bug class:
+`services/legacy/smsAuthService.js` did
+`require('../../dual-use/authService')` (resolves to nonexistent
+`backend/src/dual-use/`) instead of `require('../dual-use/authService')`
+(the real `services/dual-use/authService.js`).
+
+**Important caveat surfaced by this round, not yet acted on:** for the 6
+services with a "frontend match," the actual `services/api.js`/
+`componentApi.js` export the real page imports is itself wrong or
+missing - different method names than the real router, or (matching an
+earlier finding this session about confirmed-unreachable orphaned
+components) not exported at all in a few cases. Mounting the real
+backend router does NOT silently fix these the way it did for
+productService/orderService - the frontend side needs its own separate
+fix, not yet scoped.
+
+Verified (this round): `node --check`/`npx eslint` clean, backend boots
+clean, `npm test` byte-identical to baseline (355 failed / 775 passed
+suites), frontend build/tests unaffected.
+
 **Follow-up: codebase-wide reachable-destructure audit found one more real
 bug (`6e52fc8d`).** Built a script that boots the real app once, walks
 `require.cache` (so it only examines code the app genuinely loads, not
