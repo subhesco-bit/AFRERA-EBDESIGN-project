@@ -5,7 +5,14 @@
  * Handles HTTP requests and responses for ERP operations
  */
 
-const erpService = require('../services/legacy/erpService');
+// Was '../services/legacy/erpService' (a completely different ERP *sync*
+// service exporting initializeERP/syncProductToERP/etc. - none of the 46
+// generalLedger/controlling/materialsManagement/... methods this controller
+// calls). erpService.<namespace> was undefined for every call, so every one
+// of these 46 endpoints threw "Cannot read properties of undefined" at
+// request time despite the route mounting fine at boot. The real, complete
+// implementation (all 46 methods verified present) is comprehensiveERPService.js.
+const erpService = require('../services/legacy/comprehensiveERPService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
