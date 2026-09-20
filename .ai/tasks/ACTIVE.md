@@ -600,19 +600,57 @@ green (`Build Verification`, `Frontend Tests`, `Lint`, `Security Audit`,
 `Claude AI Integration Test`, `Backend Tests`, `Check Status`) for the first
 time this session.
 
-**Follow-on discovery, in progress:** the same "real `setupRoutes()`, never
-mounted" pattern found 15 MORE orphaned backend services beyond the original
-9 in `ORPHANED_SERVICES_MOUNT.js` (`aiAdvisoryService`, `buyingClubService`,
-`custodyEventRoutes`, `escrowService`, `householdEconomyService`,
-`machineryAccessService`, `marketAccessService`, `marketIntelligenceService`,
-`mobilityRidesService`, `procurementSubscriptionService`,
-`renewableEnergyService`, `ruralEnterpriseService`, `ruralFinanceService`,
-`sharedInfraService`, `villageProfileService`) — independently spot-verified
-3 against their actual route bodies. Notably `escrowService.js` (real, unmounted)
-sits alongside `routes/escrowRoutes.js` (already mounted at `/api/escrow`, but
-a fake "Route operational" scaffold) — the frontend's pre-existing `escrowAPI`
-currently calls the fake one, a live bug. Mounting all 15 + repointing their
-matching frontend objects is in progress as a follow-up task.
+**Follow-on: 15 more orphaned services mounted (`72675499`).** The same "real
+`setupRoutes()`, never mounted" pattern found 15 MORE orphaned backend
+services beyond the original 9 in `ORPHANED_SERVICES_MOUNT.js`
+(`aiAdvisoryService`, `buyingClubService`, `custodyEventRoutes`,
+`escrowService`, `householdEconomyService`, `machineryAccessService`,
+`marketAccessService`, `marketIntelligenceService`, `mobilityRidesService`,
+`procurementSubscriptionService`, `renewableEnergyService`,
+`ruralEnterpriseService`, `ruralFinanceService`, `sharedInfraService`,
+`villageProfileService`) — all 15 now mounted, boot-verified with 15 new
+"✅ ... mounted" log lines and zero unhandled exceptions. `sharedInfraService.js`
+was kept deliberately distinct from the already-mounted, similarly-named
+`sharedInfrastructureService.js` (different tables/features, confirmed by
+reading both fully).
+
+Frontend: 10 of the 15 wired to their now-real endpoints via the existing
+`ORPHANED_BASE` constant in `api.js`. Two were live-bug fixes from wrong
+wiring: `escrowAPI` previously called the fake `routes/escrowRoutes.js`
+scaffold at `/api/escrow` (and didn't even define the `list`/`release`/
+`refund` methods `EscrowPage.jsx` actually calls) — repointed to the real,
+now-mounted `escrowService.js` endpoints. `marketAccessAPI` had the same
+dead-path bug, fixed the same way. Also added `custodyAPI` to
+`componentApi.js` — `CustodyChainViewer.jsx` already imported it but it had
+never been exported there (a silent `undefined`, would throw at render
+time). `householdEconomyAPI`/`machineryAccessAPI`/`ruralFinanceAPI` stay
+honest `notImplemented()` stubs — their real services only expose a
+get-by-village summary, no generic statistics endpoint a page calls.
+
+**Second bug found while independently verifying the above (`6005e08c`):**
+`sharedInfraService.js` (backing the routed `/shared-infra` page) destructured
+`{ aiAPI }` from `aiBackboneService.js`, which exports no such thing — all 4
+of its "AI-powered recommendation" call sites threw a `TypeError` on every
+request, including the 2 methods `SharedInfraPage.jsx` actually calls
+(`searchAssets`, `getRenewableSupport`). Fixed per-case rather than papering
+over with a speculative LLM shim: `searchSharedInfrastructure` was silently
+discarding its own already-fetched, real DB query result and asking the
+(nonexistent) AI to invent the asset list instead — now returns the real
+data directly, so this endpoint actually works end-to-end for the first
+time. The other 3 call sites (`listSecondLifeEquipment`,
+`listSecondLifeBattery`, `getRenewablePowerSupport`) had no real data
+anywhere underneath them either (their own inputs were unimplemented stubs
+too) — now return honest `null`/empty/`configured: false` results instead
+of crashing, and the 10 now-fully-dead helper stub functions that only fed
+the broken AI call were deleted.
+
+Both rounds verified: backend boots clean (24/24 orphaned-service mounts
+logged), `npm test` byte-identical to baseline (355 failed / 775 passed
+suites, all pre-existing Postgres/Redis-dependent, zero new failures),
+`npx vite build` exit 0, `npx eslint` clean, `npx jest --watchAll=false`
+17/17 suites / 57/57 tests. PR #22's CI green on both commits
+(`Build Verification`, `Frontend Tests`, `Lint`, `Security Audit`,
+`Claude AI Integration Test`, `Backend Tests`, `Check Status`).
 
 ---
 
