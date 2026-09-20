@@ -5408,5 +5408,50 @@ export const preSeasonAPI = {
   getDashboard: notImplemented('Pre-season order dashboard'),
 };
 
+// erpDashboardAPI: services/erpService.js exports a real router (GET
+// /status, POST /sync/*) that existed but was never mounted anywhere -
+// mounted now at /api/erp. Only getSyncStatus/triggerSync among
+// ERPDashboardPage.jsx's 7 methods have a real matching endpoint; the
+// other 5 have no backend anywhere in this codebase (verified directly).
+export const erpDashboardAPI = {
+  getSyncStatus: () => api.get('/erp/status'),
+  triggerSync: syncType => api.post('/erp/sync/bulk', { entity_type: syncType }),
+  getDashboard: notImplemented('ERP financial dashboard'),
+  getGLEntries: notImplemented('ERP general-ledger entries'),
+  getReconciliation: notImplemented('ERP reconciliation'),
+  getFinancialReports: notImplemented('ERP financial reports'),
+  resolveConflict: notImplemented('ERP sync conflict resolution'),
+};
+
+// climateMonitoringAPI, competitorAPI, decisionEngineAPI: verified against
+// every real backend route/service in this codebase (climate_alerts covers
+// disaster alerts specifically, not general climate monitoring; no
+// competitor-observation or generic rule-based decision-engine service
+// exists anywhere) - genuine gaps, not fabricated.
+export const climateMonitoringAPI = {
+  getStatus: notImplemented('Climate monitoring status'),
+  getDroughtData: notImplemented('Drought monitoring data'),
+  getFloodData: notImplemented('Flood monitoring data'),
+  getAlerts: notImplemented('Climate monitoring alerts'),
+  generateReport: notImplemented('Climate monitoring report'),
+};
+
+export const competitorAPI = {
+  observe: notImplemented('Competitor observation'),
+  position: notImplemented('Competitive positioning'),
+};
+
+export const decisionEngineAPI = {
+  getStatus: notImplemented('Decision engine status'),
+  getRules: notImplemented('Decision engine rules'),
+  createRule: notImplemented('Decision engine rule creation'),
+  updateRule: notImplemented('Decision engine rule update'),
+  deleteRule: notImplemented('Decision engine rule deletion'),
+  evaluateDecision: notImplemented('Decision evaluation'),
+  triggerDecision: notImplemented('Decision trigger'),
+  getActiveDecisions: notImplemented('Active decisions list'),
+  getDecisionHistory: notImplemented('Decision history'),
+};
+
 export { api };
 export default api;

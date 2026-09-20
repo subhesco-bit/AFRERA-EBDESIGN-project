@@ -641,6 +641,7 @@ async function startup() {
     app.use('/api/farmervalue', farmerValueRoutes);
     app.use('/api/farmertraining', farmerTrainingRoutes);
     app.use('/api/farmer', farmerRoutes);
+    app.use('/api/erp', require('./services/erpService').router);
     app.use('/api/farmerportalenhancements', farmerPortalEnhancements);
     app.use('/api/farmerhealth', farmerHealthRoutes);
     app.use('/api/farmerfamily', farmerFamilyRoutes);
