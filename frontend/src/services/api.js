@@ -6335,23 +6335,6 @@ export const nutritionIntelligenceAPI = {
   calculateNutrientProfile: (data) => api.post('/nutrition-intelligence/nutrient-profile', data),
 };
 
-// Added 2026-09-20 - MedicalCodingDashboardPage.jsx imported this object but it
-// never existed (would crash on first render). Wired to the real, now-mounted
-// advanced-medical-coding routes (backend/src/routes/advancedMedicalCodingRoutes.js,
-// moved there from services/ where DynamicRouteLoader never found it).
-// KNOWN GAP, not silently patched: the dashboard page expects a response shaped
-// like `{ conditions: { diabetes: { <type>: {code, system, display} } } }` keyed
-// by 10 hardcoded common-condition ids, and `{ restrictions: {...} }` /
-// `{ requirements: {...} }` shapes. The real service's knowledge bases are keyed
-// by clinical category (e.g. clinical_nutrition), not those 10 condition ids, so
-// these calls will resolve without crashing but the page's tables will render
-// empty until either the backend adds a condition-id lookup layer or the page is
-// rewritten against the real knowledge-base shape. See .ai/tasks/ACTIVE.md.
-export const medicalCodingAPI = {
-  getMedicalConditionCodes: () => api.get('/advanced-medical-coding/code-systems'),
-  getDietaryRestrictions: (condition) => api.get(`/advanced-medical-coding/dietitian-knowledge/${condition}`),
-  getNutrientRequirements: (condition) => api.get(`/advanced-medical-coding/natural-therapist-knowledge/${condition}`),
-};
 
 export const modulesAPI = {
   getModules: (id, params) => api.get(`/modules/modules${id !== undefined ? '/' + id : ''}`, { params }),
@@ -6866,10 +6849,23 @@ export const glutWarningAPI = {
   scanAllCategories: (id, params) => api.get(`/glut-warning/n-all-categories${id !== undefined ? '/' + id : ''}`, { params }),
 };
 
+// Fixed 2026-09-20: this auto-generated object pointed at a `/medical-coding/*`
+// path with no backing route (would 404). Repointed at the real, now-mounted
+// advanced-medical-coding routes (backend/src/routes/advancedMedicalCodingRoutes.js,
+// moved there from services/ where DynamicRouteLoader never found it).
+// KNOWN GAP, not silently patched: MedicalCodingDashboardPage.jsx expects a
+// response shaped like `{ conditions: { diabetes: { <type>: {code, system,
+// display} } } }` keyed by 10 hardcoded common-condition ids, and
+// `{ restrictions: {...} }` / `{ requirements: {...} }` shapes. The real
+// service's knowledge bases are keyed by clinical category (e.g.
+// clinical_nutrition), not those 10 condition ids, so these calls resolve
+// without crashing but the page's tables render empty until either the
+// backend adds a condition-id lookup layer or the page is rewritten against
+// the real knowledge-base shape. See .ai/tasks/ACTIVE.md.
 export const medicalCodingAPI = {
-  getMedicalConditionCodes: (id, params) => api.get(`/medical-coding/medical-condition-codes${id !== undefined ? '/' + id : ''}`, { params }),
-  getDietaryRestrictions: (id, params) => api.get(`/medical-coding/dietary-restrictions${id !== undefined ? '/' + id : ''}`, { params }),
-  getNutrientRequirements: (id, params) => api.get(`/medical-coding/nutrient-requirements${id !== undefined ? '/' + id : ''}`, { params }),
+  getMedicalConditionCodes: () => api.get('/advanced-medical-coding/code-systems'),
+  getDietaryRestrictions: (condition) => api.get(`/advanced-medical-coding/dietitian-knowledge/${condition}`),
+  getNutrientRequirements: (condition) => api.get(`/advanced-medical-coding/natural-therapist-knowledge/${condition}`),
 };
 
 export const nervousSystemAPI = {
