@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { productsAPI, productReviewsAPI, ordersAPI, productMediaAIAPI } from '../services/api';
+import { productMediaAIAPI } from '../services/api';
+import { productsAPI, productReviewsAPI, ordersAPI } from '../services/commerceApi';
 import { ShoppingCart, Star, Leaf, Award, Truck, ChevronLeft, Minus, Plus, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel';

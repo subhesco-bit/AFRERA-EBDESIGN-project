@@ -570,7 +570,7 @@ async function startup() {
     app.use('/api/qualityassurance', qualityAssurance);
     app.use('/api/projectsystems', projectSystemsRoutes);
     app.use('/api/product', productRoutes);
-    app.use('/api/productreview', productReviewRoutes);
+    app.use('/api/v1/product-reviews', productReviewRoutes);
     app.use('/api/productmediaai', productMediaAIRoutes);
     app.use('/api/publicdata', publicDataRoutes);
     app.use('/api/productcertifications', productCertifications);
