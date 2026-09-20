@@ -1820,4 +1820,59 @@ path it already required; only the top-level file's own contents changed.
 
 ---
 
+## TODO — flagged during 2026-09-20 branch-consolidation pass (not fixed, tracked for the backend/controller/AI/ERP audit)
+
+Found while verifying 8 divergent branches' content was fully absorbed
+into `consolidated/final` before deleting them (see commit history
+`3889245f0`..`13d76a02f`). None of these were fabricated as "done" -
+recording them here specifically so they don't get silently dropped.
+
+1. **Dependency vulnerabilities - not remediated.** Ran
+   `.ai/plugins/audit-chain.js` (2026-09-20): backend 21 vulnerabilities
+   (18 moderate, 3 high); frontend 10 vulnerabilities (5 moderate, 3 high,
+   **2 critical**). The frontend criticals were not previously flagged in
+   this session and need checking first. `backup/pre-integration-checkpoint`'s
+   own commit message claimed "backend now at 0 known vulnerabilities (was
+   20)" after a real remediation pass (removed `@tensorflow/tfjs-node` +
+   8 unused packages, upgraded vitest/vite) - that state is not matched
+   here. Needs `npm audit` reviewed file-by-file for breaking changes,
+   not a blind `npm audit fix --force`.
+2. **3-way `freightPoolingService.js` duplicate - not resolved.** Three
+   copies: `backend/src/services/freightPoolingService.js`,
+   `backend/src/services/legacy/freightPoolingService.js`, and a third
+   referenced by `backend/src/routes/freightPoolingRoutes.js`. This
+   session's own live boot log already showed one of the three mounting
+   routes getting skipped ("Path already mounted: /api/v1/freight-pooling,
+   skipping freightPoolingRoutes"). Needs the same live-boot-log +
+   require()-graph liveness tracing this session used elsewhere (see
+   `docs/consolidation-audit/FINAL_CONSOLIDATION_REPORT.md`'s "BR-08 sweep
+   completion" methodology note) before deciding which copy is canonical.
+3. **`comprehensiveERPController.js` - still a scaffold, 46 endpoints,
+   zero real business logic.** Covers General Ledger, Controlling,
+   Materials Management, Sales & Distribution, Production Planning,
+   Quality Management, Plant Maintenance, HR, Project System, Treasury,
+   Asset Management, and Business Intelligence (SAP-standard module map).
+   Backed by `services/legacy/erpService.js` (944 lines - has *some* real
+   content, not fully audited method-by-method against the 46 endpoints
+   the controller needs). This is the single largest concrete "real ERP
+   business logic" gap identified so far - a strong candidate for where
+   the upcoming backend/ERP audit should start.
+4. **~41 of the original 74 module-service "gap candidates" not
+   individually re-verified.** A batch line-count comparison against
+   `codex/production-reconcile-auth-geo` flagged 74 `backend/src/modules/M*/service.js`
+   files where that branch's version was significantly bigger. Of those,
+   6 were false positives explained by HEAD's `modules/shared/createRegistryService.js`
+   factory (shorter code, same/more real capability) and 33 were confirmed
+   genuine gaps and fixed (commit `1e366ec95`). The remaining ~35 were
+   sampled (2-3 files: M100, M033) and found to already be real/adequate,
+   but **not every one of the ~35 was individually checked** - a fast
+   follow-up would be re-running
+   `compare_module_services_vs_branch.js`-style logic (grep for
+   `createRegistryService` usage vs. the literal `// Add business logic
+   here` stub marker, which is now confirmed to be the only reliable
+   signal) across the full remaining set to close this out with
+   certainty rather than sampling confidence.
+
+---
+
 *This document must be updated after every task completion or status change.*
