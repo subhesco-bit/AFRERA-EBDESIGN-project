@@ -2,521 +2,184 @@
  * INTEGRATION STATUS DASHBOARD
  * Central hub showing what's integrated, what's partial, what's missing
  * Accessible via: GET /api/debug/integration-status
- * Purpose: Visibility into project state for team
+ *
+ * Rewritten 2026-09-20: the previous version of this file hardcoded every
+ * number it returned (155/226 routes complete, 85/344 modules, 476 pages,
+ * 1000 components, "422 migrations", "0 tables", a 7-10 week timeline, a
+ * 4-6 person team roster) regardless of actual repo state, and served that
+ * fiction from a live API endpoint. This version computes real values from
+ * ROUTES_REGISTRY.js / SERVICES_REGISTRY.js / MODULES_REGISTRY.js (themselves
+ * regenerated from a live boot + filesystem scan, not hand-typed) and from
+ * direct filesystem checks. Anywhere a real answer cannot be mechanically
+ * derived, it says so explicitly (`null` / "not derivable by static analysis")
+ * rather than inventing a plausible-looking number.
  */
 
-const { routesRegistry, validateRoutes } = require('./ROUTES_REGISTRY');
-const { servicesRegistry, validateServices } = require('./SERVICES_REGISTRY');
+const fs = require('fs');
+const path = require('path');
+const { mountedRoutePaths, totalMounted } = require('./ROUTES_REGISTRY');
+const { serviceFiles, totalFiles: totalServiceFiles } = require('./SERVICES_REGISTRY');
+const { modules, totalModules } = require('./MODULES_REGISTRY');
+
+const BACKEND_ROOT = path.join(__dirname, '..');
+const REPO_ROOT = path.join(BACKEND_ROOT, '..');
+
+function countFilesRecursive(dir, extensions) {
+  if (!fs.existsSync(dir)) return null;
+  let count = 0;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) count += countFilesRecursive(full, extensions) || 0;
+    else if (extensions.some(ext => entry.name.endsWith(ext))) count++;
+  }
+  return count;
+}
+
+function checkPackageDependency(pkgJsonPath, depName) {
+  if (!fs.existsSync(pkgJsonPath)) return null;
+  try {
+    const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+    return !!(pkg.dependencies?.[depName] || pkg.devDependencies?.[depName]);
+  } catch {
+    return null;
+  }
+}
 
 class IntegrationStatusDashboard {
-  constructor() {
-    this.lastUpdate = new Date();
-    this.cache = {};
-  }
-
   /**
-   * OVERALL PROJECT STATUS
-   */
-  getProjectStatus() {
-    return {
-      timestamp: new Date(),
-      overallCompletion: this.calculateOverallCompletion(),
-      phases: {
-        phase1: this.getPhase1Status(),
-        phase2: this.getPhase2Status(),
-        phase3: this.getPhase3Status(),
-        phase4: this.getPhase4Status(),
-      },
-      criticalBlockers: this.getCriticalBlockers(),
-      highPriorityIssues: this.getHighPriorityIssues(),
-      teamReadiness: this.getTeamReadiness(),
-    };
-  }
-
-  /**
-   * PHASE 1: UNBLOCK & STABILIZE (Days 1-5)
-   */
-  getPhase1Status() {
-    return {
-      name: "Unblock & Stabilize",
-      duration: "Days 1-5",
-      status: "⏳ PENDING",
-      tasks: {
-        "Database Execution": {
-          status: "❌ NOT STARTED",
-          effort: "2-4 hours",
-          blocker: true,
-          command: "npm run migrate",
-          description: "Execute all 422 database migrations",
-        },
-        "API Key Configuration": {
-          status: "❌ NOT STARTED",
-          effort: "30 min",
-          blocker: true,
-          file: ".env",
-          description: "Set ANTHROPIC_API_KEY and others",
-        },
-        "Fix 19+ Endpoint Mismatches": {
-          status: "❌ NOT STARTED",
-          effort: "2-3 days",
-          blocker: true,
-          affected: 19,
-          description: "Frontend calls wrong API endpoints",
-        },
-        "Complete Stripe Integration": {
-          status: "⚠️ PARTIAL",
-          effort: "1-2 days",
-          blocker: true,
-          description: "Payment processing workflow",
-        },
-        "Test Core Workflows": {
-          status: "❌ NOT TESTED",
-          effort: "1-2 days",
-          blocker: true,
-          description: "User registration → login → basic action",
-        },
-      },
-      success: "System becomes functional",
-    };
-  }
-
-  /**
-   * PHASE 2: EXPAND FEATURE SET (Weeks 1-2)
-   */
-  getPhase2Status() {
-    return {
-      name: "Expand Feature Set",
-      duration: "Weeks 2-3",
-      status: "⏳ PENDING",
-      tasks: {
-        "Implement 139 Skeleton Modules": {
-          status: "❌ NOT STARTED",
-          count: 139,
-          effort: "3-4 weeks",
-          priority: "HIGH",
-          description: "M031-M344 have no business logic",
-        },
-        "Create 78 Missing Pages": {
-          status: "⏳ IN PROGRESS",
-          count: 78,
-          effort: "1-2 weeks",
-          priority: "HIGH",
-          description: "Reports, admin, advanced features",
-        },
-        "Fix Test Suite (814 Tests)": {
-          status: "❌ 0% PASSING",
-          count: 814,
-          effort: "1-2 weeks",
-          priority: "HIGH",
-          description: "Tests written but disabled",
-        },
-        "Implement Missing Integrations": {
-          status: "⚠️ PARTIAL",
-          count: 10,
-          effort: "1-2 weeks",
-          priority: "HIGH",
-          description: "AWS S3, Firebase, Twilio, etc.",
-        },
-      },
-      success: "Most features complete",
-    };
-  }
-
-  /**
-   * PHASE 3: TESTING & POLISH (Weeks 4-10)
-   */
-  getPhase3Status() {
-    return {
-      name: "Testing & Polish",
-      duration: "Weeks 4-9",
-      status: "⏳ PENDING",
-      tasks: {
-        "Comprehensive Testing": {
-          status: "❌ NOT STARTED",
-          effort: "2-3 weeks",
-          priority: "CRITICAL",
-        },
-        "Performance Optimization": {
-          status: "❌ NOT STARTED",
-          effort: "1 week",
-          priority: "HIGH",
-        },
-        "Security Audit": {
-          status: "❌ NOT STARTED",
-          effort: "1 week",
-          priority: "CRITICAL",
-        },
-        "GraphQL Completion": {
-          status: "⚠️ PARTIAL",
-          effort: "3-5 days",
-          priority: "MEDIUM",
-        },
-      },
-      success: "Production-ready code",
-    };
-  }
-
-  /**
-   * PHASE 4: LAUNCH (Week 10)
-   */
-  getPhase4Status() {
-    return {
-      name: "Launch",
-      duration: "Week 10",
-      status: "⏳ PENDING",
-      tasks: {
-        "Staging Deployment": { status: "⏳ PENDING", effort: "1 day" },
-        "Final Verification": { status: "⏳ PENDING", effort: "1 day" },
-        "Production Deployment": { status: "⏳ PENDING", effort: "4 hours" },
-        "Post-Launch Monitoring": { status: "⏳ PENDING", effort: "Ongoing" },
-      },
-      success: "Live production system",
-    };
-  }
-
-  /**
-   * CRITICAL BLOCKERS (MUST FIX BEFORE PHASE 2)
-   */
-  getCriticalBlockers() {
-    return [
-      {
-        issue: "Database Not Running",
-        severity: "CRITICAL",
-        status: "❌ NOT STARTED",
-        impact: "Zero database tables created, all data operations fail",
-        effort: "2-4 hours",
-        action: "npm run migrate",
-      },
-      {
-        issue: "API Keys Not Configured",
-        severity: "CRITICAL",
-        status: "❌ NOT STARTED",
-        impact: "Claude AI and integrations can't function",
-        effort: "30 minutes",
-        action: "Set .env variables",
-      },
-      {
-        issue: "19+ Endpoint Mismatches",
-        severity: "CRITICAL",
-        status: "❌ NOT STARTED",
-        impact: "19+ features return 404 errors",
-        effort: "2-3 days",
-        action: "Align frontend API calls with backend routes",
-      },
-      {
-        issue: "Stripe Integration Incomplete",
-        severity: "CRITICAL",
-        status: "⚠️ PARTIAL",
-        impact: "Can't process payments",
-        effort: "1-2 days",
-        action: "Complete payment flow",
-      },
-      {
-        issue: "Test Suite Not Running",
-        severity: "HIGH",
-        status: "❌ 0% PASSING",
-        impact: "Unknown code quality",
-        effort: "1-2 weeks",
-        action: "Debug and fix tests",
-      },
-    ];
-  }
-
-  /**
-   * HIGH PRIORITY ISSUES
-   */
-  getHighPriorityIssues() {
-    return [
-      { issue: "139 Skeleton Modules", count: 139, effort: "3-4 weeks", impact: "40% features missing" },
-      { issue: "78 Missing Pages", count: 78, effort: "1-2 weeks", impact: "UI incomplete" },
-      { issue: "10 Unused Integrations", count: 10, effort: "1-2 weeks", impact: "Advanced features missing" },
-      { issue: "GraphQL Incomplete", status: "⚠️ PARTIAL", effort: "3-5 days", impact: "Query API limited" },
-      { issue: "IoT Integration Skeleton", status: "❌ SKELETON", effort: "2-3 weeks", impact: "Sensors not working" },
-    ];
-  }
-
-  /**
-   * TEAM READINESS STATUS
-   */
-  getTeamReadiness() {
-    return {
-      teamSize: "4-6 people",
-      roles: {
-        backendLead: { status: "⏳ NEEDED", role: "Architect & code review", allocation: "40%" },
-        backendDev1: { status: "⏳ NEEDED", role: "Services & modules", allocation: "100%" },
-        backendDev2: { status: "⏳ NEEDED", role: "Integrations & APIs", allocation: "100%" },
-        frontendLead: { status: "⏳ NEEDED", role: "Component architecture", allocation: "40%" },
-        frontendDev: { status: "⏳ NEEDED", role: "Pages & components", allocation: "100%" },
-        devOps: { status: "⏳ NEEDED", role: "Database & infrastructure", allocation: "100%" },
-        qa: { status: "⏳ NEEDED", role: "Testing & verification", allocation: "100%" },
-      },
-      readiness: "⏳ AWAITING TEAM ASSIGNMENT",
-    };
-  }
-
-  /**
-   * ROUTE STATUS BREAKDOWN
+   * ROUTE STATUS -- from a real live-boot mount log (ROUTES_REGISTRY.js).
+   * "Mounted" means the router loaded without error; it says nothing about
+   * whether the handlers behind it contain real business logic.
    */
   getRoutesStatus() {
-    const summary = routesRegistry.summary;
     return {
-      total: summary.totalRoutes,
-      complete: summary.completeRoutes,
-      partial: summary.partialRoutes,
-      skeleton: summary.skeletonRoutes,
-      completionPercentage: summary.completionPercentage,
-      issues: validateRoutes(),
+      mountedCount: totalMounted,
+      note: 'Counts confirmed-mounted routes from a live boot (source: ROUTES_REGISTRY.js). Does not indicate handler completeness -- see modules status for that classification, and note most modules self-report as "generated".',
     };
   }
 
   /**
-   * SERVICES STATUS BREAKDOWN
+   * SERVICES STATUS -- real filesystem count. No complete/partial/skeleton
+   * split is provided because that requires a per-file audit that hasn't
+   * been done; the old version fabricated this split without doing one.
    */
   getServicesStatus() {
-    const summary = servicesRegistry.summary;
     return {
-      total: summary.total,
-      complete: summary.complete,
-      partial: summary.partial,
-      skeleton: summary.skeleton,
-      completionPercentage: summary.completionPercentage,
-      testCoverage: summary.testCoverage,
-      issues: validateServices(servicesRegistry),
+      totalServiceFiles,
+      note: 'Real count of .js files under backend/src/services/ (source: SERVICES_REGISTRY.js, filesystem scan). Completeness classification per file has not been done -- do not treat file existence as feature completeness.',
     };
   }
 
   /**
-   * MODULES STATUS BREAKDOWN
+   * MODULES STATUS -- real tally of each module's own module.json "status"
+   * field. This is each module's own self-declaration, not an external audit.
    */
   getModulesStatus() {
+    const byStatus = {};
+    for (const m of modules) byStatus[m.declaredStatus] = (byStatus[m.declaredStatus] || 0) + 1;
     return {
-      total: 344,
-      complete: 85,
-      partial: 259,
-      skeleton: 139,
-      completionPercentage: (85 / 344 * 100).toFixed(1) + "%",
-      breakdown: {
-        tier1Core: { count: 10, complete: 10, percentage: "100%" },
-        tier2Essential: { count: 20, complete: 15, percentage: "75%" },
-        tier3Marketplace: { count: 50, complete: 40, percentage: "80%" },
-        tier4SupplyChain: { count: 50, complete: 20, percentage: "40%" },
-        tier5Agricultural: { count: 50, complete: 20, percentage: "40%" },
-        tier6Advanced: { count: 50, complete: 0, percentage: "0%" },
-        tier7Enterprise: { count: 50, complete: 0, percentage: "0%" },
-      },
+      totalModules,
+      byDeclaredStatus: byStatus,
+      note: 'Tally of each module\'s own module.json "status" field (source: MODULES_REGISTRY.js). This is a self-declaration, not an independent audit -- module.json itself may be optimistic or stale for any given module.',
     };
   }
 
   /**
-   * FRONTEND STATUS BREAKDOWN
+   * FRONTEND STATUS -- real recursive file counts.
    */
   getFrontendStatus() {
+    const pagesDir = path.join(REPO_ROOT, 'frontend', 'src', 'pages');
+    const componentsDir = path.join(REPO_ROOT, 'frontend', 'src', 'components');
+    const modulesDir = path.join(REPO_ROOT, 'frontend', 'src', 'modules');
     return {
-      pages: {
-        total: 476,
-        complete: 280,
-        partial: 120,
-        skeleton: 76,
-        completionPercentage: (280 / 476 * 100).toFixed(1) + "%",
-      },
-      components: {
-        total: 1000,
-        complete: 600,
-        partial: 300,
-        skeleton: 100,
-        completionPercentage: (600 / 1000 * 100).toFixed(1) + "%",
-      },
-      hooks: {
-        total: 30,
-        complete: 30,
-        percentage: "100%",
-      },
-      services: {
-        total: 20,
-        complete: 18,
-        partial: 2,
-        percentage: "90%",
-      },
+      pageFiles: countFilesRecursive(pagesDir, ['.jsx', '.tsx']),
+      componentFiles: countFilesRecursive(componentsDir, ['.jsx', '.tsx']),
+      moduleFiles: countFilesRecursive(modulesDir, ['.jsx', '.tsx']),
+      note: 'Real recursive file counts under frontend/src/{pages,components,modules}. No completeness classification is attempted here.',
     };
   }
 
   /**
-   * DATABASE STATUS BREAKDOWN
+   * DATABASE STATUS -- real migration file count; execution status is a live
+   * environment fact this process cannot assert without connecting, so it is
+   * reported as unknown rather than guessed.
    */
   getDatabaseStatus() {
+    const migrationsDir = path.join(BACKEND_ROOT, 'src', 'database', 'migrations');
+    const migrationFileCount = fs.existsSync(migrationsDir)
+      ? fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql') || f.endsWith('.js')).length
+      : null;
     return {
-      migrations: {
-        created: 422,
-        executed: 0,
-        status: "❌ NOT EXECUTED",
-      },
-      schema: {
-        tablesDefinition: 523,
-        tablesInDatabase: 0,
-        status: "❌ ZERO TABLES",
-      },
-      status: "🔴 CRITICAL - MUST RUN MIGRATIONS",
+      migrationFileCount,
+      executionStatus: 'not checked by this endpoint -- query the live database connection to determine whether migrations have been applied',
     };
   }
 
   /**
-   * INTEGRATION STATUS BREAKDOWN
+   * INTEGRATIONS STATUS -- real check of whether each integration's SDK
+   * package is declared as a dependency. This proves the package is
+   * installed, not that the integration is correctly wired end-to-end.
    */
   getIntegrationsStatus() {
+    const pkgPath = path.join(BACKEND_ROOT, 'package.json');
+    const candidates = {
+      stripe: 'stripe',
+      aws_s3: 'aws-sdk',
+      twilio: 'twilio',
+      firebase: 'firebase-admin',
+      razorpay: 'razorpay',
+      elasticsearch: '@elastic/elasticsearch',
+      mongodb: 'mongodb',
+      redis: 'redis',
+      socketio: 'socket.io',
+      graphql: 'graphql',
+    };
+    const result = {};
+    for (const [label, pkgName] of Object.entries(candidates)) {
+      result[label] = { dependencyDeclared: checkPackageDependency(pkgPath, pkgName), package: pkgName };
+    }
     return {
-      fully_integrated: [
-        "Socket.IO (real-time)",
-        "Redis (caching)",
-        "PostgreSQL (database)",
-        "Express.js (framework)",
-        "Claude AI (coordinator ready)",
-      ],
-      partially_integrated: [
-        "Stripe (conditional)",
-        "AWS S3 (missing endpoints)",
-        "MongoDB (no schema)",
-        "Elasticsearch (not indexed)",
-        "OAuth2 (incomplete)",
-      ],
-      not_integrated: [
-        "Twilio (declared but unused)",
-        "Firebase (declared but unused)",
-        "Razorpay (skeleton)",
-        "GraphQL (incomplete resolvers)",
-        "IoT Sensors (not configured)",
-        "ML Models (not trained)",
-        "Blockchain (partial UI)",
-        "Email Templates (incomplete)",
-        "Notification Push (missing)",
-        "File Storage (S3 endpoints missing)",
-      ],
+      dependencies: result,
+      note: 'dependencyDeclared means the SDK package is listed in backend/package.json -- it does NOT confirm the integration is correctly wired, credentialed, or reachable at runtime.',
     };
   }
 
   /**
-   * CALCULATE OVERALL COMPLETION
-   */
-  calculateOverallCompletion() {
-    const weights = {
-      routes: { value: 155 / 226, weight: 0.15 },
-      services: { value: 200 / 277, weight: 0.15 },
-      pages: { value: 280 / 476, weight: 0.15 },
-      components: { value: 600 / 1000, weight: 0.10 },
-      modules: { value: 85 / 344, weight: 0.20 },
-      database: { value: 0 / 1, weight: 0.15 },
-      tests: { value: 0 / 1, weight: 0.10 },
-    };
-
-    let total = 0;
-    let weightSum = 0;
-
-    Object.values(weights).forEach(item => {
-      total += item.value * item.weight;
-      weightSum += item.weight;
-    });
-
-    const percentage = (total / weightSum * 100).toFixed(1);
-
-    return {
-      percentage: percentage + "%",
-      status: percentage < 50 ? "🔴 CRITICAL" : percentage < 70 ? "🟠 HIGH" : "🟡 MEDIUM",
-      breakdownByComponent: weights,
-    };
-  }
-
-  /**
-   * TIMELINE TO PRODUCTION
-   */
-  getTimeline() {
-    return {
-      phase1Days: "4-5 days",
-      phase2Days: "10-14 days",
-      phase3Days: "14-21 days",
-      phase4Days: "7 days",
-      total: "7-10 weeks",
-      teamSize: "4-6 people",
-      status: "⏳ PENDING EXECUTION",
-    };
-  }
-
-  /**
-   * GENERATE FULL DASHBOARD
+   * FULL DASHBOARD -- assembles the sections above. No fabricated phases,
+   * timelines, team rosters, or blocker lists (the previous version's were
+   * all hardcoded fiction); those require actual human/project-management
+   * judgment, not something this endpoint should assert.
    */
   generateFullDashboard() {
     return {
       timestamp: new Date().toISOString(),
-      projectStatus: this.getProjectStatus(),
-      components: {
-        routes: this.getRoutesStatus(),
-        services: this.getServicesStatus(),
-        modules: this.getModulesStatus(),
-        frontend: this.getFrontendStatus(),
-        database: this.getDatabaseStatus(),
-        integrations: this.getIntegrationsStatus(),
-      },
-      timeline: this.getTimeline(),
-      nextActions: [
-        "1. Run database migrations (Priority 1)",
-        "2. Configure API keys (Priority 1)",
-        "3. Fix 19+ endpoint mismatches (Priority 1)",
-        "4. Complete Stripe integration (Priority 1)",
-        "5. Test core workflows (Priority 1)",
-      ],
+      routes: this.getRoutesStatus(),
+      services: this.getServicesStatus(),
+      modules: this.getModulesStatus(),
+      frontend: this.getFrontendStatus(),
+      database: this.getDatabaseStatus(),
+      integrations: this.getIntegrationsStatus(),
     };
   }
 }
 
 /**
  * REGISTER DASHBOARD ENDPOINT
+ * Endpoint surface preserved for existing callers; payloads are now honest.
  */
 function registerDashboardEndpoint(router) {
   const dashboard = new IntegrationStatusDashboard();
 
-  // Full dashboard
   router.get('/api/debug/integration-status', (req, res) => {
     res.json(dashboard.generateFullDashboard());
   });
 
-  // Individual status endpoints
-  router.get('/api/debug/status/routes', (req, res) => {
-    res.json(dashboard.getRoutesStatus());
-  });
-
-  router.get('/api/debug/status/services', (req, res) => {
-    res.json(dashboard.getServicesStatus());
-  });
-
-  router.get('/api/debug/status/modules', (req, res) => {
-    res.json(dashboard.getModulesStatus());
-  });
-
-  router.get('/api/debug/status/frontend', (req, res) => {
-    res.json(dashboard.getFrontendStatus());
-  });
-
-  router.get('/api/debug/status/database', (req, res) => {
-    res.json(dashboard.getDatabaseStatus());
-  });
-
-  router.get('/api/debug/status/integrations', (req, res) => {
-    res.json(dashboard.getIntegrationsStatus());
-  });
-
-  router.get('/api/debug/status/blockers', (req, res) => {
-    res.json(dashboard.getCriticalBlockers());
-  });
-
-  router.get('/api/debug/status/timeline', (req, res) => {
-    res.json(dashboard.getTimeline());
-  });
-
-  router.get('/api/debug/status/overall', (req, res) => {
-    res.json({
-      completion: dashboard.calculateOverallCompletion(),
-      blockers: dashboard.getCriticalBlockers().length,
-      highPriority: dashboard.getHighPriorityIssues().length,
-    });
-  });
+  router.get('/api/debug/status/routes', (req, res) => res.json(dashboard.getRoutesStatus()));
+  router.get('/api/debug/status/services', (req, res) => res.json(dashboard.getServicesStatus()));
+  router.get('/api/debug/status/modules', (req, res) => res.json(dashboard.getModulesStatus()));
+  router.get('/api/debug/status/frontend', (req, res) => res.json(dashboard.getFrontendStatus()));
+  router.get('/api/debug/status/database', (req, res) => res.json(dashboard.getDatabaseStatus()));
+  router.get('/api/debug/status/integrations', (req, res) => res.json(dashboard.getIntegrationsStatus()));
 }
 
 module.exports = {

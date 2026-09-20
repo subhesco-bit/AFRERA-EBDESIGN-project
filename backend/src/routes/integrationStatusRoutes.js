@@ -1,146 +1,70 @@
 /**
  * INTEGRATION STATUS ROUTES
- * Unified API showing ALL project status and integration state
+ * Unified API showing project status and integration state
  * Accessible at: /api/status/*
+ *
+ * Rewritten 2026-09-20: previously hardcoded "42-68% COMPLETE", a fabricated
+ * "155/226 routes complete" figure (with `|| 226`/`|| 155` fallbacks that made
+ * the fabrication apply even if the registry was empty), a fake 7-10 week
+ * timeline, and fake team-assignment data. Now delegates entirely to
+ * IntegrationStatusDashboard, which computes real values from a live boot +
+ * filesystem scan (see INTEGRATION_STATUS_DASHBOARD.js for what is and isn't
+ * derivable that way).
  */
 
 const express = require('express');
 const router = express.Router();
 
-const { routesRegistry } = require('../ROUTES_REGISTRY');
-const { servicesRegistry } = require('../SERVICES_REGISTRY');
-const { modulesRegistry } = require('../MODULES_REGISTRY');
 const { IntegrationStatusDashboard } = require('../INTEGRATION_STATUS_DASHBOARD');
-
 const dashboard = new IntegrationStatusDashboard();
 
 /**
  * GET /api/status/complete
- * Full project status - everything visible
+ * Full project status - everything derivable by static analysis + live boot
  */
 router.get('/complete', (req, res) => {
   try {
-    res.json({
-      timestamp: new Date().toISOString(),
-      project: {
-        name: "EBDESIGN",
-        status: "42-68% COMPLETE",
-        phase: "PRE-LAUNCH",
-      },
-      components: {
-        routes: {
-          total: routesRegistry.summary?.totalRoutes || 226,
-          complete: routesRegistry.summary?.completeRoutes || 155,
-          partial: routesRegistry.summary?.partialRoutes || 65,
-          skeleton: routesRegistry.summary?.skeletonRoutes || 6,
-          percent: routesRegistry.summary?.completionPercentage || "68.6%",
-        },
-        services: {
-          total: servicesRegistry.summary.total,
-          complete: servicesRegistry.summary.complete,
-          partial: servicesRegistry.summary.partial,
-          skeleton: servicesRegistry.summary.skeleton,
-          percent: servicesRegistry.summary.completionPercentage,
-        },
-        modules: {
-          total: modulesRegistry.summary.total,
-          complete: modulesRegistry.summary.complete,
-          partial: modulesRegistry.summary.partial,
-          skeleton: modulesRegistry.summary.skeleton,
-          percent: modulesRegistry.summary.completionPercentage,
-        },
-      },
-      timeline: {
-        phase1: "4-5 days",
-        phase2: "2-3 weeks",
-        phase3: "3-5 weeks",
-        phase4: "1 week",
-        total: "7-10 weeks",
-      },
-      blockers: dashboard.getCriticalBlockers(),
-      nextSteps: [
-        "Run database migrations",
-        "Configure API keys",
-        "Fix 19+ endpoint mismatches",
-        "Complete Stripe integration",
-      ],
-    });
+    res.json(dashboard.generateFullDashboard());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/status/routes
- * All routes with status
- */
 router.get('/routes', (req, res) => {
   try {
-    res.json(routesRegistry);
+    res.json(dashboard.getRoutesStatus());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/status/services
- * All services with status
- */
 router.get('/services', (req, res) => {
   try {
-    res.json(servicesRegistry);
+    res.json(dashboard.getServicesStatus());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/status/modules
- * All modules with status
- */
 router.get('/modules', (req, res) => {
   try {
-    res.json(modulesRegistry);
+    res.json(dashboard.getModulesStatus());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/status/blockers
- * Critical blockers only
- */
-router.get('/blockers', (req, res) => {
+router.get('/database', (req, res) => {
   try {
-    res.json({
-      criticalBlockers: dashboard.getCriticalBlockers(),
-      count: dashboard.getCriticalBlockers().length,
-      phase1: "Must fix all blockers before Phase 2",
-    });
+    res.json(dashboard.getDatabaseStatus());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/status/timeline
- * Implementation timeline
- */
-router.get('/timeline', (req, res) => {
+router.get('/integrations', (req, res) => {
   try {
-    res.json(dashboard.getTimeline());
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * GET /api/status/team
- * Team assignments and readiness
- */
-router.get('/team', (req, res) => {
-  try {
-    res.json(dashboard.getTeamReadiness());
+    res.json(dashboard.getIntegrationsStatus());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -148,26 +72,25 @@ router.get('/team', (req, res) => {
 
 /**
  * GET /api/status/integration-health
- * Quick integration health check
+ * Quick pointer to the other endpoints. `blockers`, `timeline`, and `team`
+ * were removed: they were 100% hardcoded fiction (fake blocker list, fake
+ * 7-10 week timeline, fake 4-6 person roster) with no mechanical way to
+ * derive real equivalents from static analysis -- that is project-management
+ * judgment, not something this endpoint should assert.
  */
 router.get('/integration-health', (req, res) => {
   try {
     res.json({
-      status: "INTEGRATION_STATUS_READY",
+      status: 'INTEGRATION_STATUS_READY',
       endpoints: {
-        complete: "/api/status/complete",
-        routes: "/api/status/routes",
-        services: "/api/status/services",
-        modules: "/api/status/modules",
-        blockers: "/api/status/blockers",
-        timeline: "/api/status/timeline",
-        team: "/api/status/team",
+        complete: '/api/status/complete',
+        routes: '/api/status/routes',
+        services: '/api/status/services',
+        modules: '/api/status/modules',
+        database: '/api/status/database',
+        integrations: '/api/status/integrations',
       },
-      totalRoutes: routesRegistry.summary?.totalRoutes || 226,
-      totalServices: servicesRegistry.summary.total,
-      totalModules: modulesRegistry.summary.total,
-      readyForDeployment: false,
-      blockerCount: dashboard.getCriticalBlockers().length,
+      note: 'blockers/timeline/team endpoints were removed 2026-09-20: they returned hardcoded fictional data with no real derivation available from static analysis.',
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
