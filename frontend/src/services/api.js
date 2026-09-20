@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { farmersAPI as realFarmersAPI } from './commerceApi';
 
 /**
  * API Client
@@ -5340,4 +5341,72 @@ export const aiApprovalAPI = {
   decideProposal: (proposalId, data) => api.post(`/aiapproval/proposals/${proposalId}/decision`, data),
   executeProposal: proposalId => api.post(`/aiapproval/proposals/${proposalId}/execute`),
 };
+
+/**
+ * Rejects honestly instead of returning fabricated data. Used below for
+ * farmersAPI/modulesAPI methods that ~12 pages call but that were never
+ * backed by any real route anywhere in this codebase (verified by grep
+ * across backend/src/routes and backend/src/services) - distinct from the
+ * methods forwarded to the real, table-backed farmersAPI in commerceApi.js.
+ */
+const notImplemented = feature => () =>
+  Promise.reject(new Error(`${feature} has no backend implementation yet - not fabricating a response.`));
+
+// farmersAPI: was imported from this file by ~12 pages (FarmerHomePage,
+// DynamicPricingPage, PriceCheckPage, ...) but never defined here, so every
+// call threw "Cannot read properties of undefined" and broke the production
+// build outright (MISSING_EXPORT). getFarmer/calculateFDI/addCertification/
+// getCertifications/getFPOs are real and forwarded to commerceApi.js's
+// table-backed implementation; everything else those 12 pages call has no
+// backend anywhere in this codebase, so it honestly rejects rather than
+// inventing dashboard/pricing/advisory data.
+export const farmersAPI = {
+  ...realFarmersAPI,
+  getFarmerDashboard: notImplemented('Farmer dashboard'),
+  getNotifications: notImplemented('Farmer notifications'),
+  getDemandForecast: notImplemented('Demand forecast'),
+  getPriceDynamics: notImplemented('Price dynamics'),
+  getPriceSignals: notImplemented('Price signals'),
+  getMarketComparisonData: notImplemented('Market comparison'),
+  getProductsForCompare: notImplemented('Product comparison'),
+  getCropSuggestions: notImplemented('Crop suggestions'),
+  getMarketPrices: notImplemented('Market prices'),
+  getAdvisoryContext: notImplemented('Farm advisory'),
+  getQuickQuestions: notImplemented('Advisory quick questions'),
+  getMarketEvents: notImplemented('Market events'),
+  getPriceSeasonality: notImplemented('Price seasonality'),
+  getTimingRecommendations: notImplemented('Sell-timing recommendations'),
+  getBenchmarkPrices: notImplemented('Benchmark prices'),
+  getMarketConditions: notImplemented('Market conditions'),
+  savePricingModel: notImplemented('Pricing model save'),
+  getBenchmarks: notImplemented('Harvest benchmarks'),
+  getHarvestScore: notImplemented('Harvest score'),
+  getScoreHistory: notImplemented('Harvest score history'),
+  createListing: notImplemented('Farmer listing creation'),
+  getFields: notImplemented('Farmer fields'),
+  deleteField: notImplemented('Farmer field deletion'),
+  getPriceCategories: notImplemented('Price categories'),
+  getPriceTrends: notImplemented('Price trends'),
+  getCategories: notImplemented('Farmer listing categories'),
+  getStates: notImplemented('States list'),
+};
+
+// modulesAPI: same situation for ModuleHubPage/ModuleRuntimePage - no
+// module-registry route (getModules/getOverview) or AI-assistant route
+// (askAssistant) is mounted anywhere in this codebase.
+export const modulesAPI = {
+  getModules: notImplemented('Module registry listing'),
+  getOverview: notImplemented('Module registry overview'),
+  askAssistant: notImplemented('Module assistant'),
+};
+
+// preSeasonAPI: PreOrderPage.jsx's needs. routes/strategic/preSeasonPurchaseRoutes.js
+// exists but is an unmounted "Route operational" scaffold with no real
+// createOrder/getDashboard logic behind it.
+export const preSeasonAPI = {
+  createOrder: notImplemented('Pre-season order creation'),
+  getDashboard: notImplemented('Pre-season order dashboard'),
+};
+
+export { api };
 export default api;
