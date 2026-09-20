@@ -39,8 +39,15 @@ session, not just claimed by an older doc.
   had been 404ing on every real call until these were mounted. `f650042a`.
 - `routes/dual-use/mfaRoutes.js` (real TOTP/QR-code MFA setup) and
   `services/legacy/logisticsService.js` (shipments/vehicles/drivers) —
-  mounted at `/api/v1/mfa` and `/api/v1/logistics`. **Uncommitted as of
-  this doc** — see "In progress" below.
+  mounted at `/api/v1/mfa` and `/api/v1/logistics`. `a83530fa`.
+  **Known gap left honest, not papered over:** MFA *persistence* is
+  itself a stub in `services/dual-use/mfaService.js` — `enableMFA()`/
+  `isMFAEnabled()` never touch a database (3 different, mutually
+  conflicting `mfa_secrets` schema migrations exist — `mfa_schema.sql`,
+  `3015_m015_mfa.sql`, and the generic `mfa` table in `470_mfa.sql` —
+  so picking one correctly is a separate, riskier fix). `/setup`
+  generates a real QR code; `/verify` will honestly report "MFA not
+  enabled" until persistence is wired.
 - **Still not mounted / not investigated:** an unknown remainder beyond
   the ~66 handled above may still exist in `services/legacy/`,
   `services/finance/`, `services/agriculture/`, `services/commerce/`,
@@ -107,7 +114,7 @@ session, not just claimed by an older doc.
 - `mfaAPI` (in `api.js`, consumed via `componentApi.js` by
   `MFASetupPage.jsx`) and `logisticsAPI.getShipments` (consumed by
   `SupplyChainAnalyticsPage.jsx`) — same fix, done alongside the MFA/
-  logistics backend mounts. **Uncommitted as of this doc.**
+  logistics backend mounts. `a83530fa`.
 
 ### Dependency vulnerabilities
 - Backend: 2 high-severity CVEs remediated (`nodemailer` — SMTP command
@@ -126,28 +133,6 @@ session, not just claimed by an older doc.
   `services/` [dead], `services/logistics/` [dead]) collapsed to thin
   re-export wrappers per the existing `erpService.js` precedent.
   `b40dd125`.
-
----
-
-## 🚧 In progress — verified but not yet committed/pushed
-
-- `backend/src/index.js`: mounts for `routes/dual-use/mfaRoutes.js`
-  (`/api/v1/mfa`) and `services/legacy/logisticsService.js`
-  (`/api/v1/logistics`).
-- `frontend/src/services/api.js`: `mfaAPI` (setup/verify/disable, real
-  methods replacing fabricated `enableMFA`/`verifyMFA` that no page
-  called) and `logisticsAPI.getShipments` (filters/pagination now
-  actually passed through).
-- Known gap left honest, not papered over: MFA *persistence* is itself a
-  stub in `services/dual-use/mfaService.js` — `enableMFA()`/
-  `isMFAEnabled()` never touch a database (3 different, mutually
-  conflicting `mfa_secrets` schema migrations exist — `mfa_schema.sql`,
-  `3015_m015_mfa.sql`, and the generic `mfa` table in `470_mfa.sql` —
-  so picking one correctly is a separate, riskier fix). `/setup`
-  generates a real QR code; `/verify` will honestly report "MFA not
-  enabled" until persistence is wired.
-- Boot/lint/backend-test verification passed on this batch as of the
-  last check; needs a final re-confirmation + commit + push.
 
 ---
 
