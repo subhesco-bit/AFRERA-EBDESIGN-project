@@ -1,5 +1,65 @@
 # ACTIVE TASKS
 
+## TODO — regenerate 6 deleted audit CSVs (2026-09-20, not started)
+`_audit/SKELETON_SERVICE_AUDIT/{01_FILE_INVENTORY,03_SERVICE_INVENTORY,
+04_DEPENDENCY_INVENTORY,05_ROUTE_API_INVENTORY,06_DATABASE_INVENTORY,
+07_CONFIG_INVENTORY}.csv` were physically deleted from disk sometime before
+this session started (last committed in `77a9e8936`, "feat: add complete
+integration repair system", by subhesco-bit). They are git-recoverable
+(`git checkout 77a9e8936 -- _audit/SKELETON_SERVICE_AUDIT/`), but user
+explicitly asked to regenerate fresh rather than restore stale data —
+recovery-from-deletion was flagged as unreliable. No live script currently
+references these paths, so nothing is broken by their absence; this is
+purely about restoring the audit artifact itself. Need to find/run whatever
+tool originally produced them (likely a sibling of the `02_SKELETON_
+CANDIDATES.csv`/`08_SKELETON_EVIDENCE.csv`/`09_AUDIT_SUMMARY.txt` files that
+DO still exist in the same folder) and regenerate 01,03,04,05,06,07 fresh.
+
+## DONE — medical coding backend/frontend wiring (2026-09-20)
+Real bug found and fixed: `backend/src/services/advancedMedicalCodingService.js`
+(783 lines, real MS-level dietitian/natural-therapist/biological-coding
+knowledge base) and `backend/src/services/medicalCodingReferenceService.js`
+(real SQL-backed reference-lookup router) each contained a fully-built
+Express router with real endpoints matching the frontend's exact call sites
+— but both lived in `services/`, and `DynamicRouteLoader.discoverServiceEmbeddedRoutes`
+only picks up misplaced routers under `services/` whose filename ends in
+`Routes.js`; these ended in `Service.js`, so neither the normal `routes/`
+scan nor the misplaced-router fallback ever found them. Zero backend
+mounting existed for either, silently. Fixed: `git mv`'d both into
+`backend/src/routes/` as `advancedMedicalCodingRoutes.js` and
+`medicalCodingReferenceRoutes.js`. Verified via live boot: both now mount
+(`/api/v1/advanced-medical-coding`, `/api/v1/medical-coding-reference`),
+total mounted routes 768 → 770. Removed the two now-stale path entries from
+`SERVICES_REGISTRY.js`.
+
+Also added `medicalCodingAPI` to `frontend/src/services/api.js` — it was
+imported by `MedicalCodingDashboardPage.jsx` but never existed at all
+(would have crashed on first render). Wired its 3 methods to the real
+mounted endpoints.
+
+**Known remaining gap, not fabricated around:** `MedicalCodingDashboardPage.jsx`
+expects response shapes keyed by 10 hardcoded common-condition ids (diabetes,
+hypertension, gout, etc.) — `{conditions: {diabetes: {...}}}`,
+`{restrictions: {...}}`, `{requirements: {...}}`. The real knowledge base in
+`advancedMedicalCodingRoutes.js` is keyed by clinical category
+(`clinical_nutrition`, etc.), not those 10 condition ids, and
+`searchMedicalCodes()` is itself a stub that always returns `codes: []`
+(comment: "Implementation would search through the medical coding
+database"). Calls now resolve without crashing, but the dashboard's
+code/restriction/requirement tables will render empty for all 10
+conditions until either: (a) a condition-id lookup layer is added
+server-side mapping the 10 common conditions to real ICD-10-CM/SNOMED
+codes (needs real clinical coding data, not something to invent), or (b)
+the page is rewritten against the real knowledge-base shape. Did not
+fabricate ICD codes for the 10 conditions to make it "look" wired.
+
+`AdvancedMedicalCodingPage.jsx` (the other medical coding page) calls
+`api.get('/advanced-medical-coding/...')` directly with no API-object
+layer, and its endpoints (`code-systems`, `search-codes/:condition`,
+`dietitian-knowledge/:condition`, `natural-therapist-knowledge/:condition`,
+`health-management-plan`) now fully resolve — this page is genuinely fixed
+end-to-end by the route move alone.
+
 ## TODO — "make all gaps zero" (2026-08-29, in progress, resume here)
 
 User asked to close every code-achievable gap from the AFRERA Gap Index

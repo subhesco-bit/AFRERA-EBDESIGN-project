@@ -63,10 +63,6 @@ const serviceFiles = [
     "sizeBytes": 1129
   },
   {
-    "path": "services/advancedMedicalCodingService.js",
-    "sizeBytes": 28608
-  },
-  {
     "path": "services/advancedSearchService.js",
     "sizeBytes": 9387
   },
@@ -2237,10 +2233,6 @@ const serviceFiles = [
   {
     "path": "services/masterDataReconciliationService.js",
     "sizeBytes": 763
-  },
-  {
-    "path": "services/medicalCodingReferenceService.js",
-    "sizeBytes": 1312
   },
   {
     "path": "services/merchandisingService.js",
