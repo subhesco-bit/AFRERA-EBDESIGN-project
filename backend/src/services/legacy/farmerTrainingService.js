@@ -5,7 +5,6 @@
 
 const { logger } = require('../../utils/logger');
 const aiBackbone = require('./aiBackboneService');
-const { aiAPI } = require('./aiBackboneService');
 const { getPostgreSQL } = require('../../database/connection');
 const { signalBus } = require('../../core/signalBus');
 const { authMiddleware } = require('../../middleware/auth');
@@ -317,32 +316,31 @@ async function issueTrainingCertificate(registrationId) {
  */
 async function getTrainingRecommendations(farmerId) {
   try {
-    const farmerProfile = await getFarmerProfile(farmerId);
-
-    const aiRequest = {
-      task: 'training_recommendation',
-      parameters: {
-        farmer_profile: farmerProfile,
-        current_skills: await getFarmerSkills(farmerId),
-        career_goals: await getCareerGoals(farmerId),
-        market_demand: await getMarketDemandForSkills(),
-        available_programs: await getAvailableTrainingPrograms(farmerProfile.state),
-        government_priorities: await getGovernmentTrainingPriorities(farmerProfile.state),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
+    // BUG FIX (2026-09-20): this routed farmer_profile/current_skills/
+    // career_goals/market_demand/available_programs/government_priorities
+    // through aiAPI.generateRecommendation() to have the AI invent a
+    // recommended_programs list - but aiAPI was never a real export of
+    // aiBackboneService.js (see sharedInfraService.js 6005e08c for the same
+    // finding), so this threw a TypeError on every call. Every one of those
+    // inputs is itself an unimplemented stub (getFarmerProfile, getFarmerSkills,
+    // getCareerGoals, getMarketDemandForSkills, getAvailableTrainingPrograms,
+    // getGovernmentTrainingPriorities all just return {}/[]) - there is no
+    // real data anywhere in this path, not just a missing AI call. Surfaced
+    // honestly rather than fabricated program recommendations. Note: no
+    // currently-wired frontend method reaches this endpoint
+    // (/api/v1/training/recommendations/:farmerId is not called from
+    // farmerTrainingAPI in frontend/src/services/api.js).
     const recommendations = {
       farmer_id: farmerId,
       timestamp: new Date().toISOString(),
-      recommended_programs: aiResponse.recommended_programs,
-      priority_order: aiResponse.priority_order,
-      career_impact: aiResponse.career_impact,
-      time_commitment: aiResponse.time_commitment,
-      cost_estimate: aiResponse.cost_estimate,
-      subsidy_opportunities: aiResponse.subsidy_opportunities,
-      confidence: aiResponse.confidence,
+      recommended_programs: [],
+      priority_order: [],
+      career_impact: null,
+      time_commitment: null,
+      cost_estimate: null,
+      subsidy_opportunities: [],
+      configured: false,
+      reason: 'Training recommendations are not implemented in this deployment: no AI provider is wired for it, and the underlying farmer-profile, skills, career-goals, market-demand and program-catalog data sources are unimplemented stubs.',
     };
 
     return recommendations;
@@ -600,31 +598,6 @@ async function getGovernmentOrganicSupport(location) {
 
 async function getTrainingRegistration(registrationId) {
   // Get training registration
-  return {};
-}
-
-async function getFarmerSkills(farmerId) {
-  // Get farmer skills
-  return [];
-}
-
-async function getCareerGoals(farmerId) {
-  // Get career goals
-  return [];
-}
-
-async function getMarketDemandForSkills() {
-  // Get market demand
-  return {};
-}
-
-async function getAvailableTrainingPrograms(state) {
-  // Get available programs
-  return [];
-}
-
-async function getGovernmentTrainingPriorities(state) {
-  // Get government priorities
   return {};
 }
 

@@ -4,7 +4,6 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiBackboneService');
 const { socketServer } = require('../../websocket');
 const { authMiddleware } = require('../../middleware/auth');
 // Shared pool (2026-08-04 convention, see database/pool.js): the AI-matching
@@ -178,62 +177,37 @@ async function checkSchemeEligibility(params = {}) {
  */
 async function getApplicableSchemes(params) {
   try {
-    const {
-      user_id,
-      user_type,
-      location,
-      state,
-      district,
-      category,
-      crop_type,
-      farm_size,
-      income_level,
-    } = params;
+    const { user_id, location } = params;
 
-    // AI-powered scheme matching
-    const aiRequest = {
-      task: 'scheme_matching',
-      parameters: {
-        user_id,
-        user_type,
-        location,
-        state,
-        district,
-        category,
-        crop_type,
-        farm_size,
-        income_level,
-        all_schemes: await getAllGovernmentSchemes(),
-        user_profile: await getUserProfile(user_id),
-        historical_applications: await getUserSchemeHistory(user_id),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    // BUG FIX (2026-09-20): this discarded the real getAllGovernmentSchemes()
+    // list (5 hardcoded national/NE schemes with real name/code/ministry/
+    // subsidy fields) and asked the (nonexistent) AI to reinvent
+    // eligible_schemes with fabricated eligibility_score/confidence/
+    // ai_recommendation fields instead - aiAPI was never a real export of
+    // aiBackboneService.js (see sharedInfraService.js 6005e08c for the same
+    // finding), so this threw a TypeError on every call. user_profile/
+    // historical_applications were themselves unimplemented stubs too, so
+    // per-user matching was never possible anyway. Now returns the real
+    // scheme list directly - no per-user eligibility scoring is fabricated.
+    const allSchemes = await getAllGovernmentSchemes();
 
     const schemes = {
       user_id,
       location,
       timestamp: new Date().toISOString(),
-      eligible_schemes: aiResponse.eligible_schemes.map(scheme => ({
+      eligible_schemes: allSchemes.map(scheme => ({
         scheme_name: scheme.name,
         scheme_code: scheme.code,
         ministry: scheme.ministry,
         department: scheme.department,
         description: scheme.description,
-        eligibility_score: scheme.eligibility_score,
         subsidy_percentage: scheme.subsidy_percentage,
         max_amount: scheme.max_amount,
         application_deadline: scheme.deadline,
-        required_documents: scheme.documents,
-        application_process: scheme.process,
-        contact_details: scheme.contact,
-        ai_recommendation: scheme.recommendation,
-        confidence: scheme.confidence,
       })),
-      recommended_schemes: aiResponse.recommended_schemes,
-      total_schemes: aiResponse.eligible_schemes.length,
-      application_guidance: aiResponse.application_guidance,
+      recommended_schemes: [],
+      total_schemes: allSchemes.length,
+      application_guidance: null,
     };
 
     return schemes;
@@ -391,50 +365,27 @@ async function governmentOfficialLogin(credentials) {
  */
 async function getCSROpportunities(params) {
   try {
-    const {
-      location,
-      sector,
-      focus_area,
-      budget_range,
-      company_type,
-    } = params;
-
-    // AI-powered CSR matching
-    const aiRequest = {
-      task: 'csr_opportunity_matching',
-      parameters: {
-        location,
-        sector,
-        focus_area,
-        budget_range,
-        company_type,
-        available_projects: await getCSRProjects(params),
-        impact_assessment: await assessCSRImpact(params),
-        compliance_requirements: await getCSRCompliance(params),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
+    // BUG FIX (2026-09-20): this routed location/sector/focus_area/
+    // budget_range/company_type through aiAPI.generateRecommendation() to
+    // have the AI invent a CSR opportunities list - but aiAPI was never a
+    // real export of aiBackboneService.js (see sharedInfraService.js
+    // 6005e08c for the same finding), so this threw a TypeError on every
+    // call. This is LIVE-WIRED: frontend/src/services/api.js's
+    // governmentSchemeAPI.getCsrOpportunities() calls this exact endpoint
+    // (/csr/opportunities), so it was 500ing for every real caller.
+    // available_projects/impact_assessment/compliance_requirements are
+    // themselves unimplemented stubs (getCSRProjects/assessCSRImpact/
+    // getCSRCompliance all return {}/[]) - there is no real CSR project data
+    // anywhere in this path. Surfaced honestly rather than fabricated.
     const opportunities = {
       search_id: generateId(),
       timestamp: new Date().toISOString(),
       search_params: params,
-      opportunities: aiResponse.opportunities.map(opp => ({
-        project_id: opp.id,
-        project_name: opp.name,
-        organization: opp.organization,
-        focus_area: opp.focus_area,
-        location: opp.location,
-        budget_required: opp.budget,
-        impact_score: opp.impact_score,
-        beneficiaries: opp.beneficiaries,
-        timeline: opp.timeline,
-        match_score: opp.match_score,
-        ai_recommendation: opp.recommendation,
-      })),
-      total_opportunities: aiResponse.opportunities.length,
-      recommendations: aiResponse.recommendations,
+      opportunities: [],
+      total_opportunities: 0,
+      recommendations: [],
+      configured: false,
+      reason: 'CSR opportunity matching is not implemented in this deployment: no AI provider is wired for it, and the underlying CSR-project, impact-assessment and compliance data sources are unimplemented stubs.',
     };
 
     return opportunities;
@@ -481,19 +432,14 @@ async function submitCSRProposal(proposalData) {
       tracking_number: generateTrackingNumber(),
     };
 
-    // AI-powered proposal assessment
-    const aiRequest = {
-      task: 'csr_proposal_assessment',
-      parameters: {
-        proposal_data: proposalData,
-        government_priorities: await getGovernmentPriorities(location),
-        impact_potential: await assessImpactPotential(proposalData),
-        alignment_score: await calculateAlignmentScore(proposalData),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    proposal.ai_assessment = aiResponse;
+    // AI-powered proposal assessment is not available - same finding as
+    // getApplicableSchemes/getCSROpportunities above: no real
+    // `aiAPI.generateRecommendation`, and the government_priorities/
+    // impact_potential/alignment_score helpers that would have fed it are
+    // themselves unimplemented stubs. The proposal itself is stored from the
+    // real submitted proposalData above (not affected); only the assessment
+    // add-on is surfaced honestly rather than fabricated.
+    proposal.ai_assessment = null;
 
     logger.info(`CSR proposal submitted: ${proposal.proposal_id}`);
     return proposal;
@@ -621,16 +567,6 @@ async function getAllGovernmentSchemes() {
   ];
 }
 
-async function getUserProfile(userId) {
-  // Fetch user profile
-  return {};
-}
-
-async function getUserSchemeHistory(userId) {
-  // Fetch user's scheme application history
-  return [];
-}
-
 async function getCurrentWeather(location) {
   // Fetch current weather
   return {
@@ -680,36 +616,6 @@ async function validateGovernmentCredentials(credentials) {
     permissions: ['read', 'write', 'approve'],
     access_level: 'state',
   };
-}
-
-async function getCSRProjects(params) {
-  // Get CSR projects
-  return [];
-}
-
-async function assessCSRImpact(params) {
-  // Assess CSR impact
-  return {};
-}
-
-async function getCSRCompliance(params) {
-  // Get CSR compliance requirements
-  return {};
-}
-
-async function getGovernmentPriorities(location) {
-  // Get government priorities
-  return [];
-}
-
-async function assessImpactPotential(proposalData) {
-  // Assess impact potential
-  return {};
-}
-
-async function calculateAlignmentScore(proposalData) {
-  // Calculate alignment score
-  return {};
 }
 
 async function getFeaturedSchemes(location) {

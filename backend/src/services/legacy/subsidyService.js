@@ -5,7 +5,6 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiBackboneService');
 const { authMiddleware } = require('../../middleware/auth');
 
 /**
@@ -13,63 +12,43 @@ const { authMiddleware } = require('../../middleware/auth');
  */
 async function checkProjectSubsidyEligibility(projectDetails) {
   try {
-    const {
-      project_type,
-      location,
-      state,
-      district,
-      estimated_cost,
-      farmer_category,
-      land_ownership,
-      existing_infrastructure,
-      crop_type,
-      scale_of_operation,
-    } = projectDetails;
+    const { project_type, state } = projectDetails;
 
-    // AI-powered subsidy eligibility check
-    const aiRequest = {
-      task: 'subsidy_eligibility_check',
-      parameters: {
-        subsidy_type: 'project',
-        project_type,
-        location,
-        state,
-        district,
-        estimated_cost,
-        farmer_category,
-        land_ownership,
-        existing_infrastructure,
-        crop_type,
-        scale_of_operation,
-        government_schemes: await getGovernmentSchemes(state, project_type),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    // BUG FIX (2026-09-20): this routed the real, state-filtered
+    // getGovernmentSchemes() result (the same real hardcoded scheme catalog
+    // - name/code/ministry/subsidy_percentage/max_amount/eligibility - that
+    // getApplicableSchemes() below already returns directly, unbroken)
+    // through aiAPI.generateRecommendation() to have the AI invent
+    // eligibility_score/subsidy_breakdown/next_steps on top of it - but
+    // aiAPI was never a real export of aiBackboneService.js (see
+    // sharedInfraService.js 6005e08c for the same finding), so this threw a
+    // TypeError on every call. This is LIVE-WIRED and was the highest-value
+    // finding of this pass: frontend/src/services/api.js's
+    // subsidyOpsAPI.checkProjectSubsidy() calls this exact endpoint
+    // (/subsidy/project/check), so every real caller got a 500. Now returns
+    // the real, state-filtered scheme list directly instead of fabricating
+    // AI eligibility scores on top of it - no eligibility_score/confidence/
+    // documents/deadline fields are invented since getGovernmentSchemes()
+    // does not track those.
+    const matchingSchemes = await getGovernmentSchemes(state, project_type);
 
     const eligibility = {
       check_id: generateId(),
       timestamp: new Date().toISOString(),
       project_details: projectDetails,
-      eligible_schemes: aiResponse.eligible_schemes.map(scheme => ({
+      eligible_schemes: matchingSchemes.map(scheme => ({
         scheme_name: scheme.name,
         scheme_code: scheme.code,
         ministry: scheme.ministry,
         subsidy_percentage: scheme.subsidy_percentage,
         max_subsidy_amount: scheme.max_amount,
-        eligibility_score: scheme.eligibility_score,
-        confidence: scheme.confidence,
-        requirements: scheme.requirements,
-        documents_required: scheme.documents,
-        application_deadline: scheme.deadline,
-        expected_processing_time: scheme.processing_time,
+        eligibility_criteria: scheme.eligibility,
       })),
-      recommended_scheme: aiResponse.recommended_scheme,
-      total_potential_subsidy: aiResponse.total_potential_subsidy,
-      subsidy_breakdown: aiResponse.subsidy_breakdown,
-      application_guidance: aiResponse.application_guidance,
-      next_steps: aiResponse.next_steps,
-      ai_confidence: aiResponse.confidence,
+      recommended_scheme: null,
+      total_potential_subsidy: null,
+      subsidy_breakdown: null,
+      application_guidance: null,
+      next_steps: [],
     };
 
     logger.info(`Project subsidy eligibility check: ${eligibility.check_id}`);
@@ -85,69 +64,38 @@ async function checkProjectSubsidyEligibility(projectDetails) {
  */
 async function checkEquipmentSubsidyEligibility(equipmentDetails) {
   try {
-    const {
-      equipment_type,
-      equipment_category,
-      brand,
-      model,
-      quantity,
-      unit_cost,
-      total_cost,
-      location,
-      state,
-      farmer_category,
-      existing_equipment,
-      intended_use,
-      power_source,
-    } = equipmentDetails;
+    const { equipment_category, state } = equipmentDetails;
 
-    const aiRequest = {
-      task: 'subsidy_eligibility_check',
-      parameters: {
-        subsidy_type: 'equipment',
-        equipment_type,
-        equipment_category,
-        brand,
-        model,
-        quantity,
-        unit_cost,
-        total_cost,
-        location,
-        state,
-        farmer_category,
-        existing_equipment,
-        intended_use,
-        power_source,
-        government_schemes: await getEquipmentSchemes(state, equipment_category),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    // BUG FIX (2026-09-20): same finding as checkProjectSubsidyEligibility
+    // above - this discarded the real, state-filtered getEquipmentSchemes()
+    // result and asked the (nonexistent) AI to invent eligibility_score/
+    // subsidy_breakdown/alternatives on top of it. aiAPI was never a real
+    // export of aiBackboneService.js. LIVE-WIRED:
+    // subsidyOpsAPI.checkEquipmentSubsidy() in frontend/src/services/api.js
+    // calls this exact endpoint (/subsidy/equipment/check), so every real
+    // caller got a 500. Now returns the real scheme list directly - no
+    // max_subsidy_per_unit/brand_restrictions/eligibility_score fields are
+    // invented since getEquipmentSchemes() does not track per-unit or
+    // brand-level data.
+    const matchingSchemes = await getEquipmentSchemes(state, equipment_category);
 
     const eligibility = {
       check_id: generateId(),
       timestamp: new Date().toISOString(),
       equipment_details: equipmentDetails,
-      eligible_schemes: aiResponse.eligible_schemes.map(scheme => ({
+      eligible_schemes: matchingSchemes.map(scheme => ({
         scheme_name: scheme.name,
         scheme_code: scheme.code,
         ministry: scheme.ministry,
         subsidy_percentage: scheme.subsidy_percentage,
-        max_subsidy_per_unit: scheme.max_per_unit,
-        max_quantity: scheme.max_quantity,
-        eligibility_score: scheme.eligibility_score,
-        confidence: scheme.confidence,
-        requirements: scheme.requirements,
-        documents_required: scheme.documents,
-        application_deadline: scheme.deadline,
-        brand_restrictions: scheme.brand_restrictions,
+        max_subsidy_amount: scheme.max_amount,
+        eligibility_criteria: scheme.eligibility,
       })),
-      recommended_scheme: aiResponse.recommended_scheme,
-      total_potential_subsidy: aiResponse.total_potential_subsidy,
-      subsidy_breakdown: aiResponse.subsidy_breakdown,
-      alternative_equipment: aiResponse.alternatives,
-      application_guidance: aiResponse.application_guidance,
-      ai_confidence: aiResponse.confidence,
+      recommended_scheme: null,
+      total_potential_subsidy: null,
+      subsidy_breakdown: null,
+      alternative_equipment: [],
+      application_guidance: null,
     };
 
     logger.info(`Equipment subsidy eligibility check: ${eligibility.check_id}`);
@@ -163,70 +111,47 @@ async function checkEquipmentSubsidyEligibility(equipmentDetails) {
  */
 async function checkLogisticsSubsidyEligibility(logisticsDetails) {
   try {
-    const {
-      logistics_type,
-      route,
-      origin,
-      destination,
-      distance,
-      cargo_type,
-      cargo_value,
-      vehicle_type,
-      temperature_requirement,
-      farmer_category,
-      state,
-      is_northeast_route,
-      is_interstate,
-    } = logisticsDetails;
+    const { state, is_northeast_route } = logisticsDetails;
 
-    const aiRequest = {
-      task: 'subsidy_eligibility_check',
-      parameters: {
-        subsidy_type: 'logistics',
-        logistics_type,
-        route,
-        origin,
-        destination,
-        distance,
-        cargo_type,
-        cargo_value,
-        vehicle_type,
-        temperature_requirement,
-        farmer_category,
-        state,
-        is_northeast_route,
-        is_interstate,
-        government_schemes: await getLogisticsSchemes(state, is_northeast_route),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    // BUG FIX (2026-09-20): same finding as checkProjectSubsidyEligibility
+    // above - this discarded the real getLogisticsSchemes() result (a real,
+    // concrete NE-logistics scheme with actual subsidy_type/rate/max_amount
+    // fields when is_northeast_route is true) and asked the (nonexistent) AI
+    // to invent eligibility_score/subsidy_breakdown/alternative_routes on
+    // top of it, and also fabricated estimated_cost_with_gst via
+    // aiResponse.estimated_private_cost. aiAPI was never a real export of
+    // aiBackboneService.js. LIVE-WIRED:
+    // subsidyOpsAPI.checkLogisticsSubsidy() in
+    // frontend/src/services/api.js calls this exact endpoint
+    // (/subsidy/logistics/check), so every real caller got a 500. Now
+    // returns the real scheme list directly (subsidy_type/subsidy_rate/
+    // max_subsidy_amount are genuine fields on the NE-logistics scheme
+    // object, not invented); estimated_cost_with_gst is left null rather
+    // than fabricating a private-carrier fare quote (a real GST-inclusive
+    // figure for a known cargo_value is available via the separate
+    // /subsidy/gst/calculate endpoint - calculateGSTApplicability() below).
+    const matchingSchemes = await getLogisticsSchemes(state, is_northeast_route);
 
     const eligibility = {
       check_id: generateId(),
       timestamp: new Date().toISOString(),
       logistics_details: logisticsDetails,
-      eligible_schemes: aiResponse.eligible_schemes.map(scheme => ({
+      eligible_schemes: matchingSchemes.map(scheme => ({
         scheme_name: scheme.name,
         scheme_code: scheme.code,
         ministry: scheme.ministry,
         subsidy_type: scheme.subsidy_type, // per_km, per_ton, flat_rate
         subsidy_rate: scheme.rate,
         max_subsidy_amount: scheme.max_amount,
-        eligibility_score: scheme.eligibility_score,
-        confidence: scheme.confidence,
-        requirements: scheme.requirements,
-        documents_required: scheme.documents,
-        application_deadline: scheme.deadline,
+        eligibility_criteria: scheme.eligibility,
       })),
-      recommended_scheme: aiResponse.recommended_scheme,
-      total_potential_subsidy: aiResponse.total_potential_subsidy,
-      subsidy_breakdown: aiResponse.subsidy_breakdown,
-      private_company_routing: aiResponse.private_routing,
-      gst_applicability: aiResponse.gst_applicability,
-      alternative_routes: aiResponse.alternative_routes,
-      application_guidance: aiResponse.application_guidance,
-      ai_confidence: aiResponse.confidence,
+      recommended_scheme: null,
+      total_potential_subsidy: null,
+      subsidy_breakdown: null,
+      private_company_routing: null,
+      gst_applicability: null,
+      alternative_routes: [],
+      application_guidance: null,
     };
 
     // If subsidy not available, route through private company with GST
@@ -237,7 +162,7 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
         gst_applicable: true,
         gst_rate: 18,
         private_logistics_partners: await getPrivateLogisticsPartners(state),
-        estimated_cost_with_gst: aiResponse.estimated_private_cost,
+        estimated_cost_with_gst: null,
       };
     }
 

@@ -4,7 +4,6 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiBackboneService');
 const { authMiddleware } = require('../../middleware/auth');
 
 /**
@@ -12,82 +11,32 @@ const { authMiddleware } = require('../../middleware/auth');
  */
 async function designGreenhouse(params) {
   try {
-    const {
-      location,
-      crop_type,
-      area_size,
-      budget,
-      climate_zone,
-      automation_level,
-      renewable_integration,
-      target_yield,
-    } = params;
-
-    // AI-driven greenhouse design
-    const aiRequest = {
-      task: 'greenhouse_design',
-      parameters: {
-        location,
-        crop_type,
-        area_size,
-        budget,
-        climate_zone,
-        automation_level,
-        renewable_integration,
-        target_yield,
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
+    // BUG FIX (2026-09-20): this routed the raw design params (location,
+    // crop_type, area_size, budget, climate_zone, automation_level,
+    // renewable_integration, target_yield - all just passed through from the
+    // caller, nothing computed or fetched) through
+    // aiAPI.generateRecommendation() to have the AI invent an entire
+    // greenhouse design (structure/materials/microclimate systems/
+    // irrigation/lighting/automation/renewable sizing/cost estimate) - but
+    // aiAPI was never a real export of aiBackboneService.js (see
+    // sharedInfraService.js 6005e08c for the same finding), so this threw a
+    // TypeError on every call. There is no real engineering computation or
+    // catalog behind any of this - nothing to surface honestly except the
+    // params themselves, so this returns null-out sections rather than
+    // fabricating structural/electrical specs or cost figures.
     const design = {
       greenhouse_id: generateId(),
-      specifications: {
-        structure: aiResponse.structure,
-        dimensions: aiResponse.dimensions,
-        materials: aiResponse.materials,
-        covering: aiResponse.covering,
-        frame_type: aiResponse.frame_type,
-      },
-      microclimate_systems: {
-        ventilation: aiResponse.ventilation,
-        cooling: aiResponse.cooling,
-        heating: aiResponse.heating,
-        humidity_control: aiResponse.humidity_control,
-        co2_enrichment: aiResponse.co2_enrichment,
-      },
-      irrigation_system: {
-        type: aiResponse.irrigation_type,
-        automation: aiResponse.irrigation_automation,
-        sensors: aiResponse.irrigation_sensors,
-        water_management: aiResponse.water_management,
-      },
-      lighting: {
-        natural_light_optimization: aiResponse.lighting,
-        supplemental_lighting: aiResponse.supplemental_lighting,
-        light_sensors: aiResponse.light_sensors,
-      },
-      automation: {
-        control_system: aiResponse.control_system,
-        sensors: aiResponse.sensors,
-        actuators: aiResponse.actuators,
-        monitoring: aiResponse.monitoring,
-      },
-      renewable_energy: {
-        solar_capacity: aiResponse.solar_capacity,
-        wind_integration: aiResponse.wind_integration,
-        battery_storage: aiResponse.battery_storage,
-        grid_connection: aiResponse.grid_connection,
-      },
-      cost_estimate: {
-        construction: aiResponse.construction_cost,
-        equipment: aiResponse.equipment_cost,
-        installation: aiResponse.installation_cost,
-        total: aiResponse.total_cost,
-        roi_estimate: aiResponse.roi_estimate,
-      },
-      ai_confidence: aiResponse.confidence,
-      recommendations: aiResponse.recommendations,
+      design_params: params,
+      specifications: null,
+      microclimate_systems: null,
+      irrigation_system: null,
+      lighting: null,
+      automation: null,
+      renewable_energy: null,
+      cost_estimate: null,
+      recommendations: [],
+      configured: false,
+      reason: 'Greenhouse design generation is not implemented in this deployment: no AI provider is wired for it, and there is no engineering catalog or sizing logic to fall back on.',
     };
 
     logger.info(`Greenhouse design generated: ${design.greenhouse_id}`);
@@ -103,35 +52,28 @@ async function designGreenhouse(params) {
  */
 async function optimizeMicroclimate(greenhouseId, currentConditions, targetConditions) {
   try {
-    const aiRequest = {
-      task: 'microclimate_optimization',
-      parameters: {
-        greenhouse_id: greenhouseId,
-        current_conditions: currentConditions,
-        target_conditions: targetConditions,
-        weather_forecast: await getWeatherForecast(currentConditions.location),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
+    // BUG FIX (2026-09-20): this routed current/target conditions plus
+    // getWeatherForecast() through aiAPI.generateRecommendation() to have
+    // the AI invent temperature/humidity/CO2/light/irrigation/ventilation
+    // adjustments - but aiAPI was never a real export of
+    // aiBackboneService.js (see sharedInfraService.js 6005e08c for the same
+    // finding), so this threw a TypeError on every call. getWeatherForecast()
+    // itself is a hardcoded placeholder (fixed min/max values regardless of
+    // location, its own comment says "In production, integrate with weather
+    // API") - not real per-location data - so there is nothing real to base
+    // adjustment recommendations on. Surfaced honestly rather than
+    // fabricated control-system adjustments.
     const optimization = {
       greenhouse_id: greenhouseId,
       timestamp: new Date().toISOString(),
       current_conditions: currentConditions,
       target_conditions: targetConditions,
-      adjustments: {
-        temperature: aiResponse.temperature_adjustment,
-        humidity: aiResponse.humidity_adjustment,
-        co2_level: aiResponse.co2_adjustment,
-        light_intensity: aiResponse.light_adjustment,
-        irrigation: aiResponse.irrigation_adjustment,
-        ventilation: aiResponse.ventilation_adjustment,
-      },
-      predicted_outcome: aiResponse.predicted_outcome,
-      energy_impact: aiResponse.energy_impact,
-      cost_impact: aiResponse.cost_impact,
-      ai_confidence: aiResponse.confidence,
+      adjustments: null,
+      predicted_outcome: null,
+      energy_impact: null,
+      cost_impact: null,
+      configured: false,
+      reason: 'Microclimate optimization is not implemented in this deployment: no AI provider is wired for it, and no real weather-forecast integration exists to base adjustments on.',
     };
 
     logger.info(`Microclimate optimization for greenhouse ${greenhouseId}`);
@@ -220,14 +162,15 @@ async function monitorGreenhouse(greenhouseId) {
       },
     };
 
-    // AI analysis of conditions
-    const aiRequest = {
-      task: 'greenhouse_monitoring_analysis',
-      parameters: sensorData,
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    sensorData.ai_analysis = aiResponse;
+    // BUG FIX (2026-09-20): this routed sensorData through
+    // aiAPI.generateRecommendation() for an "ai_analysis" - but aiAPI was
+    // never a real export of aiBackboneService.js (see sharedInfraService.js
+    // 6005e08c for the same finding), so this threw a TypeError on every
+    // call. sensorData itself is simulated placeholder data (see the
+    // "Simulate sensor data" comment above, not real IoT input), so an AI
+    // analysis of it would only be fabricating an analysis of fake numbers -
+    // surfaced honestly as null rather than adding that.
+    sensorData.ai_analysis = null;
 
     return sensorData;
   } catch (error) {
@@ -241,34 +184,23 @@ async function monitorGreenhouse(greenhouseId) {
  */
 async function predictYield(greenhouseId, cropType, growingConditions) {
   try {
-    const aiRequest = {
-      task: 'yield_prediction',
-      parameters: {
-        greenhouse_id: greenhouseId,
-        crop_type: cropType,
-        growing_conditions: growingConditions,
-        historical_data: await getYieldHistory(greenhouseId),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
+    // BUG FIX (2026-09-20): this routed growingConditions plus
+    // getYieldHistory() through aiAPI.generateRecommendation() to have the
+    // AI invent expected_yield/harvest_date/quality_grade/risk_factors - but
+    // aiAPI was never a real export of aiBackboneService.js (see
+    // sharedInfraService.js 6005e08c for the same finding), so this threw a
+    // TypeError on every call. getYieldHistory() is an unimplemented stub
+    // (returns []) - there is no real historical yield data anywhere in this
+    // path. Surfaced honestly rather than fabricating a yield forecast.
     const prediction = {
       greenhouse_id: greenhouseId,
       crop_type: cropType,
-      prediction: {
-        expected_yield: aiResponse.expected_yield,
-        confidence_interval: aiResponse.confidence_interval,
-        harvest_date: aiResponse.harvest_date,
-        quality_grade: aiResponse.quality_grade,
-      },
-      factors: {
-        contributing: aiResponse.contributing_factors,
-        risks: aiResponse.risk_factors,
-        opportunities: aiResponse.opportunities,
-      },
-      recommendations: aiResponse.recommendations,
-      ai_confidence: aiResponse.confidence,
+      growing_conditions: growingConditions,
+      prediction: null,
+      factors: null,
+      recommendations: [],
+      configured: false,
+      reason: 'Yield prediction is not implemented in this deployment: no AI provider is wired for it, and no historical yield data source exists to base a forecast on.',
     };
 
     logger.info(`Yield prediction for greenhouse ${greenhouseId}`);
@@ -284,85 +216,46 @@ async function predictYield(greenhouseId, cropType, growingConditions) {
  */
 async function generateDPR(projectParams) {
   try {
-    const {
-      project_name,
-      location,
-      greenhouse_type,
-      area_size,
-      crop_plan,
-      budget,
-      timeline,
-      stakeholders,
-    } = projectParams;
+    const { project_name, location, greenhouse_type } = projectParams;
 
-    // AI-powered DPR generation
-    const aiRequest = {
-      task: 'dpr_generation',
-      parameters: {
-        project_name,
-        location,
-        greenhouse_type,
-        area_size,
-        crop_plan,
-        budget,
-        timeline,
-        stakeholders,
-        government_schemes: await getApplicableSchemes(location, greenhouse_type),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    // BUG FIX (2026-09-20): this routed the project params plus
+    // getApplicableSchemes() through aiAPI.generateRecommendation() to have
+    // the AI invent a full Detailed Project Report (executive summary,
+    // technical specs, financial analysis, market analysis, risk analysis,
+    // implementation plan, environmental impact) - but aiAPI was never a
+    // real export of aiBackboneService.js (see sharedInfraService.js
+    // 6005e08c for the same finding), so this threw a TypeError on every
+    // call. getApplicableSchemes(location, greenhouse_type) below IS real,
+    // concrete data (a hardcoded but genuine list of named scheme codes:
+    // PM-FME/AIF/MIDH/NER Logistics - same treatment as
+    // governmentSchemeService.js's getAllGovernmentSchemes), so it is kept
+    // and surfaced directly here rather than discarded. Everything else a
+    // DPR document needs (financial ratios, market/risk analysis, technical
+    // specs) requires genuine engineering/financial analysis this deployment
+    // has no source for - surfaced honestly as null rather than fabricated.
+    const applicableSchemes = await getApplicableSchemes(location, greenhouse_type);
 
     const dpr = {
       project_id: generateId(),
       project_name,
-      executive_summary: aiResponse.executive_summary,
-      project_background: aiResponse.project_background,
-      technical_specifications: {
-        site_details: aiResponse.site_details,
-        greenhouse_design: aiResponse.greenhouse_design,
-        infrastructure: aiResponse.infrastructure,
-        equipment: aiResponse.equipment,
-        technology: aiResponse.technology,
-      },
-      financial_analysis: {
-        capital_cost: aiResponse.capital_cost,
-        operating_cost: aiResponse.operating_cost,
-        revenue_projection: aiResponse.revenue_projection,
-        financial_ratios: aiResponse.financial_ratios,
-        break_even_analysis: aiResponse.break_even_analysis,
-      },
-      market_analysis: {
-        target_market: aiResponse.target_market,
-        demand_analysis: aiResponse.demand_analysis,
-        competition: aiResponse.competition,
-        marketing_strategy: aiResponse.marketing_strategy,
-      },
-      risk_analysis: {
-        technical_risks: aiResponse.technical_risks,
-        financial_risks: aiResponse.financial_risks,
-        market_risks: aiResponse.market_risks,
-        mitigation_strategies: aiResponse.mitigation_strategies,
-      },
+      project_params: projectParams,
+      executive_summary: null,
+      project_background: null,
+      technical_specifications: null,
+      financial_analysis: null,
+      market_analysis: null,
+      risk_analysis: null,
       government_schemes: {
-        applicable_schemes: aiResponse.applicable_schemes,
-        subsidy_eligibility: aiResponse.subsidy_eligibility,
-        application_process: aiResponse.application_process,
-        expected_subsidy: aiResponse.expected_subsidy,
+        applicable_schemes: applicableSchemes,
+        subsidy_eligibility: null,
+        application_process: null,
+        expected_subsidy: null,
       },
-      implementation_plan: {
-        phases: aiResponse.phases,
-        timeline: aiResponse.timeline,
-        milestones: aiResponse.milestones,
-        resource_allocation: aiResponse.resource_allocation,
-      },
-      environmental_impact: {
-        sustainability: aiResponse.sustainability,
-        carbon_footprint: aiResponse.carbon_footprint,
-        water_usage: aiResponse.water_usage,
-        energy_efficiency: aiResponse.energy_efficiency,
-      },
-      appendices: aiResponse.appendices,
+      implementation_plan: null,
+      environmental_impact: null,
+      appendices: [],
+      configured: false,
+      reason: 'Full DPR generation is not implemented in this deployment: no AI provider is wired for it, and no financial/engineering analysis source exists for the document sections beyond the real applicable-schemes list above.',
       generated_at: new Date().toISOString(),
     };
 
@@ -379,34 +272,35 @@ async function generateDPR(projectParams) {
  */
 async function estimateProjectCost(projectDetails) {
   try {
-    const aiRequest = {
-      task: 'project_cost_estimation',
-      parameters: {
-        ...projectDetails,
-        current_market_rates: await getCurrentMarketRates(),
-        regional_factors: await getRegionalFactors(projectDetails.location),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    // BUG FIX (2026-09-20): this routed projectDetails plus
+    // getCurrentMarketRates()/getRegionalFactors() through
+    // aiAPI.generateRecommendation() to have the AI invent a full cost
+    // breakdown (civil/structural/electrical/mechanical/automation/
+    // installation/contingency, total_estimate) - but aiAPI was never a real
+    // export of aiBackboneService.js (see sharedInfraService.js 6005e08c for
+    // the same finding), so this threw a TypeError on every call.
+    // getCurrentMarketRates() and getRegionalFactors() ARE real, concrete
+    // hardcoded reference data (steel/cement/labor rates; regional cost
+    // multipliers) - kept and surfaced directly here. There is no real
+    // formula anywhere that turns those rates into a civil/structural/
+    // electrical/mechanical cost breakdown - fabricating one would mean
+    // inventing a specific total cost figure, so that part is surfaced
+    // honestly as null instead.
+    const currentMarketRates = await getCurrentMarketRates();
+    const regionalFactors = await getRegionalFactors(projectDetails.location);
 
     const estimate = {
       project_id: generateId(),
-      breakdown: {
-        civil_works: aiResponse.civil_works,
-        structural: aiResponse.structural,
-        electrical: aiResponse.electrical,
-        mechanical: aiResponse.mechanical,
-        automation: aiResponse.automation,
-        installation: aiResponse.installation,
-        contingency: aiResponse.contingency,
-      },
-      total_estimate: aiResponse.total_estimate,
-      confidence_level: aiResponse.confidence_level,
-      cost_drivers: aiResponse.cost_drivers,
-      cost_optimization_suggestions: aiResponse.optimization_suggestions,
-      inflation_adjustment: aiResponse.inflation_adjustment,
-      regional_adjustment: aiResponse.regional_adjustment,
+      project_details: projectDetails,
+      current_market_rates: currentMarketRates,
+      regional_factors: regionalFactors,
+      breakdown: null,
+      total_estimate: null,
+      confidence_level: null,
+      cost_drivers: [],
+      cost_optimization_suggestions: [],
+      configured: false,
+      reason: 'Full cost-breakdown estimation is not implemented in this deployment: no AI provider is wired for it, and no real cost-estimation formula exists beyond the market-rate and regional-factor reference data above.',
     };
 
     return estimate;
@@ -419,21 +313,6 @@ async function estimateProjectCost(projectDetails) {
 // Helper functions
 function generateId() {
   return `GH-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getWeatherForecast(location) {
-  // In production, integrate with weather API
-  return {
-    temperature: { min: 18, max: 32 },
-    humidity: { min: 45, max: 75 },
-    rainfall: { probability: 20, amount: 0 },
-    wind_speed: { min: 5, max: 15 },
-  };
-}
-
-async function getYieldHistory(greenhouseId) {
-  // Fetch from database
-  return [];
 }
 
 async function getApplicableSchemes(location, greenhouseType) {
