@@ -1,0 +1,2 @@
+export const CONST_5 = { value: 'constant' };
+export const ENUM_5 = { KEY_1: 'value1', KEY_2: 'value2' };
