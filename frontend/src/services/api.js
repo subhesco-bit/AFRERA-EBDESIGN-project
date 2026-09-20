@@ -1599,9 +1599,24 @@ export const experienceAPI = {
   addExperience: (data) => api.post('/experience/add', data),
 };
 
+// escrowAPI: LIVE BUG FIX. Previously called api.get('/escrow') /
+// api.post('/escrow', ...), which resolve against baseURL to .../api/v1/escrow
+// - no route ever existed there (the fake "Route operational" scaffold is
+// mounted unversioned at /api/escrow via routes/escrowRoutes.js, a different,
+// wrong URL again). Neither matched what EscrowPage.jsx actually calls
+// (list/release/refund - not getEscrows/createEscrow) either. The real,
+// DB-backed services/legacy/escrowService.js is now rescued via
+// ORPHANED_SERVICES_MOUNT; there is no "list all" endpoint there (only
+// get-by-id/order/user), so list() is left an honest stub rather than
+// fabricated - everything else is real.
 export const escrowAPI = {
-  getEscrows: () => api.get('/escrow'),
-  createEscrow: (data) => api.post('/escrow', data),
+  list: notImplemented('Escrow: list all transactions (no such endpoint in escrowService.js)'),
+  createEscrow: data => api.post(`${ORPHANED_BASE}/api/v1/escrow`, data),
+  release: (escrowId, data) => api.post(`${ORPHANED_BASE}/api/v1/escrow/${escrowId}/release`, data),
+  refund: (escrowId, reason) => api.post(`${ORPHANED_BASE}/api/v1/escrow/${escrowId}/refund`, { reason }),
+  getEscrow: escrowId => api.get(`${ORPHANED_BASE}/api/v1/escrow/${escrowId}`),
+  getEscrowsByOrder: orderId => api.get(`${ORPHANED_BASE}/api/v1/escrow/order/${orderId}`),
+  getUserEscrows: (userId, role) => api.get(`${ORPHANED_BASE}/api/v1/escrow/user/${userId}`, { params: { role } }),
 };
 
 export const equipmentExchangeAPI = {
@@ -3435,9 +3450,21 @@ export const maintenanceAPI2 = {
   scheduleMaintenance: (data) => api.post('/maintenance/schedule', data),
 };
 
+// marketAccessAPI: LIVE BUG FIX. Previously called api.get('/market-access') /
+// api.post('/market-access/manage', ...) - resolves to .../api/v1/market-access
+// which never existed (services/legacy/marketAccessService.js was never
+// mounted). Now rescued via ORPHANED_SERVICES_MOUNT, real path is
+// .../api/orphaned_services_mount/api/v1/market-access/... There is no
+// generic "get all" endpoint (only by id/village/type + a village summary),
+// so getMarketAccess() is replaced with the real granular getters;
+// manageMarketAccess (create/update) maps to the real upsert endpoint. No
+// page currently calls this object (checked pages/** and components/**).
 export const marketAccessAPI = {
-  getMarketAccess: () => api.get('/market-access'),
-  manageMarketAccess: (data) => api.post('/market-access/manage', data),
+  getById: accessId => api.get(`${ORPHANED_BASE}/api/v1/market-access/access/${accessId}`),
+  getByVillage: villageId => api.get(`${ORPHANED_BASE}/api/v1/market-access/access/village/${villageId}`),
+  getByType: marketType => api.get(`${ORPHANED_BASE}/api/v1/market-access/access/type/${marketType}`),
+  getVillageSummary: villageId => api.get(`${ORPHANED_BASE}/api/v1/market-access/access/village/${villageId}/summary`),
+  manageMarketAccess: data => api.post(`${ORPHANED_BASE}/api/v1/market-access/access`, data),
 };
 
 export const marketAPI2 = {
@@ -5789,11 +5816,13 @@ export const logisticsEnhancementAPI = {
   getShipmentTrail: notImplemented('Logistics: shipment trail'),
 };
 
-// marketIntelligenceAPI: services/marketIntelligenceService.js exists but is
-// never required/mounted anywhere in backend/src/index.js.
+// marketIntelligenceAPI: services/legacy/marketIntelligenceService.js is real
+// (queries the market_intelligence table directly) and is now rescued via
+// ORPHANED_SERVICES_MOUNT - matches exactly what MarketIntelligencePage.jsx
+// calls (getLatestIntelligence(villageId) / createIntelligence({village_id})).
 export const marketIntelligenceAPI = {
-  getLatestIntelligence: notImplemented('Market intelligence'),
-  createIntelligence: notImplemented('Market intelligence submission'),
+  getLatestIntelligence: villageId => api.get(`${ORPHANED_BASE}/api/v1/market-intelligence/intelligence/village/${villageId}/latest`),
+  createIntelligence: data => api.post(`${ORPHANED_BASE}/api/v1/market-intelligence/intelligence`, data),
 };
 
 // medicalCodingAPI: no route anywhere exposes getMedicalConditionCodes /
@@ -6053,15 +6082,22 @@ export const seedPlanningAPI = {
   deletePlan: notImplemented('Seed plan deletion'),
 };
 
-// sharedInfraAPI: services/platform/sharedInfraService.js (and
-// sharedInfrastructureService.js) has a real setupRoutes(), but it is never
-// called from backend/src/index.js.
+// sharedInfraAPI: services/legacy/sharedInfraService.js (shared infra +
+// equipment rental / second-life marketplace - distinct from
+// sharedInfrastructureService.js) is now rescued via ORPHANED_SERVICES_MOUNT.
+// registerAsset/bookAsset are fully DB-backed (assets/shared_infrastructure_access
+// tables) and work. searchAssets/searchSecondLife/getRenewableSupport are
+// wired to real routes too, but those route handlers internally call
+// `aiAPI.generateRecommendation(...)` where aiAPI is destructured from
+// aiBackboneService.js, which does not export any `aiAPI` - a pre-existing
+// bug in that (out-of-scope) file, so those 3 will 500 at runtime until it's
+// fixed, rather than silently returning fake data.
 export const sharedInfraAPI = {
-  searchAssets: notImplemented('Shared infrastructure: search assets'),
-  searchSecondLife: notImplemented('Shared infrastructure: search second-life assets'),
-  getRenewableSupport: notImplemented('Shared infrastructure: renewable support'),
-  registerAsset: notImplemented('Shared infrastructure: register asset'),
-  bookAsset: notImplemented('Shared infrastructure: book asset'),
+  searchAssets: params => api.get(`${ORPHANED_BASE}/api/v1/shared-infra/assets/search`, { params }),
+  searchSecondLife: params => api.get(`${ORPHANED_BASE}/api/v1/shared-infra/second-life/search`, { params }),
+  getRenewableSupport: params => api.get(`${ORPHANED_BASE}/api/v1/shared-infra/renewable/support`, { params }),
+  registerAsset: data => api.post(`${ORPHANED_BASE}/api/v1/shared-infra/assets/register`, data),
+  bookAsset: data => api.post(`${ORPHANED_BASE}/api/v1/shared-infra/assets/book`, data),
 };
 
 // sheepAIAPI: routes/sheepRoutes.js mounted at /api/sheep is a 38-line
@@ -6572,27 +6608,37 @@ export const waterAnalyticsRecordsAPI = {
 
 // --- REOSDashboardPage.jsx (Rural Economic Operating System): villageProfile/
 // procurementSubscription/buyingClub/ruralEnterprise/renewableEnergy/
-// aiAdvisory services exist under 3 near-duplicate filenames each (root,
-// a domain subfolder, and legacy/) and the backend boot log itself logs
-// "Duplicate service name" for every one of them, meaning which copy (if
-// any) the dynamic service auto-loader keeps is filesystem-order-dependent,
-// not deterministic - not something to wire against. No explicit
-// `app.use(...)` mount and no ORPHANED_SERVICES_MOUNT entry exists for any
-// of these 11 names either, so all are stubbed.
+// householdEconomy/sharedInfrastructure/machineryAccess/ruralFinance/
+// aiAdvisory/mobilityRides services exist under 3 near-duplicate filenames
+// each (root, a domain subfolder, and legacy/) and the backend boot log
+// itself logs "Duplicate service name" for every one of them, so which copy
+// a dynamic auto-loader would keep is filesystem-order-dependent - still not
+// something to wire against. The legacy/ copies specifically, though, are
+// now deterministically require()'d and mounted one by one via
+// ORPHANED_SERVICES_MOUNT.js (not a dynamic loader), so the 7 below whose
+// method names match a real legacy/*Service.js route exactly are wired for
+// real. householdEconomyAPI/machineryAccessAPI/ruralFinanceAPI stay honest
+// stubs: their legacy/ services only expose a get-by-village-id summary, no
+// generic getStatistics()-shaped endpoint. sharedInfrastructureAPI also stays
+// a stub - that name maps to sharedInfrastructureService.js (already mounted
+// as one of the original 9, out of scope for this change, and it likewise
+// has no generic statistics route either). None of these 11 have a page that
+// actually invokes them beyond REOSDashboardPage.jsx's import list (only 7
+// are called via useQuery there).
 export const villageProfileAPI = {
-  searchVillages: notImplemented('Village profile search'),
+  searchVillages: params => api.get(`${ORPHANED_BASE}/api/v1/village-profiles/villages/search`, { params }),
 };
 export const procurementSubscriptionAPI = {
-  getStatistics: notImplemented('Procurement subscription statistics'),
+  getStatistics: params => api.get(`${ORPHANED_BASE}/api/v1/procurement-subscriptions/subscriptions/statistics`, { params }),
 };
 export const buyingClubAPI = {
-  getStatistics: notImplemented('Buying club statistics'),
+  getStatistics: params => api.get(`${ORPHANED_BASE}/api/v1/buying-clubs/clubs/statistics`, { params }),
 };
 export const ruralEnterpriseAPI = {
-  getStatistics: notImplemented('Rural enterprise statistics'),
+  getStatistics: params => api.get(`${ORPHANED_BASE}/api/v1/rural-enterprises/enterprises/statistics`, { params }),
 };
 export const renewableEnergyAPI = {
-  getStatistics: notImplemented('Renewable energy statistics'),
+  getStatistics: params => api.get(`${ORPHANED_BASE}/api/v1/renewable-energy/systems/statistics`, { params }),
 };
 export const householdEconomyAPI = {
   getStatistics: notImplemented('Household economy statistics'),
@@ -6607,10 +6653,10 @@ export const ruralFinanceAPI = {
   getStatistics: notImplemented('Rural finance statistics'),
 };
 export const aiAdvisoryAPI = {
-  getStatistics: notImplemented('AI advisory statistics'),
+  getStatistics: params => api.get(`${ORPHANED_BASE}/api/v1/ai-advisories/advisories/statistics`, { params }),
 };
 export const mobilityRidesAPI = {
-  getStatistics: notImplemented('Mobility rides statistics'),
+  getStatistics: params => api.get(`${ORPHANED_BASE}/api/v1/mobility-rides/rides/statistics`, { params }),
 };
 
 export { api };

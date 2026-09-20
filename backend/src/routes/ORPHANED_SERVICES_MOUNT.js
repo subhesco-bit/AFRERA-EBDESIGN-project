@@ -17,6 +17,28 @@ const sharedInfraService = require('../services/legacy/sharedInfrastructureServi
 const soilTestingService = require('../services/legacy/soilTestingService');
 const subsidyService = require('../services/legacy/subsidyService');
 
+// Batch 2: 15 additional orphaned services discovered with real setupRoutes()
+// functions that were never require()'d or mounted anywhere.
+const aiAdvisoryService = require('../services/legacy/aiAdvisoryService');
+const buyingClubService = require('../services/legacy/buyingClubService');
+const custodyEventRoutes = require('../services/legacy/custodyEventRoutes');
+const escrowService = require('../services/legacy/escrowService');
+const householdEconomyService = require('../services/legacy/householdEconomyService');
+const machineryAccessService = require('../services/legacy/machineryAccessService');
+const marketAccessService = require('../services/legacy/marketAccessService');
+const marketIntelligenceService = require('../services/legacy/marketIntelligenceService');
+const mobilityRidesService = require('../services/legacy/mobilityRidesService');
+const procurementSubscriptionService = require('../services/legacy/procurementSubscriptionService');
+const renewableEnergyService = require('../services/legacy/renewableEnergyService');
+const ruralEnterpriseService = require('../services/legacy/ruralEnterpriseService');
+const ruralFinanceService = require('../services/legacy/ruralFinanceService');
+// NOTE: distinct from `sharedInfraService` above, which is actually
+// services/legacy/sharedInfrastructureService.js (already mounted, #7).
+// This is the real, separate services/legacy/sharedInfraService.js (shared
+// infrastructure + equipment rental / second-life marketplace).
+const sharedInfraEquipmentService = require('../services/legacy/sharedInfraService');
+const villageProfileService = require('../services/legacy/villageProfileService');
+
 const router = express.Router();
 
 logger.info('🔌 Initializing orphaned services router...');
@@ -109,6 +131,157 @@ try {
   }
 } catch (error) {
   logger.error('❌ Failed to mount Subsidy Service:', error.message);
+}
+
+// 10. AI Advisory Service
+try {
+  if (aiAdvisoryService && typeof aiAdvisoryService.setupRoutes === 'function') {
+    aiAdvisoryService.setupRoutes(router);
+    logger.info('✅ AI Advisory Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount AI Advisory Service:', error.message);
+}
+
+// 11. Buying Club Service
+try {
+  if (buyingClubService && typeof buyingClubService.setupRoutes === 'function') {
+    buyingClubService.setupRoutes(router);
+    logger.info('✅ Buying Club Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Buying Club Service:', error.message);
+}
+
+// 12. Custody Event Routes
+try {
+  if (custodyEventRoutes && typeof custodyEventRoutes.setupRoutes === 'function') {
+    custodyEventRoutes.setupRoutes(router);
+    logger.info('✅ Custody Event Routes mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Custody Event Routes:', error.message);
+}
+
+// 13. Escrow Service
+try {
+  if (escrowService && typeof escrowService.setupRoutes === 'function') {
+    escrowService.setupRoutes(router);
+    logger.info('✅ Escrow Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Escrow Service:', error.message);
+}
+
+// 14. Household Economy Service
+try {
+  if (householdEconomyService && typeof householdEconomyService.setupRoutes === 'function') {
+    householdEconomyService.setupRoutes(router);
+    logger.info('✅ Household Economy Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Household Economy Service:', error.message);
+}
+
+// 15. Machinery Access Service
+try {
+  if (machineryAccessService && typeof machineryAccessService.setupRoutes === 'function') {
+    machineryAccessService.setupRoutes(router);
+    logger.info('✅ Machinery Access Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Machinery Access Service:', error.message);
+}
+
+// 16. Market Access Service
+try {
+  if (marketAccessService && typeof marketAccessService.setupRoutes === 'function') {
+    marketAccessService.setupRoutes(router);
+    logger.info('✅ Market Access Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Market Access Service:', error.message);
+}
+
+// 17. Market Intelligence Service
+try {
+  if (marketIntelligenceService && typeof marketIntelligenceService.setupRoutes === 'function') {
+    marketIntelligenceService.setupRoutes(router);
+    logger.info('✅ Market Intelligence Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Market Intelligence Service:', error.message);
+}
+
+// 18. Mobility Rides Service
+try {
+  if (mobilityRidesService && typeof mobilityRidesService.setupRoutes === 'function') {
+    mobilityRidesService.setupRoutes(router);
+    logger.info('✅ Mobility Rides Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Mobility Rides Service:', error.message);
+}
+
+// 19. Procurement Subscription Service
+try {
+  if (procurementSubscriptionService && typeof procurementSubscriptionService.setupRoutes === 'function') {
+    procurementSubscriptionService.setupRoutes(router);
+    logger.info('✅ Procurement Subscription Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Procurement Subscription Service:', error.message);
+}
+
+// 20. Renewable Energy Service
+try {
+  if (renewableEnergyService && typeof renewableEnergyService.setupRoutes === 'function') {
+    renewableEnergyService.setupRoutes(router);
+    logger.info('✅ Renewable Energy Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Renewable Energy Service:', error.message);
+}
+
+// 21. Rural Enterprise Service
+try {
+  if (ruralEnterpriseService && typeof ruralEnterpriseService.setupRoutes === 'function') {
+    ruralEnterpriseService.setupRoutes(router);
+    logger.info('✅ Rural Enterprise Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Rural Enterprise Service:', error.message);
+}
+
+// 22. Rural Finance Service
+try {
+  if (ruralFinanceService && typeof ruralFinanceService.setupRoutes === 'function') {
+    ruralFinanceService.setupRoutes(router);
+    logger.info('✅ Rural Finance Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Rural Finance Service:', error.message);
+}
+
+// 23. Shared Infrastructure & Equipment Rental Service (legacy/sharedInfraService.js
+// - distinct from #7's sharedInfrastructureService.js)
+try {
+  if (sharedInfraEquipmentService && typeof sharedInfraEquipmentService.setupRoutes === 'function') {
+    sharedInfraEquipmentService.setupRoutes(router);
+    logger.info('✅ Shared Infrastructure & Equipment Rental Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Shared Infrastructure & Equipment Rental Service:', error.message);
+}
+
+// 24. Village Profile Service (canonical M041-backed compatibility layer)
+try {
+  if (villageProfileService && typeof villageProfileService.setupRoutes === 'function') {
+    villageProfileService.setupRoutes(router);
+    logger.info('✅ Village Profile Service mounted');
+  }
+} catch (error) {
+  logger.error('❌ Failed to mount Village Profile Service:', error.message);
 }
 
 logger.info('✅ Orphaned services router initialized');

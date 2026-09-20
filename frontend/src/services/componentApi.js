@@ -44,3 +44,21 @@ export const voiceAIAPI = {
   transcribeAudio: (audio) => api.post('/ai/voice/transcribe', { audio }),
   generateSpeech: (text) => api.post('/ai/voice/speak', { text }),
 };
+
+// LIVE BUG FIX: components/Logistics/CustodyChainViewer.jsx imports
+// `custodyAPI` from this file, but it never existed here - the import
+// silently resolved to undefined, so calling custodyAPI.getChain() at
+// render time threw "Cannot read properties of undefined". The real,
+// hash-chained backend/src/services/legacy/custodyEventService.js is now
+// rescued via backend/src/routes/ORPHANED_SERVICES_MOUNT.js (registered
+// through custodyEventRoutes.js). Note: CustodyChainViewer.jsx itself is not
+// currently rendered by any page - this only fixes it for whenever it is.
+const ORPHANED_BASE = `${UNVERSIONED_BASE}/api/orphaned_services_mount`;
+export const custodyAPI = {
+  getChain: (shipmentId, verify) => api.get(`${ORPHANED_BASE}/api/v1/custody/chain/${shipmentId}`, verify !== undefined ? { params: { verify } } : undefined),
+  appendEvent: data => api.post(`${ORPHANED_BASE}/api/v1/custody/events`, data),
+  issueSettlementInstruction: data => api.post(`${ORPHANED_BASE}/api/v1/custody/settlement/instructions`, data),
+  confirmSettlement: instructionId => api.post(`${ORPHANED_BASE}/api/v1/custody/settlement/${instructionId}/confirm`),
+  getSettlement: instructionId => api.get(`${ORPHANED_BASE}/api/v1/custody/settlement/${instructionId}`),
+  getStateMachine: () => api.get(`${ORPHANED_BASE}/api/v1/custody/state-machine`),
+};
