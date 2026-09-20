@@ -15,6 +15,13 @@ const api = axios.create({
   }
 });
 
+// `api`'s baseURL is API_BASE_URL (".../api/v1"), but many backend routes
+// are mounted unversioned at "/api/<name>" directly on the Express app,
+// not under /api/v1 - same reasoning as apiClient.js's authBase. Any
+// export below calling one of those must go through this, not `api`
+// directly, or it silently 404s against .../api/v1/<name>/... instead.
+const UNVERSIONED_BASE = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
@@ -5378,24 +5385,24 @@ export const warningAPI = {
 // table-backed against land_records (migration 011), mounted at
 // /api/landrecords but never had a frontend caller anywhere.
 export const landRecordsAPI = {
-  addRecord: data => api.post('/landrecords', data),
-  getMyRecords: filters => api.get('/landrecords', { params: filters }),
-  getRecord: recordId => api.get(`/landrecords/${recordId}`),
-  updateRecord: (recordId, data) => api.put(`/landrecords/${recordId}`, data),
-  deleteRecord: recordId => api.delete(`/landrecords/${recordId}`),
-  verifyRecord: (recordId, data) => api.post(`/landrecords/${recordId}/verify`, data),
-  syncWithGovernment: () => api.post('/landrecords/sync-government'),
-  getRegionalStatistics: filters => api.get('/landrecords/regional-statistics', { params: filters }),
+  addRecord: data => api.post(`${UNVERSIONED_BASE}/api/landrecords`, data),
+  getMyRecords: filters => api.get(`${UNVERSIONED_BASE}/api/landrecords`, { params: filters }),
+  getRecord: recordId => api.get(`${UNVERSIONED_BASE}/api/landrecords/${recordId}`),
+  updateRecord: (recordId, data) => api.put(`${UNVERSIONED_BASE}/api/landrecords/${recordId}`, data),
+  deleteRecord: recordId => api.delete(`${UNVERSIONED_BASE}/api/landrecords/${recordId}`),
+  verifyRecord: (recordId, data) => api.post(`${UNVERSIONED_BASE}/api/landrecords/${recordId}/verify`, data),
+  syncWithGovernment: () => api.post(`${UNVERSIONED_BASE}/api/landrecords/sync-government`),
+  getRegionalStatistics: filters => api.get(`${UNVERSIONED_BASE}/api/landrecords/regional-statistics`, { params: filters }),
 };
 
 // aiApprovalRoutes.js (backend/src/routes/aiApprovalRoutes.js) - real,
 // authenticated proposal/approval workflow (ai_proposals table), mounted
 // at /api/aiapproval but never had a frontend caller anywhere.
 export const aiApprovalAPI = {
-  createProposal: data => api.post('/aiapproval/proposals', data),
-  getProposals: filters => api.get('/aiapproval/proposals', { params: filters }),
-  decideProposal: (proposalId, data) => api.post(`/aiapproval/proposals/${proposalId}/decision`, data),
-  executeProposal: proposalId => api.post(`/aiapproval/proposals/${proposalId}/execute`),
+  createProposal: data => api.post(`${UNVERSIONED_BASE}/api/aiapproval/proposals`, data),
+  getProposals: filters => api.get(`${UNVERSIONED_BASE}/api/aiapproval/proposals`, { params: filters }),
+  decideProposal: (proposalId, data) => api.post(`${UNVERSIONED_BASE}/api/aiapproval/proposals/${proposalId}/decision`, data),
+  executeProposal: proposalId => api.post(`${UNVERSIONED_BASE}/api/aiapproval/proposals/${proposalId}/execute`),
 };
 
 /**
@@ -5470,8 +5477,8 @@ export const preSeasonAPI = {
 // ERPDashboardPage.jsx's 7 methods have a real matching endpoint; the
 // other 5 have no backend anywhere in this codebase (verified directly).
 export const erpDashboardAPI = {
-  getSyncStatus: () => api.get('/erp/status'),
-  triggerSync: syncType => api.post('/erp/sync/bulk', { entity_type: syncType }),
+  getSyncStatus: () => api.get(`${UNVERSIONED_BASE}/api/erp/status`),
+  triggerSync: syncType => api.post(`${UNVERSIONED_BASE}/api/erp/sync/bulk`, { entity_type: syncType }),
   getDashboard: notImplemented('ERP financial dashboard'),
   getGLEntries: notImplemented('ERP general-ledger entries'),
   getReconciliation: notImplemented('ERP reconciliation'),
@@ -5507,6 +5514,1103 @@ export const decisionEngineAPI = {
   triggerDecision: notImplemented('Decision trigger'),
   getActiveDecisions: notImplemented('Active decisions list'),
   getDecisionHistory: notImplemented('Decision history'),
+};
+
+// goatAPI/goatAIAPI: routes/goatRoutes.js (M124 Goat Farming Management) is
+// real and substantial (herd/milk/feed/breeding/vaccination CRUD + 4 AI
+// endpoints) but GoatFarmingPage.jsx's goatAPI/goatAIAPI were never
+// defined anywhere - every call threw. Wired field-for-field against the
+// route file. listMilkProduction/getHerdPerformance are called with no
+// animalId by the page but the backend only exposes them per-animal
+// (/herd/:animalId/...) - forwarded as-is (accepting an optional id) since
+// there's no herd-wide equivalent route; that mismatch is the page's own
+// pre-existing design gap, not something to paper over here.
+export const goatAPI = {
+  listHerd: () => api.get(`${UNVERSIONED_BASE}/api/goat/herd`),
+  createAnimal: data => api.post(`${UNVERSIONED_BASE}/api/goat/herd`, data),
+  getAnimal: id => api.get(`${UNVERSIONED_BASE}/api/goat/herd/${id}`),
+  updateAnimal: (id, data) => api.put(`${UNVERSIONED_BASE}/api/goat/herd/${id}`, data),
+  deleteAnimal: id => api.delete(`${UNVERSIONED_BASE}/api/goat/herd/${id}`),
+  listMilkProduction: animalId => api.get(`${UNVERSIONED_BASE}/api/goat/herd/${animalId}/milk-production`),
+  recordMilkProduction: data => api.post(`${UNVERSIONED_BASE}/api/goat/herd/${data.animal_id}/milk-production`, data),
+  listFeedConsumption: animalId => api.get(`${UNVERSIONED_BASE}/api/goat/herd/${animalId}/feed-consumption`),
+  recordFeedConsumption: data => api.post(`${UNVERSIONED_BASE}/api/goat/herd/${data.animal_id}/feed-consumption`, data),
+  listBreedingRecords: femaleId => api.get(`${UNVERSIONED_BASE}/api/goat/herd/${femaleId}/breeding`),
+  recordBreeding: data => api.post(`${UNVERSIONED_BASE}/api/goat/herd/${data.female_id}/breeding`, data),
+  updateKiddingOutcome: (id, data) => api.put(`${UNVERSIONED_BASE}/api/goat/breeding/${id}/kidding-outcome`, data),
+  listVaccinationRecords: animalId => api.get(`${UNVERSIONED_BASE}/api/goat/herd/${animalId}/vaccinations`),
+  recordVaccination: data => api.post(`${UNVERSIONED_BASE}/api/goat/herd/${data.animal_id}/vaccinations`, data),
+  getHerdPerformance: animalId => api.get(`${UNVERSIONED_BASE}/api/goat/herd/${animalId}/performance`),
+  getBreedingAlerts: () => api.get(`${UNVERSIONED_BASE}/api/goat/breeding-alerts`),
+  getVaccinationAlerts: () => api.get(`${UNVERSIONED_BASE}/api/goat/vaccination-alerts`),
+};
+
+export const goatAIAPI = {
+  optimizeGoatMilkProduction: animalId => api.post(`${UNVERSIONED_BASE}/api/goat/ai/optimize-milk/${animalId}`),
+  monitorGoatHealth: animalId => api.post(`${UNVERSIONED_BASE}/api/goat/ai/monitor-health/${animalId}`),
+  optimizeGoatFeed: (animalId, data) => api.post(`${UNVERSIONED_BASE}/api/goat/ai/optimize-feed/${animalId}`, data),
+  recommendGoatBreeding: animalId => api.post(`${UNVERSIONED_BASE}/api/goat/ai/recommend-breeding/${animalId}`),
+};
+
+// ---------------------------------------------------------------------------
+// 53 objects below were imported by pages but never exported anywhere in
+// this file (MISSING_EXPORT, broke `vite build`). Each was checked against
+// backend/src/index.js's actual app.use() mounts and the real route file's
+// handler bodies (not just the filename) before being wired or stubbed -
+// see the per-object note. 5 have a real, already-mounted, non-scaffold
+// backend; the rest genuinely have none (either never required/mounted at
+// all, or the mounted route file is a 20/38-line "Route operational"
+// placeholder scaffold, even when a "_merged"/"finance/"/"platform/" sibling
+// file sitting unused on disk contains real logic for the same names, or a
+// page comment optimistically claims otherwise) and honestly reject instead
+// of fabricating data.
+
+// freightPoolingAPI: routes/freightPoolingRoutes.js is REAL (services/legacy/
+// freightPoolingService.js), mounted unversioned at /api/freightpooling.
+export const freightPoolingAPI = {
+  findPoolableShipments: (originAddress, destinationAddress) =>
+    api.get(`${UNVERSIONED_BASE}/api/freightpooling/poolable-shipments`, { params: { originAddress, destinationAddress } }),
+  createPoolWindow: data => api.post(`${UNVERSIONED_BASE}/api/freightpooling/windows`, data),
+  listOpenWindows: () => api.get(`${UNVERSIONED_BASE}/api/freightpooling/windows`),
+  getPoolWindow: windowId => api.get(`${UNVERSIONED_BASE}/api/freightpooling/windows/${windowId}`),
+  joinPoolWindow: (windowId, shipmentId) => api.post(`${UNVERSIONED_BASE}/api/freightpooling/windows/${windowId}/join`, { shipmentId }),
+  closeAndDispatch: windowId => api.post(`${UNVERSIONED_BASE}/api/freightpooling/windows/${windowId}/dispatch`),
+};
+
+// glutWarningAPI: routes/glutWarningRoutes_merged.js is REAL (services/legacy/
+// glutWarningService.js), mounted unversioned at /api/glutwarning (index.js
+// switched this mount to the merged/real file already; only this one of the
+// "_merged" siblings encountered in this batch is actually wired).
+export const glutWarningAPI = {
+  checkGlutRisk: (categoryId, stateId) => api.get(`${UNVERSIONED_BASE}/api/glutwarning/check`, { params: { categoryId, stateId } }),
+  scanAllCategories: stateId => api.get(`${UNVERSIONED_BASE}/api/glutwarning/scan`, { params: { stateId } }),
+};
+
+// paymentGatewayAPI: routes/paymentGatewayRoutes.js is REAL (controllers/
+// paymentGatewayController.js + services/paymentGatewayService.js), mounted
+// unversioned at /api/paymentgateway.
+export const paymentGatewayAPI = {
+  processPayment: paymentData => api.post(`${UNVERSIONED_BASE}/api/paymentgateway/process`, paymentData),
+  getPaymentStatus: paymentId => api.get(`${UNVERSIONED_BASE}/api/paymentgateway/status/${paymentId}`),
+  refundPayment: (paymentId, data) => api.post(`${UNVERSIONED_BASE}/api/paymentgateway/refund/${paymentId}`, data),
+  getSupportedGateways: () => api.get(`${UNVERSIONED_BASE}/api/paymentgateway/gateways`),
+};
+
+// wearableAPI: routes/wearableIntegrationRoutes.js is REAL (controllers/
+// wearableIntegrationController.js), mounted unversioned at
+// /api/wearableintegration.
+export const wearableAPI = {
+  getStatus: () => api.get(`${UNVERSIONED_BASE}/api/wearableintegration/status`),
+  getFitbitAuthUrl: () => api.get(`${UNVERSIONED_BASE}/api/wearableintegration/fitbit/auth-url`),
+  handleFitbitCallback: code => api.post(`${UNVERSIONED_BASE}/api/wearableintegration/fitbit/callback`, { code }),
+  syncFitbit: () => api.post(`${UNVERSIONED_BASE}/api/wearableintegration/fitbit/sync`),
+  getRecentActivity: days => api.get(`${UNVERSIONED_BASE}/api/wearableintegration/activity/recent`, { params: { days } }),
+  disconnect: provider => api.delete(`${UNVERSIONED_BASE}/api/wearableintegration/${provider}`),
+};
+
+// varietyDirectoryAPI: routes/neVarietiesRoutes.js is REAL (queries
+// ne_variety_products directly), mounted VERSIONED at /api/v1/varieties, so
+// it uses a bare relative path, not UNVERSIONED_BASE. Only GET / (list, with
+// search/category filters) exists there - getCategories/requestImage/
+// createListing have no matching endpoint anywhere in this codebase.
+export const varietyDirectoryAPI = {
+  list: params => api.get('/varieties', { params }),
+  getCategories: notImplemented('Variety category list'),
+  requestImage: notImplemented('Variety image generation request'),
+  createListing: notImplemented('Variety marketplace listing creation'),
+};
+
+// blockchainTraceabilityAPI: routes/blockchainTrace.js (/api/blockchaintrace)
+// and blockchainVerificationRoutes.js (/api/blockchainverification) are both
+// placeholder scaffolds - no traceability-events/chain-of-custody endpoint
+// exists anywhere in this codebase.
+export const blockchainTraceabilityAPI = {
+  getTraceabilityEvents: notImplemented('Blockchain traceability events'),
+  verifyChainOfCustody: notImplemented('Blockchain chain-of-custody verification'),
+};
+
+// enterpriseMemoryAPI: services/enterpriseMemoryService.js exists but is
+// never required/mounted anywhere in backend/src/index.js.
+export const enterpriseMemoryAPI = {
+  getCases: notImplemented('Enterprise memory case list'),
+  getLearningInsights: notImplemented('Enterprise memory learning insights'),
+  getKnowledgeGraph: notImplemented('Enterprise memory knowledge graph'),
+  searchCases: notImplemented('Enterprise memory case search'),
+  createCase: notImplemented('Enterprise memory case creation'),
+  updateCase: notImplemented('Enterprise memory case update'),
+};
+
+// farmerTrainingAPI: routes/farmerTrainingRoutes.js mounted at
+// /api/farmertraining is a scaffold, BUT services/legacy/farmerTrainingService.js
+// is one of the 9 services backend/src/routes/ORPHANED_SERVICES_MOUNT.js
+// explicitly rescues (mounted at /api/orphaned_services_mount, see
+// index.js's `app.use('/api/orphaned_services_mount', ORPHANED_SERVICES_MOUNT)`)
+// - its setupRoutes(router) registers register/carbon-footprint for real.
+// No list-programs endpoint exists though (only POST to create one).
+const ORPHANED_BASE = `${UNVERSIONED_BASE}/api/orphaned_services_mount`;
+export const farmerTrainingAPI = {
+  getPrograms: notImplemented('Farmer training programs list'),
+  register: data => api.post(`${ORPHANED_BASE}/api/v1/training/register`, data),
+  getCarbonFootprint: farmerId => api.get(`${ORPHANED_BASE}/api/v1/training/carbon-footprint/${farmerId}`),
+};
+
+// fertilityManagementAPI: no real backend. SoilManagementPage.jsx itself
+// documents this - backend/src/modules/M074 is an empty scaffold, not
+// registered in index.js.
+export const fertilityManagementAPI = {
+  getRecords: notImplemented('Fertility management records'),
+  createRecord: notImplemented('Fertility record creation'),
+  updateRecord: notImplemented('Fertility record update'),
+  deleteRecord: notImplemented('Fertility record deletion'),
+};
+
+// foluAPI: routes/foluRoutes.js mounted at /api/folu is a 30-line "Route
+// operational" scaffold - no landUseSummary/schemeStatus endpoint exists.
+export const foluAPI = {
+  landUseSummary: notImplemented('FOLU land-use summary'),
+  schemeStatus: notImplemented('FOLU scheme status'),
+};
+
+// foluBenchmarkAPI: routes/foluBenchmarkRoutes.js mounted at
+// /api/folubenchmark is a scaffold - no listTransitions/getBenchmarkReport
+// endpoint exists.
+export const foluBenchmarkAPI = {
+  listTransitions: notImplemented('FOLU benchmark transitions'),
+  getBenchmarkReport: notImplemented('FOLU benchmark report'),
+};
+
+// formsAPI: services/formService.js exists but has no route file/mount
+// anywhere in backend/src/index.js.
+export const formsAPI = {
+  getForms: notImplemented('Form list'),
+  createForm: notImplemented('Form creation'),
+  updateForm: notImplemented('Form update'),
+  submitForm: notImplemented('Form submission'),
+};
+
+// governmentAPI: no "government*" route is mounted anywhere; only unmounted
+// services (governmentSchemeService, governmentSubsidyService) exist.
+export const governmentAPI = {
+  getSchemeAnalytics: notImplemented('Government scheme analytics'),
+  getComplianceStatus: notImplemented('Government compliance status'),
+};
+
+// governmentSchemeAPI: services/legacy/governmentSchemeService.js IS one of
+// the ORPHANED_SERVICES_MOUNT-rescued services (see farmerTrainingAPI note
+// above) - its setupRoutes(router) registers weather-alerts/announcements/
+// csr-opportunities for real, at /api/orphaned_services_mount/api/v1/government/...
+export const governmentSchemeAPI = {
+  getWeatherAlerts: params => api.get(`${ORPHANED_BASE}/api/v1/government/weather/alerts`, { params }),
+  getAnnouncements: params => api.get(`${ORPHANED_BASE}/api/v1/government/announcements`, { params }),
+  getCsrOpportunities: params => api.get(`${ORPHANED_BASE}/api/v1/government/csr/opportunities`, { params }),
+};
+
+// schemeRegistryAPI: same governmentSchemeService, same ORPHANED_SERVICES_MOUNT
+// rescue - the scheme-registry endpoints (government_schemes table) are real.
+export const schemeRegistryAPI = {
+  list: params => api.get(`${ORPHANED_BASE}/api/v1/government/schemes/registry`, { params }),
+  getExpiring: days => api.get(`${ORPHANED_BASE}/api/v1/government/schemes/registry/expiring`, { params: { days } }),
+};
+
+// informationSharingAPI: routes/informationSharingRoutes.js mounted at
+// /api/informationsharing is a 38-line scaffold; the real implementation in
+// routes/platform/informationSharingRoutes_merged.js is never required.
+export const informationSharingAPI = {
+  getDocuments: notImplemented('Information sharing: list documents'),
+  getDocument: notImplemented('Information sharing: get document'),
+  searchDocuments: notImplemented('Information sharing: search documents'),
+  createDocument: notImplemented('Information sharing: create document'),
+  updateDocument: notImplemented('Information sharing: update document'),
+  deleteDocument: notImplemented('Information sharing: delete document'),
+  getFolders: notImplemented('Information sharing: list folders'),
+  getFolderTree: notImplemented('Information sharing: folder tree'),
+  createFolder: notImplemented('Information sharing: create folder'),
+  getPermissions: notImplemented('Information sharing: get permissions'),
+  setPermission: notImplemented('Information sharing: set permission'),
+  checkPermission: notImplemented('Information sharing: check permission'),
+  createSharingLink: notImplemented('Information sharing: create sharing link'),
+  accessSharingLink: notImplemented('Information sharing: access sharing link'),
+  getCollaborationSessions: notImplemented('Information sharing: list collaboration sessions'),
+  createCollaborationSession: notImplemented('Information sharing: create collaboration session'),
+  joinCollaborationSession: notImplemented('Information sharing: join collaboration session'),
+  endCollaborationSession: notImplemented('Information sharing: end collaboration session'),
+  generateAIRecommendations: notImplemented('Information sharing: AI recommendations'),
+  getActivityLogs: notImplemented('Information sharing: activity logs'),
+  getAnalytics: notImplemented('Information sharing: analytics'),
+  getHealthStatus: notImplemented('Information sharing: health status'),
+};
+
+// irrigationAPI: routes/irrigationManagementRoutes.js mounted at
+// /api/irrigationmanagement is a 38-line scaffold; the real, unmounted
+// waterIrrigationRoutes.js targets a different shape (water budgets, not
+// schedules/water-sources CRUD) and is never required in index.js either.
+export const irrigationAPI = {
+  getSchedules: notImplemented('Irrigation schedules'),
+  getWaterSources: notImplemented('Irrigation water sources'),
+  createSchedule: notImplemented('Irrigation schedule creation'),
+  updateSchedule: notImplemented('Irrigation schedule update'),
+  deleteSchedule: notImplemented('Irrigation schedule deletion'),
+};
+
+// labourAPI: routes/labourRoutes.js exists on disk but is never required or
+// mounted anywhere in backend/src/index.js.
+export const labourAPI = {
+  getWorkers: notImplemented('Labour worker list'),
+  getAttendance: notImplemented('Labour attendance'),
+  getPayments: notImplemented('Labour payments'),
+  createWorker: notImplemented('Labour worker creation'),
+  recordAttendance: notImplemented('Labour attendance recording'),
+};
+
+// logisticsEnhancementAPI: both mounted files - logisticsEnhancementRoutes.js
+// (/api/logisticsenhancement) and logisticsEnhancements.js
+// (/api/logisticsenhancements) - are scaffolds; the real fleet/warehouse/
+// tracking implementation in logisticsEnhancements_merged.js is never
+// required in index.js.
+export const logisticsEnhancementAPI = {
+  addVehicle: notImplemented('Logistics: add vehicle'),
+  getFleet: notImplemented('Logistics: fleet list'),
+  getVehicle: notImplemented('Logistics: get vehicle'),
+  updateVehicle: notImplemented('Logistics: update vehicle'),
+  scheduleMaintenance: notImplemented('Logistics: schedule maintenance'),
+  updateTracking: notImplemented('Logistics: update tracking'),
+  getTracking: notImplemented('Logistics: tracking history'),
+  getLiveTracking: notImplemented('Logistics: live tracking'),
+  setGeofence: notImplemented('Logistics: set geofence'),
+  recordTemperature: notImplemented('Logistics: record temperature'),
+  getTemperatureData: notImplemented('Logistics: temperature data'),
+  getTemperatureAlerts: notImplemented('Logistics: temperature alerts'),
+  createWarehouse: notImplemented('Logistics: create warehouse'),
+  getWarehouses: notImplemented('Logistics: warehouse list'),
+  addInventory: notImplemented('Logistics: add inventory'),
+  getWarehouseInventory: notImplemented('Logistics: warehouse inventory'),
+  recordDriverLocation: notImplemented('Logistics: record driver location'),
+  getActiveDrivers: notImplemented('Logistics: active drivers'),
+  getShipmentTrail: notImplemented('Logistics: shipment trail'),
+};
+
+// marketIntelligenceAPI: services/marketIntelligenceService.js exists but is
+// never required/mounted anywhere in backend/src/index.js.
+export const marketIntelligenceAPI = {
+  getLatestIntelligence: notImplemented('Market intelligence'),
+  createIntelligence: notImplemented('Market intelligence submission'),
+};
+
+// medicalCodingAPI: no route anywhere exposes getMedicalConditionCodes /
+// getDietaryRestrictions / getNutrientRequirements (checked services/
+// medicalCodingReferenceService.js and advancedMedicalCodingService.js -
+// neither is mounted, and neither defines these method names either).
+export const medicalCodingAPI = {
+  getMedicalConditionCodes: notImplemented('Medical condition codes'),
+  getDietaryRestrictions: notImplemented('Dietary restrictions'),
+  getNutrientRequirements: notImplemented('Nutrient requirements'),
+};
+
+// nervousSystemAPI: routes/nervousSystemRoutes.js mounted at
+// /api/nervoussystem is a 38-line "Route operational" scaffold - none of
+// these brain/heart/neural/sensor/motor/route endpoints exist.
+export const nervousSystemAPI = {
+  processEventThroughBrain: notImplemented('Nervous system: process event'),
+  getBrainDecisionHistory: notImplemented('Nervous system: brain decision history'),
+  getBrainFocus: notImplemented('Nervous system: brain focus'),
+  startHeartBeat: notImplemented('Nervous system: start heartbeat'),
+  stopHeartBeat: notImplemented('Nervous system: stop heartbeat'),
+  getHeartBeatStatus: notImplemented('Nervous system: heartbeat status'),
+  createNeuralPathway: notImplemented('Nervous system: create neural pathway'),
+  getNeuralPathways: notImplemented('Nervous system: list neural pathways'),
+  strengthenNeuralPathway: notImplemented('Nervous system: strengthen neural pathway'),
+  createReflexArc: notImplemented('Nervous system: create reflex arc'),
+  getReflexArcs: notImplemented('Nervous system: list reflex arcs'),
+  triggerReflex: notImplemented('Nervous system: trigger reflex'),
+  registerSensor: notImplemented('Nervous system: register sensor'),
+  getSensorData: notImplemented('Nervous system: sensor data'),
+  getSensorsStatus: notImplemented('Nervous system: sensors status'),
+  executeMotorFunction: notImplemented('Nervous system: execute motor function'),
+  getActiveMotorFunctions: notImplemented('Nervous system: active motor functions'),
+  registerEnterpriseRoute: notImplemented('Nervous system: register enterprise route'),
+  routeRequest: notImplemented('Nervous system: route request'),
+  getOptimalRoute: notImplemented('Nervous system: optimal route'),
+  deactivateEnterpriseRoute: notImplemented('Nervous system: deactivate enterprise route'),
+  getNervousSystemHealth: notImplemented('Nervous system: health snapshot'),
+};
+
+// nurseryAPI: no nursery route or service exists anywhere in backend/src.
+export const nurseryAPI = {
+  getNurseries: notImplemented('Nursery list'),
+  createNursery: notImplemented('Nursery creation'),
+  updateNursery: notImplemented('Nursery update'),
+  deleteNursery: notImplemented('Nursery deletion'),
+};
+
+// nutrientValueSalesAPI: routes/nutrientValueSalesRoutes.js mounted at
+// /api/nutrientvaluesales is a 38-line scaffold; the real implementation in
+// nutrientValueSalesRoutes_merged.js / routes/commerce/ is never required.
+export const nutrientValueSalesAPI = {
+  searchByNutrientCriteria: notImplemented('Nutrient value: search by criteria'),
+  submitNutrientContent: notImplemented('Nutrient value: submit lab content'),
+  issueNutrientCertificate: notImplemented('Nutrient value: issue certificate'),
+};
+
+// nutritionIntelligenceAPI: routes/nutritionIntelligenceRoutes.js mounted at
+// /api/nutritionintelligence IS real (services/legacy/
+// nutritionIntelligenceService.js), but it only exposes product-nutrition/
+// dietary-profile/recommendation endpoints - no calculateNutrientProfile
+// endpoint exists anywhere.
+export const nutritionIntelligenceAPI = {
+  calculateNutrientProfile: notImplemented('Nutrient profile calculation'),
+};
+
+// operationsAPI: routes/operationsManagementRoutes.js mounted at
+// /api/operationsmanagement is a 38-line scaffold - no getOverview endpoint
+// exists.
+export const operationsAPI = {
+  getOverview: notImplemented('Operations overview'),
+};
+
+// orchardAPI: no orchard route or service exists anywhere in backend/src.
+export const orchardAPI = {
+  getOrchards: notImplemented('Orchard list'),
+  createOrchard: notImplemented('Orchard creation'),
+  updateOrchard: notImplemented('Orchard update'),
+  deleteOrchard: notImplemented('Orchard deletion'),
+  recordHarvest: notImplemented('Orchard harvest recording'),
+};
+
+// organicTraceabilityAPI: services/legacy/organicTraceabilityService.js has
+// real getConsumerTransparencyByQR/registerFarm logic, but is never
+// required/mounted anywhere in backend/src/index.js.
+export const organicTraceabilityAPI = {
+  getConsumerTransparency: notImplemented('Organic traceability: consumer transparency'),
+  getStandards: notImplemented('Organic traceability: standards'),
+  registerFarm: notImplemented('Organic traceability: farm registration'),
+};
+
+// organizationManagementAPI: routes/organizationManagementRoutes.js mounted
+// at /api/organizationmanagement is a 38-line scaffold; the real version in
+// routes/platform/organizationManagementRoutes_merged.js is never required.
+export const organizationManagementAPI = {
+  getAllOrganizations: notImplemented('Organization list'),
+  createOrganization: notImplemented('Organization creation'),
+  deleteOrganization: notImplemented('Organization deletion'),
+};
+
+// pigAPI / pigAIAPI: routes/pigRoutes.js mounted at /api/pig is a 38-line
+// scaffold - the real herd-management and AI logic (services/legacy/
+// pigService.js) is only wired up in the unused pigRoutes_merged.js, which
+// index.js never requires (unlike goatRoutes.js, which is real).
+export const pigAPI = {
+  listHerd: notImplemented('Pig herd list'),
+  listWeightRecords: notImplemented('Pig weight records'),
+  getHerdPerformance: notImplemented('Pig herd performance'),
+  getBreedingAlerts: notImplemented('Pig breeding alerts'),
+  getVaccinationAlerts: notImplemented('Pig vaccination alerts'),
+  getFeedConversionRatio: notImplemented('Pig feed conversion ratio'),
+  createAnimal: notImplemented('Pig creation'),
+  updateAnimal: notImplemented('Pig update'),
+  deleteAnimal: notImplemented('Pig deletion'),
+  recordWeight: notImplemented('Pig weight recording'),
+  recordFeedConsumption: notImplemented('Pig feed consumption recording'),
+  recordBreeding: notImplemented('Pig breeding recording'),
+};
+
+export const pigAIAPI = {
+  optimizeMeatProduction: notImplemented('Pig AI: optimize meat production'),
+  monitorPigHealth: notImplemented('Pig AI: monitor health'),
+  optimizePigFeed: notImplemented('Pig AI: optimize feed'),
+  recommendPigBreeding: notImplemented('Pig AI: recommend breeding'),
+};
+
+// platformConfigurationAPI: routes/platformConfigurationRoutes.js mounted at
+// /api/platformconfiguration is a 38-line scaffold - no getRecommendations/
+// applyConfiguration endpoint exists.
+export const platformConfigurationAPI = {
+  getRecommendations: notImplemented('Platform configuration recommendations'),
+  applyConfiguration: notImplemented('Platform configuration apply'),
+};
+
+// platformTelemetryAPI: routes/platformTelemetryRoutes.js mounted at
+// /api/platformtelemetry is a 38-line scaffold - no getStatus/getAnalytics
+// endpoint exists.
+export const platformTelemetryAPI = {
+  getStatus: notImplemented('Platform telemetry status'),
+  getAnalytics: notImplemented('Platform telemetry analytics'),
+};
+
+// pondAPI: no pond route or service exists anywhere in backend/src.
+export const pondAPI = {
+  getPonds: notImplemented('Pond list'),
+  createPond: notImplemented('Pond creation'),
+  updatePond: notImplemented('Pond update'),
+  deletePond: notImplemented('Pond deletion'),
+};
+
+// poultryAIAPI: routes/poultryRoutes.js mounted at /api/poultry is a
+// 38-line scaffold - the real AI logic (services/legacy/poultryService.js)
+// is only wired up in the unused poultryRoutes_merged.js.
+export const poultryAIAPI = {
+  optimizeEggProduction: notImplemented('Poultry AI: optimize egg production'),
+  monitorFlockHealth: notImplemented('Poultry AI: monitor flock health'),
+  optimizePoultryFeed: notImplemented('Poultry AI: optimize feed'),
+  predictMortalityRisk: notImplemented('Poultry AI: predict mortality risk'),
+};
+
+// predictiveAnalyticsAPI: both routes/predictiveAnalytics.js
+// (/api/predictiveanalytics) and routes/predictiveIntelligenceRoutes.js
+// (/api/predictiveintelligence) are placeholder scaffolds - no forecasts/
+// predictions/alerts endpoint exists in either.
+export const predictiveAnalyticsAPI = {
+  getForecasts: notImplemented('Predictive analytics: forecasts'),
+  getPredictions: notImplemented('Predictive analytics: predictions'),
+  getUnacknowledgedAlerts: notImplemented('Predictive analytics: unacknowledged alerts'),
+  getDemandForecast: notImplemented('Predictive analytics: demand forecast'),
+  getPricingPrediction: notImplemented('Predictive analytics: pricing prediction'),
+};
+
+// pricingAPI: routes/riskPricingRoutes.js mounted at /api/riskpricing is a
+// 38-line scaffold; the real forward()/advise() logic exists in
+// routes/finance/riskPricingRoutes.js (and riskPricingRoutes_merged.js) but
+// neither is ever required in index.js.
+export const pricingAPI = {
+  forward: notImplemented('Forward pricing rate'),
+  advise: notImplemented('Forward pricing commitment advice'),
+};
+
+// productsAPI: services/productService.js has a real router
+// (getProducts/createProduct/getCategories/getStates over the products
+// table), but that router is never required or app.use()'d anywhere in
+// backend/src/index.js - unmounted despite SellerProductFormPage.jsx's
+// comment claiming "POST /api/v1/products ... has existed all along".
+export const productsAPI = {
+  getProducts: notImplemented('Product list'),
+  getProduct: notImplemented('Product detail'),
+  getCategories: notImplemented('Product categories'),
+  getStates: notImplemented('Product states'),
+  createProduct: notImplemented('Product creation'),
+};
+
+// projectSystemsAPI: routes/projectSystemsRoutes.js mounted at
+// /api/projectsystems is a 38-line scaffold - none of these WBS/milestone/
+// budget endpoints exist (real version in projectSystemsRoutes_merged.js is
+// never required).
+export const projectSystemsAPI = {
+  getProjects: notImplemented('Project list'),
+  getProjectWbs: notImplemented('Project WBS'),
+  getWbsCostRollup: notImplemented('Project WBS cost rollup'),
+  getProjectMilestones: notImplemented('Project milestones'),
+  getMilestoneStatusSummary: notImplemented('Project milestone status summary'),
+  getProjectBudgetVsActual: notImplemented('Project budget vs actual'),
+  createWbsElement: notImplemented('Project WBS element creation'),
+  updateWbsStatus: notImplemented('Project WBS status update'),
+  createMilestone: notImplemented('Project milestone creation'),
+  completeMilestone: notImplemented('Project milestone completion'),
+  updateProjectStatus: notImplemented('Project status update'),
+  createProject: notImplemented('Project creation'),
+};
+
+// publicDataAPI: routes/publicDataRoutes.js mounted at /api/publicdata is a
+// 38-line scaffold - no listSources/registerSource/extract endpoint exists.
+export const publicDataAPI = {
+  listSources: notImplemented('Public data sources list'),
+  registerSource: notImplemented('Public data source registration'),
+  extract: notImplemented('Public data extraction'),
+};
+
+// pushNotificationsAPI: no push-notification route or service exists
+// anywhere in backend/src.
+export const pushNotificationsAPI = {
+  subscribe: notImplemented('Push notification subscribe'),
+  unsubscribe: notImplemented('Push notification unsubscribe'),
+};
+
+// rolePermissionAPI: no route matches these method names. (roleManagementAPI
+// already exists elsewhere in this file, backed by the real, differently-
+// shaped routes/roleManagementRoutes.js - listRoles/getPermissionMatrix/
+// getRoleHierarchy/recommendRoleForUser have no equivalent there.)
+export const rolePermissionAPI = {
+  listRoles: notImplemented('Role list'),
+  listPermissions: notImplemented('Permission list'),
+  getPermissionMatrix: notImplemented('Permission matrix'),
+  getRoleHierarchy: notImplemented('Role hierarchy'),
+  createRole: notImplemented('Role creation'),
+  recommendRoleForUser: notImplemented('Role recommendation'),
+};
+
+// securityAccessControlAPI: no security-access-control route exists
+// anywhere in backend/src.
+export const securityAccessControlAPI = {
+  getSecurityEvents: notImplemented('Security events'),
+  getIpLists: notImplemented('IP allow/block lists'),
+  calculateSecurityScore: notImplemented('Security score calculation'),
+};
+
+// seedPlanningAPI: routes/seedVaultRoutes.js (the only seed-related mounted
+// route, at /api/seedvault) is a 38-line scaffold, and its domain (seed
+// inventory) doesn't match this page's getPlans/createPlan shape anyway.
+export const seedPlanningAPI = {
+  getPlans: notImplemented('Seed planning plans'),
+  createPlan: notImplemented('Seed plan creation'),
+  updatePlan: notImplemented('Seed plan update'),
+  deletePlan: notImplemented('Seed plan deletion'),
+};
+
+// sharedInfraAPI: services/platform/sharedInfraService.js (and
+// sharedInfrastructureService.js) has a real setupRoutes(), but it is never
+// called from backend/src/index.js.
+export const sharedInfraAPI = {
+  searchAssets: notImplemented('Shared infrastructure: search assets'),
+  searchSecondLife: notImplemented('Shared infrastructure: search second-life assets'),
+  getRenewableSupport: notImplemented('Shared infrastructure: renewable support'),
+  registerAsset: notImplemented('Shared infrastructure: register asset'),
+  bookAsset: notImplemented('Shared infrastructure: book asset'),
+};
+
+// sheepAIAPI: routes/sheepRoutes.js mounted at /api/sheep is a 38-line
+// scaffold - the real AI logic (services/legacy/sheepService.js) is only
+// wired up in the unused sheepRoutes_merged.js.
+export const sheepAIAPI = {
+  optimizeWoolProduction: notImplemented('Sheep AI: optimize wool production'),
+  monitorSheepHealth: notImplemented('Sheep AI: monitor health'),
+  optimizeSheepFeed: notImplemented('Sheep AI: optimize feed'),
+  recommendSheepBreeding: notImplemented('Sheep AI: recommend breeding'),
+};
+
+// shgAPI: no self-help-group route or service exists anywhere in
+// backend/src.
+export const shgAPI = {
+  getGroups: notImplemented('SHG group list'),
+  getMembers: notImplemented('SHG member list'),
+  getSavings: notImplemented('SHG savings'),
+  createGroup: notImplemented('SHG group creation'),
+  addMember: notImplemented('SHG member addition'),
+  recordSaving: notImplemented('SHG saving recording'),
+};
+
+// soilTestingOpsAPI: services/legacy/soilTestingService.js IS one of the
+// ORPHANED_SERVICES_MOUNT-rescued services (see farmerTrainingAPI note) -
+// submitSample/trackSample/getHealthCard are real, confirming
+// SoilManagementPage.jsx's claim, just at /api/orphaned_services_mount/api/v1/
+// soil-testing/... rather than a conventional path.
+export const soilTestingOpsAPI = {
+  submitSample: data => api.post(`${ORPHANED_BASE}/api/v1/soil-testing/samples`, data),
+  trackSample: trackId => api.get(`${ORPHANED_BASE}/api/v1/soil-testing/samples/${trackId}/track`),
+  getHealthCard: params => api.get(`${ORPHANED_BASE}/api/v1/soil-testing/health-card`, { params }),
+};
+
+// sowingAPI: no sowing route or service exists anywhere in backend/src.
+export const sowingAPI = {
+  getRecords: notImplemented('Sowing records'),
+  createRecord: notImplemented('Sowing record creation'),
+  updateRecord: notImplemented('Sowing record update'),
+  deleteRecord: notImplemented('Sowing record deletion'),
+};
+
+// subsidyOpsAPI: routes/strategic/governmentSubsidyRoutes.js is never
+// mounted, BUT services/legacy/subsidyService.js IS one of the
+// ORPHANED_SERVICES_MOUNT-rescued services (see farmerTrainingAPI note) -
+// every method below matches a real setupRoutes() endpoint exactly.
+export const subsidyOpsAPI = {
+  checkProjectSubsidy: data => api.post(`${ORPHANED_BASE}/api/v1/subsidy/project/check`, data),
+  checkEquipmentSubsidy: data => api.post(`${ORPHANED_BASE}/api/v1/subsidy/equipment/check`, data),
+  checkLogisticsSubsidy: data => api.post(`${ORPHANED_BASE}/api/v1/subsidy/logistics/check`, data),
+  getSchemes: params => api.get(`${ORPHANED_BASE}/api/v1/subsidy/schemes`, { params }),
+  apply: data => api.post(`${ORPHANED_BASE}/api/v1/subsidy/apply`, data),
+  track: id => api.get(`${ORPHANED_BASE}/api/v1/subsidy/track/${id}`),
+  calculateGst: data => api.post(`${ORPHANED_BASE}/api/v1/subsidy/gst/calculate`, data),
+};
+
+// userManagementAPI: services/userManagementService.js exists but has no
+// route file/mount anywhere in backend/src/index.js.
+export const userManagementAPI = {
+  getSettings: notImplemented('User management settings'),
+  getSystemAnalytics: notImplemented('User management system analytics'),
+  detectAnomalies: notImplemented('User management anomaly detection'),
+  getPredictiveMaintenance: notImplemented('User management predictive maintenance'),
+  upsertSetting: notImplemented('User management setting upsert'),
+};
+
+// wikipediaAPI: routes/wikipediaRoutes.js mounted at /api/wikipedia is a
+// 38-line scaffold; the real version in wikipediaRoutes_merged.js is never
+// required.
+export const wikipediaAPI = {
+  lookup: notImplemented('Wikipedia lookup'),
+  getSummaryByTitle: notImplemented('Wikipedia summary by title'),
+};
+
+// yieldAPI: routes/yieldManagement.js mounted at /api/yieldmanagement is a
+// 20-line placeholder; the real lot-price/booking-curve logic exists in
+// routes/finance/riskPricingRoutes.js but that file is never required.
+export const yieldAPI = {
+  lotsNeedingAttention: notImplemented('Yield: lots needing attention'),
+  lotPrice: notImplemented('Yield: lot price'),
+  openNextBucket: notImplemented('Yield: open next booking bucket'),
+  bookingCurve: notImplemented('Yield: booking curve'),
+};
+
+// ---------------------------------------------------------------------------
+// A second wave of 72 missing exports (the first pass's `import` scanner used
+// a single-line regex and missed multi-line `import { a, b, c } from
+// '../services/api'` statements - HorticultureManagementPage.jsx,
+// MachineryManagementPage.jsx, InputSupplyManagementPage.jsx,
+// LivestockManagementPage.jsx, IdentityManagementPage.jsx,
+// OperationsManagementPage.jsx, LandManagementPage.jsx, WaterManagementPage.jsx,
+// WaterRecordsPage.jsx and REOSDashboardPage.jsx import 10 names each on
+// average, spread across multiple lines). Re-scanned with a multi-line-aware
+// parser to get the true list. Same rule as above: real, deterministic,
+// already-mounted backend only, otherwise an honest stub. One real find: a
+// second orphaned service (see farmerTrainingAPI above); one confirmed-real
+// route (goat/herd, already used by the existing goatAPI/goatFarmingAPI
+// pattern); everything else in this wave has no real backend - most of these
+// pages document that themselves via their own `backendNote` prop, and where
+// a page's inline comment instead *claimed* a real backend (Machinery,
+// Livestock's poultry/sheep/pig tabs), the claim was independently checked
+// against the actual mounted route file and found to be stale/inaccurate
+// (still a 38-line "Route operational" scaffold) - so it is stubbed, not
+// wired, despite the comment.
+
+// --- HorticultureManagementPage.jsx: routes/foluRoutes.js-style scaffolds
+// only exist for greenhouse/hydroponics (already real, already exported
+// elsewhere in this file); none of these 7 sub-modules have any route or
+// service anywhere in backend/src - the page's own backendNote on every tab
+// says so ("has not been built yet").
+export const vegetableProductionAPI = {
+  getRecords: notImplemented('Vegetable production records'),
+  createRecord: notImplemented('Vegetable production record creation'),
+  updateRecord: notImplemented('Vegetable production record update'),
+  deleteRecord: notImplemented('Vegetable production record deletion'),
+};
+export const floricultureAPI = {
+  getRecords: notImplemented('Floriculture records'),
+  createRecord: notImplemented('Floriculture record creation'),
+  updateRecord: notImplemented('Floriculture record update'),
+  deleteRecord: notImplemented('Floriculture record deletion'),
+};
+export const polyhouseAPI = {
+  getRecords: notImplemented('Polyhouse records'),
+  createRecord: notImplemented('Polyhouse record creation'),
+  updateRecord: notImplemented('Polyhouse record update'),
+  deleteRecord: notImplemented('Polyhouse record deletion'),
+};
+export const aeroponicsAPI = {
+  getSystems: notImplemented('Aeroponics systems'),
+  createSystem: notImplemented('Aeroponics system creation'),
+  updateSystem: notImplemented('Aeroponics system update'),
+  deleteSystem: notImplemented('Aeroponics system deletion'),
+};
+export const precisionHorticultureAPI = {
+  getReadings: notImplemented('Precision horticulture readings'),
+  createReading: notImplemented('Precision horticulture reading creation'),
+  updateReading: notImplemented('Precision horticulture reading update'),
+  deleteReading: notImplemented('Precision horticulture reading deletion'),
+};
+export const protectedCultivationAPI = {
+  getStructures: notImplemented('Protected cultivation structures'),
+  createStructure: notImplemented('Protected cultivation structure creation'),
+  updateStructure: notImplemented('Protected cultivation structure update'),
+  deleteStructure: notImplemented('Protected cultivation structure deletion'),
+};
+export const horticultureAnalyticsAPI = {
+  getMetrics: notImplemented('Horticulture analytics metrics'),
+  createMetric: notImplemented('Horticulture analytics metric creation'),
+  updateMetric: notImplemented('Horticulture analytics metric update'),
+  deleteMetric: notImplemented('Horticulture analytics metric deletion'),
+};
+
+// --- MachineryManagementPage.jsx: this page's comments claim several tabs
+// are "Backed by the real /modules/m10x endpoint" - checked independently:
+// backend/src/modules/M102/M103/M104/M107/M108/M109/M110 exist but are never
+// required/mounted anywhere (no moduleAutoLoader/registry wiring in
+// index.js); their functions are merged into OTHER legacy services
+// (fertilizerInventoryService, revenueService, equipmentExchangeService) via
+// Object.assign, but the routes actually mounted for those
+// (fertilizerRoutes.js etc.) are themselves disconnected scaffolds that never
+// call them. The "fleet" tab's claimed /api/v1/logistics/fleet and
+// getMaintenanceDue() also do not exist anywhere in backend/src. All 9 tabs
+// are therefore stubbed despite the confident-sounding comments.
+export const implementManagementAPI = {
+  getImplements: notImplemented('Implement management list'),
+  createImplement: notImplemented('Implement registration'),
+};
+export const equipmentInventoryAPI = {
+  getEquipment: notImplemented('Equipment inventory list'),
+  createEquipment: notImplemented('Equipment registration'),
+};
+export const equipmentRentalAPI = {
+  getRentals: notImplemented('Equipment rental listings'),
+  createRental: notImplemented('Equipment rental listing creation'),
+};
+export const fleetManagementAPI = {
+  getFleet: notImplemented('Fleet vehicle list'),
+  addVehicle: notImplemented('Fleet vehicle creation'),
+  updateVehicle: notImplemented('Fleet vehicle update'),
+  getMaintenanceDue: notImplemented('Fleet maintenance-due list'),
+};
+export const preventiveMaintenanceAPI = {
+  getRecords: notImplemented('Preventive maintenance records'),
+  createRecord: notImplemented('Preventive maintenance record creation'),
+  updateRecord: notImplemented('Preventive maintenance record update'),
+  deleteRecord: notImplemented('Preventive maintenance record deletion'),
+};
+export const breakdownMaintenanceAPI = {
+  getRecords: notImplemented('Breakdown maintenance records'),
+  createRecord: notImplemented('Breakdown report creation'),
+};
+export const fuelManagementAPI = {
+  getLogs: notImplemented('Fuel purchase logs'),
+  createLog: notImplemented('Fuel purchase log creation'),
+};
+export const sparePartsAPI = {
+  getParts: notImplemented('Spare parts inventory'),
+  createPart: notImplemented('Spare part registration'),
+};
+export const assetLifecycleAPI = {
+  getAssets: notImplemented('Asset lifecycle registry'),
+  createAsset: notImplemented('Asset registration'),
+};
+
+// --- InputSupplyManagementPage.jsx: every tab's own backendNote says its
+// endpoint "has not been built yet"; verified no matching route/service
+// exists anywhere in backend/src either.
+export const biofertilizerAPI = {
+  getItems: notImplemented('Biofertilizer inventory'),
+  createItem: notImplemented('Biofertilizer item creation'),
+  updateItem: notImplemented('Biofertilizer item update'),
+  deleteItem: notImplemented('Biofertilizer item deletion'),
+};
+export const pesticideInventoryAPI = {
+  getItems: notImplemented('Pesticide inventory'),
+  createItem: notImplemented('Pesticide item creation'),
+  updateItem: notImplemented('Pesticide item update'),
+  deleteItem: notImplemented('Pesticide item deletion'),
+};
+export const bioPesticideAPI = {
+  getItems: notImplemented('Bio-pesticide inventory'),
+  createItem: notImplemented('Bio-pesticide item creation'),
+  updateItem: notImplemented('Bio-pesticide item update'),
+  deleteItem: notImplemented('Bio-pesticide item deletion'),
+};
+export const micronutrientAPI = {
+  getItems: notImplemented('Micronutrient inventory'),
+  createItem: notImplemented('Micronutrient item creation'),
+  updateItem: notImplemented('Micronutrient item update'),
+  deleteItem: notImplemented('Micronutrient item deletion'),
+};
+export const organicInputAPI = {
+  getItems: notImplemented('Organic input inventory'),
+  createItem: notImplemented('Organic input item creation'),
+  updateItem: notImplemented('Organic input item update'),
+  deleteItem: notImplemented('Organic input item deletion'),
+};
+export const inputProcurementAPI = {
+  getOrders: notImplemented('Input procurement orders'),
+  createOrder: notImplemented('Input procurement order creation'),
+  updateOrder: notImplemented('Input procurement order update'),
+  deleteOrder: notImplemented('Input procurement order deletion'),
+};
+export const inputDistributionAPI = {
+  getRecords: notImplemented('Input distribution records'),
+  createRecord: notImplemented('Input distribution record creation'),
+  updateRecord: notImplemented('Input distribution record update'),
+  deleteRecord: notImplemented('Input distribution record deletion'),
+};
+export const inputTraceabilityAPI = {
+  getRecords: notImplemented('Input traceability records'),
+  createRecord: notImplemented('Input traceability record creation'),
+  updateRecord: notImplemented('Input traceability record update'),
+  deleteRecord: notImplemented('Input traceability record deletion'),
+};
+
+// --- LivestockManagementPage.jsx: goat is real (routes/goatRoutes.js, 429
+// lines, mounted unversioned at /api/goat - same backend the existing
+// goatAPI export already uses). Poultry/sheep/pig tabs' comments claim real
+// "/poultry/flocks", "/sheep/flock", "/pig/herd" endpoints (M123/M125/M126) -
+// checked independently: routes/poultryRoutes.js, sheepRoutes.js and
+// pigRoutes.js mounted at /api/poultry, /api/sheep, /api/pig are each still
+// the generic 38-line "Route operational" scaffold, so those three claims
+// are stale and are stubbed. cattleRegistry/feed/analytics are honestly
+// documented by the page itself as not built yet.
+export const cattleRegistryAPI = {
+  getAnimals: notImplemented('Cattle registry list'),
+  createAnimal: notImplemented('Cattle registration'),
+  updateAnimal: notImplemented('Cattle record update'),
+  deleteAnimal: notImplemented('Cattle record deletion'),
+};
+export const poultryManagementAPI = {
+  getBatches: notImplemented('Poultry flock list'),
+  createBatch: notImplemented('Poultry flock creation'),
+  updateBatch: notImplemented('Poultry flock update'),
+  deleteBatch: notImplemented('Poultry flock deletion'),
+};
+export const goatFarmingAPI = {
+  getAnimals: params => api.get(`${UNVERSIONED_BASE}/api/goat/herd`, { params }),
+  createAnimal: data => api.post(`${UNVERSIONED_BASE}/api/goat/herd`, data),
+  updateAnimal: (id, data) => api.put(`${UNVERSIONED_BASE}/api/goat/herd/${id}`, data),
+  deleteAnimal: id => api.delete(`${UNVERSIONED_BASE}/api/goat/herd/${id}`),
+};
+export const sheepFarmingAPI = {
+  getAnimals: notImplemented('Sheep flock list'),
+  createAnimal: notImplemented('Sheep registration'),
+  updateAnimal: notImplemented('Sheep record update'),
+  deleteAnimal: notImplemented('Sheep record deletion'),
+};
+export const pigFarmingAPI = {
+  getAnimals: notImplemented('Pig herd list'),
+  createAnimal: notImplemented('Pig registration'),
+  updateAnimal: notImplemented('Pig record update'),
+  deleteAnimal: notImplemented('Pig record deletion'),
+};
+export const feedManagementAPI = {
+  getRecords: notImplemented('Livestock feed records'),
+  createRecord: notImplemented('Livestock feed record creation'),
+  updateRecord: notImplemented('Livestock feed record update'),
+  deleteRecord: notImplemented('Livestock feed record deletion'),
+};
+export const livestockAnalyticsAPI = {
+  getRecords: notImplemented('Livestock analytics records'),
+  createRecord: notImplemented('Livestock analytics record creation'),
+  updateRecord: notImplemented('Livestock analytics record update'),
+  deleteRecord: notImplemented('Livestock analytics record deletion'),
+};
+
+// --- IdentityManagementPage.jsx: every tab's backendNote says its endpoint
+// "has not been built yet"; verified no matching route/service exists.
+export const permissionManagementAPI = {
+  getPermissions: notImplemented('Permission list'),
+  createPermission: notImplemented('Permission creation'),
+  updatePermission: notImplemented('Permission update'),
+  deletePermission: notImplemented('Permission deletion'),
+};
+export const ssoAPI = {
+  getProviders: notImplemented('SSO provider list'),
+  createProvider: notImplemented('SSO provider creation'),
+  updateProvider: notImplemented('SSO provider update'),
+  deleteProvider: notImplemented('SSO provider deletion'),
+};
+export const mfaManagementAPI = {
+  getDevices: notImplemented('MFA device list'),
+  createDevice: notImplemented('MFA device registration'),
+  updateDevice: notImplemented('MFA device update'),
+  deleteDevice: notImplemented('MFA device deletion'),
+};
+export const digitalIdentityAPI = {
+  getIdentities: notImplemented('Digital identity list'),
+  createIdentity: notImplemented('Digital identity creation'),
+  updateIdentity: notImplemented('Digital identity update'),
+  deleteIdentity: notImplemented('Digital identity deletion'),
+};
+export const consentManagementAPI = {
+  getRecords: notImplemented('Consent record list'),
+  createRecord: notImplemented('Consent record creation'),
+  updateRecord: notImplemented('Consent record update'),
+  deleteRecord: notImplemented('Consent record deletion'),
+};
+export const sessionManagementAPI = {
+  getSessions: notImplemented('Session list'),
+  updateSession: notImplemented('Session update'),
+  deleteSession: notImplemented('Session deletion'),
+};
+
+// --- OperationsManagementPage.jsx: every tab's backendNote says its endpoint
+// "has not been built yet"; verified no matching route/service exists.
+export const farmActivityAPI = {
+  getActivities: notImplemented('Farm activity list'),
+  createActivity: notImplemented('Farm activity creation'),
+  updateActivity: notImplemented('Farm activity update'),
+  deleteActivity: notImplemented('Farm activity deletion'),
+};
+export const farmTaskAPI = {
+  getTasks: notImplemented('Farm task list'),
+  createTask: notImplemented('Farm task creation'),
+  updateTask: notImplemented('Farm task update'),
+  deleteTask: notImplemented('Farm task deletion'),
+};
+export const contractorManagementAPI = {
+  getContractors: notImplemented('Contractor list'),
+  createContractor: notImplemented('Contractor creation'),
+  updateContractor: notImplemented('Contractor update'),
+  deleteContractor: notImplemented('Contractor deletion'),
+};
+export const machineryOperationsAPI = {
+  getOperations: notImplemented('Machinery operation list'),
+  createOperation: notImplemented('Machinery operation creation'),
+  updateOperation: notImplemented('Machinery operation update'),
+  deleteOperation: notImplemented('Machinery operation deletion'),
+};
+export const equipmentSchedulingAPI = {
+  getSchedules: notImplemented('Equipment schedule list'),
+  createSchedule: notImplemented('Equipment schedule creation'),
+  updateSchedule: notImplemented('Equipment schedule update'),
+  deleteSchedule: notImplemented('Equipment schedule deletion'),
+};
+export const inputConsumptionAPI = {
+  getRecords: notImplemented('Input consumption records'),
+  createRecord: notImplemented('Input consumption record creation'),
+  updateRecord: notImplemented('Input consumption record update'),
+  deleteRecord: notImplemented('Input consumption record deletion'),
+};
+export const farmProductivityAPI = {
+  getMetrics: notImplemented('Farm productivity metrics'),
+  createMetric: notImplemented('Farm productivity metric creation'),
+  updateMetric: notImplemented('Farm productivity metric update'),
+  deleteMetric: notImplemented('Farm productivity metric deletion'),
+};
+export const farmOperationsDashboardAPI = {
+  getKpis: notImplemented('Farm operations KPI list'),
+  createKpi: notImplemented('Farm operations KPI creation'),
+  updateKpi: notImplemented('Farm operations KPI update'),
+  deleteKpi: notImplemented('Farm operations KPI deletion'),
+};
+
+// --- LandManagementPage.jsx: every tab's backendNote says its endpoint "has
+// not been built yet"; verified no matching route/service exists.
+export const landLeaseAPI = {
+  getLeases: notImplemented('Land lease list'),
+  createLease: notImplemented('Land lease creation'),
+  updateLease: notImplemented('Land lease update'),
+  deleteLease: notImplemented('Land lease deletion'),
+};
+export const gisLandMappingAPI = {
+  getMappings: notImplemented('GIS land mapping parcels'),
+  createMapping: notImplemented('GIS land mapping parcel creation'),
+  updateMapping: notImplemented('GIS land mapping parcel update'),
+  deleteMapping: notImplemented('GIS land mapping parcel deletion'),
+};
+export const soilMappingAPI = {
+  getZones: notImplemented('Soil mapping zones'),
+  createZone: notImplemented('Soil mapping zone creation'),
+  updateZone: notImplemented('Soil mapping zone update'),
+  deleteZone: notImplemented('Soil mapping zone deletion'),
+};
+export const waterResourceMappingAPI = {
+  getResources: notImplemented('Water resource mapping'),
+  createResource: notImplemented('Water resource creation'),
+  updateResource: notImplemented('Water resource update'),
+  deleteResource: notImplemented('Water resource deletion'),
+};
+export const geoBoundaryAPI = {
+  getBoundaries: notImplemented('Geo-boundary list'),
+  createBoundary: notImplemented('Geo-boundary creation'),
+  updateBoundary: notImplemented('Geo-boundary update'),
+  deleteBoundary: notImplemented('Geo-boundary deletion'),
+};
+export const surveyManagementAPI = {
+  getSurveys: notImplemented('Land survey list'),
+  createSurvey: notImplemented('Land survey creation'),
+  updateSurvey: notImplemented('Land survey update'),
+  deleteSurvey: notImplemented('Land survey deletion'),
+};
+
+// --- WaterManagementPage.jsx: action-style methods (calculate/design/
+// monitor/optimize/...) - no matching endpoint anywhere; the only real,
+// mounted water route (waterManagementRoutes.js, /api/watermanagement) is a
+// 38-line scaffold, and the one unmounted file with real logic
+// (waterIrrigationRoutes.js) exposes a different, simple-resource shape
+// (POST /water-budgets etc.), not these action names.
+export const rainwaterHarvestingAPI = {
+  calculateBudget: notImplemented('Rainwater harvesting budget calculation'),
+  designSystem: notImplemented('Rainwater harvesting system design'),
+  manageStorage: notImplemented('Rainwater harvesting storage management'),
+  monitorCollection: notImplemented('Rainwater harvesting collection monitoring'),
+};
+export const waterQualityAPI = {
+  getComplianceReport: notImplemented('Water quality compliance report'),
+  getTreatmentRecommendations: notImplemented('Water quality treatment recommendations'),
+  monitorQuality: notImplemented('Water quality monitoring'),
+  recordMeasurement: notImplemented('Water quality measurement recording'),
+};
+export const watershedManagementAPI = {
+  createPlan: notImplemented('Watershed management plan creation'),
+  generateReport: notImplemented('Watershed management report'),
+  implementConservation: notImplemented('Watershed conservation implementation'),
+  monitorHealth: notImplemented('Watershed health monitoring'),
+};
+export const waterBudgetingAPI = {
+  createBudget: notImplemented('Water budget creation'),
+  generateReport: notImplemented('Water budget report'),
+  optimizeAllocation: notImplemented('Water allocation optimization'),
+  trackUsage: notImplemented('Water usage tracking'),
+};
+export const waterAnalyticsAPI = {
+  comparePerformance: notImplemented('Water analytics performance comparison'),
+  createDashboard: notImplemented('Water analytics dashboard creation'),
+  generatePrediction: notImplemented('Water analytics prediction'),
+  generateUsageAnalytics: notImplemented('Water usage analytics'),
+};
+
+// --- WaterRecordsPage.jsx: simple list/create/update/remove CRUD variants of
+// the same water domains as WaterManagementPage.jsx above - same result, no
+// matching endpoint anywhere.
+export const rainwaterStructuresAPI = {
+  list: notImplemented('Rainwater structures list'),
+  create: notImplemented('Rainwater structure creation'),
+  update: notImplemented('Rainwater structure update'),
+  remove: notImplemented('Rainwater structure deletion'),
+};
+export const waterQualityRecordsAPI = {
+  list: notImplemented('Water quality records list'),
+  create: notImplemented('Water quality record creation'),
+  update: notImplemented('Water quality record update'),
+  remove: notImplemented('Water quality record deletion'),
+};
+export const watershedRecordsAPI = {
+  list: notImplemented('Watershed records list'),
+  create: notImplemented('Watershed record creation'),
+  update: notImplemented('Watershed record update'),
+  remove: notImplemented('Watershed record deletion'),
+};
+export const waterBudgetRecordsAPI = {
+  list: notImplemented('Water budget records list'),
+  create: notImplemented('Water budget record creation'),
+  update: notImplemented('Water budget record update'),
+  remove: notImplemented('Water budget record deletion'),
+};
+export const waterAnalyticsRecordsAPI = {
+  list: notImplemented('Water analytics records list'),
+  create: notImplemented('Water analytics record creation'),
+  update: notImplemented('Water analytics record update'),
+  remove: notImplemented('Water analytics record deletion'),
+};
+
+// --- REOSDashboardPage.jsx (Rural Economic Operating System): villageProfile/
+// procurementSubscription/buyingClub/ruralEnterprise/renewableEnergy/
+// aiAdvisory services exist under 3 near-duplicate filenames each (root,
+// a domain subfolder, and legacy/) and the backend boot log itself logs
+// "Duplicate service name" for every one of them, meaning which copy (if
+// any) the dynamic service auto-loader keeps is filesystem-order-dependent,
+// not deterministic - not something to wire against. No explicit
+// `app.use(...)` mount and no ORPHANED_SERVICES_MOUNT entry exists for any
+// of these 11 names either, so all are stubbed.
+export const villageProfileAPI = {
+  searchVillages: notImplemented('Village profile search'),
+};
+export const procurementSubscriptionAPI = {
+  getStatistics: notImplemented('Procurement subscription statistics'),
+};
+export const buyingClubAPI = {
+  getStatistics: notImplemented('Buying club statistics'),
+};
+export const ruralEnterpriseAPI = {
+  getStatistics: notImplemented('Rural enterprise statistics'),
+};
+export const renewableEnergyAPI = {
+  getStatistics: notImplemented('Renewable energy statistics'),
+};
+export const householdEconomyAPI = {
+  getStatistics: notImplemented('Household economy statistics'),
+};
+export const sharedInfrastructureAPI = {
+  getStatistics: notImplemented('Shared infrastructure (REOS) statistics'),
+};
+export const machineryAccessAPI = {
+  getStatistics: notImplemented('Machinery access statistics'),
+};
+export const ruralFinanceAPI = {
+  getStatistics: notImplemented('Rural finance statistics'),
+};
+export const aiAdvisoryAPI = {
+  getStatistics: notImplemented('AI advisory statistics'),
+};
+export const mobilityRidesAPI = {
+  getStatistics: notImplemented('Mobility rides statistics'),
 };
 
 export { api };
