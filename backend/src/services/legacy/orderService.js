@@ -359,6 +359,24 @@ async function createOrder(userId, orderData) {
 
     logger.info(`Order created: ${orderNumber} for user ${userId}`);
 
+    // Announce the order so fulfilment (escrow hold, cold-storage allocation,
+    // shipment, cold-chain monitoring, transit-cover assessment) can run.
+    // SIGNAL.ORDER_PLACED was in the catalog but nothing ever emitted it, so
+    // core/decisionEngine.js's order/shipment-delay correlation could never
+    // fire either. Emitting rather than calling keeps this service unaware of
+    // its consumers, and signalBus guarantees a throwing subscriber cannot
+    // propagate back here -- the order is already committed at this point.
+    try {
+      const { signalBus, SIGNAL } = require('../../core/signalBus');
+      signalBus.emitSignal(
+        SIGNAL.ORDER_PLACED,
+        { order: { ...order, buyer_id: order.buyer_id ?? userId } },
+        { source: 'orderService.createOrder', entityId: order.id },
+      );
+    } catch (error) {
+      logger.warn('Failed to emit order.placed signal', { orderId: order.id, error: error.message });
+    }
+
     return order;
   } catch (error) {
     logger.error('Error creating order', { error: error.message, stack: error.stack });
