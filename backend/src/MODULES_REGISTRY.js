@@ -2466,7 +2466,7 @@ const modules = [
     "dir": "M261",
     "declaredStatus": "generated",
     "declaredName": "M261 Module",
-    "description": "backend module bound to the '3d_rendering' table.",
+    "description": "backend module bound to the 'rendering_3d' table.",
     "hasServiceFile": true,
     "hasRoutesFile": true
   },

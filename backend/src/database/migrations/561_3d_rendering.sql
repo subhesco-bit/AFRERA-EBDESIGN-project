@@ -1,11 +1,21 @@
--- Migration: Create 3d_rendering table
+-- NOTE: this table was originally declared as 3d_rendering, which is not a
+-- valid unquoted PostgreSQL identifier: the parser reads the leading 3d as a
+-- numeric literal, so the file failed with
+--   42601: trailing junk after numeric literal
+-- and could never apply, in any order or environment. The same applied to the
+-- constraint name.
+-- Renamed to rendering_3d rather than quoted, because the consuming service
+-- (modules/M261/service.js) interpolates the table name unquoted into SQL
+-- (SELECT * FROM ${this.table}) and would hit the identical error.
+-- Index names were already valid (they begin with idx_) and are unchanged.
+-- Migration: Create rendering_3d table
 -- Description: 3D Rendering Engine
 -- Created: $(date)
 
 BEGIN;
 
 -- Create main table
-CREATE TABLE IF NOT EXISTS 3d_rendering (
+CREATE TABLE IF NOT EXISTS rendering_3d (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
@@ -22,26 +32,26 @@ CREATE TABLE IF NOT EXISTS 3d_rendering (
   deleted_at TIMESTAMP,
 
   -- Constraints
-  CONSTRAINT 3d_rendering_user_fk FOREIGN KEY (user_id)
+  CONSTRAINT rendering_3d_user_fk FOREIGN KEY (user_id)
     REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Create indexes for common queries
 CREATE INDEX IF NOT EXISTS idx_3d_rendering_user_id
-  ON 3d_rendering(user_id) WHERE deleted_at IS NULL;
+  ON rendering_3d(user_id) WHERE deleted_at IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_3d_rendering_status
-  ON 3d_rendering(status) WHERE deleted_at IS NULL;
+  ON rendering_3d(status) WHERE deleted_at IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_3d_rendering_created_at
-  ON 3d_rendering(created_at) WHERE deleted_at IS NULL;
+  ON rendering_3d(created_at) WHERE deleted_at IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_3d_rendering_updated_at
-  ON 3d_rendering(updated_at) WHERE deleted_at IS NULL;
+  ON rendering_3d(updated_at) WHERE deleted_at IS NULL;
 
 -- Index for JSONB data searches
 CREATE INDEX IF NOT EXISTS idx_3d_rendering_data_gin
-  ON 3d_rendering USING gin(data) WHERE deleted_at IS NULL;
+  ON rendering_3d USING gin(data) WHERE deleted_at IS NULL;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_3d_rendering_timestamp()
@@ -52,8 +62,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER 3d_rendering_timestamp_trigger
-BEFORE UPDATE ON 3d_rendering
+CREATE TRIGGER rendering_3d_timestamp_trigger
+BEFORE UPDATE ON rendering_3d
 FOR EACH ROW
 EXECUTE FUNCTION update_3d_rendering_timestamp();
 

@@ -1,3 +1,11 @@
+-- NOTE: this migration declared `updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- ON UPDATE CURRENT_TIMESTAMP` on ne_variety_products and ne_variety_media.
+-- `ON UPDATE CURRENT_TIMESTAMP` is MySQL syntax; PostgreSQL has no such clause,
+-- so the file failed with `42601: syntax error at or near "ON"` and could never
+-- apply. Replaced with this project's own shared trigger function
+-- update_updated_at_column(), defined in 032_knowledge_graph_schema.sql and
+-- already reused by 9991_1_logistics_enhancements.sql. 032 sorts before 9001
+-- under the runner's numeric ordering, so the function exists by this point.
 -- North East India Variety Directory - Comprehensive Integration
 -- 100+ agricultural varieties with GI tags, biochemical profiles, and commercial data
 -- Generated: 2026-09-05
@@ -95,7 +103,7 @@ CREATE TABLE IF NOT EXISTS ne_variety_products (
   certification_status TEXT,
 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   INDEX idx_category (category_id),
   INDEX idx_state (primary_state),
@@ -240,7 +248,7 @@ CREATE TABLE IF NOT EXISTS ne_variety_media (
   usage_instructions_text TEXT,
 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================================================
@@ -278,3 +286,15 @@ UNION ALL SELECT
 -- ============================================================================
 
 COMMIT;
+
+-- Keep updated_at current on UPDATE (PostgreSQL equivalent of the MySQL clause
+-- removed above), using the shared function from 032_knowledge_graph_schema.sql.
+DROP TRIGGER IF EXISTS set_ne_variety_products_updated_at ON ne_variety_products;
+CREATE TRIGGER set_ne_variety_products_updated_at
+  BEFORE UPDATE ON ne_variety_products
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS set_ne_variety_media_updated_at ON ne_variety_media;
+CREATE TRIGGER set_ne_variety_media_updated_at
+  BEFORE UPDATE ON ne_variety_media
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

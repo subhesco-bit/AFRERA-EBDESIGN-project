@@ -4,7 +4,11 @@ const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/e
 
 class M261Service {
   constructor() {
-    this.table = '3d_rendering';
+    // `3d_rendering` is not a valid unquoted PostgreSQL identifier (the parser
+    // reads `3d` as a numeric literal), and this value is interpolated raw into
+    // SQL below, so every query threw 42601. Renamed with its migration,
+    // database/migrations/561_3d_rendering.sql.
+    this.table = 'rendering_3d';
     this.defaultLimit = 20;
     this.maxLimit = 100;
   }

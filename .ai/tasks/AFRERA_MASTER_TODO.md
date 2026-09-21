@@ -232,14 +232,33 @@ mean the resulting schema depends on which definition happens to win.
 - [x] **1.2.1 Execute all 789 migrations against a real PostgreSQL** — `VERIFIED` — *no longer blocked*
   PostgreSQL 16 stood up locally and the full set applied continue-on-error, in
   the runner's own order, without modifying any migration file.
-  **Result: 714 of 789 apply; 75 fail**, in 10 error classes. Full per-file
+  **Result after 1.2.1a: 715 of 789 apply; 74 fail** (initially 714/75), in 10 error classes. Full per-file
   breakdown in `.ai/reports/MIGRATION_EXECUTION_REPORT.md`.
   The project's runner halts on first failure, so before this the schema could
   not get past migration **4 of 789** (`001_skeleton_complete_schema.sql`,
   unique violation on `roles_code_key`, `Key (code)=(farmer) already exists`).
 
-- [ ] **1.2.1a Fix the 2 SQL syntax errors** — `CONFLICTING` — *do first, unambiguous*
-      `42601` — these files cannot apply in any order or environment.
+- [x] **1.2.1a Fix the 2 SQL syntax errors** — `VERIFIED`
+      Both `42601` failures are gone; applied count 714 → 715.
+      - `561_3d_rendering.sql` — declared `CREATE TABLE 3d_rendering` and
+        `CONSTRAINT 3d_rendering_user_fk`. Neither is a valid unquoted
+        PostgreSQL identifier: the parser reads the leading `3d` as a numeric
+        literal (`trailing junk after numeric literal`). **Renamed** to
+        `rendering_3d` rather than quoted, because the consuming service
+        `modules/M261/service.js` interpolated the name unquoted into SQL
+        (`SELECT * FROM ${this.table}`) and hit the identical error at runtime —
+        so the table was unusable from both directions. Service and
+        `MODULES_REGISTRY.js` updated with it. Verified: migration now commits.
+      - `9001_north_east_varieties_comprehensive.sql` — used
+        `updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`
+        on `ne_variety_products` and `ne_variety_media`. **`ON UPDATE
+        CURRENT_TIMESTAMP` is MySQL syntax**; PostgreSQL has no such clause, so
+        the file could never apply. Replaced with this project's own shared
+        trigger function `update_updated_at_column()` (defined in
+        `032_knowledge_graph_schema.sql`, already reused by
+        `9991_1_logistics_enhancements.sql`; `032` sorts before `9001`).
+        It now parses and has advanced to a missing-type dependency, which
+        belongs to the 1.2.1c group rather than being unapplicable in principle.
 - [ ] **1.2.1b Fix 18 foreign-key type mismatches** — `CONFLICTING`
       `42804` / `42703` — FK column type differs from the referenced key.
 - [ ] **1.2.1c Consolidate 263 multiply-defined objects, then re-run** — `CONFLICTING` — *largest group*
