@@ -1,0 +1,42 @@
+{
+  "moduleId": "M029",
+  "version": "0.1.0",
+  "name": "M029 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "agriculture",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m029",
+      "backend"
+    ],
+    "capabilities": [
+      "listHealthRecords",
+      "getHealthRecord",
+      "createHealthRecord",
+      "updateHealthRecord",
+      "deleteHealthRecord",
+      "getFarmerHealthSummary",
+      "getWelfarePrograms",
+      "enrollWelfareProgram",
+      "listItems",
+      "getItem",
+      "createItem",
+      "updateItem"
+    ],
+    "aiContext": "backend module M029; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

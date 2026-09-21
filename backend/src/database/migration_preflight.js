@@ -106,24 +106,47 @@ function findDuplicateOwnership(tables) {
     .map(([table, files]) => ({ table, files }));
 }
 
-function findForeignKeyMismatches(tables) {
-  const definitions = new Map();
+// 2026-09-18: rewritten to be execution-order-aware. `tables` arrives in the
+// same order migrate.js runs files in. `CREATE TABLE IF NOT EXISTS` means the
+// FIRST file to declare a given table wins that table's column types for
+// real - every later redeclaration of the same table is a full no-op, not a
+// per-column merge, and its own column definitions never take effect. The
+// previous version compared "every type ever declared for this column" and
+// called it "ambiguous" whenever more than one existed, silently missing
+// real bugs (verified: this undercounted 78 real order-resolvable mismatches
+// down to 20, and separately produced a false-positive "blocker" for a
+// mismatch inside a table declaration that never actually runs) - see
+// docs/consolidation-audit/FINAL_CONSOLIDATION_REPORT.md, "Systemic FK
+// type-mismatch sweep", for the audit that found this.
+function resolveWinningColumns(tables) {
+  const firstDeclFile = new Map(); // tableName -> filename
+  const winningColumns = new Map(); // tableName -> Map(column -> {type, filename})
   for (const table of tables) {
-    if (!definitions.has(table.tableName)) definitions.set(table.tableName, new Map());
-    for (const [column, type] of table.columns) {
-      if (!definitions.get(table.tableName).has(column)) definitions.get(table.tableName).set(column, []);
-      definitions.get(table.tableName).get(column).push({ type, filename: table.filename });
+    if (!firstDeclFile.has(table.tableName)) {
+      firstDeclFile.set(table.tableName, table.filename);
+      winningColumns.set(table.tableName, new Map(
+        [...table.columns].map(([column, type]) => [column, { type, filename: table.filename }]),
+      ));
     }
   }
+  return { firstDeclFile, winningColumns };
+}
+
+function findForeignKeyMismatches(tables) {
+  const { firstDeclFile, winningColumns } = resolveWinningColumns(tables);
   const mismatches = [];
   for (const table of tables) {
+    const tableIsLive = firstDeclFile.get(table.tableName) === table.filename;
     for (const foreignKey of table.foreignKeys) {
+      // If this table's own declaration never wins, its column types never
+      // took effect either - checking them would just re-report whatever the
+      // winning declaration already resolved (or didn't).
+      if (!tableIsLive) continue;
       const localType = table.columns.get(foreignKey.column);
-      const targets = definitions.get(foreignKey.targetTable)?.get(foreignKey.targetColumn) || [];
-      const targetTypes = [...new Set(targets.map(target => target.type))];
-      const uuidIntegerMismatch = targetTypes.length > 0 &&
-        targetTypes.every(targetType => (localType === 'uuid' && targetType === 'integer') ||
-          (localType === 'integer' && targetType === 'uuid'));
+      const target = winningColumns.get(foreignKey.targetTable)?.get(foreignKey.targetColumn);
+      if (!target || !localType) continue;
+      const uuidIntegerMismatch = (localType === 'uuid' && target.type === 'integer') ||
+        (localType === 'integer' && target.type === 'uuid');
       if (uuidIntegerMismatch) {
         mismatches.push({
           filename: table.filename,
@@ -131,7 +154,8 @@ function findForeignKeyMismatches(tables) {
           column: foreignKey.column,
           localType,
           target: `${foreignKey.targetTable}.${foreignKey.targetColumn}`,
-          targetTypes,
+          targetTypes: [target.type],
+          targetWinningFile: target.filename,
         });
       }
     }
@@ -139,6 +163,11 @@ function findForeignKeyMismatches(tables) {
   return mismatches;
 }
 
+// 2026-09-18: kept as an informational/legacy signal only. Execution order
+// always resolves a single winning type per table.column now (see
+// findForeignKeyMismatches above), so nothing here is actually ambiguous any
+// more - this just surfaces "more than one file ever declared this
+// table.column" as a lower-priority note for a human, not a blocker.
 function findAmbiguousForeignKeyTypes(tables) {
   const definitions = new Map();
   for (const table of tables) {
@@ -196,7 +225,11 @@ function inspectSchemaMigrationDefinitions() {
 }
 
 function run() {
-  const files = fs.readdirSync(migrationsDir).filter(file => file.endsWith('.sql')).sort();
+  // Must match migrate.js's own sort exactly (numeric-aware), not plain lexical
+  // sort - "9_x" vs "10_x" order differently under each, and getting this wrong
+  // silently breaks every "which file actually runs/wins first" check below.
+  const files = fs.readdirSync(migrationsDir).filter(file => file.endsWith('.sql'))
+    .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
   const tables = files.flatMap(file => parseTables(file, fs.readFileSync(path.join(migrationsDir, file), 'utf8')));
   const report = {
     migrationCount: files.length,

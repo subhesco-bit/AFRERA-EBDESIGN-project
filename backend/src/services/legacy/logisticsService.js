@@ -8,6 +8,7 @@ const { getPostgreSQL } = require('../../database/connection');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
 const { LOGISTICS_ROLES } = require('../../middleware/roleGroups');
 const decisionSupportService = require('./decisionSupportService');
+const { withTransaction } = require('../../core/withTransaction');
 
 /**
  * Create shipment
@@ -170,7 +171,7 @@ async function updateShipmentStatus(shipmentId, status, notes = null) {
     const shipment = result.rows[0];
 
     // Emit WebSocket event
-    const io = require('../../../index').app.get('io');
+    const io = require('../index').app.get('io');
     if (io) {
       io.to(`shipment:${shipmentId}`).emit('shipment_status_updated', {
         shipment_id: shipmentId,
@@ -211,7 +212,7 @@ async function addTrackingUpdate(shipmentId, trackingData) {
     ]);
 
     // Emit WebSocket event
-    const io = require('../../../index').app.get('io');
+    const io = require('../index').app.get('io');
     if (io) {
       io.to(`shipment:${shipmentId}`).emit('tracking_update', {
         shipment_id: shipmentId,
@@ -340,29 +341,36 @@ async function getVehicles(filters = {}) {
  */
 async function registerDriver(driverData) {
   try {
-    const pg = getPostgreSQL();
-
     const query = `
       INSERT INTO drivers (name, phone, license_number, license_expiry_date, assigned_vehicle_id)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `;
 
-    const result = await pg.query(query, [
-      driverData.name,
-      driverData.phone,
-      driverData.license_number,
-      driverData.license_expiry_date,
-      driverData.assigned_vehicle_id || null,
-    ]);
+    // BR-08: creating the driver and assigning them to a vehicle is one
+    // operation when assigned_vehicle_id is given — if the vehicle update
+    // were lost after the driver row committed, the vehicle would keep
+    // whatever driver_id it had before (stale/none) while the driver record
+    // itself claims an assignment, a lost-update visible from either side.
+    const result = await withTransaction(async (client) => {
+      const inserted = await client.query(query, [
+        driverData.name,
+        driverData.phone,
+        driverData.license_number,
+        driverData.license_expiry_date,
+        driverData.assigned_vehicle_id || null,
+      ]);
 
-    // Update vehicle if assigned
-    if (driverData.assigned_vehicle_id) {
-      await pg.query(
-        'UPDATE vehicles SET driver_id = $1 WHERE id = $2',
-        [result.rows[0].id, driverData.assigned_vehicle_id],
-      );
-    }
+      // Update vehicle if assigned
+      if (driverData.assigned_vehicle_id) {
+        await client.query(
+          'UPDATE vehicles SET driver_id = $1 WHERE id = $2',
+          [inserted.rows[0].id, driverData.assigned_vehicle_id],
+        );
+      }
+
+      return inserted;
+    }, { name: 'logisticsService.registerDriver' });
 
     logger.info(`Driver registered: ${driverData.name}`);
 

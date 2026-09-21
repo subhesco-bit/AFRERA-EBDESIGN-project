@@ -1,0 +1,20 @@
+{
+  "moduleId": "M783_CARTOON_MAKER_AI",
+  "version": "1.0.0",
+  "name": "AI Cartoon Maker",
+  "description": "Cartoon character and animation creation",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "character_design",
+    "story_animation",
+    "scene_generation"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m783_cartoon_maker_ai"
+    }
+  }
+}

@@ -57,6 +57,24 @@ class ServiceError extends AppError {
   }
 }
 
+/**
+ * Raised when a database operation fails.
+ *
+ * 227 module services (e.g. modules/M177, M183) already
+ * `throw new DatabaseError(...)` in their query error paths and import it from
+ * this file, but it was never defined or exported. Every one of those paths
+ * therefore threw "DatabaseError is not a constructor" instead of the intended
+ * error -- breaking error handling precisely when the database was failing.
+ *
+ * Call sites pass a single message string; `cause` is optional and additive.
+ */
+class DatabaseError extends AppError {
+  constructor(message, cause = null) {
+    super(message, 500, 'DATABASE_ERROR');
+    if (cause) this.cause = cause;
+  }
+}
+
 module.exports = {
   AppError,
   ValidationError,
@@ -66,4 +84,5 @@ module.exports = {
   ConflictError,
   RateLimitError,
   ServiceError,
+  DatabaseError,
 };

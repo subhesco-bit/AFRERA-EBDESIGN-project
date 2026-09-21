@@ -25,6 +25,12 @@
 -- list of what can be grown, not agronomic detail, which already lives in
 -- native_crops_database, organic_crops and crop_plans. Linked to the v42
 -- crop_concepts semantic index (992) so a crop resolves across languages.
+--
+-- 2026-09-18 CORRECTION: 001_skeleton_complete_schema.sql already declares a
+-- "crops" table (INTEGER/SERIAL id) and runs first, so the CREATE TABLE below
+-- is itself a no-op - 001's version is what actually exists. This file's 4
+-- crop_id columns were typed UUID to match this file's own (dead) table, not
+-- the live one; retyped to INTEGER below to match the real, live crops.id.
 -- ===========================================================================
 CREATE TABLE IF NOT EXISTS crops (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -189,7 +195,7 @@ CREATE INDEX IF NOT EXISTS idx_household_orders_delivery ON household_orders(del
 CREATE TABLE IF NOT EXISTS farm_consumables (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reu_id UUID NOT NULL REFERENCES rural_economic_units(id) ON DELETE CASCADE,
-  crop_id UUID REFERENCES crops(id) ON DELETE SET NULL,
+  crop_id INTEGER REFERENCES crops(id) ON DELETE SET NULL,
   
   -- Input Details
   input_type VARCHAR(50) NOT NULL, -- seed, fertilizer, protection, micronutrient, mulch, irrigation, feed
@@ -271,7 +277,7 @@ CREATE TABLE IF NOT EXISTS machinery_access (
   
   -- Purpose
   purpose VARCHAR(100),
-  crop_id UUID REFERENCES crops(id) ON DELETE SET NULL,
+  crop_id INTEGER REFERENCES crops(id) ON DELETE SET NULL,
   area DECIMAL, -- in acres
   area_unit VARCHAR(20), -- acre, hectare, sqft
   
@@ -338,7 +344,7 @@ CREATE TABLE IF NOT EXISTS shared_infrastructure_access (
   
   -- Purpose
   purpose VARCHAR(100),
-  crop_id UUID REFERENCES crops(id) ON DELETE SET NULL,
+  crop_id INTEGER REFERENCES crops(id) ON DELETE SET NULL,
   produce_type VARCHAR(100),
   
   -- Status
@@ -751,7 +757,7 @@ CREATE INDEX IF NOT EXISTS idx_financial_needs_assessment_date ON financial_need
 CREATE TABLE IF NOT EXISTS ai_advisories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reu_id UUID NOT NULL REFERENCES rural_economic_units(id) ON DELETE CASCADE,
-  crop_id UUID REFERENCES crops(id) ON DELETE SET NULL,
+  crop_id INTEGER REFERENCES crops(id) ON DELETE SET NULL,
   enterprise_id UUID REFERENCES rural_enterprises(id) ON DELETE SET NULL,
   
   -- Advisory Details

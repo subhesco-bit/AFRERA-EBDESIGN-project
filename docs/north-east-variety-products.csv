@@ -1,0 +1,143 @@
+id,name,crop,category,region,description,estimated_price_inr,unit,source_table,source_row
+nei-citrus-khasi-mandarin-orange,Khasi Mandarin Orange,Citrus,North East India Varieties,North East India,"High sweetness, thin smooth rind, and rich flavour; grown in high-rainfall zones 1 . | Fresh consumption, premium juice extraction, and essential oil processing 20 .",420,kg/seedling/bundle,1,1
+nei-citrus-assam-mandarin,Assam Mandarin,Citrus,North East India Varieties,North East India,"High aroma, intense volatile rind oils, and balanced acidity 2 . | Bulk commercial juice concentrate and export markets 11 .",338,kg/seedling/bundle,1,2
+nei-citrus-kachai-lemon,Kachai Lemon,Citrus,North East India Varieties,North East India,"Locally known as Kachai Champra ; highest concentration of ascorbic acid globally 20 . | Fresh culinary use, pickling, and freeze-dried juice powder processing 20 .",418,kg/seedling/bundle,1,3
+nei-citrus-naga-sweet-orange,Naga Sweet Orange,Citrus,North East India Varieties,North East India,"Low acidity, high sweetness, and organically cultivated in hilly terrains 21 . | Fresh retail fruit and premium organic segments 22 .",356,kg/seedling/bundle,1,4
+nei-citrus-galgal-citrus-pseudolimon,Galgal (Citrus pseudolimon),Citrus,North East India Varieties,North East India,"Large, highly acidic fruits rich in pectin and medicinal citric acid 2 . | Heavy pickling, citrus vinegar, and industrial citric acid extraction.",380,kg/seedling/bundle,1,5
+nei-citrus-pomelo-robab-tenga,Pomelo (Robab Tenga),Citrus,North East India Varieties,North East India,"Extremely large fruit with pink or white segment sacs; high in potassium, copper, and vitamin C 23 . | Fresh salads, commercial juice blending, and high-pectin marmalades 23 .",440,kg/seedling/bundle,1,6
+nei-citrus-kaffir-lime,Kaffir Lime,Citrus,North East India Varieties,North East India,"Highly aromatic, wrinkled green rind and bi-lobed leaves rich in citronellal. | Essential oil extraction and fresh culinary use in Southeast Asian cuisines.",402,kg/seedling/bundle,1,7
+nei-citrus-citron,Citron,Citrus,North East India Varieties,North East India,"Thick, fleshy rind; rich in volatile essential oils and medicinal properties 2 . | Candied peel processing, medicinal extracts, and essential oils.",384,kg/seedling/bundle,1,8
+nei-exotic-kiwi,Kiwi,Exotic,North East India Varieties,North East India,"High ascorbic acid (vitamin C) and actinidin enzyme content; organic mountain crop. | Premium fresh retail, dehydrated kiwi slices, and fruit pulp.",384,kg/seedling/bundle,1,9
+nei-exotic-avocado,Avocado,Exotic,North East India Varieties,North East India,Rich in monounsaturated fatty acids (oleic acid) and vitamin E; buttery texture. | Premium fresh retail and cosmetic-grade cold-pressed oil extraction.,392,kg/seedling/bundle,1,10
+nei-exotic-dragon-fruit,Dragon Fruit,Exotic,North East India Varieties,North East India,High antioxidant content (betalains); emerging climate-resilient crop. | Fresh wellness retail and natural organic food colouring.,350,kg/seedling/bundle,1,11
+nei-exotic-passion-fruit,Passion Fruit,Exotic,North East India Varieties,North East India,"Intense tropical aroma, high acidity, and rich yellow pulp; processing grade 26 . | High-value juice concentrate, squashes, and RTS beverages 26 .",382,kg/seedling/bundle,1,12
+nei-exotic-persimmon,Persimmon,Exotic,North East India Varieties,North East India,Rare high-altitude orange fruit; rich in tannins and soluble dietary fibres. | Premium fresh dessert fruit and dehydrated sweet slices.,360,kg/seedling/bundle,1,13
+nei-exotic-plum,Plum,Exotic,North East India Varieties,North East India,"Temperate high-altitude stone fruit; rich in anthocyanins and organic acids. | Fresh mountain retail, premium jams, and organic fruit wines.",370,kg/seedling/bundle,1,14
+nei-exotic-peach,Peach,Exotic,North East India Varieties,North East India,Soft-fleshed mountain crop; high water content and delicate aroma. | Premium fresh retail and processed canned halves in syrup.,344,kg/seedling/bundle,1,15
+nei-exotic-pear,Pear,Exotic,North East India Varieties,North East India,"Crispy temperate crop; high stone-cell density and high dietary fibre. | Fresh retail, dehydrated fruit leather, and perry (pear cider).",362,kg/seedling/bundle,1,16
+nei-exotic-apricot,Apricot,Exotic,North East India Varieties,North East India,High-altitude dry fruit potential; rich in beta-carotene and iron 27 . | Dehydrated whole apricots and cosmetic apricot kernel oil.,352,kg/seedling/bundle,1,17
+nei-exotic-cherry,Cherry,Exotic,North East India Varieties,North East India,High-altitude stone fruit; bright red pigmentation and low shelf life. | Premium fresh retail and gourmet confectioneries.,334,kg/seedling/bundle,1,18
+nei-tropical-queen-pineapple,Queen Pineapple,Tropical,North East India Varieties,North East India,"Deep yellow color, extremely sweet taste, low fiber, and low acidity 29 . | Fresh luxury export, vacuum-dried slices, and premium canned rings 14 .",384,kg/seedling/bundle,1,19
+nei-tropical-kew-pineapple,Kew Pineapple,Tropical,North East India Varieties,North East India,"Large, juicy fruit; ideal processing grade with high juice recovery. | Commercial juice concentrate, squashes, and canned pieces.",348,kg/seedling/bundle,1,20
+nei-tropical-banana,Banana,Tropical,North East India Varieties,North East India,"Rich diversity including red, green, and culinary cooking varieties 2 . | Fresh local markets, banana chips, and organic starch processing.",368,kg/seedling/bundle,1,21
+nei-tropical-papaya,Papaya,Tropical,North East India Varieties,North East India,"High yield; rich in papain enzyme and dietary fiber. | Green papaya latex extraction, candy ( tutti-frutti ), and pulp.",328,kg/seedling/bundle,1,22
+nei-tropical-mango,Mango,Tropical,North East India Varieties,North East India,"Local high-aroma varieties suited for humid subtropical zones 2 . | Fresh local retail, green mango pickling, and pulp concentrate.",352,kg/seedling/bundle,1,23
+nei-tropical-jackfruit,Jackfruit,Tropical,North East India Varieties,North East India,"Massive size; high starch and protein content 2 . | Green jackfruit meat-substitute chunks, chips, and seed flour.",318,kg/seedling/bundle,1,24
+nei-tropical-guava,Guava,Tropical,North East India Varieties,North East India,"High vitamin C and pectin content; pink and white pulp varieties. | Fresh retail, high-viscosity guava jelly, and RTS beverages.",346,kg/seedling/bundle,1,25
+nei-tropical-litchi,Litchi,Tropical,North East India Varieties,North East India,"Extremely sweet, juicy pulp with a deep red rind and pleasant aroma 33 . | Premium fresh retail, canned pulp, and exotic export markets 34 .",370,kg/seedling/bundle,1,26
+nei-tropical-custard-apple,Custard Apple,Tropical,North East India Varieties,North East India,"Sweet, creamy pulp with high caloric density and calcium levels. | Fresh local markets and premium ice-cream pulp base.",328,kg/seedling/bundle,1,27
+nei-wild-sohiong-khasi-cherry,Sohiong (Khasi Cherry),Wild,North East India Varieties,North East India,"Dark blackish-purple berry ( Prunus nepalensis ); rich in anthocyanins 3 . | Premium functional beverages, kombucha, and organic wines 3 .",366,kg/seedling/bundle,1,28
+nei-wild-sohshang,Sohshang,Wild,North East India Varieties,North East India,"Oval/oblong pinkish-red berry ( Elaeagnus latifolia ); highly acidic 35 . | Gourmet ethnic pickling, jams, and home-processed preserves 35 .",370,kg/seedling/bundle,1,29
+nei-wild-wild-apple,Wild Apple,Wild,North East India Varieties,North East India,"High-altitude, sour forest fruit; high pectin and polyphenol content. | Dried wild apple slices, herbal teas, and traditional medicines 4 .",368,kg/seedling/bundle,1,30
+nei-wild-wild-pear,Wild Pear,Wild,North East India Varieties,North East India,"Small, gritty green fruits; astringent and highly fibrous landrace. | Traditional medicine, vinegar production, and wild cider brewing.",360,kg/seedling/bundle,1,31
+nei-leafy-lai-patta-leafy-mustard,Lai Patta (Leafy Mustard),Leafy,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,1
+nei-leafy-mustard-greens,Mustard Greens,Leafy,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,2
+nei-leafy-perilla-leaves,Perilla Leaves,Leafy,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,3
+nei-leafy-tree-bean-leaves,Tree Bean Leaves,Leafy,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,4
+nei-leafy-roselle-leaves,Roselle Leaves,Leafy,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,5
+nei-leafy-water-spinach,Water Spinach,Leafy,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,6
+nei-leafy-amaranthus,Amaranthus,Leafy,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,7
+nei-leafy-colocasia-leaves,Colocasia Leaves,Leafy,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,8
+nei-root-yam,Yam,Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,9
+nei-root-elephant-foot-yam,Elephant Foot Yam,Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,10
+nei-root-sweet-potato,Sweet Potato,Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,11
+nei-root-tapioca-cassava,Tapioca (Cassava),Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,12
+nei-root-taro,Taro,Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,13
+nei-root-radish,Radish,Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,14
+nei-root-carrot,Carrot,Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,15
+nei-root-beetroot,Beetroot,Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,16
+nei-root-turnip,Turnip,Root,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,17
+nei-cruciferous-cabbage,Cabbage,Cruciferous,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,18
+nei-cruciferous-cauliflower,Cauliflower,Cruciferous,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,19
+nei-cruciferous-broccoli,Broccoli,Cruciferous,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,20
+nei-cruciferous-kale,Kale,Cruciferous,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,21
+nei-beans-french-bean,French Bean,Beans,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,22
+nei-beans-runner-bean,Runner Bean,Beans,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,23
+nei-beans-tree-bean,Tree Bean,Beans,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,24
+nei-beans-soybean-vegetable,Soybean (Vegetable),Beans,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,25
+nei-cucurbits-bottle-gourd,Bottle Gourd,Cucurbits,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,26
+nei-cucurbits-bitter-gourd,Bitter Gourd,Cucurbits,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,27
+nei-cucurbits-ridge-gourd,Ridge Gourd,Cucurbits,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,28
+nei-cucurbits-pumpkin,Pumpkin,Cucurbits,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,29
+nei-cucurbits-cucumber,Cucumber,Cucurbits,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,30
+nei-cucurbits-squash,Squash,Cucurbits,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,31
+nei-mushroom-oyster-mushroom,Oyster Mushroom,Mushroom,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,32
+nei-mushroom-shiitake,Shiitake,Mushroom,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,33
+nei-mushroom-button-mushroom,Button Mushroom,Mushroom,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,34
+nei-mushroom-wild-mushrooms,Wild Mushrooms,Mushroom,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,2,35
+nei-bhut-jolokia-bhut-jolokia,Bhut Jolokia,Bhut Jolokia,North East India Varieties,North East India,"High heat index; up to 1,000,000 Scoville Heat Units (SHU) 22 .",216,kg/seedling/bundle,3,1
+nei-raja-mircha-raja-mircha,Raja Mircha,Raja Mircha,North East India Varieties,North East India,"Highly pungent (800,000–1,000,000 SHU) with a unique smoky flavor 22 .",230,kg/seedling/bundle,3,2
+nei-bird-s-eye-chilli-bird-s-eye-chilli,Bird's Eye Chilli,Bird's Eye Chilli,North East India Varieties,North East India,"Small, intensely pungent chillies; rich in vitamins 26 .",202,kg/seedling/bundle,3,3
+nei-dalle-khursani-dalle-khursani,Dalle Khursani,Dalle Khursani,North East India Varieties,North East India,"Red cherry pepper; high pungency (100,000–350,000 SHU) 54 .",208,kg/seedling/bundle,3,4
+nei-ginger-karbi-anglong-ginger-karbi-anglong,Ginger (Karbi Anglong),Ginger (Karbi Anglong),North East India Varieties,North East India,Low fiber in Aizol ; high oleoresin oil recovery ( Gingerin ) 48 .,222,kg/seedling/bundle,3,5
+nei-lakadong-turmeric-lakadong-turmeric,Lakadong Turmeric,Lakadong Turmeric,North East India Varieties,North East India,Curcumin content of 7% to 12%; bright golden-yellow hue 17 .,210,kg/seedling/bundle,3,6
+nei-black-turmeric-black-turmeric,Black Turmeric,Black Turmeric,North East India Varieties,North East India,Curcuma caesia ; dark bluish-black rhizome; rich in camphor and cineole.,234,kg/seedling/bundle,3,7
+nei-turmeric-general-turmeric-general,Turmeric (General),Turmeric (General),North East India Varieties,North East India,Standard regional varieties; average curcumin content of 3% to 5% 59 .,230,kg/seedling/bundle,3,8
+nei-large-cardamom-large-cardamom,Large Cardamom,Large Cardamom,North East India Varieties,North East India,"Bold capsules with a strong smoky, camphoraceous aroma 53 .",208,kg/seedling/bundle,3,9
+nei-cinnamon-cinnamon,Cinnamon,Cinnamon,North East India Varieties,North East India,"Sourced from Cinnamomum verum ; sweet, delicate, woody aroma 13 .",220,kg/seedling/bundle,3,10
+nei-bay-leaf-tej-patta-bay-leaf-tej-patta,Bay Leaf (Tej Patta),Bay Leaf (Tej Patta),North East India Varieties,North East India,Sourced around Shillong; high essential oil content 51 .,202,kg/seedling/bundle,3,11
+nei-black-pepper-black-pepper,Black Pepper,Black Pepper,North East India Varieties,North East India,Bold black peppercorns; high piperine content and intense heat.,216,kg/seedling/bundle,3,12
+nei-long-pepper-long-pepper,Long Pepper,Long Pepper,North East India Varieties,North East India,Piper longum (Pipli); sweet-pungent woody heat; high piperine content 13 .,238,kg/seedling/bundle,3,13
+nei-perilla-seed-perilla-seed,Perilla Seed,Perilla Seed,North East India Varieties,North East India,Known as Kenye ; rich in alpha-linolenic acid (omega-3) and proteins.,228,kg/seedling/bundle,3,14
+nei-coriander-coriander,Coriander,Coriander,North East India Varieties,North East India,High-aroma coriander varieties grown in moist valley soils 13 .,216,kg/seedling/bundle,3,15
+nei-fennel-fennel,Fennel,Fennel,North East India Varieties,North East India,"Sweet, anise-like seeds rich in anethole; grown in cold climates.",220,kg/seedling/bundle,3,16
+nei-star-anise-star-anise,Star Anise,Star Anise,North East India Varieties,North East India,Illicium griffithii ; star-shaped carpels rich in shikimic acid 4 .,224,kg/seedling/bundle,3,17
+nei-clove-clove,Clove,Clove,North East India Varieties,North East India,Premium flower buds rich in eugenol; intense numbing heat.,206,kg/seedling/bundle,3,18
+nei-nutmeg-nutmeg,Nutmeg,Nutmeg,North East India Varieties,North East India,Tropical seed rich in myristicin and sweet aromatic oils.,204,kg/seedling/bundle,3,19
+nei-akhuni-axone-akhuni-axone,Akhuni / Axone,Akhuni / Axone,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,1
+nei-tungrymbai-tungrymbai,Tungrymbai,Tungrymbai,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,2
+nei-hawaijar-hawaijar,Hawaijar,Hawaijar,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,3
+nei-bekang-bekang,Bekang,Bekang,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,4
+nei-ngari-ngari,Ngari,Ngari,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,5
+nei-shidal-shidal,Shidal,Shidal,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,6
+nei-hentak-hentak,Hentak,Hentak,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,7
+nei-tungtap-tungtap,Tungtap,Tungtap,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,8
+nei-anishi-n-oshi-anishi-n-oshi,Anishi / Nüoshi,Anishi / Nüoshi,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,9
+nei-mesu-mesu,Mesu,Mesu,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,10
+nei-soibum-soibum,Soibum,Soibum,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,11
+nei-soidon-soidon,Soidon,Soidon,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,12
+nei-bastenga-bastenga,Bastenga,Bastenga,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,13
+nei-chhurpi-chhurpi,Chhurpi,Chhurpi,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,14
+nei-kinema-kinema,Kinema,Kinema,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,4,15
+nei-bamboo-fresh-bamboo-shoot-bah-gaj,Fresh Bamboo Shoot (Bah Gaj),Bamboo,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,1
+nei-bamboo-fermented-bamboo-shoot-khorisa,Fermented Bamboo Shoot (Khorisa),Bamboo,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,2
+nei-bamboo-bamboo-shoot-pickle,Bamboo Shoot Pickle,Bamboo,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,3
+nei-bamboo-bamboo-shoot-powder,Bamboo Shoot Powder,Bamboo,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,4
+nei-bamboo-bamboo-tea,Bamboo Tea,Bamboo,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,5
+nei-honey-wild-forest-honey,Wild Forest Honey,Honey,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,6
+nei-honey-rock-bee-honey,Rock Bee Honey,Honey,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,7
+nei-honey-stingless-bee-honey,Stingless Bee Honey,Honey,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,8
+nei-honey-organic-honey,Organic Honey,Honey,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,9
+nei-honey-bamboo-honey,Bamboo Honey,Honey,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,10
+nei-grains-joha-rice,Joha Rice,Grains,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,11
+nei-grains-bao-rice,Bao Rice,Grains,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,12
+nei-grains-black-rice-chakhao,Black Rice (Chakhao),Grains,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,13
+nei-grains-finger-millet-marua,Finger Millet (Marua),Grains,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,14
+nei-grains-foxtail-millet,Foxtail Millet,Grains,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,5,15
+nei-pulses-rajma-kidney-beans,Rajma (Kidney Beans),Pulses,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,1
+nei-pulses-black-gram-urad,Black Gram (Urad),Pulses,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,2
+nei-pulses-green-gram-moong,Green Gram (Moong),Pulses,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,3
+nei-pulses-pigeon-pea-arhar,Pigeon Pea (Arhar),Pulses,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,4
+nei-oilseeds-mustard-seed,Mustard Seed,Oilseeds,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,5
+nei-oilseeds-perilla-seed,Perilla Seed,Oilseeds,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,6
+nei-oilseeds-sesame-seed,Sesame Seed,Oilseeds,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,7
+nei-nuts-arecanut-kwai-gue,Arecanut (Kwai / Gue),Nuts,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,8
+nei-nuts-walnut,Walnut,Nuts,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,9
+nei-nuts-chestnut,Chestnut,Nuts,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,10
+nei-tea-coffee-assam-tea,Assam Tea,Tea / Coffee,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,11
+nei-tea-coffee-orthodox-tea,Orthodox Tea,Tea / Coffee,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,12
+nei-tea-coffee-singpho-tea-phalap,Singpho Tea (Phalap),Tea / Coffee,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,13
+nei-tea-coffee-arabica-coffee,Arabica Coffee,Tea / Coffee,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,14
+nei-tea-coffee-robusta-coffee,Robusta Coffee,Tea / Coffee,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,6,15
+nei-animal-yak-milk,Yak Milk,Animal,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,1
+nei-animal-mithun-meat,Mithun Meat,Animal,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,2
+nei-animal-indigenous-pork,Indigenous Pork,Animal,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,3
+nei-animal-free-range-chicken,Free Range Chicken,Animal,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,4
+nei-animal-duck-meat,Duck Meat,Animal,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,5
+nei-fisheries-freshwater-prawn,Freshwater Prawn,Fisheries,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,6
+nei-fisheries-river-fish,River Fish,Fisheries,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,7
+nei-fisheries-smoked-fish,Smoked Fish,Fisheries,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,8
+nei-fisheries-fermented-fish,Fermented Fish,Fisheries,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,9
+nei-forest-wild-fern-dhekia,Wild Fern (Dhekia),Forest,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,10
+nei-forest-wild-berries,Wild Berries,Forest,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,11
+nei-forest-wild-citrus,Wild Citrus,Forest,North East India Varieties,North East India,North East India agricultural variety,164,kg/seedling/bundle,7,12

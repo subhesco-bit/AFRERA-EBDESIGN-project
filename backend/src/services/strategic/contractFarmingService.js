@@ -390,8 +390,6 @@ class ContractFarmingService {
           [contractId],
         );
 
-        client.release();
-
         return {
           contract: {
             id: contract.id,
@@ -517,6 +515,8 @@ class ContractFarmingService {
             testId,
           ],
         );
+
+        if (!updateResult.rows[0]) throw new Error('Quality test not found');
 
         // Update contract compliance score
         const contractId = updateResult.rows[0].contract_id;
@@ -745,8 +745,6 @@ class ContractFarmingService {
            ORDER BY total_yield DESC`,
         );
 
-        client.release();
-
         return {
           summary: summaryResult.rows[0],
           status_breakdown: statusResult.rows,
@@ -762,6 +760,26 @@ class ContractFarmingService {
       logger.error(`Error getting buyer contract portfolio: ${error.message}`);
       throw error;
     }
+  }
+
+  /**
+   * Return the authenticated farmer's own contracts. This replaces the
+   * historical successful-but-empty route response without inventing a
+   * portfolio summary or exposing another farmer's agreement.
+   */
+  async getFarmerContracts(farmerId, { limit = 50 } = {}) {
+    const boundedLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 50, 1), 200);
+    const result = await this.pool.query(
+      `SELECT id, buyer_id, crop_variety, area_hectares, expected_yield_tons,
+              contract_period_start, contract_period_end, base_price,
+              compliance_score, quality_score, dispute_status, created_at
+         FROM contract_farming_agreements
+        WHERE farmer_id = $1
+        ORDER BY created_at DESC
+        LIMIT $2`,
+      [farmerId, boundedLimit],
+    );
+    return result.rows;
   }
 
   /**

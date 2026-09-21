@@ -52,7 +52,7 @@ describe('StatCard Component', () => {
   });
 
   it('should call onClick handler when clicked', () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(
       <StatCard
         title="Clickable"

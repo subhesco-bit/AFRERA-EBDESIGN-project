@@ -223,7 +223,7 @@ function cache(ttl = 3600, keyGenerator = null) {
  */
 async function invalidateEntity(entityType, entityId) {
   const pattern = `${entityType}:${entityId}:*`;
-  return await delPattern(pattern);
+  return delPattern(pattern);
 }
 
 /**

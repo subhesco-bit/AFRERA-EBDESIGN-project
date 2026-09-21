@@ -1,4 +1,4 @@
-import api from './api';
+import { api } from './api';
 
 /**
  * Soil Nutrient Land Service (API Client)

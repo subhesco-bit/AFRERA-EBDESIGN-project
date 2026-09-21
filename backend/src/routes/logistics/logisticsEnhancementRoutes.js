@@ -6,7 +6,7 @@
 const express = require('express');
 const { logger } = require('../../utils/logger');
 const { authMiddleware } = require('../../middleware/auth');
-const logisticsService = require('../../services/logistics/logisticsEnhancementService');
+const logisticsService = require('../../services/logisticsEnhancementService');
 
 const router = express.Router();
 

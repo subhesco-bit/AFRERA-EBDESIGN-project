@@ -13,7 +13,9 @@ const REDACT_PATTERNS = [
   { regex: /(?:OPENAI_API_KEY|GOOGLE_API_KEY|GEMINI_API_KEY|AWS_SECRET_ACCESS_KEY|STRIPE_SECRET_KEY|TWILIO_AUTH_TOKEN)\s*[=:]\s*['"]?[^\s'"]+/gi, replacement: 'PROVIDER_SECRET=***REDACTED***' },
   { regex: /Bearer\s+[A-Za-z0-9\-._~+/]+=*/gi, replacement: 'Bearer ***REDACTED***' },
   { regex: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g, replacement: '****-****-****-****' }, // Credit card
-  { regex: /\b\d{6}\b/g, replacement: '***OTP***' }, // 6-digit OTP
+  // *** FIX: Removed generic 6-digit redaction to avoid false positives on IDs, timestamps, zip codes
+  // Use context-specific patterns instead:
+  { regex: /\b(?:otp|totp|code|mfa)['"=:\s]+['"]?(\d{6})['"]?/gi, replacement: '***REDACTED***' },
   { regex: /"password"\s*:\s*"[^"]*"/gi, replacement: '"password":"***REDACTED***' },
   { regex: /"token"\s*:\s*"[^"]*"/gi, replacement: '"token":"***REDACTED***' },
   { regex: /"secret"\s*:\s*"[^"]*"/gi, replacement: '"secret":"***REDACTED***' },

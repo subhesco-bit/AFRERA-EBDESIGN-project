@@ -3,9 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import WalletCard from './WalletCard';
 import { walletAPI } from '../../services/api';
 
-jest.mock('../../services/api', () => ({
+vi.mock('../../services/api', () => ({
   walletAPI: {
-    getBalance: jest.fn(),
+    getBalance: vi.fn(),
   },
 }));
 
@@ -16,7 +16,7 @@ describe('WalletCard Component', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
   });
 
@@ -58,7 +58,7 @@ describe('WalletCard Component', () => {
   });
 
   it('should call onAddFunds when Add Funds button is clicked', async () => {
-    const handleAddFunds = jest.fn();
+    const handleAddFunds = vi.fn();
 
     walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 1000 } } });
 
@@ -73,7 +73,7 @@ describe('WalletCard Component', () => {
   });
 
   it('should call onTransfer when Transfer button is clicked', async () => {
-    const handleTransfer = jest.fn();
+    const handleTransfer = vi.fn();
 
     walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 1000 } } });
 

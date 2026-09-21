@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../../backend/src/services/legacy/conversationalAIService');
+module.exports = require('../../../services/legacy/conversationalAIService');

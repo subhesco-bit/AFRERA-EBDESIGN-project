@@ -7,6 +7,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware } = require('../../middleware/auth');
+const { withTransaction } = require('../../core/withTransaction');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
@@ -279,31 +280,42 @@ async function recordHarvest(data) {
   } = data;
 
   try {
-    const result = await pool.query(
-      `INSERT INTO organic_harvests 
-       (organic_crop_id, harvest_number, harvest_date, total_quantity_kg, grade,
-        moisture_content, quality_parameters, harvested_by, storage_location, batch_number)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-       RETURNING *`,
-      [
-        organic_crop_id,
-        `HVST-${Date.now()}`,
-        harvest_date,
-        total_quantity_kg,
-        grade,
-        moisture_content,
-        JSON.stringify(quality_parameters),
-        harvested_by,
-        storage_location,
-        `BATCH-${Date.now()}`,
-      ],
-    );
+    // BR-08: the harvest record and the crop's status flip to 'harvested'
+    // (plus its actual_harvest_date/actual_yield_kg) are one event — if the
+    // status update were lost after the harvest row committed, the crop
+    // would stay in its pre-harvest status while a harvest record already
+    // exists for it, letting a second harvest be recorded against the same
+    // crop or letting the crop appear un-harvested in every downstream
+    // traceability view that reads organic_crops.status.
+    const result = await withTransaction(async (client) => {
+      const inserted = await client.query(
+        `INSERT INTO organic_harvests
+         (organic_crop_id, harvest_number, harvest_date, total_quantity_kg, grade,
+          moisture_content, quality_parameters, harvested_by, storage_location, batch_number)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         RETURNING *`,
+        [
+          organic_crop_id,
+          `HVST-${Date.now()}`,
+          harvest_date,
+          total_quantity_kg,
+          grade,
+          moisture_content,
+          JSON.stringify(quality_parameters),
+          harvested_by,
+          storage_location,
+          `BATCH-${Date.now()}`,
+        ],
+      );
 
-    // Update crop status
-    await pool.query(
-      'UPDATE organic_crops SET actual_harvest_date = $1, actual_yield_kg = $2, status = $3 WHERE id = $4',
-      [harvest_date, total_quantity_kg, 'harvested', organic_crop_id],
-    );
+      // Update crop status
+      await client.query(
+        'UPDATE organic_crops SET actual_harvest_date = $1, actual_yield_kg = $2, status = $3 WHERE id = $4',
+        [harvest_date, total_quantity_kg, 'harvested', organic_crop_id],
+      );
+
+      return inserted;
+    }, { name: 'organicTraceabilityService.recordHarvest' });
 
     return result.rows[0];
   } catch (error) {

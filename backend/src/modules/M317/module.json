@@ -1,0 +1,43 @@
+{
+  "moduleId": "M317",
+  "version": "0.1.0",
+  "name": "M317 Module",
+  "description": "backend module bound to the 'ab_testing' table.",
+  "category": "unclassified",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m317",
+      "backend",
+      "ab_testing"
+    ],
+    "capabilities": [
+      "validateInput",
+      "getAll",
+      "getById",
+      "create",
+      "update",
+      "delete",
+      "createBulk",
+      "search",
+      "offset"
+    ],
+    "aiContext": "backend operations over the 'ab_testing' table."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js table binding",
+      "service.js method names"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

@@ -1,0 +1,60 @@
+-- Migration: Create rbac table
+-- Description: Role Based Access Control
+-- Created: $(date)
+
+BEGIN;
+
+-- Create main table
+CREATE TABLE IF NOT EXISTS rbac (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+  -- Data storage (flexible for different module needs)
+  data JSONB DEFAULT '{}' NOT NULL,
+
+  -- Standard fields
+  status VARCHAR(50) DEFAULT 'active' NOT NULL
+    CHECK (status IN ('active', 'inactive', 'completed', 'pending', 'archived')),
+
+  -- Audit fields
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  deleted_at TIMESTAMP,
+
+  -- Constraints
+  CONSTRAINT rbac_user_fk FOREIGN KEY (user_id)
+    REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Create indexes for common queries
+CREATE INDEX IF NOT EXISTS idx_rbac_user_id
+  ON rbac(user_id) WHERE deleted_at IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_rbac_status
+  ON rbac(status) WHERE deleted_at IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_rbac_created_at
+  ON rbac(created_at) WHERE deleted_at IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_rbac_updated_at
+  ON rbac(updated_at) WHERE deleted_at IS NULL;
+
+-- Index for JSONB data searches
+CREATE INDEX IF NOT EXISTS idx_rbac_data_gin
+  ON rbac USING gin(data) WHERE deleted_at IS NULL;
+
+-- Create trigger for updated_at
+CREATE OR REPLACE FUNCTION update_rbac_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER rbac_timestamp_trigger
+BEFORE UPDATE ON rbac
+FOR EACH ROW
+EXECUTE FUNCTION update_rbac_timestamp();
+
+COMMIT;

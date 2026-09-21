@@ -5,6 +5,7 @@
 
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
+const { withTransaction } = require('../core/withTransaction');
 
 class WalletService {
   constructor() {
@@ -76,115 +77,122 @@ class WalletService {
 
   /**
    * Add funds to wallet
+   *
+   * BR-08: the balance UPDATE and the wallet_transactions INSERT must
+   * commit together — if the ledger row failed to insert after the balance
+   * had already moved, the wallet would show a credit with no audit trail
+   * behind it. The previous implementation issued BEGIN/COMMIT/ROLLBACK via
+   * `this.db`, which is the shared pool (see getPostgreSQL()), not a
+   * dedicated client — each `this.db.query(...)` call could be handed a
+   * different pooled connection, so the BEGIN/COMMIT pair frequently did not
+   * even wrap the same session and gave no real atomicity. withTransaction
+   * uses one client for every statement, so this is a genuine fix, not just
+   * a rename. No external call is involved.
    */
   async addFunds(walletId, fundData) {
+    return withTransaction(
+      (client) => this._addFundsWithClient(client, walletId, fundData),
+      { name: 'wallet.addFunds', lockTables: ['wallets'] }
+    );
+  }
+
+  async _addFundsWithClient(client, walletId, fundData) {
     const { amount, source, referenceId, description } = fundData;
 
-    try {
-      // Start transaction
-      await this.db.query('BEGIN');
+    // Update wallet balance
+    const updateQuery = `
+      UPDATE wallets
+      SET balance = balance + $1,
+          updated_at = NOW()
+      WHERE wallet_id = $2
+      RETURNING *
+    `;
+    const walletResult = await client.query(updateQuery, [amount, walletId]);
 
-      // Update wallet balance
-      const updateQuery = `
-        UPDATE wallets 
-        SET balance = balance + $1,
-            updated_at = NOW()
-        WHERE wallet_id = $2
-        RETURNING *
-      `;
-      const walletResult = await this.db.query(updateQuery, [amount, walletId]);
-
-      if (walletResult.rows.length === 0) {
-        throw new Error('Wallet not found');
-      }
-
-      // Create transaction record
-      const transactionQuery = `
-        INSERT INTO wallet_transactions (
-          wallet_id, type, amount, source, reference_id, 
-          description, status, created_at
-        ) VALUES ($1, 'credit', $2, $3, $4, $5, 'completed', NOW())
-        RETURNING *
-      `;
-      const transactionResult = await this.db.query(transactionQuery, [
-        walletId,
-        amount,
-        source,
-        referenceId,
-        description || 'Funds added',
-      ]);
-
-      await this.db.query('COMMIT');
-
-      logger.info(`Added ${amount} to wallet ${walletId}`);
-      return {
-        wallet: walletResult.rows[0],
-        transaction: transactionResult.rows[0],
-      };
-    } catch (error) {
-      await this.db.query('ROLLBACK');
-      logger.error('Add funds failed', error);
-      throw error;
+    if (walletResult.rows.length === 0) {
+      throw new Error('Wallet not found');
     }
+
+    // Create transaction record
+    const transactionQuery = `
+      INSERT INTO wallet_transactions (
+        wallet_id, type, amount, source, reference_id,
+        description, status, created_at
+      ) VALUES ($1, 'credit', $2, $3, $4, $5, 'completed', NOW())
+      RETURNING *
+    `;
+    const transactionResult = await client.query(transactionQuery, [
+      walletId,
+      amount,
+      source,
+      referenceId,
+      description || 'Funds added',
+    ]);
+
+    logger.info(`Added ${amount} to wallet ${walletId}`);
+    return {
+      wallet: walletResult.rows[0],
+      transaction: transactionResult.rows[0],
+    };
   }
 
   /**
    * Deduct funds from wallet
+   *
+   * BR-08: same reasoning as addFunds — the balance check/UPDATE and the
+   * wallet_transactions INSERT must be atomic, and the previous
+   * BEGIN/COMMIT via the shared pool did not actually guarantee that.
    */
   async deductFunds(walletId, amount, reason) {
-    try {
-      // Start transaction
-      await this.db.query('BEGIN');
+    return withTransaction(
+      (client) => this._deductFundsWithClient(client, walletId, amount, reason),
+      { name: 'wallet.deductFunds', lockTables: ['wallets'] }
+    );
+  }
 
-      // Check sufficient balance
-      const balanceQuery = `
-        SELECT balance FROM wallets WHERE wallet_id = $1 FOR UPDATE
-      `;
-      const balanceResult = await this.db.query(balanceQuery, [walletId]);
+  async _deductFundsWithClient(client, walletId, amount, reason) {
+    // Check sufficient balance
+    const balanceQuery = `
+      SELECT balance FROM wallets WHERE wallet_id = $1 FOR UPDATE
+    `;
+    const balanceResult = await client.query(balanceQuery, [walletId]);
 
-      if (balanceResult.rows.length === 0) {
-        throw new Error('Wallet not found');
-      }
-
-      if (balanceResult.rows[0].balance < amount) {
-        throw new Error('Insufficient balance');
-      }
-
-      // Update wallet balance
-      const updateQuery = `
-        UPDATE wallets 
-        SET balance = balance - $1,
-            updated_at = NOW()
-        WHERE wallet_id = $2
-        RETURNING *
-      `;
-      const walletResult = await this.db.query(updateQuery, [amount, walletId]);
-
-      // Create transaction record
-      const transactionQuery = `
-        INSERT INTO wallet_transactions (
-          wallet_id, type, amount, description, status, created_at
-        ) VALUES ($1, 'debit', $2, $3, 'completed', NOW())
-        RETURNING *
-      `;
-      const transactionResult = await this.db.query(transactionQuery, [
-        walletId,
-        amount,
-        reason,
-      ]);
-
-      await this.db.query('COMMIT');
-
-      logger.info(`Deducted ${amount} from wallet ${walletId}`);
-      return {
-        wallet: walletResult.rows[0],
-        transaction: transactionResult.rows[0],
-      };
-    } catch (error) {
-      await this.db.query('ROLLBACK');
-      logger.error('Deduct funds failed', error);
-      throw error;
+    if (balanceResult.rows.length === 0) {
+      throw new Error('Wallet not found');
     }
+
+    if (balanceResult.rows[0].balance < amount) {
+      throw new Error('Insufficient balance');
+    }
+
+    // Update wallet balance
+    const updateQuery = `
+      UPDATE wallets
+      SET balance = balance - $1,
+          updated_at = NOW()
+      WHERE wallet_id = $2
+      RETURNING *
+    `;
+    const walletResult = await client.query(updateQuery, [amount, walletId]);
+
+    // Create transaction record
+    const transactionQuery = `
+      INSERT INTO wallet_transactions (
+        wallet_id, type, amount, description, status, created_at
+      ) VALUES ($1, 'debit', $2, $3, 'completed', NOW())
+      RETURNING *
+    `;
+    const transactionResult = await client.query(transactionQuery, [
+      walletId,
+      amount,
+      reason,
+    ]);
+
+    logger.info(`Deducted ${amount} from wallet ${walletId}`);
+    return {
+      wallet: walletResult.rows[0],
+      transaction: transactionResult.rows[0],
+    };
   }
 
   /**
@@ -255,35 +263,33 @@ class WalletService {
 
   /**
    * Transfer funds between wallets
+   *
+   * BR-08: a transfer is a deduct + a credit that must both land or neither
+   * does — a failure between the two would either destroy money (deducted,
+   * never credited) or create it (credited without a matching deduction).
+   * Both legs now run against the same client inside one transaction; the
+   * table lock order (wallets only, single table) matches the other wallet
+   * boundaries so two concurrent transfers can't deadlock against each other.
    */
   async transferFunds(fromWalletId, toWalletId, amount, description) {
-    try {
-      // Start transaction
-      await this.db.query('BEGIN');
-
+    return withTransaction(async (client) => {
       // Deduct from source wallet
-      const deductResult = await this.deductFunds(fromWalletId, amount, description);
+      const deductResult = await this._deductFundsWithClient(client, fromWalletId, amount, description);
 
       // Add to destination wallet
-      const addResult = await this.addFunds(toWalletId, {
+      const addResult = await this._addFundsWithClient(client, toWalletId, {
         amount,
         source: 'transfer',
         referenceId: deductResult.transaction.transaction_id,
         description: description || 'Fund transfer',
       });
 
-      await this.db.query('COMMIT');
-
       logger.info(`Transferred ${amount} from wallet ${fromWalletId} to ${toWalletId}`);
       return {
         fromTransaction: deductResult.transaction,
         toTransaction: addResult.transaction,
       };
-    } catch (error) {
-      await this.db.query('ROLLBACK');
-      logger.error('Transfer funds failed', error);
-      throw error;
-    }
+    }, { name: 'wallet.transferFunds', lockTables: ['wallets'] });
   }
 
   /**

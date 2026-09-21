@@ -37,7 +37,7 @@ async function create(req, res) {
     res.status(201).json({ success: true, data: item });
   } catch (e) {
     logger.error('M069 create error', { error: e.message });
-    res.status(500).json({ success: false, error: e.message });
+    res.status(400).json({ success: false, error: e.message });
   }
 }
 
@@ -49,7 +49,7 @@ async function update(req, res) {
     res.json({ success: true, data: item });
   } catch (e) {
     logger.error('M069 update error', { error: e.message });
-    res.status(500).json({ success: false, error: e.message });
+    res.status(400).json({ success: false, error: e.message });
   }
 }
 

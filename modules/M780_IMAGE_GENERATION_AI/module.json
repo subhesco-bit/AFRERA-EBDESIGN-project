@@ -1,0 +1,20 @@
+{
+  "moduleId": "M780_IMAGE_GENERATION_AI",
+  "version": "1.0.0",
+  "name": "AI Image Maker",
+  "description": "Image generation and design creation",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "image_generation",
+    "design_creation",
+    "product_visualization"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m780_image_generation_ai"
+    }
+  }
+}

@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #faf8f3; }
+    a { color: #1a5f3a; } a:hover { color: #0f3a23; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width: 1200px; padding: 40px; background: #faf8f3;">
+
+  <div style="margin-bottom: 8px; display: flex; align-items: baseline; gap: 12px;">
+    <h1 style="margin: 0; color: #1f2937; font-size: 28px; font-weight: 700;">NE Variety Directory</h1>
+    <span style="color: #6b7280; font-size: 13px; font-weight: 500;">ne_variety_products</span>
+  </div>
+  <p style="margin: 0 0 28px 0; color: #6b7280; font-size: 14px; line-height: 1.5; max-width: 820px;">
+    Commercial and agronomic master database of the edible biodiversity of North-East India &mdash; eight states,
+    fifteen product categories, mapped for procurement, FPO onboarding and export planning.
+  </p>
+
+  <!-- Summary strip -->
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 28px;">
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+      <div style="color: #1a5f3a; font-size: 26px; font-weight: 700; line-height: 1;">50+</div>
+      <div style="color: #6b7280; font-size: 12px; font-weight: 500; margin-top: 6px;">Varieties catalogued</div>
+    </div>
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+      <div style="color: #1a5f3a; font-size: 26px; font-weight: 700; line-height: 1;">15</div>
+      <div style="color: #6b7280; font-size: 12px; font-weight: 500; margin-top: 6px;">Product categories</div>
+    </div>
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+      <div style="color: #1a5f3a; font-size: 26px; font-weight: 700; line-height: 1;">8</div>
+      <div style="color: #6b7280; font-size: 12px; font-weight: 500; margin-top: 6px;">NER states</div>
+    </div>
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+      <div style="color: #d4a942; font-size: 26px; font-weight: 700; line-height: 1;">GI</div>
+      <div style="color: #6b7280; font-size: 12px; font-weight: 500; margin-top: 6px;">Protected origin flag</div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 260px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="text" placeholder="Search varieties, cultivars, scientific names&hellip;" style="flex: 1; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; font-family: inherit; color: #1f2937; background: #faf8f3;">
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Category</span>
+      <div style="display: flex; gap: 6px;">
+        <span style="padding: 5px 12px; background: #1a5f3a; color: white; border-radius: 4px; font-size: 12px; font-weight: 500;">All</span>
+        <span style="padding: 5px 12px; background: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px; font-weight: 500;">Spices</span>
+        <span style="padding: 5px 12px; background: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px; font-weight: 500;">Grains</span>
+        <span style="padding: 5px 12px; background: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px; font-weight: 500;">Vegetables</span>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Region</span>
+      <div style="display: flex; gap: 6px;">
+        <span style="padding: 5px 12px; background: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px; font-weight: 500;">Assam</span>
+        <span style="padding: 5px 12px; background: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px; font-weight: 500;">Meghalaya</span>
+        <span style="padding: 5px 12px; background: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px; font-weight: 500;">Manipur</span>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; padding-left: 20px; border-left: 1px solid #e5e7eb;">
+      <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; background: #fef3c7; border: 1px solid #fde68a; color: #92400e; border-radius: 4px; font-size: 12px; font-weight: 600;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
+        GI-tagged only
+      </span>
+    </div>
+  </div>
+
+  <!-- Variety grid -->
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+
+    <!-- Lakadong Turmeric — GI -->
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+      <div style="height: 120px; background: linear-gradient(135deg, #d4a942 0%, #b8941a 100%); display: flex; align-items: flex-start; justify-content: space-between; padding: 12px;">
+        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: rgba(255,255,255,0.95); border-radius: 4px; color: #92400e; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
+          GI Tagged
+        </span>
+      </div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div>
+          <h3 style="margin: 0 0 2px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Lakadong Turmeric</h3>
+          <div style="color: #6b7280; font-size: 12px; font-style: italic;">Curcuma longa &middot; wild-type</div>
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="padding: 3px 8px; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 4px; color: #059669; font-size: 11px; font-weight: 500;">Meghalaya</span>
+          <span style="padding: 3px 8px; background: #f3f4f6; border-radius: 4px; color: #6b7280; font-size: 11px; font-weight: 500;">Spices</span>
+        </div>
+        <p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 1.5;">West Jaintia Hills. Globally unique curcumin concentration, dependent on the acidic soils and microclimate of the Jaintia Hills.</p>
+        <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #f3f4f6; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div><div style="color: #6b7280; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Curcumin</div><div style="color: #1f2937; font-size: 14px; font-weight: 700;">7&ndash;12%</div></div>
+          <div><div style="color: #6b7280; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Yield</div><div style="color: #1f2937; font-size: 14px; font-weight: 700;">15 t/ha</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Megha Turmeric-1 -->
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+      <div style="height: 120px; background: linear-gradient(135deg, #d4a942 0%, #b8941a 100%);"></div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div>
+          <h3 style="margin: 0 0 2px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Megha Turmeric-1</h3>
+          <div style="color: #6b7280; font-size: 12px; font-style: italic;">Curcuma longa &middot; clonal selection</div>
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="padding: 3px 8px; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 4px; color: #059669; font-size: 11px; font-weight: 500;">Meghalaya</span>
+          <span style="padding: 3px 8px; background: #f3f4f6; border-radius: 4px; color: #6b7280; font-size: 11px; font-weight: 500;">Spices</span>
+        </div>
+        <p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 1.5;">Stabilises curcumin synthesis across diverse soil profiles while raising productivity &mdash; scalable raw material for industrial extraction.</p>
+        <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #f3f4f6; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div><div style="color: #6b7280; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Curcumin</div><div style="color: #1f2937; font-size: 14px; font-weight: 700;">6.6%</div></div>
+          <div><div style="color: #6b7280; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Yield</div><div style="color: #1f2937; font-size: 14px; font-weight: 700;">22.5 t/ha</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Karbi Anglong Ginger -->
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+      <div style="height: 120px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div>
+          <h3 style="margin: 0 0 2px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Karbi Anglong Ginger</h3>
+          <div style="color: #6b7280; font-size: 12px; font-style: italic;">Zingiber officinale</div>
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="padding: 3px 8px; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 4px; color: #059669; font-size: 11px; font-weight: 500;">Assam</span>
+          <span style="padding: 3px 8px; background: #f3f4f6; border-radius: 4px; color: #6b7280; font-size: 11px; font-weight: 500;">Spices</span>
+        </div>
+        <p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 1.5;">Singhasan Hills, grown on Jhum and Tila systems. Matures over 9&ndash;10 months in well-drained acidic forest soils.</p>
+        <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #f3f4f6; display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="color: #1f2937; font-size: 12px; font-weight: 600;">Nadia</span><span style="color: #6b7280; font-size: 11px;">56% starch &middot; 5.4% fibre</span></div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="color: #1f2937; font-size: 12px; font-weight: 600;">Aizol</span><span style="color: #6b7280; font-size: 11px;">45% starch &middot; 4.1% fibre</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chakhao -->
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+      <div style="height: 120px; background: linear-gradient(135deg, #4c1d95 0%, #2e1065 100%); display: flex; align-items: flex-start; justify-content: space-between; padding: 12px;">
+        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: rgba(255,255,255,0.95); border-radius: 4px; color: #92400e; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
+          GI Tagged
+        </span>
+      </div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div>
+          <h3 style="margin: 0 0 2px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Chakhao Amubi</h3>
+          <div style="color: #6b7280; font-size: 12px; font-style: italic;">Oryza sativa &middot; scented black rice</div>
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="padding: 3px 8px; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 4px; color: #059669; font-size: 11px; font-weight: 500;">Manipur</span>
+          <span style="padding: 3px 8px; background: #f3f4f6; border-radius: 4px; color: #6b7280; font-size: 11px; font-weight: 500;">Grains</span>
+        </div>
+        <p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 1.5;">Solid black pericarp with 26 identified volatile aromatic compounds. Anthocyanins concentrated in the outer bran layer.</p>
+        <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #f3f4f6; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div><div style="color: #6b7280; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Amylose</div><div style="color: #1f2937; font-size: 14px; font-weight: 700;">3.4&ndash;7%</div></div>
+          <div><div style="color: #6b7280; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Cook time</div><div style="color: #1f2937; font-size: 14px; font-weight: 700;">40&ndash;45 min</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Joha Rice -->
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+      <div style="height: 120px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div>
+          <h3 style="margin: 0 0 2px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Joha Rice</h3>
+          <div style="color: #6b7280; font-size: 12px; font-style: italic;">Oryza sativa &middot; aromatic short-grain</div>
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="padding: 3px 8px; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 4px; color: #059669; font-size: 11px; font-weight: 500;">Assam</span>
+          <span style="padding: 3px 8px; background: #f3f4f6; border-radius: 4px; color: #6b7280; font-size: 11px; font-weight: 500;">Grains</span>
+        </div>
+        <p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 1.5;">Indigenous winter Sali rices. Linoleic and linolenic acids with oryzanol and tocotrienols &mdash; anti-diabetic and cardio-protective.</p>
+        <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #f3f4f6; display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="color: #1f2937; font-size: 12px; font-weight: 600;">Kola Joha</span><span style="color: #6b7280; font-size: 11px;">2.0&ndash;3.0 t/ha &middot; landrace</span></div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="color: #1f2937; font-size: 12px; font-weight: 600;">Keteki Joha</span><span style="color: #6b7280; font-size: 11px;">3.5&ndash;4.0 t/ha &middot; semi-dwarf</span></div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="color: #1f2937; font-size: 12px; font-weight: 600;">Bokul Joha</span><span style="color: #6b7280; font-size: 11px;">3.5&ndash;4.0 t/ha &middot; medium-bold</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lai Patta -->
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+      <div style="height: 120px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+        <div>
+          <h3 style="margin: 0 0 2px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Lai Patta</h3>
+          <div style="color: #6b7280; font-size: 12px; font-style: italic;">Brassica juncea var. rugosa</div>
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="padding: 3px 8px; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 4px; color: #059669; font-size: 11px; font-weight: 500;">Assam</span>
+          <span style="padding: 3px 8px; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 4px; color: #059669; font-size: 11px; font-weight: 500;">Sikkim</span>
+          <span style="padding: 3px 8px; background: #f3f4f6; border-radius: 4px; color: #6b7280; font-size: 11px; font-weight: 500;">Vegetables</span>
+        </div>
+        <p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 1.5;">Cold-tolerant leafy mustard, winter Sali season. Harvest window of 55&ndash;60 days before bolting &mdash; more than double the ChL-9 check.</p>
+        <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #f3f4f6; display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="color: #1f2937; font-size: 12px; font-weight: 600;">JorMLG-1</span><span style="color: #6b7280; font-size: 11px;">350.1 q/ha &middot; IC 586672</span></div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="color: #1f2937; font-size: 12px; font-weight: 600;">JorMLP-2</span><span style="color: #6b7280; font-size: 11px;">318.2 q/ha &middot; IC 586673</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -18,7 +18,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../../utils/logger').warn('aiClient:  is set but its SDK failed to load', { error: error.message });
+    require('../../utils/logger').logger.warn('aiClient: API key is set but its SDK failed to load', { error: error.message });
     return null;
   }
 }
@@ -56,8 +56,11 @@ class AIOperationIntelligenceService {
     // Initialize optimization strategies
     this.initializeOptimizationStrategies();
 
-    // Start real-time monitoring
-    this.startRealTimeMonitoring();
+    // Background AI work is opt-in so importing routes cannot spend tokens or
+    // initiate provider traffic during startup, tests, or degraded operation.
+    if (process.env.ENABLE_AI_BACKGROUND_JOBS === 'true') {
+      this.startRealTimeMonitoring();
+    }
   }
 
   /**
@@ -120,11 +123,13 @@ class AIOperationIntelligenceService {
     this._metricsInterval = setInterval(() => {
       this.collectPerformanceMetrics();
     }, 10000);
+    this._metricsInterval.unref?.();
 
     // Run optimization every 60 seconds
     this._optimizationInterval = setInterval(() => {
       this.runOptimizationCycle();
     }, 60000);
+    this._optimizationInterval.unref?.();
   }
 
   /**

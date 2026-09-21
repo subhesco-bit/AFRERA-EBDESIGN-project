@@ -27,6 +27,23 @@ async function createProductListing(sellerId, listingData) {
   const pg = getPostgreSQL();
 
   try {
+    // National-marketplace listings require a verified seller origin address
+    // matching the claimed state, checked first (before any AI calls) so an
+    // invalid listing fails fast without wasted computation.
+    if (listingData.location_id && listingData.state_id) {
+      const originCheck = await pg.query(
+        `SELECT a.id, s.name FROM addresses a
+         JOIN states s ON s.id = a.state_id
+         WHERE a.id = $1 AND a.seller_id = $2 AND a.state_id = $3 AND a.verified = true`,
+        [listingData.location_id, sellerId, listingData.state_id],
+      );
+      if (originCheck.rows.length === 0) {
+        const error = new Error('Verified seller origin required for national marketplace listings');
+        error.statusCode = 403;
+        throw error;
+      }
+    }
+
     // AI-powered price recommendation
     const priceRecommendation = await getAIPriceRecommendation(listingData);
 
@@ -50,6 +67,10 @@ async function createProductListing(sellerId, listingData) {
         demand_prediction,
         harvest_date,
         location_id,
+        state_id,
+        market_reach,
+        shelf_life_hours,
+        cold_chain_required,
         certifications,
         images,
         gi_tagged,
@@ -57,7 +78,7 @@ async function createProductListing(sellerId, listingData) {
         listing_status,
         visibility_score,
         created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW())
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW())
       RETURNING *
     `, [
       sellerId,
@@ -72,6 +93,10 @@ async function createProductListing(sellerId, listingData) {
       demandPrediction.demand_level,
       listingData.harvest_date,
       listingData.location_id,
+      listingData.state_id,
+      'india',
+      listingData.shelf_life_hours || null,
+      listingData.cold_chain_required || false,
       JSON.stringify(listingData.certifications || []),
       JSON.stringify(listingData.images || []),
       listingData.gi_tagged || false,
@@ -105,13 +130,104 @@ async function createProductListing(sellerId, listingData) {
       success: true,
       listing,
       ai_insights: {
-        price_recommendation: priceRecommendation,
+        // Honest label: these are deterministic heuristic calculations
+        // (historical averages, fixed multipliers), not a trained model's
+        // prediction, so no confidence score is fabricated for them.
+        method: 'deterministic_heuristics_not_model_prediction',
+        price_recommendation: { ...priceRecommendation, confidence: null },
         quality_score: qualityScore,
         demand_prediction: demandPrediction,
       },
     };
   } catch (error) {
     logger.error('Error creating product listing', { error: error.message, sellerId });
+    throw error;
+  }
+}
+
+/**
+ * Update a seller's own listing. Ownership- and origin-scoped: only fields a
+ * seller may safely self-edit are ever written (seller_id and state_id can
+ * never be changed this way, regardless of what the caller supplies) and the
+ * WHERE clause is always scoped to the calling seller.
+ */
+async function updateSellerListing(listingId, sellerId, updates = {}) {
+  const pg = getPostgreSQL();
+
+  const editableFields = ['quantity', 'base_price', 'description', 'unit', 'harvest_date', 'shelf_life_hours', 'images', 'certifications'];
+  const setClauses = [];
+  const values = [];
+
+  for (const field of editableFields) {
+    if (Object.prototype.hasOwnProperty.call(updates, field)) {
+      values.push(updates[field]);
+      setClauses.push(`${field}=$${values.length}`);
+    }
+  }
+
+  if (setClauses.length === 0) {
+    const error = new Error('No editable fields supplied');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  values.push(listingId, sellerId);
+
+  try {
+    const result = await pg.query(
+      `UPDATE product_listings SET ${setClauses.join(', ')} WHERE id=$${values.length - 1} AND seller_id=$${values.length} RETURNING *`,
+      values,
+    );
+
+    if (!result.rows[0]) {
+      const error = new Error('Listing not found or not owned by this seller');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    await signalBus.emit('marketplace.listing.updated', {
+      listing_id: listingId,
+      seller_id: sellerId,
+      fields: Object.keys(updates).filter(f => editableFields.includes(f)),
+      timestamp: new Date().toISOString(),
+    });
+
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error updating seller listing', { error: error.message, listingId, sellerId });
+    throw error;
+  }
+}
+
+/**
+ * Remove a seller's own listing via seller-scoped soft delete (never a hard
+ * delete, so order history and audit trails referencing the listing stay
+ * intact).
+ */
+async function deleteSellerListing(listingId, sellerId) {
+  const pg = getPostgreSQL();
+
+  try {
+    const result = await pg.query(
+      `UPDATE product_listings SET listing_status='deleted', updated_at=NOW() WHERE id=$1 AND seller_id=$2 RETURNING *`,
+      [listingId, sellerId],
+    );
+
+    if (!result.rows[0]) {
+      const error = new Error('Listing not found or not owned by this seller');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    await signalBus.emit('marketplace.listing.deleted', {
+      listing_id: listingId,
+      seller_id: sellerId,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { status: 'deleted', listing: result.rows[0] };
+  } catch (error) {
+    logger.error('Error deleting seller listing', { error: error.message, listingId, sellerId });
     throw error;
   }
 }
@@ -695,6 +811,8 @@ async function getMarketDemandAnalysis(categoryId) {
 module.exports = {
   // Product Listing Management
   createProductListing,
+  updateSellerListing,
+  deleteSellerListing,
   getMarketplaceListings,
 
   // AI-Powered Pricing & Recommendations

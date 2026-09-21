@@ -458,6 +458,13 @@ function getTextDirection() {
   return SUPPORTED_LANGUAGES[currentLanguage]?.dir || 'ltr';
 }
 
+// Statically-analyzed locale file map, required because a runtime
+// `import(\`../locales/${languageCode}.json\`)` is not reliably resolvable by
+// production bundlers (it broke the build). src/locales/ does not currently
+// contain any files, so this map is empty today and loadTranslations falls
+// through to DEFAULT_TRANSLATIONS exactly as it already did before this fix.
+const localeModules = import.meta.glob('../locales/*.json');
+
 /**
  * Load translations for a language
  */
@@ -467,8 +474,9 @@ async function loadTranslations(languageCode) {
   }
 
   try {
-    // Try to load from file
-    let translations = await import(`../locales/${languageCode}.json`);
+    const loader = localeModules[`../locales/${languageCode}.json`];
+    if (!loader) throw new Error(`No locale file for ${languageCode}`);
+    let translations = await loader();
     translationCache.set(languageCode, translations.default || translations);
     return translations.default || translations;
   } catch (error) {

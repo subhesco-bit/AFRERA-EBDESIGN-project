@@ -1,0 +1,119 @@
+/**
+ * M64: Module M64 Service Styles
+ * Responsive: Mobile, Tablet, Desktop
+ */
+
+.m64-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.m64-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.m64-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.m64-controls {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.m64-controls button {
+  padding: 0.75rem 1.5rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.m64-controls button:hover {
+  background: #0056b3;
+}
+
+.m64-controls button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.m64-content {
+  background: #f5f5f5;
+  padding: 1.5rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.m64-content pre {
+  margin: 0;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+/* Tablet (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .m64-container h1 {
+    font-size: 1.75rem;
+  }
+
+  .m64-controls {
+    gap: 0.75rem;
+  }
+
+  .m64-controls button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Desktop (769px+) */
+@media (min-width: 769px) {
+  .m64-container h1 {
+    font-size: 2.5rem;
+  }
+
+  .m64-controls {
+    gap: 1.5rem;
+  }
+
+  .m64-controls button {
+    padding: 0.75rem 2rem;
+    font-size: 1.05rem;
+  }
+}
+
+/* Mobile (320px - 480px) */
+@media (max-width: 480px) {
+  .m64-page {
+    padding: 0.5rem;
+  }
+
+  .m64-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .m64-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .m64-controls button {
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .m64-content {
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+}

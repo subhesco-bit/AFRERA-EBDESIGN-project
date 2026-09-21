@@ -9,7 +9,6 @@
  */
 
 const express = require('express');
-const decisionSupportRoutes = require('../../routes/ai/decisionSupportRoutes');
 
 class DecisionSupportService {
   /**
@@ -409,7 +408,10 @@ class DecisionSupportService {
    * This allows the service to be mounted in the main app
    */
   setupRoutes(app) {
-    app.use('/api/v1/decision-support', decisionSupportRoutes);
+    // Lazy loading breaks the service ↔ route circular dependency. The route
+    // imports this service for its decision functions, so importing it at
+    // module initialization leaves Express with a partial export object.
+    app.use('/api/v1/decision-support', require('../../routes/ai/decisionSupportRoutes'));
   }
 }
 

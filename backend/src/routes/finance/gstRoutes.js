@@ -6,7 +6,7 @@
 const express = require('express');
 const { logger } = require('../../utils/logger');
 const { authMiddleware } = require('../../middleware/auth');
-const GSTService = require('../../services/finance/gstService');
+const GSTService = require('../../services/gstService');
 
 const router = express.Router();
 const gstService = GSTService;

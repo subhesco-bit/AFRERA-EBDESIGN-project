@@ -1,0 +1,30 @@
+{
+  "moduleId": "M905100_DISPUTEDESK",
+  "version": "0.1.0",
+  "name": "Dispute, Grievance & Trust Desk",
+  "description": "Case types (short delivery, quality, delay, payment), evidence attachment, SLA tracking, outcome codes, seller-ranking impact.",
+  "category": "compliance",
+  "status": "SKELETON",
+  "createdAt": "2026-09-21",
+  "source": "AFRERA P1 capability-module recommendation, 2026-09-21",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "audit/governance modules (search: audit)",
+      "M902100_QUALITYGRADING (quality-dispute evidence)"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": []
+    }
+  },
+  "completeness": {
+    "backend": false,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

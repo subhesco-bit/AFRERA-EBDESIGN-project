@@ -1,0 +1,44 @@
+{
+  "moduleId": "M002",
+  "version": "0.1.0",
+  "name": "M002 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "platform",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m002",
+      "backend",
+      "Platform Foundation"
+    ],
+    "capabilities": [
+      "createConfiguration",
+      "getConfiguration",
+      "updateConfiguration",
+      "bulkUpdateConfigurations",
+      "getConfigurationHistory",
+      "generateId",
+      "assessSecurityRisks",
+      "getConfigurationBestPractices",
+      "assessDependencyImpact",
+      "decryptValue",
+      "getConfigurationById",
+      "assessUpdateImpact"
+    ],
+    "aiContext": "backend module M002; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

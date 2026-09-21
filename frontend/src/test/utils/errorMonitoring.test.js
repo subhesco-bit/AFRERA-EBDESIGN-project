@@ -1,9 +1,9 @@
 import { errorMonitoring, logError, getErrorStats, clearErrors } from '../../utils/errorMonitoring';
 import { errorMonitoringAPI } from '../../services/api';
 
-jest.mock('../../services/api', () => ({
+vi.mock('../../services/api', () => ({
   errorMonitoringAPI: {
-    log: jest.fn(),
+    log: vi.fn(),
   },
 }));
 
@@ -44,7 +44,7 @@ describe('Error Monitoring', () => {
       expect(stats.totalErrors).toBe(50); // Should be capped at maxQueueSize
     });
 
-    it('attempts to send error to server when online', async () => {
+    it('keeps development errors local while preserving the queue', async () => {
       const testError = {
         type: 'test',
         message: 'Test error',
@@ -56,7 +56,8 @@ describe('Error Monitoring', () => {
       // Wait for async operation
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      expect(errorMonitoringAPI.log).toHaveBeenCalledWith(testError);
+      expect(errorMonitoringAPI.log).not.toHaveBeenCalled();
+      expect(getErrorStats().recentErrors).toContainEqual(testError);
     });
   });
 

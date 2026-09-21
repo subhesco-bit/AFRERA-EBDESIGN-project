@@ -1,0 +1,175 @@
+{
+  "generatedAt": "2026-09-12T14:06:27.374Z",
+  "passed": 24,
+  "total": 24,
+  "checks": [
+    {
+      "name": "Library health route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "1532 indexed items visible through health route.",
+      "next": "Keep health public for platform readiness checks."
+    },
+    {
+      "name": "Library initialize route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "1532 items indexed and 1188 hashes computed.",
+      "next": "Run with syncDatabase only under admin/authenticated deployment setup."
+    },
+    {
+      "name": "Library statistics route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "1532 total items across 6 types.",
+      "next": "Expose the type breakdown in admin dashboards."
+    },
+    {
+      "name": "Library modules route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "686 runtime/backend/library modules returned.",
+      "next": "Use this list as the feature merge source of truth."
+    },
+    {
+      "name": "Library search route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "36 search results returned for farmer.",
+      "next": "Add ranked snippets for better UI explainability."
+    },
+    {
+      "name": "Library AI context route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "12 governed AI context matches returned.",
+      "next": "Connect this context into every AI generation and copilot workflow."
+    },
+    {
+      "name": "Library verification route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "1532 items checked, 166 semantic catalogue records found.",
+      "next": "Resolve invalid JSON warnings without blocking read access."
+    },
+    {
+      "name": "Enterprise library summary route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "512239 files represented across 4 source roots.",
+      "next": "Keep this as the project-wide source intelligence baseline."
+    },
+    {
+      "name": "Enterprise feature matrix route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "69655 feature tracks available, 5 returned.",
+      "next": "Use these tracks for agentic feature merge priorities."
+    },
+    {
+      "name": "Enterprise duplicate groups route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "5 duplicate filename groups returned in preview.",
+      "next": "Rename same-name candidates before evaluating or merging."
+    },
+    {
+      "name": "Enterprise file search route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "5 enterprise file rows returned for dynamic-pricing.",
+      "next": "Expose file-level search filters for source, feature, and workflow role."
+    },
+    {
+      "name": "Enterprise activity summary route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "512239 files tracked with 10 live signals.",
+      "next": "Use this route as the active Library dashboard source."
+    },
+    {
+      "name": "Enterprise activity file search route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "3 file activity rows returned with current disk/git status.",
+      "next": "Use this route before modifying any candidate file."
+    },
+    {
+      "name": "Enterprise activity ledger summary route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "512239 files present in the active ledger snapshot.",
+      "next": "Run the activity tracker after major scans, merges, and cleanup passes."
+    },
+    {
+      "name": "Enterprise workflow route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "Workflow markdown returned for AI and agentic merge operations.",
+      "next": "Use this workflow as the operating standard for future merges."
+    },
+    {
+      "name": "Library AI workflow route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "AI workflow markdown returned for Application AI, Analytic AI, Generative AI, and agentic operations.",
+      "next": "Use this document as the speed and retrieval contract for AI integrations."
+    },
+    {
+      "name": "Library AI workspace status route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "512239 indexed files available to coding agents without provider lock-in.",
+      "next": "Use this as the common Library gateway for ChatGPT, Claude, Copilot, Devin, and project code."
+    },
+    {
+      "name": "Library AI workspace file search route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "3 file records returned with stable library_id values.",
+      "next": "Agents must identify files through library_id before reading or editing."
+    },
+    {
+      "name": "Library AI workspace safe content route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "2000 safe bytes returned for libraryRoutes.js.",
+      "next": "Keep file reads bounded and deny secrets, caches, and unsafe file types."
+    },
+    {
+      "name": "Library AI workspace context route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "5 files and 20 activity events packed for agent work.",
+      "next": "Use this packet before project enhancement or duplicate merge work."
+    },
+    {
+      "name": "Library AI workspace event route",
+      "status": "pass",
+      "httpStatus": 201,
+      "evidence": "Agent event LIBAI-MTYGKP3T-7B7913D0 recorded in workspace audit log.",
+      "next": "Record all coding-agent Library interactions through this endpoint."
+    },
+    {
+      "name": "Unified orchestrator status route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "feature-merge-batches-ready; source preservation=true.",
+      "next": "Use this endpoint as the common multi-agent merge control plane."
+    },
+    {
+      "name": "Unified orchestrator group search route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "3 auditable duplicate groups returned.",
+      "next": "Assign divergent groups to bounded feature merge batches."
+    },
+    {
+      "name": "Unified orchestrator multi-agent task route",
+      "status": "pass",
+      "httpStatus": 200,
+      "evidence": "3 ready multi-agent assignments returned with coordinator and validator roles.",
+      "next": "Claim tasks in bounded feature batches and record every merge decision."
+    }
+  ]
+}

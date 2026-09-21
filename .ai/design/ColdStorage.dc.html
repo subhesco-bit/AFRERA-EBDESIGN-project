@@ -1,0 +1,216 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #faf8f3; }
+    a { color: #1a5f3a; } a:hover { color: #0f3a23; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width: 1200px; padding: 40px; background: #faf8f3;">
+
+  <!-- Title -->
+  <div style="margin-bottom: 8px; display: flex; align-items: baseline; gap: 12px;">
+    <h1 style="margin: 0; color: #1f2937; font-size: 28px; font-weight: 700;">Cold Storage Module</h1>
+    <span style="color: #6b7280; font-size: 13px; font-weight: 500;">M-COLDSTORE-001</span>
+  </div>
+  <p style="margin: 0 0 32px 0; color: #6b7280; font-size: 14px; line-height: 1.5; max-width: 780px;">
+    Lumiearth Foundation &times; NEIA &times; UNEP / FOLU framework. Not a storage facility manager &mdash; a
+    market-to-farmer value retention system connecting verified buyer demand with smallholder production.
+  </p>
+
+  <!-- Value leakage callout -->
+  <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 20px 24px; margin-bottom: 40px; display: flex; gap: 24px; align-items: center;">
+    <div style="flex-shrink: 0;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 9v4"></path>
+        <path d="M12 17h.01"></path>
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      </svg>
+    </div>
+    <div style="flex: 1;">
+      <div style="color: #92400e; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">The problem &mdash; value leakage</div>
+      <div style="color: #1f2937; font-size: 15px; font-weight: 500; line-height: 1.5;">
+        Bhut Jolokia realises <strong>&#8377;80&ndash;150/kg</strong> at farm gate against <strong>&#8377;1,200&ndash;5,500/kg</strong> at retail.
+      </div>
+    </div>
+    <div style="text-align: right; flex-shrink: 0; padding-left: 24px; border-left: 1px solid #fde68a;">
+      <div style="color: #92400e; font-size: 32px; font-weight: 700; line-height: 1;">93%</div>
+      <div style="color: #92400e; font-size: 12px; font-weight: 500; margin-top: 4px;">leaked before<br>farmer realisation</div>
+    </div>
+  </div>
+
+  <!-- 5-step value flow -->
+  <h2 style="margin: 0 0 16px 0; color: #6b7280; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">The Design Sequence &mdash; 5-Step Value Flow</h2>
+
+  <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 40px;">
+
+    <div style="background: white; border: 1px solid #e5e7eb; border-top: 3px solid #1a5f3a; border-radius: 8px; padding: 18px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: #1a5f3a; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;">1</div>
+        <div style="color: #1f2937; font-size: 14px; font-weight: 700;">Verify Demand</div>
+      </div>
+      <div style="color: #6b7280; font-size: 11px; font-weight: 500; font-style: italic;">Buyer-driven market validation</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Buyer specification</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Who values it? What price?</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Product selection</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Which foods? What season?</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Volume requirement</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">How much? What schedule?</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Price validation</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Repeat demand?</div></div>
+      </div>
+    </div>
+
+    <div style="background: white; border: 1px solid #e5e7eb; border-top: 3px solid #1a5f3a; border-radius: 8px; padding: 18px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: #1a5f3a; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;">2</div>
+        <div style="color: #1f2937; font-size: 14px; font-weight: 700;">Organise Supply</div>
+      </div>
+      <div style="color: #6b7280; font-size: 11px; font-weight: 500; font-style: italic;">Production signal to farmers</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">FPO structure</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Producer org aggregation</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Production signal</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Forecast &rarr; order &rarr; delivery</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Aggregation node</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Pool + grade + pre-cool</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Quality certification</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Traceability + origin</div></div>
+      </div>
+    </div>
+
+    <div style="background: white; border: 1px solid #e5e7eb; border-top: 3px solid #d4a942; border-radius: 8px; padding: 18px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: #d4a942; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;">3</div>
+        <div style="color: #1f2937; font-size: 14px; font-weight: 700;">Preserve Value</div>
+      </div>
+      <div style="color: #6b7280; font-size: 11px; font-weight: 500; font-style: italic;">Temperature continuity</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Pre-cooling</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Field heat removal</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Multi-temp storage</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Commodity-specific regimes</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Temperature integrity</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Cascade refrigeration</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Shelf-life extension</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Processing where justified</div></div>
+      </div>
+    </div>
+
+    <div style="background: white; border: 1px solid #e5e7eb; border-top: 3px solid #1a5f3a; border-radius: 8px; padding: 18px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: #1a5f3a; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;">4</div>
+        <div style="color: #1f2937; font-size: 14px; font-weight: 700;">Connect Markets</div>
+      </div>
+      <div style="color: #6b7280; font-size: 11px; font-weight: 500; font-style: italic;">Reefer logistics + routing</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Two-direction flow</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Value-out + food-security-in</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Reefer routing</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">NE &rarr; Dimapur &rarr; NCR</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Backhaul optimisation</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Return utilisation</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Temp continuity</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Payload + route + time</div></div>
+      </div>
+    </div>
+
+    <div style="background: white; border: 1px solid #e5e7eb; border-top: 3px solid #1a5f3a; border-radius: 8px; padding: 18px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: #1a5f3a; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;">5</div>
+        <div style="color: #1f2937; font-size: 14px; font-weight: 700;">Measure &amp; Scale</div>
+      </div>
+      <div style="color: #6b7280; font-size: 11px; font-weight: 500; font-style: italic;">MRV for finance + replication</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Baseline measurement</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">kg loss / stage / reason</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Impact vs counterfactual</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Attributable change</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Farmer value realisation</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">&#8377; returned to producer</div></div>
+        <div><div style="color: #1f2937; font-size: 12px; font-weight: 600;">Bankability package</div><div style="color: #6b7280; font-size: 11px; line-height: 1.4;">Replication evidence</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 6 value dimensions -->
+  <h2 style="margin: 0 0 4px 0; color: #6b7280; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">The 6 Value Dimensions &mdash; FOLU Systems Lens</h2>
+  <p style="margin: 0 0 16px 0; color: #6b7280; font-size: 13px;">Every intervention must measurably change these variables.</p>
+
+  <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 40px;">
+    <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.5fr 1.4fr; gap: 0; background: #f3f4f6; border-bottom: 1px solid #e5e7eb;">
+      <div style="padding: 10px 16px; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Dimension</div>
+      <div style="padding: 10px 16px; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Current state</div>
+      <div style="padding: 10px 16px; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Intervention</div>
+      <div style="padding: 10px 16px; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Verification indicator</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.5fr 1.4fr; border-bottom: 1px solid #f3f4f6;">
+      <div style="padding: 14px 16px; display: flex; align-items: center; gap: 8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><span style="color: #1f2937; font-size: 13px; font-weight: 600;">Food Loss</span></div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">6&ndash;15% loss across supply chain</div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Pre-cooling + cascade refrigeration + temperature continuity</div>
+      <div style="padding: 14px 16px; color: #1f2937; font-size: 12px; line-height: 1.5; font-weight: 500;">kg loss/tonne; rejection rate; food waste &#8377;</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.5fr 1.4fr; border-bottom: 1px solid #f3f4f6;">
+      <div style="padding: 14px 16px; display: flex; align-items: center; gap: 8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path></svg><span style="color: #1f2937; font-size: 13px; font-weight: 600;">Farmers' Livelihoods</span></div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Value leakage across supply chain</div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Market-to-production signal; guaranteed aggregation</div>
+      <div style="padding: 14px 16px; color: #1f2937; font-size: 12px; line-height: 1.5; font-weight: 500;">&#8377;/farmer/season; repeat orders; income volatility</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.5fr 1.4fr; border-bottom: 1px solid #f3f4f6;">
+      <div style="padding: 14px 16px; display: flex; align-items: center; gap: 8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="m4.93 4.93 2.83 2.83"></path><path d="m16.24 16.24 2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path></svg><span style="color: #1f2937; font-size: 13px; font-weight: 600;">Local Linkages</span></div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Fragmented markets; weak aggregation</div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Structured aggregation nodes; validated routes</div>
+      <div style="padding: 14px 16px; color: #1f2937; font-size: 12px; line-height: 1.5; font-weight: 500;">throughput/node; % of FPO supply chain</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.5fr 1.4fr; border-bottom: 1px solid #f3f4f6;">
+      <div style="padding: 14px 16px; display: flex; align-items: center; gap: 8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6"></path></svg><span style="color: #1f2937; font-size: 13px; font-weight: 600;">Nature</span></div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Extraction risk; unmanaged cultivation</div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Sourcing controls + traceability + market recognition</div>
+      <div style="padding: 14px 16px; color: #1f2937; font-size: 12px; line-height: 1.5; font-weight: 500;">% traceable supply; biodiversity monitoring</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.5fr 1.4fr; border-bottom: 1px solid #f3f4f6;">
+      <div style="padding: 14px 16px; display: flex; align-items: center; gap: 8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg><span style="color: #1f2937; font-size: 13px; font-weight: 600;">Digital</span></div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">No visibility across supply chain</div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Temperature + energy + origin + flow data</div>
+      <div style="padding: 14px 16px; color: #1f2937; font-size: 12px; line-height: 1.5; font-weight: 500;">data completeness %; real-time decision accuracy</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.5fr 1.4fr;">
+      <div style="padding: 14px 16px; display: flex; align-items: center; gap: 8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="m17 5-5-3-5 3"></path><path d="m17 19-5 3-5-3"></path><path d="M2 12h20"></path><path d="m5 7-3 5 3 5"></path><path d="m19 7 3 5-3 5"></path></svg><span style="color: #1f2937; font-size: 13px; font-weight: 600;">Climate</span></div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">High-carbon logistics + loss</div>
+      <div style="padding: 14px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">Efficient cooling + renewable energy + avoided waste</div>
+      <div style="padding: 14px 16px; color: #1f2937; font-size: 12px; line-height: 1.5; font-weight: 500;">kWh/tonne; net avoided burden; refrigerant GWP</div>
+    </div>
+  </div>
+
+  <!-- Physical network -->
+  <h2 style="margin: 0 0 4px 0; color: #6b7280; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Physical Network</h2>
+  <p style="margin: 0 0 16px 0; color: #6b7280; font-size: 13px;">A corridor, not a warehouse cluster.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;">
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;">
+        <span style="color: #1a5f3a; font-size: 24px; font-weight: 700;">8 &times; 50T</span>
+      </div>
+      <div style="color: #1f2937; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Production Nodes</div>
+      <div style="color: #6b7280; font-size: 12px; line-height: 1.5;">Pre-cooling and aggregation at source, close to FPO catchments.</div>
+    </div>
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;">
+        <span style="color: #1a5f3a; font-size: 24px; font-weight: 700;">2 &times; 100T</span>
+      </div>
+      <div style="color: #1f2937; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Dimapur Hubs</div>
+      <div style="color: #6b7280; font-size: 12px; line-height: 1.5;">Consolidation point where regional volume meets trunk logistics.</div>
+    </div>
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;">
+        <span style="color: #1a5f3a; font-size: 24px; font-weight: 700;">2 &times; 80T</span>
+      </div>
+      <div style="color: #1f2937; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Gurgaon / NCR</div>
+      <div style="color: #6b7280; font-size: 12px; line-height: 1.5;">Demand-side distribution into the verified buyer network.</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

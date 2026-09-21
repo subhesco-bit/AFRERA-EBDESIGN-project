@@ -1,0 +1,44 @@
+{
+  "moduleId": "M018",
+  "version": "0.1.0",
+  "name": "M018 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "platform",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m018",
+      "backend",
+      "Identity"
+    ],
+    "capabilities": [
+      "createDataAccessPolicy",
+      "getDataAccessPolicies",
+      "checkDataAccess",
+      "applyDataMasking",
+      "createMaskingRule",
+      "getMaskingRules",
+      "createPrivacyPolicy",
+      "getPrivacyPolicies",
+      "acceptPrivacyPolicy",
+      "assessPrivacyRisk",
+      "generatePrivacyRecommendations",
+      "performPrivacyImpactAnalysis"
+    ],
+    "aiContext": "backend module M018; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

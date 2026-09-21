@@ -1,0 +1,8 @@
+const svc=require('../src/services/enterpriseModule550RuntimeService');
+describe('M001-M550 enterprise runtime',()=>{
+ test('resolves exactly 550 governed module definitions',()=>{const p=svc.portfolio();expect(p).toHaveLength(550);expect(p[0].code).toBe('M001');expect(p[549].code).toBe('M550');});
+ test('every module has full-stack enterprise standards',()=>{for(const d of svc.portfolio()){expect(d.surfaces).toEqual(expect.arrayContaining(['operations','workflow','visualization','work_queue','decision_center','erp_controls','integrations','evidence_audit','ai_assist']));expect(d.middleware).toEqual(expect.arrayContaining(['authentication','rbac_abac','tenant_scope','geography_scope','record_scope','audit']));expect(d.erpControls).toEqual(expect.arrayContaining(['master_data_integrity','state_machine','maker_checker','transaction_boundary','audit_trail']));expect(d.certification).toEqual(expect.arrayContaining(['database_contract','api_contract','page_renders','authorization_negative_tests','kpi_provenance','accessibility','observability','e2e']));expect(d.decisionPolicy.humanApprovalRequired).toBe(true);expect(d.decisionPolicy.makerChecker).toBe(true);}});
+ test('workflow cannot skip control states',()=>{expect(svc.assertTransition('M550','capture','validate')).toBe(true);expect(()=>svc.assertTransition('M550','capture','approve')).toThrow();});
+ test('rejects codes outside governed portfolio',()=>{expect(()=>svc.definition('M000')).toThrow();expect(()=>svc.definition('M551')).toThrow();expect(()=>svc.definition('bad')).toThrow();});
+ test('does not claim missing physical modules are bespoke',()=>{const d=svc.definition('M550');if(!d.physicalModule)expect(d.implementationMode).toBe('governed_enterprise_runtime');});
+});

@@ -33,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_irrigation_water_sources_type ON irrigation_water
 
 CREATE TABLE IF NOT EXISTS irrigation_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    schedule_id UUID REFERENCES irrigation_schedules(id) ON DELETE SET NULL,
+    schedule_id INTEGER REFERENCES irrigation_schedules(id) ON DELETE SET NULL,
     field_name VARCHAR(200),
     volume_liters NUMERIC(14,2),
     duration_minutes NUMERIC(8,2),

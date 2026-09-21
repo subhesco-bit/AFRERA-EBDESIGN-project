@@ -1,21 +1,7 @@
 /**
- * Generic REST bridge for backend/src/modules/M0XX (the plain function-export
- * family). Exposes whatever real operations a module actually has, under its
- * own real function names - never invents a CRUD shape a module doesn't have.
- *
- * Mounted per-module at /api/v1/backend-modules/:moduleId/:operation/:id?.
- * GET maps query params to the function's object argument; POST/PUT/DELETE
- * map the body. The optional :id path segment covers the common
- * fn(id) / fn(id, payload) shape (e.g. getOrchard(id), updateOrchard(id,
- * payload)) that a single merged-body argument can't express - dispatch is
- * based on the real function's arity (Function.length), not guessed per
- * module, so this works generically across every module without per-module
- * mapping code. An unknown operation returns the real list of what's
- * callable, same contract as the Claude AI module registry's execute()
- * endpoint - this is the same underlying code path, just reachable via a
- * conventional REST verb for frontend pages that were built expecting one.
+ * Generic REST bridge for backend/src/modules/M### services.
+ * Exposes the real exported operations under /api/v1/backend-modules.
  */
-
 'use strict';
 
 const express = require('express');
@@ -32,12 +18,12 @@ const moduleCache = new Map();
 
 function loadModule(moduleId) {
   if (moduleCache.has(moduleId)) return moduleCache.get(moduleId);
-  if (!/^M\d+$/.test(moduleId)) return null;
+  if (!/^M\d{3}$/.test(moduleId)) return null;
   const svcPath = path.join(__dirname, '../../modules', moduleId, 'service.js');
   let mod;
   try {
     mod = require(svcPath);
-  } catch (e) {
+  } catch (error) {
     moduleCache.set(moduleId, null);
     return null;
   }
@@ -45,46 +31,65 @@ function loadModule(moduleId) {
   return mod;
 }
 
+function callableOperations(mod) {
+  return Object.keys(mod || {}).filter(key => typeof mod[key] === 'function');
+}
+
+function deriveArguments(fn, id, payload) {
+  if (id !== undefined) return fn.length >= 2 ? [id, payload] : [id];
+  if (fn.length < 2) return [payload];
+
+  // Legacy module clients often send an operation's entity identifier in the
+  // request body instead of the URL (e.g. { villageId, ...resourceData }).
+  // Only adapt this shape when there is exactly one unambiguous identifier
+  // key; otherwise fail instead of guessing and calling real business logic
+  // with the wrong argument order.
+  const body = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
+  const idKeys = Object.keys(body).filter(key => /(?:^id$|Id$|_id$)/.test(key));
+  if (idKeys.length !== 1) {
+    const error = new Error('Operation requires two arguments. Supply the entity id in the URL or exactly one id field in the request payload.');
+    error.statusCode = 400;
+    throw error;
+  }
+  const idKey = idKeys[0];
+  const first = body[idKey];
+  const second = { ...body };
+  delete second[idKey];
+  return [first, second];
+}
+
 async function handle(req, res) {
   const { moduleId, operation, id } = req.params;
   const mod = loadModule(moduleId);
-  if (!mod) {
-    return res.status(404).json({ success: false, error: `No backend module found for ${moduleId}` });
-  }
+  if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${moduleId}` });
+
   const fn = mod[operation];
   if (typeof fn !== 'function') {
-    const available = Object.keys(mod).filter(k => typeof mod[k] === 'function');
     return res.status(404).json({
       success: false,
-      error: `Unknown operation "${operation}" on ${moduleId}. Available: ${available.join(', ')}`,
+      error: `Unknown operation "${operation}" on ${moduleId}`,
+      available: callableOperations(mod),
     });
   }
+
+  const correlationId = req.get('x-correlation-id') || `module-${moduleId}-${Date.now()}`;
   try {
-    const correlationId = req.get('x-correlation-id') || `module-${moduleId}-${Date.now()}`;
     await recordBestEffort({ moduleId, operation, eventType: 'started', actorUserId: req.user.id, entityId: id, correlationId, payload: { method: req.method } });
-    const body = req.method === 'GET' ? req.query : req.body;
-    let args;
-    if (id !== undefined) {
-      // fn(id) or fn(id, payload) depending on real arity - never fn(object)
-      // when the real function expects a bare id string.
-      args = fn.length >= 2 ? [id, body] : [id];
-    } else {
-      args = [body];
-    }
-    const data = await fn(...args);
+    const payload = req.method === 'GET' ? req.query : req.body;
+    const data = await fn(...deriveArguments(fn, id, payload));
     await recordBestEffort({ moduleId, operation, eventType: 'completed', actorUserId: req.user.id, entityId: id, correlationId, payload: { method: req.method } });
     signalBus.emitSignal(`${moduleId.toLowerCase()}.${operation}.completed`, { moduleId, operation, entityId: id }, { source: 'backendModuleBridge', correlationId, entityId: id });
-    res.json({ success: true, data });
+    return res.json({ success: true, data, provenance: { moduleId, operation, correlationId, implementation: 'real-module-service' } });
   } catch (error) {
-    await recordBestEffort({ moduleId, operation, eventType: 'failed', actorUserId: req.user?.id, entityId: id, correlationId: req.get('x-correlation-id') || `module-${moduleId}-${Date.now()}`, errorCode: error.code, payload: { method: req.method } });
-    res.status(500).json({ success: false, error: error.message });
+    await recordBestEffort({ moduleId, operation, eventType: 'failed', actorUserId: req.user?.id, entityId: id, correlationId, errorCode: error.code, payload: { method: req.method } });
+    return res.status(error.statusCode || 500).json({ success: false, error: error.message, correlationId });
   }
 }
 
 router.get('/:moduleId/contract', rateLimiters.api, authMiddleware, (req, res) => {
   const mod = loadModule(req.params.moduleId);
   if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${req.params.moduleId}` });
-  res.json({ success: true, data: buildModuleContract(req.params.moduleId, mod) });
+  return res.json({ success: true, data: buildModuleContract(req.params.moduleId, mod) });
 });
 
 router.post('/:moduleId/ai-advisory', rateLimiters.api, authMiddleware, async (req, res) => {
@@ -102,9 +107,9 @@ router.post('/:moduleId/ai-advisory', rateLimiters.api, authMiddleware, async (r
       userId: req.user.id,
       sessionId: req.headers['x-session-id'] || `module-${req.params.moduleId}-${req.user.id}`,
     });
-    res.json({ success: true, data: { module: contract, advisory, decision_mode: contract.decision_mode, executes_commands: false } });
+    return res.json({ success: true, data: { module: contract, advisory, decision_mode: contract.decision_mode, executes_commands: false } });
   } catch (error) {
-    res.status(503).json({ success: false, error: 'AI advisory unavailable' });
+    return res.status(503).json({ success: false, error: 'AI advisory unavailable' });
   }
 });
 
@@ -112,31 +117,23 @@ router.post('/:moduleId/ai-decision', rateLimiters.api, authMiddleware, async (r
   const { moduleId } = req.params;
   const mod = loadModule(moduleId);
   if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${moduleId}` });
-
   const { question, operation, context } = req.body || {};
   const contract = buildModuleContract(moduleId, mod);
-  const operationExists = operation === undefined || (
-    typeof operation === 'string' && typeof mod[operation] === 'function'
-  );
-  if (typeof question !== 'string' || question.trim().length === 0 || question.length > 4000 ||
-      !operationExists ||
+  const operationExists = operation === undefined || (typeof operation === 'string' && typeof mod[operation] === 'function');
+  if (typeof question !== 'string' || question.trim().length === 0 || question.length > 4000 || !operationExists ||
       (context !== undefined && (context === null || typeof context !== 'object' || Array.isArray(context)))) {
     return res.status(400).json({ success: false, error: 'question, operation, or context is invalid' });
   }
-
   try {
     const decision = await claudeAICoordinator.coordinateAIRequest({
       requestType: 'module_decision',
       query: question,
-      context: {
-        module_contract: contract,
-        operation_context: { operation, context: context || {} },
-      },
+      context: { module_contract: contract, operation_context: { operation, context: context || {} } },
       userId: req.user.id,
       sessionId: req.headers['x-session-id'] || `module-${moduleId}-${req.user.id}`,
     });
     const hasCommandOperations = contract.operations.some(item => item.kind === 'command');
-    res.json({
+    return res.json({
       success: true,
       data: {
         module_contract: contract,
@@ -144,15 +141,11 @@ router.post('/:moduleId/ai-decision', rateLimiters.api, authMiddleware, async (r
         decision_mode: contract.decision_mode,
         executes_commands: false,
         human_approval_required: hasCommandOperations,
-        provenance: {
-          coordinator: 'claudeAICoordinator',
-          request_type: 'module_decision',
-          module_id: moduleId,
-        },
+        provenance: { coordinator: 'claudeAICoordinator', request_type: 'module_decision', module_id: moduleId },
       },
     });
   } catch (error) {
-    res.status(503).json({ success: false, error: 'AI decision unavailable' });
+    return res.status(503).json({ success: false, error: 'AI decision unavailable' });
   }
 });
 
@@ -165,12 +158,18 @@ router.put('/:moduleId/:operation', rateLimiters.api, authMiddleware, handle);
 router.delete('/:moduleId/:operation/:id', rateLimiters.api, authMiddleware, handle);
 router.delete('/:moduleId/:operation', rateLimiters.api, authMiddleware, handle);
 
-// Lists which operations actually exist on a module - lets a frontend page
-// discover real function names instead of guessing.
 router.get('/:moduleId', rateLimiters.api, authMiddleware, (req, res) => {
   const mod = loadModule(req.params.moduleId);
   if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${req.params.moduleId}` });
-  res.json({ success: true, operations: Object.keys(mod).filter(k => typeof mod[k] === 'function') });
+  return res.json({ success: true, moduleId: req.params.moduleId, operations: callableOperations(mod), implementation: 'real-module-service' });
 });
+
+router.__ebdesign = {
+  contract: 'backend-module-bridge-v2',
+  canonicalMount: '/api/v1/backend-modules',
+  realServiceDispatch: true,
+  authenticationRequired: true,
+  fakeSuccessStubs: false,
+};
 
 module.exports = router;

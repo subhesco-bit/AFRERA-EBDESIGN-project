@@ -1,0 +1,10 @@
+const express=require('express');
+const router=express.Router();
+const service=require('../services/m051m100AgricultureProductionService');
+const {authMiddleware}=require('../middleware/auth');
+router.use(authMiddleware);
+router.post('/fpo/procurement',async(req,res,next)=>{try{res.status(201).json({success:true,record:await service.recordFpoProcurement(req.body)});}catch(e){next(e);}});
+router.post('/production/validate',(req,res,next)=>{try{res.json({success:true,validation:service.validateProduction(req.body)});}catch(e){next(e);}});
+router.post('/harvest/classify',(req,res,next)=>{try{res.json({success:true,classification:service.classifyHarvest(req.body)});}catch(e){next(e);}});
+router.post('/:moduleCode/operations',async(req,res,next)=>{try{res.status(201).json({success:true,record:await service.recordOperation(req.params.moduleCode,req.body)});}catch(e){next(e);}});
+module.exports=router;

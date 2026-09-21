@@ -5,158 +5,350 @@
   "description": "Central AI orchestration and decision-making backbone for all modules. Provides enterprise-level AI coordination, strategic planning, and cross-module intelligence.",
   "category": "ai",
   "status": "production",
-  "author": "EBDESIGN Team",
-  "license": "MIT",
+  "author": "EBDESIGN AI Team",
+  "license": "PROPRIETARY",
+  
   "dependencies": {
     "modules": ["M001_PLATFORM_CORE"],
     "services": ["postgresql", "redis", "mongodb"],
     "libraries": {
-      "backend": ["express", "winston", "@anthropic-ai/sdk"],
-      "frontend": ["react", "zustand"]
-    }
-  },
-  "discovery": {
-    "keywords": ["ai", "backbone", "orchestration", "decision-making", "strategy", "intelligence", "coordination"],
-    "capabilities": [
-      "ai-orchestration",
-      "decision-making",
-      "strategy-formulation",
-      "cross-module-intelligence",
-      "enterprise-ai-coordination",
-      "learning-system",
-      "prediction-engine"
-    ],
-    "aiContext": "Central AI backbone that orchestrates AI capabilities across all modules. Provides decision-making, strategic planning, and cross-module intelligence sharing.",
-    "useCases": [
-      "Coordinate AI agents across modules",
-      "Make enterprise-level decisions",
-      "Formulate strategic plans",
-      "Share intelligence between modules",
-      "Provide AI resource allocation",
-      "Implement learning and prediction"
+      "backend": [
+        "express",
+        "winston",
+        "@anthropic-ai/sdk",
+        "node-cache",
+        "ioredis"
+      ],
+      "frontend": [
+        "react",
+        "zustand",
+        "recharts",
+        "axios"
+      ]
+    },
+    "externalAPIs": [
+      "claude-ai",
+      "openai-gpt",
+      "google-gemini",
+      "azure-openai",
+      "huggingface-inference"
     ]
   },
+
+  "discovery": {
+    "keywords": [
+      "ai",
+      "backbone",
+      "orchestration",
+      "decision-making",
+      "strategy",
+      "intelligence",
+      "coordination",
+      "prediction",
+      "learning"
+    ],
+    "capabilities": [
+      "ai-decision-making",
+      "strategy-generation",
+      "predictive-analytics",
+      "multi-agent-coordination",
+      "cross-module-intelligence",
+      "learning-from-feedback",
+      "ai-provider-orchestration",
+      "intelligent-caching",
+      "enterprise-ai-governance"
+    ],
+    "aiContext": "Central AI backbone that orchestrates AI capabilities across all ERP modules. Provides decision-making engines, strategic planning, predictive analytics, and cross-module intelligence sharing. Supports multiple AI providers (Claude, OpenAI, Gemini, Azure, HuggingFace, Ollama) with intelligent fallback and caching.",
+    "useCases": [
+      "Make data-driven business decisions with AI reasoning",
+      "Generate strategic plans for organizational objectives",
+      "Predict future outcomes based on historical patterns",
+      "Coordinate multiple AI agents for complex tasks",
+      "Share intelligence and context across modules",
+      "Learn from past decisions to improve future recommendations",
+      "Route AI requests with load balancing and failover",
+      "Cache AI results to improve performance and reduce costs"
+    ]
+  },
+
   "execution": {
     "backend": {
       "entryPoint": "backend/service.js",
       "className": "AIBackboneService",
+      "singletonPattern": true,
       "apiRoutes": "backend/routes.js",
       "port": 4000,
-      "startup": "backend/startup.js",
-      "shutdown": "backend/shutdown.js"
+      "baseEndpoint": "/api/v1/m400-ai-backbone",
+      "startup": "initialize",
+      "shutdown": "shutdown",
+      "livenessProbe": "/api/v1/m400-ai-backbone/health",
+      "readinessProbe": "/api/v1/m400-ai-backbone/health"
     },
     "frontend": {
-      "entryPoint": "frontend/index.jsx",
-      "routes": "frontend/routes.json",
-      "mainComponent": "frontend/components/AIBackboneDashboard.jsx"
+      "entryPoint": "backend/AIDashboard.jsx",
+      "componentName": "AIDashboard",
+      "routePath": "/dashboard/ai-backbone",
+      "styles": "backend/AIDashboard.css",
+      "visualizationType": "real-time-dashboard",
+      "features": [
+        "live-metrics",
+        "engine-status",
+        "decision-history",
+        "strategy-tracking",
+        "prediction-monitoring",
+        "health-checks"
+      ]
     },
-    "api": {
-      "specification": "api/openapi.json",
-      "baseEndpoint": "/api/v1/ai-backbone",
-      "contracts": "api/contracts.json",
-      "client": "api/client.js"
+    "testing": {
+      "unit": "backend/service.test.js",
+      "framework": "jest",
+      "coverage": {
+        "statements": 85,
+        "branches": 80,
+        "functions": 85,
+        "lines": 85
+      }
     }
   },
-  "claudeIntegration": {
-    "supportedAgents": ["enterprise-architect", "strategic-planner", "decision-coordinator", "intelligence-analyst"],
-    "contextSources": [
-      "database:ai_decisions",
-      "database:ai_strategies",
-      "runtime:module_states",
-      "runtime:ai_metrics"
-    ],
-    "autoDiscovery": true,
-    "runtimeLoading": true,
-    "priority": "critical",
-    "interactionPatterns": {
-      "discovery": "Natural language query for AI system status",
-      "execution": "Complex AI orchestration and coordination",
-      "monitoring": "Real-time AI system monitoring",
-      "configuration": "Dynamic AI system configuration"
+
+  "apis": {
+    "decisions": {
+      "POST /api/v1/m400-ai-backbone/decisions": {
+        "description": "Make an AI-powered decision",
+        "requestBody": {
+          "moduleId": "string (required)",
+          "capability": "string (required)",
+          "data": "object (required)",
+          "provider": "string (optional: claude|openai|gemini|azure|huggingface)",
+          "confidence": "number (optional, 0-1)"
+        },
+        "response": {
+          "success": "boolean",
+          "decisionId": "string",
+          "reasoning": "string",
+          "confidence": "number",
+          "provider": "string",
+          "model": "string",
+          "timestamp": "ISO8601"
+        }
+      },
+      "GET /api/v1/m400-ai-backbone/decisions": {
+        "description": "List recent decisions (paginated)",
+        "queryParams": {
+          "limit": "number (default: 20)",
+          "offset": "number (default: 0)",
+          "moduleId": "string (optional filter)",
+          "status": "string (optional filter)"
+        }
+      },
+      "GET /api/v1/m400-ai-backbone/decisions/:id": {
+        "description": "Get specific decision details"
+      },
+      "POST /api/v1/m400-ai-backbone/decisions/:id/feedback": {
+        "description": "Provide feedback on a decision (for learning)",
+        "requestBody": {
+          "outcome": "object",
+          "feedback": "string",
+          "accuracy": "number"
+        }
+      }
+    },
+    "strategies": {
+      "POST /api/v1/m400-ai-backbone/strategies": {
+        "description": "Generate AI strategy for objectives",
+        "requestBody": {
+          "moduleId": "string (required)",
+          "objectives": "string[] (required)",
+          "currentState": "object (required)",
+          "provider": "string (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "strategyId": "string",
+          "objectives": "string[]",
+          "strategy": "string",
+          "timestamp": "ISO8601"
+        }
+      },
+      "GET /api/v1/m400-ai-backbone/strategies": {
+        "description": "List recent strategies"
+      },
+      "GET /api/v1/m400-ai-backbone/strategies/:id": {
+        "description": "Get strategy details"
+      }
+    },
+    "predictions": {
+      "POST /api/v1/m400-ai-backbone/predictions": {
+        "description": "Make AI prediction",
+        "requestBody": {
+          "moduleId": "string (required)",
+          "modelId": "string (required)",
+          "context": "object (required)",
+          "provider": "string (optional)"
+        }
+      },
+      "GET /api/v1/m400-ai-backbone/predictions": {
+        "description": "List recent predictions"
+      },
+      "GET /api/v1/m400-ai-backbone/predictions/:id": {
+        "description": "Get prediction details"
+      },
+      "POST /api/v1/m400-ai-backbone/predictions/:id/verify": {
+        "description": "Verify prediction accuracy"
+      }
+    },
+    "coordination": {
+      "POST /api/v1/m400-ai-backbone/coordinate": {
+        "description": "Coordinate multi-agent AI request",
+        "requestBody": {
+          "moduleId": "string (required)",
+          "capability": "string (required)",
+          "input": "object (required)",
+          "agents": "string[] (optional)",
+          "timeout": "number (optional)"
+        }
+      },
+      "GET /api/v1/m400-ai-backbone/executions/:id": {
+        "description": "Get execution status"
+      }
+    },
+    "system": {
+      "GET /api/v1/m400-ai-backbone/health": {
+        "description": "Health check",
+        "response": {
+          "status": "healthy|degraded|failed",
+          "checks": {
+            "database": "boolean",
+            "cache": "boolean",
+            "aiProviders": "boolean",
+            "engines": "object"
+          }
+        }
+      },
+      "GET /api/v1/m400-ai-backbone/metrics": {
+        "description": "Get system metrics"
+      },
+      "GET /api/v1/m400-ai-backbone/engines": {
+        "description": "Get AI engines status"
+      }
     }
   },
-  "endpoints": {
-    "health": {
-      "method": "GET",
-      "path": "/api/v1/ai-backbone/health",
-      "description": "Get AI backbone health status",
-      "authentication": false
-    },
-    "coordinate": {
-      "method": "POST",
-      "path": "/api/v1/ai-backbone/coordinate",
-      "description": "Coordinate AI request across modules",
-      "authentication": true
-    },
-    "decide": {
-      "method": "POST",
-      "path": "/api/v1/ai-backbone/decide",
-      "description": "Make enterprise-level AI decision",
-      "authentication": true
-    },
-    "strategize": {
-      "method": "POST",
-      "path": "/api/v1/ai-backbone/strategize",
-      "description": "Formulate AI-powered strategy",
-      "authentication": true
-    },
-    "intelligence": {
-      "method": "GET",
-      "path": "/api/v1/ai-backbone/intelligence",
-      "description": "Get cross-module intelligence",
-      "authentication": true
-    }
-  },
-  "dataModels": {
-    "input": {
-      "coordinationRequest": "backend/models/coordinationRequest.model.js",
-      "decisionRequest": "backend/models/decisionRequest.model.js",
-      "strategyRequest": "backend/models/strategyRequest.model.js"
-    },
-    "output": {
-      "coordinationResponse": "backend/models/coordinationResponse.model.js",
-      "decisionResponse": "backend/models/decisionResponse.model.js",
-      "strategyResponse": "backend/models/strategyResponse.model.js"
-    }
-  },
-  "aiCapabilities": {
-    "decisionMaking": true,
-    "strategyEngine": true,
-    "learning": true,
-    "prediction": true,
-    "agents": {
-      "primaryAgent": "enterprise-ai-coordinator",
-      "secondaryAgents": ["decision-engine", "strategy-engine", "learning-engine", "prediction-engine"]
-    }
-  },
+
   "cables": {
     "incoming": [
-      "CABLE_PLATFORM_TO_AI_BACKBONE",
-      "CABLE_USER_TO_AI_BACKBONE",
-      "CABLE_ORGANIZATION_TO_AI_BACKBONE"
+      "CABLE_M001_PLATFORM_CORE_TO_M400_AI_BACKBONE_AI",
+      "CABLE_M002_USER_MANAGEMENT_TO_M400_AI_BACKBONE_AI",
+      "CABLE_M100_CROP_MANAGEMENT_TO_M400_AI_BACKBONE_AI",
+      "CABLE_M101_LIVESTOCK_MANAGEMENT_TO_M400_AI_BACKBONE_AI",
+      "CABLE_M301_FINANCIAL_MANAGEMENT_TO_M400_AI_BACKBONE_AI"
     ],
     "outgoing": [
-      "CABLE_AI_BACKBONE_TO_ALL_MODULES"
+      "CABLE_M400_AI_BACKBONE_TO_M401_AI_GATEWAY_ORCHESTRATION",
+      "CABLE_M400_AI_BACKBONE_TO_M402_AI_ORCHESTRATION_COORDINATION",
+      "CABLE_M400_AI_BACKBONE_TO_M403_AGRICULTURAL_AI_DECISION",
+      "CABLE_M400_AI_BACKBONE_TO_M404_DECISION_SUPPORT_STRATEGY",
+      "CABLE_M400_AI_BACKBONE_TO_M405_PREDICTIVE_ANALYTICS_FORECAST",
+      "CABLE_M400_AI_BACKBONE_TO_M407_CONVERSATIONAL_AI_DIALOGUE",
+      "CABLE_M400_AI_BACKBONE_TO_M408_KNOWLEDGE_MANAGEMENT_LEARNING"
     ]
   },
-  "testing": {
-    "unit": "tests/unit",
-    "integration": "tests/integration",
-    "e2e": "tests/e2e",
-    "coverage": ">= 90%"
+
+  "database": {
+    "tables": [
+      {
+        "name": "ai_decisions",
+        "description": "Stores all AI decisions made",
+        "primaryKey": "id",
+        "uniqueKey": "decision_id"
+      },
+      {
+        "name": "ai_strategies",
+        "description": "Stores generated strategies",
+        "primaryKey": "id",
+        "uniqueKey": "strategy_id"
+      },
+      {
+        "name": "ai_predictions",
+        "description": "Stores AI predictions",
+        "primaryKey": "id",
+        "uniqueKey": "prediction_id"
+      },
+      {
+        "name": "ai_intelligence_cache",
+        "description": "Intelligent caching for AI results",
+        "primaryKey": "id",
+        "uniqueKey": "cache_key"
+      },
+      {
+        "name": "ai_agent_executions",
+        "description": "Tracks agent executions",
+        "primaryKey": "id",
+        "uniqueKey": "execution_id"
+      },
+      {
+        "name": "ai_learning_feedback",
+        "description": "Stores learning feedback",
+        "primaryKey": "id"
+      }
+    ]
   },
-  "documentation": {
-    "readme": "docs/README.md",
-    "architecture": "docs/ARCHITECTURE.md",
-    "api": "docs/API.md",
-    "integration": "docs/INTEGRATION.md",
-    "ai": "docs/AI_ARCHITECTURE.md"
+
+  "monitoring": {
+    "metrics": [
+      "decisionsCount",
+      "strategiesCount",
+      "predictionsCount",
+      "coordinationEvents",
+      "cacheHits",
+      "cacheMisses",
+      "aiProviderUsage",
+      "averageResponseTime",
+      "errorRate"
+    ],
+    "alerts": [
+      "high_error_rate",
+      "ai_provider_failure",
+      "cache_miss_ratio_high",
+      "coordination_timeout",
+      "database_connection_failed"
+    ]
   },
-  "metadata": {
-    "createdAt": "2026-08-24T20:35:00Z",
-    "updatedAt": "2026-08-24T20:35:00Z",
-    "installedAt": null,
-    "lastHealthCheck": null,
-    "versionHistory": []
+
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": true,
+    "tests": true,
+    "documentation": true,
+    "monitoring": true,
+    "errorHandling": true
+  },
+
+  "production": {
+    "readiness": "READY",
+    "scalability": "horizontal",
+    "failover": "enabled",
+    "caching": "enabled",
+    "compression": "enabled",
+    "rateLimit": {
+      "decisions": 100,
+      "strategies": 50,
+      "predictions": 100,
+      "coordination": 50
+    },
+    "timeout": {
+      "decision": 30000,
+      "strategy": 45000,
+      "prediction": 30000,
+      "coordination": 60000
+    }
+  },
+
+  "integration": {
+    "status": "WIRED",
+    "cableConnections": "ESTABLISHED",
+    "moduleRegistry": "CONFIGURED",
+    "healthProbes": "ACTIVE",
+    "lastUpdated": "2026-09-08T00:00:00Z"
   }
 }

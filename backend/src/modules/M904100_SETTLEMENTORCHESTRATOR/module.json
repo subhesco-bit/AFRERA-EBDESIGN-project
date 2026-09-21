@@ -1,0 +1,31 @@
+{
+  "moduleId": "M904100_SETTLEMENTORCHESTRATOR",
+  "version": "0.1.0",
+  "name": "Settlement, UPI & Payout Engine",
+  "description": "Order -> delivery confirm -> quality hold -> payout orchestration: UPI/NEFT payout, FPO split, GST invoice, payment failure retry.",
+  "category": "commerce",
+  "status": "SKELETON",
+  "createdAt": "2026-09-21",
+  "source": "AFRERA P1 capability-module recommendation, 2026-09-21",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "services/finance/gstService.js (real, 225 lines)",
+      "services/legacy/escrowService.js",
+      "M900100_FPOOPERATIONS (member payout split)"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": []
+    }
+  },
+  "completeness": {
+    "backend": false,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

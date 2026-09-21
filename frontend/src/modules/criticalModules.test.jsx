@@ -5,9 +5,9 @@ import M001Page from './M001/M001Page';
 import M016Page from './M016/M016Page';
 import M084Page from './M084/M084Page';
 
-jest.mock('../services/api', () => ({
+vi.mock('../services/api', () => ({
   __esModule: true,
-  default: { get: jest.fn(), post: jest.fn() },
+  default: { get: vi.fn(), post: vi.fn() },
 }));
 
 describe('critical module pages', () => {

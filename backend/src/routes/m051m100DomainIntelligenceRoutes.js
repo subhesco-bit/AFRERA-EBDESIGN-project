@@ -1,0 +1,17 @@
+const express=require('express');
+const router=express.Router();
+const intelligence=require('../services/m051m100DomainIntelligenceService');
+const {authMiddleware}=require('../middleware/auth');
+router.use(authMiddleware);
+const run=(method,moduleCode)=>(req,res,next)=>{try{const result=method(req.body);res.json({success:true,moduleCode,result});}catch(e){next(e);}};
+router.post('/M055/procurement-decision',run(intelligence.fpoProcurementDecision,'M055'));
+router.post('/M053/membership-health',run(intelligence.membershipHealth,'M053'));
+router.post('/M061/crop-economics',run(intelligence.cropPlan,'M061'));
+router.post('/M065/seed-requirement',run(intelligence.seedRequirement,'M065'));
+router.post('/M069/harvest-readiness',run(intelligence.harvestReadiness,'M069'));
+router.post('/M071/soil-amendment',run(intelligence.soilAmendment,'M071'));
+router.post('/M076/water-allocation',run(intelligence.waterAllocation,'M076'));
+router.post('/M089/climate-risk',run(intelligence.climateRisk,'M089'));
+router.post('/M093/labour-productivity',run(intelligence.labourProductivity,'M093'));
+router.post('/M098/farm-unit-economics',run(intelligence.farmUnitEconomics,'M098'));
+module.exports=router;

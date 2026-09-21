@@ -1,0 +1,44 @@
+{
+  "moduleId": "M007",
+  "version": "0.1.0",
+  "name": "M007 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "platform",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m007",
+      "backend",
+      "Platform Foundation"
+    ],
+    "capabilities": [
+      "listRoles",
+      "getRole",
+      "createRole",
+      "updateRole",
+      "deleteRole",
+      "listPermissions",
+      "createPermission",
+      "assignRoleToUser",
+      "removeRoleFromUser",
+      "getUserRoles",
+      "getUserPermissions",
+      "recommendRoleForUser"
+    ],
+    "aiContext": "backend module M007; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

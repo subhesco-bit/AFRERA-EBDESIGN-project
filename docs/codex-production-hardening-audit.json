@@ -1,0 +1,3985 @@
+{
+  "generated_at": "2026-09-12T03:32:04.404Z",
+  "totals": {
+    "all_files": 422873,
+    "core_files": 9280,
+    "junk_candidate_files": 379127,
+    "review_required_files": 34466,
+    "audited_core_files": 9280,
+    "files_with_issues": 5387,
+    "clean_files": 3893
+  },
+  "severities": {
+    "medium": 1507,
+    "low": 5597,
+    "high": 587
+  },
+  "issue_types": {
+    "missing_adjacent_test": 4885,
+    "placeholder_or_todo": 1448,
+    "sql_interpolation_risk": 491,
+    "console_logging": 476,
+    "unreadable_file": 236,
+    "route_auth_not_obvious": 95,
+    "localhost_reference": 43,
+    "test_secret_fixture": 15,
+    "unsafe_dynamic_execution": 1,
+    "large_core_file": 1
+  },
+  "highest_priority_files": [
+    {
+      "path": "backend/src/modules/M001_PLATFORM_CORE/backend/service.js",
+      "category": "backend_module",
+      "bytes": 20749,
+      "issue_count": 4,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "console_logging",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "Console logging found. Route production logs through a structured logger.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/TEMPLATES/MODULE_TEMPLATE/backend/service.js",
+      "category": "backend_module",
+      "bytes": 11188,
+      "issue_count": 4,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "console_logging",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "Console logging found. Route production logs through a structured logger.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/core/aiOrchestrator.js",
+      "category": "backend_runtime",
+      "bytes": 44752,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M400_AI_BACKBONE/backend/service.js",
+      "category": "backend_module",
+      "bytes": 20005,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/aiBrainRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 8519,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "console_logging",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Console logging found. Route production logs through a structured logger.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/aiGatewayRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 1545,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/aiOperationIntelligenceRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 8810,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "console_logging",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Console logging found. Route production logs through a structured logger.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/aiSelfHealingRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 7278,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "console_logging",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Console logging found. Route production logs through a structured logger.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/ar.js",
+      "category": "backend_route",
+      "bytes": 294,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/auditTrail.js",
+      "category": "backend_route",
+      "bytes": 311,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/automation.js",
+      "category": "backend_route",
+      "bytes": 310,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/biometric.js",
+      "category": "backend_route",
+      "bytes": 308,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/blockchainTrace.js",
+      "category": "backend_route",
+      "bytes": 321,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/bulkOrders.js",
+      "category": "backend_route",
+      "bytes": 311,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/certificationManagement.js",
+      "category": "backend_route",
+      "bytes": 337,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/claude/backendModuleBridge.js",
+      "category": "backend_route",
+      "bytes": 330,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/claude/moduleRegistryRoutes.js",
+      "category": "backend_route",
+      "bytes": 2701,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "console_logging",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Console logging found. Route production logs through a structured logger.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/climateAdvisory.js",
+      "category": "backend_route",
+      "bytes": 321,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/climateAdvisoryRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 341,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/cloudManagementRoutes.js",
+      "category": "backend_route",
+      "bytes": 12904,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "console_logging",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Console logging found. Route production logs through a structured logger.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/coldChainMonitoring.js",
+      "category": "backend_route",
+      "bytes": 330,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/complianceTracking.js",
+      "category": "backend_route",
+      "bytes": 327,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/databaseManagementRoutes.js",
+      "category": "backend_route",
+      "bytes": 16859,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "console_logging",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Console logging found. Route production logs through a structured logger.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/dataVisualization.js",
+      "category": "backend_route",
+      "bytes": 325,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/ENDPOINT_MISMATCH_FIXER.js",
+      "category": "backend_route",
+      "bytes": 356,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/ENDPOINT_MISMATCH_FIXER_COMPLETE.js",
+      "category": "backend_route",
+      "bytes": 382,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/energyRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 322,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/enterpriseAIRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 336,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/equipmentExchangeRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 345,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/farmAnalytics.js",
+      "category": "backend_route",
+      "bytes": 317,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/farmerHealthRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 335,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/fertilizerRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 330,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/financialAnalytics.js",
+      "category": "backend_route",
+      "bytes": 327,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/foodRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 318,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/freightPooling.js",
+      "category": "backend_route",
+      "bytes": 319,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/governanceModule.js",
+      "category": "backend_route",
+      "bytes": 323,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/greenhouse.js",
+      "category": "backend_route",
+      "bytes": 310,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/gstRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 316,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/horticulture.js",
+      "category": "backend_route",
+      "bytes": 314,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/iotSensors.js",
+      "category": "backend_route",
+      "bytes": 311,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/livestock.js",
+      "category": "backend_route",
+      "bytes": 308,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/loanManagement.js",
+      "category": "backend_route",
+      "bytes": 319,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/logistics/coldStorageRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 333,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/logistics/geofencingRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 330,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/logisticsEnhancementRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 351,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/M041VillageERP.js",
+      "category": "backend_route",
+      "bytes": 12595,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "console_logging",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Console logging found. Route production logs through a structured logger.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/marketAnalytics.js",
+      "category": "backend_route",
+      "bytes": 321,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/mlOptimization.js",
+      "category": "backend_route",
+      "bytes": 319,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/nlp.js",
+      "category": "backend_route",
+      "bytes": 296,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/phase10.js",
+      "category": "backend_route",
+      "bytes": 304,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/phase11.js",
+      "category": "backend_route",
+      "bytes": 304,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/phase12.js",
+      "category": "backend_route",
+      "bytes": 304,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/phase8.js",
+      "category": "backend_route",
+      "bytes": 302,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/phase9.js",
+      "category": "backend_route",
+      "bytes": 302,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/platformConfigurationRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 353,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/predictiveAnalytics.js",
+      "category": "backend_route",
+      "bytes": 329,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/productCertifications.js",
+      "category": "backend_route",
+      "bytes": 333,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/publicDomainDataExtractionRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 365,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/qualityAssurance.js",
+      "category": "backend_route",
+      "bytes": 323,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/researchAndDevelopmentRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 356,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/resourceRouteFactory.js",
+      "category": "backend_route",
+      "bytes": 332,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/riskAssessment.js",
+      "category": "backend_route",
+      "bytes": 319,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/sapModuleArchitectureRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 299,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/sellerVerifications.js",
+      "category": "backend_route",
+      "bytes": 329,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/serverManagementRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 13362,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "console_logging",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Console logging found. Route production logs through a structured logger.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/soilHealth.js",
+      "category": "backend_route",
+      "bytes": 311,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/startupEnvironmentRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 347,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/supplyChainAnalytics.js",
+      "category": "backend_route",
+      "bytes": 332,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/supplyChainTracking.js",
+      "category": "backend_route",
+      "bytes": 330,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/systemAdministrationRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 351,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/tenantManagementRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 343,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/unifiedAIGateway.js",
+      "category": "backend_route",
+      "bytes": 325,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/unifiedLedgerRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 337,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/vendorRoutes_merged.js",
+      "category": "backend_route",
+      "bytes": 322,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/videoAnalytics.js",
+      "category": "backend_route",
+      "bytes": 319,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/vr.js",
+      "category": "backend_route",
+      "bytes": 294,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/warehouseManagement.js",
+      "category": "backend_route",
+      "bytes": 329,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/routes/yieldManagement.js",
+      "category": "backend_route",
+      "bytes": 321,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "placeholder_or_todo",
+        "route_auth_not_obvious",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "Placeholder or unfinished implementation marker found.",
+        "Route auth/permission enforcement is not obvious in this file.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/claude/aiCollaborationService.js",
+      "category": "backend_service",
+      "bytes": 11236,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/claude/enhancedLibraryKnowledgeService.js",
+      "category": "backend_service",
+      "bytes": 27063,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/commerce/arVrService.js",
+      "category": "backend_service",
+      "bytes": 19331,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/commerce/orderService.js",
+      "category": "backend_service",
+      "bytes": 26145,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/dual-use/gdprService.js",
+      "category": "backend_service",
+      "bytes": 7902,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/finance/revenueService.js",
+      "category": "backend_service",
+      "bytes": 4453,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/food/nutritionIntelligenceService.js",
+      "category": "backend_service",
+      "bytes": 22899,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/legacy/arVrService.js",
+      "category": "backend_service",
+      "bytes": 19307,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/legacy/costService.js",
+      "category": "backend_service",
+      "bytes": 3516,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/legacy/demandService.js",
+      "category": "backend_service",
+      "bytes": 6645,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/legacy/multilingualService.js",
+      "category": "backend_service",
+      "bytes": 27980,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/legacy/nutritionIntelligenceService.js",
+      "category": "backend_service",
+      "bytes": 45447,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/legacy/revenueService.js",
+      "category": "backend_service",
+      "bytes": 4630,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/legacy/weatherService.js",
+      "category": "backend_service",
+      "bytes": 20446,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/machineryVillageOpsService.js",
+      "category": "backend_service",
+      "bytes": 14906,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/platform/multilingualService.js",
+      "category": "backend_service",
+      "bytes": 27850,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/soilNutrientLandService.js",
+      "category": "backend_service",
+      "bytes": 15289,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/strategic/contractFarmingService.js",
+      "category": "backend_service",
+      "bytes": 27450,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/strategic/governmentSubsidyService.js",
+      "category": "backend_service",
+      "bytes": 36014,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/strategic/preSeasonPurchaseService.js",
+      "category": "backend_service",
+      "bytes": 26968,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/vendorProcurementService.js",
+      "category": "backend_service",
+      "bytes": 15676,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/services/waterIrrigationService.js",
+      "category": "backend_service",
+      "bytes": 17611,
+      "issue_count": 3,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/core/ai/aiAuditLogger.js",
+      "category": "backend_runtime",
+      "bytes": 9054,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/core/configRegistry.js",
+      "category": "backend_runtime",
+      "bytes": 14832,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/core/erpAgents.js",
+      "category": "backend_runtime",
+      "bytes": 47482,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/core/outcomeResolver.js",
+      "category": "backend_runtime",
+      "bytes": 11863,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/core/outcomeSink.js",
+      "category": "backend_runtime",
+      "bytes": 7466,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/core/productionService.js",
+      "category": "backend_runtime",
+      "bytes": 5816,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/core/withTransaction.js",
+      "category": "backend_runtime",
+      "bytes": 4014,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/database/execute-migrations.js",
+      "category": "backend_database",
+      "bytes": 6311,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger."
+      ]
+    },
+    {
+      "path": "backend/src/database/executeMigrationsComplete.js",
+      "category": "backend_database",
+      "bytes": 7080,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger."
+      ]
+    },
+    {
+      "path": "backend/src/database/migrate.js",
+      "category": "backend_database",
+      "bytes": 3339,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger."
+      ]
+    },
+    {
+      "path": "backend/src/database/migrations/enhanced_migrate.js",
+      "category": "backend_database",
+      "bytes": 18424,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "console_logging"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Console logging found. Route production logs through a structured logger."
+      ]
+    },
+    {
+      "path": "backend/src/database/seed.js",
+      "category": "backend_database",
+      "bytes": 2720,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "placeholder_or_todo"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "Placeholder or unfinished implementation marker found."
+      ]
+    },
+    {
+      "path": "backend/src/integrations/stripeIntegrationComplete.js",
+      "category": "backend_runtime",
+      "bytes": 11132,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/middleware/ownership.js",
+      "category": "backend_middleware",
+      "bytes": 5757,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M002/service.js",
+      "category": "backend_module",
+      "bytes": 7975,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M003/service.js",
+      "category": "backend_module",
+      "bytes": 8947,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M004/service.js",
+      "category": "backend_module",
+      "bytes": 5871,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M005/service.js",
+      "category": "backend_module",
+      "bytes": 6349,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M022/service.js",
+      "category": "backend_module",
+      "bytes": 21567,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M023/service.js",
+      "category": "backend_module",
+      "bytes": 27089,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M024/service.js",
+      "category": "backend_module",
+      "bytes": 10992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M025/service.js",
+      "category": "backend_module",
+      "bytes": 7853,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M026/service.js",
+      "category": "backend_module",
+      "bytes": 7865,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M027/service.js",
+      "category": "backend_module",
+      "bytes": 9058,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M028/service.js",
+      "category": "backend_module",
+      "bytes": 8393,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M031/service.js",
+      "category": "backend_module",
+      "bytes": 6991,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M032/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M033/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M034/service.js",
+      "category": "backend_module",
+      "bytes": 6989,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M035/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M036/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M037/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M038/service.js",
+      "category": "backend_module",
+      "bytes": 6989,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M039/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M040/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M041/service.js",
+      "category": "backend_module",
+      "bytes": 26178,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M041/villageCompletenessService.js",
+      "category": "backend_module",
+      "bytes": 3168,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M041/villageEconomyGeoService.js",
+      "category": "backend_module",
+      "bytes": 21802,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M041/villageERPService.js",
+      "category": "backend_module",
+      "bytes": 7855,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M041/villageExternalSupplyService.js",
+      "category": "backend_module",
+      "bytes": 11154,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M041/villageProductionPotentialService.js",
+      "category": "backend_module",
+      "bytes": 8711,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M041/villageProjectIntelligenceService.js",
+      "category": "backend_module",
+      "bytes": 16064,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M042/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M043/service.js",
+      "category": "backend_module",
+      "bytes": 6997,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M044/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M045/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M046/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M047/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M048/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M049/service.js",
+      "category": "backend_module",
+      "bytes": 6986,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M050/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M051/service.js",
+      "category": "backend_module",
+      "bytes": 6989,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M052/service.js",
+      "category": "backend_module",
+      "bytes": 6991,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M053/service.js",
+      "category": "backend_module",
+      "bytes": 6993,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M054/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M055/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M056/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M057/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M058/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M059/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M060/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M061/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M062/service.js",
+      "category": "backend_module",
+      "bytes": 6983,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M063/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M064/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M065/service.js",
+      "category": "backend_module",
+      "bytes": 6984,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M066/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M067/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M068/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M069/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M070/service.js",
+      "category": "backend_module",
+      "bytes": 6986,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M071/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M072/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M073/service.js",
+      "category": "backend_module",
+      "bytes": 6995,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M074/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M075/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M076/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M077/service.js",
+      "category": "backend_module",
+      "bytes": 6984,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M078/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M079/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M080/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M081/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M082/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M083/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M084/service.js",
+      "category": "backend_module",
+      "bytes": 6998,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M085/service.js",
+      "category": "backend_module",
+      "bytes": 6991,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M086/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M087/service.js",
+      "category": "backend_module",
+      "bytes": 6995,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M088/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M089/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M090/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M091/service.js",
+      "category": "backend_module",
+      "bytes": 6991,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M092/service.js",
+      "category": "backend_module",
+      "bytes": 6996,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M093/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M094/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M095/service.js",
+      "category": "backend_module",
+      "bytes": 6991,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M096/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M097/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M098/service.js",
+      "category": "backend_module",
+      "bytes": 6986,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M099/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M100/service.js",
+      "category": "backend_module",
+      "bytes": 6989,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M103/service.js",
+      "category": "backend_module",
+      "bytes": 6980,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M104/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M105/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M106/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M107/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M108/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M109/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M110/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M111/service.js",
+      "category": "backend_module",
+      "bytes": 6986,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M112/service.js",
+      "category": "backend_module",
+      "bytes": 6995,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M113/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M114/service.js",
+      "category": "backend_module",
+      "bytes": 6989,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M115/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M116/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M117/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M118/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M119/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M120/service.js",
+      "category": "backend_module",
+      "bytes": 6984,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M121/service.js",
+      "category": "backend_module",
+      "bytes": 6980,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M122/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M123/service.js",
+      "category": "backend_module",
+      "bytes": 6986,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M124/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M125/service.js",
+      "category": "backend_module",
+      "bytes": 6991,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M126/service.js",
+      "category": "backend_module",
+      "bytes": 6981,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M127/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M128/service.js",
+      "category": "backend_module",
+      "bytes": 6998,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M129/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M130/service.js",
+      "category": "backend_module",
+      "bytes": 6990,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M131/service.js",
+      "category": "backend_module",
+      "bytes": 6983,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M132/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M133/service.js",
+      "category": "backend_module",
+      "bytes": 6994,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M134/service.js",
+      "category": "backend_module",
+      "bytes": 6984,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M135/service.js",
+      "category": "backend_module",
+      "bytes": 6987,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M136/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M137/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M138/service.js",
+      "category": "backend_module",
+      "bytes": 6984,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M139/service.js",
+      "category": "backend_module",
+      "bytes": 6982,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M140/service.js",
+      "category": "backend_module",
+      "bytes": 6989,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M141/service.js",
+      "category": "backend_module",
+      "bytes": 6986,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M142/service.js",
+      "category": "backend_module",
+      "bytes": 6989,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M143/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M144/service.js",
+      "category": "backend_module",
+      "bytes": 6988,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M145/service.js",
+      "category": "backend_module",
+      "bytes": 6985,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M146/service.js",
+      "category": "backend_module",
+      "bytes": 6986,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M147/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M148/service.js",
+      "category": "backend_module",
+      "bytes": 6984,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M149/service.js",
+      "category": "backend_module",
+      "bytes": 6995,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M150/service.js",
+      "category": "backend_module",
+      "bytes": 6997,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    },
+    {
+      "path": "backend/src/modules/M152/service.js",
+      "category": "backend_module",
+      "bytes": 6992,
+      "issue_count": 2,
+      "highest_severity": "high",
+      "issue_codes": [
+        "sql_interpolation_risk",
+        "missing_adjacent_test"
+      ],
+      "issue_messages": [
+        "SQL template interpolation found. Use parameterized queries.",
+        "No adjacent test file found for this backend unit."
+      ]
+    }
+  ]
+}

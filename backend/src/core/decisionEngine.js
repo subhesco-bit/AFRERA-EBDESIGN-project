@@ -26,7 +26,6 @@
  */
 
 const { signalBus, SIGNAL, SEVERITY } = require('./signalBus');
-const stats = require('../utils/statistics');
 const { logger } = require('../utils/logger');
 
 const ACTION = Object.freeze({

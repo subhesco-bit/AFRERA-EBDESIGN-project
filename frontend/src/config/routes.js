@@ -183,6 +183,9 @@ const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'));
 const MarketingCenter = lazy(() => import('../pages/MarketingCenter'));
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'));
 const AIProductStudioPage = lazy(() => import('../pages/AIProductStudioPage'));
+const ValueChainStudioPage = lazy(() => import('../pages/ValueChainStudioPage'));
+const ValueChainControlCenterPage = lazy(() => import('../pages/ValueChainControlCenterPage'));
+const AdvancedMedicalCodingPage = lazy(() => import('../pages/AdvancedMedicalCodingPage'));
 const PublicDataExtractorPage = lazy(() => import('../pages/PublicDataExtractorPage'));
 
 // Additional management pages
@@ -1257,6 +1260,14 @@ export const dashboardRoutes = [
  */
 export const managementRoutes = [
   {
+    path: '/medical-coding',
+    component: AdvancedMedicalCodingPage,
+    title: 'Clinical Coding Workspace - AFRERA',
+    description: 'Human-reviewed AI assistance for clinical terminology and medical coding references',
+    keywords: 'medical coding, clinical documentation, ICD-10, CPT, SNOMED, LOINC',
+    transition: 'fade',
+  },
+  {
     path: '/farmer-profile',
     component: FarmerProfilePage,
     title: 'Farmer Profile - AFRERA',
@@ -1722,6 +1733,22 @@ export const managementRoutes = [
     title: 'AI Product Studio - AFRERA',
     description: 'Image generation, cartoon storytelling, nutrient diagnosis, and natural therapist guidance for product marketing and wellness',
     keywords: 'ai, product image, cartoon generator, nutrient diagnosis, wellness, therapist',
+    transition: 'fade',
+  },
+  {
+    path: '/value-chain-studio',
+    component: ValueChainStudioPage,
+    title: 'Value-Chain Studio - AFRERA',
+    description: 'Full farmer/product lifecycle plan: pricing, cold-chain, insurance, subsidies, compliance, engineering, shared infrastructure, and equipment rental, all provenance-tagged',
+    keywords: 'value chain, pricing, cold chain, insurance, subsidy, compliance, engineering, shared infrastructure, equipment rental',
+    transition: 'fade',
+  },
+  {
+    path: '/value-chain-control',
+    component: ValueChainControlCenterPage,
+    title: 'Value-Chain Control Center - AFRERA',
+    description: 'Evidence-led orchestration for product, logistics, finance, insurance, subsidy and engineering handoffs',
+    keywords: 'value chain, control plane, evidence, gates, pricing, mass balance',
     transition: 'fade',
   },
   {

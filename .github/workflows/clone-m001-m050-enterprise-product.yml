@@ -1,0 +1,59 @@
+name: Clone M001-M050 Enterprise Product Gate
+on:
+  push:
+    branches: [chatgpt-clone/main-reconciliation-phase-1]
+  pull_request:
+    branches: [chatgpt-clone/highest-standard-enhancement]
+jobs:
+  enterprise-product:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ebdesign_user
+          POSTGRES_PASSWORD: ebdesign_ci_password
+          POSTGRES_DB: ebdesign
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U ebdesign_user -d ebdesign"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      NODE_ENV: test
+      JWT_SECRET: m001-m050-ci-only-jwt-secret-not-for-production-2026
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: ebdesign_user
+      DB_PASSWORD: ebdesign_ci_password
+      DB_NAME: ebdesign
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Backend install
+        run: npm ci
+      - name: M001-M050 clean-database migration and schema verification
+        run: npm run migrate:m001-m050
+      - name: Batch release reachability audit
+        run: npm run audit:m001-m050
+      - name: Enterprise product and real workflow tests
+        run: npx jest tests/m001-m050-enterprise-product.test.js tests/m001-m050-highest-standard.test.js tests/m001-m050-workflow-orchestration.test.js tests/m001-m050-db-workflows.e2e.test.js --runInBand
+      - name: Verify exactly 50 enterprise specifications
+        run: node -e "const s=require('./src/services/m001m050EnterpriseProductService');if(s.portfolio().length!==50)process.exit(1)"
+      - name: Backend lint
+        run: npm run lint
+      - name: Frontend install
+        working-directory: frontend
+        run: npm ci
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build

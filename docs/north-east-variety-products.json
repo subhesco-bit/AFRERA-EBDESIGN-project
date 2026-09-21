@@ -1,0 +1,3506 @@
+{
+  "source": "C:\\Users\\DIYA GOEL\\Desktop\\ne\\New folder\\North East India Variety Directory.docx",
+  "paragraph_count": 1012,
+  "table_count": 7,
+  "product_count": 142,
+  "products": [
+    {
+      "id": "nei-citrus-khasi-mandarin-orange",
+      "name": "Khasi Mandarin Orange",
+      "crop": "Citrus",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High sweetness, thin smooth rind, and rich flavour; grown in high-rainfall zones 1 . | Fresh consumption, premium juice extraction, and essential oil processing 20 .",
+      "estimated_price_inr": 420,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 1,
+      "attributes": {
+        "category": "Citrus",
+        "product_name": "Khasi Mandarin Orange",
+        "primary_state_s": "Meghalaya",
+        "gi_status_application_no": "Registered (No. 465) 19",
+        "specialty_usp_biochemical_profile": "High sweetness, thin smooth rind, and rich flavour; grown in high-rainfall zones 1 .",
+        "commercial_value_added_potential": "Fresh consumption, premium juice extraction, and essential oil processing 20 ."
+      }
+    },
+    {
+      "id": "nei-citrus-assam-mandarin",
+      "name": "Assam Mandarin",
+      "crop": "Citrus",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High aroma, intense volatile rind oils, and balanced acidity 2 . | Bulk commercial juice concentrate and export markets 11 .",
+      "estimated_price_inr": 338,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 2,
+      "attributes": {
+        "category": "Citrus",
+        "product_name": "Assam Mandarin",
+        "primary_state_s": "Assam",
+        "gi_status_application_no": "Non-GI (Market Standard)",
+        "specialty_usp_biochemical_profile": "High aroma, intense volatile rind oils, and balanced acidity 2 .",
+        "commercial_value_added_potential": "Bulk commercial juice concentrate and export markets 11 ."
+      }
+    },
+    {
+      "id": "nei-citrus-kachai-lemon",
+      "name": "Kachai Lemon",
+      "crop": "Citrus",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Locally known as Kachai Champra ; highest concentration of ascorbic acid globally 20 . | Fresh culinary use, pickling, and freeze-dried juice powder processing 20 .",
+      "estimated_price_inr": 418,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 3,
+      "attributes": {
+        "category": "Citrus",
+        "product_name": "Kachai Lemon",
+        "primary_state_s": "Manipur",
+        "gi_status_application_no": "Registered (No. 466) 20",
+        "specialty_usp_biochemical_profile": "Locally known as Kachai Champra ; highest concentration of ascorbic acid globally 20 .",
+        "commercial_value_added_potential": "Fresh culinary use, pickling, and freeze-dried juice powder processing 20 ."
+      }
+    },
+    {
+      "id": "nei-citrus-naga-sweet-orange",
+      "name": "Naga Sweet Orange",
+      "crop": "Citrus",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Low acidity, high sweetness, and organically cultivated in hilly terrains 21 . | Fresh retail fruit and premium organic segments 22 .",
+      "estimated_price_inr": 356,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 4,
+      "attributes": {
+        "category": "Citrus",
+        "product_name": "Naga Sweet Orange",
+        "primary_state_s": "Nagaland",
+        "gi_status_application_no": "Non-GI (Market Standard)",
+        "specialty_usp_biochemical_profile": "Low acidity, high sweetness, and organically cultivated in hilly terrains 21 .",
+        "commercial_value_added_potential": "Fresh retail fruit and premium organic segments 22 ."
+      }
+    },
+    {
+      "id": "nei-citrus-galgal-citrus-pseudolimon",
+      "name": "Galgal (Citrus pseudolimon)",
+      "crop": "Citrus",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Large, highly acidic fruits rich in pectin and medicinal citric acid 2 . | Heavy pickling, citrus vinegar, and industrial citric acid extraction.",
+      "estimated_price_inr": 380,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 5,
+      "attributes": {
+        "category": "Citrus",
+        "product_name": "Galgal (Citrus pseudolimon)",
+        "primary_state_s": "Arunachal Pradesh",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Large, highly acidic fruits rich in pectin and medicinal citric acid 2 .",
+        "commercial_value_added_potential": "Heavy pickling, citrus vinegar, and industrial citric acid extraction."
+      }
+    },
+    {
+      "id": "nei-citrus-pomelo-robab-tenga",
+      "name": "Pomelo (Robab Tenga)",
+      "crop": "Citrus",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Extremely large fruit with pink or white segment sacs; high in potassium, copper, and vitamin C 23 . | Fresh salads, commercial juice blending, and high-pectin marmalades 23 .",
+      "estimated_price_inr": 440,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 6,
+      "attributes": {
+        "category": "Citrus",
+        "product_name": "Pomelo (Robab Tenga)",
+        "primary_state_s": "Mizoram, Assam",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Extremely large fruit with pink or white segment sacs; high in potassium, copper, and vitamin C 23 .",
+        "commercial_value_added_potential": "Fresh salads, commercial juice blending, and high-pectin marmalades 23 ."
+      }
+    },
+    {
+      "id": "nei-citrus-kaffir-lime",
+      "name": "Kaffir Lime",
+      "crop": "Citrus",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Highly aromatic, wrinkled green rind and bi-lobed leaves rich in citronellal. | Essential oil extraction and fresh culinary use in Southeast Asian cuisines.",
+      "estimated_price_inr": 402,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 7,
+      "attributes": {
+        "category": "Citrus",
+        "product_name": "Kaffir Lime",
+        "primary_state_s": "Mizoram",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Highly aromatic, wrinkled green rind and bi-lobed leaves rich in citronellal.",
+        "commercial_value_added_potential": "Essential oil extraction and fresh culinary use in Southeast Asian cuisines."
+      }
+    },
+    {
+      "id": "nei-citrus-citron",
+      "name": "Citron",
+      "crop": "Citrus",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Thick, fleshy rind; rich in volatile essential oils and medicinal properties 2 . | Candied peel processing, medicinal extracts, and essential oils.",
+      "estimated_price_inr": 384,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 8,
+      "attributes": {
+        "category": "Citrus",
+        "product_name": "Citron",
+        "primary_state_s": "Meghalaya",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Thick, fleshy rind; rich in volatile essential oils and medicinal properties 2 .",
+        "commercial_value_added_potential": "Candied peel processing, medicinal extracts, and essential oils."
+      }
+    },
+    {
+      "id": "nei-exotic-kiwi",
+      "name": "Kiwi",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High ascorbic acid (vitamin C) and actinidin enzyme content; organic mountain crop. | Premium fresh retail, dehydrated kiwi slices, and fruit pulp.",
+      "estimated_price_inr": 384,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 9,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Kiwi",
+        "primary_state_s": "Arunachal Pradesh, Sikkim",
+        "gi_status_application_no": "Non-GI (APEDA Target) 25",
+        "specialty_usp_biochemical_profile": "High ascorbic acid (vitamin C) and actinidin enzyme content; organic mountain crop.",
+        "commercial_value_added_potential": "Premium fresh retail, dehydrated kiwi slices, and fruit pulp."
+      }
+    },
+    {
+      "id": "nei-exotic-avocado",
+      "name": "Avocado",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Rich in monounsaturated fatty acids (oleic acid) and vitamin E; buttery texture. | Premium fresh retail and cosmetic-grade cold-pressed oil extraction.",
+      "estimated_price_inr": 392,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 10,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Avocado",
+        "primary_state_s": "Meghalaya, Sikkim",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Rich in monounsaturated fatty acids (oleic acid) and vitamin E; buttery texture.",
+        "commercial_value_added_potential": "Premium fresh retail and cosmetic-grade cold-pressed oil extraction."
+      }
+    },
+    {
+      "id": "nei-exotic-dragon-fruit",
+      "name": "Dragon Fruit",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High antioxidant content (betalains); emerging climate-resilient crop. | Fresh wellness retail and natural organic food colouring.",
+      "estimated_price_inr": 350,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 11,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Dragon Fruit",
+        "primary_state_s": "Sikkim",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "High antioxidant content (betalains); emerging climate-resilient crop.",
+        "commercial_value_added_potential": "Fresh wellness retail and natural organic food colouring."
+      }
+    },
+    {
+      "id": "nei-exotic-passion-fruit",
+      "name": "Passion Fruit",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Intense tropical aroma, high acidity, and rich yellow pulp; processing grade 26 . | High-value juice concentrate, squashes, and RTS beverages 26 .",
+      "estimated_price_inr": 382,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 12,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Passion Fruit",
+        "primary_state_s": "Mizoram, Nagaland",
+        "gi_status_application_no": "Non-GI (Taxed at 5% GST) 26",
+        "specialty_usp_biochemical_profile": "Intense tropical aroma, high acidity, and rich yellow pulp; processing grade 26 .",
+        "commercial_value_added_potential": "High-value juice concentrate, squashes, and RTS beverages 26 ."
+      }
+    },
+    {
+      "id": "nei-exotic-persimmon",
+      "name": "Persimmon",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Rare high-altitude orange fruit; rich in tannins and soluble dietary fibres. | Premium fresh dessert fruit and dehydrated sweet slices.",
+      "estimated_price_inr": 360,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 13,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Persimmon",
+        "primary_state_s": "Arunachal Pradesh",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Rare high-altitude orange fruit; rich in tannins and soluble dietary fibres.",
+        "commercial_value_added_potential": "Premium fresh dessert fruit and dehydrated sweet slices."
+      }
+    },
+    {
+      "id": "nei-exotic-plum",
+      "name": "Plum",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Temperate high-altitude stone fruit; rich in anthocyanins and organic acids. | Fresh mountain retail, premium jams, and organic fruit wines.",
+      "estimated_price_inr": 370,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 14,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Plum",
+        "primary_state_s": "Sikkim",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Temperate high-altitude stone fruit; rich in anthocyanins and organic acids.",
+        "commercial_value_added_potential": "Fresh mountain retail, premium jams, and organic fruit wines."
+      }
+    },
+    {
+      "id": "nei-exotic-peach",
+      "name": "Peach",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Soft-fleshed mountain crop; high water content and delicate aroma. | Premium fresh retail and processed canned halves in syrup.",
+      "estimated_price_inr": 344,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 15,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Peach",
+        "primary_state_s": "Arunachal Pradesh",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Soft-fleshed mountain crop; high water content and delicate aroma.",
+        "commercial_value_added_potential": "Premium fresh retail and processed canned halves in syrup."
+      }
+    },
+    {
+      "id": "nei-exotic-pear",
+      "name": "Pear",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Crispy temperate crop; high stone-cell density and high dietary fibre. | Fresh retail, dehydrated fruit leather, and perry (pear cider).",
+      "estimated_price_inr": 362,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 16,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Pear",
+        "primary_state_s": "Arunachal Pradesh",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Crispy temperate crop; high stone-cell density and high dietary fibre.",
+        "commercial_value_added_potential": "Fresh retail, dehydrated fruit leather, and perry (pear cider)."
+      }
+    },
+    {
+      "id": "nei-exotic-apricot",
+      "name": "Apricot",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High-altitude dry fruit potential; rich in beta-carotene and iron 27 . | Dehydrated whole apricots and cosmetic apricot kernel oil.",
+      "estimated_price_inr": 352,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 17,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Apricot",
+        "primary_state_s": "Sikkim",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "High-altitude dry fruit potential; rich in beta-carotene and iron 27 .",
+        "commercial_value_added_potential": "Dehydrated whole apricots and cosmetic apricot kernel oil."
+      }
+    },
+    {
+      "id": "nei-exotic-cherry",
+      "name": "Cherry",
+      "crop": "Exotic",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High-altitude stone fruit; bright red pigmentation and low shelf life. | Premium fresh retail and gourmet confectioneries.",
+      "estimated_price_inr": 334,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 18,
+      "attributes": {
+        "category": "Exotic",
+        "product_name": "Cherry",
+        "primary_state_s": "Sikkim",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "High-altitude stone fruit; bright red pigmentation and low shelf life.",
+        "commercial_value_added_potential": "Premium fresh retail and gourmet confectioneries."
+      }
+    },
+    {
+      "id": "nei-tropical-queen-pineapple",
+      "name": "Queen Pineapple",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Deep yellow color, extremely sweet taste, low fiber, and low acidity 29 . | Fresh luxury export, vacuum-dried slices, and premium canned rings 14 .",
+      "estimated_price_inr": 384,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 19,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Queen Pineapple",
+        "primary_state_s": "Tripura",
+        "gi_status_application_no": "Registered (No. 436) 28",
+        "specialty_usp_biochemical_profile": "Deep yellow color, extremely sweet taste, low fiber, and low acidity 29 .",
+        "commercial_value_added_potential": "Fresh luxury export, vacuum-dried slices, and premium canned rings 14 ."
+      }
+    },
+    {
+      "id": "nei-tropical-kew-pineapple",
+      "name": "Kew Pineapple",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Large, juicy fruit; ideal processing grade with high juice recovery. | Commercial juice concentrate, squashes, and canned pieces.",
+      "estimated_price_inr": 348,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 20,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Kew Pineapple",
+        "primary_state_s": "Assam",
+        "gi_status_application_no": "Non-GI (Market Standard)",
+        "specialty_usp_biochemical_profile": "Large, juicy fruit; ideal processing grade with high juice recovery.",
+        "commercial_value_added_potential": "Commercial juice concentrate, squashes, and canned pieces."
+      }
+    },
+    {
+      "id": "nei-tropical-banana",
+      "name": "Banana",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Rich diversity including red, green, and culinary cooking varieties 2 . | Fresh local markets, banana chips, and organic starch processing.",
+      "estimated_price_inr": 368,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 21,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Banana",
+        "primary_state_s": "All States",
+        "gi_status_application_no": "Non-GI (Regional Varieties)",
+        "specialty_usp_biochemical_profile": "Rich diversity including red, green, and culinary cooking varieties 2 .",
+        "commercial_value_added_potential": "Fresh local markets, banana chips, and organic starch processing."
+      }
+    },
+    {
+      "id": "nei-tropical-papaya",
+      "name": "Papaya",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High yield; rich in papain enzyme and dietary fiber. | Green papaya latex extraction, candy ( tutti-frutti ), and pulp.",
+      "estimated_price_inr": 328,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 22,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Papaya",
+        "primary_state_s": "All States",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "High yield; rich in papain enzyme and dietary fiber.",
+        "commercial_value_added_potential": "Green papaya latex extraction, candy ( tutti-frutti ), and pulp."
+      }
+    },
+    {
+      "id": "nei-tropical-mango",
+      "name": "Mango",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Local high-aroma varieties suited for humid subtropical zones 2 . | Fresh local retail, green mango pickling, and pulp concentrate.",
+      "estimated_price_inr": 352,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 23,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Mango",
+        "primary_state_s": "Assam, Tripura",
+        "gi_status_application_no": "Non-GI (Diverse Landraces)",
+        "specialty_usp_biochemical_profile": "Local high-aroma varieties suited for humid subtropical zones 2 .",
+        "commercial_value_added_potential": "Fresh local retail, green mango pickling, and pulp concentrate."
+      }
+    },
+    {
+      "id": "nei-tropical-jackfruit",
+      "name": "Jackfruit",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Massive size; high starch and protein content 2 . | Green jackfruit meat-substitute chunks, chips, and seed flour.",
+      "estimated_price_inr": 318,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 24,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Jackfruit",
+        "primary_state_s": "Assam, Tripura",
+        "gi_status_application_no": "Non-GI (Unsuccessful App) 1",
+        "specialty_usp_biochemical_profile": "Massive size; high starch and protein content 2 .",
+        "commercial_value_added_potential": "Green jackfruit meat-substitute chunks, chips, and seed flour."
+      }
+    },
+    {
+      "id": "nei-tropical-guava",
+      "name": "Guava",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High vitamin C and pectin content; pink and white pulp varieties. | Fresh retail, high-viscosity guava jelly, and RTS beverages.",
+      "estimated_price_inr": 346,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 25,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Guava",
+        "primary_state_s": "Assam",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "High vitamin C and pectin content; pink and white pulp varieties.",
+        "commercial_value_added_potential": "Fresh retail, high-viscosity guava jelly, and RTS beverages."
+      }
+    },
+    {
+      "id": "nei-tropical-litchi",
+      "name": "Litchi",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Extremely sweet, juicy pulp with a deep red rind and pleasant aroma 33 . | Premium fresh retail, canned pulp, and exotic export markets 34 .",
+      "estimated_price_inr": 370,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 26,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Litchi",
+        "primary_state_s": "Tripura, Assam",
+        "gi_status_application_no": "Registered (Tezpur Litchi) 32",
+        "specialty_usp_biochemical_profile": "Extremely sweet, juicy pulp with a deep red rind and pleasant aroma 33 .",
+        "commercial_value_added_potential": "Premium fresh retail, canned pulp, and exotic export markets 34 ."
+      }
+    },
+    {
+      "id": "nei-tropical-custard-apple",
+      "name": "Custard Apple",
+      "crop": "Tropical",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Sweet, creamy pulp with high caloric density and calcium levels. | Fresh local markets and premium ice-cream pulp base.",
+      "estimated_price_inr": 328,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 27,
+      "attributes": {
+        "category": "Tropical",
+        "product_name": "Custard Apple",
+        "primary_state_s": "Meghalaya",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Sweet, creamy pulp with high caloric density and calcium levels.",
+        "commercial_value_added_potential": "Fresh local markets and premium ice-cream pulp base."
+      }
+    },
+    {
+      "id": "nei-wild-sohiong-khasi-cherry",
+      "name": "Sohiong (Khasi Cherry)",
+      "crop": "Wild",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Dark blackish-purple berry ( Prunus nepalensis ); rich in anthocyanins 3 . | Premium functional beverages, kombucha, and organic wines 3 .",
+      "estimated_price_inr": 366,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 28,
+      "attributes": {
+        "category": "Wild",
+        "product_name": "Sohiong (Khasi Cherry)",
+        "primary_state_s": "Meghalaya",
+        "gi_status_application_no": "Pending 16",
+        "specialty_usp_biochemical_profile": "Dark blackish-purple berry ( Prunus nepalensis ); rich in anthocyanins 3 .",
+        "commercial_value_added_potential": "Premium functional beverages, kombucha, and organic wines 3 ."
+      }
+    },
+    {
+      "id": "nei-wild-sohshang",
+      "name": "Sohshang",
+      "crop": "Wild",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Oval/oblong pinkish-red berry ( Elaeagnus latifolia ); highly acidic 35 . | Gourmet ethnic pickling, jams, and home-processed preserves 35 .",
+      "estimated_price_inr": 370,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 29,
+      "attributes": {
+        "category": "Wild",
+        "product_name": "Sohshang",
+        "primary_state_s": "Meghalaya",
+        "gi_status_application_no": "Pending 16",
+        "specialty_usp_biochemical_profile": "Oval/oblong pinkish-red berry ( Elaeagnus latifolia ); highly acidic 35 .",
+        "commercial_value_added_potential": "Gourmet ethnic pickling, jams, and home-processed preserves 35 ."
+      }
+    },
+    {
+      "id": "nei-wild-wild-apple",
+      "name": "Wild Apple",
+      "crop": "Wild",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High-altitude, sour forest fruit; high pectin and polyphenol content. | Dried wild apple slices, herbal teas, and traditional medicines 4 .",
+      "estimated_price_inr": 368,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 30,
+      "attributes": {
+        "category": "Wild",
+        "product_name": "Wild Apple",
+        "primary_state_s": "Arunachal Pradesh",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "High-altitude, sour forest fruit; high pectin and polyphenol content.",
+        "commercial_value_added_potential": "Dried wild apple slices, herbal teas, and traditional medicines 4 ."
+      }
+    },
+    {
+      "id": "nei-wild-wild-pear",
+      "name": "Wild Pear",
+      "crop": "Wild",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Small, gritty green fruits; astringent and highly fibrous landrace. | Traditional medicine, vinegar production, and wild cider brewing.",
+      "estimated_price_inr": 360,
+      "unit": "kg/seedling/bundle",
+      "source_table": 1,
+      "source_row": 31,
+      "attributes": {
+        "category": "Wild",
+        "product_name": "Wild Pear",
+        "primary_state_s": "Arunachal Pradesh",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Small, gritty green fruits; astringent and highly fibrous landrace.",
+        "commercial_value_added_potential": "Traditional medicine, vinegar production, and wild cider brewing."
+      }
+    },
+    {
+      "id": "nei-leafy-lai-patta-leafy-mustard",
+      "name": "Lai Patta (Leafy Mustard)",
+      "crop": "Leafy",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 1,
+      "attributes": {
+        "category": "Leafy",
+        "product_name": "Lai Patta (Leafy Mustard)",
+        "primary_state_s": "Assam, Sikkim, AP",
+        "key_variety_taxonomic_detail": "JorMLG-1 & JorMLP-2 36",
+        "agronomic_nutritional_usp": "Brassica juncea var. rugosa ; rich in ascorbic acid, calcium, and iron 36 .",
+        "processing_value_added_potential": "Dehydrated greens, traditional saag , and fermented gundruk 37 ."
+      }
+    },
+    {
+      "id": "nei-leafy-mustard-greens",
+      "name": "Mustard Greens",
+      "crop": "Leafy",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 2,
+      "attributes": {
+        "category": "Leafy",
+        "product_name": "Mustard Greens",
+        "primary_state_s": "Nagaland, Manipur",
+        "key_variety_taxonomic_detail": "Hangam 40",
+        "agronomic_nutritional_usp": "High chlorophyll and glucosinolate content; peppery flavour 37 .",
+        "processing_value_added_potential": "Pressed mustard seed oil, fresh local greens, and dried condiments 37 ."
+      }
+    },
+    {
+      "id": "nei-leafy-perilla-leaves",
+      "name": "Perilla Leaves",
+      "crop": "Leafy",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 3,
+      "attributes": {
+        "category": "Leafy",
+        "product_name": "Perilla Leaves",
+        "primary_state_s": "Mizoram, Nagaland",
+        "key_variety_taxonomic_detail": "Mentha-like landraces",
+        "agronomic_nutritional_usp": "Exceptionally high in rosmarinic acid, omega-3 fatty acids, and aromatic oils.",
+        "processing_value_added_potential": "Fresh culinary garnishes, herbal extracts, and aromatic teas."
+      }
+    },
+    {
+      "id": "nei-leafy-tree-bean-leaves",
+      "name": "Tree Bean Leaves",
+      "crop": "Leafy",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 4,
+      "attributes": {
+        "category": "Leafy",
+        "product_name": "Tree Bean Leaves",
+        "primary_state_s": "Manipur, Nagaland",
+        "key_variety_taxonomic_detail": "Yongchak Leaves",
+        "agronomic_nutritional_usp": "Rich in sulfur compounds and amino acids; traditional tribal vegetable.",
+        "processing_value_added_potential": "Fresh local salads and traditional medicinal decoctions 41 ."
+      }
+    },
+    {
+      "id": "nei-leafy-roselle-leaves",
+      "name": "Roselle Leaves",
+      "crop": "Leafy",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 5,
+      "attributes": {
+        "category": "Leafy",
+        "product_name": "Roselle Leaves",
+        "primary_state_s": "Assam, Meghalaya",
+        "key_variety_taxonomic_detail": "JorRS 10-02 42",
+        "agronomic_nutritional_usp": "Hibiscus sabdariffa ; sharp sour flavor due to high citric and malic acids 42 .",
+        "processing_value_added_potential": "Sour curry bases, herbal infusions, and natural pink food colourants."
+      }
+    },
+    {
+      "id": "nei-leafy-water-spinach",
+      "name": "Water Spinach",
+      "crop": "Leafy",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 6,
+      "attributes": {
+        "category": "Leafy",
+        "product_name": "Water Spinach",
+        "primary_state_s": "Assam",
+        "key_variety_taxonomic_detail": "Kalmou Saag",
+        "agronomic_nutritional_usp": "Fast-growing aquatic green; exceptionally high in iron and vitamin A.",
+        "processing_value_added_potential": "Fresh local table greens and animal fodder."
+      }
+    },
+    {
+      "id": "nei-leafy-amaranthus",
+      "name": "Amaranthus",
+      "crop": "Leafy",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 7,
+      "attributes": {
+        "category": "Leafy",
+        "product_name": "Amaranthus",
+        "primary_state_s": "All States",
+        "key_variety_taxonomic_detail": "Jorhat Promising Lines 42",
+        "agronomic_nutritional_usp": "High-iron, fast-growing leafy amaranth; rich in calcium and amino acids 42 .",
+        "processing_value_added_potential": "Fresh local retail, green smoothies, and dehydrated leaf powders."
+      }
+    },
+    {
+      "id": "nei-leafy-colocasia-leaves",
+      "name": "Colocasia Leaves",
+      "crop": "Leafy",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 8,
+      "attributes": {
+        "category": "Leafy",
+        "product_name": "Colocasia Leaves",
+        "primary_state_s": "Nagaland, Manipur",
+        "key_variety_taxonomic_detail": "Nuo / Taro leaves 43",
+        "agronomic_nutritional_usp": "High in dietary fibre and vitamins; base for traditional fermentations 43 .",
+        "processing_value_added_potential": "Processed into smoked Anishi patties and traditional leaf wraps 46 ."
+      }
+    },
+    {
+      "id": "nei-root-yam",
+      "name": "Yam",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 9,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Yam",
+        "primary_state_s": "Nagaland, Mizoram",
+        "key_variety_taxonomic_detail": "High-altitude landraces",
+        "agronomic_nutritional_usp": "Heavily cultivated in Jhum plots; high starch density and calorie source 45 .",
+        "processing_value_added_potential": "Raw tuber sales, dehydrated yam flour, and traditional baking base."
+      }
+    },
+    {
+      "id": "nei-root-elephant-foot-yam",
+      "name": "Elephant Foot Yam",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 10,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Elephant Foot Yam",
+        "primary_state_s": "Assam",
+        "key_variety_taxonomic_detail": "Amorphophallus paeoniifolius",
+        "agronomic_nutritional_usp": "Highly productive; containing medicinal alkaloids and high-quality starch.",
+        "processing_value_added_potential": "Yam starch extraction, commercial chips, and pickling."
+      }
+    },
+    {
+      "id": "nei-root-sweet-potato",
+      "name": "Sweet Potato",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 11,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Sweet Potato",
+        "primary_state_s": "Meghalaya, Assam",
+        "key_variety_taxonomic_detail": "Orange & Purple cultivars",
+        "agronomic_nutritional_usp": "High beta-carotene and anthocyanin levels; highly sweet and non-fibrous.",
+        "processing_value_added_potential": "Dehydrated sweet potato flour, organic vacuum chips, and starch."
+      }
+    },
+    {
+      "id": "nei-root-tapioca-cassava",
+      "name": "Tapioca (Cassava)",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 12,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Tapioca (Cassava)",
+        "primary_state_s": "Meghalaya, AP",
+        "key_variety_taxonomic_detail": "Jhum landraces 48",
+        "agronomic_nutritional_usp": "High-starch drought-tolerant root; staple security crop 48 .",
+        "processing_value_added_potential": "Industrial sago tapioca pearls, premium starch, and alcohol brewing."
+      }
+    },
+    {
+      "id": "nei-root-taro",
+      "name": "Taro",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 13,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Taro",
+        "primary_state_s": "All States",
+        "key_variety_taxonomic_detail": "Colocasia esculenta tubers",
+        "agronomic_nutritional_usp": "Dense, sticky tubers containing mucilage and high starch 44 .",
+        "processing_value_added_potential": "Fresh retail, taro chips, and thickeners for gourmet soup bases."
+      }
+    },
+    {
+      "id": "nei-root-radish",
+      "name": "Radish",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 14,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Radish",
+        "primary_state_s": "Sikkim",
+        "key_variety_taxonomic_detail": "Red & White winter varieties",
+        "agronomic_nutritional_usp": "Long, crisp roots; high water content and distinct peppery heat.",
+        "processing_value_added_potential": "Fresh retail, sun-dried radish slices, and fermented sinki 40 ."
+      }
+    },
+    {
+      "id": "nei-root-carrot",
+      "name": "Carrot",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 15,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Carrot",
+        "primary_state_s": "Sikkim, AP",
+        "key_variety_taxonomic_detail": "Orange organic landraces",
+        "agronomic_nutritional_usp": "Sweet, crisp root; high beta-carotene and soluble sugars.",
+        "processing_value_added_potential": "Fresh organic retail, canned carrot juice, and baby food pulp."
+      }
+    },
+    {
+      "id": "nei-root-beetroot",
+      "name": "Beetroot",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 16,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Beetroot",
+        "primary_state_s": "Sikkim",
+        "key_variety_taxonomic_detail": "Deep purple landraces",
+        "agronomic_nutritional_usp": "Rich in betalains and nitrates; grown in temperate soils.",
+        "processing_value_added_potential": "Fresh retail, natural beetroot powder, and wellness juices."
+      }
+    },
+    {
+      "id": "nei-root-turnip",
+      "name": "Turnip",
+      "crop": "Root",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 17,
+      "attributes": {
+        "category": "Root",
+        "product_name": "Turnip",
+        "primary_state_s": "Sikkim",
+        "key_variety_taxonomic_detail": "Himalayan white turnip",
+        "agronomic_nutritional_usp": "Cold-hardy root; high in vitamin C and dietary potassium.",
+        "processing_value_added_potential": "Winter vegetable retail, pickling, and dehydrated animal feed."
+      }
+    },
+    {
+      "id": "nei-cruciferous-cabbage",
+      "name": "Cabbage",
+      "crop": "Cruciferous",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 18,
+      "attributes": {
+        "category": "Cruciferous",
+        "product_name": "Cabbage",
+        "primary_state_s": "All States",
+        "key_variety_taxonomic_detail": "Winter heavy-drum types",
+        "agronomic_nutritional_usp": "Highly productive; sweet, tightly packed heads with high water retention.",
+        "processing_value_added_potential": "Fresh bulk markets, sauerkraut processing, and dehydrated shreds."
+      }
+    },
+    {
+      "id": "nei-cruciferous-cauliflower",
+      "name": "Cauliflower",
+      "crop": "Cruciferous",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 19,
+      "attributes": {
+        "category": "Cruciferous",
+        "product_name": "Cauliflower",
+        "primary_state_s": "Assam",
+        "key_variety_taxonomic_detail": "Early & Late white varieties",
+        "agronomic_nutritional_usp": "Solid curds; high commercial volume and premium visual appeal.",
+        "processing_value_added_potential": "Fresh bulk retail, mixed vegetable pickling, and frozen florets."
+      }
+    },
+    {
+      "id": "nei-cruciferous-broccoli",
+      "name": "Broccoli",
+      "crop": "Cruciferous",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 20,
+      "attributes": {
+        "category": "Cruciferous",
+        "product_name": "Broccoli",
+        "primary_state_s": "Sikkim, Meghalaya",
+        "key_variety_taxonomic_detail": "Premium organic green",
+        "agronomic_nutritional_usp": "Extremely high in glucoraphanin; premium cold-climate vegetable.",
+        "processing_value_added_potential": "High-value fresh retail, dehydrated broccoli powder, and frozen cuts."
+      }
+    },
+    {
+      "id": "nei-cruciferous-kale",
+      "name": "Kale",
+      "crop": "Cruciferous",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 21,
+      "attributes": {
+        "category": "Cruciferous",
+        "product_name": "Kale",
+        "primary_state_s": "Sikkim",
+        "key_variety_taxonomic_detail": "Emerging winter green",
+        "agronomic_nutritional_usp": "Cold-tolerant, nutrient-dense curly leaves; high in vitamin K and iron.",
+        "processing_value_added_potential": "Fresh organic wellness markets and freeze-dried kale chips."
+      }
+    },
+    {
+      "id": "nei-beans-french-bean",
+      "name": "French Bean",
+      "crop": "Beans",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 22,
+      "attributes": {
+        "category": "Beans",
+        "product_name": "French Bean",
+        "primary_state_s": "Sikkim",
+        "key_variety_taxonomic_detail": "Hilly climbing cultivars",
+        "agronomic_nutritional_usp": "Stringless, tender green pods; high protein and soluble fiber content.",
+        "processing_value_added_potential": "Fresh retail markets and industrial quick-freezing (IQF) lines."
+      }
+    },
+    {
+      "id": "nei-beans-runner-bean",
+      "name": "Runner Bean",
+      "crop": "Beans",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 23,
+      "attributes": {
+        "category": "Beans",
+        "product_name": "Runner Bean",
+        "primary_state_s": "AP, Sikkim",
+        "key_variety_taxonomic_detail": "High-altitude varieties",
+        "agronomic_nutritional_usp": "Large, flat green pods with red/purple seeds; highly cold-resistant.",
+        "processing_value_added_potential": "Mountain retail and frozen vegetable mixes."
+      }
+    },
+    {
+      "id": "nei-beans-tree-bean",
+      "name": "Tree Bean",
+      "crop": "Beans",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 24,
+      "attributes": {
+        "category": "Beans",
+        "product_name": "Tree Bean",
+        "primary_state_s": "Manipur, Nagaland",
+        "key_variety_taxonomic_detail": "Parkia speciosa ( Yongchak ) 39",
+        "agronomic_nutritional_usp": "High in protein, iron, and sulfur; strong, pungent, nutty aroma 39 .",
+        "processing_value_added_potential": "Premium fresh retail, sun-dried seeds, and gourmet canning 49 ."
+      }
+    },
+    {
+      "id": "nei-beans-soybean-vegetable",
+      "name": "Soybean (Vegetable)",
+      "crop": "Beans",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 25,
+      "attributes": {
+        "category": "Beans",
+        "product_name": "Soybean (Vegetable)",
+        "primary_state_s": "Nagaland, Manipur",
+        "key_variety_taxonomic_detail": "Hairless green pod types",
+        "agronomic_nutritional_usp": "High vegetable-protein density; harvested when pods are young.",
+        "processing_value_added_potential": "Edamame-style processing, frozen green pods, and fresh local retail."
+      }
+    },
+    {
+      "id": "nei-cucurbits-bottle-gourd",
+      "name": "Bottle Gourd",
+      "crop": "Cucurbits",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 26,
+      "attributes": {
+        "category": "Cucurbits",
+        "product_name": "Bottle Gourd",
+        "primary_state_s": "Assam",
+        "key_variety_taxonomic_detail": "Traditional landraces",
+        "agronomic_nutritional_usp": "High water content, cooling properties, and delicate fibrous flesh.",
+        "processing_value_added_potential": "Fresh local markets, commercial juice processing, and candy ( petha )."
+      }
+    },
+    {
+      "id": "nei-cucurbits-bitter-gourd",
+      "name": "Bitter Gourd",
+      "crop": "Cucurbits",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 27,
+      "attributes": {
+        "category": "Cucurbits",
+        "product_name": "Bitter Gourd",
+        "primary_state_s": "Assam, Manipur",
+        "key_variety_taxonomic_detail": "Small wild types",
+        "agronomic_nutritional_usp": "Rich in charantin and polypeptide-p; strong antidiabetic properties.",
+        "processing_value_added_potential": "Fresh retail, antidiabetic dried slices, and wellness powders."
+      }
+    },
+    {
+      "id": "nei-cucurbits-ridge-gourd",
+      "name": "Ridge Gourd",
+      "crop": "Cucurbits",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 28,
+      "attributes": {
+        "category": "Cucurbits",
+        "product_name": "Ridge Gourd",
+        "primary_state_s": "Assam",
+        "key_variety_taxonomic_detail": "JorRG 09-05 42",
+        "agronomic_nutritional_usp": "High-yielding selection; tender, non-fibrous culinary ribs 42 .",
+        "processing_value_added_potential": "Fresh local vegetable markets and organic fiber sponges (matured)."
+      }
+    },
+    {
+      "id": "nei-cucurbits-pumpkin",
+      "name": "Pumpkin",
+      "crop": "Cucurbits",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 29,
+      "attributes": {
+        "category": "Cucurbits",
+        "product_name": "Pumpkin",
+        "primary_state_s": "Assam",
+        "key_variety_taxonomic_detail": "High-carotene landraces 42",
+        "agronomic_nutritional_usp": "Highly sweet, deep orange flesh; excellent storage capability 42 .",
+        "processing_value_added_potential": "Dehydrated pumpkin powder, seed oil extraction, and purees 42 ."
+      }
+    },
+    {
+      "id": "nei-cucurbits-cucumber",
+      "name": "Cucumber",
+      "crop": "Cucurbits",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 30,
+      "attributes": {
+        "category": "Cucurbits",
+        "product_name": "Cucumber",
+        "primary_state_s": "Nagaland",
+        "key_variety_taxonomic_detail": "Naga Cucumber (GI Tagged) 22",
+        "agronomic_nutritional_usp": "Extremely sweet, juicy, crisp, and completely free of chemical residue 22 .",
+        "processing_value_added_potential": "Premium fresh retail, cooling cosmetic gels, and low-salt brined pickles 22 ."
+      }
+    },
+    {
+      "id": "nei-cucurbits-squash",
+      "name": "Squash",
+      "crop": "Cucurbits",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 31,
+      "attributes": {
+        "category": "Cucurbits",
+        "product_name": "Squash",
+        "primary_state_s": "Mizoram, Sikkim",
+        "key_variety_taxonomic_detail": "Chayote (Isis) 50",
+        "agronomic_nutritional_usp": "Highly productive pear-shaped cucurbit; high water and mild starch 50 .",
+        "processing_value_added_potential": "Fresh bulk markets, commercial pickling, and animal feed silage 50 ."
+      }
+    },
+    {
+      "id": "nei-mushroom-oyster-mushroom",
+      "name": "Oyster Mushroom",
+      "crop": "Mushroom",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 32,
+      "attributes": {
+        "category": "Mushroom",
+        "product_name": "Oyster Mushroom",
+        "primary_state_s": "Meghalaya, Assam",
+        "key_variety_taxonomic_detail": "Pleurotus ostreatus",
+        "agronomic_nutritional_usp": "Highly productive on straw substrates; high protein and vitamin D.",
+        "processing_value_added_potential": "Fresh retail, dehydrated mushroom shreds, and savory soup powders."
+      }
+    },
+    {
+      "id": "nei-mushroom-shiitake",
+      "name": "Shiitake",
+      "crop": "Mushroom",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 33,
+      "attributes": {
+        "category": "Mushroom",
+        "product_name": "Shiitake",
+        "primary_state_s": "Sikkim, Nagaland",
+        "key_variety_taxonomic_detail": "Lentinula edodes",
+        "agronomic_nutritional_usp": "Wood-grown premium mushroom; extremely rich in lenthionine umami.",
+        "processing_value_added_potential": "Premium fresh retail, dehydrated whole shiitake, and wellness extracts."
+      }
+    },
+    {
+      "id": "nei-mushroom-button-mushroom",
+      "name": "Button Mushroom",
+      "crop": "Mushroom",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 34,
+      "attributes": {
+        "category": "Mushroom",
+        "product_name": "Button Mushroom",
+        "primary_state_s": "Assam",
+        "key_variety_taxonomic_detail": "Agaricus bisporus",
+        "agronomic_nutritional_usp": "Large-scale commercial production; high volume demand.",
+        "processing_value_added_potential": "Fresh retail and industrial pickling / canning in brine."
+      }
+    },
+    {
+      "id": "nei-mushroom-wild-mushrooms",
+      "name": "Wild Mushrooms",
+      "crop": "Mushroom",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 2,
+      "source_row": 35,
+      "attributes": {
+        "category": "Mushroom",
+        "product_name": "Wild Mushrooms",
+        "primary_state_s": "Nagaland, Manipur",
+        "key_variety_taxonomic_detail": "Forest-collected types",
+        "agronomic_nutritional_usp": "Exceptional variety of seasonal mushrooms collected from deep woods.",
+        "processing_value_added_potential": "Gourmet restaurant supplies and dehydrated specialty mushroom blends."
+      }
+    },
+    {
+      "id": "nei-bhut-jolokia-bhut-jolokia",
+      "name": "Bhut Jolokia",
+      "crop": "Bhut Jolokia",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High heat index; up to 1,000,000 Scoville Heat Units (SHU) 22 .",
+      "estimated_price_inr": 216,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 1,
+      "attributes": {
+        "product_name": "Bhut Jolokia",
+        "state_of_origin": "Assam, Nagaland",
+        "gi_status_application_no": "Non-GI (General Class) 22",
+        "specialty_usp_biochemical_profile": "High heat index; up to 1,000,000 Scoville Heat Units (SHU) 22 .",
+        "value_added_processing_potential": "Capsaicin extraction, defense-grade pepper sprays, and extreme hot sauces 22 ."
+      }
+    },
+    {
+      "id": "nei-raja-mircha-raja-mircha",
+      "name": "Raja Mircha",
+      "crop": "Raja Mircha",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Highly pungent (800,000–1,000,000 SHU) with a unique smoky flavor 22 .",
+      "estimated_price_inr": 230,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 2,
+      "attributes": {
+        "product_name": "Raja Mircha",
+        "state_of_origin": "Nagaland",
+        "gi_status_application_no": "Registered (No. 122) 22",
+        "specialty_usp_biochemical_profile": "Highly pungent (800,000–1,000,000 SHU) with a unique smoky flavor 22 .",
+        "value_added_processing_potential": "High-value organic exports, specialty chili powders, and hot sauces 22 ."
+      }
+    },
+    {
+      "id": "nei-bird-s-eye-chilli-bird-s-eye-chilli",
+      "name": "Bird's Eye Chilli",
+      "crop": "Bird's Eye Chilli",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Small, intensely pungent chillies; rich in vitamins 26 .",
+      "estimated_price_inr": 202,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 3,
+      "attributes": {
+        "product_name": "Bird's Eye Chilli",
+        "state_of_origin": "Mizoram",
+        "gi_status_application_no": "Registered (No. 427) 26",
+        "specialty_usp_biochemical_profile": "Small, intensely pungent chillies; rich in vitamins 26 .",
+        "value_added_processing_potential": "Lowered 5% GST on packaged products; ideal for flakes and spice oils 26 ."
+      }
+    },
+    {
+      "id": "nei-dalle-khursani-dalle-khursani",
+      "name": "Dalle Khursani",
+      "crop": "Dalle Khursani",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Red cherry pepper; high pungency (100,000–350,000 SHU) 54 .",
+      "estimated_price_inr": 208,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 4,
+      "attributes": {
+        "product_name": "Dalle Khursani",
+        "state_of_origin": "Sikkim",
+        "gi_status_application_no": "Registered (No. 636) 52",
+        "specialty_usp_biochemical_profile": "Red cherry pepper; high pungency (100,000–350,000 SHU) 54 .",
+        "value_added_processing_potential": "Premium chili paste, direct export, and gourmet vinegar pickles 54 ."
+      }
+    },
+    {
+      "id": "nei-ginger-karbi-anglong-ginger-karbi-anglong",
+      "name": "Ginger (Karbi Anglong)",
+      "crop": "Ginger (Karbi Anglong)",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Low fiber in Aizol ; high oleoresin oil recovery ( Gingerin ) 48 .",
+      "estimated_price_inr": 222,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 5,
+      "attributes": {
+        "product_name": "Ginger (Karbi Anglong)",
+        "state_of_origin": "Assam",
+        "gi_status_application_no": "Registered (No. 226) 55",
+        "specialty_usp_biochemical_profile": "Low fiber in Aizol ; high oleoresin oil recovery ( Gingerin ) 48 .",
+        "value_added_processing_potential": "Essential oil extraction, dry powder, ginger ale, and pharmaceuticals 56 ."
+      }
+    },
+    {
+      "id": "nei-lakadong-turmeric-lakadong-turmeric",
+      "name": "Lakadong Turmeric",
+      "crop": "Lakadong Turmeric",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Curcumin content of 7% to 12%; bright golden-yellow hue 17 .",
+      "estimated_price_inr": 210,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 6,
+      "attributes": {
+        "product_name": "Lakadong Turmeric",
+        "state_of_origin": "Meghalaya",
+        "gi_status_application_no": "Registered 6",
+        "specialty_usp_biochemical_profile": "Curcumin content of 7% to 12%; bright golden-yellow hue 17 .",
+        "value_added_processing_potential": "Turmeric latte mixes, oleoresin extraction, and nutraceutical tablets 58 ."
+      }
+    },
+    {
+      "id": "nei-black-turmeric-black-turmeric",
+      "name": "Black Turmeric",
+      "crop": "Black Turmeric",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Curcuma caesia ; dark bluish-black rhizome; rich in camphor and cineole.",
+      "estimated_price_inr": 234,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 7,
+      "attributes": {
+        "product_name": "Black Turmeric",
+        "state_of_origin": "Assam",
+        "gi_status_application_no": "Non-GI (Medicinal Class)",
+        "specialty_usp_biochemical_profile": "Curcuma caesia ; dark bluish-black rhizome; rich in camphor and cineole.",
+        "value_added_processing_potential": "High-value medicinal extracts, essential oils, and traditional cosmetics."
+      }
+    },
+    {
+      "id": "nei-turmeric-general-turmeric-general",
+      "name": "Turmeric (General)",
+      "crop": "Turmeric (General)",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Standard regional varieties; average curcumin content of 3% to 5% 59 .",
+      "estimated_price_inr": 230,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 8,
+      "attributes": {
+        "product_name": "Turmeric (General)",
+        "state_of_origin": "All States",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Standard regional varieties; average curcumin content of 3% to 5% 59 .",
+        "value_added_processing_potential": "Bulk dry turmeric powder, culinary blends, and natural dye processing 60 ."
+      }
+    },
+    {
+      "id": "nei-large-cardamom-large-cardamom",
+      "name": "Large Cardamom",
+      "crop": "Large Cardamom",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Bold capsules with a strong smoky, camphoraceous aroma 53 .",
+      "estimated_price_inr": 208,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 9,
+      "attributes": {
+        "product_name": "Large Cardamom",
+        "state_of_origin": "Sikkim",
+        "gi_status_application_no": "Registered (No. 376) 1",
+        "specialty_usp_biochemical_profile": "Bold capsules with a strong smoky, camphoraceous aroma 53 .",
+        "value_added_processing_potential": "Premium whole spice exports, cardamom oil, and aromatic blends 33 ."
+      }
+    },
+    {
+      "id": "nei-cinnamon-cinnamon",
+      "name": "Cinnamon",
+      "crop": "Cinnamon",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Sourced from Cinnamomum verum ; sweet, delicate, woody aroma 13 .",
+      "estimated_price_inr": 220,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 10,
+      "attributes": {
+        "product_name": "Cinnamon",
+        "state_of_origin": "Arunachal Pradesh",
+        "gi_status_application_no": "Non-GI (Horticulture Select) 25",
+        "specialty_usp_biochemical_profile": "Sourced from Cinnamomum verum ; sweet, delicate, woody aroma 13 .",
+        "value_added_processing_potential": "Aromatic spice quill packaging, bakery blends, and essential oils 61 ."
+      }
+    },
+    {
+      "id": "nei-bay-leaf-tej-patta-bay-leaf-tej-patta",
+      "name": "Bay Leaf (Tej Patta)",
+      "crop": "Bay Leaf (Tej Patta)",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Sourced around Shillong; high essential oil content 51 .",
+      "estimated_price_inr": 202,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 11,
+      "attributes": {
+        "product_name": "Bay Leaf (Tej Patta)",
+        "state_of_origin": "Meghalaya",
+        "gi_status_application_no": "Non-GI (Market Standard)",
+        "specialty_usp_biochemical_profile": "Sourced around Shillong; high essential oil content 51 .",
+        "value_added_processing_potential": "Whole-leaf export packaging, bay leaf powder, and essential oils 51 ."
+      }
+    },
+    {
+      "id": "nei-black-pepper-black-pepper",
+      "name": "Black Pepper",
+      "crop": "Black Pepper",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Bold black peppercorns; high piperine content and intense heat.",
+      "estimated_price_inr": 216,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 12,
+      "attributes": {
+        "product_name": "Black Pepper",
+        "state_of_origin": "Tripura, Meghalaya",
+        "gi_status_application_no": "Non-GI (Organic Standard) 16",
+        "specialty_usp_biochemical_profile": "Bold black peppercorns; high piperine content and intense heat.",
+        "value_added_processing_potential": "Premium whole-corn table spice, ground pepper shakers, and oleoresins 61 ."
+      }
+    },
+    {
+      "id": "nei-long-pepper-long-pepper",
+      "name": "Long Pepper",
+      "crop": "Long Pepper",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Piper longum (Pipli); sweet-pungent woody heat; high piperine content 13 .",
+      "estimated_price_inr": 238,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 13,
+      "attributes": {
+        "product_name": "Long Pepper",
+        "state_of_origin": "Assam",
+        "gi_status_application_no": "Non-GI (Medicinal Class)",
+        "specialty_usp_biochemical_profile": "Piper longum (Pipli); sweet-pungent woody heat; high piperine content 13 .",
+        "value_added_processing_potential": "Ayurvedic formulations, cough syrups, and exotic spice blends 13 ."
+      }
+    },
+    {
+      "id": "nei-perilla-seed-perilla-seed",
+      "name": "Perilla Seed",
+      "crop": "Perilla Seed",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Known as Kenye ; rich in alpha-linolenic acid (omega-3) and proteins.",
+      "estimated_price_inr": 228,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 14,
+      "attributes": {
+        "product_name": "Perilla Seed",
+        "state_of_origin": "Nagaland",
+        "gi_status_application_no": "Non-GI (Traditional Crop)",
+        "specialty_usp_biochemical_profile": "Known as Kenye ; rich in alpha-linolenic acid (omega-3) and proteins.",
+        "value_added_processing_potential": "Cold-pressed perilla oil, roasted seed seasonings, and traditional chutneys."
+      }
+    },
+    {
+      "id": "nei-coriander-coriander",
+      "name": "Coriander",
+      "crop": "Coriander",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "High-aroma coriander varieties grown in moist valley soils 13 .",
+      "estimated_price_inr": 216,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 15,
+      "attributes": {
+        "product_name": "Coriander",
+        "state_of_origin": "Meghalaya",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "High-aroma coriander varieties grown in moist valley soils 13 .",
+        "value_added_processing_potential": "Premium ground coriander spice, fresh leaf retail, and culinary pastes."
+      }
+    },
+    {
+      "id": "nei-fennel-fennel",
+      "name": "Fennel",
+      "crop": "Fennel",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Sweet, anise-like seeds rich in anethole; grown in cold climates.",
+      "estimated_price_inr": 220,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 16,
+      "attributes": {
+        "product_name": "Fennel",
+        "state_of_origin": "Sikkim",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Sweet, anise-like seeds rich in anethole; grown in cold climates.",
+        "value_added_processing_potential": "Mouth freshener packaging, digestive tea blends, and sweet spice oils."
+      }
+    },
+    {
+      "id": "nei-star-anise-star-anise",
+      "name": "Star Anise",
+      "crop": "Star Anise",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Illicium griffithii ; star-shaped carpels rich in shikimic acid 4 .",
+      "estimated_price_inr": 224,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 17,
+      "attributes": {
+        "product_name": "Star Anise",
+        "state_of_origin": "Arunachal Pradesh",
+        "gi_status_application_no": "Non-GI (High Altitude)",
+        "specialty_usp_biochemical_profile": "Illicium griffithii ; star-shaped carpels rich in shikimic acid 4 .",
+        "value_added_processing_potential": "Tamiflu precursor synthesis, incense, tea flavoring, and spice blends 4 ."
+      }
+    },
+    {
+      "id": "nei-clove-clove",
+      "name": "Clove",
+      "crop": "Clove",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Premium flower buds rich in eugenol; intense numbing heat.",
+      "estimated_price_inr": 206,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 18,
+      "attributes": {
+        "product_name": "Clove",
+        "state_of_origin": "Sikkim",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Premium flower buds rich in eugenol; intense numbing heat.",
+        "value_added_processing_potential": "Culinary spice exports, clove essential oil, and oral-care formulations."
+      }
+    },
+    {
+      "id": "nei-nutmeg-nutmeg",
+      "name": "Nutmeg",
+      "crop": "Nutmeg",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "Tropical seed rich in myristicin and sweet aromatic oils.",
+      "estimated_price_inr": 204,
+      "unit": "kg/seedling/bundle",
+      "source_table": 3,
+      "source_row": 19,
+      "attributes": {
+        "product_name": "Nutmeg",
+        "state_of_origin": "Tripura",
+        "gi_status_application_no": "Non-GI",
+        "specialty_usp_biochemical_profile": "Tropical seed rich in myristicin and sweet aromatic oils.",
+        "value_added_processing_potential": "Ground nutmeg powder, mace blade packaging, and aromatic extracts."
+      }
+    },
+    {
+      "id": "nei-akhuni-axone-akhuni-axone",
+      "name": "Akhuni / Axone",
+      "crop": "Akhuni / Axone",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 1,
+      "attributes": {
+        "product_name": "Akhuni / Axone",
+        "state_of_origin": "Nagaland",
+        "key_substrate_material": "Whole Yellow Soybeans 47",
+        "microbial_fermentation_pathway": "Alkaline solid-state; proteolytic Bacillus spp. 47",
+        "finished_product_usp_usage": "Pungent, brown umami paste; used in traditional smoked pork stews 45 ."
+      }
+    },
+    {
+      "id": "nei-tungrymbai-tungrymbai",
+      "name": "Tungrymbai",
+      "crop": "Tungrymbai",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 2,
+      "attributes": {
+        "product_name": "Tungrymbai",
+        "state_of_origin": "Meghalaya",
+        "key_substrate_material": "Soybeans, Pyrnium leaves 63",
+        "microbial_fermentation_pathway": "Proteolytic breakdown by Bacillus subtilis [cite: 64]",
+        "finished_product_usp_usage": "Dense sticky paste; rich in protein and probiotics; served cooked with pork 64 ."
+      }
+    },
+    {
+      "id": "nei-hawaijar-hawaijar",
+      "name": "Hawaijar",
+      "crop": "Hawaijar",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 3,
+      "attributes": {
+        "product_name": "Hawaijar",
+        "state_of_origin": "Manipur",
+        "key_substrate_material": "Yellow Soybeans 64",
+        "microbial_fermentation_pathway": "Spontaneous Bacillus -driven alkaline process",
+        "finished_product_usp_usage": "Stringy fermented beans; high protein; key ingredient in Manipuri side dishes."
+      }
+    },
+    {
+      "id": "nei-bekang-bekang",
+      "name": "Bekang",
+      "crop": "Bekang",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 4,
+      "attributes": {
+        "product_name": "Bekang",
+        "state_of_origin": "Mizoram",
+        "key_substrate_material": "Soybeans",
+        "microbial_fermentation_pathway": "Alkaline solid-state; Bacillus spp.",
+        "finished_product_usp_usage": "Mucilaginous sticky beans with a pleasant, mild ammonia aroma."
+      }
+    },
+    {
+      "id": "nei-ngari-ngari",
+      "name": "Ngari",
+      "crop": "Ngari",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 5,
+      "attributes": {
+        "product_name": "Ngari",
+        "state_of_origin": "Manipur",
+        "key_substrate_material": "Dry Puntius sophore [cite: 64, 66]",
+        "microbial_fermentation_pathway": "Anaerobic aging in Kharung clay pots 66",
+        "finished_product_usp_usage": "Solid grey fish with a rich, salty-umami flavor; used in Iromba stews 65 ."
+      }
+    },
+    {
+      "id": "nei-shidal-shidal",
+      "name": "Shidal",
+      "crop": "Shidal",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 6,
+      "attributes": {
+        "product_name": "Shidal",
+        "state_of_origin": "Tripura, Assam",
+        "key_substrate_material": "Dry Puntius spp. 64",
+        "microbial_fermentation_pathway": "Semi-dry anaerobic clay pot aging",
+        "finished_product_usp_usage": "Pungent, paste-like fish; high amino acid content; key curry flavor enhancer."
+      }
+    },
+    {
+      "id": "nei-hentak-hentak",
+      "name": "Hentak",
+      "crop": "Hentak",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 7,
+      "attributes": {
+        "product_name": "Hentak",
+        "state_of_origin": "Manipur",
+        "key_substrate_material": "Esomus danricus & Alocasia 66",
+        "microbial_fermentation_pathway": "Blended and aged in earthenware pots 66",
+        "finished_product_usp_usage": "Dark paste/balls; safe to consume as Alocasia oxalates are broken down 66 ."
+      }
+    },
+    {
+      "id": "nei-tungtap-tungtap",
+      "name": "Tungtap",
+      "crop": "Tungtap",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 8,
+      "attributes": {
+        "product_name": "Tungtap",
+        "state_of_origin": "Meghalaya",
+        "key_substrate_material": "Puntius / Danio spp., salt 64",
+        "microbial_fermentation_pathway": "Salted anaerobic fish fermentation 64",
+        "finished_product_usp_usage": "Probiotic fish paste; intensely savory and sharp; served as a cold condiment 64 ."
+      }
+    },
+    {
+      "id": "nei-anishi-n-oshi-anishi-n-oshi",
+      "name": "Anishi / Nüoshi",
+      "crop": "Anishi / Nüoshi",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 9,
+      "attributes": {
+        "product_name": "Anishi / Nüoshi",
+        "state_of_origin": "Nagaland",
+        "key_substrate_material": "Taro / Colocasia leaves 43",
+        "microbial_fermentation_pathway": "yellowed taro leaves are pounded, cooked, and smoked 46",
+        "finished_product_usp_usage": "Coal-hard, smoke-dried patties; adds a smoky, sour depth to pork stews 44 ."
+      }
+    },
+    {
+      "id": "nei-mesu-mesu",
+      "name": "Mesu",
+      "crop": "Mesu",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 10,
+      "attributes": {
+        "product_name": "Mesu",
+        "state_of_origin": "Sikkim",
+        "key_substrate_material": "Malingo bamboo shoots 68",
+        "microbial_fermentation_pathway": "Lactic Acid Bacteria ( LAB ) driven souring 68",
+        "finished_product_usp_usage": "Crisp, sour, tangy shredded shoots; used as a pickle or culinary seasoning 68 ."
+      }
+    },
+    {
+      "id": "nei-soibum-soibum",
+      "name": "Soibum",
+      "crop": "Soibum",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 11,
+      "attributes": {
+        "product_name": "Soibum",
+        "state_of_origin": "Manipur",
+        "key_substrate_material": "Dendrocalamus hamiltonii [cite: 65, 69]",
+        "microbial_fermentation_pathway": "Pounded and fermented over months 68",
+        "finished_product_usp_usage": "Sour fermented bamboo shoots; soft texture; used in fish and pork curries 68 ."
+      }
+    },
+    {
+      "id": "nei-soidon-soidon",
+      "name": "Soidon",
+      "crop": "Soidon",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 12,
+      "attributes": {
+        "product_name": "Soidon",
+        "state_of_origin": "Manipur",
+        "key_substrate_material": "Bamboo shoot tips/juice 68",
+        "microbial_fermentation_pathway": "Fermented with wild mustard seeds 68",
+        "finished_product_usp_usage": "Delicate sour shoot tips; prized ingredient in stews and Iromba 68 ."
+      }
+    },
+    {
+      "id": "nei-bastenga-bastenga",
+      "name": "Bastenga",
+      "crop": "Bastenga",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 13,
+      "attributes": {
+        "product_name": "Bastenga",
+        "state_of_origin": "Mizoram, Nagaland",
+        "key_substrate_material": "Sliced Bamboo shoots 45",
+        "microbial_fermentation_pathway": "Sliced shoots aged in waterlogged pots",
+        "finished_product_usp_usage": "Intensely pungent, sour liquid and shoots; base flavor for Naga pork 45 ."
+      }
+    },
+    {
+      "id": "nei-chhurpi-chhurpi",
+      "name": "Chhurpi",
+      "crop": "Chhurpi",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 14,
+      "attributes": {
+        "product_name": "Chhurpi",
+        "state_of_origin": "Sikkim, AP",
+        "key_substrate_material": "Yak / Cow Milk 71",
+        "microbial_fermentation_pathway": "Acid coagulation and sun dehydration 71",
+        "finished_product_usp_usage": "Extremely hard, long-lasting cheese cubes; high protein and low moisture 72 ."
+      }
+    },
+    {
+      "id": "nei-kinema-kinema",
+      "name": "Kinema",
+      "crop": "Kinema",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 4,
+      "source_row": 15,
+      "attributes": {
+        "product_name": "Kinema",
+        "state_of_origin": "Sikkim",
+        "key_substrate_material": "Whole Yellow Soybeans 73",
+        "microbial_fermentation_pathway": "Stringy alkaline fermentation by B. subtilis [cite: 73]",
+        "finished_product_usp_usage": "High-protein stringy beans; pungent, nutty aroma; served fried as side dish 73 ."
+      }
+    },
+    {
+      "id": "nei-bamboo-fresh-bamboo-shoot-bah-gaj",
+      "name": "Fresh Bamboo Shoot (Bah Gaj)",
+      "crop": "Bamboo",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 1,
+      "attributes": {
+        "category": "Bamboo",
+        "product_name": "Fresh Bamboo Shoot (Bah Gaj)",
+        "primary_state_s": "Assam, Nagaland",
+        "quality_grade_sourcing_details": "Sourced from Bambusa tulda [cite: 69, 70]",
+        "processing_commercial_utility": "Low calorie; canned in brine or vacuum-packed 74 ."
+      }
+    },
+    {
+      "id": "nei-bamboo-fermented-bamboo-shoot-khorisa",
+      "name": "Fermented Bamboo Shoot (Khorisa)",
+      "crop": "Bamboo",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 2,
+      "attributes": {
+        "category": "Bamboo",
+        "product_name": "Fermented Bamboo Shoot (Khorisa)",
+        "primary_state_s": "Assam, Mizoram",
+        "quality_grade_sourcing_details": "Fermented in earthen pits 68",
+        "processing_commercial_utility": "Long shelf life; ideal as a seasoning and ingredient in meat/fish 68 ."
+      }
+    },
+    {
+      "id": "nei-bamboo-bamboo-shoot-pickle",
+      "name": "Bamboo Shoot Pickle",
+      "crop": "Bamboo",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 3,
+      "attributes": {
+        "category": "Bamboo",
+        "product_name": "Bamboo Shoot Pickle",
+        "primary_state_s": "All States",
+        "quality_grade_sourcing_details": "Infused with mustard oil and Bhut Jolokia 68",
+        "processing_commercial_utility": "High-value retail condiment; widely distributed."
+      }
+    },
+    {
+      "id": "nei-bamboo-bamboo-shoot-powder",
+      "name": "Bamboo Shoot Powder",
+      "crop": "Bamboo",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 4,
+      "attributes": {
+        "category": "Bamboo",
+        "product_name": "Bamboo Shoot Powder",
+        "primary_state_s": "Manipur",
+        "quality_grade_sourcing_details": "Dehydrated and finely milled shoots 20",
+        "processing_commercial_utility": "Natural food thickener, fiber fortifier, and enhancer 20 ."
+      }
+    },
+    {
+      "id": "nei-bamboo-bamboo-tea",
+      "name": "Bamboo Tea",
+      "crop": "Bamboo",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 5,
+      "attributes": {
+        "category": "Bamboo",
+        "product_name": "Bamboo Tea",
+        "primary_state_s": "Mizoram",
+        "quality_grade_sourcing_details": "Sourced from tender organic bamboo leaves",
+        "processing_commercial_utility": "High in silica; marketed as a premium wellness infusion."
+      }
+    },
+    {
+      "id": "nei-honey-wild-forest-honey",
+      "name": "Wild Forest Honey",
+      "crop": "Honey",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 6,
+      "attributes": {
+        "category": "Honey",
+        "product_name": "Wild Forest Honey",
+        "primary_state_s": "Arunachal Pradesh",
+        "quality_grade_sourcing_details": "Collected from wild hives of Apis dorsata",
+        "processing_commercial_utility": "Rich, dark color; high complex sugars; therapeutic grade."
+      }
+    },
+    {
+      "id": "nei-honey-rock-bee-honey",
+      "name": "Rock Bee Honey",
+      "crop": "Honey",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 7,
+      "attributes": {
+        "category": "Honey",
+        "product_name": "Rock Bee Honey",
+        "primary_state_s": "Meghalaya",
+        "quality_grade_sourcing_details": "Sourced from high-altitude rock faces",
+        "processing_commercial_utility": "Intense herbal properties; strong antioxidant and floral notes."
+      }
+    },
+    {
+      "id": "nei-honey-stingless-bee-honey",
+      "name": "Stingless Bee Honey",
+      "crop": "Honey",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 8,
+      "attributes": {
+        "category": "Honey",
+        "product_name": "Stingless Bee Honey",
+        "primary_state_s": "Nagaland",
+        "quality_grade_sourcing_details": "Sourced from Meliponini bee hives 76",
+        "processing_commercial_utility": "High value; sourish-sweet profile; strong antibacterial properties."
+      }
+    },
+    {
+      "id": "nei-honey-organic-honey",
+      "name": "Organic Honey",
+      "crop": "Honey",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 9,
+      "attributes": {
+        "category": "Honey",
+        "product_name": "Organic Honey",
+        "primary_state_s": "Sikkim",
+        "quality_grade_sourcing_details": "Nectar from organic mountain wildflowers",
+        "processing_commercial_utility": "Certified organic; high-value retail packing and export."
+      }
+    },
+    {
+      "id": "nei-honey-bamboo-honey",
+      "name": "Bamboo Honey",
+      "crop": "Honey",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 10,
+      "attributes": {
+        "category": "Honey",
+        "product_name": "Bamboo Honey",
+        "primary_state_s": "Mizoram",
+        "quality_grade_sourcing_details": "Rare honeydew collected from bamboo stalks",
+        "processing_commercial_utility": "Exotic wellness product with sweet, woody flavor notes."
+      }
+    },
+    {
+      "id": "nei-grains-joha-rice",
+      "name": "Joha Rice",
+      "crop": "Grains",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 11,
+      "attributes": {
+        "category": "Grains",
+        "product_name": "Joha Rice",
+        "primary_state_s": "Assam",
+        "quality_grade_sourcing_details": "Kola Joha, Keteki Joha, Bokul Joha 77",
+        "processing_commercial_utility": "Aromatic short-grain; rich in omega-3/omega-6 and antioxidants 79 ."
+      }
+    },
+    {
+      "id": "nei-grains-bao-rice",
+      "name": "Bao Rice",
+      "crop": "Grains",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 12,
+      "attributes": {
+        "category": "Grains",
+        "product_name": "Bao Rice",
+        "primary_state_s": "Assam",
+        "quality_grade_sourcing_details": "LPR 106, KDML 105, Padmapani 78",
+        "processing_commercial_utility": "Red-kernelled deep-water floating rice; high iron and zinc 78 ."
+      }
+    },
+    {
+      "id": "nei-grains-black-rice-chakhao",
+      "name": "Black Rice (Chakhao)",
+      "crop": "Grains",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 13,
+      "attributes": {
+        "category": "Grains",
+        "product_name": "Black Rice (Chakhao)",
+        "primary_state_s": "Manipur",
+        "quality_grade_sourcing_details": "Chakhao Amubi, Chakhao Poireiton 20",
+        "processing_commercial_utility": "Scented glutinous rice; rich in anthocyanins 83 ."
+      }
+    },
+    {
+      "id": "nei-grains-finger-millet-marua",
+      "name": "Finger Millet (Marua)",
+      "crop": "Grains",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 14,
+      "attributes": {
+        "category": "Grains",
+        "product_name": "Finger Millet (Marua)",
+        "primary_state_s": "Sikkim, AP",
+        "quality_grade_sourcing_details": "Traditional high-altitude crop 85",
+        "processing_commercial_utility": "Gluten-free, rich in calcium and dietary fiber; drought-hardy."
+      }
+    },
+    {
+      "id": "nei-grains-foxtail-millet",
+      "name": "Foxtail Millet",
+      "crop": "Grains",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 5,
+      "source_row": 15,
+      "attributes": {
+        "category": "Grains",
+        "product_name": "Foxtail Millet",
+        "primary_state_s": "Nagaland",
+        "quality_grade_sourcing_details": "Organic hill landrace",
+        "processing_commercial_utility": "Rich in protein, magnesium, and dietary fiber; low glycemic index."
+      }
+    },
+    {
+      "id": "nei-pulses-rajma-kidney-beans",
+      "name": "Rajma (Kidney Beans)",
+      "crop": "Pulses",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 1,
+      "attributes": {
+        "category": "Pulses",
+        "product_name": "Rajma (Kidney Beans)",
+        "primary_state_s": "Sikkim, AP",
+        "key_variety_usp": "Libi Balangbu, Andoye Kidney Bean 25",
+        "commercial_export_value": "Hilly, cold-climate landraces; dense in plant protein 25 ."
+      }
+    },
+    {
+      "id": "nei-pulses-black-gram-urad",
+      "name": "Black Gram (Urad)",
+      "crop": "Pulses",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 2,
+      "attributes": {
+        "category": "Pulses",
+        "product_name": "Black Gram (Urad)",
+        "primary_state_s": "Assam",
+        "key_variety_usp": "Traditional landraces",
+        "commercial_export_value": "High nitrogen-fixing crop; small seeds with a rich, earthy flavor."
+      }
+    },
+    {
+      "id": "nei-pulses-green-gram-moong",
+      "name": "Green Gram (Moong)",
+      "crop": "Pulses",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 3,
+      "attributes": {
+        "category": "Pulses",
+        "product_name": "Green Gram (Moong)",
+        "primary_state_s": "Assam",
+        "key_variety_usp": "Organic riverbank crops",
+        "commercial_export_value": "Fast-growing pulse; highly digestible, light plant-protein source."
+      }
+    },
+    {
+      "id": "nei-pulses-pigeon-pea-arhar",
+      "name": "Pigeon Pea (Arhar)",
+      "crop": "Pulses",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 4,
+      "attributes": {
+        "category": "Pulses",
+        "product_name": "Pigeon Pea (Arhar)",
+        "primary_state_s": "All States",
+        "key_variety_usp": "Hilly, drought-hardy landraces",
+        "commercial_export_value": "Deep-rooting shrub; high protein and fiber; staple security crop."
+      }
+    },
+    {
+      "id": "nei-oilseeds-mustard-seed",
+      "name": "Mustard Seed",
+      "crop": "Oilseeds",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 5,
+      "attributes": {
+        "category": "Oilseeds",
+        "product_name": "Mustard Seed",
+        "primary_state_s": "Assam, Manipur",
+        "key_variety_usp": "Brassica juncea varieties 36",
+        "commercial_export_value": "High-pungency seeds; rich in glucosinolates and sulfur."
+      }
+    },
+    {
+      "id": "nei-oilseeds-perilla-seed",
+      "name": "Perilla Seed",
+      "crop": "Oilseeds",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 6,
+      "attributes": {
+        "category": "Oilseeds",
+        "product_name": "Perilla Seed",
+        "primary_state_s": "Nagaland, Mizoram",
+        "key_variety_usp": "Sourced from Perilla frutescens",
+        "commercial_export_value": "Edible oil rich in omega-3 (ALA), protein, and antioxidants."
+      }
+    },
+    {
+      "id": "nei-oilseeds-sesame-seed",
+      "name": "Sesame Seed",
+      "crop": "Oilseeds",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 7,
+      "attributes": {
+        "category": "Oilseeds",
+        "product_name": "Sesame Seed",
+        "primary_state_s": "Tripura, Assam",
+        "key_variety_usp": "Black & White varieties",
+        "commercial_export_value": "High oil recovery rate; rich in lignans (sesamin) and vitamin E."
+      }
+    },
+    {
+      "id": "nei-nuts-arecanut-kwai-gue",
+      "name": "Arecanut (Kwai / Gue)",
+      "crop": "Nuts",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 8,
+      "attributes": {
+        "category": "Nuts",
+        "product_name": "Arecanut (Kwai / Gue)",
+        "primary_state_s": "Meghalaya",
+        "key_variety_usp": "Firm kernel structure; durable chew 16",
+        "commercial_export_value": "High local demand; processed into dried supari cuts 16 ."
+      }
+    },
+    {
+      "id": "nei-nuts-walnut",
+      "name": "Walnut",
+      "crop": "Nuts",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 9,
+      "attributes": {
+        "category": "Nuts",
+        "product_name": "Walnut",
+        "primary_state_s": "Sikkim, AP",
+        "key_variety_usp": "Temperate high-altitude varieties",
+        "commercial_export_value": "Large-shelled nuts; rich in polyunsaturated fats and polyphenols."
+      }
+    },
+    {
+      "id": "nei-nuts-chestnut",
+      "name": "Chestnut",
+      "crop": "Nuts",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 10,
+      "attributes": {
+        "category": "Nuts",
+        "product_name": "Chestnut",
+        "primary_state_s": "Sikkim",
+        "key_variety_usp": "Himalayan chestnut ( Castanopsis spp.)",
+        "commercial_export_value": "Sweet, starchy nuts; low fat compared to other culinary nuts."
+      }
+    },
+    {
+      "id": "nei-tea-coffee-assam-tea",
+      "name": "Assam Tea",
+      "crop": "Tea / Coffee",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 11,
+      "attributes": {
+        "category": "Tea / Coffee",
+        "product_name": "Assam Tea",
+        "primary_state_s": "Assam",
+        "key_variety_usp": "Camellia sinensis var. assamica 11",
+        "commercial_export_value": "World's strongest black tea; high in caffeine and polyphenols 11 ."
+      }
+    },
+    {
+      "id": "nei-tea-coffee-orthodox-tea",
+      "name": "Orthodox Tea",
+      "crop": "Tea / Coffee",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 12,
+      "attributes": {
+        "category": "Tea / Coffee",
+        "product_name": "Orthodox Tea",
+        "primary_state_s": "Assam",
+        "key_variety_usp": "Registered (No. 115) 33",
+        "commercial_export_value": "High-grade whole leaves with distinct floral and honey notes 14 ."
+      }
+    },
+    {
+      "id": "nei-tea-coffee-singpho-tea-phalap",
+      "name": "Singpho Tea (Phalap)",
+      "crop": "Tea / Coffee",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 13,
+      "attributes": {
+        "category": "Tea / Coffee",
+        "product_name": "Singpho Tea (Phalap)",
+        "primary_state_s": "AP, Assam",
+        "key_variety_usp": "Smoked bamboo-processed tea 85",
+        "commercial_export_value": "Formed into dry cylinders; distinct wood-smoke aroma 86 ."
+      }
+    },
+    {
+      "id": "nei-tea-coffee-arabica-coffee",
+      "name": "Arabica Coffee",
+      "crop": "Tea / Coffee",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 14,
+      "attributes": {
+        "category": "Tea / Coffee",
+        "product_name": "Arabica Coffee",
+        "primary_state_s": "AP, Meghalaya",
+        "key_variety_usp": "Hills Arabica varieties 16",
+        "commercial_export_value": "High-altitude crop; bright acidity, floral body, and notes of cocoa 16 ."
+      }
+    },
+    {
+      "id": "nei-tea-coffee-robusta-coffee",
+      "name": "Robusta Coffee",
+      "crop": "Tea / Coffee",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 6,
+      "source_row": 15,
+      "attributes": {
+        "category": "Tea / Coffee",
+        "product_name": "Robusta Coffee",
+        "primary_state_s": "Tripura",
+        "key_variety_usp": "Lowland robusta varieties",
+        "commercial_export_value": "Heavy body, low acidity, high caffeine; excellent crema density."
+      }
+    },
+    {
+      "id": "nei-animal-yak-milk",
+      "name": "Yak Milk",
+      "crop": "Animal",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 1,
+      "attributes": {
+        "category": "Animal",
+        "product_name": "Yak Milk",
+        "primary_state_s": "AP, Sikkim",
+        "breeds_species_detail": "Arunachali Yak 71",
+        "processing_commercial_utility": "High fat (10.9%); processed into Churpi yak cheese 71 ."
+      }
+    },
+    {
+      "id": "nei-animal-mithun-meat",
+      "name": "Mithun Meat",
+      "crop": "Animal",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 2,
+      "attributes": {
+        "category": "Animal",
+        "product_name": "Mithun Meat",
+        "primary_state_s": "AP, Nagaland",
+        "breeds_species_detail": "Bos frontalis 5",
+        "processing_commercial_utility": "Exceptionally tender and low-fat organic meat; highly valued 71 ."
+      }
+    },
+    {
+      "id": "nei-animal-indigenous-pork",
+      "name": "Indigenous Pork",
+      "crop": "Animal",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 3,
+      "attributes": {
+        "category": "Animal",
+        "product_name": "Indigenous Pork",
+        "primary_state_s": "Nagaland, Meghalaya",
+        "breeds_species_detail": "Tenyi Vo, Niang Megha, Wak Chambil 91",
+        "processing_commercial_utility": "Highly adapted swine; sweet fat profile and aromatic lean pork 93 ."
+      }
+    },
+    {
+      "id": "nei-animal-free-range-chicken",
+      "name": "Free Range Chicken",
+      "crop": "Animal",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 4,
+      "attributes": {
+        "category": "Animal",
+        "product_name": "Free Range Chicken",
+        "primary_state_s": "Assam, AP",
+        "breeds_species_detail": "Kamrupa, Miri (Porog) 95",
+        "processing_commercial_utility": "Scavenging habit; high-protein meat with a firm texture 95 ."
+      }
+    },
+    {
+      "id": "nei-animal-duck-meat",
+      "name": "Duck Meat",
+      "crop": "Animal",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 5,
+      "attributes": {
+        "category": "Animal",
+        "product_name": "Duck Meat",
+        "primary_state_s": "Assam",
+        "breeds_species_detail": "Nageswari Duck 95",
+        "processing_commercial_utility": "Prized dark meat; high fat content and distinct gamey flavour 95 ."
+      }
+    },
+    {
+      "id": "nei-fisheries-freshwater-prawn",
+      "name": "Freshwater Prawn",
+      "crop": "Fisheries",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 6,
+      "attributes": {
+        "category": "Fisheries",
+        "product_name": "Freshwater Prawn",
+        "primary_state_s": "Tripura, Assam",
+        "breeds_species_detail": "Macrobrachium rosenbergii",
+        "processing_commercial_utility": "High value; large size, sweet firm meat; grown in fresh ponds."
+      }
+    },
+    {
+      "id": "nei-fisheries-river-fish",
+      "name": "River Fish",
+      "crop": "Fisheries",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 7,
+      "attributes": {
+        "category": "Fisheries",
+        "product_name": "River Fish",
+        "primary_state_s": "AP, Nagaland",
+        "breeds_species_detail": "Tor putitora, Neolissochilus 99",
+        "processing_commercial_utility": "Wild-caught Mahseer and carps; firm flesh and high protein 99 ."
+      }
+    },
+    {
+      "id": "nei-fisheries-smoked-fish",
+      "name": "Smoked Fish",
+      "crop": "Fisheries",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 8,
+      "attributes": {
+        "category": "Fisheries",
+        "product_name": "Smoked Fish",
+        "primary_state_s": "Assam, Manipur",
+        "breeds_species_detail": "Small river carps",
+        "processing_commercial_utility": "Smoke-cured over kitchen fires; highly shelf-stable 41 ."
+      }
+    },
+    {
+      "id": "nei-fisheries-fermented-fish",
+      "name": "Fermented Fish",
+      "crop": "Fisheries",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 9,
+      "attributes": {
+        "category": "Fisheries",
+        "product_name": "Fermented Fish",
+        "primary_state_s": "Manipur, Tripura",
+        "breeds_species_detail": "Ngari, Shidal, Hentak, Tungtap 64",
+        "processing_commercial_utility": "Anaerobically fermented small river carps 64 ."
+      }
+    },
+    {
+      "id": "nei-forest-wild-fern-dhekia",
+      "name": "Wild Fern (Dhekia)",
+      "crop": "Forest",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 10,
+      "attributes": {
+        "category": "Forest",
+        "product_name": "Wild Fern (Dhekia)",
+        "primary_state_s": "Assam",
+        "breeds_species_detail": "Matteuccia struthiopteris",
+        "processing_commercial_utility": "Fiddlehead greens; rich in iron, fiber, and antioxidant vitamins 76 ."
+      }
+    },
+    {
+      "id": "nei-forest-wild-berries",
+      "name": "Wild Berries",
+      "crop": "Forest",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 11,
+      "attributes": {
+        "category": "Forest",
+        "product_name": "Wild Berries",
+        "primary_state_s": "Meghalaya",
+        "breeds_species_detail": "Sohiong, Sohshang, Sohphie 3",
+        "processing_commercial_utility": "Nutrient-dense, highly perishable wild stone fruits 3 ."
+      }
+    },
+    {
+      "id": "nei-forest-wild-citrus",
+      "name": "Wild Citrus",
+      "crop": "Forest",
+      "category": "North East India Varieties",
+      "region": "North East India",
+      "description": "North East India agricultural variety",
+      "estimated_price_inr": 164,
+      "unit": "kg/seedling/bundle",
+      "source_table": 7,
+      "source_row": 12,
+      "attributes": {
+        "category": "Forest",
+        "product_name": "Wild Citrus",
+        "primary_state_s": "Meghalaya",
+        "breeds_species_detail": "Memong Narang ( Citrus indica ) 34",
+        "processing_commercial_utility": "Endangered wild orange; high genetic resistance and raw acidity 34 ."
+      }
+    }
+  ],
+  "paragraph_preview": [
+    "Commercial and Agronomic Master Database of the Edible and Agricultural Biodiversity of North-East India",
+    "Geographic and Economic Framework for Procurement Mapping",
+    "The North-East Region (NER) of India—comprising the states of Arunachal Pradesh, Assam, Manipur, Meghalaya, Mizoram, Nagaland, Sikkim, and Tripura—is a vital reservoir of rare flora, fauna, and indigenous agricultural systems 1 . Characterised by extreme altitudinal gradients ranging from 300 to over 3,000 metres above mean sea level, the region spans microclimates from humid subtropical plains to alpine zones 3 . This complex geography, combined with highly acidic clay-loam soils ( ), has fostered a dense concentration of endemic plant and animal species 2 . Traditional farming communities have domesticatied and preserved these genetic resources over centuries 1 .",
+    "The Geographical Indications of Goods (Registration and Protection) Act, 1999, serves as the primary legal framework to protect the intellectual property of these unique regional goods 8 . Administered by the Geographical Indications Registry in Chennai, a Geographical Indication (GI) tag guarantees origin, standardises quality, and prevents unauthorized commercial exploitation by third parties 10 . In the NER, where agricultural systems are organic by default, GI tagging acts as a commercial catalyst 7 . It transitions subsistence crops into high-value export commodities, enabling local Farmer Producer Organisations (FPOs) and tribal cooperatives to command premium pricing in domestic and international wellness markets 14 .",
+    "This master database has been compiled to serve as an exhaustive reference for NE Harvest, procurement mapping, FPO onboarding, export planning, product cataloguing, and value-added processing identification. It maps the regional edible biodiversity of the NER across 15 distinct product categories, detailing state-wise distribution, commercial potential, and legal status.",
+    "Categorised Master Inventory and Taxonomic Characterisation",
+    "Fruits of North-East India",
+    "The horticultural sector of the NER is characterised by elite landraces of citrus, temperate exotic fruits, and highly pigmented wild berries rich in bioactive compounds 2 .",
+    "Category",
+    "Product Name",
+    "Primary State(s)",
+    "GI Status & Application No.",
+    "Specialty, USP & Biochemical Profile",
+    "Commercial & Value-Added Potential",
+    "Citrus",
+    "Khasi Mandarin Orange",
+    "Meghalaya",
+    "Registered (No. 465) 19",
+    "High sweetness, thin smooth rind, and rich flavour; grown in high-rainfall zones 1 .",
+    "Fresh consumption, premium juice extraction, and essential oil processing 20 .",
+    "Citrus",
+    "Assam Mandarin",
+    "Assam",
+    "Non-GI (Market Standard)",
+    "High aroma, intense volatile rind oils, and balanced acidity 2 .",
+    "Bulk commercial juice concentrate and export markets 11 .",
+    "Citrus",
+    "Kachai Lemon",
+    "Manipur",
+    "Registered (No. 466) 20",
+    "Locally known as Kachai Champra ; highest concentration of ascorbic acid globally 20 .",
+    "Fresh culinary use, pickling, and freeze-dried juice powder processing 20 .",
+    "Citrus",
+    "Naga Sweet Orange",
+    "Nagaland",
+    "Non-GI (Market Standard)",
+    "Low acidity, high sweetness, and organically cultivated in hilly terrains 21 .",
+    "Fresh retail fruit and premium organic segments 22 .",
+    "Citrus",
+    "Galgal (Citrus pseudolimon)"
+  ],
+  "table_preview": [
+    [
+      [
+        "Category",
+        "Product Name",
+        "Primary State(s)",
+        "GI Status & Application No.",
+        "Specialty, USP & Biochemical Profile",
+        "Commercial & Value-Added Potential"
+      ],
+      [
+        "Citrus",
+        "Khasi Mandarin Orange",
+        "Meghalaya",
+        "Registered (No. 465) 19",
+        "High sweetness, thin smooth rind, and rich flavour; grown in high-rainfall zones 1 .",
+        "Fresh consumption, premium juice extraction, and essential oil processing 20 ."
+      ],
+      [
+        "Citrus",
+        "Assam Mandarin",
+        "Assam",
+        "Non-GI (Market Standard)",
+        "High aroma, intense volatile rind oils, and balanced acidity 2 .",
+        "Bulk commercial juice concentrate and export markets 11 ."
+      ],
+      [
+        "Citrus",
+        "Kachai Lemon",
+        "Manipur",
+        "Registered (No. 466) 20",
+        "Locally known as Kachai Champra ; highest concentration of ascorbic acid globally 20 .",
+        "Fresh culinary use, pickling, and freeze-dried juice powder processing 20 ."
+      ],
+      [
+        "Citrus",
+        "Naga Sweet Orange",
+        "Nagaland",
+        "Non-GI (Market Standard)",
+        "Low acidity, high sweetness, and organically cultivated in hilly terrains 21 .",
+        "Fresh retail fruit and premium organic segments 22 ."
+      ],
+      [
+        "Citrus",
+        "Galgal (Citrus pseudolimon)",
+        "Arunachal Pradesh",
+        "Non-GI",
+        "Large, highly acidic fruits rich in pectin and medicinal citric acid 2 .",
+        "Heavy pickling, citrus vinegar, and industrial citric acid extraction."
+      ],
+      [
+        "Citrus",
+        "Pomelo (Robab Tenga)",
+        "Mizoram, Assam",
+        "Non-GI",
+        "Extremely large fruit with pink or white segment sacs; high in potassium, copper, and vitamin C 23 .",
+        "Fresh salads, commercial juice blending, and high-pectin marmalades 23 ."
+      ],
+      [
+        "Citrus",
+        "Kaffir Lime",
+        "Mizoram",
+        "Non-GI",
+        "Highly aromatic, wrinkled green rind and bi-lobed leaves rich in citronellal.",
+        "Essential oil extraction and fresh culinary use in Southeast Asian cuisines."
+      ],
+      [
+        "Citrus",
+        "Citron",
+        "Meghalaya",
+        "Non-GI",
+        "Thick, fleshy rind; rich in volatile essential oils and medicinal properties 2 .",
+        "Candied peel processing, medicinal extracts, and essential oils."
+      ],
+      [
+        "Exotic",
+        "Kiwi",
+        "Arunachal Pradesh, Sikkim",
+        "Non-GI (APEDA Target) 25",
+        "High ascorbic acid (vitamin C) and actinidin enzyme content; organic mountain crop.",
+        "Premium fresh retail, dehydrated kiwi slices, and fruit pulp."
+      ],
+      [
+        "Exotic",
+        "Avocado",
+        "Meghalaya, Sikkim",
+        "Non-GI",
+        "Rich in monounsaturated fatty acids (oleic acid) and vitamin E; buttery texture.",
+        "Premium fresh retail and cosmetic-grade cold-pressed oil extraction."
+      ],
+      [
+        "Exotic",
+        "Dragon Fruit",
+        "Sikkim",
+        "Non-GI",
+        "High antioxidant content (betalains); emerging climate-resilient crop.",
+        "Fresh wellness retail and natural organic food colouring."
+      ],
+      [
+        "Exotic",
+        "Passion Fruit",
+        "Mizoram, Nagaland",
+        "Non-GI (Taxed at 5% GST) 26",
+        "Intense tropical aroma, high acidity, and rich yellow pulp; processing grade 26 .",
+        "High-value juice concentrate, squashes, and RTS beverages 26 ."
+      ],
+      [
+        "Exotic",
+        "Persimmon",
+        "Arunachal Pradesh",
+        "Non-GI",
+        "Rare high-altitude orange fruit; rich in tannins and soluble dietary fibres.",
+        "Premium fresh dessert fruit and dehydrated sweet slices."
+      ],
+      [
+        "Exotic",
+        "Plum",
+        "Sikkim",
+        "Non-GI",
+        "Temperate high-altitude stone fruit; rich in anthocyanins and organic acids.",
+        "Fresh mountain retail, premium jams, and organic fruit wines."
+      ],
+      [
+        "Exotic",
+        "Peach",
+        "Arunachal Pradesh",
+        "Non-GI",
+        "Soft-fleshed mountain crop; high water content and delicate aroma.",
+        "Premium fresh retail and processed canned halves in syrup."
+      ],
+      [
+        "Exotic",
+        "Pear",
+        "Arunachal Pradesh",
+        "Non-GI",
+        "Crispy temperate crop; high stone-cell density and high dietary fibre.",
+        "Fresh retail, dehydrated fruit leather, and perry (pear cider)."
+      ],
+      [
+        "Exotic",
+        "Apricot",
+        "Sikkim",
+        "Non-GI",
+        "High-altitude dry fruit potential; rich in beta-carotene and iron 27 .",
+        "Dehydrated whole apricots and cosmetic apricot kernel oil."
+      ],
+      [
+        "Exotic",
+        "Cherry",
+        "Sikkim",
+        "Non-GI",
+        "High-altitude stone fruit; bright red pigmentation and low shelf life.",
+        "Premium fresh retail and gourmet confectioneries."
+      ],
+      [
+        "Tropical",
+        "Queen Pineapple",
+        "Tripura",
+        "Registered (No. 436) 28",
+        "Deep yellow color, extremely sweet taste, low fiber, and low acidity 29 .",
+        "Fresh luxury export, vacuum-dried slices, and premium canned rings 14 ."
+      ],
+      [
+        "Tropical",
+        "Kew Pineapple",
+        "Assam",
+        "Non-GI (Market Standard)",
+        "Large, juicy fruit; ideal processing grade with high juice recovery.",
+        "Commercial juice concentrate, squashes, and canned pieces."
+      ],
+      [
+        "Tropical",
+        "Banana",
+        "All States",
+        "Non-GI (Regional Varieties)",
+        "Rich diversity including red, green, and culinary cooking varieties 2 .",
+        "Fresh local markets, banana chips, and organic starch processing."
+      ],
+      [
+        "Tropical",
+        "Papaya",
+        "All States",
+        "Non-GI",
+        "High yield; rich in papain enzyme and dietary fiber.",
+        "Green papaya latex extraction, candy ( tutti-frutti ), and pulp."
+      ],
+      [
+        "Tropical",
+        "Mango",
+        "Assam, Tripura",
+        "Non-GI (Diverse Landraces)",
+        "Local high-aroma varieties suited for humid subtropical zones 2 .",
+        "Fresh local retail, green mango pickling, and pulp concentrate."
+      ],
+      [
+        "Tropical",
+        "Jackfruit",
+        "Assam, Tripura",
+        "Non-GI (Unsuccessful App) 1",
+        "Massive size; high starch and protein content 2 .",
+        "Green jackfruit meat-substitute chunks, chips, and seed flour."
+      ],
+      [
+        "Tropical",
+        "Guava",
+        "Assam",
+        "Non-GI",
+        "High vitamin C and pectin content; pink and white pulp varieties.",
+        "Fresh retail, high-viscosity guava jelly, and RTS beverages."
+      ],
+      [
+        "Tropical",
+        "Litchi",
+        "Tripura, Assam",
+        "Registered (Tezpur Litchi) 32",
+        "Extremely sweet, juicy pulp with a deep red rind and pleasant aroma 33 .",
+        "Premium fresh retail, canned pulp, and exotic export markets 34 ."
+      ],
+      [
+        "Tropical",
+        "Custard Apple",
+        "Meghalaya",
+        "Non-GI",
+        "Sweet, creamy pulp with high caloric density and calcium levels.",
+        "Fresh local markets and premium ice-cream pulp base."
+      ],
+      [
+        "Wild",
+        "Sohiong (Khasi Cherry)",
+        "Meghalaya",
+        "Pending 16",
+        "Dark blackish-purple berry ( Prunus nepalensis ); rich in anthocyanins 3 .",
+        "Premium functional beverages, kombucha, and organic wines 3 ."
+      ],
+      [
+        "Wild",
+        "Sohshang",
+        "Meghalaya",
+        "Pending 16",
+        "Oval/oblong pinkish-red berry ( Elaeagnus latifolia ); highly acidic 35 .",
+        "Gourmet ethnic pickling, jams, and home-processed preserves 35 ."
+      ],
+      [
+        "Wild",
+        "Wild Apple",
+        "Arunachal Pradesh",
+        "Non-GI",
+        "High-altitude, sour forest fruit; high pectin and polyphenol content.",
+        "Dried wild apple slices, herbal teas, and traditional medicines 4 ."
+      ],
+      [
+        "Wild",
+        "Wild Pear",
+        "Arunachal Pradesh",
+        "Non-GI",
+        "Small, gritty green fruits; astringent and highly fibrous landrace.",
+        "Traditional medicine, vinegar production, and wild cider brewing."
+      ]
+    ],
+    [
+      [
+        "Category",
+        "Product Name",
+        "Primary State(s)",
+        "Key Variety / Taxonomic Detail",
+        "Agronomic & Nutritional USP",
+        "Processing & Value-Added Potential"
+      ],
+      [
+        "Leafy",
+        "Lai Patta (Leafy Mustard)",
+        "Assam, Sikkim, AP",
+        "JorMLG-1 & JorMLP-2 36",
+        "Brassica juncea var. rugosa ; rich in ascorbic acid, calcium, and iron 36 .",
+        "Dehydrated greens, traditional saag , and fermented gundruk 37 ."
+      ],
+      [
+        "Leafy",
+        "Mustard Greens",
+        "Nagaland, Manipur",
+        "Hangam 40",
+        "High chlorophyll and glucosinolate content; peppery flavour 37 .",
+        "Pressed mustard seed oil, fresh local greens, and dried condiments 37 ."
+      ],
+      [
+        "Leafy",
+        "Perilla Leaves",
+        "Mizoram, Nagaland",
+        "Mentha-like landraces",
+        "Exceptionally high in rosmarinic acid, omega-3 fatty acids, and aromatic oils.",
+        "Fresh culinary garnishes, herbal extracts, and aromatic teas."
+      ],
+      [
+        "Leafy",
+        "Tree Bean Leaves",
+        "Manipur, Nagaland",
+        "Yongchak Leaves",
+        "Rich in sulfur compounds and amino acids; traditional tribal vegetable.",
+        "Fresh local salads and traditional medicinal decoctions 41 ."
+      ],
+      [
+        "Leafy",
+        "Roselle Leaves",
+        "Assam, Meghalaya",
+        "JorRS 10-02 42",
+        "Hibiscus sabdariffa ; sharp sour flavor due to high citric and malic acids 42 .",
+        "Sour curry bases, herbal infusions, and natural pink food colourants."
+      ],
+      [
+        "Leafy",
+        "Water Spinach",
+        "Assam",
+        "Kalmou Saag",
+        "Fast-growing aquatic green; exceptionally high in iron and vitamin A.",
+        "Fresh local table greens and animal fodder."
+      ],
+      [
+        "Leafy",
+        "Amaranthus",
+        "All States",
+        "Jorhat Promising Lines 42",
+        "High-iron, fast-growing leafy amaranth; rich in calcium and amino acids 42 .",
+        "Fresh local retail, green smoothies, and dehydrated leaf powders."
+      ],
+      [
+        "Leafy",
+        "Colocasia Leaves",
+        "Nagaland, Manipur",
+        "Nuo / Taro leaves 43",
+        "High in dietary fibre and vitamins; base for traditional fermentations 43 .",
+        "Processed into smoked Anishi patties and traditional leaf wraps 46 ."
+      ],
+      [
+        "Root",
+        "Yam",
+        "Nagaland, Mizoram",
+        "High-altitude landraces",
+        "Heavily cultivated in Jhum plots; high starch density and calorie source 45 .",
+        "Raw tuber sales, dehydrated yam flour, and traditional baking base."
+      ],
+      [
+        "Root",
+        "Elephant Foot Yam",
+        "Assam",
+        "Amorphophallus paeoniifolius",
+        "Highly productive; containing medicinal alkaloids and high-quality starch.",
+        "Yam starch extraction, commercial chips, and pickling."
+      ],
+      [
+        "Root",
+        "Sweet Potato",
+        "Meghalaya, Assam",
+        "Orange & Purple cultivars",
+        "High beta-carotene and anthocyanin levels; highly sweet and non-fibrous.",
+        "Dehydrated sweet potato flour, organic vacuum chips, and starch."
+      ],
+      [
+        "Root",
+        "Tapioca (Cassava)",
+        "Meghalaya, AP",
+        "Jhum landraces 48",
+        "High-starch drought-tolerant root; staple security crop 48 .",
+        "Industrial sago tapioca pearls, premium starch, and alcohol brewing."
+      ],
+      [
+        "Root",
+        "Taro",
+        "All States",
+        "Colocasia esculenta tubers",
+        "Dense, sticky tubers containing mucilage and high starch 44 .",
+        "Fresh retail, taro chips, and thickeners for gourmet soup bases."
+      ],
+      [
+        "Root",
+        "Radish",
+        "Sikkim",
+        "Red & White winter varieties",
+        "Long, crisp roots; high water content and distinct peppery heat.",
+        "Fresh retail, sun-dried radish slices, and fermented sinki 40 ."
+      ],
+      [
+        "Root",
+        "Carrot",
+        "Sikkim, AP",
+        "Orange organic landraces",
+        "Sweet, crisp root; high beta-carotene and soluble sugars.",
+        "Fresh organic retail, canned carrot juice, and baby food pulp."
+      ],
+      [
+        "Root",
+        "Beetroot",
+        "Sikkim",
+        "Deep purple landraces",
+        "Rich in betalains and nitrates; grown in temperate soils.",
+        "Fresh retail, natural beetroot powder, and wellness juices."
+      ],
+      [
+        "Root",
+        "Turnip",
+        "Sikkim",
+        "Himalayan white turnip",
+        "Cold-hardy root; high in vitamin C and dietary potassium.",
+        "Winter vegetable retail, pickling, and dehydrated animal feed."
+      ],
+      [
+        "Cruciferous",
+        "Cabbage",
+        "All States",
+        "Winter heavy-drum types",
+        "Highly productive; sweet, tightly packed heads with high water retention.",
+        "Fresh bulk markets, sauerkraut processing, and dehydrated shreds."
+      ],
+      [
+        "Cruciferous",
+        "Cauliflower",
+        "Assam",
+        "Early & Late white varieties",
+        "Solid curds; high commercial volume and premium visual appeal.",
+        "Fresh bulk retail, mixed vegetable pickling, and frozen florets."
+      ],
+      [
+        "Cruciferous",
+        "Broccoli",
+        "Sikkim, Meghalaya",
+        "Premium organic green",
+        "Extremely high in glucoraphanin; premium cold-climate vegetable.",
+        "High-value fresh retail, dehydrated broccoli powder, and frozen cuts."
+      ],
+      [
+        "Cruciferous",
+        "Kale",
+        "Sikkim",
+        "Emerging winter green",
+        "Cold-tolerant, nutrient-dense curly leaves; high in vitamin K and iron.",
+        "Fresh organic wellness markets and freeze-dried kale chips."
+      ],
+      [
+        "Beans",
+        "French Bean",
+        "Sikkim",
+        "Hilly climbing cultivars",
+        "Stringless, tender green pods; high protein and soluble fiber content.",
+        "Fresh retail markets and industrial quick-freezing (IQF) lines."
+      ],
+      [
+        "Beans",
+        "Runner Bean",
+        "AP, Sikkim",
+        "High-altitude varieties",
+        "Large, flat green pods with red/purple seeds; highly cold-resistant.",
+        "Mountain retail and frozen vegetable mixes."
+      ],
+      [
+        "Beans",
+        "Tree Bean",
+        "Manipur, Nagaland",
+        "Parkia speciosa ( Yongchak ) 39",
+        "High in protein, iron, and sulfur; strong, pungent, nutty aroma 39 .",
+        "Premium fresh retail, sun-dried seeds, and gourmet canning 49 ."
+      ],
+      [
+        "Beans",
+        "Soybean (Vegetable)",
+        "Nagaland, Manipur",
+        "Hairless green pod types",
+        "High vegetable-protein density; harvested when pods are young.",
+        "Edamame-style processing, frozen green pods, and fresh local retail."
+      ],
+      [
+        "Cucurbits",
+        "Bottle Gourd",
+        "Assam",
+        "Traditional landraces",
+        "High water content, cooling properties, and delicate fibrous flesh.",
+        "Fresh local markets, commercial juice processing, and candy ( petha )."
+      ],
+      [
+        "Cucurbits",
+        "Bitter Gourd",
+        "Assam, Manipur",
+        "Small wild types",
+        "Rich in charantin and polypeptide-p; strong antidiabetic properties.",
+        "Fresh retail, antidiabetic dried slices, and wellness powders."
+      ],
+      [
+        "Cucurbits",
+        "Ridge Gourd",
+        "Assam",
+        "JorRG 09-05 42",
+        "High-yielding selection; tender, non-fibrous culinary ribs 42 .",
+        "Fresh local vegetable markets and organic fiber sponges (matured)."
+      ],
+      [
+        "Cucurbits",
+        "Pumpkin",
+        "Assam",
+        "High-carotene landraces 42",
+        "Highly sweet, deep orange flesh; excellent storage capability 42 .",
+        "Dehydrated pumpkin powder, seed oil extraction, and purees 42 ."
+      ],
+      [
+        "Cucurbits",
+        "Cucumber",
+        "Nagaland",
+        "Naga Cucumber (GI Tagged) 22",
+        "Extremely sweet, juicy, crisp, and completely free of chemical residue 22 .",
+        "Premium fresh retail, cooling cosmetic gels, and low-salt brined pickles 22 ."
+      ],
+      [
+        "Cucurbits",
+        "Squash",
+        "Mizoram, Sikkim",
+        "Chayote (Isis) 50",
+        "Highly productive pear-shaped cucurbit; high water and mild starch 50 .",
+        "Fresh bulk markets, commercial pickling, and animal feed silage 50 ."
+      ],
+      [
+        "Mushroom",
+        "Oyster Mushroom",
+        "Meghalaya, Assam",
+        "Pleurotus ostreatus",
+        "Highly productive on straw substrates; high protein and vitamin D.",
+        "Fresh retail, dehydrated mushroom shreds, and savory soup powders."
+      ],
+      [
+        "Mushroom",
+        "Shiitake",
+        "Sikkim, Nagaland",
+        "Lentinula edodes",
+        "Wood-grown premium mushroom; extremely rich in lenthionine umami.",
+        "Premium fresh retail, dehydrated whole shiitake, and wellness extracts."
+      ],
+      [
+        "Mushroom",
+        "Button Mushroom",
+        "Assam",
+        "Agaricus bisporus",
+        "Large-scale commercial production; high volume demand.",
+        "Fresh retail and industrial pickling / canning in brine."
+      ],
+      [
+        "Mushroom",
+        "Wild Mushrooms",
+        "Nagaland, Manipur",
+        "Forest-collected types",
+        "Exceptional variety of seasonal mushrooms collected from deep woods.",
+        "Gourmet restaurant supplies and dehydrated specialty mushroom blends."
+      ]
+    ],
+    [
+      [
+        "Product Name",
+        "State of Origin",
+        "GI Status & Application No.",
+        "Specialty, USP & Biochemical Profile",
+        "Value-Added & Processing Potential"
+      ],
+      [
+        "Bhut Jolokia",
+        "Assam, Nagaland",
+        "Non-GI (General Class) 22",
+        "High heat index; up to 1,000,000 Scoville Heat Units (SHU) 22 .",
+        "Capsaicin extraction, defense-grade pepper sprays, and extreme hot sauces 22 ."
+      ],
+      [
+        "Raja Mircha",
+        "Nagaland",
+        "Registered (No. 122) 22",
+        "Highly pungent (800,000–1,000,000 SHU) with a unique smoky flavor 22 .",
+        "High-value organic exports, specialty chili powders, and hot sauces 22 ."
+      ],
+      [
+        "Bird's Eye Chilli",
+        "Mizoram",
+        "Registered (No. 427) 26",
+        "Small, intensely pungent chillies; rich in vitamins 26 .",
+        "Lowered 5% GST on packaged products; ideal for flakes and spice oils 26 ."
+      ],
+      [
+        "Dalle Khursani",
+        "Sikkim",
+        "Registered (No. 636) 52",
+        "Red cherry pepper; high pungency (100,000–350,000 SHU) 54 .",
+        "Premium chili paste, direct export, and gourmet vinegar pickles 54 ."
+      ],
+      [
+        "Ginger (Karbi Anglong)",
+        "Assam",
+        "Registered (No. 226) 55",
+        "Low fiber in Aizol ; high oleoresin oil recovery ( Gingerin ) 48 .",
+        "Essential oil extraction, dry powder, ginger ale, and pharmaceuticals 56 ."
+      ],
+      [
+        "Lakadong Turmeric",
+        "Meghalaya",
+        "Registered 6",
+        "Curcumin content of 7% to 12%; bright golden-yellow hue 17 .",
+        "Turmeric latte mixes, oleoresin extraction, and nutraceutical tablets 58 ."
+      ],
+      [
+        "Black Turmeric",
+        "Assam",
+        "Non-GI (Medicinal Class)",
+        "Curcuma caesia ; dark bluish-black rhizome; rich in camphor and cineole.",
+        "High-value medicinal extracts, essential oils, and traditional cosmetics."
+      ],
+      [
+        "Turmeric (General)",
+        "All States",
+        "Non-GI",
+        "Standard regional varieties; average curcumin content of 3% to 5% 59 .",
+        "Bulk dry turmeric powder, culinary blends, and natural dye processing 60 ."
+      ],
+      [
+        "Large Cardamom",
+        "Sikkim",
+        "Registered (No. 376) 1",
+        "Bold capsules with a strong smoky, camphoraceous aroma 53 .",
+        "Premium whole spice exports, cardamom oil, and aromatic blends 33 ."
+      ],
+      [
+        "Cinnamon",
+        "Arunachal Pradesh",
+        "Non-GI (Horticulture Select) 25",
+        "Sourced from Cinnamomum verum ; sweet, delicate, woody aroma 13 .",
+        "Aromatic spice quill packaging, bakery blends, and essential oils 61 ."
+      ],
+      [
+        "Bay Leaf (Tej Patta)",
+        "Meghalaya",
+        "Non-GI (Market Standard)",
+        "Sourced around Shillong; high essential oil content 51 .",
+        "Whole-leaf export packaging, bay leaf powder, and essential oils 51 ."
+      ],
+      [
+        "Black Pepper",
+        "Tripura, Meghalaya",
+        "Non-GI (Organic Standard) 16",
+        "Bold black peppercorns; high piperine content and intense heat.",
+        "Premium whole-corn table spice, ground pepper shakers, and oleoresins 61 ."
+      ],
+      [
+        "Long Pepper",
+        "Assam",
+        "Non-GI (Medicinal Class)",
+        "Piper longum (Pipli); sweet-pungent woody heat; high piperine content 13 .",
+        "Ayurvedic formulations, cough syrups, and exotic spice blends 13 ."
+      ],
+      [
+        "Perilla Seed",
+        "Nagaland",
+        "Non-GI (Traditional Crop)",
+        "Known as Kenye ; rich in alpha-linolenic acid (omega-3) and proteins.",
+        "Cold-pressed perilla oil, roasted seed seasonings, and traditional chutneys."
+      ],
+      [
+        "Coriander",
+        "Meghalaya",
+        "Non-GI",
+        "High-aroma coriander varieties grown in moist valley soils 13 .",
+        "Premium ground coriander spice, fresh leaf retail, and culinary pastes."
+      ],
+      [
+        "Fennel",
+        "Sikkim",
+        "Non-GI",
+        "Sweet, anise-like seeds rich in anethole; grown in cold climates.",
+        "Mouth freshener packaging, digestive tea blends, and sweet spice oils."
+      ],
+      [
+        "Star Anise",
+        "Arunachal Pradesh",
+        "Non-GI (High Altitude)",
+        "Illicium griffithii ; star-shaped carpels rich in shikimic acid 4 .",
+        "Tamiflu precursor synthesis, incense, tea flavoring, and spice blends 4 ."
+      ],
+      [
+        "Clove",
+        "Sikkim",
+        "Non-GI",
+        "Premium flower buds rich in eugenol; intense numbing heat.",
+        "Culinary spice exports, clove essential oil, and oral-care formulations."
+      ],
+      [
+        "Nutmeg",
+        "Tripura",
+        "Non-GI",
+        "Tropical seed rich in myristicin and sweet aromatic oils.",
+        "Ground nutmeg powder, mace blade packaging, and aromatic extracts."
+      ]
+    ]
+  ]
+}

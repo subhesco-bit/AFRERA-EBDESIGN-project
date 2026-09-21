@@ -195,7 +195,7 @@ const sanitizeInput = (req, res, next) => {
     const sanitized = Array.isArray(obj) ? [] : {};
     
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         // Remove potentially dangerous keys
         if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
           continue;
@@ -219,7 +219,7 @@ const sanitizeInput = (req, res, next) => {
 const preventSQLInjection = (req, res, next) => {
   const sqlPatterns = [
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|EXEC|UNION|SCRIPT)\b)/i,
-    /(;|\-\-|\/\*|\*\/)/,
+    /(;|--|\/\*|\*\/)/,
     /(\b(OR|AND)\s+\d+\s*=\s*\d+)/i
   ];
 
@@ -230,11 +230,11 @@ const preventSQLInjection = (req, res, next) => {
 
   const checkObject = (obj) => {
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         if (checkString(obj[key])) {
           return true;
         }
-        if (typeof obj[key] === 'object') {
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
           if (checkObject(obj[key])) {
             return true;
           }
@@ -274,10 +274,10 @@ const preventXSS = (req, res, next) => {
 
   const sanitizeObject = (obj) => {
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         if (typeof obj[key] === 'string') {
           obj[key] = sanitizeString(obj[key]);
-        } else if (typeof obj[key] === 'object') {
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
           sanitizeObject(obj[key]);
         }
       }

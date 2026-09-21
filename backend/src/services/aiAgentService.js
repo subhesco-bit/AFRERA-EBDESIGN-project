@@ -26,7 +26,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../utils/logger').warn(`aiAgentService: ${envVar} is set but its SDK failed to load`, {
+    require('../utils/logger').logger.warn(`aiAgentService: ${envVar} is set but its SDK failed to load`, {
       error: error.message,
     });
     return null;

@@ -15,6 +15,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware } = require('../../middleware/auth');
+const { withTransaction } = require('../../core/withTransaction');
 const crypto = require('crypto');
 // Loaded on first QR generation, not at import — see authService for why.
 const QRCode = { toDataURL: (...args) => require('qrcode').toDataURL(...args) };
@@ -148,31 +149,39 @@ async function processOfflinePayment(paymentCode, payerId, pin, biometricData = 
     // Create offline transaction
     const transactionId = `OFF-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    const transactionQuery = `
-      INSERT INTO offline_transactions
-      (transaction_id, payment_request_id, payer_id, merchant_id, amount, pin_verified, biometric_data, status, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'completed', NOW())
-      RETURNING *
-    `;
+    // BR-08: recording the transaction, closing out the payment request, and
+    // queuing it for sync must all land together — if the status update was
+    // lost after the transaction row committed, the same payment_code could
+    // be replayed (it is still 'pending'), double-spending the payer. PIN
+    // check and daily-limit read already happened above and involve no
+    // external calls, so it is safe to hold the rest in one DB transaction.
+    await withTransaction(async (client) => {
+      const transactionQuery = `
+        INSERT INTO offline_transactions
+        (transaction_id, payment_request_id, payer_id, merchant_id, amount, pin_verified, biometric_data, status, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, 'completed', NOW())
+        RETURNING *
+      `;
 
-    const transactionResult = await pool.query(transactionQuery, [
-      transactionId,
-      paymentRequest.id,
-      payerId,
-      paymentRequest.merchant_id,
-      paymentRequest.amount,
-      true,
-      biometricData ? JSON.stringify(biometricData) : null,
-    ]);
+      await client.query(transactionQuery, [
+        transactionId,
+        paymentRequest.id,
+        payerId,
+        paymentRequest.merchant_id,
+        paymentRequest.amount,
+        true,
+        biometricData ? JSON.stringify(biometricData) : null,
+      ]);
 
-    // Update payment request status
-    await pool.query(
-      'UPDATE offline_payment_requests SET status = \'completed\', completed_at = NOW() WHERE id = $1',
-      [paymentRequest.id],
-    );
+      // Update payment request status
+      await client.query(
+        'UPDATE offline_payment_requests SET status = \'completed\', completed_at = NOW() WHERE id = $1',
+        [paymentRequest.id],
+      );
 
-    // Add to sync queue
-    await addToSyncQueue(transactionId, 'offline_payment');
+      // Add to sync queue
+      await addToSyncQueue(transactionId, 'offline_payment', client);
+    }, { name: 'offlinePaymentService.processOfflinePayment' });
 
     logger.info(`Offline payment processed: ${transactionId}`);
 
@@ -239,7 +248,7 @@ async function getDailyTransactionTotal(userId) {
 /**
  * Add to Sync Queue
  */
-async function addToSyncQueue(transactionId, transactionType) {
+async function addToSyncQueue(transactionId, transactionType, executor = pool) {
   try {
     const query = `
       INSERT INTO offline_sync_queue
@@ -248,7 +257,7 @@ async function addToSyncQueue(transactionId, transactionType) {
       ON CONFLICT (transaction_id) DO NOTHING
     `;
 
-    await pool.query(query, [transactionId, transactionType]);
+    await executor.query(query, [transactionId, transactionType]);
   } catch (error) {
     logger.error('Failed to add to sync queue', { error: error.message, stack: error.stack });
   }
@@ -331,32 +340,40 @@ async function syncPaymentTransaction(transactionId) {
 
     const offlineTx = offlineResult.rows[0];
 
-    // Create corresponding online transaction
-    const onlineQuery = `
-      INSERT INTO transactions
-      (transaction_id, user_id, type, amount, status, reference, metadata, created_at)
-      VALUES ($1, $2, 'payment', $3, 'completed', $4, $5, $6)
-      RETURNING id
-    `;
+    // BR-08: creating the online ledger transaction, marking the offline
+    // transaction synced, and moving both wallet balances are one economic
+    // event (money leaving the payer's wallet and landing in the merchant's).
+    // Any partial application here is a real money bug: e.g. debiting the
+    // payer without crediting the merchant, or marking the transaction
+    // "synced" while the wallets never moved so it can never be retried.
+    await withTransaction(async (client) => {
+      // Create corresponding online transaction
+      const onlineQuery = `
+        INSERT INTO transactions
+        (transaction_id, user_id, type, amount, status, reference, metadata, created_at)
+        VALUES ($1, $2, 'payment', $3, 'completed', $4, $5, $6)
+        RETURNING id
+      `;
 
-    await pool.query(onlineQuery, [
-      transactionId,
-      offlineTx.payer_id,
-      offlineTx.amount,
-      `OFFLINE-${offlineTx.payment_request_id}`,
-      JSON.stringify({ source: 'offline_payment', offline_transaction_id: offlineTx.id }),
-      offlineTx.created_at,
-    ]);
+      await client.query(onlineQuery, [
+        transactionId,
+        offlineTx.payer_id,
+        offlineTx.amount,
+        `OFFLINE-${offlineTx.payment_request_id}`,
+        JSON.stringify({ source: 'offline_payment', offline_transaction_id: offlineTx.id }),
+        offlineTx.created_at,
+      ]);
 
-    // Update offline transaction sync status
-    await pool.query(
-      'UPDATE offline_transactions SET sync_status = \'synced\', synced_at = NOW() WHERE transaction_id = $1',
-      [transactionId],
-    );
+      // Update offline transaction sync status
+      await client.query(
+        'UPDATE offline_transactions SET sync_status = \'synced\', synced_at = NOW() WHERE transaction_id = $1',
+        [transactionId],
+      );
 
-    // Update wallet balances
-    await updateWalletBalance(offlineTx.payer_id, -offlineTx.amount);
-    await updateWalletBalance(offlineTx.merchant_id, offlineTx.amount);
+      // Update wallet balances
+      await updateWalletBalance(offlineTx.payer_id, -offlineTx.amount, client);
+      await updateWalletBalance(offlineTx.merchant_id, offlineTx.amount, client);
+    }, { name: 'offlinePaymentService.syncPaymentTransaction', lockTables: ['user_wallets'] });
 
     logger.info(`Payment transaction synced: ${transactionId}`);
   } catch (error) {
@@ -368,16 +385,16 @@ async function syncPaymentTransaction(transactionId) {
 /**
  * Update Wallet Balance
  */
-async function updateWalletBalance(userId, amount) {
+async function updateWalletBalance(userId, amount, executor = pool) {
   try {
     const query = `
       INSERT INTO user_wallets (user_id, balance)
       VALUES ($1, $2)
-      ON CONFLICT (user_id) 
+      ON CONFLICT (user_id)
       DO UPDATE SET balance = user_wallets.balance + $2
     `;
 
-    await pool.query(query, [userId, amount]);
+    await executor.query(query, [userId, amount]);
   } catch (error) {
     logger.error('Failed to update wallet balance', { error: error.message, stack: error.stack });
     throw error;

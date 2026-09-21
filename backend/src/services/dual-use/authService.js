@@ -15,6 +15,7 @@ const fs = require('fs');
 const path = require('path');
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
+const { withTransaction } = require('../../core/withTransaction');
 // NOTE: middleware/auth.js requires THIS file (for verifyToken/hasPermission),
 // so importing it at the top level here creates a circular dependency: at load
 // time authService's exports are not yet populated, so authMiddleware resolves
@@ -377,36 +378,46 @@ async function registerUser(userData) {
     // Hash password
     const passwordHash = await hashPassword(registrationData.password);
 
-    // Insert user
-    const userQuery = `
-      INSERT INTO users (email, phone, password_hash, role, status)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, email, phone, role, status, created_at
-    `;
+    // BR-08: the users row and its user_profiles row must be created
+    // together — a crash between the two INSERTs would leave a user account
+    // with no profile row, which every profile-joining query (including
+    // loginUser's own SELECT) does not expect. No external call is involved
+    // here (password hashing already happened above), so it is safe to hold
+    // both writes in one transaction.
+    const { user, profile } = await withTransaction(async (client) => {
+      // Insert user
+      const userQuery = `
+        INSERT INTO users (email, phone, password_hash, role, status)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, email, phone, role, status, created_at
+      `;
 
-    const userResult = await pg.query(userQuery, [
-      registrationData.email.toLowerCase(),
-      registrationData.phone || null,
-      passwordHash,
-      registrationData.role,
-      registrationData.status,
-    ]);
+      const userResult = await client.query(userQuery, [
+        registrationData.email.toLowerCase(),
+        registrationData.phone || null,
+        passwordHash,
+        registrationData.role,
+        registrationData.status,
+      ]);
 
-    const user = userResult.rows[0];
+      const insertedUser = userResult.rows[0];
 
-    // Insert user profile
-    const profileQuery = `
-      INSERT INTO user_profiles (user_id, first_name, last_name, phone)
-      VALUES ($1, $2, $3, $4)
-      RETURNING *
-    `;
+      // Insert user profile
+      const profileQuery = `
+        INSERT INTO user_profiles (user_id, first_name, last_name, phone)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+      `;
 
-    const profileResult = await pg.query(profileQuery, [
-      user.id,
-      registrationData.first_name || '',
-      registrationData.last_name || '',
-      registrationData.phone || '',
-    ]);
+      const profileResult = await client.query(profileQuery, [
+        insertedUser.id,
+        registrationData.first_name || '',
+        registrationData.last_name || '',
+        registrationData.phone || '',
+      ]);
+
+      return { user: insertedUser, profile: profileResult.rows[0] };
+    }, { name: 'authService.registerUser' });
 
     // Generate tokens
     const accessToken = generateAccessToken(user);
@@ -421,7 +432,7 @@ async function registerUser(userData) {
         phone: user.phone,
         role: user.role,
         status: user.status,
-        profile: profileResult.rows[0],
+        profile,
       },
       token: accessToken,
       accessToken,
@@ -859,28 +870,38 @@ async function oauthAuthenticate(provider, code, redirectUri) {
       // Create new user
       const passwordHash = await hashPassword(generateRandomPassword());
 
-      const newUserQuery = `
-        INSERT INTO users (email, password_hash, role, status, email_verified)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id, email, role, status
-      `;
+      // BR-08: same reasoning as registerUser — the new users row and its
+      // user_profiles row (carrying the oauth_provider/oauth_id link) must
+      // commit together, or the account ends up unable to be matched back
+      // to its OAuth identity on the next login. The OAuth network calls
+      // (exchangeOAuthCode/getOAuthUserInfo) already completed above, so
+      // nothing external is held inside this transaction.
+      user = await withTransaction(async (client) => {
+        const newUserQuery = `
+          INSERT INTO users (email, password_hash, role, status, email_verified)
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING id, email, role, status
+        `;
 
-      const newUserResult = await pg.query(newUserQuery, [
-        userInfo.email.toLowerCase(),
-        passwordHash,
-        'consumer',
-        'active',
-        true,
-      ]);
+        const newUserResult = await client.query(newUserQuery, [
+          userInfo.email.toLowerCase(),
+          passwordHash,
+          'consumer',
+          'active',
+          true,
+        ]);
 
-      user = newUserResult.rows[0];
+        const createdUser = newUserResult.rows[0];
 
-      // Create profile
-      await pg.query(
-        `INSERT INTO user_profiles (user_id, first_name, last_name, oauth_provider, oauth_id)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [user.id, userInfo.first_name || '', userInfo.last_name || '', provider, userInfo.id],
-      );
+        // Create profile
+        await client.query(
+          `INSERT INTO user_profiles (user_id, first_name, last_name, oauth_provider, oauth_id)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [createdUser.id, userInfo.first_name || '', userInfo.last_name || '', provider, userInfo.id],
+        );
+
+        return createdUser;
+      }, { name: 'authService.oauthAuthenticate.createUser' });
     }
 
     // Generate tokens
@@ -1309,4 +1330,6 @@ module.exports = {
   hasPermission,
   generateAccessToken,
   generateRefreshToken,
+  hashPassword,
+  comparePassword,
 };

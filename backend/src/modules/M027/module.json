@@ -1,0 +1,42 @@
+{
+  "moduleId": "M027",
+  "version": "0.1.0",
+  "name": "M027 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "compliance",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m027",
+      "backend"
+    ],
+    "capabilities": [
+      "pg",
+      "daysUntil",
+      "calculateComplianceScore",
+      "inferStatus",
+      "normalizeCertification",
+      "buildCertificationSignals",
+      "listItems",
+      "getItem",
+      "createItem",
+      "updateItem",
+      "deleteItem",
+      "getCertificationPortfolio"
+    ],
+    "aiContext": "backend module M027; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

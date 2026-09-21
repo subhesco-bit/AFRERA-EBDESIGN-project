@@ -1,6 +1,6 @@
 const express = require('express');
 const enterpriseAIService = require('../../services/ai/enterpriseAIService');
-const aiOrchestrationService = require('../../services/ai/aiOrchestrationService');
+const aiOrchestrationService = require('../../services/legacy/aiOrchestrationService');
 const { authMiddleware } = require('../../middleware/auth');
 
 const router = express.Router();

@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const gstService = require('../../services/finance/gstService');
+const gstService = require('../../services/gstService');
 const productReviewService = require('../../services/commerce/productReviewService');
 const bulkOrderService = require('../../services/commerce/bulkOrderService');
 const { authMiddleware } = require('../../middleware/auth');

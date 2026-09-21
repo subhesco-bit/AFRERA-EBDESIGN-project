@@ -6,7 +6,7 @@ router.post('/qa/inspect/:productId', auth, async (req, res) => {
   try {
     const result = await qaService.inspectProduct(req.params.productId, req.body);
     res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+  } catch (error) { res.status(400).json({ success: false, error: error.message }); }
 });
 
 module.exports = router;

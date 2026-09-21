@@ -1,0 +1,44 @@
+{
+  "moduleId": "M023",
+  "version": "0.1.0",
+  "name": "M023 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "agriculture",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m023",
+      "backend",
+      "Farmer"
+    ],
+    "capabilities": [
+      "createTrainingProgram",
+      "createTrainingSession",
+      "enrollFarmer",
+      "recordAttendance",
+      "submitAssessment",
+      "getRecommendedPrograms",
+      "getTrainingAnalytics",
+      "generateId",
+      "getIndustryStandards",
+      "getSkillRequirements",
+      "predictLearningOutcomes",
+      "getFarmerProfile"
+    ],
+    "aiContext": "backend module M023; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names",
+      "README domain"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

@@ -39,6 +39,14 @@ const PreloadPriority = {
 const preloadCache = new Map();
 
 /**
+ * Statically-analyzed map of every page module, built at build time by Vite.
+ * Replaces a runtime `import(\`../pages/${routePath}.jsx\`)`, which is not
+ * reliably resolvable by production bundlers (it made every page a candidate
+ * for eager parsing and broke the production build).
+ */
+const pageModules = import.meta.glob('../pages/**/*.jsx');
+
+/**
  * Preload a route component
  */
 async function preloadRoute(routePath, priority = PreloadPriority.MEDIUM) {
@@ -49,8 +57,9 @@ async function preloadRoute(routePath, priority = PreloadPriority.MEDIUM) {
   }
 
   try {
-    // Dynamic import based on route path
-    const component = await import(`../pages/${routePath}.jsx`);
+    const loader = pageModules[`../pages/${routePath}.jsx`];
+    if (!loader) return null;
+    const component = await loader();
     preloadCache.set(routePath, component);
     return component;
   } catch (error) {

@@ -1,0 +1,21 @@
+{
+  "moduleId": "M777_VETERINARY_AI",
+  "version": "1.0.0",
+  "name": "AI Veterinary Doctor",
+  "description": "Animal health diagnosis for poultry, livestock, pets",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "animal_diagnosis",
+    "disease_detection",
+    "treatment_recommendation",
+    "health_monitoring"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m777_veterinary_ai"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "moduleId": "M028",
+  "version": "0.1.0",
+  "name": "M028 Module",
+  "description": "backend module. Purpose not yet declared by the module itself.",
+  "category": "ai",
+  "status": "generated",
+  "surface": "backend",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {}
+  },
+  "discovery": {
+    "keywords": [
+      "m028",
+      "backend"
+    ],
+    "capabilities": [
+      "pg",
+      "asArray",
+      "normalizePriority",
+      "buildAdvisoryActions",
+      "derivePriority",
+      "normalizeAdvisory",
+      "listItems",
+      "getItem",
+      "createItem",
+      "updateItem",
+      "deleteItem",
+      "generateAdvisoryPlan"
+    ],
+    "aiContext": "backend module M028; no table binding declared."
+  },
+  "provenance": {
+    "generatedBy": "library B2 module registration",
+    "derivedFrom": [
+      "service.js method names"
+    ],
+    "note": "Fields are derived from the module's own code. category is unclassified where the evidence did not support one; status is generated, not verified."
+  }
+}

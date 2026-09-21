@@ -1,5 +1,192 @@
 # ACTIVE TASKS
 
+## TODO — AFRERA P1 capability-module backlog (2026-09-21, 5 skeletons remain — 2 superseded)
+
+**Update (2026-09-21, later same day):** reconciling with `subh-deep`
+remote's independently-pushed work found real, substantial implementations
+already exist for 2 of the 7 skeletons below — `fpoOperationsService.js` +
+`fpoOperationsRoutes.js` + `FPODashboardPage.jsx`/`FPORegistrationPage.jsx`
+(real FPO Operations Hub, not a skeleton) and `warehouseReceiptService.js` +
+`warehouseReceiptRoutes.js` (real Warehouse Receipt / WRS). Deleted
+`M900100_FPOOPERATIONS` and `M903100_WAREHOUSERECEIPT` skeleton folders to
+avoid a duplicate/confusing module ID sitting next to the real
+implementation. See `DOCUMENTATION/FPO_AND_WAREHOUSE_RECEIPT.md` for the
+real implementation's own docs. 5 skeletons remain genuinely needed.
+
+User supplied a stakeholder-loop analysis of ~200 named `modules/` + backend
+services, identifying that the project has many **labels** (crop, dairy,
+cold storage, insurance, GI, subsidy, escrow, WhatsApp) but is missing the
+**closed stakeholder loops** that make it a coherent platform: aggregate
+(FPO), prove quality, contract, store with title, move, pay, insure/
+subsidize, resolve disputes. Full source doc (stakeholder table, priority
+tiers P1-P4, target architecture diagram): ask user to re-paste if needed,
+not persisted verbatim here - this entry tracks only the actionable P1 set
+and what's been done.
+
+User's own recommended build order: Settlement → FPO pooling → Grading →
+Contract farming → Warehouse receipt → Dispute desk → Scheme cases →
+Harvest→cold→logistics spine → WhatsApp/multilingual/offline access layer →
+Engineering O&M/energy. User then asked instead for **skeletons of all P1
+items at once** ("so we develop them and dont miss then") rather than
+picking one to fully build first.
+
+**Verified against the real codebase before scaffolding** (do not trust the
+recommendation doc's names without checking - this session's standing
+rule): all 13 module names the doc cited as "existing, COMPLETE not ADD"
+were confirmed real. Each is a thin wrapper (`backend/service.js`,
+~13 lines) re-exporting a real backing service under
+`backend/src/services/` — `governmentSchemeService.js` (709 lines),
+`institutionalProcurementService.js` (784 lines), `offlineSyncService.js`
+(886 lines), `multilingualService.js` (821 lines), `subsidyService.js`
+(591 lines), `landRecordsService.js` (461 lines), `dprGenerationService.js`
+(477 lines), `whatsappService.js` (423 lines), `gstService.js` (225 lines) -
+all genuinely substantial, not scaffolds. **Side-finding, not yet acted on:**
+`escrowService.js`, `cooperativeShareService.js`,
+`identityManagementService.js`, and `dynamicPricingService.js` each exist
+twice - a real implementation under `services/legacy/` and a stale 22-line
+duplicate at `services/` top level with the same filename. Flag for a
+merge-not-delete cleanup pass later; not touched yet.
+
+### 5 new SKELETON modules remaining (2 of the original 7 deleted, see above)
+Following the existing module.json convention (`status: "SKELETON"`,
+`completeness: {backend:false, frontend:false, routes:false, tests:false}`),
+each with a `backend/service.js` whose every method throws
+`NOT_IMPLEMENTED` explicitly (no fake success, per this project's honesty
+discipline) and a `SPEC.md` naming the real stakeholder loop, the real
+existing services to compose (not duplicate), and open product questions to
+resolve before building. **Deliberately no `routes.js` yet** - mounting
+endpoints that only throw would pollute the live route-mount count with
+dead endpoints; routes get added when each module's real logic lands.
+
+1. `M901100_CONTRACTFARMING` - Contract Farming & Forward Trade (acreage/
+   qty commitment, quality clauses, milestone escrow release, breach
+   flags). Links: `escrowService.js` (real, 339 lines - compose, don't
+   reimplement). Also note: `subh-deep` added real multi-party
+   trade-escrow (`fpoOperationsRoutes.js`'s sibling work,
+   `DOCUMENTATION/`) - check for overlap before building.
+2. `M902100_QUALITYGRADING` - Quality Grading & Assaying Lab Workflow
+   (sample intake → parameters → certificate → linked to price/custody).
+   Needs: verify existing lab/food-safety module schemas before building
+   (doc claims fragments exist).
+3. `M904100_SETTLEMENTORCHESTRATOR` - Settlement, UPI & Payout Engine
+   (delivery confirm → quality hold → UPI/NEFT payout → FPO split → GST
+   invoice → retry). User's #1 priority. Real UPI/NEFT bank-rail
+   integration explicitly left as a documented not-configured integration
+   point (no real credentials this session) - matches the pattern already
+   used in `landRecordsService.js`. Check `subh-deep`'s new
+   `vcs-control-plane` (price-waterfall, mass-balance, provenance kernel)
+   for overlap before building - may already cover part of this.
+4. `M905100_DISPUTEDESK` - Dispute, Grievance & Trust Desk (typed cases,
+   evidence, SLA, outcome codes, seller-ranking impact). Needs: outcome-
+   code vocabulary and ranking-impact formula are product decisions, not
+   to invent unilaterally.
+5. `M906100_HARVESTPLANNING` - Harvest & Post-Harvest Planning (harvest
+   window → labour request → packhouse checklist → cold slot booking →
+   dispatch). Links: existing crop-planning service, the real
+   `warehouseReceiptService.js` for cold slot booking (not `M903100` -
+   that skeleton was deleted, real implementation exists instead).
+
+### 3 P1 items that extend existing modules — no new folder created
+- **Document/KYC/Consent Vault** → extend `M501100_IDENTITYMANAGEMENT`
+  (real backing service exists, `identityManagementService.js`).
+- **Scheme Application Case Manager** → extend `M652100_GOVERNMENTSCHEME`
+  + `M386100_SUBSIDY` (both real, 709 and 591 lines respectively) with a
+  file-and-track application-case layer, not a new eligibility checker.
+- **Extension/Advisory Workbench** → extend `M472100_AIADVISORY` (confirmed
+  exists) with human-accountable ticket/visit/prescription workflow, not
+  chatbot-only advisory.
+
+### Not started
+All 7 new skeletons need real implementation (each SPEC.md has the method
+list and composition plan). Recommended order per user's own doc: Settlement
+(M904100) first, since it's ranked #1 and other modules (FPO payout split,
+contract escrow release) depend on it existing.
+
+## TODO — AFRERA Value-Chain Execution & Orchestration Control Plane (2026-09-21, Phase 1 done, rest not started)
+
+User's expanded architectural direction: the "value-chain studio" should not be one more isolated page/service — it should become a formal cross-domain control plane sitting above the existing specialist systems (Farmer/FPO/Village ERP, Marketplace, Procurement, Warehouse, Cold Chain, Logistics, Finance, Insurance, Subsidy/Government Schemes, Engineering OS, Shared Infrastructure, IoT/Digital Twin, Renewable Energy, FOLU/ESG, Compliance). Core principle (non-negotiable): **no number without a source, formula, or declared assumption** — every financial/production/logistics/engineering/subsidy/insurance/compliance output must trace to real evidence and a versioned calculation; generative AI is confined to product positioning copy and image generation, never the authoritative computational path.
+
+**Phase 1 — DONE and pushed:** `backend/src/services/valueChainStudioService.js` + `backend/src/routes/valueChainStudioRoutes.js` + `frontend/src/pages/ValueChainStudioPage.jsx` + `frontend/src/services/valueChainStudioAPI.js`. Orchestrates farmer-value scoring, pricing, cold-chain, insurance, subsidies, compliance, engineering, shared-infrastructure, and equipment-rental (all real, DB-backed services — see file header for exact functions used and scoping decisions). Verified live: backend boots, route mounts at `/api/v1/value-chain-studio/:productId`, responds correctly under auth. Full spec: `.ai/handoffs/2026-09-21-value-chain-studio-implementation-spec.md`.
+
+**Remaining phases — not started, scoped by the user for follow-on work (see conversation for full detail on each):**
+- **Value Chain Case model**: a `value_chain_case` root entity (not `product`) representing one economic opportunity — farmers, plots, FPO, production plan, harvest lots, aggregation, processing, packaging, cold chain, logistics, market/buyer, pricing, contracts, finance, insurance, subsidy, compliance, infrastructure, risk, sustainability, settlement — referencing canonical IDs (farmer/FPO/village/product/etc.) rather than duplicating master data.
+- **Lifecycle Graph Engine**: configurable node/edge graph (not a hard-coded linear workflow) since different commodities (turmeric vs. fish vs. milk vs. bamboo) have different real lifecycles; each node carries `node_type`, `responsible_party`, `input`, `output`, `status`, `gate`, `evidence`, `cost`, `duration`, `dependency`, `specialist_module`, `specialist_route`.
+- **Provenance Ledger**: field-level `DataAssertion` records (evidence_class, source_system/record, verification_status, calculation_definition + version, assumption_id, supersedes_assertion_id) — richer than a single `provenance` object per response; evidence taxonomy expanded beyond verified/observed/calculated/estimated to include AUTHORITATIVE, TRANSACTIONAL, SENSOR-OBSERVED, USER-DECLARED, STALE, CONFLICTED, MISSING.
+- **Calculation & Rules Registry**: every formula gets an identity + version (e.g. `PRICE-LANDED-001`) with effective dates, inputs, units, rounding, jurisdiction, approval status, test cases — so historical cases can be reconstructed with the exact calculation version used at the time.
+- **Price Waterfall, Mass-Balance Engine, Cold-Chain Capacity calculation, Funding Stack (gross CapEx vs. potential/approved/disbursed subsidy kept separate), Scheme Rule Engine, Compliance Gates (G0–G12), Exception Management, Saga-style cross-domain transaction orchestration, Evidence Graph, immutable lifecycle Snapshots, Scenario Studio (fork-and-recompute, never mutates baseline), Decision Records.**
+- **Frontend**: evolve from the single Phase-1 page into a "mission control" workspace (Executive Cockpit, Lifecycle Graph, Economics Workbench, Physical Flow, Readiness & Gates, Stakeholder Room, Evidence & Audit) with a readiness *matrix* per domain (not one blended score) and deep links carrying signed context capsules (case_id, actor, entity, permissions, return_route) into the existing specialist pages.
+- **Architecture-level rule to enforce in code, not just convention**: authoritative computation zone (rules/pricing/eligibility/financials/compliance/mass-balance/settlement) must never accept LLM output; a separate, clearly bounded generative-AI zone handles only positioning/imagery/narrative.
+
+Recommended sequencing (from the user's own material, not yet started): canonical domain/identity → integration forensics (what's actually live vs. stub across existing modules, machine-readable) → trust foundation (evidence/provenance/calculation registry/snapshots) → execution kernel (case registry/lifecycle graph/gates/handoffs) → physical & economic engines → specialist integration → enterprise UX → controlled AI → production hardening.
+
+**Caveat for whoever picks this up:** a large batch of pasted planning documents (Gap Resolution Matrix, Implementation Roadmap, Enhancement PR Plan, Execution Workflow — referencing "SVESCO/EBDESIGN," "77 gaps," week-by-week schedules) arrived alongside this vision but were **not verified against this codebase** and read as generic/templated rather than grounded — treat those four specifically as unverified until checked against real code, the way Phase 1 above was.
+
+## DONE — integrated product value chain, token/plugin policy, and professional medical coding (2026-09-21)
+
+Implemented and verified the farmer-product vertical slice from intake through AI media/copy, nutrition reference, value pricing, cold chain, insurance, funding, subsidy, engineering, compliance, commerce, settlement handoffs, and governance. Added quality-preserving token defaults and a capability-based enterprise integration registry; external and financial writes remain approval-gated. Extended AI coding assistance to clinical coding, dietitian/MNT, nutritionist, nutrient-calculator/laboratory, and natural-therapist contexts with evidence-only prompts, qualified review, and no automatic diagnosis or claim submission. Added the contextual placeholder contract and final delivery checklist at `docs/INTEGRATED_PLATFORM_TODO.md`.
+
+Verification: 7 targeted backend tests passed; full Vite production build passed (6,353 modules). The remaining build message is a non-fatal generated-page dynamic/static import chunking warning.
+
+## TODO — regenerate 6 deleted audit CSVs (2026-09-20, not started)
+`_audit/SKELETON_SERVICE_AUDIT/{01_FILE_INVENTORY,03_SERVICE_INVENTORY,
+04_DEPENDENCY_INVENTORY,05_ROUTE_API_INVENTORY,06_DATABASE_INVENTORY,
+07_CONFIG_INVENTORY}.csv` were physically deleted from disk sometime before
+this session started (last committed in `77a9e8936`, "feat: add complete
+integration repair system", by subhesco-bit). They are git-recoverable
+(`git checkout 77a9e8936 -- _audit/SKELETON_SERVICE_AUDIT/`), but user
+explicitly asked to regenerate fresh rather than restore stale data —
+recovery-from-deletion was flagged as unreliable. No live script currently
+references these paths, so nothing is broken by their absence; this is
+purely about restoring the audit artifact itself. Need to find/run whatever
+tool originally produced them (likely a sibling of the `02_SKELETON_
+CANDIDATES.csv`/`08_SKELETON_EVIDENCE.csv`/`09_AUDIT_SUMMARY.txt` files that
+DO still exist in the same folder) and regenerate 01,03,04,05,06,07 fresh.
+
+## DONE — medical coding backend/frontend wiring (2026-09-20)
+Real bug found and fixed: `backend/src/services/advancedMedicalCodingService.js`
+(783 lines, real MS-level dietitian/natural-therapist/biological-coding
+knowledge base) and `backend/src/services/medicalCodingReferenceService.js`
+(real SQL-backed reference-lookup router) each contained a fully-built
+Express router with real endpoints matching the frontend's exact call sites
+— but both lived in `services/`, and `DynamicRouteLoader.discoverServiceEmbeddedRoutes`
+only picks up misplaced routers under `services/` whose filename ends in
+`Routes.js`; these ended in `Service.js`, so neither the normal `routes/`
+scan nor the misplaced-router fallback ever found them. Zero backend
+mounting existed for either, silently. Fixed: `git mv`'d both into
+`backend/src/routes/` as `advancedMedicalCodingRoutes.js` and
+`medicalCodingReferenceRoutes.js`. Verified via live boot: both now mount
+(`/api/v1/advanced-medical-coding`, `/api/v1/medical-coding-reference`),
+total mounted routes 768 → 770. Removed the two now-stale path entries from
+`SERVICES_REGISTRY.js`.
+
+Also added `medicalCodingAPI` to `frontend/src/services/api.js` — it was
+imported by `MedicalCodingDashboardPage.jsx` but never existed at all
+(would have crashed on first render). Wired its 3 methods to the real
+mounted endpoints.
+
+**Known remaining gap, not fabricated around:** `MedicalCodingDashboardPage.jsx`
+expects response shapes keyed by 10 hardcoded common-condition ids (diabetes,
+hypertension, gout, etc.) — `{conditions: {diabetes: {...}}}`,
+`{restrictions: {...}}`, `{requirements: {...}}`. The real knowledge base in
+`advancedMedicalCodingRoutes.js` is keyed by clinical category
+(`clinical_nutrition`, etc.), not those 10 condition ids, and
+`searchMedicalCodes()` is itself a stub that always returns `codes: []`
+(comment: "Implementation would search through the medical coding
+database"). Calls now resolve without crashing, but the dashboard's
+code/restriction/requirement tables will render empty for all 10
+conditions until either: (a) a condition-id lookup layer is added
+server-side mapping the 10 common conditions to real ICD-10-CM/SNOMED
+codes (needs real clinical coding data, not something to invent), or (b)
+the page is rewritten against the real knowledge-base shape. Did not
+fabricate ICD codes for the 10 conditions to make it "look" wired.
+
+`AdvancedMedicalCodingPage.jsx` (the other medical coding page) calls
+`api.get('/advanced-medical-coding/...')` directly with no API-object
+layer, and its endpoints (`code-systems`, `search-codes/:condition`,
+`dietitian-knowledge/:condition`, `natural-therapist-knowledge/:condition`,
+`health-management-plan`) now fully resolve — this page is genuinely fixed
+end-to-end by the route move alone.
+
 ## TODO — "make all gaps zero" (2026-08-29, in progress, resume here)
 
 User asked to close every code-achievable gap from the AFRERA Gap Index
@@ -1817,6 +2004,155 @@ re-export wrapper or (for the 2 `aiGatewayService.js` files) an unchanged
 implementation with an added header comment. No route, controller, or
 `index.js` changes were needed - every route continues requiring whatever
 path it already required; only the top-level file's own contents changed.
+
+---
+
+## TODO — flagged during 2026-09-20 branch-consolidation pass (not fixed, tracked for the backend/controller/AI/ERP audit)
+
+Found while verifying 8 divergent branches' content was fully absorbed
+into `consolidated/final` before deleting them (see commit history
+`3889245f0`..`13d76a02f`). None of these were fabricated as "done" -
+recording them here specifically so they don't get silently dropped.
+
+1. ~~**Dependency vulnerabilities - not remediated.**~~ **MOSTLY RESOLVED
+   same session (commits `740e7da58` backend... wait, `1bafce9a3` backend,
+   `740e7da58` frontend).** Backend: 21 -> 4 (moderate only, both HIGHs
+   resolved) via removing 2 confirmed-zero-usage packages
+   (`firebase-admin`, `apollo-server-express` - eliminated the
+   @google-cloud/* chain at the root) plus upgrading `nodemailer` (real
+   SMTP-injection/SSRF CVEs, actively used in emailService.js) and `sharp`
+   (real libvips/libheif CVEs, actively used in visionService.js, verified
+   with a real functional smoke test after upgrading, not just
+   `node --check`). Removing the two zero-usage packages broke a real,
+   previously-undeclared dependency (`uuid`, used directly in 44 files via
+   hoisting from the packages just removed) - caught via a full boot
+   test, fixed by adding `uuid@^11.1.1` as a proper direct dependency
+   before committing. Frontend: 10 -> 3 (both criticals resolved: `vitest`
+   major-bumped to 5.0.1 after confirming zero regression risk - the 314
+   test files using `import ... from 'vitest'` already fail identically
+   under the actual configured runner, jest, before and after). Remaining
+   4 backend moderate + 3 frontend moderate all require downgrading a
+   real, used dependency to an ancient major version (aws-sdk, bull,
+   exceljs, @capacitor/cli) - not applied, real regression for
+   moderate-severity issues is a bad trade.
+2. ~~**3-way `freightPoolingService.js` duplicate - not resolved.**~~
+   **RESOLVED same session (commit `00cb17c37`).** Traced: 2 of the 3
+   route files were real and distinct (2-endpoint pool create/join vs.
+   6-endpoint pooling-windows), both correctly wired to their own real
+   service, but colliding on the same derived mount path — renamed one
+   (`freightPooling.js` -> `freightPoolRoutes.js`) so both are reachable.
+   The 3rd (`routes/logistics/freightPoolingRoutes.js`) was a broken,
+   100% redundant duplicate of the windows file with the wrong service
+   required — archived to `_archive/duplicates/2026-09-20/`. Live boot
+   now shows 768/768 mounted (was 767/768 every prior run this session).
+3. ~~**`comprehensiveERPController.js` - still a scaffold, 46 endpoints,
+   zero real business logic.**~~ **WRONG DIAGNOSIS, CORRECTED AND FIXED
+   same session (commit `00cb17c37`).** This flag was carried over from
+   an earlier investigation done in `.consolidation_work/chatgpt-tree`
+   (a different, less-mature tree) without re-verifying against
+   `consolidated/final` specifically — that was a mistake, caught and
+   fixed. The real business logic already exists and is substantial:
+   `services/legacy/comprehensiveERPService.js`, 1751 lines, all 12
+   SAP-module namespaces with real parameterized-SQL-backed methods. The
+   controller was simply requiring the wrong file
+   (`services/legacy/erpService.js`, an unrelated ERP *sync* service).
+   Verified all 46 controller method calls resolve against the correct
+   service (0 missing) before swapping the require, then proved the fix
+   by direct invocation (before: `TypeError: Cannot read properties of
+   undefined`; after: the real, honest `"Database not initialized"`).
+   **Lesson: don't carry a finding from one tree over to another without
+   re-verifying — this exact mistake already cost one wasted flag.**
+4. ~~**~41 of the original 74 module-service "gap candidates" not
+   individually re-verified.**~~ **RESOLVED same session** - re-ran the
+   check for the literal `// Add business logic here` stub marker (the
+   only reliable signal, confirmed by direct inspection - `module.json`
+   status and line-count are both unreliable) across all 41 remaining
+   candidates (M034-M141 range). Zero matches. This category is closed
+   with certainty: no further module-service gaps of this specific kind
+   remain anywhere in the 544-module set.
+
+## TODO — systematic controller/service call-resolution audit (2026-09-20, commit `a2fa3b39a`)
+
+Built a scanner (`audit_all_controllers.js` pattern, not saved to the repo
+- recreate from this description if needed) that, for every
+`backend/src/controllers/*.js` and `backend/src/modules/M*/controller.js`
+(371 files), resolves every `<requiredVar>.<method>(` call against the
+actual `require()`'d module's real exports (handling destructuring and
+`require(...).property` chains after two false-positive-fixing passes).
+
+**Real bugs found and fixed:**
+- M013 (authorization/permission service) and M144 (greenhouse management
+  service) controllers called generic `listItems/getItem/createItem/
+  updateItem/deleteItem` names their real, class-based services never
+  exported. Fixed both to the real names (commit `a2fa3b39a`).
+- M144's own test file tested a fictional generic API (search/createBulk/
+  getAll-with-pagination) the real service never had - skipped with an
+  honest documented reason rather than fabricating those capabilities.
+
+**Confirmed false positives (no action needed):** `bulkOrderController`'s
+flag was the scanner matching text inside an already-fixed comment;
+`ecommerceController`'s was a `require(...).getPostgreSQL()` chain the
+scanner doesn't parse; ~30 `logger.error` flags across M0xx modules were
+the `require(...).logger || console` fallback pattern, also unparsed by
+the scanner. M012/M014's `REQUIRE_THROWS` (JWT_SECRET) is the scanner's
+own isolated-process env, not a real bug - dotenv loads at real boot.
+
+**Status: this specific scan is closed** (every one of the 371 controllers
+now accounted for). Not yet done: the same call-resolution audit against
+`backend/src/services/*.js` calling into OTHER services (cross-service
+calls), and the frontend equivalent (component -> API-client call
+resolution) - both would very likely surface the same bug class.
+
+## RESOLVED — service-to-service and frontend API-client call-resolution audits (2026-09-20)
+
+Both predicted next-scope items above were completed same session:
+
+**Service-to-service** (commit `ed408afee`): 1275 files scanned, 86 broken
+calls found, 4 real bugs fixed - `aiCollaborationService.logWork` missing
+entirely (crashed 13+ AI services), `smsAuthService.js` off-by-one require
+path (broke SMS login/registration entirely), `authService.js`
+hashPassword/comparePassword existed but weren't exported,
+`aiGatewayService.js` missing healthCheck/optimize/analyze (crashed
+platformCoreService's 3 main operations), `insurancePolicyIssuanceService.js`
+wrong require path. Plus (commit `6b25e28cd`) a genuine feature
+implementation: `nutritionCommerceIntelligenceService.calculateNutritionDensity`
+and `priceObservationQuality` were spec'd by their own test file but never
+implemented - built for real, 6/7 tests now pass. **One honest open
+discrepancy**: `calculateNutritionDensity`'s test expects score 0.75 for a
+specific input; the implemented principled formula (average of
+per-nutrient capped ratios) gives 0.65. Tried several alternative
+weightings looking for one with a real justification that lands on 0.75;
+none did. Left as-is rather than curve-fit an unjustified adjustment -
+whoever specified the original 0.75 expectation should clarify the
+intended weighting.
+
+**Frontend component-to-API-client** (commit `1044ff4ad`): 719 real broken
+calls across 130 API objects in 145 files - the same "generic
+placeholder, not the real methods pages need" pattern as the backend
+audits, now confirmed at the frontend API-client layer. Fixed by
+injecting 665 missing methods into 125 existing objects, creating 5 fully
+missing objects, and hand-fixing 3 componentApi.js objects
+(multilingualAPI/conversationalAIAPI/voiceAIAPI) that real components
+depend on. Re-ran the scanner after fixing: 723 -> 4 (the remaining 4 are
+a confirmed scanner false positive on the real, working `api` axios
+instance export, not an actual gap).
+
+## Still open, not yet done
+
+1. **`marketplace.test.js` real rewrite** - still `describe.skip`'d
+   (2026-08-30 reason: stale schema, external-server integration test).
+   Given no live Postgres exists in this dev environment, a true
+   integration-test fix can't be verified here regardless of how it's
+   written. The verifiable path is converting it to a mocked-DB unit test
+   (same pattern as `nationalMarketplaceListing.test.js`, which does work)
+   - not started yet.
+2. **314 frontend test files using `import ... from 'vitest'`** against a
+   project whose actual configured runner is jest - tracked, not
+   rewritten (see the dependency-remediation commit `740e7da58` for full
+   context).
+3. Remaining backend/frontend moderate npm vulnerabilities (aws-sdk, bull,
+   exceljs, @capacitor/cli's uuid chain) - no clean fix without
+   downgrading a real, used dependency to an ancient major version.
 
 ---
 

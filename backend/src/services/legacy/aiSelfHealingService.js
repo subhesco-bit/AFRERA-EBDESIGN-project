@@ -18,7 +18,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../../utils/logger').warn('aiClient:  is set but its SDK failed to load', { error: error.message });
+    require('../../utils/logger').logger.warn('aiClient: API key is set but its SDK failed to load', { error: error.message });
     return null;
   }
 }
@@ -60,7 +60,9 @@ class AISelfHealingService {
     this.initializeRecoveryStrategies();
 
     // Start health monitoring
-    this.startHealthMonitoring();
+    if (process.env.ENABLE_AI_BACKGROUND_JOBS === 'true') {
+      this.startHealthMonitoring();
+    }
   }
 
   /**
@@ -596,6 +598,7 @@ class AISelfHealingService {
     this._healthInterval = setInterval(() => {
       this.updateHealthMetrics();
     }, 30000);
+    this._healthInterval.unref?.();
   }
 
   stopHealthMonitoring() {
