@@ -28,6 +28,14 @@ class CacheService {
         url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
         password: process.env.REDIS_PASSWORD || undefined,
         database: Number.parseInt(process.env.REDIS_DB, 10) || 0,
+        socket: {
+          // Without these, an absent Redis makes connect() retry indefinitely,
+          // so the await below never settles and the server never reaches
+          // listen() -- the catch block's "continue without cache" intent
+          // could never actually run. Fail fast instead and degrade.
+          connectTimeout: Number.parseInt(process.env.REDIS_CONNECT_TIMEOUT_MS, 10) || 2000,
+          reconnectStrategy: false,
+        },
       });
 
       this.client.on('error', (err) => {

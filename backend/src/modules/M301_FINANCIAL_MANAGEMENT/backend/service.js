@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../../backend/src/services/legacy/financialService');
+module.exports = require('../../../services/legacy/financialService');

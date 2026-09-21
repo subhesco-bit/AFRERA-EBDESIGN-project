@@ -3,7 +3,7 @@
  * Production-ready module with AI integration and decision-making capabilities
  */
 
-const { getPostgreSQL } = require('../../../../backend/src/database/connection');
+const { getPostgreSQL } = require('../../../../database/connection');
 
 class ModuleNameService {
   constructor() {

@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../../backend/src/services/legacy/aiOrchestrationService');
+module.exports = require('../../../services/legacy/aiOrchestrationService');
