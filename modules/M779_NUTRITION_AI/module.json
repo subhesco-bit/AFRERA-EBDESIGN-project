@@ -1,0 +1,21 @@
+{
+  "moduleId": "M779_NUTRITION_AI",
+  "version": "1.0.0",
+  "name": "AI Nutritionist",
+  "description": "Personalized nutrition planning and health analysis",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "nutrition_planning",
+    "dietary_recommendation",
+    "health_assessment",
+    "calorie_calculation"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m779_nutrition_ai"
+    }
+  }
+}

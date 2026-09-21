@@ -1,0 +1,21 @@
+{
+  "moduleId": "M785_FARMER_SUPPORT_AI",
+  "version": "1.0.0",
+  "name": "AI Farmer Support System",
+  "description": "Comprehensive farmer support and guidance",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "farming_guidance",
+    "crisis_management",
+    "market_information",
+    "weather_alerts"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m785_farmer_support_ai"
+    }
+  }
+}

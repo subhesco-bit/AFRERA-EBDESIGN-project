@@ -2,45 +2,20 @@
   "moduleId": "M405_PREDICTIVE_ANALYTICS",
   "version": "1.0.0",
   "name": "Predictive Analytics",
-  "description": "Migrated from legacy service: predictiveAnalyticsService.js",
+  "description": "Forecasting and trend analysis",
   "category": "ai",
-  "status": "WIRED",
-  "migration": {
-    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\predictiveAnalyticsService.js",
-    "migratedAt": "2026-08-24T17:28:25.364Z",
-    "analysis": {
-      "hasConstructor": false,
-      "hasMethods": true,
-      "hasDatabase": true,
-      "hasAuth": true,
-      "hasErrorHandling": true,
-      "lineCount": 496,
-      "isComplete": false,
-      "category": "SKELETON"
-    },
-    "wiredAt": "2026-08-25T10:20:19.070Z",
-    "wiredVerification": "Loads successfully and delegates to the live source service."
-  },
-  "dependencies": {
-    "modules": [],
-    "services": [
-      "postgresql"
-    ],
-    "libraries": {
-      "backend": [
-        "express",
-        "winston"
-      ],
-      "frontend": [
-        "react",
-        "zustand"
-      ]
+  "status": "production",
+  "capabilities": [
+    "yield_prediction",
+    "disease_prediction",
+    "market_trends",
+    "anomaly_detection"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m405_predictive_analytics"
     }
-  },
-  "completeness": {
-    "backend": true,
-    "frontend": false,
-    "routes": false,
-    "tests": false
   }
 }

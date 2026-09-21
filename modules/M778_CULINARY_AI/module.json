@@ -1,0 +1,21 @@
+{
+  "moduleId": "M778_CULINARY_AI",
+  "version": "1.0.0",
+  "name": "AI Master Chef",
+  "description": "Recipe generation and meal planning",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "recipe_generation",
+    "meal_planning",
+    "nutrition_analysis",
+    "cooking_instructions"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m778_culinary_ai"
+    }
+  }
+}

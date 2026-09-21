@@ -1,0 +1,21 @@
+{
+  "moduleId": "M782_DISEASE_ANALYZER_AI",
+  "version": "1.0.0",
+  "name": "AI Plant Disease Analyzer",
+  "description": "Plant disease detection and solution with farmer support letters",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "disease_identification",
+    "image_analysis",
+    "treatment_recommendation",
+    "farmer_letter"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m782_disease_analyzer_ai"
+    }
+  }
+}

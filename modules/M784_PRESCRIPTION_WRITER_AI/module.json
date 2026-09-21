@@ -1,0 +1,20 @@
+{
+  "moduleId": "M784_PRESCRIPTION_WRITER_AI",
+  "version": "1.0.0",
+  "name": "AI Prescription Writer",
+  "description": "Medical prescription generation (educational)",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "prescription_generation",
+    "medicine_recommendation",
+    "dosage_calculation"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m784_prescription_writer_ai"
+    }
+  }
+}

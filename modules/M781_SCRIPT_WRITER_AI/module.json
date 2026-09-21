@@ -1,0 +1,21 @@
+{
+  "moduleId": "M781_SCRIPT_WRITER_AI",
+  "version": "1.0.0",
+  "name": "AI Script Writer",
+  "description": "Script and story generation",
+  "category": "ai",
+  "status": "production",
+  "capabilities": [
+    "script_generation",
+    "story_writing",
+    "content_generation",
+    "dialogue_writing"
+  ],
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "apiRoutes": "backend/routes.js",
+      "baseEndpoint": "/api/v1/m781_script_writer_ai"
+    }
+  }
+}

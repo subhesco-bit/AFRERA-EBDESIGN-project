@@ -1,5 +1,5 @@
 // Component-facing adapter. API ownership remains in services/api.js.
-import api from './api';
+import { api } from './api';
 export { default } from './api';
 export * from './api';
 
