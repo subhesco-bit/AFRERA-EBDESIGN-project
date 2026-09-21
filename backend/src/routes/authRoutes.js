@@ -9,6 +9,51 @@ const router = express.Router();
  * POST /auth/refresh - Refresh token
  */
 
+// ---------------------------------------------------------------------------
+// FAIL-CLOSED GUARD
+//
+// This router is a MOCK. It keeps users in a process-local Map, compares and
+// stores passwords in PLAINTEXT (lines below), and issues fabricated non-JWT
+// strings of the form `jwt_<userId>_<timestamp>`.
+//
+// It is live: index.js mounts it explicitly at `/api/auth`. Verified against a
+// running server before this guard was added:
+//
+//   POST /api/auth/register -> 201, token "jwt_user_1789981049426_..."
+//   POST /api/auth/login    -> 200 with the plaintext password
+//
+// The tokens it mints are correctly REJECTED by the real verifier in
+// middleware/auth.js, so this was not an authorization bypass. It was still a
+// live endpoint accepting and retaining plaintext credentials, and a login that
+// appears to succeed while granting no access -- the two-incoherent-auth-systems
+// problem.
+//
+// Per the project rule that nothing is deleted, the implementation is retained
+// but disabled unless explicitly opted into. Set ALLOW_MOCK_AUTH=true (never in
+// a deployed environment) to use it. Replace this router with the real identity
+// service rather than enabling the flag: see
+// .ai/tasks/AFRERA_ENHANCEMENT_TODO.md items 1.1.1-1.1.5.
+//
+// The same remediation is applied in subhesco-bit/subh-deep, where the
+// equivalent router was auto-mounted at /api/v1/auth by route discovery.
+// ---------------------------------------------------------------------------
+const MOCK_AUTH_ENABLED = process.env.ALLOW_MOCK_AUTH === 'true';
+
+router.use((req, res, next) => {
+  if (MOCK_AUTH_ENABLED) return next();
+  return res.status(503).json({
+    success: false,
+    error: {
+      message:
+        'Mock authentication is disabled. This endpoint stores plaintext ' +
+        'passwords and issues non-JWT tokens, and must not serve traffic. ' +
+        'A real identity service has not yet replaced it.',
+      code: 'MOCK_AUTH_DISABLED',
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Mock user database (in production, use PostgreSQL)
 const users = new Map();
 const sessions = new Map();

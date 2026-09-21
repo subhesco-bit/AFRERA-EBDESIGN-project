@@ -127,12 +127,34 @@ These were fixed in this change. Before it, the platform did not start.
 
 ### 1.1 Authentication — one coherent identity system
 
-- [ ] **1.1.1 Verify and remediate the mock auth path** — `PROPOSED` — *security, high*
-  The assessment reports `authRoutes.js` using in-memory users, plaintext
-  passwords, fabricated `jwt_user_timestamp` tokens and process-local sessions,
-  while protected routes use real JWT verification in `middleware/auth.js`.
-  **This claim was not yet verified against the code in this change** — verify
-  first, then converge on one identity authority.
+- [x] **1.1.1 Mock authentication path — closed fail-closed** — `VERIFIED` — *was a live exposure*
+  The assessment's finding 2 is **confirmed**, verified against a running
+  server rather than inferred:
+
+  ```
+  POST /api/auth/register -> 201  {"token":"jwt_user_1789981049426_1789981049426"}
+  POST /api/auth/login    -> 200  (with the plaintext password)
+  ```
+
+  `routes/authRoutes.js` keeps users in a process-local `Map` (line 13),
+  compares passwords in plaintext (line 37), stores them in plaintext (line 88)
+  and mints fabricated non-JWT `jwt_<userId>_<timestamp>` strings
+  (`generateToken`, line 17). It is mounted **explicitly** at `/api/auth`
+  (`index.js:710`) — not merely required.
+
+  **Severity, stated precisely:** not an authorization bypass. The tokens it
+  mints are rejected by the real verifier in `middleware/auth.js`. The exposure
+  was a reachable endpoint accepting and retaining plaintext credentials, plus a
+  login that appears to succeed while granting no access.
+
+  **Remediation:** per the no-deletion rule the implementation is retained but
+  gated behind `ALLOW_MOCK_AUTH=true`, defaulting to **disabled**. Confirmed
+  after the change: `503 MOCK_AUTH_DISABLED` on register and login, platform
+  still healthy (`/health` 200, 212 routes mounted). The flag is a stopgap —
+  1.1.2–1.1.5 replace this with a real identity service; do not enable it.
+  The same remediation is applied in `subhesco-bit/subh-deep`, where the
+  equivalent router was auto-mounted at `/api/v1/auth` by route discovery.
+
 - [ ] **1.1.2 Single token contract** — `PROPOSED`
   Frontend clients reportedly use different token names and API paths.
 - [ ] **1.1.3 Short-lived access token + secure refresh + rotation** — `PROPOSED`
