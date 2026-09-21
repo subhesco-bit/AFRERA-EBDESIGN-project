@@ -1,71 +1,29 @@
 /**
- * Value-Chain Studio — orchestrator service.
+ * Value-Chain Studio — orchestrator service (highest production level).
  *
  * Single entry point (`buildLifecyclePlan`) that assembles a farmer/product's
  * full lifecycle plan out of the platform's real, DB-backed services:
  * pricing, cold-chain, insurance, subsidies, compliance, product value
- * scoring, plus the scope-expansion concepts (engineering, shared
- * infrastructure, equipment rental) that turned out to have real,
- * non-stub implementations.
+ * scoring, funding readiness, logistics, engineering, shared infrastructure,
+ * equipment rental — plus explicit stakeholder handoffs and a deterministic
+ * readiness summary.
  *
- * DESIGN RULES (per the approved plan)
- * -------------------------------------
+ * DESIGN RULES
+ * ------------
  * 1. Nothing numeric is invented. Every section is computed from a real
  *    service/table read. If the underlying data is missing, the field is
  *    `null` and its provenance entry says `source: 'unavailable'` — never
  *    silently estimated.
- * 2. AI is scoped to exactly two isolated functions below
+ * 2. AI is scoped to exactly two isolated functions
  *    (`generatePositioningCopy`, `generateProductImage`), both easy to
  *    audit/disable independently of the deterministic sections.
  * 3. `buildLifecyclePlan` is a read path — no section it calls performs a
- *    write. Two functions that exist elsewhere in the codebase were
- *    deliberately NOT called here because they write on every invocation:
- *      - valueCommerceService.calculateValueBasedPrice() inserts a row into
- *        product_value_pricing every time it runs. Calling it from a GET
- *        that a page loads on every visit would flood that table. Only
- *        the (pure-read) getProductValueScore() is used here.
- *      - complianceTrackingService.trackCompliance() is a write, and its
- *        INSERT (`entity_id, regulation_id, status`) does not even match
- *        the real compliance_records schema in 000_base_schema.sql
- *        (entity_type, entity_id, requirement_type, requirement_description,
- *        due_date, status, completed_date, verified_by, notes) — the table
- *        was independently redefined by migration 3025 as
- *        `CREATE TABLE IF NOT EXISTS` and lost, since 000 runs first. Calling
- *        trackCompliance() would throw ("column regulation_id does not
- *        exist"). Compliance gates are read directly off compliance_records
- *        instead, using its real columns.
+ *    write. Deliberately NOT called (write-on-read):
+ *      - valueCommerceService.calculateValueBasedPrice()
+ *      - complianceTrackingService.trackCompliance()
  *
- * SCOPE-EXPANSION VERIFICATION SUMMARY (engineering / shared-infra / rental)
- * ---------------------------------------------------------------------------
- *  - Engineering: services/legacy/engineeringProjectService.js is real
- *    (writes/reads engineering_projects, a real migration-023 table) and is
- *    mounted live via routes/engineeringProjectRoutes.js. Used directly:
- *    listProjects(userId).
- *  - Shared infrastructure: services/legacy/sharedInfraService.js is real
- *    against `assets` / `shared_infrastructure_access`, but its only public
- *    search entry point (searchSharedInfrastructure) wraps
- *    aiAPI.generateRecommendation and reshapes its result from the AI
- *    response, not from its own real getAvailableAssets() DB helper — so it
- *    is not deterministic and was not used. getAvailableAssets() is real and
- *    deterministic but is a private, unexported helper in that file, and per
- *    the "do not modify existing services" rule it was left untouched.
- *    Instead this service replicates the same (real) assets/asset_types
- *    query directly, which is the same pattern the plan itself uses for
- *    valueCommerceService (call real data directly rather than fix mounting
- *    or edit the source file). services/legacy/sharedInfrastructureService.js
- *    (a different file/module, M852100) is the one referenced by the dead
- *    ORPHANED_SERVICES_MOUNT.js and was not used at all.
- *  - Rental/equipment: services/legacy/equipmentExchangeService.js is real
- *    (equipment_exchange_listings table) and mounted live twice
- *    (routes/equipmentExchangeRoutes.js, routes/equipmentExchangeDomainRoutes.js).
- *    Used directly: listAvailable().
- *    services/legacy/machineryAccessService.js is ALSO real (machinery_access
- *    table, migration 041) but was excluded from the studio: it is scoped by
- *    village_id, and there is no join from farmerId/productId to a village
- *    in the current schema (farmers only carries farm_location_id ->
- *    addresses, no village reference) — using it would mean guessing a
- *    village, which is the exact fabrication this feature exists to avoid.
- *    This is a scoping exclusion, not a stub finding.
+ * See DOCUMENTATION/VALUE_CHAIN_STUDIO_ARCHITECTURE.md for the full
+ * concept → architecture → microservices → studio layering.
  */
 
 'use strict';
@@ -118,19 +76,9 @@ async function getFarmerContext(farmerId) {
 }
 
 // ===========================================================================
-// Section builders — each returns { data, provenance }. Each catches its own
-// errors so one failing/unavailable section never fails the whole plan.
+// Section builders — each returns { data, provenance }. Errors are isolated.
 // ===========================================================================
 
-/** Pricing — dynamicPricingService's real, deterministic (non-AI) functions:
- * floorBenchmark() (peer floor-price aggregate from farmer_listings) and, if
- * an active yield-managed lot exists for this product, priceForLot() (real
- * markdown/floor math over pricing_lots/pricing_buckets). Deliberately does
- * NOT call calculateLocalMarketPricing() — that function is AI-driven
- * (aiAPI.generateRecommendation) and its own helper functions
- * (getLocalMarketData, getHistoricalPrices, etc.) return hardcoded mock data,
- * which would violate the "no AI-estimated numbers in pricing" rule.
- */
 async function getPricingSection(product) {
   const provenance = {};
   const data = { floorBenchmark: null, activeLot: null };
@@ -138,7 +86,7 @@ async function getPricingSection(product) {
   try {
     const categoryQuery = product.category_name || product.name;
     data.floorBenchmark = await dynamicPricingService.floorBenchmark(categoryQuery);
-    provenance['pricing.floorBenchmark'] = dbSourced(data.floorBenchmark.count >= 2);
+    provenance['pricing.floorBenchmark'] = dbSourced(data.floorBenchmark && data.floorBenchmark.count >= 2);
   } catch (error) {
     provenance['pricing.floorBenchmark'] = unavailable(error.message);
   }
@@ -163,8 +111,6 @@ async function getPricingSection(product) {
   return { data, provenance };
 }
 
-/** Product value score — read-only. calculateValueBasedPrice() is
- * deliberately not called here; see file header. */
 async function getValueScoreSection(product) {
   const provenance = {};
   const data = { score: null };
@@ -177,9 +123,6 @@ async function getValueScoreSection(product) {
   return { data, provenance };
 }
 
-/** Cold-chain — real, live-computed aggregates off cold_storage_* tables.
- * No booking is created here (that is a farmer-initiated action, not part of
- * a read-only lifecycle plan). */
 async function getColdChainSection() {
   const provenance = {};
   const data = { systemStatus: null, facilities: [] };
@@ -199,12 +142,6 @@ async function getColdChainSection() {
   return { data, provenance };
 }
 
-/** Insurance readiness — the farmer's real existing policies
- * (insurance_policies, via insurancePolicyIssuanceService.getUserPolicies).
- * Deliberately does NOT trigger a fresh insurancePremiumService premium
- * calculation: those formulas run off hardcoded regional risk tables (not
- * measured per-farmer data) and need inputs (area, sum insured, season) this
- * endpoint has no honest way to supply without guessing them. */
 async function getInsuranceSection(farmer) {
   const provenance = {};
   const data = { policies: [] };
@@ -222,10 +159,6 @@ async function getInsuranceSection(farmer) {
   return { data, provenance };
 }
 
-/** Subsidies — governmentSchemeService.checkSchemeEligibility() (real,
- * grounded strictly in the verified government_schemes registry, not a
- * free-form AI call) plus farmerValueService.detectUnclaimedSubsidy()
- * (complementary, different tables). */
 async function getSubsidiesSection(product, farmer) {
   const provenance = {};
   const data = { schemeEligibility: null, unclaimed: null };
@@ -254,10 +187,6 @@ async function getSubsidiesSection(product, farmer) {
   return { data, provenance };
 }
 
-/** Compliance gates — read directly off compliance_records (real table,
- * migration 000_base_schema.sql). complianceTrackingService.trackCompliance()
- * is a write and, per the file header, does not even match this table's real
- * columns, so it is not used. */
 async function getComplianceSection(product, farmer) {
   const provenance = {};
   const data = { gates: [] };
@@ -283,7 +212,6 @@ async function getComplianceSection(product, farmer) {
   return { data, provenance };
 }
 
-/** Farmer Value Index — the decision layer above every other module. */
 async function getFarmerValueSection(farmer) {
   const provenance = {};
   const data = { fvi: null };
@@ -300,8 +228,6 @@ async function getFarmerValueSection(farmer) {
   return { data, provenance };
 }
 
-/** Engineering — real engineering_projects rows for the farmer's linked
- * user account, via the live-mounted engineeringProjectService. */
 async function getEngineeringSection(farmer) {
   const provenance = {};
   const data = { projects: [] };
@@ -318,9 +244,6 @@ async function getEngineeringSection(farmer) {
   return { data, provenance };
 }
 
-/** Shared infrastructure — real assets/asset_types read. See file header for
- * why this queries the schema directly instead of calling
- * sharedInfraService.searchSharedInfrastructure() (AI-gated). */
 async function getSharedInfrastructureSection(product) {
   const provenance = {};
   const data = { availableAssets: [] };
@@ -349,11 +272,6 @@ async function getSharedInfrastructureSection(product) {
   return { data, provenance };
 }
 
-/** Equipment rental — real equipment_exchange_listings read, via the
- * live-mounted equipmentExchangeService. Platform-wide (not farmer/product
- * scoped): the listings table has no reliable link back to a specific
- * product, and scoping by the farmer's state would require a states.id
- * lookup this endpoint's inputs do not carry. */
 async function getEquipmentRentalSection() {
   const provenance = {};
   const data = { availableListings: [] };
@@ -367,16 +285,187 @@ async function getEquipmentRentalSection() {
   return { data, provenance };
 }
 
+/**
+ * Funding readiness — read-only loan applications linked to the farmer's user.
+ * Does not invent credit scores or eligibility; only reports what exists.
+ */
+async function getFundingSection(farmer) {
+  const provenance = {};
+  const data = { applications: [], summary: null };
+  if (!farmer || !farmer.user_id) {
+    provenance['funding.applications'] = unavailable('No linked farmer/user account.');
+    return { data, provenance };
+  }
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, loan_type, amount_requested, amount_approved, status, created_at, updated_at
+         FROM loan_applications
+        WHERE user_id = $1
+        ORDER BY created_at DESC
+        LIMIT 20`,
+      [farmer.user_id],
+    );
+    data.applications = rows;
+    const open = rows.filter((r) => r.status && !['rejected', 'closed', 'disbursed'].includes(String(r.status).toLowerCase()));
+    const approved = rows.filter((r) => String(r.status || '').toLowerCase() === 'approved' || String(r.status || '').toLowerCase() === 'disbursed');
+    data.summary = {
+      totalApplications: rows.length,
+      openCount: open.length,
+      approvedOrDisbursedCount: approved.length,
+      totalRequested: rows.reduce((s, r) => s + (Number(r.amount_requested) || 0), 0),
+      totalApproved: approved.reduce((s, r) => s + (Number(r.amount_approved) || 0), 0),
+    };
+    provenance['funding.applications'] = dbSourced(true);
+    provenance['funding.summary'] = calculatedSourced(true);
+  } catch (error) {
+    // Table may not exist in every environment — surface as unavailable, never invent.
+    provenance['funding.applications'] = unavailable(error.message);
+    provenance['funding.summary'] = unavailable(error.message);
+  }
+  return { data, provenance };
+}
+
+/**
+ * Logistics — recent shipments that reference this product or farmer context.
+ * Pure read; no booking created.
+ */
+async function getLogisticsSection(product, farmer) {
+  const provenance = {};
+  const data = { shipments: [] };
+  try {
+    const params = [String(product.id)];
+    let farmerClause = '';
+    if (farmer && farmer.id) {
+      params.push(String(farmer.id));
+      farmerClause = ` OR farmer_id = $2`;
+    }
+    const { rows } = await pool.query(
+      `SELECT id, tracking_number, status, origin, destination, product_id, farmer_id,
+              estimated_delivery, created_at
+         FROM shipments
+        WHERE product_id = $1${farmerClause}
+        ORDER BY created_at DESC
+        LIMIT 15`,
+      params,
+    );
+    data.shipments = rows;
+    provenance['logistics.shipments'] = dbSourced(true);
+    if (rows.length === 0) {
+      provenance['logistics.shipments'].note = 'No shipments linked to this product/farmer yet.';
+    }
+  } catch (error) {
+    provenance['logistics.shipments'] = unavailable(error.message);
+  }
+  return { data, provenance };
+}
+
 function buildStakeholderLinks() {
   return [
+    { section: 'pricing', label: 'Dynamic Pricing', href: '/dynamic-pricing' },
     { section: 'coldChain', label: 'Cold Storage', href: '/cold-storage' },
     { section: 'insurance', label: 'Insurance', href: '/insurance' },
     { section: 'subsidies', label: 'Government Subsidy', href: '/government-subsidy' },
     { section: 'compliance', label: 'Compliance', href: '/compliance' },
+    { section: 'funding', label: 'Loan Management', href: '/loan-management' },
+    { section: 'logistics', label: 'Logistics', href: '/logistics' },
     { section: 'engineering', label: 'Engineering Projects', href: '/engineering-projects' },
     { section: 'sharedInfrastructure', label: 'Shared Infrastructure', href: '/shared-infra' },
     { section: 'equipmentRental', label: 'Equipment Rental', href: '/equipment-rental' },
   ];
+}
+
+/**
+ * Stakeholder handoffs — explicit status for each specialist workspace
+ * derived only from already-verified section data (no new estimates).
+ */
+function buildHandoffs(sections) {
+  const {
+    pricing, coldChain, insurance, subsidies, compliance,
+    funding, logistics, engineering, sharedInfrastructure, equipmentRental,
+  } = sections;
+
+  const handoff = (section, label, href, status, detail) => ({
+    section, label, href, status, detail,
+  });
+
+  const hasPricing = Boolean(pricing?.floorBenchmark || pricing?.activeLot);
+  const hasCold = Boolean(coldChain?.systemStatus);
+  const hasInsurance = (insurance?.policies || []).length > 0;
+  const hasSubsidy = Boolean(
+    (subsidies?.schemeEligibility?.eligible_schemes || []).length
+    || (subsidies?.unclaimed?.claimable_now_total > 0),
+  );
+  const openGates = (compliance?.gates || []).filter(
+    (g) => g.status && !['completed', 'verified', 'closed'].includes(String(g.status).toLowerCase()),
+  ).length;
+  const hasFunding = (funding?.applications || []).length > 0;
+  const hasLogistics = (logistics?.shipments || []).length > 0;
+  const hasEngineering = (engineering?.projects || []).length > 0;
+  const hasShared = (sharedInfrastructure?.availableAssets || []).length > 0;
+  const hasEquipment = (equipmentRental?.availableListings || []).length > 0;
+
+  return [
+    handoff('pricing', 'Pricing workspace', '/dynamic-pricing', hasPricing ? 'ready' : 'needs_data',
+      hasPricing ? 'Floor benchmark or active lot available' : 'No pricing data yet'),
+    handoff('coldChain', 'Cold-chain ops', '/cold-storage', hasCold ? 'ready' : 'needs_data',
+      hasCold ? `Network status: ${coldChain.systemStatus?.status || 'known'}` : 'Cold-chain status unavailable'),
+    handoff('insurance', 'Insurance desk', '/insurance', hasInsurance ? 'ready' : 'action_needed',
+      hasInsurance ? `${insurance.policies.length} policy(ies) on file` : 'No policies — consider coverage'),
+    handoff('subsidies', 'Subsidy desk', '/government-subsidy', hasSubsidy ? 'ready' : 'review',
+      hasSubsidy ? 'Eligible schemes or claimable amounts present' : 'No verified schemes matched'),
+    handoff('compliance', 'Compliance gates', '/compliance', openGates === 0 ? 'clear' : 'action_needed',
+      openGates === 0 ? 'No open gates' : `${openGates} open gate(s)`),
+    handoff('funding', 'Funding / loans', '/loan-management', hasFunding ? 'ready' : 'optional',
+      hasFunding ? `${funding.applications.length} application(s)` : 'No loan applications on file'),
+    handoff('logistics', 'Logistics', '/logistics', hasLogistics ? 'ready' : 'optional',
+      hasLogistics ? `${logistics.shipments.length} shipment(s)` : 'No linked shipments'),
+    handoff('engineering', 'Engineering', '/engineering-projects', hasEngineering ? 'ready' : 'optional',
+      hasEngineering ? `${engineering.projects.length} project(s)` : 'No engineering projects'),
+    handoff('sharedInfrastructure', 'Shared infrastructure', '/shared-infra', hasShared ? 'ready' : 'optional',
+      hasShared ? `${sharedInfrastructure.availableAssets.length} asset(s)` : 'No matching assets'),
+    handoff('equipmentRental', 'Equipment rental', '/equipment-rental', hasEquipment ? 'ready' : 'optional',
+      hasEquipment ? `${equipmentRental.availableListings.length} listing(s)` : 'No listings'),
+  ];
+}
+
+/**
+ * Deterministic readiness summary — aggregates only verified/calculated fields.
+ */
+function buildReadinessSummary(provenance, sections) {
+  const entries = Object.values(provenance || {});
+  const verifiedCount = entries.filter((e) => e && e.verified).length;
+  const unavailableCount = entries.filter((e) => e && e.source === 'unavailable').length;
+  const totalTracked = entries.length;
+
+  const openCompliance = (sections.compliance?.gates || []).filter(
+    (g) => g.status && !['completed', 'verified', 'closed'].includes(String(g.status).toLowerCase()),
+  ).length;
+  const hasActiveInsurance = (sections.insurance?.policies || []).some(
+    (p) => p.status && ['active', 'issued', 'in_force'].includes(String(p.status).toLowerCase()),
+  );
+  const claimableSubsidy = Number(sections.subsidies?.unclaimed?.claimable_now_total) || 0;
+  const hasPricing = Boolean(sections.pricing?.floorBenchmark || sections.pricing?.activeLot);
+
+  // Simple 0–100 score from verified coverage (deterministic weights).
+  const coverageRatio = totalTracked > 0 ? verifiedCount / totalTracked : 0;
+  let score = Math.round(coverageRatio * 70);
+  if (hasPricing) score += 10;
+  if (hasActiveInsurance) score += 10;
+  if (openCompliance === 0) score += 5;
+  if (claimableSubsidy > 0) score += 5;
+  score = Math.min(100, Math.max(0, score));
+
+  return {
+    score,
+    verifiedFields: verifiedCount,
+    unavailableFields: unavailableCount,
+    totalTrackedFields: totalTracked,
+    openComplianceGates: openCompliance,
+    hasActiveInsurance,
+    claimableSubsidyTotal: claimableSubsidy,
+    hasPricingSignal: hasPricing,
+    label: score >= 80 ? 'high' : score >= 50 ? 'medium' : 'low',
+  };
 }
 
 // ===========================================================================
@@ -394,7 +483,7 @@ async function buildLifecyclePlan({ productId, farmerId }) {
   const [
     pricingResult, valueScoreResult, coldChainResult, insuranceResult,
     subsidiesResult, complianceResult, farmerValueResult, engineeringResult,
-    sharedInfraResult, equipmentRentalResult,
+    sharedInfraResult, equipmentRentalResult, fundingResult, logisticsResult,
   ] = await Promise.all([
     getPricingSection(product),
     getValueScoreSection(product),
@@ -406,6 +495,8 @@ async function buildLifecyclePlan({ productId, farmerId }) {
     getEngineeringSection(farmer),
     getSharedInfrastructureSection(product),
     getEquipmentRentalSection(),
+    getFundingSection(farmer),
+    getLogisticsSection(product, farmer),
   ]);
 
   const provenance = {
@@ -421,7 +512,29 @@ async function buildLifecyclePlan({ productId, farmerId }) {
     ...engineeringResult.provenance,
     ...sharedInfraResult.provenance,
     ...equipmentRentalResult.provenance,
+    ...fundingResult.provenance,
+    ...logisticsResult.provenance,
   };
+
+  const sections = {
+    pricing: pricingResult.data,
+    valueScore: valueScoreResult.data,
+    coldChain: coldChainResult.data,
+    insurance: insuranceResult.data,
+    subsidies: subsidiesResult.data,
+    compliance: complianceResult.data,
+    farmerValue: farmerValueResult.data,
+    engineering: engineeringResult.data,
+    sharedInfrastructure: sharedInfraResult.data,
+    equipmentRental: equipmentRentalResult.data,
+    funding: fundingResult.data,
+    logistics: logisticsResult.data,
+  };
+
+  const readiness = buildReadinessSummary(provenance, sections);
+  provenance['readiness.summary'] = calculatedSourced(true);
+
+  const handoffs = buildHandoffs(sections);
 
   return {
     productId: product.id,
@@ -434,62 +547,63 @@ async function buildLifecyclePlan({ productId, farmerId }) {
       basePrice: product.base_price !== null && product.base_price !== undefined ? Number(product.base_price) : null,
       isActive: Boolean(product.is_active),
     },
-    pricing: pricingResult.data,
-    valueScore: valueScoreResult.data,
-    coldChain: coldChainResult.data,
-    insurance: insuranceResult.data,
-    subsidies: subsidiesResult.data,
-    compliance: complianceResult.data,
-    farmerValue: farmerValueResult.data,
-    engineering: engineeringResult.data,
-    sharedInfrastructure: sharedInfraResult.data,
-    equipmentRental: equipmentRentalResult.data,
+    ...sections,
     stakeholderLinks: buildStakeholderLinks(),
+    handoffs,
+    readiness,
     provenance,
   };
 }
 
 // ===========================================================================
-// AI — exactly two narrow, isolated, auditable functions. Both delegate to
-// existing, already-governed real services; neither is called from
-// buildLifecyclePlan() above, so the base plan stays deterministic/cheap.
+// AI (advisory only — never used for calculable fields)
 // ===========================================================================
 
-/**
- * Product positioning copy. Uses aiAPI.generateRecommendation() from
- * aiBackboneService.js — the same governed envelope pattern
- * governmentSchemeService already relies on. Returns the envelope as-is
- * (status 'ok' | 'unavailable' | 'error' | 'rejected', actionBoundary
- * 'advisory_only') — never fabricates copy if no provider is configured.
- */
 async function generatePositioningCopy(productData) {
-  return aiAPI.generateRecommendation({
-    task: 'product_positioning_copy',
-    parameters: {
-      productId: productData.id,
-      name: productData.name,
-      category: productData.category,
-      basePrice: productData.basePrice,
-      valueScore: productData.valueScore || null,
-      pricing: productData.pricing || null,
-    },
-  });
+  const name = productData?.name || 'Product';
+  const category = productData?.category || 'agricultural product';
+  const basePrice = productData?.basePrice;
+  const prompt = [
+    `Write 2–3 concise marketing sentences for an Indian rural GI / farm product.`,
+    `Name: ${name}. Category: ${category}.`,
+    basePrice != null ? `Base price reference (INR): ${basePrice}.` : '',
+    `Tone: honest, premium, farmer-first. No invented certifications or awards.`,
+  ].filter(Boolean).join(' ');
+
+  try {
+    const result = await aiAPI.generateRecommendation({ prompt, maxTokens: 220 });
+    const text = typeof result === 'string' ? result : (result?.text || result?.recommendation || JSON.stringify(result));
+    return {
+      copy: text,
+      provenance: { source: 'ai', verified: false, asOf: nowIso(), note: 'Advisory positioning only' },
+    };
+  } catch (error) {
+    return {
+      copy: null,
+      provenance: unavailable(error.message),
+    };
+  }
 }
 
-/**
- * Product image generation. Delegates entirely to productMediaAIService's
- * real DALL-E 3 adapter, which is honestly `not_configured` with no
- * OPENAI_API_KEY set rather than fabricating an image URL.
- */
 async function generateProductImage(productId, prompt) {
-  return productMediaAIService.requestProductImageGeneration(productId, prompt);
+  try {
+    const result = await productMediaAIService.generateImage(productId, prompt);
+    return {
+      ...result,
+      provenance: { source: 'ai', verified: false, asOf: nowIso(), note: 'Studio image — advisory' },
+    };
+  } catch (error) {
+    return {
+      imageUrl: null,
+      provenance: unavailable(error.message),
+    };
+  }
 }
 
 module.exports = {
   buildLifecyclePlan,
   generatePositioningCopy,
   generateProductImage,
-  // exported for tests / diagnostics
   getProductContext,
   getFarmerContext,
 };
