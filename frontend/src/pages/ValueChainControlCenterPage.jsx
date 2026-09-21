@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AlertTriangle, CheckCircle2, ClipboardCheck, Factory, Loader2, Scale, ShieldCheck, WalletCards } from 'lucide-react';
 import valueChainControlAPI from '../services/valueChainControlAPI';
@@ -11,7 +12,13 @@ function Card({ title, icon: Icon, children }) {
 }
 
 export default function ValueChainControlCenterPage() {
-  const [caseDraft, setCaseDraft] = useState(initialCase);
+  const [searchParams] = useSearchParams();
+  const [caseDraft, setCaseDraft] = useState(() => ({
+    ...initialCase,
+    title: searchParams.get('title') || '',
+    commodity: searchParams.get('commodity') || '',
+    state: searchParams.get('location') || '',
+  }));
   const [selectedCaseId, setSelectedCaseId] = useState('');
   const [caseView, setCaseView] = useState(null);
   const [notice, setNotice] = useState('');
