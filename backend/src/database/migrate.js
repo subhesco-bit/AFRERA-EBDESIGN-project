@@ -40,9 +40,32 @@ function getPostgresConfig() {
 }
 
 function stripTransactionMarkers(sql) {
-  return sql
-    .replace(/^\s*(BEGIN|START\s+TRANSACTION)\s*;\s*$/gim, '')
-    .replace(/^\s*(COMMIT|END|ROLLBACK)\s*;\s*$/gim, '');
+  // Naive line-based stripping corrupts PL/pgSQL function bodies, which
+  // routinely end with a bare "END;" inside a $$ ... $$ block. Only strip
+  // transaction-control lines that fall outside any dollar-quoted region.
+  const lines = sql.split(/\r\n|\r|\n/);
+  let dollarTag = null;
+  const dollarQuoteStart = /\$([A-Za-z_][A-Za-z0-9_]*)?\$/g;
+  const out = [];
+  for (const line of lines) {
+    if (dollarTag === null) {
+      if (/^\s*(BEGIN|START\s+TRANSACTION)\s*;\s*$/i.test(line) ||
+          /^\s*(COMMIT|END|ROLLBACK)\s*;\s*$/i.test(line)) {
+        continue;
+      }
+    }
+    let match;
+    dollarQuoteStart.lastIndex = 0;
+    while ((match = dollarQuoteStart.exec(line)) !== null) {
+      if (dollarTag === null) {
+        dollarTag = match[0];
+      } else if (match[0] === dollarTag) {
+        dollarTag = null;
+      }
+    }
+    out.push(line);
+  }
+  return out.join('\n');
 }
 
 function runPreflight() {
