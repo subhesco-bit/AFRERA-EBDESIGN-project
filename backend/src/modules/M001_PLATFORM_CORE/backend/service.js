@@ -3,7 +3,7 @@
  * Production-ready platform foundation service with Claude AI integration
  */
 
-const { getPostgreSQL } = require('../../database/connection');
+const { getPostgreSQL } = require('../../../database/connection');
 
 class PlatformCoreService {
   constructor() {

@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/aiBackboneService');
+module.exports = require('../../../services/legacy/aiBackboneService');

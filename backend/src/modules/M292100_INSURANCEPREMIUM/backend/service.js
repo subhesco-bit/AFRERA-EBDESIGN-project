@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/insurancePremiumService');
+module.exports = require('../../../services/legacy/insurancePremiumService');

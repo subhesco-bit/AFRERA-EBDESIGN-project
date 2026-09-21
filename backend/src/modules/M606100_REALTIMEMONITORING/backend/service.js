@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/realtimeMonitoringService');
+module.exports = require('../../../services/legacy/realtimeMonitoringService');

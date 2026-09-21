@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/biodiversityService');
+module.exports = require('../../../services/legacy/biodiversityService');

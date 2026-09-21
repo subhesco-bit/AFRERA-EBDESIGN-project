@@ -3,7 +3,7 @@
  * Production-ready role management with Claude AI integration
  */
 
-const { getPostgreSQL } = require('../../database/connection');
+const { getPostgreSQL } = require('../../../database/connection');
 
 class RoleManagementService {
   constructor() {
@@ -271,7 +271,7 @@ const m007ArgMap = {
 };
 for (const [op, toArgs] of Object.entries(m007ArgMap)) {
   RoleManagementService.prototype[op] = async function (parameters = {}, context) {
-    const fn = require('../../modules/M007/service')[op];
+    const fn = require('../../M007/service')[op];
     const data = await fn(...toArgs(parameters));
     return { success: true, data, metadata: { operation: op, moduleId: this.moduleId, timestamp: new Date().toISOString() } };
   };

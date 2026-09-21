@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/glutWarningService');
+module.exports = require('../../../services/legacy/glutWarningService');

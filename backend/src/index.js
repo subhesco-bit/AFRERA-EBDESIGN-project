@@ -278,7 +278,16 @@ app.use(requestId);
 app.use(responseFormatter);
 app.use(routeMonitoring);
 app.use(securityHeaders);
-app.use(rateLimit);
+// rateLimit is a FACTORY: (maxRequests, windowMs) => (req, res, next).
+// Registered as `app.use(rateLimit)`, Express invoked the factory with
+// (req, res, next); it returned the inner middleware and never called next(),
+// so every API request hung forever and no rate limiting was applied at all.
+// Invoke the factory. Limits are env-overridable because the 100/15min default
+// is tight for a single-page frontend issuing many calls per view.
+app.use(rateLimit(
+  Number.parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 100,
+  Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
+));
 
 // Canonical operational ERP reconciliation surface. The dynamic loader also
 // discovers this route, but this explicit mount keeps the contract stable even

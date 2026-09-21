@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/ecommerceIntegrationService');
+module.exports = require('../../../services/legacy/ecommerceIntegrationService');

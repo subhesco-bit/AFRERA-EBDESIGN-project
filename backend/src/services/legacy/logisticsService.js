@@ -171,7 +171,7 @@ async function updateShipmentStatus(shipmentId, status, notes = null) {
     const shipment = result.rows[0];
 
     // Emit WebSocket event
-    const io = require('../../../index').app.get('io');
+    const io = require('../index').app.get('io');
     if (io) {
       io.to(`shipment:${shipmentId}`).emit('shipment_status_updated', {
         shipment_id: shipmentId,
@@ -212,7 +212,7 @@ async function addTrackingUpdate(shipmentId, trackingData) {
     ]);
 
     // Emit WebSocket event
-    const io = require('../../../index').app.get('io');
+    const io = require('../index').app.get('io');
     if (io) {
       io.to(`shipment:${shipmentId}`).emit('tracking_update', {
         shipment_id: shipmentId,

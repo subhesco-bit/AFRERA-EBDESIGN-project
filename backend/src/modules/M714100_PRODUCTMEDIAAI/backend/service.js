@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/productMediaAIService');
+module.exports = require('../../../services/legacy/productMediaAIService');

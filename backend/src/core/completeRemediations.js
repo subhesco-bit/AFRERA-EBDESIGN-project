@@ -105,7 +105,7 @@ class AppError extends Error {
 }
 
 const errorHandler = (err, req, res, next) => {
-  const logger = require('./logger');
+  const logger = require('../utils/logger');
 
   logger.error('Error occurred', {
     requestId: req.id,
@@ -448,7 +448,7 @@ const setupHealthChecks = (app, db, redis, cache) => {
 // ============================================================================
 
 const setupGracefulShutdown = (server, db, redis) => {
-  const logger = require('./logger');
+  const logger = require('../utils/logger');
 
   const shutdown = async (signal) => {
     logger.info(`${signal} received, shutting down gracefully`);

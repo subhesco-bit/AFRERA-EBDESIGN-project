@@ -29,7 +29,21 @@ const AIBackboneService = require('../../../modules/M400_AI_BACKBONE/backend/ser
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 
-const backbone = new AIBackboneService();
+// M400_AI_BACKBONE/backend/service.js defines `class AIBackboneService` but
+// exports a singleton-accessor object ({ getInstance, initialize, makeDecision,
+// ... }), not the class. `new AIBackboneService()` therefore threw
+// "AIBackboneService is not a constructor" at require time, which blocked the
+// entire platform from booting (routes/index.js aggregates this file).
+//
+// NOTE: fixing construction does not make every endpoint below work. This
+// router calls execute(), coordinateAIRequest(), makeEnterpriseDecision(),
+// generateEnterpriseStrategy(), getCrossModuleIntelligence(), registerModule()
+// and unregisterModule(), none of which the service exposes; its nearest
+// equivalents (makeDecision, generateStrategy, coordinateRequest) also take
+// different arguments. Those calls are a genuine route/service contract
+// mismatch and are tracked as a todo item rather than silently remapped to a
+// different signature.
+const backbone = AIBackboneService.getInstance();
 let initPromise = null;
 
 function ensureInitialized() {

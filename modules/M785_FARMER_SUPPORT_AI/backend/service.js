@@ -4,7 +4,7 @@
 
 'use strict';
 
-const aiBackbone = require('../M400_AI_BACKBONE/backend/service');
+const aiBackbone = require('../../M400_AI_BACKBONE/backend/service');
 const { logger } = require('../../../backend/src/utils/logger');
 
 class FARMERSUPPORTAIService {

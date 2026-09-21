@@ -10,7 +10,7 @@
 // ============================================================================
 
 const redis = require('redis');
-const { logger } = require('./logger');
+const { logger } = require('../utils/logger');
 
 class CacheService {
   static instance = null;

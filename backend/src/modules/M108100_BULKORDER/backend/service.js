@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/bulkOrderService');
+module.exports = require('../../../services/legacy/bulkOrderService');

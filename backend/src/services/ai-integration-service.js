@@ -6,9 +6,16 @@
 
 'use strict';
 
-const aiBackbone = require('../../modules/M400_AI_BACKBONE/backend/service');
-const aiGateway = require('../../modules/M401_AI_GATEWAY/backend/service');
-const { getPostgreSQL, getRedis, getMongoDB } = require('../database/connection');
+const aiBackbone = require('../../../modules/M400_AI_BACKBONE/backend/service');
+const aiGateway = require('../../../modules/M401_AI_GATEWAY/backend/service');
+const { getPostgreSQL, getMongoDB } = require('../database/connection');
+// database/connection.js has no Redis accessor -- `getRedis` was imported from
+// it but never existed there, so `await getRedis()` below threw at init.
+// The project's Redis client lives in cache/redis.js, whose exported
+// getClient() THROWS when Redis is not initialized. It is called defensively
+// so this.redis stays null in that case, preserving the `if (this.redis)`
+// degradation the caching paths below already rely on.
+const { getClient: getRedisClient } = require('../cache/redis');
 const { logger } = require('../utils/logger');
 const EventEmitter = require('events');
 const crypto = require('crypto');
@@ -50,7 +57,11 @@ class AIIntegrationService extends EventEmitter {
       logger.info('Initializing AI Integration Service...');
       
       this.pool = await getPostgreSQL();
-      this.redis = await getRedis();
+      try {
+        this.redis = getRedisClient();
+      } catch {
+        this.redis = null; // Redis unavailable: caching is skipped, not fatal.
+      }
       this.mongodb = await getMongoDB();
       
       await this.initializeDatabase();

@@ -3,7 +3,7 @@
  * Enforces AI governance rules, audits requests, and routes to appropriate providers
  */
 
-const aiBackbone = require('../M400_AI_BACKBONE/backend/service');
+const aiBackbone = require('../../M400_AI_BACKBONE/backend/service');
 const { getPostgreSQL, getRedis } = require('../../../backend/src/database/connection');
 const { logger } = require('../../../backend/src/utils/logger');
 const crypto = require('crypto');

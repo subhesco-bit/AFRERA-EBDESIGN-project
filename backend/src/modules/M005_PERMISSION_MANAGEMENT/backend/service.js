@@ -3,7 +3,7 @@
  * Production-ready permission management with Claude AI integration
  */
 
-const { getPostgreSQL } = require('../../database/connection');
+const { getPostgreSQL } = require('../../../database/connection');
 
 class PermissionManagementService {
   constructor() {

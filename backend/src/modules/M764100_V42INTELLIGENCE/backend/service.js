@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/v42IntelligenceService');
+module.exports = require('../../../services/legacy/v42IntelligenceService');

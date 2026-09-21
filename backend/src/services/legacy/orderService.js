@@ -348,7 +348,7 @@ async function createOrder(userId, orderData) {
     // ---- end transaction -------------------------------------------------
 
     // Emit WebSocket event
-    const io = require('../../../index').app.get('io');
+    const io = require('../index').app.get('io');
     if (io) {
       io.to(`user:${userId}`).emit('order_created', {
         order_id: order.id,
@@ -512,7 +512,7 @@ async function updateOrderStatus(orderId, status, notes = null) {
     const order = result.rows[0];
 
     // Emit WebSocket event
-    const io = require('../../../index').app.get('io');
+    const io = require('../index').app.get('io');
     if (io) {
       io.to(`order:${orderId}`).emit('order_status_updated', {
         order_id: orderId,

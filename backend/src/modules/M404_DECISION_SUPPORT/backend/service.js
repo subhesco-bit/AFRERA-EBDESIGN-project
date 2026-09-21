@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/decisionSupportService');
+module.exports = require('../../../services/legacy/decisionSupportService');

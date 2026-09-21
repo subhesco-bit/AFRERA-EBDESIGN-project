@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/farmerTrainingService');
+module.exports = require('../../../services/legacy/farmerTrainingService');

@@ -3,7 +3,7 @@
  * Production-ready organization management with Claude AI integration
  */
 
-const { getPostgreSQL } = require('../../database/connection');
+const { getPostgreSQL } = require('../../../database/connection');
 
 class OrganizationManagementService {
   constructor() {
@@ -252,7 +252,7 @@ class OrganizationManagementService {
 // already existed here with a different (single-object-param) calling convention
 // and were left untouched rather than overwritten.
 OrganizationManagementService.prototype.listOrganizations = async function (parameters, context) {
-  const { listOrganizations } = require('../../modules/M004/service');
+  const { listOrganizations } = require('../../M004/service');
   const data = await listOrganizations(parameters);
   return { success: true, data, metadata: { operation: 'listOrganizations', moduleId: this.moduleId, timestamp: new Date().toISOString() } };
 };

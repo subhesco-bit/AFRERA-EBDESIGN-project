@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/institutionalProcurementService');
+module.exports = require('../../../services/legacy/institutionalProcurementService');

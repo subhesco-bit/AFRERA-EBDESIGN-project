@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/organizationManagementService');
+module.exports = require('../../../services/legacy/organizationManagementService');

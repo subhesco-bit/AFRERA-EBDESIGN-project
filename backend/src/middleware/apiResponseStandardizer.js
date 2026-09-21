@@ -174,12 +174,26 @@ function addStandardHeaders() {
 function trackResponseTime() {
   return (req, res, next) => {
     const startTime = Date.now();
-    
+
+    // The header must be set BEFORE headers flush. This previously ran inside
+    // the 'finish' event, which fires *after* they are sent, so setHeader threw
+    // ERR_HTTP_HEADERS_SENT from an event handler -- an uncaught exception that
+    // terminated the whole process on every successful response.
+    const originalWriteHead = res.writeHead;
+    res.writeHead = function patchedWriteHead(...args) {
+      if (!res.headersSent) {
+        try {
+          res.setHeader('X-Response-Time', `${Date.now() - startTime}ms`);
+        } catch {
+          // Never let instrumentation break the response.
+        }
+      }
+      return originalWriteHead.apply(res, args);
+    };
+
+    // Slow-request logging is safe here: it touches no headers.
     res.on('finish', () => {
       const responseTime = Date.now() - startTime;
-      res.setHeader('X-Response-Time', `${responseTime}ms`);
-      
-      // Log slow requests
       if (responseTime > 1000) {
         logger.warn('Slow API request', {
           requestId: req.id,
@@ -189,7 +203,7 @@ function trackResponseTime() {
         });
       }
     });
-    
+
     next();
   };
 }
@@ -283,9 +297,17 @@ function generateCorrelationId() {
 function contentNegotiation() {
   return (req, res, next) => {
     const acceptHeader = req.headers.accept || 'application/json';
-    
-    // Currently only support JSON
-    if (!acceptHeader.includes('application/json')) {
+
+    // The API serves JSON, but a client asking for anything ('*/*' or
+    // 'application/*') is happy to receive it. curl, browsers and most load
+    // balancer / k8s health probes send '*/*' or 'text/html,...,*/*', all of
+    // which were previously rejected with 406.
+    const acceptsJson =
+      acceptHeader.includes('application/json') ||
+      acceptHeader.includes('application/*') ||
+      acceptHeader.includes('*/*');
+
+    if (!acceptsJson) {
       return res.status(406).json({
         success: false,
         error: {

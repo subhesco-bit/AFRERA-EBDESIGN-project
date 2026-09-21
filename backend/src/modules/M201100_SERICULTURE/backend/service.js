@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../services/legacy/sericultureService');
+module.exports = require('../../../services/legacy/sericultureService');
