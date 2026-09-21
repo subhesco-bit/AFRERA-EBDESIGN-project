@@ -1,9 +1,8 @@
 /**
  * Value-Chain Studio — orchestrator service (production v2).
  * buildLifecyclePlan: deterministic read path. AI only for positioning/image.
+ * Handoffs: pricing, cold-chain, funding, engineering, AI design, MEP, farmer clinic, platform support.
  * See DOCUMENTATION/VALUE_CHAIN_STUDIO_ARCHITECTURE.md
- *
- * Handoffs include AI Engineering Design Team (/ai-engineering-design) and MEP Design Studio.
  */
 'use strict';
 
@@ -225,6 +224,8 @@ function buildStakeholderLinks() {
     { section: 'engineering', label: 'Engineering Projects', href: '/engineering-projects' },
     { section: 'aiEngineering', label: 'AI Engineering Design Team', href: '/ai-engineering-design' },
     { section: 'mepDesign', label: 'MEP Design Studio', href: '/mep-design' },
+    { section: 'farmerClinic', label: 'Farmer Support Clinic', href: '/farmer-support-clinic' },
+    { section: 'platformSupport', label: 'Platform Support Hub', href: '/platform-support' },
     { section: 'sharedInfrastructure', label: 'Shared Infrastructure', href: '/shared-infra' },
     { section: 'equipmentRental', label: 'Equipment Rental', href: '/equipment-rental' },
   ];
@@ -254,6 +255,8 @@ function buildHandoffs(sections) {
     h('engineering', 'Engineering', '/engineering-projects', hasEngineering ? 'ready' : 'optional', hasEngineering ? (engineering.projects.length + ' project(s)') : 'No engineering projects'),
     h('aiEngineering', 'AI Engineering Design', '/ai-engineering-design', 'optional', 'Assemble design team packages (structural, MEP, cost, compliance)'),
     h('mepDesign', 'MEP Design Studio', '/mep-design', 'optional', 'Mechanical / electrical / plumbing design support'),
+    h('farmerClinic', 'Farmer Support Clinic', '/farmer-support-clinic', 'optional', 'Plant, soil, livestock, poultry, fish advisory triage'),
+    h('platformSupport', 'Platform Support Hub', '/platform-support', 'optional', 'Unified routing across clinic + engineering + value-chain'),
     h('sharedInfrastructure', 'Shared infrastructure', '/shared-infra', hasShared ? 'ready' : 'optional', hasShared ? (sharedInfrastructure.availableAssets.length + ' asset(s)') : 'No matching assets'),
     h('equipmentRental', 'Equipment rental', '/equipment-rental', hasEquipment ? 'ready' : 'optional', hasEquipment ? (equipmentRental.availableListings.length + ' listing(s)') : 'No listings'),
   ];
@@ -306,7 +309,7 @@ function buildStages(sections, product) {
 
 function getCapabilities() {
   return {
-    planVersion: '2.0',
+    planVersion: '2.1',
     designRules: [
       'Nothing numeric is invented',
       'Missing data is unavailable, never estimated',
@@ -363,7 +366,7 @@ async function buildLifecyclePlan({ productId, farmerId }) {
     productId: product.id,
     farmerId: farmer ? farmer.id : (farmerId || null),
     generatedAt: nowIso(),
-    planVersion: '2.0',
+    planVersion: '2.1',
     product: {
       id: product.id, name: product.name, category: product.category_name,
       basePrice: product.base_price != null ? Number(product.base_price) : null,
