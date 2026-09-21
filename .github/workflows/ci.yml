@@ -345,7 +345,73 @@ jobs:
           kubectl apply -f infra/k8s/mlflow-service.yaml --dry-run=client -o yaml || true
 
   docker:
-    name: Build backend image
+    name: Build, scan, and push backend image
+    runs-on: ubuntu-latest
+    needs: [backend]
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Static Dockerfile check before spending build minutes on a bad one.
+      # DL3008/DL3009 (pin apt versions / no apt cache cleanup) are ignored -
+      # this base image's package set changes with security patches upstream,
+      # pinning would just mean constantly-stale ignored advice.
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3
+        with:
+          dockerfile: Dockerfile
+          ignore: DL3008,DL3009
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Registry-backed cache (not just actions-cache) so scheduled/rebuilt
+      # runs on other branches still hit a warm cache.
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+
+      # Smoke test before trusting the pushed tag: does the image even start.
+      - name: Test image runs
+        run: |
+          docker run --rm ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            node -e "console.log('Image OK')"
+
+      # Scan the exact image that was just pushed, not a locally rebuilt one.
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy results to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: trivy-results.sarif
+
+  docker-compose-integration:
+    name: Docker Compose - full-stack integration test
     runs-on: ubuntu-latest
     needs: [backend]
     if: github.event_name == 'push'
@@ -353,19 +419,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v3
+      # Matches backend's own PG_USER/PG_PASSWORD/PG_DATABASE defaults
+      # (backend/src/database/migrate.js) rather than the compose file's
+      # own subh_admin/subh_dev defaults, so migrate.js connects without
+      # any override.
+      - name: Start services with docker compose
+        run: docker compose -f docker-compose.database.yml up -d
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: afrera_db
 
-      # Build only - not pushed. Restore the registry login + push step once a
-      # container registry is actually chosen for this project.
-      - name: Build image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: false
-          tags: afrera-backend:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Wait for services and run integration tests
+        run: |
+          sleep 10
+          npm run migrate
+          npm test -- --testPathPattern=integration
+        working-directory: backend
+        env:
+          PG_HOST: localhost
+          PG_USER: postgres
+          PG_PASSWORD: password
+          PG_DATABASE: afrera_db
+
+      - name: Stop services
+        if: always()
+        run: docker compose -f docker-compose.database.yml down -v
 
   # Desktop build — no Rust/Cargo toolchain is available in the sandbox this
   # codebase was developed in, so this is the real way the Tauri desktop
