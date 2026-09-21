@@ -4,7 +4,12 @@
 
 const { logger } = require('../../utils/logger');
 const { aiAPI } = require('../aiService/index');
-const { sendNotification } = require('../../websocket/index');
+// sendNotification is a METHOD on socketServer (websocket/socketServer.js), not a
+// top-level export of websocket/index.js -- which exports only
+// { initializeWebSocket, socketServer }. Destructuring it yielded undefined
+// and every call site threw TypeError at runtime.
+// services/legacy/governmentSchemeService.js already uses this correct form.
+const { socketServer } = require('../../websocket/index');
 const { authMiddleware } = require('../../middleware/auth');
 
 /**
@@ -72,7 +77,7 @@ async function submitInsuranceClaim(claimData) {
     };
 
     // Notify farmer via WebSocket
-    sendNotification(farmer_id, {
+    socketServer.sendNotification(farmer_id, {
       type: 'claim_submitted',
       claim_id: claim.claim_id,
       claim_number: claim.claim_number,
@@ -146,7 +151,7 @@ async function processInsuranceClaim(claimId) {
     claim.assessed_at = new Date().toISOString();
 
     // Notify farmer
-    sendNotification(claim.farmer_id, {
+    socketServer.sendNotification(claim.farmer_id, {
       type: 'claim_assessed',
       claim_id: claimId,
       status: claim.status,

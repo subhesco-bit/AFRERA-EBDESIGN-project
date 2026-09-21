@@ -45,10 +45,16 @@ function maskComments(src) {
   let i = 0;
   const n = src.length;
   while (i < n) {
-    if (src[i] === '"' || src[i] === "'" || src[i] === '`') {
-      const quote = src[i];
+    // Mask TEMPLATE LITERALS ONLY (backticks). Code generators embed
+    // `require(...)` inside template literals describing code they emit, which
+    // must not be audited as this file's own dependency.
+    //
+    // Quoted strings are deliberately NOT masked: a require's own path is a
+    // quoted string, so masking those blinds this audit entirely (it then
+    // finds zero requires and reports a meaningless PASS).
+    if (src[i] === '`') {
       let j = i + 1;
-      while (j < n && src[j] !== quote) {
+      while (j < n && src[j] !== '`') {
         if (src[j] === '\\') j++;
         j++;
       }

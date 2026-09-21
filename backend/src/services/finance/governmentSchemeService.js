@@ -5,7 +5,12 @@
 
 const { logger } = require('../../utils/logger');
 const { aiAPI } = require('../aiService/index');
-const { sendGovernmentAnnouncement } = require('../../websocket/index');
+// sendGovernmentAnnouncement is a METHOD on socketServer (websocket/socketServer.js), not a
+// top-level export of websocket/index.js -- which exports only
+// { initializeWebSocket, socketServer }. Destructuring it yielded undefined
+// and every call site threw TypeError at runtime.
+// services/legacy/governmentSchemeService.js already uses this correct form.
+const { socketServer } = require('../../websocket/index');
 const { authMiddleware } = require('../../middleware/auth');
 
 /**
@@ -498,7 +503,7 @@ async function getWeatherRecommendations(location) {
 
 async function broadcastAnnouncement(announcement) {
   // Broadcast via WebSocket
-  sendGovernmentAnnouncement(announcement);
+  socketServer.sendGovernmentAnnouncement(announcement);
 }
 
 async function getFilteredAnnouncements(params) {
