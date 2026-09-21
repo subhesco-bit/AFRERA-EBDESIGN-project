@@ -97,6 +97,45 @@ architecture."
    clearest end state, but it removes files, which the standing instruction not
    to remove anything rules out without an explicit decision.
 
+### Blast radius, measured
+
+Counting frontend call sites by path prefix across `frontend/src`:
+
+| | call sites |
+|---|---|
+| On the **scaffold** paths served today (`/commerce/ecommerce`, `/livestock/sheep`, …) | **0** |
+| On the **real** paths that are unmounted and return 404 (`/ecommerce`, `/sheep`, …) | **238** |
+
+Not one frontend call reaches a scaffold path. 238 frontend calls are hitting
+404 right now because the file that would serve them was discarded. Per route:
+`researchAndDevelopment` 27, `nervousSystem` 24, `sapModuleArchitecture` 24,
+`sheep` 16, `completeAIIntegration` 15, `projectSystems` 15, `ecommerce` 14,
+`ecommerceIntegration` 14, `poultry` 13, `pig` 12, `ecommerceAI` 11, and the
+rest in single digits. Three have no caller either way
+(`publicDomainDataExtraction`, `serverManagement`, `startupEnvironment`).
+
+This removes the compatibility objection to option 1: mounting the discarded
+files changes no working caller, and fixes 238 broken ones.
+
+### Correction to the caution above, with the mechanism verified
+
+The warning about `recoveredFinanceRoutes` was right but stated imprecisely.
+Verified 2026-09-21 by reading both files and probing the running server:
+
+- `routes/finance/recoveredFinanceRoutes.js` — **the file being served** — is the
+  one that carries Part 3C's HTTP 410 guards on `/gst/*` and `/ledger/*`.
+  `GET /api/v1/finance/recovered-finance/ledger/trial-balance` returns **410**,
+  so that deprecation is genuinely in effect.
+- `routes/recoveredFinanceRoutes.js` — **the discarded file** — contains no 410
+  at all.
+
+So the risk runs the opposite way from the `unifiedLedger` case: mounting the
+discarded file would newly expose `/api/v1/recovered-finance/gst/*` and
+`/ledger/*` **without** the deprecation, reviving the second GST rate authority
+and third ledger that Part 3C deliberately retired. Option 1 must exclude this
+file explicitly, which is exactly why the per-file pass over the 99 is a
+precondition and not a formality.
+
 Recommendation: option 2 now as a correctness fix, with option 1 done
 deliberately afterwards behind the per-file pass.
 
@@ -195,3 +234,55 @@ Two things found while doing it, neither resolved here:
   scaffold in place of a real implementation.
 
 Boot verified after every change: 782 routes discovered, 782 mounted, 0 failed.
+
+## CI coverage gap on this integration line
+
+No workflow can run on a pull request into `consolidated/final`. All 8
+CI-enabled workflows filter their `pull_request` trigger on `main`, `develop`,
+or `chatgpt-clone/**`:
+
+```
+ci.yml                    pull_request: branches: [main, develop]
+claude-ai-integration     pull_request: branches: [main, develop]
+system-completion-gate    pull_request: branches: ['chatgpt-clone/**', main]
+clone-completion-verif.   pull_request: branches: ['chatgpt-clone/**', main]
+production-hardening      pull_request: branches: [chatgpt-clone/foundation]
+production-re-audit       pull_request: branches: [chatgpt-clone/foundation]
+complete-production-...   pull_request: branches: [chatgpt-clone/foundation]
+clone-m001-m050-...       pull_request: branches: [chatgpt-clone/highest-standard-enhancement]
+```
+
+PR #7 reported `total_count: 0` checks, as would every PR opened against this
+base. `ci.yml` does carry `workflow_dispatch`, so it was triggered manually
+against this branch (run 35607089476) to get a real signal; GitHub attached the
+run to the PR.
+
+**Result:** Frontend lint+build **passed**, Dependency audit **passed**, Backend
+lint **failed** — and the failure is pre-existing on the base, not this PR's:
+
+```
+src/services/enterpriseModule550RuntimeService.js
+  21:461  error  Empty block statement  no-empty
+```
+
+That file is not in this PR's diff (`git diff --name-only 546648074..HEAD`
+does not list it; it was last touched by 6ddaf8f97), and linting the base
+commit's copy of it reproduces the identical error. Everything after the Lint
+step was skipped, so **the test, migration and governance steps have still
+never executed on this line.**
+
+The offending code is a deliberate best-effort swallow in `readTitle()`, which
+tries `README.md` then `module.json` and falls through to the module code on a
+malformed file. `no-empty` accepts a block containing a comment, so the minimal
+fix carries no behaviour change:
+
+```js
+-}catch{} }return code;}
++}catch{ /* best-effort: malformed file, fall through to the next candidate */ } }return code;}
+```
+
+Not applied here: it is unrelated to this PR's subject, and widening a PR to
+carry someone else's lint fix is worse than naming it. Whether
+`consolidated/final` should be added to the CI branch filters is a separate
+decision — it is a one-line change per workflow, but which branches gate which
+pipelines is not mine to choose.
