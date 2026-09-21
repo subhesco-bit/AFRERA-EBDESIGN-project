@@ -186,13 +186,19 @@ async function createProduct(productData) {
   try {
     const pg = getPostgreSQL();
     
+    // The column list has 26 entries and `values` supplies 26, but the VALUES
+    // clause listed only $1..$25 -- one short. PostgreSQL rejected every call
+    // with "INSERT has more target columns than expressions", so createProduct
+    // ALWAYS threw and no product could ever be created. The unbound column was
+    // `created_by`, which is also the ownership column assertProductOwnership()
+    // authorises against.
     const query = `
       INSERT INTO products (name, slug, sku, category_id, state_id, unit_id, description, usp,
                          gi_status, gi_certificate_number, gi_registry_date, organic,
                          organic_certificate_number, nutrition_data, images, base_price,
                          map_price, retail_price, weight_per_unit, dimensions, tags,
                          meta_title, meta_description, is_active, featured, created_by)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
       RETURNING *
     `;
     
@@ -238,6 +244,24 @@ async function createProduct(productData) {
       productMediaAIService
         .requestProductImageGeneration(product.id, `${product.name}${productData.description ? ' — ' + productData.description : ''}`)
         .catch((error) => logger.warn('Product image generation request failed', { productId: product.id, error: error.message }));
+    }
+
+    // Announce the listing so post-listing enrichment (attribute extraction,
+    // nutrient valuation, premium tier, page copy) can run. Emitting rather
+    // than calling keeps this service unaware of its consumers, and signalBus
+    // guarantees a throwing subscriber cannot propagate back here -- so a
+    // failure downstream can never fail the farmer's listing, which is already
+    // committed at this point.
+    //
+    // This replaces a path that never worked: middleware/
+    // productImageAutoGenerationHooks.js registers via
+    // productService.on('created', ...), but this service is not an
+    // EventEmitter and emits nothing, so that registration silently no-opped.
+    try {
+      const { signalBus, SIGNAL } = require('../core/signalBus');
+      signalBus.emitSignal(SIGNAL.PRODUCT_LISTED, { product }, { source: 'productService.createProduct' });
+    } catch (error) {
+      logger.warn('Failed to emit product.listed signal', { productId: product.id, error: error.message });
     }
 
     return product;

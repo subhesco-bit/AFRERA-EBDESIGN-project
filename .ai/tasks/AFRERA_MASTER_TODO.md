@@ -120,6 +120,29 @@ layer is largely not a template problem.
   in strings describing code they emit. With it actually working it found the
   438 defects repaired in 1.0.12–1.0.15 below.
 
+- [x] **1.0.16 Fix `createProduct`, which had never worked** — `VERIFIED` — *core marketplace action*
+  The `INSERT INTO products` column list has **26** entries and the values array
+  supplies **26**, but the `VALUES` clause listed only `$1..$25` — one short.
+  PostgreSQL rejected every call with *"INSERT has more target columns than
+  expressions"*, so **no product could ever be created**. The unbound column was
+  `created_by`, which is also the ownership column `assertProductOwnership()`
+  authorises against. Found by running the listing pipeline end-to-end; no
+  static check would have caught it. Verified: products now insert.
+
+- [x] **1.0.17 Fix signal payload access in `disruptionRoutingAgent`** — `VERIFIED` — *crisis path*
+  `signalBus.emitSignal` dispatches the whole envelope
+  (`{ type, payload, severity, source, entityId, correlationId, timestamp }`),
+  so emitted fields live under `signal.payload`. Both handlers destructured
+  straight off the envelope, yielding **`undefined` for every field**.
+  Demonstrated before fixing: `disruptionId: undefined` via the old access,
+  `DISR-42` via `.payload`. Stakeholder notification, shipment rerouting,
+  emergency procurement and insurance-claim acceleration were therefore all
+  running on undefined inputs — while `TRUTHPACK.json` describes
+  `disruption_crisis_management` as `fully_implemented`.
+  `core/reflexEngine.js`, `core/decisionEngine.js` and `core/effectors.js`
+  already read `signal.payload` correctly; these now match.
+  Verified after fix: `disruptionId: "DISR-42"` arrives.
+
 ### Open
 
 - [x] **1.0.7 Confirm full boot and sustained request serving** — `VERIFIED`
@@ -391,10 +414,48 @@ mean the resulting schema depends on which definition happens to win.
 
 - [ ] **2.1 Agriculture lifecycle** — `PARTIAL`
       `plot → plan → finance → procure → operate → monitor → harvest → grade → store → sell → settle`
-- [ ] **2.2 Farmer product-listing AI pipeline** — `PARTIAL` — *flagship requested flow*
-      `listing → AI image generation → attribute extraction → (if food) nutrient
-      valuation → nutrient-based and per-kg pricing → AI premium page copy/slogan`.
-      Component services exist; **no orchestration connects them into one flow.**
+- [x] **2.2 Farmer product-listing AI pipeline — orchestration built** — `PARTIAL` (4 of 9 stages blocked on schema)
+      Requested flow: `listing → AI image → attribute extraction → (if food)
+      nutrient valuation → nutrient-based and per-unit pricing → AI premium
+      page copy/slogan`.
+
+      **The components all existed and worked. Nothing called them in sequence.**
+      Three separate reasons the flow never ran:
+      - `middleware/productImageAutoGenerationHooks.js` exports
+        `registerAutoGenerationHooks(productService)` with the comment *"Call
+        this during app initialization"* — **nothing ever required or called it.**
+      - It registers via `productService.on('created', …)`, but `productService`
+        is **not an EventEmitter and emits nothing**, so the registration would
+        have silently no-opped behind its own `typeof … === 'function'` guard.
+      - `nutritionIntelligenceService.calculateNutritionPricing` had **zero
+        callers** anywhere in the codebase.
+
+      Built `core/productListingPipelineAgent.js`, following this project's own
+      signal-agent pattern (`core/disruptionRoutingAgent.js`): added
+      `commerce.product.listed` / `commerce.product.enriched` to the `SIGNAL`
+      catalog, emitted the first from `createProduct`, and registered the agent
+      at boot. Stage 1 (image generation) is deliberately **not** duplicated —
+      `createProduct` already fires it best-effort and records `not_configured`
+      honestly.
+
+      **Honesty properties, each tested:** food is never inferred from a product
+      name ("Organic Rice 5kg" → `isFood: null` → nutrient stages skipped, not
+      assumed); a stage that cannot run records `unavailable`/`skipped` with a
+      reason rather than a plausible number; a malformed signal is handled
+      without throwing; a failing stage cannot fail the farmer's listing.
+
+      **Verified end-to-end against live PostgreSQL:** product created → signal
+      → 9 stages in 24 ms. Food listing: `food_classification`,
+      `nutrition_profile`, `value_per_nutrient` → **ok**; `attribute_extraction`
+      and `listing_copy` → **unavailable** (no AI key, correctly not
+      fabricated). Non-food listing correctly skips 6 stages.
+
+      **Remaining 4 stages are blocked by the schema, not the pipeline:**
+      `nutrition_score` (FK violation on `product_nutrition_scores`),
+      `nutrient_value_price` (`column "product_name" does not exist`),
+      `nutrition_pricing` (cascades from score), `premium_tier`
+      (`column "nutrient_density_score" does not exist`). All four are
+      consequences of the 74 failing migrations — unblocked by **1.2.1d**.
 - [ ] **2.3 Consumer order fulfilment with cold chain and insurance** — `PARTIAL` — *flagship requested flow*
       `order → payment/escrow → cold-storage allocation → cold-chain monitoring
       → logistics → in-transit insurance binding → exception → claim → settlement`,
