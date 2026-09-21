@@ -183,6 +183,7 @@ const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'));
 const MarketingCenter = lazy(() => import('../pages/MarketingCenter'));
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'));
 const AIProductStudioPage = lazy(() => import('../pages/AIProductStudioPage'));
+const ValueChainStudioPage = lazy(() => import('../pages/ValueChainStudioPage'));
 const AdvancedMedicalCodingPage = lazy(() => import('../pages/AdvancedMedicalCodingPage'));
 const PublicDataExtractorPage = lazy(() => import('../pages/PublicDataExtractorPage'));
 
@@ -1731,6 +1732,14 @@ export const managementRoutes = [
     title: 'AI Product Studio - AFRERA',
     description: 'Image generation, cartoon storytelling, nutrient diagnosis, and natural therapist guidance for product marketing and wellness',
     keywords: 'ai, product image, cartoon generator, nutrient diagnosis, wellness, therapist',
+    transition: 'fade',
+  },
+  {
+    path: '/value-chain-studio',
+    component: ValueChainStudioPage,
+    title: 'Value-Chain Studio - AFRERA',
+    description: 'Full farmer/product lifecycle plan: pricing, cold-chain, insurance, subsidies, compliance, engineering, shared infrastructure, and equipment rental, all provenance-tagged',
+    keywords: 'value chain, pricing, cold chain, insurance, subsidy, compliance, engineering, shared infrastructure, equipment rental',
     transition: 'fade',
   },
   {
