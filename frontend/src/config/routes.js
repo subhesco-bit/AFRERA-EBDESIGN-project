@@ -184,6 +184,7 @@ const MarketingCenter = lazy(() => import('../pages/MarketingCenter'));
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'));
 const AIProductStudioPage = lazy(() => import('../pages/AIProductStudioPage'));
 const ValueChainStudioPage = lazy(() => import('../pages/ValueChainStudioPage'));
+const ValueChainControlCenterPage = lazy(() => import('../pages/ValueChainControlCenterPage'));
 const AdvancedMedicalCodingPage = lazy(() => import('../pages/AdvancedMedicalCodingPage'));
 const PublicDataExtractorPage = lazy(() => import('../pages/PublicDataExtractorPage'));
 
@@ -1740,6 +1741,14 @@ export const managementRoutes = [
     title: 'Value-Chain Studio - AFRERA',
     description: 'Full farmer/product lifecycle plan: pricing, cold-chain, insurance, subsidies, compliance, engineering, shared infrastructure, and equipment rental, all provenance-tagged',
     keywords: 'value chain, pricing, cold chain, insurance, subsidy, compliance, engineering, shared infrastructure, equipment rental',
+    transition: 'fade',
+  },
+  {
+    path: '/value-chain-control',
+    component: ValueChainControlCenterPage,
+    title: 'Value-Chain Control Center - AFRERA',
+    description: 'Evidence-led orchestration for product, logistics, finance, insurance, subsidy and engineering handoffs',
+    keywords: 'value chain, control plane, evidence, gates, pricing, mass balance',
     transition: 'fade',
   },
   {
