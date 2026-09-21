@@ -1,5 +1,107 @@
 # ACTIVE TASKS
 
+## TODO — AFRERA P1 capability-module backlog (2026-09-21, 5 skeletons remain — 2 superseded)
+
+**Update (2026-09-21, later same day):** reconciling with `subh-deep`
+remote's independently-pushed work found real, substantial implementations
+already exist for 2 of the 7 skeletons below — `fpoOperationsService.js` +
+`fpoOperationsRoutes.js` + `FPODashboardPage.jsx`/`FPORegistrationPage.jsx`
+(real FPO Operations Hub, not a skeleton) and `warehouseReceiptService.js` +
+`warehouseReceiptRoutes.js` (real Warehouse Receipt / WRS). Deleted
+`M900100_FPOOPERATIONS` and `M903100_WAREHOUSERECEIPT` skeleton folders to
+avoid a duplicate/confusing module ID sitting next to the real
+implementation. See `DOCUMENTATION/FPO_AND_WAREHOUSE_RECEIPT.md` for the
+real implementation's own docs. 5 skeletons remain genuinely needed.
+
+User supplied a stakeholder-loop analysis of ~200 named `modules/` + backend
+services, identifying that the project has many **labels** (crop, dairy,
+cold storage, insurance, GI, subsidy, escrow, WhatsApp) but is missing the
+**closed stakeholder loops** that make it a coherent platform: aggregate
+(FPO), prove quality, contract, store with title, move, pay, insure/
+subsidize, resolve disputes. Full source doc (stakeholder table, priority
+tiers P1-P4, target architecture diagram): ask user to re-paste if needed,
+not persisted verbatim here - this entry tracks only the actionable P1 set
+and what's been done.
+
+User's own recommended build order: Settlement → FPO pooling → Grading →
+Contract farming → Warehouse receipt → Dispute desk → Scheme cases →
+Harvest→cold→logistics spine → WhatsApp/multilingual/offline access layer →
+Engineering O&M/energy. User then asked instead for **skeletons of all P1
+items at once** ("so we develop them and dont miss then") rather than
+picking one to fully build first.
+
+**Verified against the real codebase before scaffolding** (do not trust the
+recommendation doc's names without checking - this session's standing
+rule): all 13 module names the doc cited as "existing, COMPLETE not ADD"
+were confirmed real. Each is a thin wrapper (`backend/service.js`,
+~13 lines) re-exporting a real backing service under
+`backend/src/services/` — `governmentSchemeService.js` (709 lines),
+`institutionalProcurementService.js` (784 lines), `offlineSyncService.js`
+(886 lines), `multilingualService.js` (821 lines), `subsidyService.js`
+(591 lines), `landRecordsService.js` (461 lines), `dprGenerationService.js`
+(477 lines), `whatsappService.js` (423 lines), `gstService.js` (225 lines) -
+all genuinely substantial, not scaffolds. **Side-finding, not yet acted on:**
+`escrowService.js`, `cooperativeShareService.js`,
+`identityManagementService.js`, and `dynamicPricingService.js` each exist
+twice - a real implementation under `services/legacy/` and a stale 22-line
+duplicate at `services/` top level with the same filename. Flag for a
+merge-not-delete cleanup pass later; not touched yet.
+
+### 5 new SKELETON modules remaining (2 of the original 7 deleted, see above)
+Following the existing module.json convention (`status: "SKELETON"`,
+`completeness: {backend:false, frontend:false, routes:false, tests:false}`),
+each with a `backend/service.js` whose every method throws
+`NOT_IMPLEMENTED` explicitly (no fake success, per this project's honesty
+discipline) and a `SPEC.md` naming the real stakeholder loop, the real
+existing services to compose (not duplicate), and open product questions to
+resolve before building. **Deliberately no `routes.js` yet** - mounting
+endpoints that only throw would pollute the live route-mount count with
+dead endpoints; routes get added when each module's real logic lands.
+
+1. `M901100_CONTRACTFARMING` - Contract Farming & Forward Trade (acreage/
+   qty commitment, quality clauses, milestone escrow release, breach
+   flags). Links: `escrowService.js` (real, 339 lines - compose, don't
+   reimplement). Also note: `subh-deep` added real multi-party
+   trade-escrow (`fpoOperationsRoutes.js`'s sibling work,
+   `DOCUMENTATION/`) - check for overlap before building.
+2. `M902100_QUALITYGRADING` - Quality Grading & Assaying Lab Workflow
+   (sample intake → parameters → certificate → linked to price/custody).
+   Needs: verify existing lab/food-safety module schemas before building
+   (doc claims fragments exist).
+3. `M904100_SETTLEMENTORCHESTRATOR` - Settlement, UPI & Payout Engine
+   (delivery confirm → quality hold → UPI/NEFT payout → FPO split → GST
+   invoice → retry). User's #1 priority. Real UPI/NEFT bank-rail
+   integration explicitly left as a documented not-configured integration
+   point (no real credentials this session) - matches the pattern already
+   used in `landRecordsService.js`. Check `subh-deep`'s new
+   `vcs-control-plane` (price-waterfall, mass-balance, provenance kernel)
+   for overlap before building - may already cover part of this.
+4. `M905100_DISPUTEDESK` - Dispute, Grievance & Trust Desk (typed cases,
+   evidence, SLA, outcome codes, seller-ranking impact). Needs: outcome-
+   code vocabulary and ranking-impact formula are product decisions, not
+   to invent unilaterally.
+5. `M906100_HARVESTPLANNING` - Harvest & Post-Harvest Planning (harvest
+   window → labour request → packhouse checklist → cold slot booking →
+   dispatch). Links: existing crop-planning service, the real
+   `warehouseReceiptService.js` for cold slot booking (not `M903100` -
+   that skeleton was deleted, real implementation exists instead).
+
+### 3 P1 items that extend existing modules — no new folder created
+- **Document/KYC/Consent Vault** → extend `M501100_IDENTITYMANAGEMENT`
+  (real backing service exists, `identityManagementService.js`).
+- **Scheme Application Case Manager** → extend `M652100_GOVERNMENTSCHEME`
+  + `M386100_SUBSIDY` (both real, 709 and 591 lines respectively) with a
+  file-and-track application-case layer, not a new eligibility checker.
+- **Extension/Advisory Workbench** → extend `M472100_AIADVISORY` (confirmed
+  exists) with human-accountable ticket/visit/prescription workflow, not
+  chatbot-only advisory.
+
+### Not started
+All 7 new skeletons need real implementation (each SPEC.md has the method
+list and composition plan). Recommended order per user's own doc: Settlement
+(M904100) first, since it's ranked #1 and other modules (FPO payout split,
+contract escrow release) depend on it existing.
+
 ## TODO — AFRERA Value-Chain Execution & Orchestration Control Plane (2026-09-21, Phase 1 done, rest not started)
 
 User's expanded architectural direction: the "value-chain studio" should not be one more isolated page/service — it should become a formal cross-domain control plane sitting above the existing specialist systems (Farmer/FPO/Village ERP, Marketplace, Procurement, Warehouse, Cold Chain, Logistics, Finance, Insurance, Subsidy/Government Schemes, Engineering OS, Shared Infrastructure, IoT/Digital Twin, Renewable Energy, FOLU/ESG, Compliance). Core principle (non-negotiable): **no number without a source, formula, or declared assumption** — every financial/production/logistics/engineering/subsidy/insurance/compliance output must trace to real evidence and a versioned calculation; generative AI is confined to product positioning copy and image generation, never the authoritative computational path.

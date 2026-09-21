@@ -1,0 +1,30 @@
+{
+  "moduleId": "M906100_HARVESTPLANNING",
+  "version": "0.1.0",
+  "name": "Harvest & Post-Harvest Planning",
+  "description": "Harvest window -> labour request -> packhouse checklist -> cold storage slot booking -> dispatch, linked to crop planning.",
+  "category": "agriculture",
+  "status": "SKELETON",
+  "createdAt": "2026-09-21",
+  "source": "AFRERA P1 capability-module recommendation, 2026-09-21",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "services (crop planning - search: cropPlanning)",
+      "M903100_WAREHOUSERECEIPT (cold slot booking)"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": []
+    }
+  },
+  "completeness": {
+    "backend": false,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

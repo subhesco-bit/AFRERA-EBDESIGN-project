@@ -1,0 +1,30 @@
+{
+  "moduleId": "M901100_CONTRACTFARMING",
+  "version": "0.1.0",
+  "name": "Contract Farming & Forward Trade",
+  "description": "Forward contracts between farmers/FPOs and buyers: acreage/qty commitment, quality clauses, milestone harvest, escrow release, breach/dispute flags.",
+  "category": "commerce",
+  "status": "SKELETON",
+  "createdAt": "2026-09-21",
+  "source": "AFRERA P1 capability-module recommendation, 2026-09-21",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "services/legacy/escrowService.js (real, 9.4KB - milestone release target)",
+      "services/legacy/insurancePremiumService.js (risk pricing reference)"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": []
+    }
+  },
+  "completeness": {
+    "backend": false,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

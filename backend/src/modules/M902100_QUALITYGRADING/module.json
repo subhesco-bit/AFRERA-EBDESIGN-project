@@ -1,0 +1,31 @@
+{
+  "moduleId": "M902100_QUALITYGRADING",
+  "version": "0.1.0",
+  "name": "Quality Grading & Assaying Lab Workflow",
+  "description": "Sample intake, grading parameters by crop/GI, grade certificate issuance, linkage from grade to price and custody events.",
+  "category": "agriculture",
+  "status": "SKELETON",
+  "createdAt": "2026-09-21",
+  "source": "AFRERA P1 capability-module recommendation, 2026-09-21",
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "services/legacy/multilingualService.js (grader instructions in local language)",
+      "services/dynamicPricingService.js",
+      "GI intelligence modules (search: giIntelligence)"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": []
+    }
+  },
+  "completeness": {
+    "backend": false,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}
