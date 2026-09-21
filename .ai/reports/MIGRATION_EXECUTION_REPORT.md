@@ -238,3 +238,80 @@ node tools/audit-migrations.js      # static: ordering and duplicate objects
 # then, against a live PostgreSQL, apply continue-on-error to enumerate
 # runtime failures (see .ai/tasks/AFRERA_MASTER_TODO.md item 1.2.7)
 ```
+
+## Keystone finding: why 74 failures trace to two files
+
+Added after the initial report, from targeted experiments against a live
+database. The 74 failures are not 74 independent defects. A large share trace
+to a single conflict between two protected core migrations.
+
+### The causal chain
+
+1. `000_base_schema.sql` creates `users`, `roles`, `states` and seeds role and
+   state lookup data.
+2. `001_skeleton_complete_schema.sql` defines **incompatible versions of the
+   same core tables** and re-seeds the same lookup data. Every statement in it
+   runs in one transaction, so one conflict rolls back the whole file.
+3. `001` therefore never commits. Measured, in order, by clearing each
+   collision in a throwaway database and re-running:
+
+   | Collision cleared | `001` then fails on |
+   |---|---|
+   | *(nothing)* | `23505` unique violation on `roles_code_key`, `Key (code)=(farmer) already exists` |
+   | `roles` | `23505` unique violation on `states_name_key` |
+   | `roles`, `states`, `user_roles` | `42703` `column "first_name" of relation "users" does not exist` |
+
+   The last one cannot be cleared by deleting rows: `000_base_schema.sql`
+   already created `users` **without** `first_name`, so `001`'s own
+   `CREATE TABLE users` does not take effect and its `INSERT` has nowhere to go.
+   The two files disagree on the shape of the core `users` table.
+
+4. Because `001` rolls back, **everything it uniquely defines never exists** —
+   including `villages` with `id UUID PRIMARY KEY DEFAULT gen_random_uuid()`.
+5. `012_governance_module.sql` then creates `villages` with `id SERIAL`
+   (integer). Confirmed in the live database:
+   `information_schema` reports `villages.id` as **`integer`**.
+6. Downstream migrations declare `village_id UUID` and cannot form a foreign
+   key to an integer primary key — hence
+   `foreign key constraint ... cannot be implemented`.
+
+### The ecosystem has already voted
+
+Across all 789 migrations:
+
+| `village_id` declared as | Files |
+|---|---|
+| `UUID` | **45** |
+| `INTEGER` | 5 |
+| `SERIAL` | 1 |
+
+All six failing `village_*` migrations declare `village_id UUID`. The schema the
+code expects is `001`'s, but the schema that actually materialises is
+`000_base_schema.sql` + `012`'s.
+
+### The decision this requires
+
+Which file is canonical for the core tables `users`, `roles`, `states` and
+`villages`: `000_base_schema.sql` or `001_skeleton_complete_schema.sql`?
+
+**Recommendation — make `001` canonical**, on this evidence:
+
+- 45 of 51 `village_id` declarations assume `001`'s UUID key.
+- `000_zz2_roles_early_collision_repair.sql` already exists specifically to add
+  the `code` / `is_system` / `parent_role_id` columns **that `001` needs** — the
+  project has already been patching toward `001`'s model.
+- `001` is named `skeleton_complete_schema` and supplies the richer taxonomy
+  (~15 role codes vs 5 permission-based names).
+
+**This cannot be applied mechanically, and is not applied here**, because:
+
+- Both files are inside the protected `000-071` range.
+- Deleting the base rows is not sufficient (step 3, last row) and deleting data
+  conflicts with the project's no-deletion rule.
+- Making `001`'s inserts tolerant with `ON CONFLICT DO NOTHING` would silently
+  let `000`'s weaker definitions win — the opposite of the recommendation — and
+  leave the UUID/integer split in place.
+
+The likely shape of the fix is a consolidating migration ordered before both,
+plus an explicit decision recorded in `.ai/decisions/`. That is a schema-owner
+call, not a transformation.

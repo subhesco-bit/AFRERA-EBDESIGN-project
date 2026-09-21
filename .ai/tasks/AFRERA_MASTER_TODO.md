@@ -259,8 +259,15 @@ mean the resulting schema depends on which definition happens to win.
         `9991_1_logistics_enhancements.sql`; `032` sorts before `9001`).
         It now parses and has advanced to a missing-type dependency, which
         belongs to the 1.2.1c group rather than being unapplicable in principle.
-- [ ] **1.2.1b Fix 18 foreign-key type mismatches** — `CONFLICTING`
-      `42804` / `42703` — FK column type differs from the referenced key.
+- [ ] **1.2.1b Fix 18 foreign-key type mismatches** — `BLOCKED` by 1.2.1d — *root cause identified*
+      `42804` / `42703`. **Not 18 independent defects.** Seven are `village_id`,
+      and they fail because `villages.id` materialises as `integer` (from
+      `012_governance_module.sql`) while 45 of 51 `village_id` declarations
+      across the migration set say `UUID`. `001_skeleton_complete_schema.sql`
+      defines `villages.id` as `UUID` but its transaction always rolls back
+      (see 1.2.1d), so its definition never exists. Fixing 1.2.1d is expected
+      to clear most of this group; patching the FKs individually would cement
+      the wrong key type in 45 places.
 - [ ] **1.2.1c Consolidate 263 multiply-defined objects, then re-run** — `CONFLICTING` — *largest group*
       47 failures are missing relation/column (`42P01`/`42703`) and most should
       disappear once object ownership is settled. `TABLE users` alone is created
@@ -272,13 +279,33 @@ mean the resulting schema depends on which definition happens to win.
       so 001's richer definition is skipped and its columns never exist.
       Which definition is canonical is a schema decision. Note `000-071` are
       protected by project convention and were not edited.
-- [ ] **1.2.1d Decide the canonical role taxonomy** — `CONFLICTING` — *decision required*
-      `000_base_schema.sql:1081` seeds 5 permission-based roles keyed by `name`;
-      `001_skeleton_complete_schema.sql:61` seeds ~15 roles keyed by `code`.
-      `000_zz2_roles_early_collision_repair.sql` backfills `code` from `name`,
-      which is what creates the collision. Merging them is a data-model choice,
-      not a mechanical fix; making the insert tolerant would silently pick a
-      winner.
+- [ ] **1.2.1d Decide the canonical core schema: `000_base_schema` vs `001_skeleton_complete_schema`** — `CONFLICTING` — *KEYSTONE; decision required*
+      **This is the single highest-leverage item in Stage 1.2.** The two files
+      define incompatible versions of `users`, `roles`, `states` and `villages`
+      and re-seed the same lookup data. `001` runs as one transaction, so it
+      always rolls back, and everything it uniquely defines never exists.
+      Measured by clearing each collision in a throwaway database:
+
+      | Collision cleared | `001` then fails on |
+      |---|---|
+      | *(nothing)* | unique violation `roles_code_key`, `Key (code)=(farmer)` |
+      | `roles` | unique violation `states_name_key` |
+      | `roles`, `states`, `user_roles` | `column "first_name" of relation "users" does not exist` |
+
+      The last cannot be cleared by deleting rows: `000` already created `users`
+      **without** `first_name`, so `001`'s `CREATE TABLE users` never takes
+      effect. The files disagree on the core table's shape.
+
+      **Recommendation: make `001` canonical** — 45 of 51 `village_id`
+      declarations assume its UUID key; `000_zz2_roles_early_collision_repair.sql`
+      exists precisely to add the columns `001` needs, so the project has already
+      been patching toward `001`; and `001` supplies the richer taxonomy.
+      Not applied here: both files are in the protected `000-071` range, row
+      deletion is insufficient and conflicts with the no-deletion rule, and
+      `ON CONFLICT DO NOTHING` would silently make `000` win. Needs a
+      consolidating migration ordered before both, plus a recorded decision in
+      `.ai/decisions/`. Full chain in
+      `.ai/reports/MIGRATION_EXECUTION_REPORT.md`.
 - [ ] **1.2.1e Resolve 3 already-exists collisions** (`42P07`, `42710`) — `DUPLICATE`
 - [ ] **1.2.1f Re-run to green and record the applied count** — `BLOCKED` (needs 1.2.1a–e)
 - [ ] **1.2.2 Resolve the 38 duplicate-prefix collisions** — `CONFLICTING`
