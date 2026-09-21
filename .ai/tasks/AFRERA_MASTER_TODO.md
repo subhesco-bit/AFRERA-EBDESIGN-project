@@ -161,20 +161,35 @@ layer is largely not a template problem.
 
 ## STAGE 1.1 — Authentication and identity (assessment finding 2)
 
-- [ ] **1.1.1 Resolve the mock authentication path** — `DISCONNECTED`/`CONFLICTING` — *highest security item*
-  **Verified in this repo:** `routes/authRoutes.js` line 13 is
-  `const users = new Map()` (in-memory); line 37 compares
-  `user.password !== password` (**plaintext comparison**); line 88 stores
-  `{ id, name, email, password }` (**plaintext at rest**); line 33 carries the
-  comment *"In production: query PostgreSQL, hash password, verify"*.
-  **Divergence from the assessment:** it says "the current server mounts
-  authRoutes.js". In *this* repository the file is required at `index.js:175`
-  but has **no `app.use` registration**. However `discoverAndMountRoutes(routesDir, '/api/v1')`
-  walks the routes directory, so it is likely auto-mounted at `/api/v1/auth`.
-  **Sub-task 1.1.1a: determine empirically whether `/api/v1/auth/login` is
-  reachable.** If reachable this is a live credential vulnerability; if not it
-  is dead code that must still be removed from the graph so it cannot be
-  mounted by accident. Do not close on reasoning alone.
+- [x] **1.1.1 Mock authentication path — closed fail-closed** — `VERIFIED` — *was a live exposure*
+  **Verified live against a running server, not inferred.** The assessment's
+  finding 2 is confirmed exactly, including the token format it named:
+
+  ```
+  POST /api/v1/auth/register -> 201  {"token":"jwt_user_1789976455307_1789976455307"}
+  POST /api/v1/auth/login    -> 200  (with the plaintext password)
+  ```
+
+  `routes/authRoutes.js` keeps users in a process-local `Map` (line 13),
+  compares passwords in plaintext (line 37), stores them in plaintext (line 88)
+  and mints fabricated non-JWT `jwt_<userId>_<timestamp>` strings. It is
+  required at `index.js:175` with **no `app.use` registration**, but
+  `discoverAndMountRoutes(routesDir, '/api/v1')` walks the routes directory, so
+  it **was auto-mounted and reachable**.
+
+  **Severity, stated precisely:** this was *not* an authorization bypass. The
+  tokens it mints are correctly rejected by the real verifier in
+  `middleware/auth.js` — protected routes answered `401` both with and without
+  one. The real exposure was a reachable endpoint accepting and retaining
+  plaintext credentials, plus a login that appears to succeed while granting no
+  access (the two-incoherent-auth-systems problem).
+
+  **Remediation:** per the no-deletion rule the implementation is retained but
+  gated behind `ALLOW_MOCK_AUTH=true`, defaulting to **disabled**. Confirmed
+  after the change: `503 MOCK_AUTH_DISABLED`, with the platform still healthy
+  (`/health` 200, 773/773 routes mounted, 0 failed). The flag is a stopgap —
+  1.1.2–1.1.7 replace this with a real identity service; do not enable it.
+
 - [ ] **1.1.2 One identity and session authority** — `CONFLICTING`
   Converge mock login and the real `middleware/auth.js` JWT verification.
 - [ ] **1.1.3 Single token contract across all frontend clients** — `PROPOSED`
