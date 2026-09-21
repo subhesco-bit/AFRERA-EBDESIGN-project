@@ -183,6 +183,7 @@ const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'));
 const MarketingCenter = lazy(() => import('../pages/MarketingCenter'));
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'));
 const AIProductStudioPage = lazy(() => import('../pages/AIProductStudioPage'));
+const AdvancedMedicalCodingPage = lazy(() => import('../pages/AdvancedMedicalCodingPage'));
 const PublicDataExtractorPage = lazy(() => import('../pages/PublicDataExtractorPage'));
 
 // Additional management pages
@@ -1256,6 +1257,14 @@ export const dashboardRoutes = [
  * Management routes
  */
 export const managementRoutes = [
+  {
+    path: '/medical-coding',
+    component: AdvancedMedicalCodingPage,
+    title: 'Clinical Coding Workspace - AFRERA',
+    description: 'Human-reviewed AI assistance for clinical terminology and medical coding references',
+    keywords: 'medical coding, clinical documentation, ICD-10, CPT, SNOMED, LOINC',
+    transition: 'fade',
+  },
   {
     path: '/farmer-profile',
     component: FarmerProfilePage,

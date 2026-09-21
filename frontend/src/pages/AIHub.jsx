@@ -4,7 +4,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Card, Grid, Tabs, TabList, TabPanel, Tab, Select, Input, Button, Textarea } from '@chakra-ui/react';
 import './AIHub.css';
 
 const AIHubDashboard = () => {
@@ -90,8 +89,8 @@ const AIHubDashboard = () => {
     },
     veterinary: {
       icon: '🐾',
-      title: 'Veterinary AI Doctor',
-      description: 'Animal health diagnosis and treatment',
+      title: 'Veterinary Decision Support',
+      description: 'Animal-health triage and professional-review support',
     },
     chef: {
       icon: '👨‍🍳',
@@ -125,8 +124,8 @@ const AIHubDashboard = () => {
     },
     prescription: {
       icon: '💊',
-      title: 'AI Prescription Writer',
-      description: 'Medical prescription generation',
+      title: 'Clinical Coding Assistant',
+      description: 'Review-only coding and documentation support',
     },
     farmer_support: {
       icon: '👨‍🌾',

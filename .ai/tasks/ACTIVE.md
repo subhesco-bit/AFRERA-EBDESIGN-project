@@ -1,5 +1,11 @@
 # ACTIVE TASKS
 
+## DONE — integrated product value chain, token/plugin policy, and professional medical coding (2026-09-21)
+
+Implemented and verified the farmer-product vertical slice from intake through AI media/copy, nutrition reference, value pricing, cold chain, insurance, funding, subsidy, engineering, compliance, commerce, settlement handoffs, and governance. Added quality-preserving token defaults and a capability-based enterprise integration registry; external and financial writes remain approval-gated. Extended AI coding assistance to clinical coding, dietitian/MNT, nutritionist, nutrient-calculator/laboratory, and natural-therapist contexts with evidence-only prompts, qualified review, and no automatic diagnosis or claim submission. Added the contextual placeholder contract and final delivery checklist at `docs/INTEGRATED_PLATFORM_TODO.md`.
+
+Verification: 7 targeted backend tests passed; full Vite production build passed (6,353 modules). The remaining build message is a non-fatal generated-page dynamic/static import chunking warning.
+
 ## TODO — regenerate 6 deleted audit CSVs (2026-09-20, not started)
 `_audit/SKELETON_SERVICE_AUDIT/{01_FILE_INVENTORY,03_SERVICE_INVENTORY,
 04_DEPENDENCY_INVENTORY,05_ROUTE_API_INVENTORY,06_DATABASE_INVENTORY,

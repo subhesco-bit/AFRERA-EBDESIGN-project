@@ -194,6 +194,8 @@ const advancedFeatures = require('./routes/advancedFeatures.js');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
 const operationalModuleRoutes = require('./routes/operationalModuleRoutes.js');
+const productValueChainRoutes = require('./routes/productValueChainRoutes.js');
+const { router: advancedMedicalCodingRoutes } = require('./services/advancedMedicalCodingService.js');
 
 /**
  * EBDESIGN Platform Backend - Main Entry Point
@@ -293,6 +295,8 @@ app.use(rateLimit(
 // discovers this route, but this explicit mount keeps the contract stable even
 // when directory discovery is running in degraded mode.
 app.use('/api/v1/operational-modules', operationalModuleRoutes);
+app.use('/api/v1/value-chain', productValueChainRoutes);
+app.use('/api/v1/advanced-medical-coding', advancedMedicalCodingRoutes);
 
 // M007 Role & Permission Management (AI-enhanced) lives under
 // backend/src/modules/M007/routes.js, not backend/src/routes/, so

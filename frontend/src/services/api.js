@@ -4974,6 +4974,8 @@ export const userAPI2 = {
 export const valueChainAPI = {
   getValueChain: () => api.get('/value-chain'),
   manageValueChain: (data) => api.post('/value-chain/manage', data),
+  getStatus: () => api.get('/value-chain/status'),
+  analyzeProduct: (data) => api.post('/value-chain/analyze', data),
 };
 
 export var vehicleAPI = {
