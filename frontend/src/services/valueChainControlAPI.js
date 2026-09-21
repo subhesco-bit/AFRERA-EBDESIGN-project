@@ -11,6 +11,7 @@ export const valueChainControlAPI = {
   runCalculation: (payload) => api.post(`${BASE}/calculations/run`, payload),
   buildWaterfall: (payload) => api.post(`${BASE}/price-waterfall`, payload),
   projectMassBalance: (payload) => api.post(`${BASE}/mass-balance/project`, payload),
+  assertField: (caseId, payload) => api.post(`${BASE}/cases/${caseId}/assertions`, payload),
   evaluateGate: (caseId, gateCode, requirements) => api.post(`${BASE}/cases/${caseId}/gates/${gateCode}/evaluate`, { requirements }),
 };
 
