@@ -25,6 +25,69 @@ async function submitInsuranceClaim(claimData) {
       farmer_id
     } = claimData;
 
+    // ------------------------------------------------------------------
+    // REFUSE BEFORE DOING WORK THAT CANNOT MATTER.
+    //
+    // This function does not persist a claim. This file contains ZERO
+    // database queries: it built the claim record below purely in memory,
+    // and then sent the farmer "Your insurance claim has been submitted
+    // successfully" over the websocket. With MongoDB up, a farmer would be
+    // told their crop-loss claim was filed when nothing had been stored.
+    // (Without MongoDB the AI call below throws first, so the bug is
+    // currently masked by an infrastructure error rather than absent.)
+    //
+    // The record it assembled also read eight fields that
+    // aiService.generateRecommendation does not return -- confidence_score,
+    // fraud_probability, coverage_eligibility, estimated_payout,
+    // validation_notes, required_documents, red_flags and
+    // estimated_processing_time. That function returns the
+    // generateRecommendations result spread plus { task, confidence,
+    // explanation }, so all eight were undefined, including the payout.
+    //
+    // Note this is aiAPI from ./aiService (line 6), which is a DIFFERENT
+    // aiAPI from the governed envelope in legacy/aiBackboneService.js.
+    //
+    // Failing loudly and early is correct here: a false "submitted" is
+    // worse than an error, because the farmer stops chasing it. The AI call
+    // is skipped entirely -- validating a claim that cannot be stored costs
+    // a model call and produces nothing.
+    //
+    // To make this real, persist against the claims schema. The live
+    // database has BOTH `claims` and `rural_insurance_claims` (plus
+    // `claim_documents`), and which is canonical for insurance claims is
+    // part of the duplicate-object consolidation tracked in
+    // .ai/tasks/AFRERA_MASTER_TODO.md item 1.2.1c -- so it is not picked
+    // here. The validated input is surfaced on the error so a caller can
+    // see exactly what would have been written.
+    // ------------------------------------------------------------------
+    const notPersisted = new Error(
+      'Insurance claim was NOT submitted: claim persistence is not implemented. ' +
+      'This service writes to no table. Resolve the claims-table ownership ' +
+      '(`claims` vs `rural_insurance_claims`) and implement the write before ' +
+      'exposing claim submission.',
+    );
+    notPersisted.code = 'CLAIM_PERSISTENCE_NOT_IMPLEMENTED';
+    notPersisted.status = 501;
+    notPersisted.wouldHaveWritten = {
+      policy_id,
+      farmer_id,
+      claim_type,
+      incident_date,
+      incident_description,
+      estimated_loss,
+      location,
+      supporting_documents,
+    };
+    logger.error('Insurance claim submission refused: no persistence implemented', {
+      policy_id,
+      farmer_id,
+      claim_type,
+    });
+    throw notPersisted;
+
+    /* eslint-disable no-unreachable */
+    // Retained below, unreachable, so the intended flow is not lost when
+    // persistence is implemented. Nothing is deleted (project rule).
     // AI-powered claim validation
     const aiRequest = {
       task: 'insurance_claim_validation',
@@ -82,7 +145,11 @@ async function submitInsuranceClaim(claimData) {
 
     logger.info(`Insurance claim submitted: ${claim.claim_id}`);
     return claim;
+    /* eslint-enable no-unreachable */
   } catch (error) {
+    // Do not flatten the explicit refusal into a generic failure: the caller
+    // needs to know the claim was refused, not attempted-and-failed.
+    if (error && error.code === 'CLAIM_PERSISTENCE_NOT_IMPLEMENTED') throw error;
     logger.error('Error submitting insurance claim', { error: error.message, stack: error.stack });
     throw new Error('Failed to submit insurance claim');
   }
