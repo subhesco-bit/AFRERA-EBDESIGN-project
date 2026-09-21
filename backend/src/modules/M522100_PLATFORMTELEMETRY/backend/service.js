@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../../backend/src/services/legacy/platformTelemetryService');
+module.exports = require('../../services/legacy/platformTelemetryService');

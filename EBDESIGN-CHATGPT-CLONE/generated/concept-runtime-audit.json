@@ -1,0 +1,1634 @@
+{
+  "generatedAt": "2026-09-19T14:50:56.235Z",
+  "inventoryCount": 169,
+  "requiredEvidenceGates": [
+    "source",
+    "runtime",
+    "persistence",
+    "authorization",
+    "contract",
+    "journey",
+    "test",
+    "telemetry"
+  ],
+  "capabilities": [
+    {
+      "id": "CAP-001",
+      "name": "Canonical concept to runtime registry",
+      "domain": "platform-governance",
+      "stage": 0,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "architecture",
+      "dependsOn": [],
+      "outcome": "Every concept is traceable from source through runtime, tests and telemetry.",
+      "evidenceHints": [
+        ".ai/architecture/CONCEPT_TO_RUNTIME_MATRIX.md",
+        "modules",
+        "backend/src",
+        "frontend/src"
+      ],
+      "nextAction": "Run the clone audit and adjudicate every ambiguous match.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "modules/AUDIT_REPORT.md",
+        "modules/COMPREHENSIVE_FILE_AUDIT.md",
+        "modules/LIBRARY_REGISTRATION_SUMMARY.md",
+        "modules/MIGRATION_RESULTS.md",
+        "modules/MODULE_REGISTRY.json",
+        "modules/README.md",
+        "modules/SYSTEM_OVERVIEW.md",
+        "frontend/src/App.jsx",
+        "frontend/src/index.css",
+        "frontend/src/main.jsx",
+        "database/registry/DATABASE_ARCHITECTURE_REGISTRY.json",
+        "database/registry/DATABASE_FOUNDATION_CHECKPOINT.txt"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-002",
+      "name": "Module contract and lifecycle governance",
+      "domain": "platform-governance",
+      "stage": 0,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "architecture",
+      "dependsOn": [
+        "CAP-001"
+      ],
+      "outcome": "Every module declares ownership, dependencies, contracts, migrations, health and lifecycle.",
+      "evidenceHints": [
+        "modules",
+        "backend/src/modules"
+      ],
+      "nextAction": "Populate canonical module records from repository evidence.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "modules/AUDIT_REPORT.md",
+        "modules/COMPREHENSIVE_FILE_AUDIT.md",
+        "modules/LIBRARY_REGISTRATION_SUMMARY.md",
+        "modules/MIGRATION_RESULTS.md",
+        "modules/MODULE_REGISTRY.json",
+        "modules/README.md",
+        "modules/SYSTEM_OVERVIEW.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-003",
+      "name": "Unified identity and session authority",
+      "domain": "identity",
+      "stage": 1,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "identity-security",
+      "dependsOn": [
+        "CAP-001"
+      ],
+      "outcome": "One identity contract serves login, refresh, MFA, recovery, revocation and protected APIs.",
+      "evidenceHints": [
+        "backend/src/middleware/auth.js",
+        "backend/src/services",
+        "frontend/src/store"
+      ],
+      "nextAction": "Reconcile all auth implementations and prove one end-to-end token contract.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        ".ai/SESSION_COMPLETION_SUMMARY_SEPTEMBER_3.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-004",
+      "name": "Contextual authorization",
+      "domain": "identity",
+      "stage": 1,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "identity-security",
+      "dependsOn": [
+        "CAP-003"
+      ],
+      "outcome": "Server-enforced role and policy decisions protect every consequential action.",
+      "evidenceHints": [
+        "backend/src/middleware",
+        "backend/src/services"
+      ],
+      "nextAction": "Create endpoint authorization inventory and negative tests.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        ".ai/FINAL_PHASE_SUMMARY_AND_LAUNCH_AUTHORIZATION.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-005",
+      "name": "Canonical data ownership and lineage",
+      "domain": "data",
+      "stage": 1,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "data-architecture",
+      "dependsOn": [
+        "CAP-001"
+      ],
+      "outcome": "Every entity and metric has one source of truth, owner, retention rule and lineage.",
+      "evidenceHints": [
+        "backend/src/database",
+        "database"
+      ],
+      "nextAction": "Execute migrations in a disposable database and reconcile schema ownership.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "database/README.md",
+        "database/registry/DATABASE_ARCHITECTURE_REGISTRY.json",
+        "database/registry/DATABASE_FOUNDATION_CHECKPOINT.txt"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-006",
+      "name": "Versioned API contract standard",
+      "domain": "integration",
+      "stage": 1,
+      "status": "partially_working",
+      "priority": "high",
+      "owner": "platform-api",
+      "dependsOn": [
+        "CAP-003",
+        "CAP-004",
+        "CAP-005"
+      ],
+      "outcome": "APIs use consistent validation, errors, idempotency and versioning.",
+      "evidenceHints": [
+        "backend/src/index.js",
+        "backend/src/services",
+        "backend/src/routes"
+      ],
+      "nextAction": "Generate route catalogue and measure conformance.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-007",
+      "name": "Durable workflow orchestration",
+      "domain": "workflow",
+      "stage": 1,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "workflow-platform",
+      "dependsOn": [
+        "CAP-004",
+        "CAP-005",
+        "CAP-006"
+      ],
+      "outcome": "Consequential journeys enforce transitions, approvals, timers, retry, compensation and audit evidence.",
+      "evidenceHints": [
+        "backend/src/services",
+        "workflows"
+      ],
+      "nextAction": "Implement the professional workflow contracts in workflow-catalog.json.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "workflows/bug-fix.md",
+        "workflows/full-audit.md",
+        "workflows/new-feature.md",
+        "workflows/pre-commit.md",
+        "workflows/pre-deploy.md",
+        "workflows/release-prep.md",
+        ".ai/INTEGRATION_REPAIR_WORKFLOW.md",
+        ".ai/VERIFICATION_WORKFLOW.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-008",
+      "name": "Unified ERP control system",
+      "domain": "erp",
+      "stage": 1,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "enterprise-finance",
+      "dependsOn": [
+        "CAP-005",
+        "CAP-007"
+      ],
+      "outcome": "Operational transactions post auditable accounting, tax, inventory and reconciliation consequences.",
+      "evidenceHints": [
+        "backend/src/services/erp",
+        "backend/src/modules",
+        "database"
+      ],
+      "nextAction": "Trace order-to-cash and procure-to-pay through ledger evidence.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "database/README.md",
+        "database/registry/DATABASE_ARCHITECTURE_REGISTRY.json",
+        "database/registry/DATABASE_FOUNDATION_CHECKPOINT.txt"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-009",
+      "name": "Agriculture lifecycle journey",
+      "domain": "agriculture",
+      "stage": 2,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "agriculture-product",
+      "dependsOn": [
+        "CAP-007",
+        "CAP-008"
+      ],
+      "outcome": "Plot to settlement operates as one seasonal, evidence-backed journey.",
+      "evidenceHints": [
+        "backend/src/services",
+        "frontend/src/pages",
+        "modules"
+      ],
+      "nextAction": "Prove plot-plan-finance-procure-operate-monitor-harvest-grade-store-sell-settle.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "modules/AUDIT_REPORT.md",
+        "modules/COMPREHENSIVE_FILE_AUDIT.md",
+        "modules/LIBRARY_REGISTRATION_SUMMARY.md",
+        "modules/MIGRATION_RESULTS.md",
+        "modules/MODULE_REGISTRY.json",
+        "modules/README.md",
+        "modules/SYSTEM_OVERVIEW.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-010",
+      "name": "Marketplace commerce journey",
+      "domain": "commerce",
+      "stage": 2,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "commerce-product",
+      "dependsOn": [
+        "CAP-007",
+        "CAP-008"
+      ],
+      "outcome": "Discovery through seller settlement is transactional, trustworthy and reversible.",
+      "evidenceHints": [
+        "backend/src/services",
+        "frontend/src/pages"
+      ],
+      "nextAction": "Prove comparison, checkout, payment, fulfilment, return, refund and settlement.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-011",
+      "name": "Insurance protection journey",
+      "domain": "insurance",
+      "stage": 2,
+      "status": "partially_working",
+      "priority": "high",
+      "owner": "insurance-product",
+      "dependsOn": [
+        "CAP-007",
+        "CAP-013"
+      ],
+      "outcome": "Need analysis through claim appeal is suitable, explainable and auditable.",
+      "evidenceHints": [
+        "backend/src/services",
+        "frontend/src/pages",
+        "modules"
+      ],
+      "nextAction": "Implement exclusions comparison, servicing, evidence, survey, payout and appeal states.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "modules/AUDIT_REPORT.md",
+        "modules/COMPREHENSIVE_FILE_AUDIT.md",
+        "modules/LIBRARY_REGISTRATION_SUMMARY.md",
+        "modules/MIGRATION_RESULTS.md",
+        "modules/MODULE_REGISTRY.json",
+        "modules/README.md",
+        "modules/SYSTEM_OVERVIEW.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-012",
+      "name": "Rural finance and lending journey",
+      "domain": "finance",
+      "stage": 2,
+      "status": "partially_working",
+      "priority": "high",
+      "owner": "financial-services",
+      "dependsOn": [
+        "CAP-007",
+        "CAP-013"
+      ],
+      "outcome": "Eligibility through repayment and recovery uses consented, explainable underwriting.",
+      "evidenceHints": [
+        "backend/src/services",
+        "frontend/src/pages",
+        "modules"
+      ],
+      "nextAction": "Prove cash-flow assessment, sanction, disbursement, monitoring and dignified recovery.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "modules/AUDIT_REPORT.md",
+        "modules/COMPREHENSIVE_FILE_AUDIT.md",
+        "modules/LIBRARY_REGISTRATION_SUMMARY.md",
+        "modules/MIGRATION_RESULTS.md",
+        "modules/MODULE_REGISTRY.json",
+        "modules/README.md",
+        "modules/SYSTEM_OVERVIEW.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-013",
+      "name": "Suitability and comparison layer",
+      "domain": "trust",
+      "stage": 2,
+      "status": "proposed_future",
+      "priority": "high",
+      "owner": "consumer-protection",
+      "dependsOn": [
+        "CAP-004",
+        "CAP-015"
+      ],
+      "outcome": "Offers are ranked by user-controlled criteria with exclusions, affordability and reasons.",
+      "evidenceHints": [],
+      "nextAction": "Define sector-neutral comparison contract and regulated-sector adapters.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        ".ai/6REPO_COMPARISON_MATRIX.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-014",
+      "name": "Logistics control tower",
+      "domain": "logistics",
+      "stage": 2,
+      "status": "partially_working",
+      "priority": "high",
+      "owner": "logistics-operations",
+      "dependsOn": [
+        "CAP-007",
+        "CAP-008"
+      ],
+      "outcome": "Load planning through settlement includes custody, ETA confidence and exception recovery.",
+      "evidenceHints": [
+        "backend/src/services",
+        "frontend/src/pages"
+      ],
+      "nextAction": "Prove capacity match, tracking, cold-chain exception, delivery and settlement.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-015",
+      "name": "Evidence Passport",
+      "domain": "trust",
+      "stage": 2,
+      "status": "proposed_future",
+      "priority": "critical",
+      "owner": "trust-governance",
+      "dependsOn": [
+        "CAP-005"
+      ],
+      "outcome": "Important objects and decisions carry provenance, issuer, consent and verification status.",
+      "evidenceHints": [],
+      "nextAction": "Define immutable evidence envelope and verification lifecycle.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-016",
+      "name": "Digital grievance spine",
+      "domain": "trust",
+      "stage": 2,
+      "status": "proposed_future",
+      "priority": "critical",
+      "owner": "consumer-protection",
+      "dependsOn": [
+        "CAP-007",
+        "CAP-015"
+      ],
+      "outcome": "Complaints and appeals share acknowledgement, evidence, SLA, escalation and closure rules.",
+      "evidenceHints": [],
+      "nextAction": "Implement cross-domain grievance state machine and regulator handoff adapters.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-017",
+      "name": "Government scheme rules engine",
+      "domain": "public-systems",
+      "stage": 2,
+      "status": "partially_working",
+      "priority": "high",
+      "owner": "government-integrations",
+      "dependsOn": [
+        "CAP-005",
+        "CAP-007",
+        "CAP-015"
+      ],
+      "outcome": "Effective-dated cited rules compute eligibility, evidence, application and appeal.",
+      "evidenceHints": [
+        "backend/src/services",
+        "frontend/src/pages",
+        "modules"
+      ],
+      "nextAction": "Convert priority schemes from content into executable versioned rules.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "modules/AUDIT_REPORT.md",
+        "modules/COMPREHENSIVE_FILE_AUDIT.md",
+        "modules/LIBRARY_REGISTRATION_SUMMARY.md",
+        "modules/MIGRATION_RESULTS.md",
+        "modules/MODULE_REGISTRY.json",
+        "modules/README.md",
+        "modules/SYSTEM_OVERVIEW.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-018",
+      "name": "Rural assisted and offline access",
+      "domain": "accessibility",
+      "stage": 2,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "rural-experience",
+      "dependsOn": [
+        "CAP-003",
+        "CAP-007"
+      ],
+      "outcome": "Low-bandwidth, offline, voice, SMS, IVR and assisted journeys preserve consent and auditability.",
+      "evidenceHints": [
+        "frontend/src",
+        "backend/src/services"
+      ],
+      "nextAction": "Prove queue, conflicts, resumable transfer, shared-device privacy and recovery.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "frontend/src/App.jsx",
+        "frontend/src/index.css",
+        "frontend/src/main.jsx"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-019",
+      "name": "Engineering intelligence chain",
+      "domain": "engineering",
+      "stage": 2,
+      "status": "partially_working",
+      "priority": "high",
+      "owner": "engineering-platform",
+      "dependsOn": [
+        "CAP-005",
+        "CAP-007",
+        "CAP-015"
+      ],
+      "outcome": "Calculations expose standards, assumptions, units, formula versions and professional approvals.",
+      "evidenceHints": [
+        "backend/src/services",
+        "modules",
+        "ENGINEERING_ENHANCEMENT_PLAN.md"
+      ],
+      "nextAction": "Trace one cold-storage project from inputs through design, BOQ, checking and commissioning.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "modules/AUDIT_REPORT.md",
+        "modules/COMPREHENSIVE_FILE_AUDIT.md",
+        "modules/LIBRARY_REGISTRATION_SUMMARY.md",
+        "modules/MIGRATION_RESULTS.md",
+        "modules/MODULE_REGISTRY.json",
+        "modules/README.md",
+        "modules/SYSTEM_OVERVIEW.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-020",
+      "name": "Governed adaptive experience",
+      "domain": "experience",
+      "stage": 3,
+      "status": "proposed_future",
+      "priority": "high",
+      "owner": "experience-platform",
+      "dependsOn": [
+        "CAP-004",
+        "CAP-021"
+      ],
+      "outcome": "Consented context adapts navigation and content without discriminatory inference or manipulation.",
+      "evidenceHints": [],
+      "nextAction": "Implement consent ledger, context profile, composer, explanations, reset and non-personalized mode.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-021",
+      "name": "Governed AI nervous system",
+      "domain": "ai",
+      "stage": 3,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "ai-governance",
+      "dependsOn": [
+        "CAP-004",
+        "CAP-005",
+        "CAP-015"
+      ],
+      "outcome": "AI routing, retrieval, agents and memory are permission-aware, evaluated and human-governed.",
+      "evidenceHints": [
+        "backend/src/services",
+        "backend/src/modules",
+        ".ai"
+      ],
+      "nextAction": "Inventory models, prompts, tools and fabricated outputs; require decision passports.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        ".ai/100_PERCENT_INTEGRATION_CONFIRMED.md",
+        ".ai/100_PERCENT_INTEGRATION_VERIFICATION.sh",
+        ".ai/20_PHASE_EXECUTION_PLAN.md",
+        ".ai/6REPO_COMPARISON_MATRIX.md",
+        ".ai/ACTUAL_IMPLEMENTATION_VERIFICATION.md",
+        ".ai/AGENT_PROTOCOL.md",
+        ".ai/ALL_PHASES_READY_FINAL_SUMMARY_2026-09-18.md",
+        ".ai/AUTOMATED_GAP_CLOSURE_GENERATOR.md",
+        ".ai/BACKUP_SEARCH_ANALYSIS.sh",
+        ".ai/BACKUP_SELECTIVE_TRANSFER.sh",
+        ".ai/BLOCKERS_RESOLVED_FINAL_STATUS_2026-09-18.md",
+        ".ai/BRUTAL_REALITY_CHECK.md",
+        ".ai/CHATGPT_WORK_EVALUATION.md",
+        ".ai/CHECKPOINT.md",
+        ".ai/CHIEF_INTEGRATION_ARCHITECT_FRAMEWORK.md",
+        ".ai/CLAUDE_ENHANCEMENT_FRAMEWORK.md",
+        ".ai/CLAUDE_TO_DEVIN_HANDOVER.md",
+        ".ai/CLEANUP_EXECUTION_COMPLETE.md",
+        ".ai/CLONE_SYNC_PROTOCOL.md",
+        ".ai/COMBINED_IMPACT_ANALYSIS.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-022",
+      "name": "Trusted analytics and benefit ledger",
+      "domain": "analytics",
+      "stage": 3,
+      "status": "partially_working",
+      "priority": "critical",
+      "owner": "data-analytics",
+      "dependsOn": [
+        "CAP-005",
+        "CAP-015",
+        "CAP-021"
+      ],
+      "outcome": "Metrics and recommendations connect verified source data to actual measured outcomes.",
+      "evidenceHints": [
+        "backend/src/services",
+        "frontend/src/pages"
+      ],
+      "nextAction": "Remove random business metrics and establish event, formula, freshness and reconciliation evidence.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        ".ai/INTEGRATION_LEDGER.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-023",
+      "name": "Trust graph",
+      "domain": "trust",
+      "stage": 3,
+      "status": "proposed_future",
+      "priority": "high",
+      "owner": "trust-governance",
+      "dependsOn": [
+        "CAP-015",
+        "CAP-016",
+        "CAP-022"
+      ],
+      "outcome": "Reputation derives from verified identity, credentials, transactions, custody and corrected disputes.",
+      "evidenceHints": [],
+      "nextAction": "Define explainable, appealable trust factors and anti-retaliation controls.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-024",
+      "name": "Personal economic digital twin",
+      "domain": "intelligence",
+      "stage": 4,
+      "status": "proposed_future",
+      "priority": "medium",
+      "owner": "decision-intelligence",
+      "dependsOn": [
+        "CAP-021",
+        "CAP-022"
+      ],
+      "outcome": "Users can simulate farm, household and enterprise decisions before acting.",
+      "evidenceHints": [],
+      "nextAction": "Define scenario model only after baseline data and outcome validation are proven.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-025",
+      "name": "Village and cluster digital twin",
+      "domain": "intelligence",
+      "stage": 4,
+      "status": "partially_working",
+      "priority": "medium",
+      "owner": "regional-intelligence",
+      "dependsOn": [
+        "CAP-021",
+        "CAP-022"
+      ],
+      "outcome": "Production, water, energy, storage, logistics and demand expose shared capacity gaps.",
+      "evidenceHints": [
+        "backend/src/services",
+        "modules"
+      ],
+      "nextAction": "Validate models, sources, uncertainty and planning decisions against one pilot cluster.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [
+        "modules/AUDIT_REPORT.md",
+        "modules/COMPREHENSIVE_FILE_AUDIT.md",
+        "modules/LIBRARY_REGISTRATION_SUMMARY.md",
+        "modules/MIGRATION_RESULTS.md",
+        "modules/MODULE_REGISTRY.json",
+        "modules/README.md",
+        "modules/SYSTEM_OVERVIEW.md"
+      ],
+      "auditNote": "Candidate files found; runtime claims remain unverified until gate evidence is recorded."
+    },
+    {
+      "id": "CAP-026",
+      "name": "Bounded autonomous rural operations",
+      "domain": "automation",
+      "stage": 5,
+      "status": "proposed_future",
+      "priority": "medium",
+      "owner": "automation-governance",
+      "dependsOn": [
+        "CAP-007",
+        "CAP-021",
+        "CAP-022"
+      ],
+      "outcome": "Pre-approved low-risk actions execute within explicit limits, oversight and reversal paths.",
+      "evidenceHints": [],
+      "nextAction": "Define autonomy tiers, approval thresholds, kill switch and compensation contracts.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    },
+    {
+      "id": "CAP-027",
+      "name": "Ethical personalization constitution",
+      "domain": "governance",
+      "stage": 3,
+      "status": "proposed_future",
+      "priority": "critical",
+      "owner": "responsible-technology",
+      "dependsOn": [
+        "CAP-004",
+        "CAP-020"
+      ],
+      "outcome": "Machine-enforced rules separate assistance from manipulation and prohibited discrimination.",
+      "evidenceHints": [],
+      "nextAction": "Codify prohibited inference, purpose limits, fairness tests and user controls.",
+      "completion": false,
+      "evidence": {
+        "source": {
+          "status": "unverified",
+          "references": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "references": []
+        },
+        "persistence": {
+          "status": "unverified",
+          "references": []
+        },
+        "authorization": {
+          "status": "unverified",
+          "references": []
+        },
+        "contract": {
+          "status": "unverified",
+          "references": []
+        },
+        "journey": {
+          "status": "unverified",
+          "references": []
+        },
+        "test": {
+          "status": "unverified",
+          "references": []
+        },
+        "telemetry": {
+          "status": "unverified",
+          "references": []
+        }
+      },
+      "candidateEvidence": [],
+      "auditNote": "No candidate repository evidence found by deterministic path/name scan."
+    }
+  ]
+}

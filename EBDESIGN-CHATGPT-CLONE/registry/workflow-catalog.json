@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "requiredFields": ["actors", "states", "transitions", "approvals", "timeouts", "retries", "compensations", "auditEvents", "acceptanceCriteria"],
+  "workflows": [
+    {
+      "id": "WF-ORDER", "name": "Marketplace order",
+      "actors": ["buyer", "seller", "warehouse", "carrier", "finance-operator"],
+      "states": ["draft", "priced", "awaiting_payment", "confirmed", "allocated", "fulfilled", "delivered", "return_window", "settled", "cancelled", "disputed"],
+      "transitions": ["draft->priced", "priced->awaiting_payment", "awaiting_payment->confirmed", "confirmed->allocated", "allocated->fulfilled", "fulfilled->delivered", "delivered->return_window", "return_window->settled"],
+      "approvals": ["manual price override", "high-risk payment release", "dispute settlement"],
+      "timeouts": ["payment authorization", "seller acceptance", "dispatch", "return window"],
+      "retries": ["payment confirmation", "inventory reservation", "carrier booking"],
+      "compensations": ["release inventory", "void payment", "cancel shipment", "reverse ledger posting"],
+      "auditEvents": ["order.created", "price.accepted", "payment.authorized", "inventory.reserved", "delivery.proven", "settlement.posted"],
+      "acceptanceCriteria": ["idempotent creation", "no settlement before delivery and return-window closure", "every transition authorized and timestamped"]
+    },
+    {
+      "id": "WF-CLAIM", "name": "Insurance claim",
+      "actors": ["claimant", "insurer", "surveyor", "medical-or-technical-reviewer", "grievance-officer"],
+      "states": ["intimated", "evidence_pending", "submitted", "triaged", "investigating", "decision_pending", "approved", "rejected", "paid", "appealed", "closed"],
+      "transitions": ["intimated->evidence_pending", "evidence_pending->submitted", "submitted->triaged", "triaged->investigating", "investigating->decision_pending", "decision_pending->approved", "decision_pending->rejected", "approved->paid", "rejected->appealed", "paid->closed"],
+      "approvals": ["coverage exception", "claim decision", "high-value payout", "appeal decision"],
+      "timeouts": ["acknowledgement", "evidence request", "survey", "decision", "payout", "appeal"],
+      "retries": ["evidence retrieval", "payment instruction"],
+      "compensations": ["reverse duplicate payout", "reopen erroneous closure"],
+      "auditEvents": ["claim.intimated", "evidence.received", "survey.completed", "decision.recorded", "payout.confirmed", "appeal.closed"],
+      "acceptanceCriteria": ["decision cites policy and evidence", "rejection exposes appeal route", "claimant sees SLA and status"]
+    },
+    {
+      "id": "WF-LOAN", "name": "Rural loan",
+      "actors": ["applicant", "assisted-operator", "underwriter", "credit-committee", "disbursement-operator", "collections-officer"],
+      "states": ["consent_pending", "application", "evidence_pending", "eligible", "underwriting", "offered", "sanctioned", "disbursed", "servicing", "delinquent", "restructured", "closed", "declined"],
+      "transitions": ["consent_pending->application", "application->evidence_pending", "evidence_pending->eligible", "eligible->underwriting", "underwriting->offered", "offered->sanctioned", "sanctioned->disbursed", "disbursed->servicing", "servicing->closed"],
+      "approvals": ["manual underwriting exception", "sanction", "disbursement", "restructure", "recovery escalation"],
+      "timeouts": ["consent", "evidence", "underwriting", "offer acceptance", "disbursement", "repayment grace"],
+      "retries": ["bank verification", "document verification", "payment collection"],
+      "compensations": ["withdraw offer", "reverse failed disbursement", "correct repayment allocation"],
+      "auditEvents": ["consent.receipted", "eligibility.explained", "underwriting.completed", "sanction.accepted", "funds.disbursed", "repayment.allocated"],
+      "acceptanceCriteria": ["no decision uses prohibited attributes", "decline and pricing are explainable", "repayment capacity evidence is retained"]
+    },
+    {
+      "id": "WF-SHIPMENT", "name": "Shipment and cold chain",
+      "actors": ["shipper", "control-tower", "carrier", "driver", "warehouse", "consignee", "insurer"],
+      "states": ["planned", "quoted", "booked", "picked_up", "in_transit", "exception", "delivered", "pod_verified", "settled", "cancelled"],
+      "transitions": ["planned->quoted", "quoted->booked", "booked->picked_up", "picked_up->in_transit", "in_transit->delivered", "delivered->pod_verified", "pod_verified->settled", "in_transit->exception", "exception->in_transit"],
+      "approvals": ["rate override", "cold-chain release", "loss declaration", "settlement adjustment"],
+      "timeouts": ["carrier acceptance", "pickup", "ETA breach", "exception response", "proof of delivery"],
+      "retries": ["carrier allocation", "tracking ingestion", "recipient contact"],
+      "compensations": ["rebook carrier", "return to origin", "quarantine goods", "open claim"],
+      "auditEvents": ["shipment.booked", "custody.transferred", "temperature.breached", "exception.assigned", "delivery.proven", "freight.settled"],
+      "acceptanceCriteria": ["chain of custody is continuous", "temperature evidence is immutable", "exceptions have owner and verified closure"]
+    },
+    {
+      "id": "WF-SCHEME", "name": "Government scheme",
+      "actors": ["applicant", "assisted-operator", "verifier", "sanctioning-authority", "payment-authority", "grievance-officer"],
+      "states": ["discovered", "eligibility_checked", "application_draft", "submitted", "verification", "approved", "rejected", "benefit_pending", "benefit_received", "appealed", "closed"],
+      "transitions": ["discovered->eligibility_checked", "eligibility_checked->application_draft", "application_draft->submitted", "submitted->verification", "verification->approved", "verification->rejected", "approved->benefit_pending", "benefit_pending->benefit_received", "rejected->appealed", "benefit_received->closed"],
+      "approvals": ["eligibility exception", "sanction", "rejection", "appeal decision"],
+      "timeouts": ["acknowledgement", "verification", "decision", "benefit transfer", "grievance response"],
+      "retries": ["registry lookup", "document verification", "benefit status reconciliation"],
+      "compensations": ["correct eligibility result", "resubmit failed transfer", "reopen wrongful rejection"],
+      "auditEvents": ["rule.version.applied", "eligibility.computed", "application.submitted", "decision.issued", "benefit.reconciled", "appeal.closed"],
+      "acceptanceCriteria": ["rule has authority citation and effective date", "result explains satisfied and failed criteria", "every manual override records reason"]
+    },
+    {
+      "id": "WF-GRIEVANCE", "name": "Digital grievance spine",
+      "actors": ["complainant", "case-owner", "domain-reviewer", "appeal-authority", "regulator-liaison"],
+      "states": ["lodged", "acknowledged", "evidence_pending", "under_review", "decision_issued", "remedy_in_progress", "resolved", "appealed", "externally_escalated", "closed"],
+      "transitions": ["lodged->acknowledged", "acknowledged->evidence_pending", "evidence_pending->under_review", "under_review->decision_issued", "decision_issued->remedy_in_progress", "remedy_in_progress->resolved", "resolved->closed", "decision_issued->appealed", "appealed->externally_escalated"],
+      "approvals": ["case dismissal", "remedy", "appeal outcome", "external escalation"],
+      "timeouts": ["acknowledgement", "owner assignment", "decision", "remedy", "appeal"],
+      "retries": ["complainant contact", "evidence retrieval", "remedy execution"],
+      "compensations": ["reopen case", "reverse incorrect remedy", "restore affected service"],
+      "auditEvents": ["grievance.lodged", "owner.assigned", "evidence.added", "decision.issued", "remedy.verified", "appeal.escalated"],
+      "acceptanceCriteria": ["complainant receives reference and SLA", "decision is reasoned", "closure requires remedy verification or recorded refusal"]
+    }
+  ]
+}

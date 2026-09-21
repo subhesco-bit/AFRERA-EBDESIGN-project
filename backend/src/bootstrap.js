@@ -3,8 +3,8 @@
  * Loads all services on startup and verifies they are ready
  */
 
-const serviceLocator = require("../core/serviceLocator");
-const logger = require("../utils/logger");
+const serviceLocator = require("./core/serviceLocator");
+const logger = require("./utils/logger");
 
 async function bootstrap() {
   try {

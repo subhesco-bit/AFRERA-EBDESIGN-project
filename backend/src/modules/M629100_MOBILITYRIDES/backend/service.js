@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../../backend/src/services/legacy/mobilityRidesService');
+module.exports = require('../../services/legacy/mobilityRidesService');

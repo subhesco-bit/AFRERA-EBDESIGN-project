@@ -1,0 +1,13 @@
+{
+  "name": "afrera-chatgpt-clone-governance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Evidence-based concept and workflow governance for the AFRERA ChatGPT clone",
+  "type": "commonjs",
+  "scripts": {
+    "audit": "node tools/build-concept-audit.js",
+    "validate": "node tools/validate-registry.js",
+    "check": "npm run audit && npm run validate"
+  },
+  "engines": { "node": ">=20" }
+}

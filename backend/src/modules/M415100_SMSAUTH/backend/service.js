@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../../backend/src/services/legacy/smsAuthService');
+module.exports = require('../../services/legacy/smsAuthService');

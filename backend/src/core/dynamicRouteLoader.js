@@ -546,6 +546,7 @@ class DynamicRouteLoader {
       return false;
     }
     if (base === 'ORPHANED_SERVICES_MOUNT.js') return false;
+    if (/Factory\.js$/i.test(base)) return false;
     if (/Support\.js$/i.test(base)) return false;
     // Additional explicit exclusions
     if (base === 'index.js') return false;

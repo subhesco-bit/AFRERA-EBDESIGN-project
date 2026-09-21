@@ -3,7 +3,7 @@
  * Production-ready platform foundation service with Claude AI integration
  */
 
-const { getPostgreSQL } = require('../../../backend/src/database/connection');
+const { getPostgreSQL } = require('../../database/connection');
 
 class PlatformCoreService {
   constructor() {
@@ -506,7 +506,7 @@ class PlatformCoreService {
     const configId = `PC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     let aiRecommendations = null;
     try {
-      // 2026-09-08: this used to require('../../../backend/src/services/legacy/aiService'),
+      // 2026-09-08: this used to require('../../services/legacy/aiService'),
       // which does not exist anywhere in the repo - always threw MODULE_NOT_FOUND,
       // silently swallowed by the surrounding catch as a fake "unavailable" reason.
       // The real aiAPI.generateRecommendation lives in services/aiService/.
@@ -571,7 +571,7 @@ class PlatformCoreService {
     const { configId, feature_flags, security_config } = parameters;
     let impactAnalysis = null;
     try {
-      // 2026-09-08: this used to require('../../../backend/src/services/legacy/aiService'),
+      // 2026-09-08: this used to require('../../services/legacy/aiService'),
       // which does not exist anywhere in the repo - always threw MODULE_NOT_FOUND,
       // silently swallowed by the surrounding catch as a fake "unavailable" reason.
       // The real aiAPI.generateRecommendation lives in services/aiService/.

@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-09-19",
+  "decisions": [
+    {
+      "id": "MEM-001",
+      "decision": "Continue from consolidated/final as the inherited ChatGPT implementation baseline.",
+      "scope": "repository",
+      "evidence": ["git ancestry: codex/chatgpt-tree-consolidation 0 behind and consolidated/final 22 ahead", "baseline commit 054ddb120f51a08bee5c9d2ac439e5ee1a072e7e"],
+      "owner": "architecture",
+      "invalidateWhen": "Branch ancestry changes or a different integration branch is explicitly selected."
+    },
+    {
+      "id": "MEM-002",
+      "decision": "Use PowerShell batch discovery and grouped failure signatures by default.",
+      "scope": "agent-operations",
+      "evidence": ["User instruction dated 2026-09-19"],
+      "owner": "agent-coordination",
+      "invalidateWhen": "A task requires a purpose-built tool or PowerShell cannot provide the required evidence."
+    },
+    {
+      "id": "MEM-003",
+      "decision": "Do not certify a capability from file presence or sampled evidence alone.",
+      "scope": "verification",
+      "evidence": ["AFRERA shortcomings specification", "registry/classification.json"],
+      "owner": "quality-governance",
+      "invalidateWhen": "Never; evidence requirements may only become stricter."
+    },
+    {
+      "id": "MEM-004",
+      "decision": "Apply full verification to identity, authorization, finance, insurance, database migrations and transactional integrity.",
+      "scope": "high-impact-systems",
+      "evidence": ["AFRERA attachment risk boundaries"],
+      "owner": "quality-governance",
+      "invalidateWhen": "Never; regulated or safety-critical scope may expand."
+    },
+    {
+      "id": "MEM-005",
+      "decision": "Treat token reduction, zero-token operations and statistical confidence figures as targets until measured.",
+      "scope": "optimization-reporting",
+      "evidence": ["Measurement standard in TOKEN_OPTIMIZATION.md"],
+      "owner": "agent-coordination",
+      "invalidateWhen": "A reproducible benchmark establishes replacement values."
+    },
+    {
+      "id": "MEM-006",
+      "decision": "Use OpenAI as the governed execution and model layer while retaining the existing Claude-authored frameworks as the supporting architecture.",
+      "scope": "entire-project",
+      "evidence": ["User instruction dated 2026-09-19", "Existing consolidated implementation and governance registries"],
+      "owner": "architecture",
+      "invalidateWhen": "The user explicitly changes the project-wide provider or framework policy."
+    }
+  ]
+}

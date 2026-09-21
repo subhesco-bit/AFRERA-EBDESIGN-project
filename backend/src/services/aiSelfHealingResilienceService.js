@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { getPostgreSQL } = require('../database');
+const { getPostgreSQL } = require('../database/connection');
 
 function id() { return crypto.randomUUID(); }
 function fingerprint(component, failureClass, evidence = {}) {
@@ -7,7 +7,11 @@ function fingerprint(component, failureClass, evidence = {}) {
 }
 
 class AISelfHealingResilienceService {
-  constructor() { this.db = getPostgreSQL(); }
+  get db() {
+    const database = getPostgreSQL();
+    if (!database) throw new Error('Database not initialized');
+    return database;
+  }
 
   classifyFailure({ component, failureClass, evidence = {} }) {
     const critical = /data_loss|security|financial|integrity/i.test(`${failureClass} ${JSON.stringify(evidence)}`);

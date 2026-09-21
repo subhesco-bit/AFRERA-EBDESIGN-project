@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "statuses": {
+    "verified_working": "Runtime behavior is proven by executable evidence across every required gate.",
+    "partially_working": "Some required gates have evidence, but the complete journey is not proven.",
+    "scaffolded": "A structural placeholder or interface exists without sufficient business behavior.",
+    "documented_only": "The capability is described but lacks executable evidence.",
+    "disconnected": "Implementation exists but is not reachable through the intended runtime journey.",
+    "duplicated_distinct": "Multiple implementations exist and each has a documented distinct responsibility.",
+    "overlapping": "Multiple implementations cover intersecting responsibility and require reconciliation.",
+    "conflicting": "Implementations or contracts disagree in a way that prevents safe canonical use.",
+    "blocked": "Completion cannot proceed until a named dependency and unblock condition are satisfied.",
+    "proposed_future": "Accepted future concept with no claim of current implementation."
+  },
+  "requiredEvidenceGates": ["source", "runtime", "persistence", "authorization", "contract", "journey", "test", "telemetry"],
+  "completionRule": "Only verified_working may use completion=true, and only when all required evidence gates are verified with repository paths or reproducible commands."
+}

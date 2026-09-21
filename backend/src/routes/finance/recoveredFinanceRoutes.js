@@ -13,7 +13,7 @@ const express = require('express');
 const Joi = require('joi');
 
 const router = express.Router();
-const fin = require('../../services/finance/recoveredFinanceService');
+const fin = require('../../services/recoveredFinanceService');
 const { authMiddleware } = require('../../middleware/auth');
 const { resolveFarmerId } = require('../../middleware/resolveFarmerId');
 const { validateBody } = require('../../middleware/inputValidation');

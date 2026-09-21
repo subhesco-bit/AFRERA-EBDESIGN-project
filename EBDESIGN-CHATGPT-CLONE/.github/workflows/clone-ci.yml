@@ -38,3 +38,7 @@ jobs:
 
       - name: Validate clone manifests
         run: test -f EBDESIGN-CHATGPT-CLONE/README.md && test -f EBDESIGN-CHATGPT-CLONE/.ai/WORK_LOG.md && test -f EBDESIGN-CHATGPT-CLONE/MASTER_PROTOCOL.md
+
+      - name: Build and validate evidence registry
+        working-directory: EBDESIGN-CHATGPT-CLONE
+        run: npm run check

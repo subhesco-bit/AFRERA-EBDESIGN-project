@@ -10,4 +10,4 @@
 
 'use strict';
 
-module.exports = require('../../../backend/src/services/legacy/returnLoadBoardService');
+module.exports = require('../../services/legacy/returnLoadBoardService');

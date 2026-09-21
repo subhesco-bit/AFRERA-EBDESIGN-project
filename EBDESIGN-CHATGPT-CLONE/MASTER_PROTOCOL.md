@@ -17,3 +17,11 @@ A reviewable increment is announced to Claude AI after validation. Claude AI rev
 
 ## 6. Merge gate
 Only approved changes may move from clone to the main tree. Review evidence and validation results must accompany the change.
+
+## 7. Token optimization default
+
+All agents follow `TOKEN_OPTIMIZATION.md` and consult `registry/MEMOIZED.json` before repeating analysis or architectural decisions. PowerShell batch discovery, generators, caching and grouped verification are preferred when they preserve the required evidence gates. High-impact paths receive complete verification rather than sampling.
+
+## 8. AI execution architecture
+
+OpenAI is the governed execution and model layer for the entire project. Existing Claude-authored frameworks remain the supporting architecture and are extended in place. Implementations use the established gateways, registries, workflow contracts, evidence gates and resilience controls instead of creating parallel provider-specific systems.

@@ -3,7 +3,7 @@
  * Production-ready user management with Claude AI integration
  */
 
-const { getPostgreSQL } = require('../../../backend/src/database/connection');
+const { getPostgreSQL } = require('../../database/connection');
 const bcrypt = require('bcryptjs');
 
 class UserManagementService {
