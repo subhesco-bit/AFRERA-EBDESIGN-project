@@ -11,7 +11,12 @@ const router = express.Router();
 const unifiedLedgerService = require('../services/unifiedLedgerService');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
-const rateLimiter = require('../middleware/rateLimiter');
+// rateLimiter.js exports an object of named limiters, so requiring the module
+// itself and passing it to router.use() threw "Router.use() requires a
+// middleware function" — this whole file failed to load, so the HTTP 410
+// below never took effect and the scaffold under routes/finance/ served the
+// deprecated model instead. Verified 2026-09-21 by requiring the file.
+const { rateLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
 
 // Apply rate limiting to all ledger routes

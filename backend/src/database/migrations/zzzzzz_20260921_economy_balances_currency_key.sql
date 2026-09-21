@@ -1,6 +1,26 @@
 -- Fix: economy_balances primary key must include currency.
 --
--- WHY
+-- READ THIS FIRST — THE SUBSYSTEM THIS TABLE BELONGS TO IS DEPRECATED
+--
+-- economy_balances is written only by unifiedLedgerService, whose entire route
+-- surface AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C deprecates (HTTP 410,
+-- explicit authorization, 2026-08-15): it implements the "9 separate economies"
+-- ledger model the directive rejects in favour of one canonical
+-- journal_entries/journal_lines ledger with economy as a cost-center tag.
+--
+-- This migration was written before that decision was found, while wiring an
+-- HTTP API onto the service. That API has since been replaced with the same 410
+-- the directive requires, so NOTHING SUPPORTED WRITES THROUGH THIS PATH and
+-- this migration is not needed for any live code path.
+--
+-- It is kept, rather than deleted, because it has already been APPLIED to the
+-- afrera database. Deleting the file would leave the repository silently
+-- diverged from the live schema, which is worse than carrying a migration that
+-- no supported code needs. Reverting the applied change is a destructive edit
+-- to a live financial table and is left for an explicit human decision; the
+-- revert is the two ALTER statements below, inverted.
+--
+-- WHAT IT FIXES (a real contradiction, still worth recording)
 --
 -- 9999_zzzzzzzzzz_unified_ledger_schema.sql declares:
 --
@@ -17,18 +37,12 @@
 --     there is no unique or exclusion constraint matching the
 --     ON CONFLICT specification
 --
--- Verified 2026-09-21 by calling createLedgerEntry() against the live
--- afrera database: every ledger write fails and rolls back. The service has
--- therefore never successfully written an economy balance.
---
--- Two readings were possible. Either currency is vestigial and the service is
--- wrong, or the key is wrong. The column exists, defaults to 'INR' rather
--- than being fixed at it, is carried through every INSERT in the service, and
--- is a query parameter on getEconomyBalance(economy, currency) and
--- getAllEconomyBalances(currency). Keying on economy alone would collapse an
--- economy's INR and USD balances into one row and silently corrupt both. The
--- service's (economy, currency) is the correct domain key, so the constraint
--- is what moves.
+-- Verified 2026-09-21 against the live afrera database: every ledger write
+-- failed and rolled back, so the service had never successfully written a row.
+-- The service's key is the correct domain key — currency defaults to 'INR'
+-- rather than being fixed at it, is carried through every INSERT, and is a
+-- parameter of getEconomyBalance/getAllEconomyBalances — so keying on economy
+-- alone would silently merge an economy's INR and USD balances.
 --
 -- Append-only: 9999_zzzzzzzzzz is already applied, so it is not edited.
 
