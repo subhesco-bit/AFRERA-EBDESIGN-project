@@ -6,11 +6,11 @@ const { authMiddleware } = require('../../middleware/auth');
 let _items = [];
 let _nextId = 1;
 
-router.get('/', (req, res) => {
+router.get('/', authMiddleware, (req, res) => {
   res.json({ success: true, data: _items });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', authMiddleware, (req, res) => {
   const item = _items.find(i => String(i.id) === String(req.params.id));
   if (!item) return res.status(404).json({ success: false, error: 'Not found' });
   res.json({ success: true, data: item });
