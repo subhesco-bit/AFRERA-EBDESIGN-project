@@ -70,6 +70,11 @@ def write_jsonl(output: Path, records: list[dict[str, Any]], model: str, max_out
         fail("input contains no records")
     if len(records) > MAX_REQUESTS:
         fail(f"batch supports at most {MAX_REQUESTS} requests")
+    if not model.strip():
+        fail("model is required")
+    identifiers = [str(record.get("id") or record.get("caseCode") or position) for position, record in enumerate(records, start=1)]
+    if len(set(identifiers)) != len(identifiers):
+        fail("record id values must be unique so Batch custom_id values are unique")
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w", encoding="utf-8", newline="\n") as handle:
         for request in batch_lines(records, model, max_output_tokens):

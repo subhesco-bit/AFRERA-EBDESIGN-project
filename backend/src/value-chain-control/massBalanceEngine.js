@@ -8,12 +8,21 @@
 
 const pool = require('../database/pool');
 
+function nonNegative(value, name) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number < 0) {
+    throw new Error(`${name} must be a finite non-negative number`);
+  }
+  return number;
+}
+
 function reconcile(line) {
-  const qtyIn = Number(line.qtyIn) || 0;
-  const qtyOut = Number(line.qtyOut) || 0;
-  const byproduct = Number(line.byproduct) || 0;
-  const waste = Number(line.waste) || 0;
-  const loss = Number(line.loss) || 0;
+  if (!line || typeof line !== 'object') throw new Error('mass-balance line is required');
+  const qtyIn = nonNegative(line.qtyIn, 'qtyIn');
+  const qtyOut = nonNegative(line.qtyOut ?? 0, 'qtyOut');
+  const byproduct = nonNegative(line.byproduct ?? 0, 'byproduct');
+  const waste = nonNegative(line.waste ?? 0, 'waste');
+  const loss = nonNegative(line.loss ?? 0, 'loss');
   const accounted = qtyOut + byproduct + waste + loss;
   const unexplained = Math.round((qtyIn - accounted) * 1000) / 1000;
   return {
@@ -27,6 +36,8 @@ function reconcile(line) {
 }
 
 async function addLine(caseId, line) {
+  if (!caseId) throw new Error('caseId is required');
+  if (!line?.stage || typeof line.stage !== 'string') throw new Error('stage is required');
   const r = reconcile(line);
   const { rows } = await pool.query(
     `INSERT INTO vc_mass_balance_lines
@@ -62,12 +73,13 @@ async function listLines(caseId) {
 /** Chain simple sequential losses from harvest qty + loss fractions (ESTIMATED path). */
 function projectChain(harvestQty, stages) {
   // stages: [{ stage, lossFraction, evidenceClass? }]
-  if (!(Number(harvestQty) >= 0)) throw new Error('harvestQty required');
-  let current = Number(harvestQty);
+  if (!Array.isArray(stages)) throw new Error('stages array required');
+  let current = nonNegative(harvestQty, 'harvestQty');
   const steps = [];
   for (const s of stages || []) {
-    const f = Number(s.lossFraction) || 0;
-    if (f < 0 || f >= 1) throw new Error(`Invalid lossFraction at ${s.stage}`);
+    if (!s?.stage || typeof s.stage !== 'string') throw new Error('Each mass-balance stage needs a stage name');
+    const f = Number(s.lossFraction);
+    if (!Number.isFinite(f) || f < 0 || f >= 1) throw new Error(`Invalid lossFraction at ${s.stage}`);
     const loss = Math.round(current * f * 1000) / 1000;
     const out = Math.round((current - loss) * 1000) / 1000;
     steps.push({
@@ -85,6 +97,7 @@ function projectChain(harvestQty, stages) {
 }
 
 module.exports = {
+  nonNegative,
   reconcile,
   addLine,
   listLines,

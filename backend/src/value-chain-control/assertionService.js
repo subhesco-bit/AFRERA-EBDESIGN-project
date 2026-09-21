@@ -14,11 +14,19 @@ async function assertField(caseId, {
   calculationId, calculationVersion, assumptionId, effectiveFrom, effectiveTo,
 }) {
   if (!fieldKey) throw new Error('fieldKey is required');
+  if (value === undefined) throw new Error('value is required');
   if (!CLASSES.includes(evidenceClass)) {
     throw new Error(`evidenceClass must be one of ${CLASSES.join(', ')}`);
   }
   if (evidenceClass === 'AI_GENERATED') {
     throw new Error('AI_GENERATED is not allowed on authoritative assertions');
+  }
+  if (['AUTHORITATIVE', 'VERIFIED', 'TRANSACTIONAL', 'SENSOR_OBSERVED'].includes(evidenceClass)
+    && (!sourceSystem || !sourceRecord)) {
+    throw new Error(`${evidenceClass} assertions require sourceSystem and sourceRecord`);
+  }
+  if (evidenceClass === 'CALCULATED' && (!calculationId || !calculationVersion)) {
+    throw new Error('CALCULATED assertions require calculationId and calculationVersion');
   }
 
   const { rows } = await pool.query(
