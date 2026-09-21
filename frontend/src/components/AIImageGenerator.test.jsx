@@ -2,9 +2,9 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import AIImageGenerator from './AIImageGenerator';
 import { productMediaAIAPI } from '../services/api';
 
-jest.mock('../services/api', () => ({
+vi.mock('../services/api', () => ({
   productMediaAIAPI: {
-    generateImage: jest.fn(),
+    generateImage: vi.fn(),
   },
 }));
 

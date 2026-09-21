@@ -17,7 +17,7 @@ describe('aiDecisionService', () => {
   });
 
   it('executes a decision action through the provided callback', async () => {
-    const callback = jest.fn().mockResolvedValue({ ok: true });
+    const callback = vi.fn().mockResolvedValue({ ok: true });
     const result = await aiDecisionService.executeDecisionAction({
       decision: { id: 'd-1', title: 'Review demand spike' },
       action: 'approve',

@@ -3,14 +3,14 @@ import TrainingAcademyPage from '../pages/TrainingAcademyPage';
 import TraceabilityPage from '../pages/TraceabilityPage';
 import { farmerTrainingAPI, blockchainTraceabilityAPI } from '../services/api';
 
-jest.mock('../services/api', () => ({
-  farmerTrainingAPI: { getPrograms: jest.fn(), register: jest.fn() },
-  blockchainTraceabilityAPI: { getTraceabilityEvents: jest.fn(), verifyChainOfCustody: jest.fn() },
-  organicTraceabilityAPI: { getConsumerTransparency: jest.fn() },
+vi.mock('../services/api', () => ({
+  farmerTrainingAPI: { getPrograms: vi.fn(), register: vi.fn() },
+  blockchainTraceabilityAPI: { getTraceabilityEvents: vi.fn(), verifyChainOfCustody: vi.fn() },
+  organicTraceabilityAPI: { getConsumerTransparency: vi.fn() },
 }));
 
 describe('training and traceability pages', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
   it('loads real programs and submits a registration', async () => {
     farmerTrainingAPI.getPrograms.mockResolvedValue({ data: [{ id: 'program-1', name: 'Organic farming' }] }); farmerTrainingAPI.register.mockResolvedValue({ data: { registration_id: 'registration-1' } });
     render(<TrainingAcademyPage />); expect(await screen.findByRole('heading', { name: 'Organic farming' })).toBeInTheDocument();

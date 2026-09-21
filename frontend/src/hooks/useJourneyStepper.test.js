@@ -20,8 +20,8 @@ describe('useJourneyStepper', () => {
   });
 
   it('saves, advances, persists, and completes the journey', async () => {
-    const save = jest.fn(async (data) => ({ ...data, saved: true }));
-    const onComplete = jest.fn();
+    const save = vi.fn(async (data) => ({ ...data, saved: true }));
+    const onComplete = vi.fn();
     const { result } = renderHook(() => useJourneyStepper({
       storageKey: 'booking-draft',
       steps: [

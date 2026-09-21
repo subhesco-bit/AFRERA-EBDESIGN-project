@@ -3,23 +3,24 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import AIChat from './AIChat';
 import api from '../../services/componentApi';
 
-jest.mock('../../services/componentApi', () => ({
+vi.mock('../../services/componentApi', () => ({
   __esModule: true,
-  default: { get: jest.fn(), post: jest.fn() },
+  default: { get: vi.fn(), post: vi.fn() },
 }));
 
 describe('AIChat governed provider integration', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   test('sends the selected domain and renders real provider output', async () => {
     api.post.mockResolvedValue({
       data: {
         success: true,
-        content: 'Grounded provider response',
-        provider: 'openai',
-        model: 'configured-model',
-        provenance: { libraryMatches: [] },
-        confidence: { score: null },
+        data: {
+          response: 'Grounded provider response',
+          agent: 'farmer-advisor',
+          metadata: { provider: 'openai', model: 'configured-model' },
+          context: {},
+        },
       },
     });
     render(<AIChat />);
@@ -29,20 +30,20 @@ describe('AIChat governed provider integration', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
 
-    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/ai-gateway/chat', expect.objectContaining({
-      moduleId: 'farmer-advisor',
-      capability: 'governed-conversation',
-      prompt: 'Review my farm plan',
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/ai/unified', expect.objectContaining({
+      requestType: 'conversational',
+      agentPreference: 'farmer-advisor',
+      query: 'Review my farm plan',
     })));
     expect(await screen.findByText('Grounded provider response')).toBeInTheDocument();
   });
 
   test('quick suggestions send their own text rather than stale component state', async () => {
-    api.post.mockResolvedValue({ data: { content: 'Response', provider: 'openai' } });
+    api.post.mockResolvedValue({ data: { data: { response: 'Response', context: {} } } });
     render(<AIChat />);
     fireEvent.click(screen.getByRole('button', { name: 'Analyze current market prices' }));
-    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/ai-gateway/chat', expect.objectContaining({
-      prompt: 'Analyze current market prices',
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/ai/unified', expect.objectContaining({
+      query: 'Analyze current market prices',
     })));
   });
 

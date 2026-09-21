@@ -5,17 +5,17 @@ import SupportCenterPage from '../pages/SupportCenterPage';
 import SustainabilityDashboardPage from '../pages/SustainabilityDashboardPage';
 import { farmerTrainingAPI, formsAPI, foluAPI, erpAPI, knowledgeGraphAPI, libraryAPI } from '../services/api';
 
-jest.mock('../services/api', () => ({
-  farmerTrainingAPI: { getCarbonFootprint: jest.fn() },
-  formsAPI: { createForm: jest.fn(), submitForm: jest.fn() },
-  foluAPI: { landUseSummary: jest.fn() },
-  erpAPI: { getSyncStatus: jest.fn() },
-  knowledgeGraphAPI: { searchNodes: jest.fn() },
-  libraryAPI: { search: jest.fn() },
+vi.mock('../services/api', () => ({
+  farmerTrainingAPI: { getCarbonFootprint: vi.fn() },
+  formsAPI: { createForm: vi.fn(), submitForm: vi.fn() },
+  foluAPI: { landUseSummary: vi.fn() },
+  erpAPI: { getSyncStatus: vi.fn() },
+  knowledgeGraphAPI: { searchNodes: vi.fn() },
+  libraryAPI: { search: vi.fn() },
 }));
 
 describe('final placeholder page replacements', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('searches verified community knowledge sources and renders results', async () => {
     libraryAPI.search.mockResolvedValue({ data: { results: [{ id: 'l1', title: 'Soil guide' }] } });

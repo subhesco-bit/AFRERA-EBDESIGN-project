@@ -3,14 +3,14 @@ import AdvancedSearchPage from '../pages/AdvancedSearchPage';
 import KnowledgeBasePage from '../pages/KnowledgeBasePage';
 import { knowledgeGraphAPI, libraryAPI, searchAPI } from '../services/api';
 
-jest.mock('../services/api', () => ({
-  searchAPI: { search: jest.fn() },
-  libraryAPI: { search: jest.fn() },
-  knowledgeGraphAPI: { searchNodes: jest.fn() },
+vi.mock('../services/api', () => ({
+  searchAPI: { search: vi.fn() },
+  libraryAPI: { search: vi.fn() },
+  knowledgeGraphAPI: { searchNodes: vi.fn() },
 }));
 
 describe('search and knowledge pages', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('searches with the selected type and renders real results', async () => {
     searchAPI.search.mockResolvedValue({ data: { results: [{ id: 'p1', name: 'Rice', type: 'product' }] } });

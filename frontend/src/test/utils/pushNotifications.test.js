@@ -3,28 +3,37 @@ import { pushNotificationManager, initializePushNotifications, requestNotificati
 // Mock navigator and Notification
 const mockNavigator = {
   serviceWorker: {
-    register: jest.fn(() => Promise.resolve({})),
+    register: vi.fn(() => Promise.resolve({
+      pushManager: { getSubscription: vi.fn(() => Promise.resolve(null)) },
+    })),
   },
 };
 
 const mockNotification = {
   permission: 'default',
-  requestPermission: jest.fn(() => Promise.resolve('granted')),
+  requestPermission: vi.fn(() => Promise.resolve('granted')),
 };
 
-Object.defineProperty(global, 'navigator', {
+Object.defineProperty(window, 'navigator', {
   value: mockNavigator,
   writable: true,
 });
 
-Object.defineProperty(global, 'Notification', {
+Object.defineProperty(window, 'Notification', {
   value: mockNotification,
   writable: true,
 });
 
 describe('Push Notifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    Object.defineProperty(window, 'PushManager', { value: class PushManager {}, configurable: true });
+    mockNavigator.serviceWorker = {
+      register: vi.fn(() => Promise.resolve({
+        pushManager: { getSubscription: vi.fn(() => Promise.resolve(null)) },
+      })),
+    };
+    mockNotification.permission = 'default';
   });
 
   describe('initializePushNotifications', () => {

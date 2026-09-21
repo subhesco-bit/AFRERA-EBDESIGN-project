@@ -4,7 +4,10 @@ import axios from 'axios';
  * API Client
  * Axios instance configured for EBDESIGN API
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+// A relative default keeps production browsers on the deployed application
+// origin. `localhost` here would send every deployed visitor to their own
+// machine when no environment override is present.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -6345,7 +6348,7 @@ export const modulesAPI = {
 };
 
 export const villageProfileAPI = {
-  searchVillages: (data) => api.post('/village-profile/villages', data),
+  searchVillages: (params = {}) => api.get('/village-profiles/villages/search', { params }),
 };
 
 export const procurementSubscriptionAPI = {

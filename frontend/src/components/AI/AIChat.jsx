@@ -37,7 +37,9 @@ export default function AIChat() {
   ];
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (typeof bottomRef.current?.scrollIntoView === 'function') {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
   const _loadChatHistory = async () => {
@@ -49,12 +51,13 @@ export default function AIChat() {
     }
   };
 
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  const sendMessage = async (messageOverride) => {
+    const content = (typeof messageOverride === 'string' ? messageOverride : input).trim();
+    if (!content) return;
 
     const userMessage = {
       role: 'user',
-      content: input,
+      content,
       attachments,
       timestamp: new Date().toISOString(),
     };
@@ -87,7 +90,7 @@ export default function AIChat() {
       console.error('AI chat error:', err);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.',
+        content: err.response?.data?.error || 'Sorry, I encountered an error. Please try again.',
         timestamp: new Date().toISOString(),
       }]);
     } finally {
@@ -111,7 +114,7 @@ export default function AIChat() {
 
   const handleSuggestionClick = (suggestion) => {
     setInput(suggestion);
-    sendMessage();
+    sendMessage(suggestion);
   };
 
   const handleDecisionAction = async (action) => {

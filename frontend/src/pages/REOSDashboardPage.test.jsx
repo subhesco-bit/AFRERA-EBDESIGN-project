@@ -4,19 +4,19 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import REOSDashboardPage from './REOSDashboardPage';
 import { villageProfileAPI, procurementSubscriptionAPI } from '../services/api';
 
-jest.mock('../services/api', () => ({
-  villageProfileAPI: { searchVillages: jest.fn() },
-  procurementSubscriptionAPI: { getStatistics: jest.fn() },
-  buyingClubAPI: { getStatistics: jest.fn() },
-  ruralEnterpriseAPI: { getStatistics: jest.fn() },
-  renewableEnergyAPI: { getStatistics: jest.fn() },
-  aiAdvisoryAPI: { getStatistics: jest.fn() },
+vi.mock('../services/api', () => ({
+  villageProfileAPI: { searchVillages: vi.fn() },
+  procurementSubscriptionAPI: { getStatistics: vi.fn() },
+  buyingClubAPI: { getStatistics: vi.fn() },
+  ruralEnterpriseAPI: { getStatistics: vi.fn() },
+  renewableEnergyAPI: { getStatistics: vi.fn() },
+  aiAdvisoryAPI: { getStatistics: vi.fn() },
 }));
 
 describe('village dashboard', () => {
   let client;
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
   });
   afterEach(() => client.clear());

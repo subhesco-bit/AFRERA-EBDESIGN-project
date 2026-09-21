@@ -5,15 +5,15 @@ import ComplianceDashboardPage from '../pages/ComplianceDashboardPage';
 import QualityControlPage from '../pages/QualityControlPage';
 import { weatherAPI, marketIntelligenceAPI, auditComplianceAPI, comprehensiveERPAPI } from '../services/api';
 
-jest.mock('../services/api', () => ({
-  weatherAPI: { coverage: jest.fn(), activeAlerts: jest.fn(), forecastAccuracy: jest.fn(), advisoryTriggers: jest.fn(), dispatchCheck: jest.fn() },
-  marketIntelligenceAPI: { getLatestIntelligence: jest.fn(), createIntelligence: jest.fn() },
-  auditComplianceAPI: { getAuditLogs: jest.fn(), listComplianceRules: jest.fn(), createAuditLog: jest.fn() },
-  comprehensiveERPAPI: { recordInspectionResult: jest.fn() },
+vi.mock('../services/api', () => ({
+  weatherAPI: { coverage: vi.fn(), activeAlerts: vi.fn(), forecastAccuracy: vi.fn(), advisoryTriggers: vi.fn(), dispatchCheck: vi.fn() },
+  marketIntelligenceAPI: { getLatestIntelligence: vi.fn(), createIntelligence: vi.fn() },
+  auditComplianceAPI: { getAuditLogs: vi.fn(), listComplianceRules: vi.fn(), createAuditLog: vi.fn() },
+  comprehensiveERPAPI: { recordInspectionResult: vi.fn() },
 }));
 
 describe('operational placeholder replacements', () => {
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => { vi.clearAllMocks(); });
   it('renders weather data and checks dispatch', async () => {
     weatherAPI.coverage.mockResolvedValue({ data: { source: 'coverage' } }); weatherAPI.activeAlerts.mockResolvedValue({ data: [] }); weatherAPI.forecastAccuracy.mockResolvedValue({ data: { score: 0.8 } }); weatherAPI.advisoryTriggers.mockResolvedValue({ data: [] }); weatherAPI.dispatchCheck.mockResolvedValue({ data: [] });
     render(<WeatherAnalyticsPage />); await screen.findByText('Weather Analytics'); await waitFor(() => expect(weatherAPI.coverage).toHaveBeenCalled()); fireEvent.change(screen.getByLabelText(/districts/i), { target: { value: 'Assam' } }); fireEvent.click(screen.getByRole('button', { name: /check dispatch/i })); await waitFor(() => expect(weatherAPI.dispatchCheck).toHaveBeenCalledWith(['Assam']));

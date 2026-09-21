@@ -131,9 +131,8 @@ router.get('/opportunities', authenticate, requireRole('farmer'), async (req, re
  */
 router.get('/farmer-contracts', authenticate, requireRole('farmer'), async (req, res) => {
   try {
-    // NOTE (pre-existing): not implemented in the service yet - kept as an
-    // honest empty result rather than invented data.
-    const result = { contracts: [], message: 'Farmer contracts retrieval' };
+    const contracts = await service.getFarmerContracts(req.user.id, { limit: req.query.limit });
+    const result = { contracts };
     apiResponseHandler.sendSuccess(res, result, 'Farmer contracts retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve farmer contracts');
