@@ -17,6 +17,11 @@
 
 const { logger } = require('../utils/logger');
 const { AppError } = require('../middleware/errorHandler');
+const crypto = require('crypto');
+const fetch = require('node-fetch');
+
+const codingCache = new Map();
+const CODING_CACHE_TTL_MS = Number(process.env.MEDICAL_CODING_CACHE_TTL_MS || 60 * 60 * 1000);
 
 // Medical Code Systems
 const MEDICAL_CODE_SYSTEMS = {
@@ -597,16 +602,73 @@ class AdvancedMedicalCodingService {
   /**
    * AI-powered medical coding assistance
    */
-  async aiMedicalCodingAssistance(clinicalDescription, codeSystem = 'ICD-10-CM') {
-    // This would integrate with AI services for coding assistance
-    // For now, return a placeholder
-    return {
-      clinical_description: clinicalDescription,
+  async aiMedicalCodingAssistance(clinicalDescription, codeSystem = 'ICD-10-CM', options = {}) {
+    const description = String(clinicalDescription || '').trim().replace(/\s+/g, ' ').slice(0, 4000);
+    const supported = ['ICD-10-CM', 'ICD-10-PCS', 'CPT', 'HCPCS', 'SNOMED-CT', 'LOINC'];
+    if (!description) throw new Error('Clinical documentation is required');
+    if (!supported.includes(codeSystem)) throw new Error('Unsupported code system');
+
+    const safeFallback = {
+      clinical_description: description,
       code_system: codeSystem,
+      status: 'documentation_review_required',
       suggested_codes: [],
+      missing_documentation: ['AI suggestions unavailable; use the verified reference search and qualified coder review.'],
+      coder_checks: ['Confirm diagnosis/procedure documentation', 'Confirm current code-set version and jurisdiction', 'Check inclusion, exclusion, sequencing, modifiers, and payer rules'],
       confidence: 0,
-      requires_ai_configuration: true
+      human_review_required: true,
+      auto_submission_allowed: false,
+      source: 'safe-fallback',
     };
+    if (options.useAI === false || !process.env.OPENAI_API_KEY) return safeFallback;
+
+    const cacheKey = crypto.createHash('sha256').update(`${codeSystem}:${description}`).digest('hex');
+    const cached = codingCache.get(cacheKey);
+    if (cached && Date.now() - cached.createdAt < CODING_CACHE_TTL_MS) return { ...cached.value, cached: true };
+
+    const prompt = [
+      `You assist a qualified medical coder. Code system: ${codeSystem}.`,
+      'Return JSON only: suggested_codes[{code,display,rationale,evidence_text,confidence}], missing_documentation[], coder_checks[].',
+      'Use only the clinical documentation supplied. Never infer diagnoses, laterality, severity, encounter type, procedures, or test results.',
+      'If documentation is insufficient, return no code and list the missing details. Suggestions are drafts and must never be auto-submitted.',
+      `Documentation:${description}`,
+    ].join(' ');
+
+    try {
+      const response = await fetch(`${process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1'}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+        body: JSON.stringify({
+          model: process.env.OPENAI_MEDICAL_CODING_MODEL || process.env.OPENAI_MODEL || 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          response_format: { type: 'json_object' },
+          temperature: 0,
+          max_tokens: Number(process.env.OPENAI_MEDICAL_CODING_MAX_TOKENS || 500),
+        }),
+      });
+      if (!response.ok) throw new Error(`OpenAI returned ${response.status}`);
+      const body = await response.json();
+      const parsed = JSON.parse(body.choices?.[0]?.message?.content || '{}');
+      const value = {
+        clinical_description: description,
+        code_system: codeSystem,
+        status: 'draft_for_coder_review',
+        suggested_codes: Array.isArray(parsed.suggested_codes) ? parsed.suggested_codes.slice(0, 8) : [],
+        missing_documentation: Array.isArray(parsed.missing_documentation) ? parsed.missing_documentation.slice(0, 8) : [],
+        coder_checks: Array.isArray(parsed.coder_checks) ? parsed.coder_checks.slice(0, 8) : safeFallback.coder_checks,
+        confidence: Array.isArray(parsed.suggested_codes) && parsed.suggested_codes.length ? Math.max(...parsed.suggested_codes.map((item) => Number(item.confidence) || 0)) : 0,
+        human_review_required: true,
+        auto_submission_allowed: false,
+        source: 'openai-draft',
+        cached: false,
+        usage: body.usage ? { prompt_tokens: body.usage.prompt_tokens, completion_tokens: body.usage.completion_tokens, total_tokens: body.usage.total_tokens } : null,
+      };
+      codingCache.set(cacheKey, { createdAt: Date.now(), value });
+      return value;
+    } catch (error) {
+      logger.warn('AI medical coding assistance unavailable; safe fallback returned', { error: error.message });
+      return { ...safeFallback, provider_status: 'unavailable' };
+    }
   }
 
   /**
@@ -750,6 +812,17 @@ router.post('/ai-coding-assistance', authMiddleware, async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+router.get('/integration-status', authMiddleware, (req, res) => {
+  res.json({
+    status: 'operational',
+    ai_configured: Boolean(process.env.OPENAI_API_KEY),
+    max_output_tokens: Number(process.env.OPENAI_MEDICAL_CODING_MAX_TOKENS || 500),
+    stakeholders: ['clinician', 'medical coder', 'farmer/patient', 'telehealth provider', 'insurer', 'finance and audit teams'],
+    workflow: ['encounter documentation', 'consent and access check', 'AI draft suggestions', 'qualified coder validation', 'claim/pre-authorization', 'ERP finance posting', 'audit and outcome feedback'],
+    controls: ['minimum necessary data', 'no automatic diagnosis', 'no automatic claim submission', 'human approval', 'versioned code set', 'immutable audit event'],
+  });
 });
 
 // Health management plan endpoint

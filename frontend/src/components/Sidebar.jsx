@@ -13,6 +13,7 @@ const QUICK_LINKS = [
   { to: '/enterprise-control', label: 'Enterprise Control' },
   { to: '/ai-backbone', label: 'AI Backbone' },
   { to: '/ai-product-studio', label: 'AI Product Studio' },
+  { to: '/medical-coding', label: 'Clinical Coding' },
   { to: '/diet-recipes', label: 'Diet & Recipes' },
   { to: '/wearables', label: 'Wearables' },
   { to: '/defense-fitness-prep', label: 'Defense Fitness Prep' },

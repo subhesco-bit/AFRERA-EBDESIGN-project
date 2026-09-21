@@ -208,6 +208,9 @@ const farmerImagePortalRoutes = require('./routes/farmerImagePortalRoutes');
 const integrationStatusRoutes = require('./routes/integrationStatusRoutes');
 const endpointMismatchFixer = require('./routes/ENDPOINT_MISMATCH_FIXER');
 const stripeWebhookRoutes = require('./routes/stripeWebhookRoutes');
+const productValueChainRoutes = require('./routes/productValueChainRoutes');
+const { router: advancedMedicalCodingRoutes } = require('./services/advancedMedicalCodingService');
+const { router: medicalCodingReferenceRoutes } = require('./services/medicalCodingReferenceService');
 
 /**
  * EBDESIGN Platform Backend - Main Entry Point
@@ -539,6 +542,9 @@ async function startup() {
     app.use('/api/v1/monitoring', infrastructureMonitoringRoutes);
     app.use('/api/gdpr', gdprComplianceRoutes);
     app.use('/api/v1/gdpr', gdprComplianceRoutes);
+    app.use('/api/v1/value-chain', productValueChainRoutes);
+    app.use('/api/v1/advanced-medical-coding', advancedMedicalCodingRoutes);
+    app.use('/api/v1/medical-coding-reference', medicalCodingReferenceRoutes);
     app.use('/api/unifiedaigateway', unifiedAIGateway);
     app.use('/api/transaction', transactionRoutes);
     app.use('/api/trackdart', trackDartRoutes);

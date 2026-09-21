@@ -6,7 +6,7 @@ import axios from 'axios';
  */
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
   headers: {
@@ -236,6 +236,15 @@ export const aiOperationIntelligenceAPI = {
 export const productMediaAIAPI = {
   analyzeProductMedia: (data) => api.post('/ai/product-media/analyze', data),
   generateProductMedia: (data) => api.post('/ai/product-media/generate', data),
+};
+
+export const modulesAPI = {
+  getModules: () => api.get('/ai/modules'),
+};
+
+export const valueChainAPI = {
+  getStatus: () => api.get('/value-chain/status'),
+  analyzeProduct: (data) => api.post('/value-chain/analyze', data),
 };
 
 export const nutritionAPI = {
@@ -4081,11 +4090,6 @@ export const userAPI2 = {
   manageUser: (data) => api.post('/users/manage', data),
 };
 
-export const valueChainAPI = {
-  getValueChain: () => api.get('/value-chain'),
-  manageValueChain: (data) => api.post('/value-chain/manage', data),
-};
-
 export var vehicleAPI = {
   getVehicles: () => api.get('/vehicles'),
   manageVehicle: (data) => api.post('/vehicles/manage', data),
@@ -4121,7 +4125,7 @@ export const visionAPI = {
   manageVision: (data) => api.post('/vision/manage', data),
 };
 
-export void visualizationAPI = {
+export const visualizationAPI = {
   getVisualization: () => api.get('/visualization'),
   manageVisualization: (data) => api.post('/visualization/manage', data),
 };
@@ -4131,7 +4135,7 @@ export const viticultureAPI = {
   manageViticulture: (data) => api.post('/viticulture/manage', data),
 };
 
-export const void warehouseAPI2 = {
+export const warehouseAPI2 = {
   getWarehouse: () => api.get('/warehouse'),
   manageWarehouse: (data) => api.post('/warehouse/manage', data),
 };
@@ -4212,6 +4216,7 @@ export const zooAPI = {
 };
 
 export default api;
+export const jurisdictionAPI = {
   getJurisdictions: () => api.get('/jurisdictions'),
   getJurisdiction: (id) => api.get(`/jurisdictions/${id}`),
 };
