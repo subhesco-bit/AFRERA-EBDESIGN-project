@@ -2,6 +2,8 @@
  * Value-Chain Studio — orchestrator service (production v2).
  * buildLifecyclePlan: deterministic read path. AI only for positioning/image.
  * See DOCUMENTATION/VALUE_CHAIN_STUDIO_ARCHITECTURE.md
+ *
+ * Handoffs include AI Engineering Design Team (/ai-engineering-design) and MEP Design Studio.
  */
 'use strict';
 
@@ -221,6 +223,8 @@ function buildStakeholderLinks() {
     { section: 'funding', label: 'Loan Management', href: '/loan-management' },
     { section: 'logistics', label: 'Logistics', href: '/logistics' },
     { section: 'engineering', label: 'Engineering Projects', href: '/engineering-projects' },
+    { section: 'aiEngineering', label: 'AI Engineering Design Team', href: '/ai-engineering-design' },
+    { section: 'mepDesign', label: 'MEP Design Studio', href: '/mep-design' },
     { section: 'sharedInfrastructure', label: 'Shared Infrastructure', href: '/shared-infra' },
     { section: 'equipmentRental', label: 'Equipment Rental', href: '/equipment-rental' },
   ];
@@ -248,6 +252,8 @@ function buildHandoffs(sections) {
     h('funding', 'Funding / loans', '/loan-management', hasFunding ? 'ready' : 'optional', hasFunding ? (funding.applications.length + ' application(s)') : 'No loan applications on file'),
     h('logistics', 'Logistics', '/logistics', hasLogistics ? 'ready' : 'optional', hasLogistics ? (logistics.shipments.length + ' shipment(s)') : 'No linked shipments'),
     h('engineering', 'Engineering', '/engineering-projects', hasEngineering ? 'ready' : 'optional', hasEngineering ? (engineering.projects.length + ' project(s)') : 'No engineering projects'),
+    h('aiEngineering', 'AI Engineering Design', '/ai-engineering-design', 'optional', 'Assemble design team packages (structural, MEP, cost, compliance)'),
+    h('mepDesign', 'MEP Design Studio', '/mep-design', 'optional', 'Mechanical / electrical / plumbing design support'),
     h('sharedInfrastructure', 'Shared infrastructure', '/shared-infra', hasShared ? 'ready' : 'optional', hasShared ? (sharedInfrastructure.availableAssets.length + ' asset(s)') : 'No matching assets'),
     h('equipmentRental', 'Equipment rental', '/equipment-rental', hasEquipment ? 'ready' : 'optional', hasEquipment ? (equipmentRental.availableListings.length + ' listing(s)') : 'No listings'),
   ];
