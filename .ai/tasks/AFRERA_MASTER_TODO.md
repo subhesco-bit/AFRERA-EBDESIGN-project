@@ -212,14 +212,56 @@ is trustworthy).
 
 Two concrete schema-ordering defects found:
 
-- **38 distinct numeric prefixes are reused** by more than one migration, so
-  execution order is ambiguous wherever they collide.
-- **60 files use `z`/`_zz` filename prefixes** as ordering hacks (e.g.
-  `000_zz2_roles_early_collision_repair.sql`,
-  `zzzzz_20260920_ai_collaboration_log.sql`) — lexical ordering is being abused
-  as a dependency mechanism.
+Measured by `tools/audit-migrations.js` (added in this branch):
 
-- [ ] **1.2.1 Stand up PostgreSQL and execute all 789 migrations** — `BLOCKED` — *unblocks most of Stage 2*
+| Check | Count |
+|---|---|
+| Migration files | 789 |
+| Reused numeric prefixes (ambiguous order) | 38 |
+| Filename ordering hacks (`z`/`zz`) | 19 |
+| Files with no recognisable order key | 11 |
+| **Objects created in more than one migration** | **263** |
+| `CREATE` without `IF NOT EXISTS` (re-run unsafe) | 237 |
+| Empty / placeholder migrations | 0 |
+
+Lexical ordering is being used as a dependency mechanism (e.g.
+`000_zz2_roles_early_collision_repair.sql`,
+`zzzzz_20260920_ai_collaboration_log.sql`), and 263 multiply-defined objects
+mean the resulting schema depends on which definition happens to win.
+
+- [x] **1.2.1 Execute all 789 migrations against a real PostgreSQL** — `VERIFIED` — *no longer blocked*
+  PostgreSQL 16 stood up locally and the full set applied continue-on-error, in
+  the runner's own order, without modifying any migration file.
+  **Result: 714 of 789 apply; 75 fail**, in 10 error classes. Full per-file
+  breakdown in `.ai/reports/MIGRATION_EXECUTION_REPORT.md`.
+  The project's runner halts on first failure, so before this the schema could
+  not get past migration **4 of 789** (`001_skeleton_complete_schema.sql`,
+  unique violation on `roles_code_key`, `Key (code)=(farmer) already exists`).
+
+- [ ] **1.2.1a Fix the 2 SQL syntax errors** — `CONFLICTING` — *do first, unambiguous*
+      `42601` — these files cannot apply in any order or environment.
+- [ ] **1.2.1b Fix 18 foreign-key type mismatches** — `CONFLICTING`
+      `42804` / `42703` — FK column type differs from the referenced key.
+- [ ] **1.2.1c Consolidate 263 multiply-defined objects, then re-run** — `CONFLICTING` — *largest group*
+      47 failures are missing relation/column (`42P01`/`42703`) and most should
+      disappear once object ownership is settled. `TABLE users` alone is created
+      in **four** migrations (`000_base_schema`, `001_skeleton_complete_schema`,
+      `1000_user_management`, `3000_M011_generated`) with divergent columns.
+      **A mechanical pass does not work:** a blanket
+      `CREATE TABLE IF NOT EXISTS` / `ON CONFLICT DO NOTHING` transformation was
+      tried in a throwaway copy and made it worse — base schema creates `users`,
+      so 001's richer definition is skipped and its columns never exist.
+      Which definition is canonical is a schema decision. Note `000-071` are
+      protected by project convention and were not edited.
+- [ ] **1.2.1d Decide the canonical role taxonomy** — `CONFLICTING` — *decision required*
+      `000_base_schema.sql:1081` seeds 5 permission-based roles keyed by `name`;
+      `001_skeleton_complete_schema.sql:61` seeds ~15 roles keyed by `code`.
+      `000_zz2_roles_early_collision_repair.sql` backfills `code` from `name`,
+      which is what creates the collision. Merging them is a data-model choice,
+      not a mechanical fix; making the insert tolerant would silently pick a
+      winner.
+- [ ] **1.2.1e Resolve 3 already-exists collisions** (`42P07`, `42710`) — `DUPLICATE`
+- [ ] **1.2.1f Re-run to green and record the applied count** — `BLOCKED` (needs 1.2.1a–e)
 - [ ] **1.2.2 Resolve the 38 duplicate-prefix collisions** — `CONFLICTING`
       Deterministic, explicit ordering. Nothing deleted; renumber or declare
       dependencies.
