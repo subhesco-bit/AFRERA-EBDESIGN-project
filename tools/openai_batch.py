@@ -86,7 +86,13 @@ def write_jsonl(output: Path, records: list[dict[str, Any]], model: str, max_out
     print(json.dumps({"status": "built", "requests": len(records), "bytes": size, "output": str(output)}))
 
 
-def api_request(path: str, method: str = "GET", body: bytes | None = None, content_type: str = "application/json") -> Any:
+def api_request(
+    path: str,
+    method: str = "GET",
+    body: bytes | None = None,
+    content_type: str = "application/json",
+    parse_json: bool = True,
+) -> Any:
     key = os.environ.get("OPENAI_API_KEY")
     if not key:
         fail("OPENAI_API_KEY is not available in the environment")
@@ -94,6 +100,8 @@ def api_request(path: str, method: str = "GET", body: bytes | None = None, conte
         f"{API_ROOT}{path}", data=body, method=method,
         headers={"Authorization": f"Bearer {key}", "Content-Type": content_type},
     )
+    if not parse_json:
+        return payload
     try:
         with urllib.request.urlopen(request, timeout=60) as response:
             payload = response.read()
@@ -162,7 +170,7 @@ def main() -> None:
     elif args.command == "status":
         print_json(api_request(f"/batches/{args.batch_id}"))
     else:
-        data = api_request(f"/files/{args.file_id}/content")
+        data = api_request(f"/files/{args.file_id}/content", parse_json=False)
         if not isinstance(data, bytes):
             fail("file content response was not binary")
         args.output.parent.mkdir(parents=True, exist_ok=True)
