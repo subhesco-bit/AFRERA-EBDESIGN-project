@@ -43,6 +43,8 @@ export default function AIEngineeringDesignPage() {
   const [state, setState] = useState('');
   const [lengthM, setLengthM] = useState('');
   const [widthM, setWidthM] = useState('');
+  const [heightM, setHeightM] = useState('');
+  const [targetClearSpanM, setTargetClearSpanM] = useState('');
   const [volumeM3, setVolumeM3] = useState('');
   const [deltaTempC, setDeltaTempC] = useState('');
   const [loadsKw, setLoadsKw] = useState('');
@@ -65,6 +67,8 @@ export default function AIEngineeringDesignPage() {
         structuralInputs: {
           lengthM: lengthM ? Number(lengthM) : undefined,
           widthM: widthM ? Number(widthM) : undefined,
+          heightM: heightM ? Number(heightM) : undefined,
+          targetClearSpanM: targetClearSpanM ? Number(targetClearSpanM) : undefined,
         },
         capacityInputs: {
           volumeM3: volumeM3 ? Number(volumeM3) : undefined,
@@ -134,13 +138,21 @@ export default function AIEngineeringDesignPage() {
 
           <fieldset className="rounded-2xl border border-dashed border-slate-200 p-4">
             <legend className="px-1 text-xs font-bold uppercase text-slate-500">Geometry & MEP inputs (optional)</legend>
-            <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <label className="text-sm">Length (m)
                 <input type="number" min="0" value={lengthM} onChange={(e) => setLengthM(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-2" />
               </label>
               <label className="text-sm">Width (m)
                 <input type="number" min="0" value={widthM} onChange={(e) => setWidthM(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-2" />
+              </label>
+              <label className="text-sm">Height (m)
+                <input type="number" min="0" value={heightM} onChange={(e) => setHeightM(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-2" />
+              </label>
+              <label className="text-sm">Target clear span (m)
+                <input type="number" min="0" value={targetClearSpanM} onChange={(e) => setTargetClearSpanM(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-2" />
               </label>
               <label className="text-sm">Volume (m³)
@@ -151,7 +163,7 @@ export default function AIEngineeringDesignPage() {
                 <input type="number" min="0" value={deltaTempC} onChange={(e) => setDeltaTempC(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-2" />
               </label>
-              <label className="text-sm sm:col-span-2 lg:col-span-1">Loads kW
+              <label className="text-sm sm:col-span-2">Loads kW (comma-separated)
                 <input value={loadsKw} onChange={(e) => setLoadsKw(e.target.value)} placeholder="15, 7.5"
                   className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-2" />
               </label>
@@ -217,6 +229,12 @@ export default function AIEngineeringDesignPage() {
                       )}
                       {pkg.hints?.approxBayAreaM2 != null && (
                         <p className="mt-2 text-sm">Bay area hint: <strong>{pkg.hints.approxBayAreaM2} m²</strong></p>
+                      )}
+                      {pkg.hints?.approxEnvelopeVolumeM3 != null && (
+                        <p className="text-sm">Envelope volume: <strong>{pkg.hints.approxEnvelopeVolumeM3} m³</strong></p>
+                      )}
+                      {pkg.hints?.targetClearSpanM != null && (
+                        <p className="text-sm">Target clear span: <strong>{pkg.hints.targetClearSpanM} m</strong> (intent only)</p>
                       )}
                       {pkg.capacityHints && (
                         <p className="mt-2 text-xs text-slate-500">

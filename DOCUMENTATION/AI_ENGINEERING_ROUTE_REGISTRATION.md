@@ -1,11 +1,16 @@
 # Route registration — AI Engineering Design + MEP
 
-Add to `frontend/src/config/routes.js`:
+Apply these edits to `frontend/src/config/routes.js` (file is large; paste carefully).
+
+## 1. Lazy imports (next to EngineeringProjectPage)
 
 ```js
-const AIEngineeringDesignPage = lazy(() => import('../pages/AIEngineeringDesignPage'));
+const EngineeringProjectPage = lazy(() => import('../pages/EngineeringProjectPage'));
 const MEPDesignStudioPage = lazy(() => import('../pages/MEPDesignStudioPage'));
+const AIEngineeringDesignPage = lazy(() => import('../pages/AIEngineeringDesignPage'));
 ```
+
+## 2. Route entries (after `/engineering-projects`)
 
 ```js
 {
@@ -21,12 +26,19 @@ const MEPDesignStudioPage = lazy(() => import('../pages/MEPDesignStudioPage'));
   component: MEPDesignStudioPage,
   title: 'MEP Design Studio - AFRERA',
   description: 'Mechanical, Electrical, Plumbing design support',
-  keywords: 'mep, hvac, electrical, plumbing',
+  keywords: 'mep, mechanical, electrical, plumbing, HVAC, design',
   transition: 'fade',
 },
 ```
 
-Backend (auto-mounted):
+## Backend (already auto-mounted)
 
 - `/api/v1/ai-engineering-team/*`
 - `/api/v1/mep-design/*`
+
+## Value-Chain Studio handoffs (already in service)
+
+Lifecycle plan `handoffs` and `stakeholderLinks` include:
+
+- AI Engineering Design → `/ai-engineering-design`
+- MEP Design Studio → `/mep-design`
