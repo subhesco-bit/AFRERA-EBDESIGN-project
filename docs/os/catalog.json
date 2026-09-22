@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-09-22",
-  "thesis": "AFRERA is a rural economic operating system, not an agriculture website. Stages 0–6 are closed on this kernel. GitHub platform remains 7%. Lattice ligaments stay ~39%. Human-equivalent body lives. Relax is the withdraw reflex: heat/alert/outage rest the mill, remaining holds, EMI is not frozen, wrong unclench is refused. Eleven flow charts live: strategy, work, process, payment, material, vision, decision, command, coordination, algorithms, supply chain. Rural ERP atlas classifies 32 SAP/Baan/Oracle analog families; sapParity is false; nested remaining conserves person=home=village. AI atlas classifies 34 families; aiParity is false; five tissues decide; GitHub living plugs stay 0. August AI veterinary coding lives on AFRERA-VET; GitHub human ICD stays a cadaver; livestock cash stays missing. Village remaining journey lives; tourism itinerary refused. Engineering BOQ stamp lives; CFD stays refused. Cell inspect lives; no login profile. Federated ask is local remaining. Policy lab what-if, amount blank. Infra twin on declared sensors. Coop license is qty-weighted remaining. One brain, five tissues. AI still cannot write rupees. Agriculture finance and procure stay missing.",
+  "thesis": "AFRERA is a rural economic operating system, not an agriculture website. Stages 0–6 are closed on this kernel. GitHub platform remains 7%. Lattice ligaments stay ~39%. Human-equivalent body lives. Relax is the withdraw reflex: heat/alert/outage rest the mill, remaining holds, EMI is not frozen, wrong unclench is refused. Eleven flow charts live: strategy, work, process, payment, material, vision, decision, command, coordination, algorithms, supply chain. Rural ERP atlas classifies 32 SAP/Baan/Oracle analog families; sapParity is false; nested remaining conserves person=home=village. AI atlas classifies 35 families; aiParity is false; five tissues decide; GitHub living plugs stay 0. August AI veterinary coding lives on AFRERA-VET; GitHub human ICD stays a cadaver; livestock cash stays missing. Shared village muscle lives as conserved hours on cold, mill, process, pack, labs, dryer, polyhouse, equipment; organic tracing lives; GST invoice stays missing; Operation Green and NE logistics eligibility compute with amount blank; rental rupees stay missing. Village remaining journey lives; tourism itinerary refused. Engineering BOQ stamp lives; CFD stays refused. Cell inspect lives; no login profile. Federated ask is local remaining. Policy lab what-if, amount blank. Infra twin on declared sensors. Coop license is qty-weighted remaining. One brain, five tissues. AI still cannot write rupees. Agriculture finance and procure stay missing.",
   "stages": [
     {
       "stage": 0,
@@ -46,8 +46,8 @@
     }
   ],
   "snapshot": {
-    "items": 128,
-    "classified": 128,
+    "items": 132,
+    "classified": 132,
     "stage0Pct": 100,
     "stageDone": {
       "0": {
@@ -58,24 +58,24 @@
         "pct": 100
       },
       "1": {
-        "total": 37,
-        "done": 37,
+        "total": 38,
+        "done": 38,
         "blocked": 0,
-        "closed": 37,
+        "closed": 38,
         "pct": 100
       },
       "2": {
-        "total": 23,
-        "done": 23,
+        "total": 25,
+        "done": 25,
         "blocked": 0,
-        "closed": 23,
+        "closed": 25,
         "pct": 100
       },
       "3": {
-        "total": 27,
-        "done": 27,
+        "total": 28,
+        "done": 28,
         "blocked": 0,
-        "closed": 27,
+        "closed": 28,
         "pct": 100
       },
       "4": {
@@ -101,14 +101,14 @@
       }
     },
     "kernelVerified": 22,
-    "kernelPartial": 105,
-    "githubScaffolded": 59,
+    "kernelPartial": 109,
+    "githubScaffolded": 60,
     "open": 0,
     "blocked": 0,
     "stagesComplete": true,
     "todo": {
-      "total": 128,
-      "done": 128,
+      "total": 132,
+      "done": 132,
       "open": 0,
       "blocked": 0
     }
@@ -202,7 +202,7 @@
       "area": "ai",
       "kernel": "partial",
       "github": "scaffolded",
-      "present": "34 AI analog families classified. Five tissues, decision passport. GitHub cadavers stay cadavers. AI parity false.",
+      "present": "35 AI analog families classified. Five tissues, decision passport. GitHub cadavers stay cadavers. AI parity false.",
       "missing": "Model registry, drift, citations, outcome feedback.",
       "next": "Library-first. LLM only on miss. Never a rupee write.",
       "organs": [
@@ -316,7 +316,7 @@
       "area": "ai",
       "kernel": "partial",
       "github": "scaffolded",
-      "present": "34 AI families classified. ackAi emits passport or named-missing. Five tissues decide. GitHub living plugs 0.",
+      "present": "35 AI families classified. ackAi emits passport or named-missing. Five tissues decide. GitHub living plugs 0.",
       "missing": "Training, drift, bias, cost, model registry on GitHub.",
       "next": "Evidence or hide. Random wrappers are not AI.",
       "organs": [
@@ -335,8 +335,8 @@
       "area": "workflow",
       "kernel": "partial",
       "github": "scaffolded",
-      "present": "harvest-mint, warehouse-intake, offtake-settle, nerve-consult, claim-file, period-close, climate-reflex, remaining-journey. Eleven flow charts: strategy, work, process, payment, material, vision, decision, command, coordination, algorithms, supply chain.",
-      "missing": "Booking, RFQ, loan, subsidy, recall. Tourism itinerary stays refused. Engineering CFD stays refused. Finance/procure stay missing.",
+      "present": "harvest-mint, warehouse-intake, offtake-settle, nerve-consult, claim-file, period-close, climate-reflex, remaining-journey, book-muscle. Eleven flow charts: strategy, work, process, payment, material, vision, decision, command, coordination, algorithms, supply chain.",
+      "missing": "Rental rupees, RFQ, loan, subsidy disbursement, recall. Tourism itinerary stays refused. Engineering CFD stays refused. Finance/procure stay missing.",
       "next": "Durable steps persist. Unknown events fail. Charts fire kernel gates.",
       "organs": [
         "spine",
@@ -373,8 +373,8 @@
       "area": "india",
       "kernel": "partial",
       "github": "documented",
-      "present": "GI mint, Magh kitchen, Langthasa cover, FPO cells, effective-dated PM-KISAN/PMFBY/MIDH with amount blank.",
-      "missing": "Mandi feed, GST, land registry, gazette twins, disbursement rails.",
+      "present": "GI mint, Magh kitchen, Langthasa cover, FPO cells, effective-dated PM-KISAN/PMFBY/MIDH/OP-GREEN/NE-LOGISTICS with amount blank.",
+      "missing": "Mandi feed, GST invoice, land registry, gazette twins, disbursement rails.",
       "next": "Eligibility may compute. Amount stays undeclared.",
       "organs": [
         "scheme",
@@ -559,6 +559,47 @@
       "todo": "done"
     },
     {
+      "id": "c-share",
+      "name": "Shared village muscle",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "engineering",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Hours conserved on cold bay, mill, mobile/static process and pack, food/soil/animal labs, dryer, polyhouse, equipment pool. FPO owns the muscle. Organic trace lives.",
+      "missing": "Rental rupees, GST invoice, subsidy disbursement, e-way bill.",
+      "next": "Book hours. Do not invent a rent. GST stays named.",
+      "organs": [
+        "shared",
+        "processing",
+        "warehouse",
+        "fpo"
+      ],
+      "href": "/share",
+      "todo": "done"
+    },
+    {
+      "id": "c-organic",
+      "name": "Organic tracing",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "esg",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Lot path mint→intake→process→pack. PGS/NPOP claim is declared. GI lineage conserved. Pack HSN named.",
+      "missing": "Certification network, residue lab confirmation, GST e-invoice.",
+      "next": "Trace the sack. Do not invent a certificate rupee.",
+      "organs": [
+        "trace",
+        "lot",
+        "shared"
+      ],
+      "href": "/share",
+      "todo": "done"
+    },
+    {
       "id": "c-flows",
       "name": "Village flow charts",
       "table": "concept",
@@ -665,7 +706,7 @@
       "area": "ai",
       "kernel": "partial",
       "github": "documented",
-      "present": "34 AI analog families classified living/partial/missing/refused. ackAi emits a passport or named-missing. Five tissues decide. GitHub living plugs 0. AI parity false.",
+      "present": "35 AI analog families classified living/partial/missing/refused. ackAi emits a passport or named-missing. Five tissues decide. GitHub living plugs 0. AI parity false.",
       "missing": "Model registry, OCR, vernacular voice, finance AI, procure AI.",
       "next": "Classify honestly. Decision lives. Do not paint cadavers living.",
       "organs": [
@@ -741,8 +782,8 @@
       "area": "logistics",
       "kernel": "partial",
       "github": "scaffolded",
-      "present": "Declared freight (zero allowed). Spoilage remainder. PoD is a clerk fact. ETA refused.",
-      "missing": "Control tower, load pooling, cold-chain.",
+      "present": "Declared freight (zero allowed). Spoilage remainder. PoD is a clerk fact. Cold bay hours live. ETA refused.",
+      "missing": "Control tower, load pooling, cold-km energy cost.",
       "next": "Freight is a deduction. Do not invent an ETA.",
       "organs": [
         "logistics"
@@ -777,7 +818,7 @@
       "area": "india",
       "kernel": "partial",
       "github": "documented",
-      "present": "Effective-dated eligibility (PM-KISAN/PMFBY/MIDH). Amount blank.",
+      "present": "Effective-dated eligibility (PM-KISAN/PMFBY/MIDH/OP-GREEN/NE-LOGISTICS). Amount blank.",
       "missing": "Gazette twins, disbursement rails.",
       "next": "Do not scrape PDFs into a chatbot. Do not invent a rupee.",
       "organs": [
@@ -832,7 +873,7 @@
       "area": "ai",
       "kernel": "partial",
       "github": "duplicated",
-      "present": "One bus, 25 GitHub cadavers, library-first, firewall. One brain, five tissues. Atlas classifies 34 families. AI parity false.",
+      "present": "One bus, 25 GitHub cadavers, library-first, firewall. One brain, five tissues. Atlas classifies 35 families. AI parity false.",
       "missing": "GitHub 16 sibling chats. Model registry missing.",
       "next": "A wrapper is not production AI. Decision lives on the kernel.",
       "organs": [
@@ -1612,7 +1653,7 @@
       "area": "ai",
       "kernel": "partial",
       "github": "documented",
-      "present": "ackAllAi walks 34 families. Living emit passports. Missing named. Refused refuse. rupeeWrite false. Companion carries a harvest-propose passport.",
+      "present": "ackAllAi walks 35 families. Living emit passports. Missing named. Refused refuse. rupeeWrite false. Companion carries a harvest-propose passport.",
       "missing": "Model registry, OCR, voice dictation.",
       "next": "Ack is a passport. Clerk still writes remaining.",
       "organs": [
@@ -1661,6 +1702,25 @@
         "erp"
       ],
       "href": "/vet",
+      "todo": "done"
+    },
+    {
+      "id": "n-share",
+      "name": "Village muscle hour conservation",
+      "table": "innovation",
+      "stage": 1,
+      "level": 3,
+      "area": "engineering",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Hours remaining conserved like grams. Clerk confirms the slot. Rent stays undeclared. GST invoice refused.",
+      "missing": "Rental ledger, kWh-priced booking, yield model calendar.",
+      "next": "Hours are the remaining. Do not invent ₹/hour.",
+      "organs": [
+        "shared",
+        "fpo"
+      ],
+      "href": "/share",
       "todo": "done"
     },
     {
@@ -2116,6 +2176,25 @@
       "todo": "done"
     },
     {
+      "id": "a-share",
+      "name": "Shared-muscle proposer",
+      "table": "ai",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "proposeSlot on village assets. Hours conserved. Rent refused. GST invoice refused. rupeeWrite false.",
+      "missing": "Rental price engine, lab network confirmation.",
+      "next": "AI proposes a slot. Clerk confirms hours. Never a rent.",
+      "organs": [
+        "ai",
+        "shared"
+      ],
+      "href": "/share",
+      "todo": "done"
+    },
+    {
       "id": "a-nerve",
       "name": "Governed AI nervous system",
       "table": "ai",
@@ -2367,14 +2446,15 @@
       "area": "engineering",
       "kernel": "partial",
       "github": "scaffolded",
-      "present": "Godown cover. Twin on declared temp/kWh/water. Capacity never invented.",
-      "missing": "Cold store/solar/pond CFD twins.",
+      "present": "Godown cover. Twin on declared temp/kWh/water. Shared hours live. Capacity never invented.",
+      "missing": "Cold store/solar/pond CFD twins, rental rupees.",
       "next": "Engineering CFD stays refused. Sensors must be declared.",
       "organs": [
         "warehouse",
-        "recie"
+        "recie",
+        "shared"
       ],
-      "href": "/os",
+      "href": "/share",
       "todo": "done"
     },
     {
