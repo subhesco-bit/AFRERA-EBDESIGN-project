@@ -114,8 +114,11 @@ Not one frontend call reaches a scaffold path. 238 frontend calls are hitting
 rest in single digits. Three have no caller either way
 (`publicDomainDataExtraction`, `serverManagement`, `startupEnvironment`).
 
-This removes the compatibility objection to option 1: mounting the discarded
-files changes no working caller, and fixes 238 broken ones.
+This removes the *compatibility* objection to option 1: mounting the discarded
+files changes no working caller, and fixes 238 broken ones. It is not a
+security clearance — see "Per-file pass over the 99" below, which found that
+mounting them as they stand would newly expose 113 unauthenticated write
+endpoints. Auth-hardening comes first.
 
 ### Correction to the caution above, with the mechanism verified
 
@@ -286,3 +289,87 @@ carry someone else's lint fix is worse than naming it. Whether
 `consolidated/final` should be added to the CI branch filters is a separate
 decision — it is a one-line change per workflow, but which branches gate which
 pipelines is not mine to choose.
+
+## Per-file pass over the 99 — and a correction to the recommendation above
+
+The pass the options section named as a precondition is now done. Every one of
+the 99 discarded files was classified by reading it, `require`-ing it, and
+counting the frontend call sites its would-be mount path serves.
+
+| class | count | meaning |
+|---|---|---|
+| **A. Unsafe — served twin carries a 410 this file lacks** | **1** | `recoveredFinanceRoutes.js` |
+| B. Self-deprecating (already returns 410) | 1 | `unifiedLedgerRoutes.js`; mounting turns 404 into the intended 410 |
+| C. Would fail to load if mounted | 0 | nothing breaks on require |
+| D. The discarded file is itself a scaffold | 19 | nothing gained by mounting |
+| E. Safe and real | 78 | would serve **365** frontend call sites now hitting 404 |
+
+So the exclusion list is **one file**, not an open-ended audit:
+`routes/recoveredFinanceRoutes.js`. Its served twin
+`routes/finance/recoveredFinanceRoutes.js` holds Part 3C's 410 guards on
+`/gst/*` and `/ledger/*`; the discarded copy has none, so mounting it would
+revive the retired second GST rate authority and third ledger.
+
+### The correction
+
+The recommendation above — that the 238/0 measurement makes the additive fix
+"clearly right" — was incomplete, and acting on it as written would have been a
+security regression. Auditing the 78 safe-and-real files for route guards
+(`authMiddleware`, `requireRole`, `requirePermission`, `adminMiddleware`,
+`optionalAuth`, `mfaMiddleware`, or a blanket `router.use`):
+
+```
+total handlers across the 78            : 777
+unguarded handlers (any method)         : 263
+unguarded WRITE handlers (POST/PUT/DELETE): 113, in 25 files
+files with a blanket router.use(auth)   : 7
+files with no unguarded handler at all  : 34
+```
+
+Mounting those files as they stand would newly expose 113 unauthenticated write
+endpoints. The worst of them are not obscure:
+
+| route | unguarded writes | examples |
+|---|---|---|
+| `publicDomainDataExtraction` | 16 | `POST /data-sources`, `DELETE /data-sources/:id`, `POST /extraction-jobs/:id/start` |
+| `completeAIIntegration` | 13 | `POST /crop/:id/disease-detection`, `POST /livestock/:id/health-monitoring` |
+| `researchAndDevelopment` | 13 | `POST /projects`, `DELETE /projects/:id` |
+| `startupEnvironment` | 13 | `POST /startups`, `POST /incubation-programs/:id/apply` |
+| `serverManagement` | 10 | `POST /servers`, `DELETE /servers/:id`, `POST /scale` |
+| `platformConfiguration` | 5 | `POST /configuration/apply`, `/rollback`, `/security-scan` |
+| `systemAdministration` | 5 | `POST /initialize`, `POST /self-healing` |
+| `tenantManagement` | 5 | `POST /tenants`, `DELETE /tenants/:id` |
+| `gst` | 1 | a tax-rate surface |
+
+Unauthenticated tenant deletion, platform-configuration apply and rollback, and
+server provisioning are not acceptable to switch on, whatever it does for the
+365 broken frontend calls. This is the same defect class as the one fixed in
+`d13301536` — scaffolded reads were public there — and it wants the same
+treatment before, not after, the paths go live.
+
+### Corrected sequence
+
+1. **Auth-harden first.** Apply route guards to the 113 unguarded write
+   handlers across those 25 files (at minimum; the 263 unguarded handlers
+   overall deserve the same pass). Each file's own domain decides the role, so
+   this is a reviewed pass, not a regex.
+2. **Exclude `routes/recoveredFinanceRoutes.js`** explicitly, by path, in
+   whatever mechanism lands — with the reason in a comment, so a later cleanup
+   does not "tidy" the exclusion away and silently revive a retired financial
+   authority.
+3. **Then path-qualify route names** so the remaining discarded files mount at
+   the distinct paths `_generateMountPath` already computes, and the 365
+   frontend calls start reaching real implementations.
+
+Steps 1 and 2 are prerequisites. Doing step 3 alone, which is what the earlier
+recommendation amounted to, trades 365 broken calls for 113 open write
+endpoints.
+
+A caveat on step 3 that the numbers do not show: for the real-vs-real
+collisions, mounting leaves **two** real implementations of the same domain
+live at different paths. Mostly that is an improvement over one of them being
+404, but for `mfa`, `gdpr`, `gst`, `revenue`, `riskPricing`, `cost`,
+`insuranceEnhancements`, `governmentSubsidy`, `contractFarming` and
+`preSeasonPurchase` it means two live authorities on security, tax, or money.
+Those ten deserve a decision about which is canonical rather than both being
+switched on.
