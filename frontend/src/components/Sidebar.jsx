@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 // Quick links — always visible, unchanged from before.
 const QUICK_LINKS = [
   { to: '/', label: 'Home' },
+  { to: '/village-books', label: 'Village Books' },
   { to: '/marketplace', label: 'Marketplace' },
   { to: '/sell/new-product', label: 'Add Product' },
   { to: '/variety-directory', label: 'Variety Directory' },

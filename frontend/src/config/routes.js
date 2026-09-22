@@ -185,6 +185,7 @@ const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarket
 const AIProductStudioPage = lazy(() => import('../pages/AIProductStudioPage'));
 const ValueChainStudioPage = lazy(() => import('../pages/ValueChainStudioPage'));
 const ValueChainControlCenterPage = lazy(() => import('../pages/ValueChainControlCenterPage'));
+const VillageBooksPage = lazy(() => import('../pages/VillageBooksPage'));
 const AdvancedMedicalCodingPage = lazy(() => import('../pages/AdvancedMedicalCodingPage'));
 const PublicDataExtractorPage = lazy(() => import('../pages/PublicDataExtractorPage'));
 
@@ -1733,6 +1734,14 @@ export const managementRoutes = [
     title: 'AI Product Studio - AFRERA',
     description: 'Image generation, cartoon storytelling, nutrient diagnosis, and natural therapist guidance for product marketing and wellness',
     keywords: 'ai, product image, cartoon generator, nutrient diagnosis, wellness, therapist',
+    transition: 'fade',
+  },
+  {
+    path: '/village-books',
+    component: VillageBooksPage,
+    title: 'Village Books - AFRERA',
+    description: 'The operator-desk front door: mint a living lot from a farmer cell, settle offtake with a real paymentRef, remaining mass stays on the lot',
+    keywords: 'village books, lots, mint, settle, fifo, weighted average cost, operator desk',
     transition: 'fade',
   },
   {
