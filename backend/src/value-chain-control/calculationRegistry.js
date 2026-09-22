@@ -1,11 +1,15 @@
 /**
  * Versioned calculation registry — authoritative formulas only.
  * No LLM. Inputs must be supplied; missing inputs → honest error.
+ *
+ * Integer rural-ERP formulas (grams, paise) live in lotKernel.js.
+ * INR/kg float formulas stay for the case-envelope path.
  */
 
 'use strict';
 
 const pool = require('../database/pool');
+const lot = require('./lotKernel');
 
 /** In-memory seed (also loadable from vc_calculation_definitions). */
 const BUILTIN = {
@@ -55,6 +59,70 @@ const BUILTIN = {
       const f = Number(inputs.lossFraction);
       if (!(q >= 0) || !(f >= 0) || f >= 1) throw new Error('qtyIn>=0 and 0<=lossFraction<1');
       return Math.round(q * (1 - f) * 1000) / 1000;
+    },
+  },
+  'LOT-REMAINING-001': {
+    version: '1.0',
+    name: 'Remaining grams on one lot body',
+    formula_text: 'mintedGrams - committedGrams',
+    inputs: ['mintedGrams', 'committedGrams'],
+    unit: 'g',
+    compute(inputs) {
+      return lot.remainingAfterCommit(inputs.mintedGrams, inputs.committedGrams);
+    },
+  },
+  'FIFO-ALLOC-001': {
+    version: '1.0',
+    name: 'FIFO allocation of remaining grams',
+    formula_text: 'oldest remaining first; refuse oversell',
+    inputs: ['lots', 'wantGrams'],
+    unit: 'g',
+    compute(inputs) {
+      return lot.allocateFifo(inputs.lots, inputs.wantGrams);
+    },
+  },
+  'WAC-PAISE-KG-001': {
+    version: '1.0',
+    name: 'Weighted average cost (declared remaining cost only)',
+    formula_text: 'sum(costPaise) / sum(remainingGrams/1000)',
+    inputs: ['lots'],
+    unit: 'paise/kg',
+    compute(inputs) {
+      return lot.weightedAverageCostPaisePerKg(inputs.lots);
+    },
+  },
+  'WAC-ISSUE-001': {
+    version: '1.0',
+    name: 'Issue FIFO mass at pool WAC',
+    formula_text: 'allocateFifo(lots, wantGrams) costed at WAC; last line absorbs paise remainder',
+    inputs: ['lots', 'wantGrams'],
+    unit: 'paise',
+    compute(inputs) {
+      return lot.issueAtWac(inputs.lots, inputs.wantGrams);
+    },
+  },
+  'QTY-WEIGHTED-SPLIT-001': {
+    version: '1.0',
+    name: 'FPO qty-weighted farmgate split',
+    formula_text: 'round(farmgate * qty / total); last cell absorbs remainder',
+    inputs: ['parts', 'farmgatePaise'],
+    unit: 'paise',
+    compute(inputs) {
+      return lot.splitQtyWeighted(inputs.parts, inputs.farmgatePaise);
+    },
+  },
+  'SETTLEMENT-PAISE-001': {
+    version: '1.0',
+    name: 'Gross / freight / farmgate in paise',
+    formula_text: 'gross = grams * pricePaisePerKg / 1000; farmgate = gross - freight',
+    inputs: ['qtyGrams', 'pricePaisePerKg', 'freightPaisePerKg'],
+    unit: 'paise',
+    compute(inputs) {
+      return lot.settlementAmounts(
+        inputs.qtyGrams,
+        inputs.pricePaisePerKg,
+        inputs.freightPaisePerKg ?? 0,
+      );
     },
   },
 };

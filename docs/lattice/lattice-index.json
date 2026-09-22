@@ -1,20 +1,25 @@
 {
   "branch": "consolidated/final",
   "stats": {
-    "concepts": 32,
-    "ligaments": 124,
-    "living": 3,
-    "partial": 13,
-    "missing": 108,
-    "technical": 99,
-    "thoughtful": 25
+    "concepts": 33,
+    "organs": 22,
+    "bridgeConcepts": 11,
+    "ligaments": 131,
+    "living": 35,
+    "partial": 17,
+    "missing": 79,
+    "technical": 103,
+    "thoughtful": 28,
+    "integrityPct": 33,
+    "isolated": 7,
+    "weak": 9
   },
   "organs": [
     {
       "id": "ai",
       "name": "AI Nervous System",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "intelligence",
       "dora": "Central nervous system",
       "binds": []
@@ -23,7 +28,7 @@
       "id": "recie",
       "name": "Energy Cost Intelligence",
       "role": "organ",
-      "status": "missing",
+      "status": "partial",
       "layer": "missing-organ",
       "dora": "Lungs / metabolism",
       "binds": []
@@ -41,7 +46,7 @@
       "id": "marketplace",
       "name": "GI Marketplace",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "commerce",
       "dora": "Hands / exchange",
       "binds": []
@@ -77,7 +82,7 @@
       "id": "crop",
       "name": "Crop & GI Genome",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "habitat",
       "dora": "Genome",
       "binds": []
@@ -86,7 +91,7 @@
       "id": "farmer",
       "name": "Farmer Cell",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "habitat",
       "dora": "Cell / nucleus",
       "binds": []
@@ -104,7 +109,7 @@
       "id": "contract",
       "name": "Contract Farming",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "commerce",
       "dora": "Ligament",
       "binds": []
@@ -131,7 +136,7 @@
       "id": "orders",
       "name": "Orders & Escrow",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "commerce",
       "dora": "Muscle",
       "binds": []
@@ -140,7 +145,7 @@
       "id": "trace",
       "name": "GI Trace & Trust",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "protection",
       "dora": "Immune markers",
       "binds": []
@@ -158,7 +163,7 @@
       "id": "warehouse",
       "name": "Warehouse & Storage",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "circulation",
       "dora": "Fat / reserve",
       "binds": []
@@ -167,7 +172,7 @@
       "id": "erp",
       "name": "ERP Spine",
       "role": "organ",
-      "status": "partial",
+      "status": "living",
       "layer": "structure",
       "dora": "Spine / ESB",
       "binds": []
@@ -194,7 +199,7 @@
       "id": "gcip",
       "name": "Culinary Knowledge",
       "role": "organ",
-      "status": "missing",
+      "status": "partial",
       "layer": "missing-organ",
       "dora": "Memory / cultural DNA",
       "binds": []
@@ -203,7 +208,7 @@
       "id": "rcop",
       "name": "Rural Cost Optimizer",
       "role": "organ",
-      "status": "missing",
+      "status": "partial",
       "layer": "missing-organ",
       "dora": "Liver / detox",
       "binds": []
@@ -212,7 +217,7 @@
       "id": "water",
       "name": "Water Cost Intelligence",
       "role": "bridge",
-      "status": "missing",
+      "status": "partial",
       "layer": "missing-organ",
       "dora": "Kidneys / fluid",
       "binds": [
@@ -227,7 +232,7 @@
       "id": "fpo",
       "name": "FPO / Cooperative",
       "role": "bridge",
-      "status": "partial",
+      "status": "living",
       "layer": "habitat",
       "dora": "Collective tissue",
       "binds": [
@@ -243,7 +248,7 @@
       "id": "household",
       "name": "Household Economy",
       "role": "bridge",
-      "status": "missing",
+      "status": "partial",
       "layer": "habitat",
       "dora": "Family cell",
       "binds": [
@@ -273,7 +278,7 @@
       "id": "spine",
       "name": "Event Spine",
       "role": "bridge",
-      "status": "partial",
+      "status": "living",
       "layer": "structure",
       "dora": "Blood / ESB",
       "binds": [
@@ -289,7 +294,7 @@
       "id": "lot",
       "name": "Living Lot",
       "role": "bridge",
-      "status": "missing",
+      "status": "living",
       "layer": "bridge",
       "dora": "The body of produce",
       "binds": [
@@ -320,7 +325,7 @@
       "id": "foodgraph",
       "name": "Food Knowledge Graph",
       "role": "bridge",
-      "status": "missing",
+      "status": "living",
       "layer": "bridge",
       "dora": "Memory / taste graph",
       "binds": [
@@ -334,7 +339,7 @@
       "id": "rupee",
       "name": "Prosperity Ledger",
       "role": "bridge",
-      "status": "missing",
+      "status": "living",
       "layer": "bridge",
       "dora": "Attribution / liver bile",
       "binds": [
@@ -348,7 +353,7 @@
       "id": "reflex",
       "name": "Hazard Reflex",
       "role": "bridge",
-      "status": "missing",
+      "status": "partial",
       "layer": "bridge",
       "dora": "Spinal reflex arc",
       "binds": [
@@ -357,6 +362,21 @@
         "finance",
         "logistics",
         "ai"
+      ]
+    },
+    {
+      "id": "module",
+      "name": "Module Contract",
+      "role": "bridge",
+      "status": "living",
+      "layer": "intelligence",
+      "dora": "Synapse / plug",
+      "binds": [
+        "ai",
+        "farmer",
+        "lot",
+        "spine",
+        "reflex"
       ]
     }
   ],
@@ -394,7 +414,7 @@
       "to": "warehouse",
       "name": "HarvestCompleted fan-out",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "harvest.completed { lotId, giTag, moisture, villageId, farmerId }"
     },
     {
@@ -403,7 +423,7 @@
       "to": "marketplace",
       "name": "Lot is born as a listing",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "lot.ready { lotId, foodUtility, gi, availableQty }"
     },
     {
@@ -412,7 +432,7 @@
       "to": "trace",
       "name": "GI marker at birth",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "trace.mint { lotId, geo, handler, season }"
     },
     {
@@ -421,7 +441,7 @@
       "to": "insurance",
       "name": "Warehouse cover on intake",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "storage.covered { lotId, policyId, hazard }"
     },
     {
@@ -440,7 +460,7 @@
       "name": "FDI reprices cover",
       "kind": "technical",
       "status": "missing",
-      "signal": "fdi.updated \u2192 premium.recompute"
+      "signal": "fdi.updated → premium.recompute"
     },
     {
       "id": "b-order-payout",
@@ -448,7 +468,7 @@
       "to": "finance",
       "name": "Settlement is one motion",
       "kind": "technical",
-      "status": "partial",
+      "status": "living",
       "signal": "order.settled { orderId, farmerId, amount, hoursToPay }"
     },
     {
@@ -457,7 +477,7 @@
       "to": "demand",
       "name": "Veins return offtake",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "demand.observed { sku, qty, village, season }"
     },
     {
@@ -475,7 +495,7 @@
       "to": "farmer",
       "name": "Planted crop is a cell fact",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "crop.planted { farmerId, plotId, variety, season }"
     },
     {
@@ -494,7 +514,7 @@
       "name": "Moratorium reflex",
       "kind": "technical",
       "status": "missing",
-      "signal": "weather.alert \u2192 finance.moratorium.offer"
+      "signal": "weather.alert → finance.moratorium.offer"
     },
     {
       "id": "b-recipe-demand",
@@ -511,8 +531,8 @@
       "to": "contract",
       "name": "Forecast becomes offtake",
       "kind": "technical",
-      "status": "missing",
-      "signal": "demand.revised { crop, village, qty } \u2192 contract.offer"
+      "status": "living",
+      "signal": "demand.revised { crop, village, qty } → contract.offer"
     },
     {
       "id": "b-fus-rank",
@@ -520,17 +540,17 @@
       "to": "marketplace",
       "name": "Food Utility ranks the shelf",
       "kind": "technical",
-      "status": "missing",
+      "status": "partial",
       "signal": "food.utility { sku, nutrition, satiety, taste, rupees, culture }"
     },
     {
       "id": "b-energy-logistics",
       "from": "recie",
       "to": "logistics",
-      "name": "\u20b9 per cold kilometre",
+      "name": "₹ per cold kilometre",
       "kind": "technical",
       "status": "missing",
-      "signal": "energy.cost { kwh, outageHours, spoilageRisk } \u2192 freight.price"
+      "signal": "energy.cost { kwh, outageHours, spoilageRisk } → freight.price"
     },
     {
       "id": "b-energy-process",
@@ -547,7 +567,7 @@
       "to": "rcop",
       "name": "Spoilage hits the village ledger",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "spoilage.event { lotId, kg, cause, kwh }"
     },
     {
@@ -565,7 +585,7 @@
       "to": "farmer",
       "name": "Spine carries live lots, not copies",
       "kind": "technical",
-      "status": "partial",
+      "status": "living",
       "signal": "erp.sync { entity, id, vector }"
     },
     {
@@ -574,7 +594,7 @@
       "to": "farmer",
       "name": "Nervous system fires muscles",
       "kind": "technical",
-      "status": "partial",
+      "status": "living",
       "signal": "reflex.fire { cause, organs[], explanation }"
     },
     {
@@ -592,7 +612,7 @@
       "to": "village",
       "name": "Farmer is a cell, not a role",
       "kind": "thoughtful",
-      "status": "missing",
+      "status": "living",
       "signal": "identity.model"
     },
     {
@@ -601,7 +621,7 @@
       "to": "rcop",
       "name": "Village is an economy",
       "kind": "thoughtful",
-      "status": "missing",
+      "status": "living",
       "signal": "village.ledger"
     },
     {
@@ -617,7 +637,7 @@
       "id": "b-thought-energy",
       "from": "recie",
       "to": "rcop",
-      "name": "Energy is lifetime \u20b9, not MW",
+      "name": "Energy is lifetime ₹, not MW",
       "kind": "thoughtful",
       "status": "missing",
       "signal": "energy.philosophy"
@@ -628,7 +648,7 @@
       "to": "marketplace",
       "name": "GI is heritage plus livelihood",
       "kind": "thoughtful",
-      "status": "partial",
+      "status": "living",
       "signal": "gi.meaning"
     },
     {
@@ -637,7 +657,7 @@
       "to": "ai",
       "name": "Prosperity path on every organ",
       "kind": "thoughtful",
-      "status": "missing",
+      "status": "partial",
       "signal": "rule.prosperity"
     },
     {
@@ -655,7 +675,7 @@
       "to": "demand",
       "name": "AI is a nervous system",
       "kind": "thoughtful",
-      "status": "missing",
+      "status": "living",
       "signal": "ai.posture"
     },
     {
@@ -671,7 +691,7 @@
       "id": "b-livestock-energy",
       "from": "livestock",
       "to": "recie",
-      "name": "\u20b9 per litre chilled",
+      "name": "₹ per litre chilled",
       "kind": "technical",
       "status": "missing",
       "signal": "chill.cost { litres, kwh, outage }"
@@ -710,7 +730,7 @@
       "name": "Milk becomes food, not a row",
       "kind": "technical",
       "status": "missing",
-      "signal": "milk.intake { litres, temp, farmerId } \u2192 process.batch"
+      "signal": "milk.intake { litres, temp, farmerId } → process.batch"
     },
     {
       "id": "b-livestock-shelf",
@@ -736,7 +756,7 @@
       "to": "processing",
       "name": "Reserve feeds digestion",
       "kind": "technical",
-      "status": "missing",
+      "status": "partial",
       "signal": "storage.release { lotId, to: mill|chiller, qty }"
     },
     {
@@ -806,10 +826,10 @@
       "id": "b-water-ledger",
       "from": "water",
       "to": "rcop",
-      "name": "\u20b9 per litre on the village ledger",
+      "name": "₹ per litre on the village ledger",
       "kind": "technical",
       "status": "missing",
-      "signal": "water.cost { villageId, \u20b9/litre, source }"
+      "signal": "water.cost { villageId, ₹/litre, source }"
     },
     {
       "id": "b-water-twin",
@@ -835,7 +855,7 @@
       "to": "farmer",
       "name": "Membership is collective tissue",
       "kind": "technical",
-      "status": "partial",
+      "status": "living",
       "signal": "fpo.member { fpoId, farmerId, share, offtake }"
     },
     {
@@ -844,7 +864,7 @@
       "to": "contract",
       "name": "Collective offtake before sowing",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "fpo.contract.offer { fpoId, crop, qty, season }"
     },
     {
@@ -880,7 +900,7 @@
       "to": "farmer",
       "name": "Household is the living unit of the cell",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "household.of { farmerId, members, goals, cash }"
     },
     {
@@ -890,7 +910,7 @@
       "name": "Family goal compiles to food utility",
       "kind": "technical",
       "status": "missing",
-      "signal": "household.goal { diabetic, child, budget } \u2192 fus.query"
+      "signal": "household.goal { diabetic, child, budget } → fus.query"
     },
     {
       "id": "b-house-cash",
@@ -898,7 +918,7 @@
       "to": "finance",
       "name": "Household cashflow, not only farm EMI",
       "kind": "technical",
-      "status": "missing",
+      "status": "partial",
       "signal": "household.cash { in, out, bufferDays }"
     },
     {
@@ -907,7 +927,7 @@
       "to": "gcip",
       "name": "Kitchen remembers why the crop exists",
       "kind": "technical",
-      "status": "missing",
+      "status": "partial",
       "signal": "household.kitchen { dishes, festival, variety }"
     },
     {
@@ -953,7 +973,7 @@
       "name": "Irrigation subsidy is a water fact",
       "kind": "technical",
       "status": "missing",
-      "signal": "scheme.water { scheme, \u20b9/litreDelta }"
+      "signal": "scheme.water { scheme, ₹/litreDelta }"
     },
     {
       "id": "b-scheme-compose",
@@ -970,7 +990,7 @@
       "to": "crop",
       "name": "Harvest is blood, not a page",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "spine.publish harvest.completed"
     },
     {
@@ -979,8 +999,8 @@
       "to": "warehouse",
       "name": "Intake subscribes, does not retype",
       "kind": "technical",
-      "status": "missing",
-      "signal": "spine.subscribe harvest.completed \u2192 warehouse.intake"
+      "status": "living",
+      "signal": "spine.subscribe harvest.completed → warehouse.intake"
     },
     {
       "id": "b-spine-settle",
@@ -988,7 +1008,7 @@
       "to": "orders",
       "name": "Settlement is a pulse",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "spine.publish order.settled"
     },
     {
@@ -997,8 +1017,8 @@
       "to": "ai",
       "name": "Nervous system rides the same blood",
       "kind": "technical",
-      "status": "missing",
-      "signal": "spine.subscribe * \u2192 reflex.evaluate"
+      "status": "living",
+      "signal": "spine.subscribe * → reflex.evaluate"
     },
     {
       "id": "b-lot-birth",
@@ -1006,7 +1026,7 @@
       "to": "crop",
       "name": "Harvest mints a living lot",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "lot.mint { lotId, variety, kg, moisture, farmerId, villageId }"
     },
     {
@@ -1015,7 +1035,7 @@
       "to": "warehouse",
       "name": "The same body is stored",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "lot.stored { lotId, bin, temp, cover }"
     },
     {
@@ -1024,7 +1044,7 @@
       "to": "trace",
       "name": "Marker is a property of the lot",
       "kind": "technical",
-      "status": "missing",
+      "status": "partial",
       "signal": "lot.marker { lotId, gi, geo, handlers[] }"
     },
     {
@@ -1033,7 +1053,7 @@
       "to": "marketplace",
       "name": "The shelf sells the lot",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "lot.listed { lotId, fus, price, cell }"
     },
     {
@@ -1042,7 +1062,7 @@
       "to": "logistics",
       "name": "Freight moves the same body",
       "kind": "technical",
-      "status": "missing",
+      "status": "partial",
       "signal": "lot.moved { lotId, energy, spoilageRisk }"
     },
     {
@@ -1051,7 +1071,7 @@
       "to": "insurance",
       "name": "Cover clings to the lot",
       "kind": "technical",
-      "status": "missing",
+      "status": "living",
       "signal": "lot.covered { lotId, policyId }"
     },
     {
@@ -1061,7 +1081,7 @@
       "name": "Cloud is how lungs become a schedule",
       "kind": "technical",
       "status": "missing",
-      "signal": "energy.cloud { villageId, forecast, surplus, \u20b9/kWh }"
+      "signal": "energy.cloud { villageId, forecast, surplus, ₹/kWh }"
     },
     {
       "id": "b-cloud-digest",
@@ -1070,7 +1090,7 @@
       "name": "Mills run on surplus",
       "kind": "technical",
       "status": "missing",
-      "signal": "cloud.window { surplus } \u2192 process.schedule"
+      "signal": "cloud.window { surplus } → process.schedule"
     },
     {
       "id": "b-cloud-cold",
@@ -1123,8 +1143,8 @@
       "to": "crop",
       "name": "Dishes imply varieties",
       "kind": "technical",
-      "status": "missing",
-      "signal": "graph.implies { dish \u2192 variety, season, district }"
+      "status": "living",
+      "signal": "graph.implies { dish → variety, season, district }"
     },
     {
       "id": "b-graph-vein",
@@ -1132,8 +1152,8 @@
       "to": "demand",
       "name": "Festival graph lifts forecast",
       "kind": "technical",
-      "status": "missing",
-      "signal": "graph.spike { festival, dish, window } \u2192 demand.revised"
+      "status": "partial",
+      "signal": "graph.spike { festival, dish, window } → demand.revised"
     },
     {
       "id": "b-rupee-cell",
@@ -1141,8 +1161,8 @@
       "to": "farmer",
       "name": "Every path ends at the cell",
       "kind": "technical",
-      "status": "missing",
-      "signal": "prosperity.post { organ, farmerId, \u20b9, hours }"
+      "status": "living",
+      "signal": "prosperity.post { organ, farmerId, ₹, hours }"
     },
     {
       "id": "b-rupee-liver",
@@ -1151,7 +1171,7 @@
       "name": "Village TCO is the same ink",
       "kind": "technical",
       "status": "missing",
-      "signal": "ledger.post { villageId, organ, \u20b9/year }"
+      "signal": "ledger.post { villageId, organ, ₹/year }"
     },
     {
       "id": "b-rupee-pancreas",
@@ -1169,7 +1189,7 @@
       "name": "A reflex must explain the rupee",
       "kind": "technical",
       "status": "missing",
-      "signal": "reflex.explain { cause, organ, \u20b9, cell }"
+      "signal": "reflex.explain { cause, organ, ₹, cell }"
     },
     {
       "id": "b-reflex-feet",
@@ -1178,7 +1198,7 @@
       "name": "Feet trigger the arc",
       "kind": "technical",
       "status": "missing",
-      "signal": "weather.alert | outage.alert | pest.alert \u2192 reflex.arc"
+      "signal": "weather.alert | outage.alert | pest.alert → reflex.arc"
     },
     {
       "id": "b-reflex-immune",
@@ -1187,7 +1207,7 @@
       "name": "Arc opens cover",
       "kind": "technical",
       "status": "missing",
-      "signal": "reflex.arc \u2192 claim.window"
+      "signal": "reflex.arc → claim.window"
     },
     {
       "id": "b-reflex-credit",
@@ -1196,7 +1216,7 @@
       "name": "Arc offers a pause",
       "kind": "technical",
       "status": "missing",
-      "signal": "reflex.arc \u2192 finance.moratorium.offer"
+      "signal": "reflex.arc → finance.moratorium.offer"
     },
     {
       "id": "b-reflex-artery",
@@ -1205,7 +1225,7 @@
       "name": "Arc retasks freight",
       "kind": "technical",
       "status": "missing",
-      "signal": "reflex.arc \u2192 logistics.reroute"
+      "signal": "reflex.arc → logistics.reroute"
     },
     {
       "id": "b-reflex-brain",
@@ -1223,7 +1243,7 @@
       "name": "Release is an artery event",
       "kind": "technical",
       "status": "missing",
-      "signal": "storage.release \u2192 freight.dispatch"
+      "signal": "storage.release → freight.dispatch"
     },
     {
       "id": "b-wh-energy",
@@ -1232,7 +1252,7 @@
       "name": "Holding power is a cost, not overhead",
       "kind": "technical",
       "status": "missing",
-      "signal": "storage.kwh { lotId, hours, \u20b9 }"
+      "signal": "storage.kwh { lotId, hours, ₹ }"
     },
     {
       "id": "b-market-move",
@@ -1241,7 +1261,7 @@
       "name": "A sold lot must move",
       "kind": "technical",
       "status": "partial",
-      "signal": "order.confirmed \u2192 freight.plan"
+      "signal": "order.confirmed → freight.plan"
     },
     {
       "id": "b-contract-sow",
@@ -1250,7 +1270,7 @@
       "name": "Offtake writes the genome",
       "kind": "technical",
       "status": "missing",
-      "signal": "contract.signed \u2192 crop.plan { variety, qty, season }"
+      "signal": "contract.signed → crop.plan { variety, qty, season }"
     },
     {
       "id": "b-contract-escrow",
@@ -1285,8 +1305,8 @@
       "to": "orders",
       "name": "ERP rides settlement, does not clone it",
       "kind": "technical",
-      "status": "partial",
-      "signal": "order.settled \u2192 erp.post"
+      "status": "living",
+      "signal": "order.settled → erp.post"
     },
     {
       "id": "b-erp-catalog",
@@ -1295,7 +1315,7 @@
       "name": "Master data is not a living lot",
       "kind": "technical",
       "status": "partial",
-      "signal": "erp.product \u2194 lot.projection"
+      "signal": "erp.product ↔ lot.projection"
     },
     {
       "id": "b-trace-cover",
@@ -1304,7 +1324,7 @@
       "name": "A marker is evidence",
       "kind": "technical",
       "status": "missing",
-      "signal": "trace.evidence { lotId } \u2192 claim.file"
+      "signal": "trace.evidence { lotId } → claim.file"
     },
     {
       "id": "b-channel-alloc",
@@ -1476,6 +1496,106 @@
       "kind": "thoughtful",
       "status": "missing",
       "signal": "philosophy.time"
+    },
+    {
+      "id": "b-module-ai",
+      "from": "module",
+      "to": "ai",
+      "name": "AI systems are modules of one nerve",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "module.attach { moduleId, organs[] }"
+    },
+    {
+      "id": "b-module-spine",
+      "from": "module",
+      "to": "spine",
+      "name": "Modules subscribe to blood",
+      "kind": "technical",
+      "status": "living",
+      "signal": "module.on harvest.completed"
+    },
+    {
+      "id": "b-module-farmer",
+      "from": "module",
+      "to": "farmer",
+      "name": "Agentic sits with the cell",
+      "kind": "thoughtful",
+      "status": "living",
+      "signal": "agentic.propose { farmerId, harvest }"
+    },
+    {
+      "id": "b-module-lot",
+      "from": "module",
+      "to": "lot",
+      "name": "A proposal that cannot mint a lot is talk",
+      "kind": "technical",
+      "status": "living",
+      "signal": "agentic.propose lot.mint"
+    },
+    {
+      "id": "b-module-reflex",
+      "from": "module",
+      "to": "reflex",
+      "name": "Sixteen mouths are not one arc",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "module.reflex weather.alert"
+    },
+    {
+      "id": "b-thought-wired",
+      "from": "module",
+      "to": "ai",
+      "name": "WIRED is not complete",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.wired"
+    },
+    {
+      "id": "b-module-rupee",
+      "from": "module",
+      "to": "rupee",
+      "name": "Every module shows a rupee path",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "module.rupeePath { organ, paise }"
     }
+  ],
+  "livingSignals": [
+    "product.farmer_id",
+    "order.items[]",
+    "farmer.dashboard.crops",
+    "harvest.completed { lotId, giTag, moisture, villageId, farmerId }",
+    "lot.ready { lotId, foodUtility, gi, availableQty }",
+    "trace.mint { lotId, geo, handler, season }",
+    "storage.covered { lotId, policyId, hazard }",
+    "order.settled { orderId, farmerId, amount, hoursToPay }",
+    "demand.observed { sku, qty, village, season }",
+    "crop.planted { farmerId, plotId, variety, season }",
+    "demand.revised { crop, village, qty } → contract.offer",
+    "spoilage.event { lotId, kg, cause, kwh }",
+    "erp.sync { entity, id, vector }",
+    "reflex.fire { cause, organs[], explanation }",
+    "identity.model",
+    "village.ledger",
+    "gi.meaning",
+    "ai.posture",
+    "fpo.member { fpoId, farmerId, share, offtake }",
+    "fpo.contract.offer { fpoId, crop, qty, season }",
+    "household.of { farmerId, members, goals, cash }",
+    "spine.publish harvest.completed",
+    "spine.subscribe harvest.completed → warehouse.intake",
+    "spine.publish order.settled",
+    "spine.subscribe * → reflex.evaluate",
+    "lot.mint { lotId, variety, kg, moisture, farmerId, villageId }",
+    "lot.stored { lotId, bin, temp, cover }",
+    "lot.listed { lotId, fus, price, cell }",
+    "lot.covered { lotId, policyId }",
+    "graph.implies { dish → variety, season, district }",
+    "prosperity.post { organ, farmerId, ₹, hours }",
+    "order.settled → erp.post",
+    "module.on harvest.completed",
+    "agentic.propose { farmerId, harvest }",
+    "agentic.propose lot.mint"
   ]
 }

@@ -2,11 +2,15 @@
  * Mass-balance engine — physical reconciliation.
  * INPUT = OUTPUT + byproduct + waste + loss (+ unexplained if any).
  * All quantities caller-supplied; never invented.
+ *
+ * Case-envelope lines stay in declared kg (float, 3 dp).
+ * Lot-body remaining uses integer grams via lotKernel.
  */
 
 'use strict';
 
 const pool = require('../database/pool');
+const lot = require('./lotKernel');
 
 function nonNegative(value, name) {
   const number = Number(value);
@@ -72,7 +76,6 @@ async function listLines(caseId) {
 
 /** Chain simple sequential losses from harvest qty + loss fractions (ESTIMATED path). */
 function projectChain(harvestQty, stages) {
-  // stages: [{ stage, lossFraction, evidenceClass? }]
   if (!Array.isArray(stages)) throw new Error('stages array required');
   let current = nonNegative(harvestQty, 'harvestQty');
   const steps = [];
@@ -96,10 +99,25 @@ function projectChain(harvestQty, stages) {
   return { saleableQty: current, steps, evidenceClass: 'CALCULATED' };
 }
 
+/**
+ * Lot-body remaining in grams. Same sack: minted − committed.
+ * Prefer this over kg floats when the organism already has a lotId.
+ */
+function remainingGrams(mintedGrams, committedGrams) {
+  return lot.remainingAfterCommit(mintedGrams, committedGrams);
+}
+
+/** FIFO remaining across godown lots. Identity of the sack, not a blend. */
+function allocateFifoGrams(lots, wantGrams) {
+  return lot.allocateFifo(lots, wantGrams);
+}
+
 module.exports = {
   nonNegative,
   reconcile,
   addLine,
   listLines,
   projectChain,
+  remainingGrams,
+  allocateFifoGrams,
 };
