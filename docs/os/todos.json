@@ -1,8 +1,8 @@
 {
   "generatedAt": "2026-09-22",
   "counts": {
-    "total": 128,
-    "done": 128,
+    "total": 132,
+    "done": 132,
     "open": 0,
     "blocked": 0
   },
@@ -113,7 +113,7 @@
       "stage": 1,
       "title": "State-driven workflows",
       "status": "done",
-      "why": "Booking, RFQ, loan, subsidy, recall. Tourism itinerary stays refused. Engineering CFD stays refused. Finance/procure stay missing.",
+      "why": "Rental rupees, RFQ, loan, subsidy disbursement, recall. Tourism itinerary stays refused. Engineering CFD stays refused. Finance/procure stay missing.",
       "exit": "Durable steps persist. Unknown events fail. Charts fire kernel gates."
     },
     {
@@ -131,7 +131,7 @@
       "stage": 2,
       "title": "India-first intelligence",
       "status": "done",
-      "why": "Mandi feed, GST, land registry, gazette twins, disbursement rails.",
+      "why": "Mandi feed, GST invoice, land registry, gazette twins, disbursement rails.",
       "exit": "Eligibility may compute. Amount stays undeclared."
     },
     {
@@ -214,6 +214,24 @@
       "status": "done",
       "why": "SNOMED-VET, WOAH lab confirmation, milk rupees.",
       "exit": "Map the second genome. Do not dump ICD-10 onto a herd."
+    },
+    {
+      "id": "todo-c-share",
+      "itemId": "c-share",
+      "stage": 2,
+      "title": "Shared village muscle",
+      "status": "done",
+      "why": "Rental rupees, GST invoice, subsidy disbursement, e-way bill.",
+      "exit": "Book hours. Do not invent a rent. GST stays named."
+    },
+    {
+      "id": "todo-c-organic",
+      "itemId": "c-organic",
+      "stage": 2,
+      "title": "Organic tracing",
+      "status": "done",
+      "why": "Certification network, residue lab confirmation, GST e-invoice.",
+      "exit": "Trace the sack. Do not invent a certificate rupee."
     },
     {
       "id": "todo-c-flows",
@@ -302,7 +320,7 @@
       "stage": 2,
       "title": "Logistics",
       "status": "done",
-      "why": "Control tower, load pooling, cold-chain.",
+      "why": "Control tower, load pooling, cold-km energy cost.",
       "exit": "Freight is a deduction. Do not invent an ETA."
     },
     {
@@ -747,6 +765,15 @@
       "exit": "Repair is naming the break. Do not invent a rupee to close a gap."
     },
     {
+      "id": "todo-n-share",
+      "itemId": "n-share",
+      "stage": 1,
+      "title": "Village muscle hour conservation",
+      "status": "done",
+      "why": "Rental ledger, kWh-priced booking, yield model calendar.",
+      "exit": "Hours are the remaining. Do not invent ₹/hour."
+    },
+    {
       "id": "todo-a-comp",
       "itemId": "a-comp",
       "stage": 3,
@@ -963,6 +990,15 @@
       "exit": "AI proposes. Vet/clerk confirms heads. Never a hospital coder."
     },
     {
+      "id": "todo-a-share",
+      "itemId": "a-share",
+      "stage": 3,
+      "title": "Shared-muscle proposer",
+      "status": "done",
+      "why": "Rental price engine, lab network confirmation.",
+      "exit": "AI proposes a slot. Clerk confirms hours. Never a rent."
+    },
+    {
       "id": "todo-a-nerve",
       "itemId": "a-nerve",
       "stage": 4,
@@ -1085,7 +1121,7 @@
       "stage": 6,
       "title": "Infrastructure Intelligence Network",
       "status": "done",
-      "why": "Cold store/solar/pond CFD twins.",
+      "why": "Cold store/solar/pond CFD twins, rental rupees.",
       "exit": "Engineering CFD stays refused. Sensors must be declared."
     },
     {

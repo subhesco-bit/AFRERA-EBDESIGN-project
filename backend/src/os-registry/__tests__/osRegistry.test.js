@@ -16,7 +16,7 @@ describe("AFRERA OS registry overlay", () => {
   it("Stage 0 is complete and does not claim GitHub is the kernel", () => {
     const os = composeOs();
     assert.equal(stage0Complete(), true);
-    assert.equal(os.classified, 128);
+    assert.equal(os.classified, 132);
     assert.equal(os.stage0Pct, 100);
     assert.equal(os.githubIntegrity, 7);
     assert.ok(os.kernelIntegrity < 40, `kernel ${os.kernelIntegrity}`);
