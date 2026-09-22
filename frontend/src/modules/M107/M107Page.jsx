@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useStore } from '@/store';
-import './${className}.css';
+import './styles.css';
 
 export default function M107Page() {
   const { user } = useStore();

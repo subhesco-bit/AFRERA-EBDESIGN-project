@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { BookOpen, Boxes, Handshake, Map as MapIcon, Sparkles, Cpu, Compass, Plus, ArrowRight, Loader2 } from 'lucide-react';
+// lucide-react 0.294.0 has no plain `Handshake` export — it arrived in a later
+// release — so the build failed with MISSING_EXPORT. HeartHandshake is the
+// handshake glyph this version ships; aliased so the usage below is unchanged.
+import { BookOpen, Boxes, HeartHandshake as Handshake, Map as MapIcon, Sparkles, Cpu, Compass, Plus, ArrowRight, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
 
 const DOORS = [
