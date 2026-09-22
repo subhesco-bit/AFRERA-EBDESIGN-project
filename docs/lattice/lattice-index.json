@@ -1,0 +1,1481 @@
+{
+  "branch": "consolidated/final",
+  "stats": {
+    "concepts": 32,
+    "ligaments": 124,
+    "living": 3,
+    "partial": 13,
+    "missing": 108,
+    "technical": 99,
+    "thoughtful": 25
+  },
+  "organs": [
+    {
+      "id": "ai",
+      "name": "AI Nervous System",
+      "role": "organ",
+      "status": "partial",
+      "layer": "intelligence",
+      "dora": "Central nervous system",
+      "binds": []
+    },
+    {
+      "id": "recie",
+      "name": "Energy Cost Intelligence",
+      "role": "organ",
+      "status": "missing",
+      "layer": "missing-organ",
+      "dora": "Lungs / metabolism",
+      "binds": []
+    },
+    {
+      "id": "fvie",
+      "name": "Food Value Intelligence",
+      "role": "organ",
+      "status": "missing",
+      "layer": "missing-organ",
+      "dora": "Tongue / taste",
+      "binds": []
+    },
+    {
+      "id": "marketplace",
+      "name": "GI Marketplace",
+      "role": "organ",
+      "status": "partial",
+      "layer": "commerce",
+      "dora": "Hands / exchange",
+      "binds": []
+    },
+    {
+      "id": "village",
+      "name": "Village Twin",
+      "role": "organ",
+      "status": "partial",
+      "layer": "habitat",
+      "dora": "Habitat / body",
+      "binds": []
+    },
+    {
+      "id": "logistics",
+      "name": "Cold-chain Logistics",
+      "role": "organ",
+      "status": "partial",
+      "layer": "circulation",
+      "dora": "Arteries",
+      "binds": []
+    },
+    {
+      "id": "finance",
+      "name": "Rural Finance",
+      "role": "organ",
+      "status": "partial",
+      "layer": "metabolism",
+      "dora": "Pancreas / metabolism",
+      "binds": []
+    },
+    {
+      "id": "crop",
+      "name": "Crop & GI Genome",
+      "role": "organ",
+      "status": "partial",
+      "layer": "habitat",
+      "dora": "Genome",
+      "binds": []
+    },
+    {
+      "id": "farmer",
+      "name": "Farmer Cell",
+      "role": "organ",
+      "status": "partial",
+      "layer": "habitat",
+      "dora": "Cell / nucleus",
+      "binds": []
+    },
+    {
+      "id": "livestock",
+      "name": "Livestock",
+      "role": "organ",
+      "status": "partial",
+      "layer": "habitat",
+      "dora": "Organ",
+      "binds": []
+    },
+    {
+      "id": "contract",
+      "name": "Contract Farming",
+      "role": "organ",
+      "status": "partial",
+      "layer": "commerce",
+      "dora": "Ligament",
+      "binds": []
+    },
+    {
+      "id": "processing",
+      "name": "Processing",
+      "role": "organ",
+      "status": "partial",
+      "layer": "digestion",
+      "dora": "Stomach",
+      "binds": []
+    },
+    {
+      "id": "soil",
+      "name": "Soil & Climate Sense",
+      "role": "organ",
+      "status": "partial",
+      "layer": "sense",
+      "dora": "Feet / ground sense",
+      "binds": []
+    },
+    {
+      "id": "orders",
+      "name": "Orders & Escrow",
+      "role": "organ",
+      "status": "partial",
+      "layer": "commerce",
+      "dora": "Muscle",
+      "binds": []
+    },
+    {
+      "id": "trace",
+      "name": "GI Trace & Trust",
+      "role": "organ",
+      "status": "partial",
+      "layer": "protection",
+      "dora": "Immune markers",
+      "binds": []
+    },
+    {
+      "id": "insurance",
+      "name": "Insurance",
+      "role": "organ",
+      "status": "partial",
+      "layer": "protection",
+      "dora": "Immune system",
+      "binds": []
+    },
+    {
+      "id": "warehouse",
+      "name": "Warehouse & Storage",
+      "role": "organ",
+      "status": "partial",
+      "layer": "circulation",
+      "dora": "Fat / reserve",
+      "binds": []
+    },
+    {
+      "id": "erp",
+      "name": "ERP Spine",
+      "role": "organ",
+      "status": "partial",
+      "layer": "structure",
+      "dora": "Spine / ESB",
+      "binds": []
+    },
+    {
+      "id": "shared",
+      "name": "Shared Infrastructure",
+      "role": "organ",
+      "status": "partial",
+      "layer": "structure",
+      "dora": "Bone / muscle share",
+      "binds": []
+    },
+    {
+      "id": "demand",
+      "name": "Demand Feedback",
+      "role": "organ",
+      "status": "partial",
+      "layer": "intelligence",
+      "dora": "Veins",
+      "binds": []
+    },
+    {
+      "id": "gcip",
+      "name": "Culinary Knowledge",
+      "role": "organ",
+      "status": "missing",
+      "layer": "missing-organ",
+      "dora": "Memory / cultural DNA",
+      "binds": []
+    },
+    {
+      "id": "rcop",
+      "name": "Rural Cost Optimizer",
+      "role": "organ",
+      "status": "missing",
+      "layer": "missing-organ",
+      "dora": "Liver / detox",
+      "binds": []
+    },
+    {
+      "id": "water",
+      "name": "Water Cost Intelligence",
+      "role": "bridge",
+      "status": "missing",
+      "layer": "missing-organ",
+      "dora": "Kidneys / fluid",
+      "binds": [
+        "recie",
+        "crop",
+        "livestock",
+        "village",
+        "rcop"
+      ]
+    },
+    {
+      "id": "fpo",
+      "name": "FPO / Cooperative",
+      "role": "bridge",
+      "status": "partial",
+      "layer": "habitat",
+      "dora": "Collective tissue",
+      "binds": [
+        "farmer",
+        "contract",
+        "finance",
+        "marketplace",
+        "shared",
+        "village"
+      ]
+    },
+    {
+      "id": "household",
+      "name": "Household Economy",
+      "role": "bridge",
+      "status": "missing",
+      "layer": "habitat",
+      "dora": "Family cell",
+      "binds": [
+        "farmer",
+        "fvie",
+        "gcip",
+        "finance",
+        "demand"
+      ]
+    },
+    {
+      "id": "scheme",
+      "name": "Government Knowledge",
+      "role": "bridge",
+      "status": "missing",
+      "layer": "missing-organ",
+      "dora": "External blood / lungs",
+      "binds": [
+        "farmer",
+        "village",
+        "finance",
+        "recie",
+        "water"
+      ]
+    },
+    {
+      "id": "spine",
+      "name": "Event Spine",
+      "role": "bridge",
+      "status": "partial",
+      "layer": "structure",
+      "dora": "Blood / ESB",
+      "binds": [
+        "crop",
+        "warehouse",
+        "orders",
+        "ai",
+        "erp",
+        "farmer"
+      ]
+    },
+    {
+      "id": "lot",
+      "name": "Living Lot",
+      "role": "bridge",
+      "status": "missing",
+      "layer": "bridge",
+      "dora": "The body of produce",
+      "binds": [
+        "crop",
+        "warehouse",
+        "trace",
+        "marketplace",
+        "logistics",
+        "insurance"
+      ]
+    },
+    {
+      "id": "cloud",
+      "name": "Village Energy Cloud",
+      "role": "bridge",
+      "status": "missing",
+      "layer": "bridge",
+      "dora": "Breath / energy cloud",
+      "binds": [
+        "recie",
+        "processing",
+        "warehouse",
+        "livestock",
+        "village"
+      ]
+    },
+    {
+      "id": "foodgraph",
+      "name": "Food Knowledge Graph",
+      "role": "bridge",
+      "status": "missing",
+      "layer": "bridge",
+      "dora": "Memory / taste graph",
+      "binds": [
+        "gcip",
+        "fvie",
+        "crop",
+        "demand"
+      ]
+    },
+    {
+      "id": "rupee",
+      "name": "Prosperity Ledger",
+      "role": "bridge",
+      "status": "missing",
+      "layer": "bridge",
+      "dora": "Attribution / liver bile",
+      "binds": [
+        "farmer",
+        "rcop",
+        "finance",
+        "ai"
+      ]
+    },
+    {
+      "id": "reflex",
+      "name": "Hazard Reflex",
+      "role": "bridge",
+      "status": "missing",
+      "layer": "bridge",
+      "dora": "Spinal reflex arc",
+      "binds": [
+        "soil",
+        "insurance",
+        "finance",
+        "logistics",
+        "ai"
+      ]
+    }
+  ],
+  "ligaments": [
+    {
+      "id": "b-farmer-market-fk",
+      "from": "farmer",
+      "to": "marketplace",
+      "name": "Product belongs to a cell",
+      "kind": "technical",
+      "status": "living",
+      "signal": "product.farmer_id"
+    },
+    {
+      "id": "b-order-contains",
+      "from": "marketplace",
+      "to": "orders",
+      "name": "Cart to order",
+      "kind": "technical",
+      "status": "living",
+      "signal": "order.items[]"
+    },
+    {
+      "id": "b-farmer-portal",
+      "from": "farmer",
+      "to": "crop",
+      "name": "Portal sees the field",
+      "kind": "technical",
+      "status": "living",
+      "signal": "farmer.dashboard.crops"
+    },
+    {
+      "id": "b-harvest-fanout",
+      "from": "crop",
+      "to": "warehouse",
+      "name": "HarvestCompleted fan-out",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "harvest.completed { lotId, giTag, moisture, villageId, farmerId }"
+    },
+    {
+      "id": "b-harvest-market",
+      "from": "crop",
+      "to": "marketplace",
+      "name": "Lot is born as a listing",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "lot.ready { lotId, foodUtility, gi, availableQty }"
+    },
+    {
+      "id": "b-harvest-trace",
+      "from": "crop",
+      "to": "trace",
+      "name": "GI marker at birth",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "trace.mint { lotId, geo, handler, season }"
+    },
+    {
+      "id": "b-harvest-insure",
+      "from": "warehouse",
+      "to": "insurance",
+      "name": "Warehouse cover on intake",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "storage.covered { lotId, policyId, hazard }"
+    },
+    {
+      "id": "b-fdi-credit",
+      "from": "farmer",
+      "to": "finance",
+      "name": "FDI metabolises credit",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "fdi.updated { farmerId, score, drivers }"
+    },
+    {
+      "id": "b-fdi-premium",
+      "from": "farmer",
+      "to": "insurance",
+      "name": "FDI reprices cover",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "fdi.updated \u2192 premium.recompute"
+    },
+    {
+      "id": "b-order-payout",
+      "from": "orders",
+      "to": "finance",
+      "name": "Settlement is one motion",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "order.settled { orderId, farmerId, amount, hoursToPay }"
+    },
+    {
+      "id": "b-order-demand",
+      "from": "orders",
+      "to": "demand",
+      "name": "Veins return offtake",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "demand.observed { sku, qty, village, season }"
+    },
+    {
+      "id": "b-iot-twin",
+      "from": "soil",
+      "to": "village",
+      "name": "Sensor ownership on the twin",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "sensor.reading { entityId, farmerId, kind, value }"
+    },
+    {
+      "id": "b-plantings-schema",
+      "from": "crop",
+      "to": "farmer",
+      "name": "Planted crop is a cell fact",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "crop.planted { farmerId, plotId, variety, season }"
+    },
+    {
+      "id": "b-weather-cascade",
+      "from": "soil",
+      "to": "insurance",
+      "name": "Weather as reflex",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "weather.alert { villageId, hazard, window }"
+    },
+    {
+      "id": "b-weather-finance",
+      "from": "soil",
+      "to": "finance",
+      "name": "Moratorium reflex",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "weather.alert \u2192 finance.moratorium.offer"
+    },
+    {
+      "id": "b-recipe-demand",
+      "from": "gcip",
+      "to": "demand",
+      "name": "Festival recipe lifts forecast",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "culinary.spike { dish, region, window, impliedCrop }"
+    },
+    {
+      "id": "b-demand-contract",
+      "from": "demand",
+      "to": "contract",
+      "name": "Forecast becomes offtake",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "demand.revised { crop, village, qty } \u2192 contract.offer"
+    },
+    {
+      "id": "b-fus-rank",
+      "from": "fvie",
+      "to": "marketplace",
+      "name": "Food Utility ranks the shelf",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "food.utility { sku, nutrition, satiety, taste, rupees, culture }"
+    },
+    {
+      "id": "b-energy-logistics",
+      "from": "recie",
+      "to": "logistics",
+      "name": "\u20b9 per cold kilometre",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "energy.cost { kwh, outageHours, spoilageRisk } \u2192 freight.price"
+    },
+    {
+      "id": "b-energy-process",
+      "from": "recie",
+      "to": "processing",
+      "name": "Village energy cloud schedules digestion",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "energy.forecast { villageId, window, surplus }"
+    },
+    {
+      "id": "b-spoilage-cascade",
+      "from": "logistics",
+      "to": "rcop",
+      "name": "Spoilage hits the village ledger",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "spoilage.event { lotId, kg, cause, kwh }"
+    },
+    {
+      "id": "b-shared-calendar",
+      "from": "shared",
+      "to": "crop",
+      "name": "Asset booking reshapes the season",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "asset.booked { assetId, plotId, window }"
+    },
+    {
+      "id": "b-erp-pulse",
+      "from": "erp",
+      "to": "farmer",
+      "name": "Spine carries live lots, not copies",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "erp.sync { entity, id, vector }"
+    },
+    {
+      "id": "b-ai-reflex",
+      "from": "ai",
+      "to": "farmer",
+      "name": "Nervous system fires muscles",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "reflex.fire { cause, organs[], explanation }"
+    },
+    {
+      "id": "b-gov-scheme",
+      "from": "ai",
+      "to": "finance",
+      "name": "Scheme knowledge as subsidy blood",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "scheme.eligible { farmerId, scheme, rupees }"
+    },
+    {
+      "id": "b-thought-cell",
+      "from": "farmer",
+      "to": "village",
+      "name": "Farmer is a cell, not a role",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "identity.model"
+    },
+    {
+      "id": "b-thought-village",
+      "from": "village",
+      "to": "rcop",
+      "name": "Village is an economy",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "village.ledger"
+    },
+    {
+      "id": "b-thought-food",
+      "from": "fvie",
+      "to": "gcip",
+      "name": "Food is culture, not a SKU",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "food.meaning"
+    },
+    {
+      "id": "b-thought-energy",
+      "from": "recie",
+      "to": "rcop",
+      "name": "Energy is lifetime \u20b9, not MW",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "energy.philosophy"
+    },
+    {
+      "id": "b-thought-gi",
+      "from": "trace",
+      "to": "marketplace",
+      "name": "GI is heritage plus livelihood",
+      "kind": "thoughtful",
+      "status": "partial",
+      "signal": "gi.meaning"
+    },
+    {
+      "id": "b-thought-prosperity",
+      "from": "farmer",
+      "to": "ai",
+      "name": "Prosperity path on every organ",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "rule.prosperity"
+    },
+    {
+      "id": "b-thought-contract",
+      "from": "contract",
+      "to": "farmer",
+      "name": "Contract is trust in time",
+      "kind": "thoughtful",
+      "status": "partial",
+      "signal": "trust.time"
+    },
+    {
+      "id": "b-thought-ai",
+      "from": "ai",
+      "to": "demand",
+      "name": "AI is a nervous system",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "ai.posture"
+    },
+    {
+      "id": "b-household-basket",
+      "from": "fvie",
+      "to": "orders",
+      "name": "Household goal becomes a basket",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "goal.basket { householdId, goal, budget }"
+    },
+    {
+      "id": "b-livestock-energy",
+      "from": "livestock",
+      "to": "recie",
+      "name": "\u20b9 per litre chilled",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "chill.cost { litres, kwh, outage }"
+    },
+    {
+      "id": "b-livestock-cell",
+      "from": "livestock",
+      "to": "farmer",
+      "name": "Animals are cell assets",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "livestock.owned { farmerId, head, milkYield }"
+    },
+    {
+      "id": "b-livestock-cover",
+      "from": "livestock",
+      "to": "insurance",
+      "name": "Herd cover on the same immune system",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "herd.covered { animalId, policyId, hazard }"
+    },
+    {
+      "id": "b-livestock-cash",
+      "from": "livestock",
+      "to": "finance",
+      "name": "Dairy cashflow metabolises credit",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "milk.settled { farmerId, litres, rupees }"
+    },
+    {
+      "id": "b-livestock-dairy",
+      "from": "livestock",
+      "to": "processing",
+      "name": "Milk becomes food, not a row",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "milk.intake { litres, temp, farmerId } \u2192 process.batch"
+    },
+    {
+      "id": "b-livestock-shelf",
+      "from": "livestock",
+      "to": "marketplace",
+      "name": "Milk and meat as living lots",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "lot.ready { kind: dairy|meat, qty, chillCost }"
+    },
+    {
+      "id": "b-process-shelf",
+      "from": "processing",
+      "to": "marketplace",
+      "name": "Digested lot returns as food",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "process.completed { lotId, sku, yield, energyKwh }"
+    },
+    {
+      "id": "b-process-intake",
+      "from": "warehouse",
+      "to": "processing",
+      "name": "Reserve feeds digestion",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "storage.release { lotId, to: mill|chiller, qty }"
+    },
+    {
+      "id": "b-process-fus",
+      "from": "processing",
+      "to": "fvie",
+      "name": "Process changes food utility",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "food.utility.recompute { sku, process, satiety, convenience }"
+    },
+    {
+      "id": "b-process-chain",
+      "from": "processing",
+      "to": "trace",
+      "name": "Handler added to the marker",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "trace.append { lotId, handler, process, temp }"
+    },
+    {
+      "id": "b-shared-twin",
+      "from": "shared",
+      "to": "village",
+      "name": "Village muscle lives on the twin",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "asset.located { assetId, villageId, hours, cost }"
+    },
+    {
+      "id": "b-shared-ledger",
+      "from": "shared",
+      "to": "rcop",
+      "name": "Shared vs individual is a liver question",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "rcop.decide { asset, shared: bool, rupeesPerYear }"
+    },
+    {
+      "id": "b-shared-power",
+      "from": "shared",
+      "to": "recie",
+      "name": "Shared dryers draw village breath",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "asset.load { assetId, kwh, window }"
+    },
+    {
+      "id": "b-water-pump",
+      "from": "water",
+      "to": "recie",
+      "name": "Pumping is an energy fact",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "water.pumped { litres, kwh, aquifer, plotId }"
+    },
+    {
+      "id": "b-water-crop",
+      "from": "water",
+      "to": "crop",
+      "name": "Irrigation writes the season",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "irrigation.window { plotId, mm, cost }"
+    },
+    {
+      "id": "b-water-ledger",
+      "from": "water",
+      "to": "rcop",
+      "name": "\u20b9 per litre on the village ledger",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "water.cost { villageId, \u20b9/litre, source }"
+    },
+    {
+      "id": "b-water-twin",
+      "from": "water",
+      "to": "village",
+      "name": "Aquifer on the habitat twin",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "aquifer.state { villageId, depth, quality, stress }"
+    },
+    {
+      "id": "b-water-stock",
+      "from": "water",
+      "to": "livestock",
+      "name": "Herd water is not leftover irrigation",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "stock.water { litres, quality, cost }"
+    },
+    {
+      "id": "b-fpo-member",
+      "from": "fpo",
+      "to": "farmer",
+      "name": "Membership is collective tissue",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "fpo.member { fpoId, farmerId, share, offtake }"
+    },
+    {
+      "id": "b-fpo-offtake",
+      "from": "fpo",
+      "to": "contract",
+      "name": "Collective offtake before sowing",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "fpo.contract.offer { fpoId, crop, qty, season }"
+    },
+    {
+      "id": "b-fpo-group-credit",
+      "from": "fpo",
+      "to": "finance",
+      "name": "Group credit on pooled health",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "fpo.credit { fpoId, line, fdiDrivers }"
+    },
+    {
+      "id": "b-fpo-seller",
+      "from": "fpo",
+      "to": "marketplace",
+      "name": "FPO as the public hand",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "listing.seller { fpoId, farmerCells[] }"
+    },
+    {
+      "id": "b-fpo-assets",
+      "from": "fpo",
+      "to": "shared",
+      "name": "Collective muscle is booked as one",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "fpo.asset { fpoId, assetId, roster }"
+    },
+    {
+      "id": "b-house-cell",
+      "from": "household",
+      "to": "farmer",
+      "name": "Household is the living unit of the cell",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "household.of { farmerId, members, goals, cash }"
+    },
+    {
+      "id": "b-house-goal",
+      "from": "household",
+      "to": "fvie",
+      "name": "Family goal compiles to food utility",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "household.goal { diabetic, child, budget } \u2192 fus.query"
+    },
+    {
+      "id": "b-house-cash",
+      "from": "household",
+      "to": "finance",
+      "name": "Household cashflow, not only farm EMI",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "household.cash { in, out, bufferDays }"
+    },
+    {
+      "id": "b-house-kitchen",
+      "from": "household",
+      "to": "gcip",
+      "name": "Kitchen remembers why the crop exists",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "household.kitchen { dishes, festival, variety }"
+    },
+    {
+      "id": "b-house-vein",
+      "from": "household",
+      "to": "demand",
+      "name": "Plates return as veins",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "demand.observed { householdId, dish, qty, window }"
+    },
+    {
+      "id": "b-scheme-cell",
+      "from": "scheme",
+      "to": "farmer",
+      "name": "Eligibility computed on the cell",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "scheme.eligible { farmerId, scheme, roi, rupees }"
+    },
+    {
+      "id": "b-scheme-village",
+      "from": "scheme",
+      "to": "village",
+      "name": "Village-scale schemes on the twin",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "scheme.village { villageId, feederSolar, storage, rupeesPerYear }"
+    },
+    {
+      "id": "b-scheme-solar",
+      "from": "scheme",
+      "to": "recie",
+      "name": "PM-KUSUM composed into energy cost",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "scheme.energy { scheme, kwh, tcoDelta }"
+    },
+    {
+      "id": "b-scheme-pump",
+      "from": "scheme",
+      "to": "water",
+      "name": "Irrigation subsidy is a water fact",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "scheme.water { scheme, \u20b9/litreDelta }"
+    },
+    {
+      "id": "b-scheme-compose",
+      "from": "scheme",
+      "to": "finance",
+      "name": "Subsidy composes with credit, not beside it",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "product.composed { credit, scheme, netEmi }"
+    },
+    {
+      "id": "b-spine-harvest",
+      "from": "spine",
+      "to": "crop",
+      "name": "Harvest is blood, not a page",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "spine.publish harvest.completed"
+    },
+    {
+      "id": "b-spine-intake",
+      "from": "spine",
+      "to": "warehouse",
+      "name": "Intake subscribes, does not retype",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "spine.subscribe harvest.completed \u2192 warehouse.intake"
+    },
+    {
+      "id": "b-spine-settle",
+      "from": "spine",
+      "to": "orders",
+      "name": "Settlement is a pulse",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "spine.publish order.settled"
+    },
+    {
+      "id": "b-spine-brain",
+      "from": "spine",
+      "to": "ai",
+      "name": "Nervous system rides the same blood",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "spine.subscribe * \u2192 reflex.evaluate"
+    },
+    {
+      "id": "b-lot-birth",
+      "from": "lot",
+      "to": "crop",
+      "name": "Harvest mints a living lot",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "lot.mint { lotId, variety, kg, moisture, farmerId, villageId }"
+    },
+    {
+      "id": "b-lot-reserve",
+      "from": "lot",
+      "to": "warehouse",
+      "name": "The same body is stored",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "lot.stored { lotId, bin, temp, cover }"
+    },
+    {
+      "id": "b-lot-marker",
+      "from": "lot",
+      "to": "trace",
+      "name": "Marker is a property of the lot",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "lot.marker { lotId, gi, geo, handlers[] }"
+    },
+    {
+      "id": "b-lot-shelf",
+      "from": "lot",
+      "to": "marketplace",
+      "name": "The shelf sells the lot",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "lot.listed { lotId, fus, price, cell }"
+    },
+    {
+      "id": "b-lot-artery",
+      "from": "lot",
+      "to": "logistics",
+      "name": "Freight moves the same body",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "lot.moved { lotId, energy, spoilageRisk }"
+    },
+    {
+      "id": "b-lot-cover",
+      "from": "lot",
+      "to": "insurance",
+      "name": "Cover clings to the lot",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "lot.covered { lotId, policyId }"
+    },
+    {
+      "id": "b-cloud-lungs",
+      "from": "cloud",
+      "to": "recie",
+      "name": "Cloud is how lungs become a schedule",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "energy.cloud { villageId, forecast, surplus, \u20b9/kWh }"
+    },
+    {
+      "id": "b-cloud-digest",
+      "from": "cloud",
+      "to": "processing",
+      "name": "Mills run on surplus",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "cloud.window { surplus } \u2192 process.schedule"
+    },
+    {
+      "id": "b-cloud-cold",
+      "from": "cloud",
+      "to": "warehouse",
+      "name": "Cold rooms breathe with the village",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "cloud.cold { load, outageRisk, holdCost }"
+    },
+    {
+      "id": "b-cloud-chill",
+      "from": "cloud",
+      "to": "livestock",
+      "name": "Chillers are on the same breath",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "cloud.chill { litres, kwh, outage }"
+    },
+    {
+      "id": "b-cloud-twin",
+      "from": "cloud",
+      "to": "village",
+      "name": "The twin has a weather of power",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "twin.energy { villageId, stack, reliability }"
+    },
+    {
+      "id": "b-graph-memory",
+      "from": "foodgraph",
+      "to": "gcip",
+      "name": "Culinary platform is a graph, not a blog",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "graph.recipe { dish, village, festival, variety }"
+    },
+    {
+      "id": "b-graph-taste",
+      "from": "foodgraph",
+      "to": "fvie",
+      "name": "Taste and satiety are edges",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "graph.fus { dish, nutrition, satiety, childAccept }"
+    },
+    {
+      "id": "b-graph-genome",
+      "from": "foodgraph",
+      "to": "crop",
+      "name": "Dishes imply varieties",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "graph.implies { dish \u2192 variety, season, district }"
+    },
+    {
+      "id": "b-graph-vein",
+      "from": "foodgraph",
+      "to": "demand",
+      "name": "Festival graph lifts forecast",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "graph.spike { festival, dish, window } \u2192 demand.revised"
+    },
+    {
+      "id": "b-rupee-cell",
+      "from": "rupee",
+      "to": "farmer",
+      "name": "Every path ends at the cell",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "prosperity.post { organ, farmerId, \u20b9, hours }"
+    },
+    {
+      "id": "b-rupee-liver",
+      "from": "rupee",
+      "to": "rcop",
+      "name": "Village TCO is the same ink",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "ledger.post { villageId, organ, \u20b9/year }"
+    },
+    {
+      "id": "b-rupee-pancreas",
+      "from": "rupee",
+      "to": "finance",
+      "name": "Hours-to-pay is a prosperity metric",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "prosperity.hoursToPay { orderId, farmerId }"
+    },
+    {
+      "id": "b-rupee-brain",
+      "from": "rupee",
+      "to": "ai",
+      "name": "A reflex must explain the rupee",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "reflex.explain { cause, organ, \u20b9, cell }"
+    },
+    {
+      "id": "b-reflex-feet",
+      "from": "reflex",
+      "to": "soil",
+      "name": "Feet trigger the arc",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "weather.alert | outage.alert | pest.alert \u2192 reflex.arc"
+    },
+    {
+      "id": "b-reflex-immune",
+      "from": "reflex",
+      "to": "insurance",
+      "name": "Arc opens cover",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "reflex.arc \u2192 claim.window"
+    },
+    {
+      "id": "b-reflex-credit",
+      "from": "reflex",
+      "to": "finance",
+      "name": "Arc offers a pause",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "reflex.arc \u2192 finance.moratorium.offer"
+    },
+    {
+      "id": "b-reflex-artery",
+      "from": "reflex",
+      "to": "logistics",
+      "name": "Arc retasks freight",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "reflex.arc \u2192 logistics.reroute"
+    },
+    {
+      "id": "b-reflex-brain",
+      "from": "reflex",
+      "to": "ai",
+      "name": "The brain owns the arc, not a chat",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "reflex.declare { cause, organs[], rupee }"
+    },
+    {
+      "id": "b-wh-logistics",
+      "from": "warehouse",
+      "to": "logistics",
+      "name": "Release is an artery event",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "storage.release \u2192 freight.dispatch"
+    },
+    {
+      "id": "b-wh-energy",
+      "from": "warehouse",
+      "to": "recie",
+      "name": "Holding power is a cost, not overhead",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "storage.kwh { lotId, hours, \u20b9 }"
+    },
+    {
+      "id": "b-market-move",
+      "from": "marketplace",
+      "to": "logistics",
+      "name": "A sold lot must move",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "order.confirmed \u2192 freight.plan"
+    },
+    {
+      "id": "b-contract-sow",
+      "from": "contract",
+      "to": "crop",
+      "name": "Offtake writes the genome",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "contract.signed \u2192 crop.plan { variety, qty, season }"
+    },
+    {
+      "id": "b-contract-escrow",
+      "from": "contract",
+      "to": "finance",
+      "name": "Escrow is the money of trust",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "contract.escrow { amount, milestone, farmerId }"
+    },
+    {
+      "id": "b-recipe-genome",
+      "from": "gcip",
+      "to": "crop",
+      "name": "A dish names a variety",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "recipe.variety { dish, crop, district }"
+    },
+    {
+      "id": "b-village-vein",
+      "from": "village",
+      "to": "demand",
+      "name": "The habitat returns what it ate",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "village.consumed { villageId, sku, season }"
+    },
+    {
+      "id": "b-erp-order",
+      "from": "erp",
+      "to": "orders",
+      "name": "ERP rides settlement, does not clone it",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "order.settled \u2192 erp.post"
+    },
+    {
+      "id": "b-erp-catalog",
+      "from": "erp",
+      "to": "marketplace",
+      "name": "Master data is not a living lot",
+      "kind": "technical",
+      "status": "partial",
+      "signal": "erp.product \u2194 lot.projection"
+    },
+    {
+      "id": "b-trace-cover",
+      "from": "trace",
+      "to": "insurance",
+      "name": "A marker is evidence",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "trace.evidence { lotId } \u2192 claim.file"
+    },
+    {
+      "id": "b-channel-alloc",
+      "from": "demand",
+      "to": "processing",
+      "name": "Veins decide fresh vs processed",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "channel.allocate { lotId, fresh|process|store|export }"
+    },
+    {
+      "id": "b-fpo-village",
+      "from": "fpo",
+      "to": "village",
+      "name": "Collective tissue sits on the habitat",
+      "kind": "technical",
+      "status": "missing",
+      "signal": "fpo.habitat { fpoId, villageId, members }"
+    },
+    {
+      "id": "b-thought-livestock",
+      "from": "livestock",
+      "to": "farmer",
+      "name": "Livestock is a second genome",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "identity.genome.2"
+    },
+    {
+      "id": "b-thought-fpo",
+      "from": "fpo",
+      "to": "farmer",
+      "name": "FPO is tissue, not a role",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "identity.collective"
+    },
+    {
+      "id": "b-thought-household",
+      "from": "household",
+      "to": "farmer",
+      "name": "The household is the demand unit",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "identity.household"
+    },
+    {
+      "id": "b-thought-water-breath",
+      "from": "water",
+      "to": "recie",
+      "name": "Water and energy are one breath",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.nexus"
+    },
+    {
+      "id": "b-thought-scheme-blood",
+      "from": "scheme",
+      "to": "farmer",
+      "name": "A scheme is blood, not a PDF",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.inclusion"
+    },
+    {
+      "id": "b-thought-lot",
+      "from": "lot",
+      "to": "farmer",
+      "name": "The lot is one body of produce",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.lot"
+    },
+    {
+      "id": "b-thought-spine-blood",
+      "from": "spine",
+      "to": "erp",
+      "name": "Blood is not bone",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.bus"
+    },
+    {
+      "id": "b-thought-shared-muscle",
+      "from": "shared",
+      "to": "village",
+      "name": "Shared infrastructure is village muscle",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.muscle"
+    },
+    {
+      "id": "b-thought-digest",
+      "from": "processing",
+      "to": "crop",
+      "name": "Processing is digestion of the same harvest",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.digest"
+    },
+    {
+      "id": "b-thought-season",
+      "from": "crop",
+      "to": "gcip",
+      "name": "Season is culture in the ground",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.season"
+    },
+    {
+      "id": "b-thought-cloud",
+      "from": "cloud",
+      "to": "village",
+      "name": "Power is a weather of the habitat",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.cloud"
+    },
+    {
+      "id": "b-thought-graph",
+      "from": "foodgraph",
+      "to": "fvie",
+      "name": "Food memory is not a nutrition label",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.graph"
+    },
+    {
+      "id": "b-thought-reflex",
+      "from": "reflex",
+      "to": "ai",
+      "name": "A chatbot is not a reflex",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.reflex"
+    },
+    {
+      "id": "b-thought-coop-trust",
+      "from": "fpo",
+      "to": "contract",
+      "name": "Collective offtake is trust at village scale",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.coop"
+    },
+    {
+      "id": "b-thought-aquifer",
+      "from": "water",
+      "to": "village",
+      "name": "An aquifer is a commons, not a borewell",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.commons"
+    },
+    {
+      "id": "b-thought-channel",
+      "from": "demand",
+      "to": "marketplace",
+      "name": "A storefront is not a revenue OS",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.revenue"
+    },
+    {
+      "id": "b-thought-time",
+      "from": "contract",
+      "to": "demand",
+      "name": "Time is the hidden dimension of every ligament",
+      "kind": "thoughtful",
+      "status": "missing",
+      "signal": "philosophy.time"
+    }
+  ]
+}
