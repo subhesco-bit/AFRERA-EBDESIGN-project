@@ -1,39 +1,63 @@
 const express = require('express');
 const router = express.Router();
-const { authMiddleware } = require('../../middleware/auth');
+const gateway = require('../../services/aiGatewayService');
+const aiBackbone = require('../../services/legacy/aiBackboneService');
 
-// aiGatewayRoutes — minimal in-memory CRUD scaffold.
-let _items = [];
-let _nextId = 1;
-
-router.get('/', authMiddleware, (req, res) => {
-  res.json({ success: true, data: _items });
+router.get('/status', async (_req, res) => res.json({ success: true, data: await gateway.healthCheck() }));
+router.get('/providers', (_req, res) => {
+  const status = aiBackbone.getAIProviderStatus();
+  const providers = Object.entries(status.providers || {}).map(([provider, value]) => ({
+    provider,
+    available: Boolean(value.enabled && value.configured),
+    model: value.model,
+  }));
+  res.json({ success: true, data: providers });
 });
-
-router.get('/:id', authMiddleware, (req, res) => {
-  const item = _items.find(i => String(i.id) === String(req.params.id));
-  if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-  res.json({ success: true, data: item });
+const runRequest = async (req, res, next) => {
+  try {
+    const result = await gateway.run(req.body || {});
+    if (result.status === 'not_configured') return res.status(503).json(result);
+    return res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+router.post('/route', runRequest);
+router.post('/chat', runRequest);
+router.post('/stream', async (req, res, next) => {
+  try {
+    const result = await gateway.run(req.body || {});
+    if (result.status === 'not_configured') return res.status(503).json(result);
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(`event: completion\ndata: ${JSON.stringify(result)}\n\n`);
+  } catch (error) {
+    next(error);
+  }
 });
-
-router.post('/', authMiddleware, (req, res) => {
-  const item = { id: _nextId++, ...req.body, created_at: new Date().toISOString() };
-  _items.push(item);
-  res.status(201).json({ success: true, data: item });
+router.put('/providers/:provider/:action', (req, res) => {
+  const provider = aiBackbone.AI_PROVIDERS[req.params.provider];
+  if (!provider || !['enable', 'disable'].includes(req.params.action)) {
+    return res.status(404).json({ success: false, error: 'Provider or action not found' });
+  }
+  provider.enabled = req.params.action === 'enable';
+  return res.json({ success: true, data: { provider: req.params.provider, available: provider.enabled } });
 });
-
-router.put('/:id', authMiddleware, (req, res) => {
-  const idx = _items.findIndex(i => String(i.id) === String(req.params.id));
-  if (idx === -1) return res.status(404).json({ success: false, error: 'Not found' });
-  _items[idx] = { ..._items[idx], ...req.body, updated_at: new Date().toISOString() };
-  res.json({ success: true, data: _items[idx] });
+router.post('/optimize', async (req, res, next) => {
+  try {
+    const { target, parameters, constraints } = req.body || {};
+    res.json(await gateway.optimize(target, parameters, constraints));
+  } catch (error) {
+    next(error);
+  }
 });
-
-router.delete('/:id', authMiddleware, (req, res) => {
-  const idx = _items.findIndex(i => String(i.id) === String(req.params.id));
-  if (idx === -1) return res.status(404).json({ success: false, error: 'Not found' });
-  _items.splice(idx, 1);
-  res.json({ success: true });
+router.post('/analyze', async (req, res, next) => {
+  try {
+    const { target, data, analysisType } = req.body || {};
+    res.json(await gateway.analyze(target, data, analysisType));
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;

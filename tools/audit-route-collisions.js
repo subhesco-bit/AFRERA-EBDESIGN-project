@@ -4,11 +4,9 @@
 /**
  * Route-name collision audit.
  *
- * DynamicRouteLoader._extractRouteName() is the file's basename, and
- * _registerRoute() discards any file whose basename is already registered. The
- * discarded file is never mounted at any path, even though
- * _generateMountPath() would have given it a distinct one (it includes the
- * subfolder). Which file survives is decided by directory-walk order.
+ * DynamicRouteLoader uses the basename for the first route and a stable
+ * path-qualified internal key for later files with the same basename. Both
+ * routers are mounted at the distinct paths generated from their subfolders.
  *
  * This matters because the repository contains pairs like
  *
@@ -19,8 +17,8 @@
  * while the real implementation is unreachable.
  *
  * Exit codes:
- *   0  no collision where a scaffold displaced a real implementation
- *   1  at least one such collision (or the loader could not be analysed)
+ *   0  no collision where a scaffold displaces a real implementation
+ *   1  at least one such collision
  *
  * The 'neither is a scaffold' collisions are reported but do not fail the
  * audit: two real implementations shadowing each other needs a human decision
@@ -73,7 +71,7 @@ function main() {
       collisions.push({
         routeName: name,
         kept: keptRel,
-        discarded: rel,
+        coMounted: rel,
         keptIsScaffold: isScaffold(path.join(ROUTES_DIR, keptRel)),
         discardedIsScaffold: isScaffold(abs),
       });
@@ -89,11 +87,11 @@ function main() {
 
   console.log(`mountable route files : ${mountable.length}`);
   console.log(`unique route names    : ${claimed.size}`);
-  console.log(`files discarded       : ${collisions.length}`);
+  console.log(`basename collisions    : ${collisions.length}`);
   console.log('');
   console.log(`  scaffold kept, real implementation discarded : ${scaffoldWins.length}`);
   console.log(`  real implementation kept, scaffold discarded : ${realWins.length}`);
-  console.log(`  neither is a scaffold (needs a decision)     : ${ambiguous.length}`);
+  console.log(`  real implementations co-mounted            : ${ambiguous.length}`);
   console.log(`  both are scaffolds                           : ${bothScaffold.length}`);
 
   if (scaffoldWins.length) {
@@ -101,14 +99,14 @@ function main() {
     for (const c of scaffoldWins) {
       console.log(`  ${c.routeName}`);
       console.log(`      serving   : ${c.kept}`);
-      console.log(`      discarded : ${c.discarded}`);
+      console.log(`      co-mounted : ${c.coMounted}`);
     }
   }
 
   if (ambiguous.length) {
-    console.log('\nTWO NON-SCAFFOLD FILES COLLIDE (reported, not failed):');
+    console.log('\nREAL ROUTE BASENAME COLLISIONS (both mounted at distinct paths):');
     for (const c of ambiguous) {
-      console.log(`  ${c.routeName.padEnd(36)} serving ${c.kept}  |  discarded ${c.discarded}`);
+      console.log(`  ${c.routeName.padEnd(36)} mounted ${c.kept}  |  co-mounted ${c.coMounted}`);
     }
   }
 

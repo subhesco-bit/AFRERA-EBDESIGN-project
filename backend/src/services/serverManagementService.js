@@ -12,6 +12,8 @@
  * - Security management
  */
 
+const { getPostgreSQL } = require('../database/connection');
+
 class ServerManagementService {
   constructor() {
     // Server inventory
@@ -31,12 +33,56 @@ class ServerManagementService {
     
     // Security configurations
     this.securityConfigs = new Map();
+    this.storageReady = null;
+    this.storageEnabled = false;
     
     // Initialize default server groups
     this.initializeServerGroups();
     
     // Start monitoring
     this.startMonitoring();
+  }
+
+  async initializeStorage() {
+    if (this.storageReady) return this.storageReady;
+    this.storageReady = (async () => {
+      const pg = getPostgreSQL();
+      if (!pg) return;
+
+      try {
+        const [servers, loadBalancers, backupSchedules] = await Promise.all([
+          pg.query('SELECT id, payload FROM server_management_servers'),
+          pg.query('SELECT id, payload FROM server_management_load_balancers'),
+          pg.query('SELECT id, payload FROM server_management_backup_schedules'),
+        ]);
+        servers.rows.forEach(({ id, payload }) => this.servers.set(id, payload));
+        loadBalancers.rows.forEach(({ id, payload }) => this.loadBalancers.set(id, payload));
+        backupSchedules.rows.forEach(({ id, payload }) => this.backupSchedules.set(id, payload));
+        this.storageEnabled = true;
+      } catch (error) {
+        // Migrations may not have run in a local development environment. Keep
+        // the service usable, but never claim that memory is durable storage.
+        console.warn('Server-management persistence unavailable; using memory for this process', error.message);
+      }
+    })();
+    return this.storageReady;
+  }
+
+  async persistRecord(table, record) {
+    if (!this.storageEnabled || !record?.id) return;
+    const pg = getPostgreSQL();
+    await pg.query(
+      `INSERT INTO ${table} (id, payload, updated_at)
+       VALUES ($1, $2::jsonb, NOW())
+       ON CONFLICT (id) DO UPDATE SET payload = EXCLUDED.payload, updated_at = NOW()`,
+      [record.id, JSON.stringify(record)],
+    );
+  }
+
+  async removeRecord(table, id) {
+    if (!this.storageEnabled) return;
+    const pg = getPostgreSQL();
+    await pg.query(`DELETE FROM ${table} WHERE id = $1`, [id]);
   }
   
   /**
@@ -104,9 +150,11 @@ class ServerManagementService {
    */
   startMonitoring() {
     // Collect metrics every 30 seconds
-    setInterval(() => {
+    const monitoringTimer = setInterval(() => {
       this.collectMetrics();
     }, 30000);
+    // Background monitoring must not keep short-lived CLI/test processes alive.
+    monitoringTimer.unref?.();
   }
   
   /**
@@ -134,6 +182,7 @@ class ServerManagementService {
    */
   async provisionServer(config) {
     try {
+      await this.initializeStorage();
       const serverId = `server-${Date.now()}`;
       
       const serverGroup = this.serverGroups.get(config.group);
@@ -170,6 +219,7 @@ class ServerManagementService {
       server.status = 'active';
       server.provisioned_at = new Date();
       this.servers.set(serverId, server);
+      await this.persistRecord('server_management_servers', server);
       
       return {
         success: true,
@@ -217,6 +267,7 @@ class ServerManagementService {
    */
   async updateServer(serverId, updates) {
     try {
+      await this.initializeStorage();
       const server = this.servers.get(serverId);
       if (!server) {
         throw new Error(`Server ${serverId} not found`);
@@ -225,6 +276,7 @@ class ServerManagementService {
       Object.assign(server, updates);
       server.updated_at = new Date();
       this.servers.set(serverId, server);
+      await this.persistRecord('server_management_servers', server);
       
       return {
         success: true,
@@ -244,6 +296,7 @@ class ServerManagementService {
    */
   async deleteServer(serverId) {
     try {
+      await this.initializeStorage();
       const server = this.servers.get(serverId);
       if (!server) {
         throw new Error(`Server ${serverId} not found`);
@@ -257,6 +310,7 @@ class ServerManagementService {
       
       this.servers.delete(serverId);
       this.monitoringData.delete(serverId);
+      await this.removeRecord('server_management_servers', serverId);
       
       return {
         success: true,
@@ -337,6 +391,7 @@ class ServerManagementService {
    */
   async createLoadBalancer(config) {
     try {
+      await this.initializeStorage();
       const lbId = `lb-${Date.now()}`;
       
       const loadBalancer = {
@@ -364,6 +419,7 @@ class ServerManagementService {
       loadBalancer.status = 'active';
       loadBalancer.created_at = new Date();
       this.loadBalancers.set(lbId, loadBalancer);
+      await this.persistRecord('server_management_load_balancers', loadBalancer);
       
       return {
         success: true,
@@ -397,6 +453,7 @@ class ServerManagementService {
    */
   async updateLoadBalancer(lbId, updates) {
     try {
+      await this.initializeStorage();
       const loadBalancer = this.loadBalancers.get(lbId);
       if (!loadBalancer) {
         throw new Error(`Load balancer ${lbId} not found`);
@@ -405,6 +462,7 @@ class ServerManagementService {
       Object.assign(loadBalancer, updates);
       loadBalancer.updated_at = new Date();
       this.loadBalancers.set(lbId, loadBalancer);
+      await this.persistRecord('server_management_load_balancers', loadBalancer);
       
       return {
         success: true,
@@ -424,12 +482,14 @@ class ServerManagementService {
    */
   async deleteLoadBalancer(lbId) {
     try {
+      await this.initializeStorage();
       const loadBalancer = this.loadBalancers.get(lbId);
       if (!loadBalancer) {
         throw new Error(`Load balancer ${lbId} not found`);
       }
       
       this.loadBalancers.delete(lbId);
+      await this.removeRecord('server_management_load_balancers', lbId);
       
       return {
         success: true,
@@ -447,8 +507,9 @@ class ServerManagementService {
   /**
    * Create backup schedule
    */
-  createBackupSchedule(config) {
+  async createBackupSchedule(config) {
     try {
+      await this.initializeStorage();
       const scheduleId = `backup-${Date.now()}`;
       
       const schedule = {
@@ -463,6 +524,7 @@ class ServerManagementService {
       };
       
       this.backupSchedules.set(scheduleId, schedule);
+      await this.persistRecord('server_management_backup_schedules', schedule);
       
       return {
         success: true,
@@ -496,6 +558,7 @@ class ServerManagementService {
    */
   async executeBackup(scheduleId) {
     try {
+      await this.initializeStorage();
       const schedule = this.backupSchedules.get(scheduleId);
       if (!schedule) {
         throw new Error(`Backup schedule ${scheduleId} not found`);
@@ -511,6 +574,7 @@ class ServerManagementService {
       schedule.status = 'active';
       schedule.last_completed = new Date();
       this.backupSchedules.set(scheduleId, schedule);
+      await this.persistRecord('server_management_backup_schedules', schedule);
       
       return {
         success: true,

@@ -1332,4 +1332,5 @@ module.exports = {
   generateRefreshToken,
   hashPassword,
   comparePassword,
+  verifyTOTPCode,
 };

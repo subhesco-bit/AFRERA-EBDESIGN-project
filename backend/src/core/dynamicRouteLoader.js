@@ -95,43 +95,30 @@ class DynamicRouteLoader {
       const fileName = path.basename(filePath, '.js');
       const version = this._extractVersion(relativePath);
       const subfolder = this._extractSubfolder(relativePath);
-      const routeName = this._extractRouteName(relativePath);
+      const fileRouteName = this._extractRouteName(relativePath);
+      const routeName = this.routes.has(fileRouteName)
+        ? `${fileRouteName}::${relativePath.replace(/\\/g, '/')}`
+        : fileRouteName;
 
-      // Check for duplicate
-      //
-      // _extractRouteName() is the file's basename, so two route files with the
-      // same basename in different folders collide here and the second one is
-      // DISCARDED ENTIRELY — it is never mounted, at any path, even though
-      // _generateMountPath() would have given it a distinct one. Which file
-      // survives is decided by _walkDirectory order, not by which is correct.
-      //
-      // Measured 2026-09-21: 881 mountable files collapse to 782 names, so 99
-      // route files are dropped this way. In 27 of those collisions the
-      // surviving file is an in-memory CRUD scaffold and the discarded one is
-      // the real, database-backed implementation — the platform serves the
-      // fake and the real code is unreachable. tools/audit-route-collisions.js
-      // enumerates them; changing which side wins alters what live paths
-      // serve, so it is a deliberate decision and is NOT done here.
-      //
-      // The log line previously named only the route name, which is not enough
-      // to find either file. It now names both paths and is an error, because
-      // silently dropping a route file is not a warning-level event.
-      if (this.routes.has(routeName)) {
-        const kept = this.routes.get(routeName);
+      // Keep both routers when basenames collide. The generated mount path
+      // already includes the subfolder, so the later file only needs a unique
+      // internal key to avoid being silently discarded.
+      if (routeName !== fileRouteName) {
+        const kept = this.routes.get(fileRouteName);
         this.collisions.push({
-          routeName,
+          routeName: fileRouteName,
           discarded: relativePath,
           keptInstead: kept.relativePath,
+          registeredAs: routeName,
         });
-        logger.error(
-          `Route name collision: discarding ${relativePath} — ${kept.relativePath} already claimed the name "${routeName}". The discarded file is not mounted at any path.`
+        logger.warn(
+          `Route name collision: registering ${relativePath} as "${routeName}"; ${kept.relativePath} remains available as "${fileRouteName}".`
         );
-        return;
       }
 
       // Register route entry
       this.routes.set(routeName, {
-        name: routeName,
+        name: fileRouteName,
         path: filePath,
         relativePath,
         version,

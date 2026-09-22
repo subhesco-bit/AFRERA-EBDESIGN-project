@@ -296,8 +296,29 @@ Ready for production deployment! 🚀
   process.exit(passed === total ? 0 : 1);
 }
 
-// Run tests
-runAllTests().catch(error => {
-  console.error('Test suite failed:', error);
-  process.exit(1);
-});
+// Keep the executable smoke script import-safe so Jest can discover this file
+// without starting timers, background work, or terminating the test process.
+if (require.main === module) {
+  runAllTests().catch(error => {
+    console.error('Test suite failed:', error);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = {
+  runAllTests,
+  testProductCreationTrigger,
+  testPageViewTrigger,
+  testInventoryTrigger,
+  testQueueManagement,
+  testBatchOperations,
+  showAPIEndpoints,
+};
+
+if (typeof describe === 'function' && typeof test === 'function') {
+  test('exposes smoke-test runners without executing them during import', () => {
+    expect(typeof runAllTests).toBe('function');
+    expect(typeof testProductCreationTrigger).toBe('function');
+    expect(typeof testBatchOperations).toBe('function');
+  });
+}

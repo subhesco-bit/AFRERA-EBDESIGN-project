@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-09-22T12:22:01.180Z",
+  "repoRoot": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN-consolidated",
+  "workflow": "token-optimization",
+  "checks": [
+    {
+      "label": "backend dep audit",
+      "ok": true,
+      "executed": true,
+      "note": "Completed via plugin-driven zero-token workflow."
+    },
+    {
+      "label": "frontend dep audit",
+      "ok": true,
+      "executed": true,
+      "note": "Completed via plugin-driven zero-token workflow."
+    },
+    {
+      "label": "audit chain",
+      "ok": true,
+      "executed": true,
+      "note": "Completed via plugin-driven zero-token workflow."
+    },
+    {
+      "label": "powerShell plugin wrappers",
+      "ok": false,
+      "executed": true,
+      "note": "Skipped; runtime dependency unavailable."
+    }
+  ]
+}

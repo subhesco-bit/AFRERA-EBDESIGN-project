@@ -1,39 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/platform/startupEnvironmentService');
 
-// startupEnvironmentRoutes — minimal in-memory CRUD scaffold.
-let _items = [];
-let _nextId = 1;
-
-router.get('/', authMiddleware, (req, res) => {
-  res.json({ success: true, data: _items });
+router.get('/health', (_req, res) => res.json({ success: true, data: service.getHealthStatus() }));
+router.get('/startups', (req, res) => res.json({ success: true, data: service.getStartups(req.query) }));
+router.get('/startups/:startupId', (req, res) => {
+  const startup = service.getStartup(req.params.startupId);
+  if (!startup) return res.status(404).json({ success: false, error: 'Startup not found' });
+  return res.json({ success: true, data: startup });
 });
-
-router.get('/:id', authMiddleware, (req, res) => {
-  const item = _items.find(i => String(i.id) === String(req.params.id));
-  if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-  res.json({ success: true, data: item });
-});
-
-router.post('/', authMiddleware, (req, res) => {
-  const item = { id: _nextId++, ...req.body, created_at: new Date().toISOString() };
-  _items.push(item);
-  res.status(201).json({ success: true, data: item });
-});
-
-router.put('/:id', authMiddleware, (req, res) => {
-  const idx = _items.findIndex(i => String(i.id) === String(req.params.id));
-  if (idx === -1) return res.status(404).json({ success: false, error: 'Not found' });
-  _items[idx] = { ..._items[idx], ...req.body, updated_at: new Date().toISOString() };
-  res.json({ success: true, data: _items[idx] });
-});
-
-router.delete('/:id', authMiddleware, (req, res) => {
-  const idx = _items.findIndex(i => String(i.id) === String(req.params.id));
-  if (idx === -1) return res.status(404).json({ success: false, error: 'Not found' });
-  _items.splice(idx, 1);
-  res.json({ success: true });
-});
+router.post('/startups', (req, res) => res.status(201).json({ success: true, data: service.registerStartup(req.body || {}) }));
+router.get('/incubation-programs', (req, res) => res.json({ success: true, data: service.getIncubationPrograms(req.query) }));
+router.get('/mentors', (req, res) => res.json({ success: true, data: service.getMentors(req.query) }));
+router.get('/funding-opportunities', (req, res) => res.json({ success: true, data: service.getFundingOpportunities(req.query) }));
+router.get('/networking-events', (req, res) => res.json({ success: true, data: service.getNetworkingEvents(req.query) }));
+router.get('/analytics', (_req, res) => res.json({ success: true, data: service.getAnalytics() }));
 
 module.exports = router;

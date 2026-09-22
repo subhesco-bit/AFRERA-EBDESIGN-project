@@ -1,0 +1,50 @@
+mountable route files : 844
+unique route names    : 801
+files discarded       : 43
+
+  scaffold kept, real implementation discarded : 0
+  real implementation kept, scaffold discarded : 5
+  neither is a scaffold (needs a decision)     : 38
+  both are scaffolds                           : 0
+
+TWO NON-SCAFFOLD FILES COLLIDE (reported, not failed):
+  decisionSupportRoutes                serving ai\decisionSupportRoutes.js  |  discarded decisionSupportRoutes.js
+  demandRoutes                         serving commerce\demandRoutes.js  |  discarded demandRoutes.js
+  energyRoutes                         serving agriculture\energyRoutes.js  |  discarded energyRoutes.js
+  enterpriseAIRoutes                   serving ai\enterpriseAIRoutes.js  |  discarded enterpriseAIRoutes.js
+  equipmentExchangeRoutes              serving commerce\equipmentExchangeRoutes.js  |  discarded equipmentExchangeRoutes.js
+  farmerHealthRoutes                   serving agriculture\farmerHealthRoutes.js  |  discarded farmerHealthRoutes.js
+  farmerPortalEnhancements             serving agriculture\farmerPortalEnhancements.js  |  discarded farmerPortalEnhancements.js
+  farmerRoutes                         serving agriculture\farmerRoutes.js  |  discarded farmerRoutes.js
+  foluBenchmarkRoutes                  serving agriculture\foluBenchmarkRoutes.js  |  discarded foluBenchmarkRoutes.js
+  foluRoutes                           serving agriculture\foluRoutes.js  |  discarded foluRoutes.js
+  foodRoutes                           serving agriculture\foodRoutes.js  |  discarded foodRoutes.js
+  glutWarningRoutes                    serving commerce\glutWarningRoutes.js  |  discarded glutWarningRoutes.js
+  gstRoutes                            serving finance\gstRoutes.js  |  discarded gstRoutes.js
+  insuranceEnhancements                serving finance\insuranceEnhancements.js  |  discarded insuranceEnhancements.js
+  apicultureRoutes                     serving apicultureRoutes.js  |  discarded legacy\apicultureRoutes.js
+  fisheriesRoutes                      serving fisheriesRoutes.js  |  discarded legacy\fisheriesRoutes.js
+  forestryRoutes                       serving forestryRoutes.js  |  discarded legacy\forestryRoutes.js
+  logisticsEnhancementRoutes           serving logistics\logisticsEnhancementRoutes.js  |  discarded logisticsEnhancementRoutes.js
+  logisticsEnhancements                serving logistics\logisticsEnhancements.js  |  discarded logisticsEnhancements.js
+  marketDataRoutes                     serving commerce\marketDataRoutes.js  |  discarded marketDataRoutes.js
+  marketplaceEnhancements              serving commerce\marketplaceEnhancements.js  |  discarded marketplaceEnhancements.js
+  recoveredFinanceRoutes               serving finance\recoveredFinanceRoutes.js  |  discarded recoveredFinanceRoutes.js
+  regionalVarietyRoutes                serving agriculture\regionalVarietyRoutes.js  |  discarded regionalVarietyRoutes.js
+  returnLoadBoardRoutes                serving logistics\returnLoadBoardRoutes.js  |  discarded returnLoadBoardRoutes.js
+  revenueRoutes                        serving finance\revenueRoutes.js  |  discarded revenueRoutes.js
+  rfqRoutes                            serving commerce\rfqRoutes.js  |  discarded rfqRoutes.js
+  riskPricingRoutes                    serving finance\riskPricingRoutes.js  |  discarded riskPricingRoutes.js
+  seedVaultRoutes                      serving agriculture\seedVaultRoutes.js  |  discarded seedVaultRoutes.js
+  sellerRankingRoutes                  serving commerce\sellerRankingRoutes.js  |  discarded sellerRankingRoutes.js
+  contractFarmingRoutes                serving contractFarmingRoutes.js  |  discarded strategic\contractFarmingRoutes.js
+  governmentSubsidyRoutes              serving governmentSubsidyRoutes.js  |  discarded strategic\governmentSubsidyRoutes.js
+  householdProcurementRoutes           serving householdProcurementRoutes.js  |  discarded strategic\householdProcurementRoutes.js
+  preSeasonPurchaseRoutes              serving preSeasonPurchaseRoutes.js  |  discarded strategic\preSeasonPurchaseRoutes.js
+  trackDartRoutes                      serving logistics\trackDartRoutes.js  |  discarded trackDartRoutes.js
+  unifiedLedgerRoutes                  serving finance\unifiedLedgerRoutes.js  |  discarded unifiedLedgerRoutes.js
+  vendorRoutes                         serving commerce\vendorRoutes.js  |  discarded vendorRoutes.js
+  weatherRoutes                        serving agriculture\weatherRoutes.js  |  discarded weatherRoutes.js
+  wikipediaRoutes                      serving platform\wikipediaRoutes.js  |  discarded wikipediaRoutes.js
+
+PASS: no route path serves a scaffold in place of a real implementation.

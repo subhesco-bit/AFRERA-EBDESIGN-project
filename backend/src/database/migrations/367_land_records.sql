@@ -26,22 +26,17 @@ CREATE TABLE IF NOT EXISTS land_records (
     REFERENCES users(id) ON DELETE CASCADE
 );
 
+ALTER TABLE land_records ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_land_records_user_id
-  ON land_records(user_id) WHERE deleted_at IS NULL;
-
-CREATE INDEX IF NOT EXISTS idx_land_records_status
-  ON land_records(status) WHERE deleted_at IS NULL;
-
-CREATE INDEX IF NOT EXISTS idx_land_records_created_at
-  ON land_records(created_at) WHERE deleted_at IS NULL;
-
-CREATE INDEX IF NOT EXISTS idx_land_records_updated_at
-  ON land_records(updated_at) WHERE deleted_at IS NULL;
-
--- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_land_records_data_gin
-  ON land_records USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'land_records' AND column_name = 'user_id') THEN CREATE INDEX IF NOT EXISTS idx_land_records_user_id ON land_records(user_id) WHERE deleted_at IS NULL; END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'land_records' AND column_name = 'status') THEN CREATE INDEX IF NOT EXISTS idx_land_records_status ON land_records(status) WHERE deleted_at IS NULL; END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'land_records' AND column_name = 'created_at') THEN CREATE INDEX IF NOT EXISTS idx_land_records_created_at ON land_records(created_at) WHERE deleted_at IS NULL; END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'land_records' AND column_name = 'updated_at') THEN CREATE INDEX IF NOT EXISTS idx_land_records_updated_at ON land_records(updated_at) WHERE deleted_at IS NULL; END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'land_records' AND column_name = 'data') THEN CREATE INDEX IF NOT EXISTS idx_land_records_data_gin ON land_records USING gin(data) WHERE deleted_at IS NULL; END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_land_records_timestamp()

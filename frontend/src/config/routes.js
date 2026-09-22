@@ -18,6 +18,7 @@ import { lazy } from 'react';
  * Lazy load page components
  */
 const HomePage = lazy(() => import('../pages/HomePage'));
+const ServiceDirectoryPage = lazy(() => import('../pages/ServiceDirectoryPage'));
 const AboutPage = lazy(() => import('../pages/AboutPage'));
 const MarketplacePage = lazy(() => import('../pages/MarketplacePage'));
 const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'));
@@ -261,6 +262,14 @@ const TransactionHistoryPage = lazy(() => import('../pages/TransactionHistoryPag
  * Public routes - no authentication required
  */
 export const publicRoutes = [
+  {
+    path: '/services',
+    component: ServiceDirectoryPage,
+    title: 'Find a Service - AFRERA',
+    description: 'Find farming, selling, equipment, finance and support services.',
+    keywords: 'services, farmer, directory, search',
+    transition: 'fade',
+  },
   {
     path: '/',
     component: HomePage,

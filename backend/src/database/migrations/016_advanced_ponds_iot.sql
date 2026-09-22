@@ -198,12 +198,19 @@ CREATE TRIGGER trigger_create_sensor_alerts
     FOR EACH ROW
     EXECUTE FUNCTION create_sensor_alerts();
 
--- Insert sample sensor configurations
-INSERT INTO pond_sensors (pond_id, sensor_type, device_id, sensor_id, calibration, battery_level, signal_strength) VALUES
-(1, 'PH', 'PH-SENSOR-001', 'SENSOR-1-PH-001', '{"optimal_min": 6.5, "optimal_max": 8.5, "calibration_date": "2026-08-12"}', 85, 92),
-(1, 'TEMPERATURE', 'TEMP-SENSOR-001', 'SENSOR-1-TEMP-001', '{"optimal_min": 25, "optimal_max": 30, "calibration_date": "2026-08-12"}', 90, 88),
-(1, 'DISSOLVED_OXYGEN', 'DO-SENSOR-001', 'SENSOR-1-DO-001', '{"optimal_min": 6, "optimal_max": 8, "calibration_date": "2026-08-12"}', 78, 95),
-(1, 'TURBIDITY', 'TURB-SENSOR-001', 'SENSOR-1-TURB-001', '{"optimal_max": 20, "calibration_date": "2026-08-12"}', 82, 91)
+WITH sample_pond AS (
+    SELECT id FROM ponds ORDER BY id LIMIT 1
+)
+INSERT INTO pond_sensors (pond_id, sensor_type, device_id, sensor_id, calibration, battery_level, signal_strength)
+SELECT sample_pond.id, samples.sensor_type, samples.device_id, samples.sensor_id,
+             samples.calibration, samples.battery_level, samples.signal_strength
+FROM sample_pond
+CROSS JOIN (VALUES
+    ('PH', 'PH-SENSOR-001', 'SENSOR-1-PH-001', '{"optimal_min": 6.5, "optimal_max": 8.5, "calibration_date": "2026-08-12"}'::jsonb, 85, 92),
+    ('TEMPERATURE', 'TEMP-SENSOR-001', 'SENSOR-1-TEMP-001', '{"optimal_min": 25, "optimal_max": 30, "calibration_date": "2026-08-12"}'::jsonb, 90, 88),
+    ('DISSOLVED_OXYGEN', 'DO-SENSOR-001', 'SENSOR-1-DO-001', '{"optimal_min": 6, "optimal_max": 8, "calibration_date": "2026-08-12"}'::jsonb, 78, 95),
+    ('TURBIDITY', 'TURB-SENSOR-001', 'SENSOR-1-TURB-001', '{"optimal_max": 20, "calibration_date": "2026-08-12"}'::jsonb, 82, 91)
+) AS samples(sensor_type, device_id, sensor_id, calibration, battery_level, signal_strength)
 ON CONFLICT (sensor_id) DO NOTHING;
 
 -- Grant permissions (adjust as needed for your setup)

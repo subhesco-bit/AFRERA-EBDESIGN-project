@@ -1,38 +1,95 @@
 /**
- * ecommerce Business Sales Routes
+ * AFRERA E-Commerce Business Sales Routes
+ *
+ * B2B and business sales endpoints:
+ * - Bulk Order Management
+ * - Contract Farming
+ * - Quotation Management
+ * - Sales Analytics
+ * - Commission Management
  */
 
 const express = require('express');
 const router = express.Router();
+const ecommerceBusinessSalesController = require('../controllers/ecommerceBusinessSalesController');
+const { authMiddleware } = require('../middleware/auth');
+const { authLimiter } = require('../middleware/rateLimiter');
 
-try {
-  const { authMiddleware } = require('../middleware/auth');
-  router.use(authMiddleware);
-} catch (e) {
-  // Auth optional
-}
-
-/**
- * Main endpoint
- */
-router.post('/', async (req, res) => {
-  res.json({
-    success: true,
-    module: 'ecommerceBusinessSalesRoutes',
-    message: 'Route operational',
-    timestamp: new Date().toISOString()
-  });
-});
+// ============================================================================
+// B2B BULK ORDER ROUTES
+// ============================================================================
 
 /**
- * Health check
+ * @route   POST /api/ecommerce-business/create-bulk-order
+ * @desc    Create B2B bulk order request
+ * @access  Private (Buyer)
  */
-router.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    status: 'healthy',
-    module: 'ecommerceBusinessSalesRoutes'
-  });
-});
+router.post('/create-bulk-order', authLimiter, authMiddleware, ecommerceBusinessSalesController.createBulkOrder);
+
+/**
+ * @route   POST /api/ecommerce-business/submit-quotation
+ * @desc    Submit quotation for bulk order
+ * @access  Private (Seller)
+ */
+router.post('/submit-quotation', authLimiter, authMiddleware, ecommerceBusinessSalesController.submitQuotation);
+
+/**
+ * @route   POST /api/ecommerce-business/accept-quotation/:quotationId
+ * @desc    Accept quotation and create order
+ * @access  Private (Buyer)
+ */
+router.post('/accept-quotation/:quotationId', authLimiter, authMiddleware, ecommerceBusinessSalesController.acceptQuotation);
+
+// ============================================================================
+// CONTRACT FARMING ROUTES
+// ============================================================================
+
+/**
+ * @route   POST /api/ecommerce-business/create-contract-farming
+ * @desc    Create contract farming agreement
+ * @access  Private (Buyer)
+ */
+router.post('/create-contract-farming', authLimiter, authMiddleware, ecommerceBusinessSalesController.createContractFarming);
+
+/**
+ * @route   POST /api/ecommerce-business/record-milestone
+ * @desc    Record contract farming milestone
+ * @access  Private (Admin/Buyer/Farmer)
+ */
+router.post('/record-milestone', authLimiter, authMiddleware, ecommerceBusinessSalesController.recordContractMilestone);
+
+// ============================================================================
+// SALES ANALYTICS ROUTES
+// ============================================================================
+
+/**
+ * @route   GET /api/ecommerce-business/sales-analytics
+ * @desc    Get comprehensive sales analytics
+ * @access  Private (Admin/Seller)
+ */
+router.get('/sales-analytics', authMiddleware, ecommerceBusinessSalesController.getSalesAnalytics);
+
+/**
+ * @route   GET /api/ecommerce-business/b2b-conversion-metrics
+ * @desc    Get B2B conversion metrics
+ * @access  Private (Admin)
+ */
+router.get('/b2b-conversion-metrics', authMiddleware, ecommerceBusinessSalesController.getB2BConversionMetrics);
+
+// ============================================================================
+// COMMISSION MANAGEMENT ROUTES
+// ============================================================================
+
+/**
+ * @route   POST /api/ecommerce-business/calculate-commission/:orderId
+ * @desc    Calculate platform commission for order
+ * @access  Private (Admin)
+ */
+router.post('/calculate-commission/:orderId', authLimiter, authMiddleware, ecommerceBusinessSalesController.calculateCommission);
+
+// ============================================================================
+// EXPORTS
+// ============================================================================
 
 module.exports = router;
+

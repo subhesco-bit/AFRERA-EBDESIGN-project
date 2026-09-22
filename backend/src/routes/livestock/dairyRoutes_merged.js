@@ -1,10 +1,4 @@
-const express = require('express');
-const router = express.Router();
-const { authMiddleware } = require('../../middleware/auth');
-
-// dairyRoutes — minimal in-memory CRUD scaffold.
-let _items = [];
-let _nextId = 1;
+module.exports = require('../dairyDomainRoutes');
 
 router.get('/', authMiddleware, (req, res) => {
   res.json({ success: true, data: _items });

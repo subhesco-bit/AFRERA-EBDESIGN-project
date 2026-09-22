@@ -11,4 +11,15 @@ CREATE TABLE IF NOT EXISTS ai_predictions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_ai_predictions_model_type ON ai_predictions(model_type);
-CREATE INDEX IF NOT EXISTS idx_ai_predictions_farm_id ON ai_predictions(farm_id);
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'ai_predictions' AND column_name = 'farm_id'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_ai_predictions_farm_id ON ai_predictions(farm_id);
+  ELSE
+    CREATE INDEX IF NOT EXISTS idx_ai_predictions_entity ON ai_predictions(entity_type, entity_id);
+  END IF;
+END $$;

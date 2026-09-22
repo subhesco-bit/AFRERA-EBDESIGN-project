@@ -76,5 +76,5 @@ CREATE TABLE IF NOT EXISTS irrigation_efficiency_metrics (
 CREATE INDEX IF NOT EXISTS idx_irrigation_efficiency_farm_date ON irrigation_efficiency_metrics(farm_id, measurement_date DESC);
 CREATE INDEX IF NOT EXISTS idx_irrigation_efficiency_percentage ON irrigation_efficiency_metrics(efficiency_percentage);
 
-ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS audit_user_id INTEGER REFERENCES users(id);
-ALTER TABLE irrigation_delivery_logs ADD COLUMN IF NOT EXISTS audit_user_id INTEGER REFERENCES users(id);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS audit_user_id UUID REFERENCES users(id);
+ALTER TABLE irrigation_delivery_logs ADD COLUMN IF NOT EXISTS audit_user_id UUID REFERENCES users(id);

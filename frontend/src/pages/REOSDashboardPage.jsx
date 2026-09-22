@@ -69,39 +69,53 @@ function REOSDashboardPage() {
   ];
 
   // Village Profiles
-  const { data: villageProfiles, isLoading: villagesLoading } = useQuery({
-    queryKey: ['village-profiles'],
-    queryFn: async () => (await villageProfileAPI.searchVillages({})).data?.data ?? [],
+  const { data: villageProfiles = [], isLoading: villagesLoading, isError: villagesError } = useQuery({
+    queryKey: ['village-profiles', searchTerm],
+    queryFn: async () => {
+      const response = await villageProfileAPI.searchVillages({
+        ...(searchTerm ? { search: searchTerm } : {}),
+        limit: 100,
+      });
+      const rows = response?.data?.data;
+      if (!Array.isArray(rows)) throw new Error('Unexpected village profile response');
+      return rows;
+    },
+    enabled: activeTab === 'village-profiles',
   });
 
   // Procurement Subscriptions
   const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
     queryKey: ['procurement-subscriptions'],
     queryFn: async () => (await procurementSubscriptionAPI.getStatistics({})).data?.data ?? {},
+    enabled: activeTab === 'procurement-subscriptions',
   });
 
   // Buying Clubs
   const { data: buyingClubs, isLoading: clubsLoading } = useQuery({
     queryKey: ['buying-clubs'],
     queryFn: async () => (await buyingClubAPI.getStatistics({})).data?.data ?? {},
+    enabled: activeTab === 'buying-clubs',
   });
 
   // Rural Enterprises
   const { data: enterprises, isLoading: enterprisesLoading } = useQuery({
     queryKey: ['rural-enterprises'],
     queryFn: async () => (await ruralEnterpriseAPI.getStatistics({})).data?.data ?? {},
+    enabled: activeTab === 'rural-enterprises',
   });
 
   // Renewable Energy
   const { data: energySystems, isLoading: energyLoading } = useQuery({
     queryKey: ['renewable-energy'],
     queryFn: async () => (await renewableEnergyAPI.getStatistics({})).data?.data ?? {},
+    enabled: activeTab === 'renewable-energy',
   });
 
   // AI Advisories
   const { data: advisories, isLoading: advisoriesLoading } = useQuery({
     queryKey: ['ai-advisories'],
     queryFn: async () => (await aiAdvisoryAPI.getStatistics({})).data?.data ?? {},
+    enabled: activeTab === 'ai-advisories',
   });
 
   const renderTabContent = () => {
@@ -109,6 +123,18 @@ function REOSDashboardPage() {
       case 'village-profiles':
         return (
           <div className="space-y-6">
+            {villagesLoading && <p role="status">Loading village profiles</p>}
+            {villagesError && (
+              <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
+                Village profiles could not be loaded.
+                <button type="button" className="ml-4 font-semibold underline" onClick={() => queryClient.invalidateQueries({ queryKey: ['village-profiles'] })}>
+                  Try again
+                </button>
+              </div>
+            )}
+            {!villagesLoading && !villagesError && villageProfiles.length === 0 && (
+              <p className="rounded-lg border bg-white p-8 text-gray-600">No villages match your search.</p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
                 <h3 className="text-sm font-medium text-gray-500">Total Villages</h3>
@@ -123,7 +149,7 @@ function REOSDashboardPage() {
               <div className="bg-white p-6 rounded-lg shadow-sm border">
                 <h3 className="text-sm font-medium text-gray-500">Avg Literacy Rate</h3>
                 <p className="text-3xl font-bold text-gray-900 mt-2">
-                  {villageProfiles?.length ? Math.round(villageProfiles.reduce((a, b) => a + (b.literacy_rate || 0), 0) / villageProfiles.length) : 0}%
+                  {villageProfiles?.length ? Math.round(villageProfiles.reduce((a, b) => a + (Number(b.literacy_rate) || 0), 0) / villageProfiles.length) : 0}%
                 </p>
               </div>
             </div>
@@ -145,12 +171,12 @@ function REOSDashboardPage() {
                     </thead>
                     <tbody>
                       {villageProfiles?.slice(0, 10).map(v => (
-                        <tr key={v.village_id} className="border-b hover:bg-gray-50">
-                          <td className="p-3">{v.village_name}</td>
+                        <tr key={v.id ?? v.village_id} className="border-b hover:bg-gray-50">
+                          <td className="p-3">{v.name ?? v.village_name}</td>
                           <td className="p-3">{v.district}</td>
                           <td className="p-3">{v.block}</td>
                           <td className="p-3">{v.population}</td>
-                          <td className="p-3">₹{v.avg_income_per_household}</td>
+                          <td className="p-3">₹{Number(v.avg_income ?? v.avg_income_per_household ?? 0).toLocaleString('en-IN')}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -332,6 +358,20 @@ function REOSDashboardPage() {
               Export
             </button>
           </div>
+          {activeTab === 'village-profiles' && (
+            <>
+              <label className="sr-only" htmlFor="village-search">Search villages</label>
+              <input
+                id="village-search"
+                aria-label="Search villages"
+                role="searchbox"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search villages"
+                className="mr-4 rounded-lg border px-3 py-2"
+              />
+            </>
+          )}
           <button
             onClick={() => setShowForm(true)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

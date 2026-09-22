@@ -89,8 +89,7 @@ function FarmerSellDoorPage() {
         </div>
 
         <p className="text-sm text-v42-mut mt-6 text-center">
-          Each farmer section signs in separately — selling here does not expose your household
-          or field records.
+          Use your AFRERA account across farmer services. Access depends on your account role.
         </p>
       </div>
     </div>

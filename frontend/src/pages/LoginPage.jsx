@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { loginDestination } from '../utils/loginDestination';
 import { useMutation } from '@tanstack/react-query';
 import { authAPI } from '../services/api';
 import { useAuthStore, demoAccounts } from '../store/authStore';
@@ -8,6 +9,7 @@ import { LogIn, Eye, EyeOff, ShieldCheck, Store, UserRound, Landmark } from 'luc
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setAuth, loginDemo } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -21,7 +23,7 @@ function LoginPage() {
       const { user, accessToken, refreshToken } = response.data;
       setAuth(user, accessToken, refreshToken);
       toast.success('Login successful');
-      navigate(user?.role === 'admin' ? '/admin/settings' : '/dashboard');
+      navigate(loginDestination(location.state?.from, user?.role === 'admin' ? '/admin/settings' : '/dashboard'), { replace: true });
     },
     onError: (error) => {
       toast.error(error.response?.data?.error || 'Login failed');
@@ -45,7 +47,7 @@ function LoginPage() {
     }
 
     toast.success('Demo account connected successfully');
-    navigate(role === 'admin' ? '/admin/settings' : role === 'banker' ? '/banker-dashboard' : role === 'farmer' ? '/farmer-portal' : '/dashboard');
+    navigate(loginDestination(location.state?.from, role === 'admin' ? '/admin/settings' : role === 'banker' ? '/banker-dashboard' : role === 'farmer' ? '/farmer-portal' : '/dashboard'), { replace: true });
   };
 
   return (

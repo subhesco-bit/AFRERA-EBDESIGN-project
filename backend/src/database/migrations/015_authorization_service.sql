@@ -15,6 +15,14 @@ CREATE TABLE IF NOT EXISTS roles (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- The canonical roles table is created by an earlier migration. Its
+-- CREATE TABLE IF NOT EXISTS is intentionally a no-op here, so add the
+-- authorization columns required by this migration before indexing or using
+-- them. Each alteration is idempotent for fresh and existing databases.
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_system_role BOOLEAN DEFAULT false;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 -- Indexes for roles
 CREATE INDEX IF NOT EXISTS idx_roles_hierarchy_level ON roles(hierarchy_level);
 CREATE INDEX IF NOT EXISTS idx_roles_is_system_role ON roles(is_system_role);
@@ -153,13 +161,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Insert default system roles
-INSERT INTO roles (name, description, hierarchy_level, default_permissions, is_system_role) VALUES
-('SUPER_ADMIN', 'Full system access with all permissions', 100, '[{"resource": "*", "action": "*"}]', true),
-('ADMIN', 'Administrative access to most system functions', 90, '[{"resource": "*", "action": ["read", "write", "delete"]}, {"resource": "users", "action": "*"}]', true),
-('MANAGER', 'Management access with oversight capabilities', 80, '[{"resource": "*", "action": ["read", "write"]}, {"resource": "reports", "action": "*"}]', true),
-('SUPERVISOR', 'Supervisory access for team management', 70, '[{"resource": "*", "action": "read"}, {"resource": "team", "action": "*"}]', true),
-('USER', 'Standard user access for daily operations', 50, '[{"resource": "*", "action": "read"}, {"resource": "profile", "action": "*"}]', true),
-('GUEST', 'Limited guest access with read-only permissions', 10, '[{"resource": "public", "action": "read"}]', true)
+INSERT INTO roles (name, code, description, hierarchy_level, default_permissions, is_system_role) VALUES
+('SUPER_ADMIN', 'SUPER_ADMIN', 'Full system access with all permissions', 100, '[{"resource": "*", "action": "*"}]', true),
+('ADMIN', 'ADMIN', 'Administrative access to most system functions', 90, '[{"resource": "*", "action": ["read", "write", "delete"]}, {"resource": "users", "action": "*"}]', true),
+('MANAGER', 'MANAGER', 'Management access with oversight capabilities', 80, '[{"resource": "*", "action": ["read", "write"]}, {"resource": "reports", "action": "*"}]', true),
+('SUPERVISOR', 'SUPERVISOR', 'Supervisory access for team management', 70, '[{"resource": "*", "action": "read"}, {"resource": "team", "action": "*"}]', true),
+('USER', 'USER', 'Standard user access for daily operations', 50, '[{"resource": "*", "action": "read"}, {"resource": "profile", "action": "*"}]', true),
+('GUEST', 'GUEST', 'Limited guest access with read-only permissions', 10, '[{"resource": "public", "action": "read"}]', true)
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert default permission templates

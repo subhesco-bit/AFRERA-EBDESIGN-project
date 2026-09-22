@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS warehouses (
 
 CREATE TABLE IF NOT EXISTS warehouse_stock (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  warehouse_id INTEGER NOT NULL REFERENCES warehouses(id),
+  warehouse_id UUID NOT NULL REFERENCES warehouses(id),
   product_id UUID,
   quantity INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

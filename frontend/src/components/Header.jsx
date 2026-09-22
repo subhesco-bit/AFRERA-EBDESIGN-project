@@ -10,7 +10,15 @@ function Header() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [serviceQuery, setServiceQuery] = useState('');
   const dropdownRefs = useRef({});
+
+  const searchServices = (event) => {
+    event.preventDefault();
+    navigate(`/services${serviceQuery.trim() ? `?q=${encodeURIComponent(serviceQuery.trim())}` : ''}`);
+    setMobileMenuOpen(false);
+    setOpenDropdown(null);
+  };
 
   const handleLogout = () => {
     logout();
@@ -566,14 +574,17 @@ function Header() {
 
           {/* Search Bar */}
           <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
-            <div className="relative w-full">
+            <form role="search" aria-label="Desktop service search" onSubmit={searchServices} className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input aria-label="Search products..."
-                type="text"
-                placeholder="Search products..."
+              <input aria-label="Search services"
+                type="search"
+                value={serviceQuery}
+                onChange={event => setServiceQuery(event.target.value)}
+                placeholder="Find a service…"
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-            </div>
+              <button type="submit" className="sr-only focus:not-sr-only focus:bg-white focus:text-green-900">Find services</button>
+            </form>
           </div>
 
           {/* Right Actions */}
@@ -966,11 +977,16 @@ function Header() {
                 </>
               )}
 
-              <input aria-label="Search products..."
-                type="text"
-                placeholder="Search products..."
+              <form role="search" aria-label="Mobile service search" onSubmit={searchServices}>
+              <input aria-label="Search services"
+                type="search"
+                value={serviceQuery}
+                onChange={event => setServiceQuery(event.target.value)}
+                placeholder="Find a service…"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 mt-4"
               />
+              <button type="submit" className="mt-2 min-h-11 w-full rounded-lg bg-green-700 px-4 text-white">Find services</button>
+              </form>
             </nav>
           </div>
         )}

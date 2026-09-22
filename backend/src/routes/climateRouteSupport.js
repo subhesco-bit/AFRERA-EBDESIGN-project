@@ -74,6 +74,14 @@ function enumValue(value, field, allowed) {
   return value;
 }
 
+/** :id route-param middleware — rejects a missing/empty id with 400 before the handler runs. */
+function validateId(req, res, next) {
+  if (!req.params.id || !String(req.params.id).trim()) {
+    return fail(req, res, invalid('id is required'), 'validate_id', 400);
+  }
+  next();
+}
+
 function queryValidator(validatorFn) {
   return (req, res, next) => {
     try {
@@ -110,3 +118,4 @@ module.exports.enumValue = enumValue;
 module.exports.queryValidator = queryValidator;
 module.exports.bodyValidator = bodyValidator;
 module.exports.requestId = requestId;
+module.exports.validateId = validateId;

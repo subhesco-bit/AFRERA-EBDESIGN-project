@@ -57,9 +57,13 @@ function FarmerEntranceHubPage() {
         <p className="text-lg text-v42-mut">
           Selling a harvest, feeding your family, buying seed, and renting a machine are four
           different decisions with four different budgets. We do not put them all behind one
-          login. Look around any door below first — signing in only happens when you take an
-          action, and only for that section.
+          login. Explore any door below first. Sign in with your AFRERA account when you
+          need to use a protected service.
         </p>
+      </div>
+
+      <div className="mx-auto mb-8 max-w-4xl text-center">
+        <Link to="/services" className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-v42-forest px-6 py-3 font-semibold text-white">Find all services <ArrowRight aria-hidden="true" className="h-4 w-4" /></Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -87,10 +91,10 @@ function FarmerEntranceHubPage() {
       <div className="max-w-3xl mx-auto mt-12 bg-v42-turmerictint/40 border border-v42-turmeric/40 rounded-lg p-6 flex items-start gap-4">
         <ShieldCheck className="w-8 h-8 text-v42-turmericink flex-shrink-0" />
         <div>
-          <h3 className="font-semibold text-v42-ink mb-1">Each section signs in separately</h3>
+          <h3 className="font-semibold text-v42-ink mb-1">One account, services for your role</h3>
           <p className="text-v42-mut text-sm">
-            Opening your household basket does not expose your selling records, and renting a
-            machine does not open your bank passport. You choose what to share, and when.
+            Your AFRERA account works across these sections. Some services require a farmer,
+            partner or administrator role. You return to your selected service after signing in.
           </p>
         </div>
       </div>

@@ -15,7 +15,10 @@ CREATE TABLE IF NOT EXISTS village_initiatives (
     CHECK (initiative_type IN ('project','government_scheme','other_scheme','ngo_work','mixed')),
   source_type VARCHAR(40) NOT NULL DEFAULT 'village'
     CHECK (source_type IN ('government','ngo','other_scheme','village','private','mixed')),
-  government_scheme_id BIGINT REFERENCES government_schemes(id) ON DELETE SET NULL,
+  -- The canonical government_schemes registry is created later by the
+  -- 9995 scheme-verification migration; keep the cross-domain identifier
+  -- here and defer the FK until that registry exists.
+  government_scheme_id BIGINT,
   implementing_partner VARCHAR(240),
   funding_source VARCHAR(240),
   department_or_sponsor VARCHAR(240),

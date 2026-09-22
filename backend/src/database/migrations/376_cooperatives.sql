@@ -26,22 +26,17 @@ CREATE TABLE IF NOT EXISTS cooperatives (
     REFERENCES users(id) ON DELETE CASCADE
 );
 
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_cooperatives_user_id
-  ON cooperatives(user_id) WHERE deleted_at IS NULL;
-
-CREATE INDEX IF NOT EXISTS idx_cooperatives_status
-  ON cooperatives(status) WHERE deleted_at IS NULL;
-
-CREATE INDEX IF NOT EXISTS idx_cooperatives_created_at
-  ON cooperatives(created_at) WHERE deleted_at IS NULL;
-
-CREATE INDEX IF NOT EXISTS idx_cooperatives_updated_at
-  ON cooperatives(updated_at) WHERE deleted_at IS NULL;
-
--- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_cooperatives_data_gin
-  ON cooperatives USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cooperatives' AND column_name = 'user_id') THEN CREATE INDEX IF NOT EXISTS idx_cooperatives_user_id ON cooperatives(user_id) WHERE deleted_at IS NULL; END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cooperatives' AND column_name = 'status') THEN CREATE INDEX IF NOT EXISTS idx_cooperatives_status ON cooperatives(status) WHERE deleted_at IS NULL; END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cooperatives' AND column_name = 'created_at') THEN CREATE INDEX IF NOT EXISTS idx_cooperatives_created_at ON cooperatives(created_at) WHERE deleted_at IS NULL; END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cooperatives' AND column_name = 'updated_at') THEN CREATE INDEX IF NOT EXISTS idx_cooperatives_updated_at ON cooperatives(updated_at) WHERE deleted_at IS NULL; END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cooperatives' AND column_name = 'data') THEN CREATE INDEX IF NOT EXISTS idx_cooperatives_data_gin ON cooperatives USING gin(data) WHERE deleted_at IS NULL; END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_cooperatives_timestamp()

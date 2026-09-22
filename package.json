@@ -1,0 +1,16 @@
+{
+  "name": "ebdesign-consolidated",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "token:install": "pwsh -ExecutionPolicy Bypass -File .ai/plugins/ps/Install-PluginHooks.ps1",
+    "token:optimize": "node .ai/plugins/token-optimizer.js",
+    "token:optimize:ps": "pwsh -ExecutionPolicy Bypass -File .ai/plugins/ps/Run-TokenOptimization.ps1",
+    "token:dep:backend": "node .ai/plugins/dep-auditor.js backend",
+    "token:dep:frontend": "node .ai/plugins/dep-auditor.js frontend",
+    "token:audit:all": "node .ai/plugins/audit-chain.js backend frontend",
+    "test:frontend": "npm --prefix frontend exec vitest run",
+    "test:frontend:watch": "npm --prefix frontend exec vitest",
+    "test:frontend:coverage": "npm --prefix frontend exec vitest run --coverage"
+  }
+}

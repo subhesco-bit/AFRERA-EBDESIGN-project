@@ -90,8 +90,7 @@ function FarmerSharedDoorPage() {
         </div>
 
         <p className="text-sm text-v42-mut mt-6 text-center">
-          Each farmer section signs in separately — booking equipment here does not expose your
-          selling or household records.
+          Use your AFRERA account across farmer services. Access depends on your account role.
         </p>
       </div>
     </div>

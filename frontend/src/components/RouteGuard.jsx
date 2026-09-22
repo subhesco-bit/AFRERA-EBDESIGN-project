@@ -41,7 +41,8 @@ export function ProtectedRoute({ children, requiredRole, requiredPermissions, re
       if (!isAuthenticated) {
         // Redirect to login with return URL
         navigate(redirectTo, {
-          state: { from: location.pathname },
+          state: { from: `${location.pathname}${location.search}${location.hash}` },
+          replace: true,
         });
         return;
       }
@@ -76,6 +77,10 @@ export function ProtectedRoute({ children, requiredRole, requiredPermissions, re
   if (!isAuthenticated) {
     return null; // Will redirect
   }
+
+  // Prevent protected children and their requests from mounting before redirect.
+  if (requiredRole && user?.role !== requiredRole) return null;
+  if (requiredPermissions?.some(permission => !user?.permissions?.includes(permission))) return null;
 
   return children;
 }
@@ -116,6 +121,7 @@ export function PublicRoute({ children, redirectTo = '/dashboard' }) {
 export function RoleRoute({ children, allowedRoles = [], redirectTo = '/unauthorized' }) {
   const { user, isAuthenticated, initialized, initializeAuth } = useAuthStore();
   let navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!initialized) {
@@ -123,14 +129,14 @@ export function RoleRoute({ children, allowedRoles = [], redirectTo = '/unauthor
       return;
     }
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate('/login', { state: { from: `${location.pathname}${location.search}${location.hash}` }, replace: true });
       return;
     }
 
     if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
       navigate(redirectTo);
     }
-  }, [initialized, initializeAuth, isAuthenticated, user, allowedRoles, navigate, redirectTo]);
+  }, [initialized, initializeAuth, isAuthenticated, user, allowedRoles, navigate, redirectTo, location]);
 
   if (!initialized || !isAuthenticated) {
     return (
