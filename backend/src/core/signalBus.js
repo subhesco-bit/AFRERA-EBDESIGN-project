@@ -43,6 +43,7 @@ const SEVERITY = Object.freeze({
 const SIGNAL = Object.freeze({
   // Commerce
   ORDER_PLACED: 'commerce.order.placed',
+  ORDER_FULFILMENT_ASSESSED: 'commerce.order.fulfilment_assessed',
   ORDER_CANCELLED: 'commerce.order.cancelled',
   PAYMENT_RECEIVED: 'commerce.payment.received',
   DEMAND_FORECAST_UPDATED: 'commerce.demand.forecast_updated',

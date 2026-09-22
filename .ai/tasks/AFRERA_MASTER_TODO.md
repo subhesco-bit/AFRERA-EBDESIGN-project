@@ -395,10 +395,63 @@ mean the resulting schema depends on which definition happens to win.
       `listing → AI image generation → attribute extraction → (if food) nutrient
       valuation → nutrient-based and per-kg pricing → AI premium page copy/slogan`.
       Component services exist; **no orchestration connects them into one flow.**
-- [ ] **2.3 Consumer order fulfilment with cold chain and insurance** — `PARTIAL` — *flagship requested flow*
-      `order → payment/escrow → cold-storage allocation → cold-chain monitoring
-      → logistics → in-transit insurance binding → exception → claim → settlement`,
-      against international e-commerce norms.
+- [x] **2.3 Consumer order fulfilment with cold chain and insurance — orchestration built** — `PARTIAL`
+      Requested flow: `order → payment/escrow → cold-storage allocation →
+      cold-chain monitoring → logistics → in-transit insurance → exception →
+      claim → settlement`.
+
+      **Every component existed. Nothing connected them.**
+      - `commerce.order.placed` was in the `SIGNAL` catalog but **nothing ever
+        emitted it**. `core/decisionEngine.js` reads it when correlating order
+        and shipment-delay signals, so that logic could never fire either.
+      - `services/orderService.js` emits nothing at all.
+      - `createOrder` referenced **neither escrow, nor cold storage, nor
+        insurance, nor shipment**.
+
+      Built `core/orderFulfilmentPipelineAgent.js`, subscribing to
+      `commerce.order.placed` and `iot.temperature.breach`, emitting
+      `commerce.order.fulfilment_assessed`, registered at boot.
+
+      **Action boundaries — what it will NOT do, and why.** Each is recorded on
+      every stage and was verified by spying on the forbidden calls:
+      - creates an escrow **hold** but never releases or refunds — releasing
+        requires delivery verification against the escrow's own
+        `release_conditions`;
+      - **assesses** transit cover but never issues a policy — `issuePolicy()`
+        binds cover and charges a premium, which an agent should not commit
+        someone to as a side effect of ordering;
+      - on a cold-chain breach records the exception and **recommends** a claim
+        but never submits one — a claim is a financial assertion against an
+        insurer; a temperature reading is evidence for it, not authority.
+
+      **Honesty properties, each tested:** perishability is never guessed
+      ("Fresh Tomatoes" with no field → `perishable: null` → cold-chain stages
+      skipped, because wrongly assuming "not perishable" spoils produce and
+      wrongly assuming "perishable" bills a farmer for storage they did not
+      need); a stage that cannot run records `unavailable`/`skipped` with a
+      reason; malformed signals are handled without throwing.
+
+      **`shipments.temperature_requirement` is a `NUMERIC` column** but a
+      cold-chain requirement is naturally a range. `"2-8C"` is stored as `null`
+      and the loss is reported on the stage
+      (`temperatureRequirementStated` / `...Stored`) rather than narrowed to a
+      midpoint, which would assert a precision the order never gave. `"4C"` and
+      `"-18 C"` parse to `4` and `-18`. **The column type is a schema
+      limitation worth revisiting** — see 1.2.x.
+
+      **Verified against live PostgreSQL:** `escrow_hold` **ok** (real escrow
+      row), `cold_chain_requirement` **ok**, `transit_insurance_assessment`
+      **ok** with a genuinely risk-factored quote (`baseRate`, `routeRisk`,
+      `durationRisk`, `goodsRisk` — not canned), `cold_storage_allocation`
+      **unavailable** ("no cold-storage facility has 40 free units" — honest,
+      no facilities seeded). Breach handler: both stages **ok**.
+      Forbidden operations invoked across all runs: **none**.
+
+      **Open:** `shipment_creation` builds the correct payload and reaches the
+      database, failing only on the `shipments → orders` foreign key because the
+      test used a synthetic order id. Verifying it needs a real order fixture
+      (cart + user + products), which also needs the schema decision in 1.2.1d.
+      `cold_storage_allocation` needs seeded facilities to exercise booking.
 - [ ] **2.4 Marketplace / retail** — `PARTIAL`
       `discovery → comparison → trust → cart → payment → fulfilment → return/refund → settlement`
 - [ ] **2.5 Insurance journey** — `PARTIAL`
