@@ -1,16 +1,68 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/risk-summary', controller.riskSummary);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('fpo','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('fpo','admin'), controller.update);
-router.post('/:id/review', authMiddleware, requireRole('admin'), controller.review);
-router.delete('/:id', authMiddleware, requireRole('fpo','admin'), controller.remove);
+/**
+ * M118 Routes
+ * Base path: /api/m118
+ */
+
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m118
+ * @desc    Get all m118 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m118/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m118/search
+ * @desc    Search m118 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m118
+ * @desc    Create new m118
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m118/:id
+ * @desc    Get m118 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m118/:id
+ * @desc    Update m118
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m118/:id
+ * @desc    Delete (soft delete) m118
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;
-

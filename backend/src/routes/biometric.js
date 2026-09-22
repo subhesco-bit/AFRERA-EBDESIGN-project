@@ -1,12 +1,20 @@
-const router = require('express').Router();
-const biometricService = require('../services/biometricService');
-const auth = require('../middleware/auth');
+/**
+ * biometric Routes
+ * Placeholder route module
+ */
 
-router.post('/biometric/verify/:userId', auth, async (req, res) => {
-  try {
-    const result = await biometricService.verifyBiometric(req.params.userId, req.body);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'biometric',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

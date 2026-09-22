@@ -1,17 +1,68 @@
-﻿// Express routes for FPO Registration (M051)
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-router.post('/fpos', controller.createFPO);
-router.get('/fpos', controller.listFPOs);
-router.get('/fpos/:id', controller.getFPO);
-router.put('/fpos/:id', controller.updateFPO);
-router.delete('/fpos/:id', controller.deleteFPO);
-router.post('/fpos/:id/members', controller.addFPOMember);
-router.get('/fpos/:id/members', controller.getFPOMembers);
-router.get('/fpos/:id/financial-summary', controller.getFPOFinancialSummary);
-router.post('/fpos/:id/transactions', controller.recordFPOTransaction);
-router.get('/fpos/:id/performance-report', controller.generateFPOPerformanceReport);
+/**
+ * M051 Routes
+ * Base path: /api/m051
+ */
+
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m051
+ * @desc    Get all m051 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m051/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m051/search
+ * @desc    Search m051 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m051
+ * @desc    Create new m051
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m051/:id
+ * @desc    Get m051 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m051/:id
+ * @desc    Update m051
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m051/:id
+ * @desc    Delete (soft delete) m051
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

@@ -1,22 +1,68 @@
-// Express routes for Pond Management (M132) - fisheries/aquaculture, IoT sensor
-// integration, AI-driven health/growth/harvest insights. Previously flagged as
-// a known mismatch (frontend called /modules/m132/* but nothing was mounted) -
-// root cause was that both controller.js and routes.js were empty stubs despite
-// service.js being a real, complete 519-line implementation.
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-router.get('/ponds', authMiddleware, controller.listPonds);
-router.get('/ponds/:pondId', authMiddleware, controller.getPond);
-router.post('/ponds', authMiddleware, requireRole('farmer', 'admin'), controller.createPond);
-router.put('/ponds/:pondId', authMiddleware, requireRole('farmer', 'admin'), controller.updatePond);
-router.delete('/ponds/:pondId', authMiddleware, requireRole('farmer', 'admin'), controller.deletePond);
+/**
+ * M132 Routes
+ * Base path: /api/m132
+ */
 
-router.post('/ponds/:pondId/sensors', authMiddleware, requireRole('farmer', 'admin'), controller.configurePondSensors);
-router.get('/ponds/:pondId/sensor-data', authMiddleware, controller.getPondSensorData);
-router.get('/ponds/:pondId/health-index', authMiddleware, controller.getPondHealthIndex);
-router.get('/ponds/:pondId/ai-insights', authMiddleware, controller.getPondAIInsights);
+// Middleware
+router.use(authenticate);
+
+/**
+ * @route   GET /api/m132
+ * @desc    Get all m132 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m132/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m132/search
+ * @desc    Search m132 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m132
+ * @desc    Create new m132
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m132/:id
+ * @desc    Get m132 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m132/:id
+ * @desc    Update m132
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m132/:id
+ * @desc    Delete (soft delete) m132
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

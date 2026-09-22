@@ -1,433 +1,243 @@
-/**
- * Equipment Rental Service (M104)
- * Equipment rental marketplace, booking management, and revenue tracking
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * List equipment for rental
- */
-async function listEquipmentForRental(rentalData) {
-  try {
-    const {
-      equipment_id,
-      owner_id,
-      equipment_name,
-      category,
-      specifications,
-      daily_rate,
-      availability_start,
-      availability_end,
-      location,
-      state,
-      district,
-      security_deposit,
-      terms_conditions,
-    } = rentalData;
+class M104Service {
+  constructor() {
+    this.table = 'compliance';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
+  }
 
-    const rental = {
-      rental_listing_id: generateId(),
-      equipment_id,
-      owner_id,
-      equipment_name,
-      category,
-      specifications,
-      daily_rate,
-      availability_start,
-      availability_end,
-      location,
-      state,
-      district,
-      security_deposit,
-      terms_conditions,
-      status: 'available',
-      created_at: new Date().toISOString(),
-    };
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    // AI-powered rental pricing optimization
-    const aiRequest = {
-      task: 'rental_pricing_optimization',
-      parameters: {
-        rental_data: rentalData,
-        market_rates: await getMarketRates(category, state, district),
-        demand_forecast: await getDemandForecast(category, state),
-        seasonality: await analyzeSeasonality(category),
-        competitor_pricing: await getCompetitorPricing(category, state),
-      },
-    };
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    rental.ai_pricing = aiResponse;
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
 
-    const result = await pool.query(
-      `INSERT INTO equipment_rental_listings 
-       (rental_listing_id, equipment_id, owner_id, equipment_name, category, 
-        specifications, daily_rate, availability_start, availability_end, location, 
-        state, district, security_deposit, terms_conditions, status, ai_pricing, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-       RETURNING *`,
-      [
-        rental.rental_listing_id,
-        rental.equipment_id,
-        rental.owner_id,
-        rental.equipment_name,
-        rental.category,
-        JSON.stringify(rental.specifications),
-        rental.daily_rate,
-        rental.availability_start,
-        rental.availability_end,
-        rental.location,
-        rental.state,
-        rental.district,
-        rental.security_deposit,
-        rental.terms_conditions,
-        rental.status,
-        JSON.stringify(rental.ai_pricing),
-        rental.created_at,
-      ],
-    );
+        validated[field] = value;
+      }
+    }
 
-    logger.info(`Equipment listed for rental: ${rental.rental_listing_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error listing equipment for rental', { error: error.message, stack: error.stack });
-    throw new Error('Failed to list equipment for rental');
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
+    }
+
+    return validated;
+  }
+
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
+
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
+
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
+
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
+      }
+
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
+
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
+    }
+  }
+
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
+
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
+
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
+
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
+
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
+    }
+  }
+
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
+
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
+
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
+
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
   }
 }
 
-/**
- * Book equipment rental
- */
-async function bookEquipmentRental(bookingData) {
-  try {
-    const {
-      rental_listing_id,
-      renter_id,
-      start_date,
-      end_date,
-      delivery_required,
-      delivery_location,
-      operator_required,
-      special_requirements,
-    } = bookingData;
-
-    const booking = {
-      booking_id: generateId(),
-      rental_listing_id,
-      renter_id,
-      start_date,
-      end_date,
-      delivery_required,
-      delivery_location,
-      operator_required,
-      special_requirements,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-    };
-
-    // AI-powered booking optimization
-    const aiRequest = {
-      task: 'rental_booking_optimization',
-      parameters: {
-        booking_data: bookingData,
-        listing_details: await getListingDetails(rental_listing_id),
-        renter_profile: await getRenterProfile(renter_id),
-        availability_check: await checkAvailability(rental_listing_id, start_date, end_date),
-        risk_assessment: await assessRentalRisk(renter_id, rental_listing_id),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    booking.ai_assessment = aiResponse;
-
-    const result = await pool.query(
-      `INSERT INTO equipment_rental_bookings 
-       (booking_id, rental_listing_id, renter_id, start_date, end_date, 
-        delivery_required, delivery_location, operator_required, special_requirements, 
-        status, ai_assessment, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-       RETURNING *`,
-      [
-        booking.booking_id,
-        booking.rental_listing_id,
-        booking.renter_id,
-        booking.start_date,
-        booking.end_date,
-        booking.delivery_required,
-        booking.delivery_location,
-        booking.operator_required,
-        booking.special_requirements,
-        booking.status,
-        JSON.stringify(booking.ai_assessment),
-        booking.created_at,
-      ],
-    );
-
-    logger.info(`Equipment rental booked: ${booking.booking_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error booking equipment rental', { error: error.message, stack: error.stack });
-    throw new Error('Failed to book equipment rental');
-  }
-}
-
-/**
- * Track rental performance
- */
-async function trackRentalPerformance(listingId, period) {
-  try {
-    const performance = {
-      tracking_id: generateId(),
-      listing_id: listingId,
-      period,
-      timestamp: new Date().toISOString(),
-      booking_count: await getBookingCount(listingId, period),
-      utilization_rate: await calculateUtilizationRate(listingId, period),
-      revenue: await calculateRevenue(listingId, period),
-      customer_satisfaction: await getCustomerSatisfaction(listingId, period),
-      recommendations: await generatePerformanceRecommendations(listingId, period),
-    };
-
-    return performance;
-  } catch (error) {
-    logger.error('Error tracking rental performance', { error: error.message, stack: error.stack });
-    throw new Error('Failed to track rental performance');
-  }
-}
-
-/**
- * Generate rental report
- */
-async function generateRentalReport(ownerId, reportType) {
-  try {
-    const report = {
-      report_id: generateId(),
-      owner_id: ownerId,
-      report_type: reportType,
-      generated_at: new Date().toISOString(),
-      total_listings: await getTotalListings(ownerId),
-      total_bookings: await getTotalBookings(ownerId),
-      revenue_summary: await getRevenueSummary(ownerId),
-      utilization_summary: await getUtilizationSummary(ownerId),
-      customer_feedback: await getCustomerFeedback(ownerId),
-      recommendations: await generateOwnerRecommendations(ownerId),
-    };
-
-    return report;
-  } catch (error) {
-    logger.error('Error generating rental report', { error: error.message, stack: error.stack });
-    throw new Error('Failed to generate rental report');
-  }
-}
-
-function generateId() {
-  return `RENT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-async function getMarketRates(category, state, district) {
-  return {
-    average_daily_rate: 500,
-    rate_range: { min: 300, max: 800 },
-    demand_level: 'high',
-  };
-}
-
-async function getDemandForecast(category, state) {
-  return {
-    forecast: 'increasing',
-    peak_season: 'kharif',
-    demand_score: 85,
-  };
-}
-
-async function analyzeSeasonality(category) {
-  return {
-    seasonal_variation: 'high',
-    peak_months: [6, 7, 8, 9, 10, 11],
-    off_peak_months: [1, 2, 3, 4, 5, 12],
-  };
-}
-
-async function getCompetitorPricing(category, state) {
-  return [
-    { competitor: 'A', rate: 450 },
-    { competitor: 'B', rate: 550 },
-    { competitor: 'C', rate: 500 },
-  ];
-}
-
-async function getListingDetails(listingId) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM equipment_rental_listings WHERE rental_listing_id = $1',
-      [listingId],
-    );
-    return result.rows[0] || {};
-  } catch (error) {
-    return {};
-  }
-}
-
-async function getRenterProfile(renterId) {
-  return {
-    rating: 4.5,
-    booking_count: 10,
-    reliability_score: 90,
-  };
-}
-
-async function checkAvailability(listingId, startDate, endDate) {
-  return {
-    available: true,
-    conflicts: [],
-  };
-}
-
-async function assessRentalRisk(renterId, listingId) {
-  return {
-    risk_level: 'low',
-    risk_factors: [],
-    recommended_deposit: 5000,
-  };
-}
-
-async function getBookingCount(listingId, period) {
-  return {
-    total_bookings: 15,
-    completed: 12,
-    cancelled: 2,
-    pending: 1,
-  };
-}
-
-async function calculateUtilizationRate(listingId, period) {
-  return {
-    utilization_rate: 70,
-    available_days: 30,
-    booked_days: 21,
-  };
-}
-
-async function calculateRevenue(listingId, period) {
-  return {
-    total_revenue: 10500,
-    daily_rate: 500,
-    booked_days: 21,
-  };
-}
-
-async function getCustomerSatisfaction(listingId, period) {
-  return {
-    average_rating: 4.3,
-    total_reviews: 12,
-    positive_reviews: 10,
-  };
-}
-
-async function generatePerformanceRecommendations(listingId, period) {
-  return [
-    'Adjust pricing during peak season',
-    'Improve equipment presentation',
-    'Offer flexible booking options',
-  ];
-}
-
-async function getTotalListings(ownerId) {
-  try {
-    const result = await pool.query(
-      'SELECT COUNT(*) as count FROM equipment_rental_listings WHERE owner_id = $1',
-      [ownerId],
-    );
-    return result.rows[0]?.count || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-async function getTotalBookings(ownerId) {
-  try {
-    const result = await pool.query(
-      `SELECT COUNT(*) as count FROM equipment_rental_bookings br
-       JOIN equipment_rental_listings rl ON br.rental_listing_id = rl.rental_listing_id
-       WHERE rl.owner_id = $1`,
-      [ownerId],
-    );
-    return result.rows[0]?.count || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-async function getRevenueSummary(ownerId) {
-  return {
-    total_revenue: 45000,
-    average_monthly: 15000,
-    growth_rate: 15,
-  };
-}
-
-async function getUtilizationSummary(ownerId) {
-  return {
-    average_utilization: 65,
-    top_performing: 80,
-    underperforming: 40,
-  };
-}
-
-async function getCustomerFeedback(ownerId) {
-  return {
-    average_rating: 4.2,
-    total_reviews: 45,
-    positive_percentage: 85,
-  };
-}
-
-async function generateOwnerRecommendations(ownerId) {
-  return [
-    'Expand rental inventory during peak season',
-    'Implement dynamic pricing',
-    'Improve equipment maintenance',
-  ];
-}
-
-/**
- * List rental listings. `listEquipmentForRental` is misleadingly named -
- * despite the name it creates a listing, it does not browse them. No real
- * browse route existed at all before this (2026-08-24).
- */
-async function listRentalListings({ page = 1, limit = 20, owner_id = null, status = null } = {}) {
-  const offset = (Number(page) - 1) * Number(limit);
-  const conditions = [];
-  const params = [];
-  if (owner_id) { params.push(owner_id); conditions.push(`owner_id = $${params.length}`); }
-  if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-
-  const totalRes = await pool.query(`SELECT COUNT(*) FROM equipment_rental_listings ${where}`, params);
-  const total = parseInt(totalRes.rows[0].count, 10);
-
-  const listParams = [...params, limit, offset];
-  const res = await pool.query(
-    `SELECT * FROM equipment_rental_listings ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams,
-  );
-  return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
-}
-
-async function getRentalListing(id) {
-  const res = await pool.query('SELECT * FROM equipment_rental_listings WHERE rental_listing_id = $1', [id]);
-  return res.rows[0] || null;
-}
-
-module.exports = {
-  listRentalListings,
-  getRentalListing,
-  listEquipmentForRental,
-  bookEquipmentRental,
-  trackRentalPerformance,
-  generateRentalReport,
-};
-
+module.exports = new M104Service();

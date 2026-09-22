@@ -1,8 +1,20 @@
-const router = require('express').Router();
-const arService = require('../services/arService');
-const auth = require('../middleware/auth');
-router.post('/ar/:productId/create', auth, async (req, res) => {
-  try { const result = await arService.createARExperience(req.params.productId, req.body); res.json(result); }
-  catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * ar Routes
+ * Placeholder route module
+ */
+
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'ar',
+    status: 'operational'
+  });
 });
+
 module.exports = router;

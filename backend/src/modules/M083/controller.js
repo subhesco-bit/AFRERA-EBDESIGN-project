@@ -1,101 +1,109 @@
-﻿/**
- * Controller for Performance Analytics (M083)
- * Handles HTTP requests for performance analytics operations
- */
+const m083Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const performanceService = require('./service');
+class M083Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const recordPerformanceMetric = async (req, res) => {
-  try {
-    const metric = await performanceService.recordPerformanceMetric(req.body);
-    res.status(201).json({ success: true, data: metric });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+      const result = await m083Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
   }
-};
 
-const getPerformanceMetrics = async (req, res) => {
-  try {
-    const metrics = await performanceService.getPerformanceMetrics(req.params.entityId, req.params.entityType, req.query);
-    res.status(200).json({ success: true, data: metrics });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m083Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
   }
-};
 
-const generatePerformanceReport = async (req, res) => {
-  try {
-    const { entity_id, entity_type, report_type, period_type, period_start, period_end } = req.body;
-    const report = await performanceService.generatePerformanceReport(entity_id, entity_type, report_type, period_type, period_start, period_end);
-    res.status(201).json({ success: true, data: report });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m083Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const analyzePerformanceTrends = async (req, res) => {
-  try {
-    const { entity_id, entity_type, metric_name, period_start, period_end } = req.body;
-    const trend = await performanceService.analyzePerformanceTrends(entity_id, entity_type, metric_name, period_start, period_end);
-    res.status(201).json({ success: true, data: trend });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m083Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const comparePerformance = async (req, res) => {
-  try {
-    const comparison = await performanceService.comparePerformance(req.body);
-    res.status(201).json({ success: true, data: comparison });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m083Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
   }
-};
 
-const setPerformanceTarget = async (req, res) => {
-  try {
-    const target = await performanceService.setPerformanceTarget(req.body);
-    res.status(201).json({ success: true, data: target });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m083Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
   }
-};
 
-const getPerformanceTargets = async (req, res) => {
-  try {
-    const targets = await performanceService.getPerformanceTargets(req.params.entityId, req.params.entityType);
-    res.status(200).json({ success: true, data: targets });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m083Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
   }
-};
+}
 
-const createPerformanceAlert = async (req, res) => {
-  try {
-    const alert = await performanceService.createPerformanceAlert(req.body);
-    res.status(201).json({ success: true, data: alert });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-const getPerformanceAlerts = async (req, res) => {
-  try {
-    const alerts = await performanceService.getPerformanceAlerts(req.params.entityId, req.params.entityType, req.query);
-    res.status(200).json({ success: true, data: alerts });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-module.exports = {
-  recordPerformanceMetric,
-  getPerformanceMetrics,
-  generatePerformanceReport,
-  analyzePerformanceTrends,
-  comparePerformance,
-  setPerformanceTarget,
-  getPerformanceTargets,
-  createPerformanceAlert,
-  getPerformanceAlerts,
-};
+module.exports = new M083Controller();

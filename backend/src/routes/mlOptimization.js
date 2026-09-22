@@ -1,8 +1,20 @@
-const router = require('express').Router();
-const mlService = require('../services/mlOptimizationService');
-const auth = require('../middleware/auth');
-router.post('/ml/:modelId/train', auth, async (req, res) => {
-  try { const result = await mlService.trainModel(req.params.modelId, req.body); res.json(result); }
-  catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * ml Optimization Routes
+ * Placeholder route module
+ */
+
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'mlOptimization',
+    status: 'operational'
+  });
 });
+
 module.exports = router;

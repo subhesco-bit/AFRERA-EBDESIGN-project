@@ -1,24 +1,68 @@
-// Express routes for Nursery Management (M046).
-// index.js's own header comment said "SHG Management" but the real controller/
-// service built here (createNursery/listNurseries/seedling batches/AI environment
-// optimization) is Nursery Management - a label/content mismatch found while
-// reconciling why this module's routes.js was empty despite 320+114 lines of real
-// code in service.js/controller.js. Wiring to what the code actually does.
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/authMiddleware');
+const { validateRequest } = require('../../middleware/validationMiddleware');
 
-router.get('/nurseries', authMiddleware, controller.listNurseries);
-router.get('/nurseries/:nurseryId', authMiddleware, controller.getNursery);
-router.post('/nurseries', authMiddleware, requireRole('farmer', 'admin'), controller.createNursery);
-router.put('/nurseries/:nurseryId', authMiddleware, requireRole('farmer', 'admin'), controller.updateNursery);
-router.delete('/nurseries/:nurseryId', authMiddleware, requireRole('farmer', 'admin'), controller.deleteNursery);
+/**
+ * M046 Routes
+ * Base path: /api/m046
+ */
 
-router.post('/seedling-batches', authMiddleware, requireRole('farmer', 'admin'), controller.createSeedlingBatch);
-router.put('/seedling-batches/:batchId/health', authMiddleware, requireRole('farmer', 'admin'), controller.updateSeedlingHealth);
+// Middleware
+router.use(authenticate);
 
-router.post('/nurseries/:nurseryId/optimize', authMiddleware, requireRole('farmer', 'admin'), controller.optimizeNurseryEnvironment);
-router.get('/analytics', authMiddleware, controller.getNurseryAnalytics);
+/**
+ * @route   GET /api/m046
+ * @desc    Get all m046 with pagination and filtering
+ * @query   page, limit, status, user_id, search, sort, order
+ * @access  Private
+ */
+router.get('/', controller.getAll.bind(controller));
+
+/**
+ * @route   POST /api/m046/bulk
+ * @desc    Create multiple records in bulk
+ * @body    { records: [...] }
+ * @access  Private
+ */
+router.post('/bulk', controller.createBulk.bind(controller));
+
+/**
+ * @route   GET /api/m046/search
+ * @desc    Search m046 records
+ * @query   q (search query), fields (comma-separated field names)
+ * @access  Private
+ */
+router.get('/search', controller.search.bind(controller));
+
+/**
+ * @route   POST /api/m046
+ * @desc    Create new m046
+ * @body    { user_id, ...data }
+ * @access  Private
+ */
+router.post('/', controller.create.bind(controller));
+
+/**
+ * @route   GET /api/m046/:id
+ * @desc    Get m046 by ID
+ * @access  Private
+ */
+router.get('/:id', controller.getById.bind(controller));
+
+/**
+ * @route   PUT /api/m046/:id
+ * @desc    Update m046
+ * @access  Private
+ */
+router.put('/:id', controller.update.bind(controller));
+
+/**
+ * @route   DELETE /api/m046/:id
+ * @desc    Delete (soft delete) m046
+ * @access  Private
+ */
+router.delete('/:id', controller.delete.bind(controller));
 
 module.exports = router;

@@ -1,3 +1,7 @@
+# Disposable audit/archive output - never track in git
+.archive/
+.audit/
+
 node_modules/
 dist/
 build/

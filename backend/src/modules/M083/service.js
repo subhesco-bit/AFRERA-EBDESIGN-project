@@ -1,727 +1,243 @@
-/**
- * Performance Analytics Service (M083)
- * Business Intelligence & Analytics - Performance measurement and analysis
- */
-
+const db = require('../../database/connection');
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiBackboneService');
-const pool = require('../../database/pool');
+const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 
-/**
- * Record performance metric
- */
-async function recordPerformanceMetric(metricData) {
-  try {
-    const {
-      entity_id,
-      entity_type,
-      metric_name,
-      metric_category,
-      metric_value,
-      metric_unit,
-      baseline_value,
-      period_type,
-      period_start,
-      period_end,
-      dimensions,
-      metadata,
-    } = metricData;
-
-    const variance = baseline_value ? metric_value - baseline_value : 0;
-    const variance_percentage = baseline_value ? (variance / baseline_value) * 100 : 0;
-
-    const metric = {
-      metric_id: generateId(),
-      entity_id,
-      entity_type,
-      metric_name,
-      metric_category,
-      metric_value,
-      metric_unit,
-      baseline_value,
-      variance,
-      variance_percentage,
-      period_type,
-      period_start,
-      period_end,
-      dimensions: dimensions || {},
-      metadata: metadata || {},
-      recorded_at: new Date().toISOString(),
-    };
-
-    // AI-powered performance analysis
-    const aiRequest = {
-      task: 'performance_metric_analysis',
-      parameters: {
-        metric_name,
-        current_value: metric_value,
-        baseline_value,
-        historical_performance: await getHistoricalPerformance(entity_id, metric_name),
-        industry_benchmarks: await getIndustryBenchmarks(metric_name),
-        context: await getPerformanceContext(entity_id, entity_type),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    metric.ai_insights = aiResponse;
-
-    const result = await pool.query(
-      `INSERT INTO performance_metrics 
-       (metric_id, entity_id, entity_type, metric_name, metric_category, metric_value, 
-        metric_unit, baseline_value, variance, variance_percentage, period_type, 
-        period_start, period_end, dimensions, metadata, recorded_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-       RETURNING *`,
-      [
-        metric.metric_id,
-        metric.entity_id,
-        metric.entity_type,
-        metric.metric_name,
-        metric.metric_category,
-        metric.metric_value,
-        metric.metric_unit,
-        metric.baseline_value,
-        metric.variance,
-        metric.variance_percentage,
-        metric.period_type,
-        metric.period_start,
-        metric.period_end,
-        JSON.stringify(metric.dimensions),
-        JSON.stringify(metric.metadata),
-        metric.recorded_at,
-      ],
-    );
-
-    logger.info(`Performance metric recorded: ${metric.metric_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error recording performance metric', { error: error.message, stack: error.stack });
-    throw new Error('Failed to record performance metric');
+class M083Service {
+  constructor() {
+    this.table = 'community';
+    this.defaultLimit = 20;
+    this.maxLimit = 100;
   }
-}
 
-/**
- * Get performance metrics
- */
-async function getPerformanceMetrics(entityId, entityType, filters = {}) {
-  try {
-    const { metric_category, period_start, period_end } = filters;
-    let query = 'SELECT * FROM performance_metrics WHERE entity_id = $1 AND entity_type = $2';
-    const params = [entityId, entityType];
-    let paramCount = 2;
+  // Validate input data
+  validateInput(data, allowedFields) {
+    const errors = {};
+    const validated = {};
 
-    if (metric_category) {
-      paramCount++;
-      query += ` AND metric_category = $${paramCount}`;
-      params.push(metric_category);
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        const value = data[field];
+
+        if (value === null || value === '') {
+          errors[field] = `${field} cannot be empty`;
+          continue;
+        }
+
+        validated[field] = value;
+      }
     }
 
-    if (period_start) {
-      paramCount++;
-      query += ` AND period_start >= $${paramCount}`;
-      params.push(period_start);
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationError('Validation failed', errors);
     }
 
-    if (period_end) {
-      paramCount++;
-      query += ` AND period_end <= $${paramCount}`;
-      params.push(period_end);
-    }
-
-    query += ' ORDER BY period_start DESC';
-
-    const result = await pool.query(query, params);
-    return result.rows;
-  } catch (error) {
-    logger.error('Error getting performance metrics', { error: error.message });
-    throw new Error('Failed to get performance metrics');
+    return validated;
   }
-}
 
-/**
- * Generate performance report
- */
-async function generatePerformanceReport(entityId, entityType, reportType, periodType, periodStart, periodEnd) {
-  try {
-    const metrics = await getPerformanceMetrics(entityId, entityType, {
-      period_start: periodStart,
-      period_end: periodEnd,
-    });
+  // Get all records with pagination, filtering, sorting
+  async getAll(filters = {}) {
+    try {
+      const {
+        page = 1,
+        limit = this.defaultLimit,
+        status = null,
+        user_id = null,
+        search = null,
+        sort = 'created_at',
+        order = 'DESC',
+      } = filters;
 
-    const benchmarks = await getRelevantBenchmarks(metrics);
-    const trends = await analyzeTrends(entityId, entityType, metrics);
-    const drivers = await identifyPerformanceDrivers(entityId, entityType, metrics);
+      // Validate pagination
+      const validLimit = Math.min(parseInt(limit) || this.defaultLimit, this.maxLimit);
+      const validPage = Math.max(parseInt(page) || 1, 1);
+      const offset = (validPage - 1) * validLimit;
 
-    const categoryScores = calculateCategoryScores(metrics);
-    const overallScore = calculateOverallScore(categoryScores);
+      // Build dynamic query
+      let conditions = ['deleted_at IS NULL'];
+      const params = [];
 
-    // AI-powered insights generation
-    const aiRequest = {
-      task: 'performance_report_insights',
-      parameters: {
-        metrics,
-        benchmarks,
-        trends,
-        drivers,
-        entity_context: await getPerformanceContext(entityId, entityType),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
-    const report = {
-      report_id: generateId(),
-      entity_id: entityId,
-      entity_type: entityType,
-      report_type: reportType,
-      period_type: periodType,
-      period_start: periodStart,
-      period_end: periodEnd,
-      overall_score: overallScore,
-      category_scores: categoryScores,
-      metric_details: metrics,
-      trend_analysis: trends,
-      insights: aiResponse.insights,
-      recommendations: aiResponse.recommendations,
-      generated_at: new Date().toISOString(),
-    };
-
-    const result = await pool.query(
-      `INSERT INTO performance_reports 
-       (report_id, entity_id, entity_type, report_type, period_type, period_start, period_end, 
-        overall_score, category_scores, metric_details, trend_analysis, insights, recommendations, generated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-       RETURNING *`,
-      [
-        report.report_id,
-        report.entity_id,
-        report.entity_type,
-        report.report_type,
-        report.period_type,
-        report.period_start,
-        report.period_end,
-        report.overall_score,
-        JSON.stringify(report.category_scores),
-        JSON.stringify(report.metric_details),
-        JSON.stringify(report.trend_analysis),
-        JSON.stringify(report.insights),
-        JSON.stringify(report.recommendations),
-        report.generated_at,
-      ],
-    );
-
-    logger.info(`Performance report generated: ${report.report_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error generating performance report', { error: error.message });
-    throw new Error('Failed to generate performance report');
-  }
-}
-
-/**
- * Analyze performance trends
- */
-async function analyzePerformanceTrends(entityId, entityType, metricName, periodStart, periodEnd) {
-  try {
-    const metrics = await getPerformanceMetrics(entityId, entityType, {
-      period_start: periodStart,
-      period_end: periodEnd,
-    });
-
-    const metricData = metrics.filter(m => m.metric_name === metricName);
-
-    if (metricData.length < 2) {
-      throw new Error('Insufficient data for trend analysis');
-    }
-
-    // AI-powered trend analysis
-    const aiRequest = {
-      task: 'performance_trend_analysis',
-      parameters: {
-        metric_name: metricName,
-        time_series_data: metricData,
-        seasonality: await detectSeasonality(metricName),
-        external_factors: await getExternalFactors(entityId, entityType),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
-    const trend = {
-      trend_id: generateId(),
-      entity_id: entityId,
-      entity_type: entityType,
-      metric_name: metricName,
-      trend_type: aiResponse.trend_type,
-      trend_direction: aiResponse.trend_direction,
-      trend_strength: aiResponse.trend_strength,
-      forecast_value: aiResponse.forecast_value,
-      confidence_level: aiResponse.confidence_level,
-      time_series_data: metricData,
-      analysis_period_start: periodStart,
-      analysis_period_end: periodEnd,
-      calculated_at: new Date().toISOString(),
-    };
-
-    const result = await pool.query(
-      `INSERT INTO performance_trends 
-       (trend_id, entity_id, entity_type, metric_name, trend_type, trend_direction, 
-        trend_strength, forecast_value, confidence_level, time_series_data, 
-        analysis_period_start, analysis_period_end, calculated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-       RETURNING *`,
-      [
-        trend.trend_id,
-        trend.entity_id,
-        trend.entity_type,
-        trend.metric_name,
-        trend.trend_type,
-        trend.trend_direction,
-        trend.trend_strength,
-        trend.forecast_value,
-        trend.confidence_level,
-        JSON.stringify(trend.time_series_data),
-        trend.analysis_period_start,
-        trend.analysis_period_end,
-        trend.calculated_at,
-      ],
-    );
-
-    logger.info(`Performance trend analyzed: ${trend.trend_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error analyzing performance trends', { error: error.message });
-    throw new Error('Failed to analyze performance trends');
-  }
-}
-
-/**
- * Compare performance
- */
-async function comparePerformance(comparisonData) {
-  try {
-    const {
-      entity_id,
-      entity_type,
-      comparison_type,
-      comparison_entities,
-      metrics_to_compare,
-      comparison_date,
-    } = comparisonData;
-
-    const results = {};
-    const ranking = {};
-
-    for (const metric of metrics_to_compare) {
-      const metricResults = [];
-      for (const entity of comparison_entities) {
-        const metrics = await getPerformanceMetrics(entity.id, entity.type, {
-          metric_category: metric.category,
-        });
-        const latestMetric = metrics[0];
-        metricResults.push({
-          entity_id: entity.id,
-          entity_name: entity.name,
-          value: latestMetric?.metric_value || 0,
-          variance: latestMetric?.variance || 0,
-        });
+      if (status) {
+        conditions.push(`status = $${params.length + 1}`);
+        params.push(status);
       }
 
-      // Sort by value
-      metricResults.sort((a, b) => b.value - a.value);
+      if (user_id) {
+        conditions.push(`user_id = $${params.length + 1}`);
+        params.push(user_id);
+      }
 
-      results[metric.name] = metricResults;
-      ranking[metric.name] = metricResults.map((m, i) => ({
-        entity_id: m.entity_id,
-        rank: i + 1,
-        value: m.value,
-      }));
+      if (search) {
+        conditions.push(`data::text ILIKE $${params.length + 1}`);
+        params.push(`%${search}%`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const orderClause = `${sort} ${order}`;
+
+      // Execute count query
+      const countQuery = `SELECT COUNT(*) as total FROM ${this.table} WHERE ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = parseInt(countResult.rows[0].total);
+
+      // Execute data query
+      const dataQuery = `
+        SELECT * FROM ${this.table}
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      const dataResult = await db.query(dataQuery, params);
+
+      logger.info(`Retrieved ${dataResult.rows.length} records from ${this.table}`);
+
+      return {
+        data: dataResult.rows,
+        pagination: {
+          page: validPage,
+          limit: validLimit,
+          total,
+          pages: Math.ceil(total / validLimit),
+          hasMore: offset + validLimit < total,
+        },
+      };
+    } catch (error) {
+      logger.error(`Error fetching from ${this.table}:`, error);
+      throw new DatabaseError(`Failed to fetch ${this.table}: ${error.message}`);
     }
-
-    const gaps = calculatePerformanceGaps(results);
-    const opportunities = identifyOpportunities(results, ranking);
-
-    // AI-powered comparison insights
-    const aiRequest = {
-      task: 'performance_comparison_insights',
-      parameters: {
-        comparison_type,
-        results,
-        ranking,
-        gaps,
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
-    const comparison = {
-      comparison_id: generateId(),
-      entity_id,
-      entity_type,
-      comparison_type,
-      comparison_entities,
-      metrics_compared: metrics_to_compare,
-      results,
-      ranking,
-      gaps,
-      opportunities,
-      ai_insights: aiResponse,
-      comparison_date,
-      created_at: new Date().toISOString(),
-    };
-
-    const result = await pool.query(
-      `INSERT INTO performance_comparisons 
-       (comparison_id, entity_id, entity_type, comparison_type, comparison_entities, 
-        metrics_compared, results, ranking, gaps, opportunities, comparison_date, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-       RETURNING *`,
-      [
-        comparison.comparison_id,
-        comparison.entity_id,
-        comparison.entity_type,
-        comparison.comparison_type,
-        JSON.stringify(comparison.comparison_entities),
-        JSON.stringify(comparison.metrics_compared),
-        JSON.stringify(comparison.results),
-        JSON.stringify(comparison.ranking),
-        JSON.stringify(comparison.gaps),
-        JSON.stringify(comparison.opportunities),
-        comparison.comparison_date,
-        comparison.created_at,
-      ],
-    );
-
-    logger.info(`Performance comparison created: ${comparison.comparison_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error comparing performance', { error: error.message });
-    throw new Error('Failed to compare performance');
   }
-}
 
-/**
- * Set performance target
- */
-async function setPerformanceTarget(targetData) {
-  try {
-    const {
-      entity_id,
-      entity_type,
-      metric_name,
-      target_value,
-      target_type,
-      stretch_target,
-      baseline_value,
-      period_type,
-      period_start,
-      period_end,
-      weight,
-    } = targetData;
+  // Get single record by ID
+  async getById(id) {
+    try {
+      if (!id || id.trim() === '') {
+        throw new ValidationError('ID is required');
+      }
 
-    const result = await pool.query(
-      `INSERT INTO performance_targets 
-       (target_id, entity_id, entity_type, metric_name, target_value, target_type, 
-        stretch_target, baseline_value, period_type, period_start, period_end, weight, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-       RETURNING *`,
-      [
-        generateId(),
-        entity_id,
-        entity_type,
-        metric_name,
-        target_value,
-        target_type,
-        stretch_target,
-        baseline_value,
-        period_type,
-        period_start,
-        period_end,
-        weight || 1.0,
-        'active',
-        new Date().toISOString(),
-      ],
-    );
-
-    logger.info(`Performance target set: ${result.rows[0].target_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error setting performance target', { error: error.message });
-    throw new Error('Failed to set performance target');
-  }
-}
-
-/**
- * Get performance targets
- */
-async function getPerformanceTargets(entityId, entityType) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM performance_targets WHERE entity_id = $1 AND entity_type = $2 AND status = $3',
-      [entityId, entityType, 'active'],
-    );
-    return result.rows;
-  } catch (error) {
-    logger.error('Error getting performance targets', { error: error.message });
-    throw new Error('Failed to get performance targets');
-  }
-}
-
-/**
- * Identify performance drivers
- */
-async function identifyPerformanceDrivers(entityId, entityType, metrics) {
-  try {
-    // AI-powered driver identification
-    const aiRequest = {
-      task: 'performance_driver_identification',
-      parameters: {
-        metrics,
-        entity_context: await getPerformanceContext(entityId, entityType),
-        historical_correlations: await getHistoricalCorrelations(entityId, entityType),
-      },
-    };
-
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-
-    const drivers = [];
-    for (const driver of aiResponse.drivers) {
-      const result = await pool.query(
-        `INSERT INTO performance_drivers 
-         (driver_id, entity_id, entity_type, driver_name, driver_category, 
-          impact_score, correlation_coefficient, influence_weight, driver_data, 
-          analysis_period_start, analysis_period_end, identified_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-         RETURNING *`,
-        [
-          generateId(),
-          entityId,
-          entityType,
-          driver.name,
-          driver.category,
-          driver.impact_score,
-          driver.correlation_coefficient,
-          driver.influence_weight,
-          JSON.stringify(driver.data),
-          driver.analysis_period_start,
-          driver.analysis_period_end,
-          new Date().toISOString(),
-        ],
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
       );
-      drivers.push(result.rows[0]);
+
+      if (result.rows.length === 0) {
+        throw new NotFoundError(`Record not found in ${this.table}`);
+      }
+
+      logger.debug(`Retrieved record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error fetching record ${id}:`, error);
+      throw error;
     }
-
-    return drivers;
-  } catch (error) {
-    logger.error('Error identifying performance drivers', { error: error.message });
-    throw new Error('Failed to identify performance drivers');
   }
-}
 
-/**
- * Create performance alert
- */
-async function createPerformanceAlert(alertData) {
-  try {
-    const {
-      entity_id,
-      entity_type,
-      metric_name,
-      alert_type,
-      severity,
-      current_value,
-      threshold_value,
-      message,
-      recommended_actions,
-    } = alertData;
+  // Create new record
+  async create(data) {
+    try {
+      // Validate required fields
+      const { user_id, ...rest } = data;
 
-    const result = await pool.query(
-      `INSERT INTO performance_alerts 
-       (alert_id, entity_id, entity_type, metric_name, alert_type, severity, 
-        current_value, threshold_value, message, recommended_actions, triggered_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING *`,
-      [
-        generateId(),
-        entity_id,
-        entity_type,
-        metric_name,
-        alert_type,
-        severity,
-        current_value,
-        threshold_value,
-        message,
-        JSON.stringify(recommended_actions),
-        new Date().toISOString(),
-      ],
-    );
+      if (!user_id) {
+        throw new ValidationError('user_id is required');
+      }
 
-    logger.info(`Performance alert created: ${result.rows[0].alert_id}`);
-    return result.rows[0];
-  } catch (error) {
-    logger.error('Error creating performance alert', { error: error.message });
-    throw new Error('Failed to create performance alert');
-  }
-}
+      // Build insert query
+      const fields = ['user_id', ...Object.keys(rest), 'status', 'created_at', 'updated_at'];
+      const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      const values = [user_id, ...Object.values(rest), 'active', new Date(), new Date()];
 
-/**
- * Get performance alerts
- */
-async function getPerformanceAlerts(entityId, entityType, filters = {}) {
-  try {
-    const { is_resolved } = filters;
-    let query = 'SELECT * FROM performance_alerts WHERE entity_id = $1 AND entity_type = $2';
-    const params = [entityId, entityType];
-    let paramCount = 2;
+      const result = await db.query(
+        `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+      );
 
-    if (is_resolved !== undefined) {
-      paramCount++;
-      query += ` AND is_resolved = $${paramCount}`;
-      params.push(is_resolved);
+      logger.info(`Created record ${result.rows[0].id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error creating record in ${this.table}:`, error);
+      throw new DatabaseError(`Failed to create record: ${error.message}`);
     }
-
-    query += ' ORDER BY triggered_at DESC';
-
-    const result = await pool.query(query, params);
-    return result.rows;
-  } catch (error) {
-    logger.error('Error getting performance alerts', { error: error.message });
-    throw new Error('Failed to get performance alerts');
   }
-}
 
-// Helper functions
-function generateId() {
-  return `PERF-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
+  // Update existing record
+  async update(id, data) {
+    try {
+      // Verify record exists
+      const existing = await this.getById(id);
 
-async function getHistoricalPerformance(entityId, metricName) {
-  try {
-    const result = await pool.query(
-      'SELECT metric_value, period_start FROM performance_metrics WHERE entity_id = $1 AND metric_name = $2 ORDER BY period_start DESC LIMIT 12',
-      [entityId, metricName],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
+      // Build update query
+      const updateFields = Object.keys(data).map((key, i) => `${key} = $${i + 1}`).join(', ');
+      const values = [...Object.values(data), id];
 
-async function getIndustryBenchmarks(metricName) {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM performance_benchmarks WHERE metric_name = $1 AND status = $2',
-      [metricName, 'active'],
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
+      const result = await db.query(
+        `UPDATE ${this.table} SET ${updateFields}, updated_at = NOW() WHERE id = $${Object.keys(data).length + 1} RETURNING *`,
+        values
+      );
 
-async function getPerformanceContext(entityId, entityType) {
-  return {
-    entity_size: 'medium',
-    industry: 'agriculture',
-    region: 'national',
-    business_cycle: 'growth',
-  };
-}
-
-async function getRelevantBenchmarks(metrics) {
-  const benchmarks = {};
-  for (const metric of metrics) {
-    benchmarks[metric.metric_name] = await getIndustryBenchmarks(metric.metric_name);
-  }
-  return benchmarks;
-}
-
-async function analyzeTrends(entityId, entityType, metrics) {
-  const trends = {};
-  for (const metric of metrics) {
-    trends[metric.metric_name] = {
-      direction: 'increasing',
-      strength: 0.75,
-      forecast: metric.metric_value * 1.05,
-    };
-  }
-  return trends;
-}
-
-function calculateCategoryScores(metrics) {
-  const categories = {};
-  metrics.forEach(metric => {
-    if (!categories[metric.metric_category]) {
-      categories[metric.metric_category] = [];
+      logger.info(`Updated record ${id} in ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error updating record ${id}:`, error);
+      throw error;
     }
-    categories[metric.metric_category].push(metric);
-  });
+  }
 
-  const scores = {};
-  Object.keys(categories).forEach(category => {
-    const values = categories[category].map(m => m.metric_value);
-    scores[category] = values.reduce((a, b) => a + b, 0) / values.length;
-  });
+  // Delete (soft delete)
+  async delete(id) {
+    try {
+      const existing = await this.getById(id);
 
-  return scores;
+      const result = await db.query(
+        `UPDATE ${this.table} SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [id]
+      );
+
+      logger.info(`Soft-deleted record ${id} from ${this.table}`);
+      return result.rows[0];
+    } catch (error) {
+      logger.error(`Error deleting record ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  async createBulk(records) {
+    try {
+      if (!Array.isArray(records) || records.length === 0) {
+        throw new ValidationError('Records must be a non-empty array');
+      }
+
+      const results = [];
+      for (const record of records) {
+        const created = await this.create(record);
+        results.push(created);
+      }
+
+      logger.info(`Bulk created ${results.length} records in ${this.table}`);
+      return results;
+    } catch (error) {
+      logger.error(`Error bulk creating records:`, error);
+      throw error;
+    }
+  }
+
+  // Search with advanced filtering
+  async search(query, fields = ['data']) {
+    try {
+      const searchConditions = fields.map((f, i) => `${f}::text ILIKE $${i + 1}`).join(' OR ');
+      const searchParams = fields.map(() => `%${query}%`);
+
+      const result = await db.query(
+        `SELECT * FROM ${this.table} WHERE (${searchConditions}) AND deleted_at IS NULL LIMIT 100`,
+        searchParams
+      );
+
+      logger.info(`Search found ${result.rows.length} matches in ${this.table}`);
+      return result.rows;
+    } catch (error) {
+      logger.error(`Error searching ${this.table}:`, error);
+      throw error;
+    }
+  }
 }
 
-function calculateOverallScore(categoryScores) {
-  const scores = Object.values(categoryScores);
-  if (scores.length === 0) return 0;
-  return scores.reduce((a, b) => a + b, 0) / scores.length;
-}
-
-async function detectSeasonality(metricName) {
-  return {
-    has_seasonality: true,
-    pattern: 'quarterly',
-  };
-}
-
-async function getExternalFactors(entityId, entityType) {
-  return {
-    market_conditions: 'favorable',
-    regulatory_changes: 'none',
-    economic_indicators: 'stable',
-  };
-}
-
-function calculatePerformanceGaps(results) {
-  const gaps = {};
-  Object.keys(results).forEach(metricName => {
-    const values = results[metricName];
-    const max = Math.max(...values.map(v => v.value));
-    const min = Math.min(...values.map(v => v.value));
-    gaps[metricName] = {
-      max_gap: max - min,
-      gap_percentage: ((max - min) / max) * 100,
-    };
-  });
-  return gaps;
-}
-
-function identifyOpportunities(results, ranking) {
-  return {
-    improvement_areas: ['efficiency', 'cost_reduction'],
-    best_practices: ['automation', 'data_driven_decisions'],
-  };
-}
-
-async function getHistoricalCorrelations(entityId, entityType) {
-  return {};
-}
-
-module.exports = {
-  recordPerformanceMetric,
-  getPerformanceMetrics,
-  generatePerformanceReport,
-  analyzePerformanceTrends,
-  comparePerformance,
-  setPerformanceTarget,
-  getPerformanceTargets,
-  identifyPerformanceDrivers,
-  createPerformanceAlert,
-  getPerformanceAlerts,
-};
-
+module.exports = new M083Service();

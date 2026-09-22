@@ -19,7 +19,8 @@
     "audit:production": "node ../tools/re-audit-production.js",
     "audit:system": "node ../tools/system-production-audit.js",
     "audit:m001-m050": "node ../tools/m001-m050-release-audit.js",
-    "audit:complete": "npm run audit:coverage && npm run audit:production && npm run audit:system",
+    "audit:wiring": "node ../tools/production-readiness-audit.js",
+    "audit:complete": "npm run audit:coverage && npm run audit:production && npm run audit:system && npm run audit:wiring",
     "upgrade:all": "node ../tools/upgrade-all.js",
     "verify:production": "npm run lint && npm test -- --runInBand && npm run audit:complete"
   },
@@ -38,6 +39,7 @@
     "exceljs": "^4.4.0",
     "express": "^4.18.2",
     "express-rate-limit": "^8.7.0",
+    "express-slow-down": "^2.0.1",
     "express-validator": "^7.0.1",
     "graphql": "^16.8.1",
     "helmet": "^7.0.0",

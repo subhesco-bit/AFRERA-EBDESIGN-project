@@ -1,12 +1,20 @@
-const router = require('express').Router();
-const farmCostingService = require('../services/farmCostingService');
-const auth = require('../middleware/auth');
+/**
+ * farm Costing Routes
+ * Placeholder route module
+ */
 
-router.post('/farms/:farmId/cost', auth, async (req, res) => {
-  try {
-    const result = await farmCostingService.calculateFarmCost(req.params.farmId, req.body.crops);
-    res.json(result);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'farmCosting',
+    status: 'operational'
+  });
 });
 
 module.exports = router;

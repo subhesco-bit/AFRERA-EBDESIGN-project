@@ -1,8 +1,20 @@
-const router = require('express').Router();
-const vrService = require('../services/vrService');
-const auth = require('../middleware/auth');
-router.post('/vr/space/create', auth, async (req, res) => {
-  try { const result = await vrService.createVRSpace(req.body); res.json(result); }
-  catch (error) { res.status(500).json({ error: error.message }); }
+/**
+ * vr Routes
+ * Placeholder route module
+ */
+
+const express = require('express');
+const router = express.Router();
+
+/**
+ * Health check
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    module: 'vr',
+    status: 'operational'
+  });
 });
+
 module.exports = router;

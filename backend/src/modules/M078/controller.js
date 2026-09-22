@@ -1,49 +1,109 @@
-﻿/**
- * Controller for Rainwater Harvesting (M078)
- * Handles HTTP requests for rainwater harvesting operations
- */
+const m078Service = require('./service');
+const { logger } = require('../../utils/logger');
+const { sendSuccess, sendError } = require('../../utils/response');
 
-const harvestingService = require('./service');
+class M078Controller {
+  async getAll(req, res) {
+    try {
+      const { page, limit, status, user_id, search, sort, order } = req.query;
 
-const designHarvestingSystem = async (req, res) => {
-  try {
-    const system = await harvestingService.designHarvestingSystem(req.body);
-    res.status(201).json({ success: true, data: system });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+      const result = await m078Service.getAll({
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 20,
+        status,
+        user_id,
+        search,
+        sort: sort || 'created_at',
+        order: order || 'DESC',
+      });
+
+      return sendSuccess(res, result.data, result.pagination);
+    } catch (error) {
+      logger.error('Error in getAll:', error);
+      return sendError(res, error);
+    }
   }
-};
 
-const monitorCollection = async (req, res) => {
-  try {
-    const monitoring = await harvestingService.monitorCollection(req.params.id, req.query.period);
-    res.status(200).json({ success: true, data: monitoring });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m078Service.getById(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in getById:', error);
+      return sendError(res, error, error.statusCode || 500);
+    }
   }
-};
 
-const calculateWaterBudget = async (req, res) => {
-  try {
-    const budget = await harvestingService.calculateWaterBudget(req.params.id, req.query.timeFrame);
-    res.status(200).json({ success: true, data: budget });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async create(req, res) {
+    try {
+      const { user_id, ...data } = req.body;
+
+      if (!user_id) {
+        return sendError(res, new Error('user_id is required'), 400);
+      }
+
+      const result = await m078Service.create({ user_id, ...data });
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in create:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-const manageStorageCapacity = async (req, res) => {
-  try {
-    const management = await harvestingService.manageStorageCapacity(req.params.id, req.body);
-    res.status(200).json({ success: true, data: management });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m078Service.update(id, req.body);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in update:', error);
+      return sendError(res, error, error.statusCode || 400);
+    }
   }
-};
 
-module.exports = {
-  designHarvestingSystem,
-  monitorCollection,
-  calculateWaterBudget,
-  manageStorageCapacity,
-};
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await m078Service.delete(id);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in delete:', error);
+      return sendError(res, error, error.statusCode || 404);
+    }
+  }
+
+  async createBulk(req, res) {
+    try {
+      const { records } = req.body;
+
+      if (!Array.isArray(records)) {
+        return sendError(res, new Error('records must be an array'), 400);
+      }
+
+      const result = await m078Service.createBulk(records);
+      return sendSuccess(res, result, null, 201);
+    } catch (error) {
+      logger.error('Error in createBulk:', error);
+      return sendError(res, error, 400);
+    }
+  }
+
+  async search(req, res) {
+    try {
+      const { q, fields } = req.query;
+
+      if (!q) {
+        return sendError(res, new Error('Search query is required'), 400);
+      }
+
+      const result = await m078Service.search(q, fields ? fields.split(',') : undefined);
+      return sendSuccess(res, result);
+    } catch (error) {
+      logger.error('Error in search:', error);
+      return sendError(res, error);
+    }
+  }
+}
+
+module.exports = new M078Controller();
