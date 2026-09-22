@@ -10,6 +10,9 @@ class DynamicRouteLoader {
   constructor(app) {
     this.app = app;
     this.routes = new Map(); // routeName → {path, mounted, router, metadata}
+    // Route files dropped by a basename collision in _registerRoute. Kept so
+    // callers and audits can see what was lost instead of only a log line.
+    this.collisions = [];
     this.byVersion = new Map(); // version → [routes]
     this.bySubfolder = new Map(); // subfolder → [routes]
     this.mountedPaths = new Set(); // Track mounted express paths
@@ -74,6 +77,7 @@ class DynamicRouteLoader {
         discovered: this.discoveredCount,
         mounted: this.mountedCount,
         failed: this.failedCount,
+        collisions: this.collisions.length,
         elapsed,
       };
     } catch (error) {
@@ -94,8 +98,34 @@ class DynamicRouteLoader {
       const routeName = this._extractRouteName(relativePath);
 
       // Check for duplicate
+      //
+      // _extractRouteName() is the file's basename, so two route files with the
+      // same basename in different folders collide here and the second one is
+      // DISCARDED ENTIRELY — it is never mounted, at any path, even though
+      // _generateMountPath() would have given it a distinct one. Which file
+      // survives is decided by _walkDirectory order, not by which is correct.
+      //
+      // Measured 2026-09-21: 881 mountable files collapse to 782 names, so 99
+      // route files are dropped this way. In 27 of those collisions the
+      // surviving file is an in-memory CRUD scaffold and the discarded one is
+      // the real, database-backed implementation — the platform serves the
+      // fake and the real code is unreachable. tools/audit-route-collisions.js
+      // enumerates them; changing which side wins alters what live paths
+      // serve, so it is a deliberate decision and is NOT done here.
+      //
+      // The log line previously named only the route name, which is not enough
+      // to find either file. It now names both paths and is an error, because
+      // silently dropping a route file is not a warning-level event.
       if (this.routes.has(routeName)) {
-        logger.warn(`Duplicate route name: ${routeName}`);
+        const kept = this.routes.get(routeName);
+        this.collisions.push({
+          routeName,
+          discarded: relativePath,
+          keptInstead: kept.relativePath,
+        });
+        logger.error(
+          `Route name collision: discarding ${relativePath} — ${kept.relativePath} already claimed the name "${routeName}". The discarded file is not mounted at any path.`
+        );
         return;
       }
 
