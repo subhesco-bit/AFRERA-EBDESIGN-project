@@ -12,7 +12,7 @@ const { getFarmerWallet, getWalletTransactions, depositToWallet, withdrawFromWal
 const { authMiddleware } = require('../../middleware/auth');
 const { adminMiddleware } = require('../../middleware/admin');
 const { authRateLimit } = require('../../middleware/rateLimiter');
-const { authMiddleware: authenticate } = require('../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth');
 
 
 /**

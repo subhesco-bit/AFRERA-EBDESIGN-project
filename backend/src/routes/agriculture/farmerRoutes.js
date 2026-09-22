@@ -27,7 +27,7 @@ const {
 const { authMiddleware } = require('../../middleware/auth');
 const { adminMiddleware } = require('../../middleware/admin');
 const { resolveFarmerId } = require('../../middleware/resolveFarmerId');
-const { authMiddleware: authenticate } = require('../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth');
 
 
 // List / search farmers
