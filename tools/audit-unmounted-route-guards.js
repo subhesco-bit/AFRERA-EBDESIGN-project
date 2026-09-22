@@ -55,6 +55,58 @@ const GUARDS = [
 ];
 const GUARD_RE = new RegExp(`\\b(${GUARDS.join('|')})\\b`);
 
+/**
+ * Guards are frequently imported under a different local name, or wrapped in a
+ * local helper:
+ *
+ *     const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
+ *     const authorize = (roles) => requireRole(...roles);
+ *
+ *     router.post('/contracts', authenticate, authorize(['farmer']), handler);
+ *
+ * Matching only the canonical names reports those handlers as unguarded, which
+ * is a false positive in the dangerous direction: it invents a security finding
+ * that sends someone to "fix" already-correct code. Found 2026-09-22 against
+ * strategic/contractFarmingRoutes.js, whose 8 handlers are all guarded and
+ * which this audit had flagged 3 of.
+ *
+ * So resolve, per file, the local names that actually refer to a guard:
+ *   - destructured renames from a middleware import
+ *   - plain aliases  (const authenticate = authMiddleware)
+ *   - local wrappers (const authorize = (r) => requireRole(...r))
+ */
+function localGuardNames(src) {
+  const names = new Set(GUARDS);
+  // const { authMiddleware: authenticate, requireRole } = require('...auth...')
+  const destructure = /const\s*\{([^}]*)\}\s*=\s*require\([^)]*\)/g;
+  let m;
+  while ((m = destructure.exec(src))) {
+    for (const part of m[1].split(',')) {
+      const [orig, alias] = part.split(':').map((x) => x && x.trim());
+      if (orig && GUARDS.includes(orig) && alias) names.add(alias);
+    }
+  }
+  // const X = <something already known to be a guard> ... (alias or wrapper)
+  // Repeat to a fixed point so a wrapper around an alias resolves too.
+  for (let pass = 0; pass < 3; pass += 1) {
+    const before = names.size;
+    const assign = /const\s+([A-Za-z_$][\w$]*)\s*=\s*([^;\n]+)/g;
+    let a;
+    while ((a = assign.exec(src))) {
+      const [, name, rhs] = a;
+      if (names.has(name)) continue;
+      for (const known of names) {
+        if (new RegExp(`\\b${known}\\b`).test(rhs)) {
+          names.add(name);
+          break;
+        }
+      }
+    }
+    if (names.size === before) break;
+  }
+  return names;
+}
+
 /** Blank comments so a guard named only in prose is not mistaken for a real one. */
 function maskComments(src) {
   return src
@@ -91,7 +143,9 @@ function auditFile(rel) {
   // A blanket router.use(authMiddleware) guards everything declared after it.
   // Treated as covering the file, which is conservative in the safe direction:
   // it can only make this audit report fewer findings, never invent one.
-  const blanket = /router\.use\(\s*(authMiddleware|auth|optionalAuth|protect|adminMiddleware)\b/.test(src);
+  const guardNames = localGuardNames(src);
+  const localGuardRe = new RegExp(`\\b(${[...guardNames].map((g) => g.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`);
+  const blanket = new RegExp(`router\\.use\\(\\s*(${[...guardNames].join('|')})\\b`).test(src);
 
   const handler = /router\.(get|post|put|patch|delete)\(\s*(['"`])([^'"`]*)\2\s*,/g;
   const unguardedWrites = [];
@@ -102,7 +156,7 @@ function auditFile(rel) {
     const method = m[1].toUpperCase();
     // Look only at the argument list between the path and the handler body.
     const tail = src.slice(m.index + m[0].length, m.index + m[0].length + 260);
-    const guarded = blanket || GUARD_RE.test(tail);
+    const guarded = blanket || localGuardRe.test(tail);
     if (!guarded && method !== 'GET') unguardedWrites.push(`${method} ${m[3] || '/'}`);
   }
   return { total, blanket, unguardedWrites };
