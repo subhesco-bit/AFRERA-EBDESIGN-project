@@ -243,6 +243,7 @@ const websocketService = require('./services/websocketService');
 const { initializeAI } = require('./core/ai');
 const disruptionRoutingAgent = require('./core/disruptionRoutingAgent');
 const orderFulfilmentPipelineAgent = require('./core/orderFulfilmentPipelineAgent');
+const productListingPipelineAgent = require('./core/productListingPipelineAgent');
 
 // ============================================================================
 // INITIALIZATION
@@ -423,6 +424,9 @@ async function startup() {
     try {
       if (typeof orderFulfilmentPipelineAgent.initialize === 'function') {
         orderFulfilmentPipelineAgent.initialize();
+      }
+      if (typeof productListingPipelineAgent.initialize === 'function') {
+        productListingPipelineAgent.initialize();
       }
       if (typeof disruptionRoutingAgent.initialize === 'function') {
         disruptionRoutingAgent.initialize();

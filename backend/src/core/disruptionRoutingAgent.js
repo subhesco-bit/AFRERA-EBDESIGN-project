@@ -57,7 +57,18 @@ class DisruptionRoutingAgent {
    */
   async handleDisruptionReported(signalData, metadata) {
     try {
-      const { disruptionId, disruptionType, affectedState, affectedDistrict, affectedShipmentCount, affectedShipmentIds } = signalData;
+      // signalBus dispatches the whole envelope
+      // ({ type, payload, severity, source, entityId, correlationId, timestamp }),
+      // not the emitted fields directly -- see emitSignal in core/signalBus.js.
+      // Destructuring straight off signalData yielded undefined for EVERY field,
+      // so stakeholder notification, shipment rerouting, emergency procurement
+      // and insurance-claim acceleration all ran on undefined inputs.
+      // core/reflexEngine.js, core/decisionEngine.js and core/effectors.js all
+      // correctly read signal.payload; this now matches them.
+      const {
+        disruptionId, disruptionType, affectedState, affectedDistrict,
+        affectedShipmentCount, affectedShipmentIds,
+      } = signalData.payload || {};
 
       logger.info('Civil disruption reported - initiating routing response', {
         disruptionId,
@@ -88,7 +99,8 @@ class DisruptionRoutingAgent {
    */
   async handleDisruptionResolved(signalData, metadata) {
     try {
-      const { disruptionId, affectedState } = signalData;
+      // See handleDisruptionReported: the emitted fields live on signal.payload.
+      const { disruptionId, affectedState } = signalData.payload || {};
 
       logger.info('Civil disruption resolved - cleanup routing response', { disruptionId, affectedState });
 
