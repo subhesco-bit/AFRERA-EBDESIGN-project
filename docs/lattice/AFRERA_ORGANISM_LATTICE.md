@@ -11,11 +11,11 @@ This is not a completion certificate. Two truths sit on this branch at once.
 | Layer | What it is | Living | Partial | Missing | Weighted integrity |
 |---|---|---|---|---|---|
 | **GitHub platform** (`backend/src/modules`, `eventBus.js`, 156 concept folders) | Storefront + stubs. Harvest is a portal row. Foreign keys are not a nervous system. | 3 | 13 | 108 / 124 | **7%** |
-| **Lattice kernel** (this catalog + `lotKernel.js`) | Ligaments that fire: one lot body, remaining grams, harvest mint, intake, cover, GI mint, FIFO offtake, WAC on declared cost, qty-weighted FPO split, balanced journal, spoilage remainder. | 35 | 17 | 79 / 131 | **33%** |
+| **Lattice kernel** (this catalog + `lotKernel.js` + OS registry) | Ligaments that fire: one lot body, remaining grams, harvest mint, intake, cover, GI mint, FIFO offtake, WAC on declared cost, qty-weighted FPO split, balanced journal, spoilage remainder, OS classification. | 45 | 22 | 73 / 140 | **39%** |
 
-The 7% diagnosis of the platform is still true. The 33% is tissue this kernel grew — not a claim that MarketplacePage, RECIE, FVIE, GCIP, or Kafka exist.
+The 7% diagnosis of the platform is still true. The 39% is tissue this kernel grew — not a claim that MarketplacePage, RECIE, FVIE, GCIP, or Kafka exist. Integrity stays under 40% on purpose: unintegrated joints remain named, not painted living.
 
-Living on the kernel today includes `lot.mint`, `harvest.completed` fan-out, `spine` pulses (harvest / intake / settle), `order.settled` → farmgate, FPO member + offtake, GI mint before claim, Langthasa godown cover, spoilage → village ledger, kitchen → next-season contract. Still missing: village energy cloud, scheme blood, weather reflex that moves a muscle, FVIE Food Utility Score, aquifer twin.
+Living on the kernel today includes `lot.mint`, `harvest.completed` fan-out, `spine` pulses (harvest / intake / settle), `order.settled` → farmgate, FPO member + offtake, GI mint before claim, Langthasa godown cover, spoilage → village ledger, kitchen → next-season contract, evidence passport, need-based navigation, constitution E1–E8. Still missing: village energy cloud, scheme blood, weather reflex that moves a muscle, FVIE Food Utility Score, aquifer twin, offline queue.
 
 ## The diagnosis
 
@@ -35,16 +35,33 @@ Until those exist **in the platform**, 156 “implemented” concepts can still 
 | | Count |
 |---|---|
 | Organs (existing modules) | 22 |
-| Bridge concepts | 11 |
-| Ligaments named | 131 |
-| Living (runtime path on this kernel) | 35 |
-| Partial (files on both sides, thin pulse) | 17 |
-| Missing | 79 |
-| Technical | 103 |
-| Thoughtful | 28 |
-| Isolated concepts (no living ligament) | 7 |
-| Weak concepts (1–2 living ligaments) | 9 |
-| Weighted integrity | **33%** |
+| Bridge concepts | 12 |
+| Ligaments named | 140 |
+| Living (runtime path on this kernel) | 45 |
+| Partial (files on both sides, thin pulse) | 22 |
+| Missing | 73 |
+| Technical | 110 |
+| Thoughtful | 30 |
+| Weighted integrity | **39%** |
+
+## OS registry (Stage 0 complete)
+
+The assessment of AFRERA as a digital economic operating system is now an executable catalog, not a memo.
+
+| | Count |
+|---|---|
+| Concepts classified (Stage 0) | 110 / 110 — **100%** |
+| Kernel verified | 20 |
+| Kernel partial | 62 |
+| TODOs done | 42 |
+| TODOs open | 60 |
+| TODOs blocked | 8 |
+| Stage 1 (industry baseline) | 21 / 32 done |
+| Stages 5–6 (autonomy / futuristic) | 0 done — named, not claimed |
+
+Canonical files: [`../os/AFRERA_OS_REGISTRY.md`](../os/AFRERA_OS_REGISTRY.md), [`../os/catalog.json`](../os/catalog.json), [`../os/todos.json`](../os/todos.json).
+
+**Principal rule:** do not generate thousands of pages or empty AI services. Preserve everything. Classify. Then enhance accepted concepts at four levels — component, industry, rural-first, futuristic. Plug a ligament.
 
 ## Bridge concepts (the joints)
 
@@ -63,6 +80,7 @@ These are not more modules. They exist to join organs that currently pretend to 
 | `scheme` | Government Knowledge | farmer, village, finance, recie, water | **Missing.** | REOS layer 4 missing. Schemes are PDFs. |
 | `water` | Water Cost Intelligence | recie, crop, livestock, village, rcop | **Partial.** Declared ₹/litre may post. No aquifer twin. | Named as a cost category. |
 | `module` | Module OS | ai, farmer, lot, spine | **Living.** 25 named AIs on one bus. Companion proposes. Clerk declares. | Folders declare WIRED; `isComplete` is false. |
+| `os` | Digital Super-Organism Registry | all organs | **Living.** Stage 0 classification, 16-link matrix, constitution, suitability, grievance spine. | Competing registries. Completion certificates without runtime. |
 
 ## Technical ligaments that fire on this kernel
 
@@ -78,58 +96,18 @@ Priority pulses — these are no longer names:
 | `order.settled` | orders → finance + demand + rupee | **living** — cash / farmgate / freight, `paymentRef` required |
 | `fpo.contract.offer` | fpo → contract | **living** — next Magh kg, price blank until declared |
 | `spoilage.event` | logistics → rcop | **living** — remaining grams cut, village fever posted |
-| `fifo.allocate` | warehouse → orders | **living** — oldest remaining first; refuse oversell |
-| `wac.cost` | warehouse → rupee | **living** — blend only declared remaining cost; issue at WAC, mass still FIFO |
-| `qty.weighted.split` | fpo → farmer | **living** — last cell absorbs paise remainder |
-
-Still named, still missing on both layers: `energy.cloud`, `weather.alert` → muscle, `scheme.eligible`, `water.pumped`, FUS rank, FDI metabolising credit.
+| `os.classify` | os → every organ | **living** — Stage 0 complete, dual-truth |
+| `os.passport` | lot → trust | **living** — GI, cover, remaining, paymentRef, journal |
+| `os.suitability` | finance / insurance / travel | **living** — refuse loan, travel, invented premium |
 
 Machine-readable list: [`lattice.json`](./lattice.json) (full contracts) and [`lattice-index.json`](./lattice-index.json) (ids and signals).
 
-Kernel bone (grams, paise, no invented ₹): [`backend/src/value-chain-control/lotKernel.js`](../../backend/src/value-chain-control/lotKernel.js).
+## What must still not be claimed
 
-## Thoughtful ligaments the branch still must believe
+- GitHub platform integrity is **7%**. Event bus is still a stub.
+- Village energy cloud, scheme blood, weather muscle, FVIE Food Utility Score, aquifer twin, offline queue — missing.
+- Stages 5–6 (autonomous ecosystem, futuristic platform) are classified and named. Zero done.
+- AI still cannot write rupees. Clerk declares kg / ₹ / loss / paymentRef.
+- No invented yield, premium, credit score, or emissions.
 
-These are not slogans. They change schema and UX.
-
-- **Farmer is a cell, not a role.** RBAC lists farmer next to admin. Roles are doors. Cells are lives.
-- **Village is an economy, not a pin.** Every intervention answers: how many rupees per year does this save the village?
-- **The lot is one body.** If two organs cannot point at the same `lotId`, they are not in the same organism.
-- **Blood is not bone.** ERP may subscribe. It may not invent pulses. `eventBus.js` is not Kafka because it was named Section 23.
-- **GI is heritage plus livelihood.** A tag without a kitchen and a rupee split is branding.
-- **Energy is lifetime ₹, not MW.** KPIs: ₹/kg, ₹/litre chilled, ₹/hour irrigation.
-- **A chatbot is not a reflex.** Sense, decide, act, learn on one event — or hide it.
-- **A scheme is blood, not a PDF.** Search is a failure mode.
-- **FPO is tissue, not a login.** The nucleus remains the farmer.
-- **The household is the demand unit.** A marketplace that sells to “users” will never feed a family it cannot name.
-- **Water and energy are one breath.** A solar pump that ignores the aquifer is a lung that does not ask if the blood is left.
-- **Time is a dimension.** Lead time to sowing, hours-to-pay, cover window, festival spike. An organism that cannot remember last Magh will plant next Magh as a surprise.
-- **WAC blends the rupee, not the sack.** FIFO keeps identity of remaining grams. Weighted average cost only runs on declared remaining cost. Missing cost → silent, never invented.
-
-## What “integrated” would mean
-
-A Chakhao harvest in Karbi Anglong:
-
-1. The cell notes kg and variety.
-2. A **lot** is minted — one id. Remaining = grams.
-3. The **spine** publishes `harvest.completed`.
-4. Warehouse intake, GI marker, cover, draft listing subscribe. Nobody retypes.
-5. The **food graph** already knew Magh pulls pithas. Demand revises.
-6. An order settles: FIFO mass, WAC only if cost was declared, farmer credit, hours-to-pay, `demand.observed` — one motion, posted to the **rupee ledger**.
-7. If a chiller outage warms 40 kg, remaining is cut, **reflex** opens cover, the **energy cloud** would book kWh, **RCOP** books village TCO.
-8. Before next sowing the **FPO** is offered offtake at last Magh kilograms, price blank.
-
-On this kernel the walk lives through step 6 and the spoilage / next-season offer. It still dies at energy cloud, scheme blood, and weather muscle. On the GitHub platform the walk still dies at step 1.
-
-## Sources on this branch
-
-- `AFRERA_DIGITAL_ORGANISM_REFERENCE_ARCHITECTURE_DORA.md`
-- `AFRERA_BIO_INSPIRED_ENTERPRISE_INTELLIGENCE_ARCHITECTURE_BIEA.md`
-- `AFRERA_MISSING_PLATFORMS_ANALYSIS.md` (RECIE, FVIE, GCIP, RCOP)
-- `REOS_MISSING_ECONOMIC_LAYERS_SPECIFICATION.md`
-- `.ai/audit/MASTER_MISSING_CONCEPT_INDEX.md` (GAP-0041–0048, GAP-0021 event bus)
-- `backend/src/platform/events/eventBus.js`
-- `backend/src/value-chain-control/lotKernel.js` — remaining grams, FIFO, WAC, journal, FPO split
-- Deferred schema collisions: `crop_plantings` vs `farms` vs `farm_plots`; IoT `farmer_id` vs `entity_id`
-
-Do not add another independent concept. Add a ligament, or a bridge concept that exists only to carry one. Do not report 33% as if the platform folders woke up.
+Next ligament to plug, not next thousand pages: **offline queue**, **scheme blood with effective dates**, **weather reflex that moves remaining grams**.

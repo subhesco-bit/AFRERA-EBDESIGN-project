@@ -1,0 +1,1363 @@
+{
+  "generatedAt": "2026-09-22",
+  "counts": {
+    "total": 110,
+    "done": 42,
+    "open": 60,
+    "blocked": 8
+  },
+  "remaining": [
+    {
+      "id": "todo-b-a11y",
+      "itemId": "b-a11y",
+      "stage": 1,
+      "title": "Accessibility",
+      "status": "open",
+      "why": "Full WCAG journeys, voice confirm.",
+      "exit": "Keep forms labelled."
+    },
+    {
+      "id": "todo-b-erpctl",
+      "itemId": "b-erpctl",
+      "stage": 1,
+      "title": "ERP control",
+      "status": "open",
+      "why": "Tax, 3-way, bank rec, assets.",
+      "exit": "Village GL is enough to be honest."
+    },
+    {
+      "id": "todo-b-i18n",
+      "itemId": "b-i18n",
+      "stage": 1,
+      "title": "Multilingual",
+      "status": "open",
+      "why": "Terminology registry, transliteration, review.",
+      "exit": "Do not auto-translate rupee laws."
+    },
+    {
+      "id": "todo-b-obs",
+      "itemId": "b-obs",
+      "stage": 1,
+      "title": "Observability",
+      "status": "open",
+      "why": "SLOs, traces, redaction on GitHub.",
+      "exit": "Correlation is lotId."
+    },
+    {
+      "id": "todo-b-off",
+      "itemId": "b-off",
+      "stage": 1,
+      "title": "Offline",
+      "status": "open",
+      "why": "Encrypted queue, conflict, sync receipt.",
+      "exit": "Do not fake store-and-forward."
+    },
+    {
+      "id": "todo-b-rel",
+      "itemId": "b-rel",
+      "stage": 1,
+      "title": "Reliability",
+      "status": "open",
+      "why": "DR, failover, backup restore.",
+      "exit": "PGLite is the village memory here."
+    },
+    {
+      "id": "todo-b-sec",
+      "itemId": "b-sec",
+      "stage": 1,
+      "title": "Security",
+      "status": "open",
+      "why": "Threat model, pen-test, incident playbook.",
+      "exit": "Clerk boundary is the control."
+    },
+    {
+      "id": "todo-c-erp",
+      "itemId": "c-erp",
+      "stage": 1,
+      "title": "Enterprise ERP",
+      "status": "open",
+      "why": "Unified CoA, tax, intercompany, period close.",
+      "exit": "Connect operational txn to this journal only."
+    },
+    {
+      "id": "todo-g-erp",
+      "itemId": "g-erp",
+      "stage": 1,
+      "title": "Unified ERP control",
+      "status": "open",
+      "why": "CoA, tax, 3-way, bank rec, assets, SoD, period close.",
+      "exit": "Journal is the GL of this village. Do not invent ₹."
+    },
+    {
+      "id": "todo-g-prod",
+      "itemId": "g-prod",
+      "stage": 1,
+      "title": "Production verification",
+      "status": "open",
+      "why": "Load, backup restore, pen-test, rollback on GitHub.",
+      "exit": "File existence is not readiness."
+    },
+    {
+      "id": "todo-g-workflow",
+      "itemId": "g-workflow",
+      "stage": 1,
+      "title": "State-driven workflows",
+      "status": "open",
+      "why": "Booking, RFQ, claim, loan, subsidy, grievance, recall.",
+      "exit": "Durable steps persist. Unknown events fail."
+    },
+    {
+      "id": "todo-a-travel",
+      "itemId": "a-travel",
+      "stage": 2,
+      "title": "Contextual journey planner",
+      "status": "blocked",
+      "why": "Budget/weather/food/access.",
+      "exit": "Do not clone agriculture UX."
+    },
+    {
+      "id": "todo-c-access",
+      "itemId": "c-access",
+      "stage": 2,
+      "title": "Rural accessibility",
+      "status": "open",
+      "why": "Offline, IVR, translation review, sync trail.",
+      "exit": "Assisted operator is living."
+    },
+    {
+      "id": "todo-c-agri",
+      "itemId": "c-agri",
+      "stage": 2,
+      "title": "Agriculture operating system",
+      "status": "open",
+      "why": "Finance-procure-operate loop, fisheries, livestock cashflow.",
+      "exit": "Walk is living. Livestock is partial."
+    },
+    {
+      "id": "todo-c-bank",
+      "itemId": "c-bank",
+      "stage": 2,
+      "title": "Banking and rural finance",
+      "status": "open",
+      "why": "Underwriting, disbursement, recovery, explainability.",
+      "exit": "No invented credit score."
+    },
+    {
+      "id": "todo-c-eng",
+      "itemId": "c-eng",
+      "stage": 2,
+      "title": "Engineering platform",
+      "status": "blocked",
+      "why": "Standards, units, BIM, simulation, commissioning.",
+      "exit": "Blocked on professional approval boundaries."
+    },
+    {
+      "id": "todo-c-esg",
+      "itemId": "c-esg",
+      "stage": 2,
+      "title": "Sustainability",
+      "status": "open",
+      "why": "Methodology, factors, audit, attribution.",
+      "exit": "Do not invent emissions."
+    },
+    {
+      "id": "todo-c-insure",
+      "itemId": "c-insure",
+      "stage": 2,
+      "title": "Insurance",
+      "status": "open",
+      "why": "Need analysis, exclusions, claims, survey, appeal.",
+      "exit": "Cover binds. Claims OS is missing."
+    },
+    {
+      "id": "todo-c-logistics",
+      "itemId": "c-logistics",
+      "stage": 2,
+      "title": "Logistics",
+      "status": "open",
+      "why": "Control tower, ETA, PoD, load pooling.",
+      "exit": "Freight is a deduction, not a marketplace yet."
+    },
+    {
+      "id": "todo-c-market",
+      "itemId": "c-market",
+      "stage": 2,
+      "title": "Marketplace",
+      "status": "open",
+      "why": "Discovery, returns, trust graph, settlement rails.",
+      "exit": "Listing is born from harvest, not a SKU form."
+    },
+    {
+      "id": "todo-c-scheme",
+      "itemId": "c-scheme",
+      "stage": 2,
+      "title": "Government schemes",
+      "status": "open",
+      "why": "Effective-dated rules, eligibility, grievance.",
+      "exit": "Do not scrape PDFs into a chatbot."
+    },
+    {
+      "id": "todo-g-eng",
+      "itemId": "g-eng",
+      "stage": 2,
+      "title": "Engineering calculation chain",
+      "status": "blocked",
+      "why": "Units, standards, BIM, BOQ, professional approval.",
+      "exit": "Do not fake CFD."
+    },
+    {
+      "id": "todo-g-india",
+      "itemId": "g-india",
+      "stage": 2,
+      "title": "India-first intelligence",
+      "status": "open",
+      "why": "Mandi feed, GST, land registry, scheme rules engine.",
+      "exit": "Schemes stay missing until effective-dated."
+    },
+    {
+      "id": "todo-g-journey",
+      "itemId": "g-journey",
+      "stage": 2,
+      "title": "Industry journeys",
+      "status": "open",
+      "why": "Travel, insurance claims, banking, logistics tower, DPR.",
+      "exit": "Finish agriculture. Name the others. Do not clone dashboards."
+    },
+    {
+      "id": "todo-g-rural",
+      "itemId": "g-rural",
+      "stage": 2,
+      "title": "Rural-first access complete",
+      "status": "open",
+      "why": "Offline queue, SMS/IVR, shared-device consent, sync audit.",
+      "exit": "Assisted mode lives. Offline does not."
+    },
+    {
+      "id": "todo-g-trust",
+      "itemId": "g-trust",
+      "stage": 2,
+      "title": "Trust and reputation",
+      "status": "open",
+      "why": "Dispute-adjusted scores, appeal, chain of custody network.",
+      "exit": "Passport first. Stars later."
+    },
+    {
+      "id": "todo-lv-2",
+      "itemId": "lv-2",
+      "stage": 2,
+      "title": "Sector digital businesses",
+      "status": "open",
+      "why": "Travel, banking, health, engineering journeys.",
+      "exit": "One sector native: spice/horticulture. Others stay named."
+    },
+    {
+      "id": "todo-lv-4",
+      "itemId": "lv-4",
+      "stage": 2,
+      "title": "India / rural-first access",
+      "status": "open",
+      "why": "Offline queue, IVR/SMS, shared-device consent.",
+      "exit": "Assisted operator lives. Offline sync is still missing."
+    },
+    {
+      "id": "todo-n-compare",
+      "itemId": "n-compare",
+      "stage": 2,
+      "title": "Cross-Sector Comparison Engine",
+      "status": "open",
+      "why": "User-weighted comparison with exclusions.",
+      "exit": "Do not rank without declared criteria."
+    },
+    {
+      "id": "todo-n-trust",
+      "itemId": "n-trust",
+      "stage": 2,
+      "title": "Trust Graph",
+      "status": "open",
+      "why": "Dispute, retaliation-safe reviews.",
+      "exit": "Evidence over stars."
+    },
+    {
+      "id": "todo-a-doc",
+      "itemId": "a-doc",
+      "stage": 3,
+      "title": "Document intelligence",
+      "status": "open",
+      "why": "OCR, layout, compliance coords.",
+      "exit": "Human verifies."
+    },
+    {
+      "id": "todo-a-fin",
+      "itemId": "a-fin",
+      "stage": 3,
+      "title": "Explainable cash-flow",
+      "status": "open",
+      "why": "Stress, early warning, underwriting.",
+      "exit": "No silent score."
+    },
+    {
+      "id": "todo-a-form",
+      "itemId": "a-form",
+      "stage": 3,
+      "title": "Evidence-aware form",
+      "status": "open",
+      "why": "OCR, voice, inconsistency detection.",
+      "exit": "Save/resume is the clerk."
+    },
+    {
+      "id": "todo-a-ins",
+      "itemId": "a-ins",
+      "stage": 3,
+      "title": "Protection-gap adviser",
+      "status": "open",
+      "why": "Exclusions, scenarios, affordability.",
+      "exit": "Do not invent a quote."
+    },
+    {
+      "id": "todo-a-note",
+      "itemId": "a-note",
+      "stage": 3,
+      "title": "Intelligent intervention",
+      "status": "open",
+      "why": "Channel/timing/fatigue engine.",
+      "exit": "Do not nag."
+    },
+    {
+      "id": "todo-a-pdp",
+      "itemId": "a-pdp",
+      "stage": 3,
+      "title": "Trust-and-suitability page",
+      "status": "open",
+      "why": "Dietary/cultural filters with consent.",
+      "exit": "No silent profiling."
+    },
+    {
+      "id": "todo-a-search",
+      "itemId": "a-search",
+      "stage": 3,
+      "title": "Multimodal intent search",
+      "status": "open",
+      "why": "Image, geo, vernacular, permissioned retrieval.",
+      "exit": "Library-first."
+    },
+    {
+      "id": "todo-c-ai",
+      "itemId": "c-ai",
+      "stage": 3,
+      "title": "AI services",
+      "status": "open",
+      "why": "GitHub 16 sibling chats. No eval harness.",
+      "exit": "A wrapper is not production AI."
+    },
+    {
+      "id": "todo-c-personal",
+      "itemId": "c-personal",
+      "stage": 3,
+      "title": "Personalization",
+      "status": "open",
+      "why": "Consent ledger, ranking, reset, non-personalized mode.",
+      "exit": "Voluntary constraints only."
+    },
+    {
+      "id": "todo-f-diet",
+      "itemId": "f-diet",
+      "stage": 3,
+      "title": "Cultural / Dietary Constraint Engine",
+      "status": "open",
+      "why": "Filter, never profile.",
+      "exit": "Cannot set price/credit/eligibility."
+    }
+  ],
+  "all": [
+    {
+      "id": "todo-lv-1",
+      "itemId": "lv-1",
+      "stage": 1,
+      "title": "Transactional platform",
+      "status": "done",
+      "why": "GST, e-invoice, bank rails, 3-way match.",
+      "exit": "Keep kernel. Do not invent a second ledger."
+    },
+    {
+      "id": "todo-lv-2",
+      "itemId": "lv-2",
+      "stage": 2,
+      "title": "Sector digital businesses",
+      "status": "open",
+      "why": "Travel, banking, health, engineering journeys.",
+      "exit": "One sector native: spice/horticulture. Others stay named."
+    },
+    {
+      "id": "todo-lv-3",
+      "itemId": "lv-3",
+      "stage": 1,
+      "title": "Shared ERP / identity / workflow",
+      "status": "done",
+      "why": "One GitHub identity. Chart of accounts. Period close.",
+      "exit": "This kernel is the shared bone. GitHub folders stay cadavers until they plug."
+    },
+    {
+      "id": "todo-lv-4",
+      "itemId": "lv-4",
+      "stage": 2,
+      "title": "India / rural-first access",
+      "status": "open",
+      "why": "Offline queue, IVR/SMS, shared-device consent.",
+      "exit": "Assisted operator lives. Offline sync is still missing."
+    },
+    {
+      "id": "todo-lv-5",
+      "itemId": "lv-5",
+      "stage": 3,
+      "title": "AI nervous system on evidence",
+      "status": "done",
+      "why": "Model registry, drift, citations, outcome feedback.",
+      "exit": "Library-first. LLM only on miss. Never a rupee write."
+    },
+    {
+      "id": "todo-lv-6",
+      "itemId": "lv-6",
+      "stage": 3,
+      "title": "Adaptive UX from consented context",
+      "status": "open",
+      "why": "Consent ledger, intent engine, non-personalized mode.",
+      "exit": "Do not infer caste, religion, health. Voluntary constraints only."
+    },
+    {
+      "id": "todo-g-sot",
+      "itemId": "g-sot",
+      "stage": 0,
+      "title": "Single source of truth",
+      "status": "done",
+      "why": "GitHub still has competing registries.",
+      "exit": "Never remove. Classify. Dual-truth."
+    },
+    {
+      "id": "todo-g-auth",
+      "itemId": "g-auth",
+      "stage": 1,
+      "title": "Coherent authentication",
+      "status": "done",
+      "why": "GitHub authRoutes in-memory + JWT middleware split.",
+      "exit": "Do not mount the mock. Canonicalize on that branch separately."
+    },
+    {
+      "id": "todo-g-journey",
+      "itemId": "g-journey",
+      "stage": 2,
+      "title": "Industry journeys",
+      "status": "open",
+      "why": "Travel, insurance claims, banking, logistics tower, DPR.",
+      "exit": "Finish agriculture. Name the others. Do not clone dashboards."
+    },
+    {
+      "id": "todo-g-adaptive",
+      "itemId": "g-adaptive",
+      "stage": 3,
+      "title": "Governed adaptive webpage",
+      "status": "open",
+      "why": "Consent profile, experimentation, outcome measurement.",
+      "exit": "Intents only. No inferred sensitive traits."
+    },
+    {
+      "id": "todo-g-ai",
+      "itemId": "g-ai",
+      "stage": 3,
+      "title": "Governed AI architecture",
+      "status": "open",
+      "why": "Training, drift, bias, cost, citations, eval harness.",
+      "exit": "Evidence or hide. Random wrappers are not AI."
+    },
+    {
+      "id": "todo-g-workflow",
+      "itemId": "g-workflow",
+      "stage": 1,
+      "title": "State-driven workflows",
+      "status": "open",
+      "why": "Booking, RFQ, claim, loan, subsidy, grievance, recall.",
+      "exit": "Durable steps persist. Unknown events fail."
+    },
+    {
+      "id": "todo-g-erp",
+      "itemId": "g-erp",
+      "stage": 1,
+      "title": "Unified ERP control",
+      "status": "open",
+      "why": "CoA, tax, 3-way, bank rec, assets, SoD, period close.",
+      "exit": "Journal is the GL of this village. Do not invent ₹."
+    },
+    {
+      "id": "todo-g-india",
+      "itemId": "g-india",
+      "stage": 2,
+      "title": "India-first intelligence",
+      "status": "open",
+      "why": "Mandi feed, GST, land registry, scheme rules engine.",
+      "exit": "Schemes stay missing until effective-dated."
+    },
+    {
+      "id": "todo-g-organism",
+      "itemId": "g-organism",
+      "stage": 0,
+      "title": "Executable super-organism",
+      "status": "done",
+      "why": "Sensory IoT, immune fraud, circulatory payments.",
+      "exit": "Map, do not metaphor."
+    },
+    {
+      "id": "todo-g-data",
+      "itemId": "g-data",
+      "stage": 1,
+      "title": "Real analytics lineage",
+      "status": "done",
+      "why": "GitHub dashboards still simulate.",
+      "exit": "No metric without source."
+    },
+    {
+      "id": "todo-g-trust",
+      "itemId": "g-trust",
+      "stage": 2,
+      "title": "Trust and reputation",
+      "status": "open",
+      "why": "Dispute-adjusted scores, appeal, chain of custody network.",
+      "exit": "Passport first. Stars later."
+    },
+    {
+      "id": "todo-g-rural",
+      "itemId": "g-rural",
+      "stage": 2,
+      "title": "Rural-first access complete",
+      "status": "open",
+      "why": "Offline queue, SMS/IVR, shared-device consent, sync audit.",
+      "exit": "Assisted mode lives. Offline does not."
+    },
+    {
+      "id": "todo-g-eng",
+      "itemId": "g-eng",
+      "stage": 2,
+      "title": "Engineering calculation chain",
+      "status": "blocked",
+      "why": "Units, standards, BIM, BOQ, professional approval.",
+      "exit": "Do not fake CFD."
+    },
+    {
+      "id": "todo-g-prod",
+      "itemId": "g-prod",
+      "stage": 1,
+      "title": "Production verification",
+      "status": "open",
+      "why": "Load, backup restore, pen-test, rollback on GitHub.",
+      "exit": "File existence is not readiness."
+    },
+    {
+      "id": "todo-c-organism",
+      "itemId": "c-organism",
+      "stage": 0,
+      "title": "Digital Super-Organism",
+      "status": "done",
+      "why": "Executable immune, sensory IoT, payment circulation.",
+      "exit": "OS board maps every metaphor to a service."
+    },
+    {
+      "id": "todo-c-modules",
+      "itemId": "c-modules",
+      "stage": 0,
+      "title": "Modular M001–M150 platform",
+      "status": "done",
+      "why": "~760 GitHub services; WIRED skeletons; duplicates.",
+      "exit": "Registry with runtime status. Do not delete folders."
+    },
+    {
+      "id": "todo-c-agri",
+      "itemId": "c-agri",
+      "stage": 2,
+      "title": "Agriculture operating system",
+      "status": "open",
+      "why": "Finance-procure-operate loop, fisheries, livestock cashflow.",
+      "exit": "Walk is living. Livestock is partial."
+    },
+    {
+      "id": "todo-c-erp",
+      "itemId": "c-erp",
+      "stage": 1,
+      "title": "Enterprise ERP",
+      "status": "open",
+      "why": "Unified CoA, tax, intercompany, period close.",
+      "exit": "Connect operational txn to this journal only."
+    },
+    {
+      "id": "todo-c-market",
+      "itemId": "c-market",
+      "stage": 2,
+      "title": "Marketplace",
+      "status": "open",
+      "why": "Discovery, returns, trust graph, settlement rails.",
+      "exit": "Listing is born from harvest, not a SKU form."
+    },
+    {
+      "id": "todo-c-insure",
+      "itemId": "c-insure",
+      "stage": 2,
+      "title": "Insurance",
+      "status": "open",
+      "why": "Need analysis, exclusions, claims, survey, appeal.",
+      "exit": "Cover binds. Claims OS is missing."
+    },
+    {
+      "id": "todo-c-bank",
+      "itemId": "c-bank",
+      "stage": 2,
+      "title": "Banking and rural finance",
+      "status": "open",
+      "why": "Underwriting, disbursement, recovery, explainability.",
+      "exit": "No invented credit score."
+    },
+    {
+      "id": "todo-c-logistics",
+      "itemId": "c-logistics",
+      "stage": 2,
+      "title": "Logistics",
+      "status": "open",
+      "why": "Control tower, ETA, PoD, load pooling.",
+      "exit": "Freight is a deduction, not a marketplace yet."
+    },
+    {
+      "id": "todo-c-eng",
+      "itemId": "c-eng",
+      "stage": 2,
+      "title": "Engineering platform",
+      "status": "blocked",
+      "why": "Standards, units, BIM, simulation, commissioning.",
+      "exit": "Blocked on professional approval boundaries."
+    },
+    {
+      "id": "todo-c-scheme",
+      "itemId": "c-scheme",
+      "stage": 2,
+      "title": "Government schemes",
+      "status": "open",
+      "why": "Effective-dated rules, eligibility, grievance.",
+      "exit": "Do not scrape PDFs into a chatbot."
+    },
+    {
+      "id": "todo-c-auth",
+      "itemId": "c-auth",
+      "stage": 1,
+      "title": "Authentication",
+      "status": "done",
+      "why": "GitHub mock users + JWT split.",
+      "exit": "One identity authority on that branch later."
+    },
+    {
+      "id": "todo-c-personal",
+      "itemId": "c-personal",
+      "stage": 3,
+      "title": "Personalization",
+      "status": "open",
+      "why": "Consent ledger, ranking, reset, non-personalized mode.",
+      "exit": "Voluntary constraints only."
+    },
+    {
+      "id": "todo-c-ai",
+      "itemId": "c-ai",
+      "stage": 3,
+      "title": "AI services",
+      "status": "open",
+      "why": "GitHub 16 sibling chats. No eval harness.",
+      "exit": "A wrapper is not production AI."
+    },
+    {
+      "id": "todo-c-access",
+      "itemId": "c-access",
+      "stage": 2,
+      "title": "Rural accessibility",
+      "status": "open",
+      "why": "Offline, IVR, translation review, sync trail.",
+      "exit": "Assisted operator is living."
+    },
+    {
+      "id": "todo-c-analytics",
+      "itemId": "c-analytics",
+      "stage": 1,
+      "title": "Analytics",
+      "status": "done",
+      "why": "Lineage, freshness, experiments on GitHub.",
+      "exit": "Ban simulated business numbers."
+    },
+    {
+      "id": "todo-c-knowledge",
+      "itemId": "c-knowledge",
+      "stage": 3,
+      "title": "Knowledge platform",
+      "status": "done",
+      "why": "OCR graph, permissions, cited rules engine.",
+      "exit": "Memory lives without an API key."
+    },
+    {
+      "id": "todo-c-esg",
+      "itemId": "c-esg",
+      "stage": 2,
+      "title": "Sustainability",
+      "status": "open",
+      "why": "Methodology, factors, audit, attribution.",
+      "exit": "Do not invent emissions."
+    },
+    {
+      "id": "todo-b-arch",
+      "itemId": "b-arch",
+      "stage": 1,
+      "title": "Product architecture",
+      "status": "done",
+      "why": "GitHub overlapping services.",
+      "exit": "Capability registry is this catalog."
+    },
+    {
+      "id": "todo-b-journey",
+      "itemId": "b-journey",
+      "stage": 1,
+      "title": "User journeys",
+      "status": "done",
+      "why": "Sector-native maps for travel/banking/health.",
+      "exit": "Agriculture journey is the proof."
+    },
+    {
+      "id": "todo-b-api",
+      "itemId": "b-api",
+      "stage": 1,
+      "title": "API architecture",
+      "status": "done",
+      "why": "GitHub many naming conventions.",
+      "exit": "Idempotent clerk writes only."
+    },
+    {
+      "id": "todo-b-ident",
+      "itemId": "b-ident",
+      "stage": 1,
+      "title": "Authentication baseline",
+      "status": "done",
+      "why": "Canonicalize GitHub identity later.",
+      "exit": "Clerk is the human command."
+    },
+    {
+      "id": "todo-b-authz",
+      "itemId": "b-authz",
+      "stage": 1,
+      "title": "Authorization",
+      "status": "done",
+      "why": "ABAC, SoD, authorization tests on GitHub.",
+      "exit": "L8–L9 are the policy."
+    },
+    {
+      "id": "todo-b-data",
+      "itemId": "b-data",
+      "stage": 1,
+      "title": "Data architecture",
+      "status": "done",
+      "why": "Schema collisions on GitHub (plantings/farms/plots).",
+      "exit": "Lot body is one id."
+    },
+    {
+      "id": "todo-b-wf",
+      "itemId": "b-wf",
+      "stage": 1,
+      "title": "Workflow orchestration",
+      "status": "done",
+      "why": "Timers, compensation, saga on GitHub.",
+      "exit": "Unknown events fail (L12)."
+    },
+    {
+      "id": "todo-b-erpctl",
+      "itemId": "b-erpctl",
+      "stage": 1,
+      "title": "ERP control",
+      "status": "open",
+      "why": "Tax, 3-way, bank rec, assets.",
+      "exit": "Village GL is enough to be honest."
+    },
+    {
+      "id": "todo-b-ui",
+      "itemId": "b-ui",
+      "stage": 1,
+      "title": "UI architecture",
+      "status": "done",
+      "why": "GitHub many page inventories.",
+      "exit": "Need-based composer starts here."
+    },
+    {
+      "id": "todo-b-resp",
+      "itemId": "b-resp",
+      "stage": 1,
+      "title": "Mobile / responsive",
+      "status": "done",
+      "why": "Device matrix, PWA offline.",
+      "exit": "Touch targets hold."
+    },
+    {
+      "id": "todo-b-off",
+      "itemId": "b-off",
+      "stage": 1,
+      "title": "Offline",
+      "status": "open",
+      "why": "Encrypted queue, conflict, sync receipt.",
+      "exit": "Do not fake store-and-forward."
+    },
+    {
+      "id": "todo-b-a11y",
+      "itemId": "b-a11y",
+      "stage": 1,
+      "title": "Accessibility",
+      "status": "open",
+      "why": "Full WCAG journeys, voice confirm.",
+      "exit": "Keep forms labelled."
+    },
+    {
+      "id": "todo-b-i18n",
+      "itemId": "b-i18n",
+      "stage": 1,
+      "title": "Multilingual",
+      "status": "open",
+      "why": "Terminology registry, transliteration, review.",
+      "exit": "Do not auto-translate rupee laws."
+    },
+    {
+      "id": "todo-b-sec",
+      "itemId": "b-sec",
+      "stage": 1,
+      "title": "Security",
+      "status": "open",
+      "why": "Threat model, pen-test, incident playbook.",
+      "exit": "Clerk boundary is the control."
+    },
+    {
+      "id": "todo-b-consent",
+      "itemId": "b-consent",
+      "stage": 1,
+      "title": "Privacy and consent",
+      "status": "done",
+      "why": "Consent receipts, deletion, purpose binding.",
+      "exit": "Voluntary constraints only."
+    },
+    {
+      "id": "todo-b-test",
+      "itemId": "b-test",
+      "stage": 1,
+      "title": "Testing evidence",
+      "status": "done",
+      "why": "E2E auth, migration, resilience on GitHub.",
+      "exit": "Mocked green is not complete."
+    },
+    {
+      "id": "todo-b-obs",
+      "itemId": "b-obs",
+      "stage": 1,
+      "title": "Observability",
+      "status": "open",
+      "why": "SLOs, traces, redaction on GitHub.",
+      "exit": "Correlation is lotId."
+    },
+    {
+      "id": "todo-b-rel",
+      "itemId": "b-rel",
+      "stage": 1,
+      "title": "Reliability",
+      "status": "open",
+      "why": "DR, failover, backup restore.",
+      "exit": "PGLite is the village memory here."
+    },
+    {
+      "id": "todo-b-content",
+      "itemId": "b-content",
+      "stage": 0,
+      "title": "Content governance",
+      "status": "done",
+      "why": "GitHub completion certificates vs runtime.",
+      "exit": "Cited or it is gossip."
+    },
+    {
+      "id": "todo-b-gov",
+      "itemId": "b-gov",
+      "stage": 0,
+      "title": "Completion governance",
+      "status": "done",
+      "why": "Hundreds of COMPLETE reports on GitHub.",
+      "exit": "Kernel under 40%. 7% platform. Dual-truth."
+    },
+    {
+      "id": "todo-n-composer",
+      "itemId": "n-composer",
+      "stage": 2,
+      "title": "Sector Experience Composer",
+      "status": "done",
+      "why": "Travel/insurance/ERP templates.",
+      "exit": "Shared primitives. Different journeys."
+    },
+    {
+      "id": "todo-n-event",
+      "itemId": "n-event",
+      "stage": 4,
+      "title": "Life-and-Business Event Engine",
+      "status": "done",
+      "why": "Marriage, illness, price-crash fan-out.",
+      "exit": "Spine publishes. Unknown events fail."
+    },
+    {
+      "id": "todo-n-passport",
+      "itemId": "n-passport",
+      "stage": 1,
+      "title": "Evidence Passport",
+      "status": "done",
+      "why": "Portable credential across organs on GitHub.",
+      "exit": "Absent stays absent."
+    },
+    {
+      "id": "todo-n-profile",
+      "itemId": "n-profile",
+      "stage": 3,
+      "title": "User-Controlled Digital Profile",
+      "status": "blocked",
+      "why": "Inspect/correct/revoke ledger.",
+      "exit": "Auth-off here. Do not fake a profile."
+    },
+    {
+      "id": "todo-n-need",
+      "itemId": "n-need",
+      "stage": 1,
+      "title": "Need-Based Navigation",
+      "status": "done",
+      "why": "Full problem taxonomy.",
+      "exit": "Module names are not the door."
+    },
+    {
+      "id": "todo-n-compare",
+      "itemId": "n-compare",
+      "stage": 2,
+      "title": "Cross-Sector Comparison Engine",
+      "status": "open",
+      "why": "User-weighted comparison with exclusions.",
+      "exit": "Do not rank without declared criteria."
+    },
+    {
+      "id": "todo-n-trust",
+      "itemId": "n-trust",
+      "stage": 2,
+      "title": "Trust Graph",
+      "status": "open",
+      "why": "Dispute, retaliation-safe reviews.",
+      "exit": "Evidence over stars."
+    },
+    {
+      "id": "todo-n-benefit",
+      "itemId": "n-benefit",
+      "stage": 3,
+      "title": "Benefit Realization Ledger",
+      "status": "done",
+      "why": "Predicted vs actual yield/income with causality label.",
+      "exit": "No success without a row."
+    },
+    {
+      "id": "todo-n-exception",
+      "itemId": "n-exception",
+      "stage": 1,
+      "title": "Exception Command Centre",
+      "status": "done",
+      "why": "Escalate and verify closure across GitHub alerts.",
+      "exit": "One place. Impact first."
+    },
+    {
+      "id": "todo-n-assist",
+      "itemId": "n-assist",
+      "stage": 2,
+      "title": "Assisted Digital Operator",
+      "status": "done",
+      "why": "Delegated consent, recorded assistance on GitHub.",
+      "exit": "User confirmation required."
+    },
+    {
+      "id": "todo-n-rules",
+      "itemId": "n-rules",
+      "stage": 1,
+      "title": "Rules-as-Evidence",
+      "status": "done",
+      "why": "Scheme/GST rules with citation+effective date.",
+      "exit": "Authority, date, logic, reviewer."
+    },
+    {
+      "id": "todo-n-suit",
+      "itemId": "n-suit",
+      "stage": 3,
+      "title": "Suitability Layer",
+      "status": "done",
+      "why": "Affordability engine, exclusions comparison on GitHub.",
+      "exit": "Do not recommend a loan here."
+    },
+    {
+      "id": "todo-n-cap",
+      "itemId": "n-cap",
+      "stage": 4,
+      "title": "Capability Marketplace",
+      "status": "open",
+      "why": "Signed adapters, migrations, permissions on GitHub.",
+      "exit": "Plug without a second organism."
+    },
+    {
+      "id": "todo-n-grief",
+      "itemId": "n-grief",
+      "stage": 2,
+      "title": "Digital Grievance Spine",
+      "status": "done",
+      "why": "Insurance/government appeal machine.",
+      "exit": "Do not hide disputes in chat."
+    },
+    {
+      "id": "todo-n-ethic",
+      "itemId": "n-ethic",
+      "stage": 3,
+      "title": "Ethical Engagement Engine",
+      "status": "done",
+      "why": "Experiment framework, fatigue controls.",
+      "exit": "Benefit over addiction."
+    },
+    {
+      "id": "todo-a-comp",
+      "itemId": "a-comp",
+      "stage": 3,
+      "title": "Intelligent component",
+      "status": "done",
+      "why": "Language adapt + outcome feedback on GitHub.",
+      "exit": "Explain or hide."
+    },
+    {
+      "id": "todo-a-form",
+      "itemId": "a-form",
+      "stage": 3,
+      "title": "Evidence-aware form",
+      "status": "open",
+      "why": "OCR, voice, inconsistency detection.",
+      "exit": "Save/resume is the clerk."
+    },
+    {
+      "id": "todo-a-search",
+      "itemId": "a-search",
+      "stage": 3,
+      "title": "Multimodal intent search",
+      "status": "open",
+      "why": "Image, geo, vernacular, permissioned retrieval.",
+      "exit": "Library-first."
+    },
+    {
+      "id": "todo-a-rec",
+      "itemId": "a-rec",
+      "stage": 3,
+      "title": "Constraint-aware recommendation",
+      "status": "done",
+      "why": "Causal benefit, season, consent.",
+      "exit": "Propose only."
+    },
+    {
+      "id": "todo-a-dash",
+      "itemId": "a-dash",
+      "stage": 3,
+      "title": "Adaptive decision workspace",
+      "status": "done",
+      "why": "Role/risk/geography composer.",
+      "exit": "Priorities from remaining and gates."
+    },
+    {
+      "id": "todo-a-note",
+      "itemId": "a-note",
+      "stage": 3,
+      "title": "Intelligent intervention",
+      "status": "open",
+      "why": "Channel/timing/fatigue engine.",
+      "exit": "Do not nag."
+    },
+    {
+      "id": "todo-a-wf",
+      "itemId": "a-wf",
+      "stage": 4,
+      "title": "AI-assisted dynamic workflow",
+      "status": "done",
+      "why": "Predict evidence, escalate.",
+      "exit": "pass/block/defer/propose."
+    },
+    {
+      "id": "todo-a-doc",
+      "itemId": "a-doc",
+      "stage": 3,
+      "title": "Document intelligence",
+      "status": "open",
+      "why": "OCR, layout, compliance coords.",
+      "exit": "Human verifies."
+    },
+    {
+      "id": "todo-a-pdp",
+      "itemId": "a-pdp",
+      "stage": 3,
+      "title": "Trust-and-suitability page",
+      "status": "open",
+      "why": "Dietary/cultural filters with consent.",
+      "exit": "No silent profiling."
+    },
+    {
+      "id": "todo-a-ins",
+      "itemId": "a-ins",
+      "stage": 3,
+      "title": "Protection-gap adviser",
+      "status": "open",
+      "why": "Exclusions, scenarios, affordability.",
+      "exit": "Do not invent a quote."
+    },
+    {
+      "id": "todo-a-travel",
+      "itemId": "a-travel",
+      "stage": 2,
+      "title": "Contextual journey planner",
+      "status": "blocked",
+      "why": "Budget/weather/food/access.",
+      "exit": "Do not clone agriculture UX."
+    },
+    {
+      "id": "todo-a-twin",
+      "itemId": "a-twin",
+      "stage": 4,
+      "title": "Farm digital-twin decisions",
+      "status": "open",
+      "why": "Soil/weather/water simulation.",
+      "exit": "No invented yield."
+    },
+    {
+      "id": "todo-a-fin",
+      "itemId": "a-fin",
+      "stage": 3,
+      "title": "Explainable cash-flow",
+      "status": "open",
+      "why": "Stress, early warning, underwriting.",
+      "exit": "No silent score."
+    },
+    {
+      "id": "todo-a-log",
+      "itemId": "a-log",
+      "stage": 4,
+      "title": "Predictive logistics market",
+      "status": "open",
+      "why": "Pooling, ETA confidence, cold-chain.",
+      "exit": "Cost is declared."
+    },
+    {
+      "id": "todo-a-net",
+      "itemId": "a-net",
+      "stage": 4,
+      "title": "Demand-supply network",
+      "status": "open",
+      "why": "Fair allocation, waste reduction.",
+      "exit": "Price stays blank until declared."
+    },
+    {
+      "id": "todo-a-ctl",
+      "itemId": "a-ctl",
+      "stage": 4,
+      "title": "Continuous intelligent control",
+      "status": "open",
+      "why": "Fraud, margin leakage models.",
+      "exit": "Anomaly is a defer, not a write."
+    },
+    {
+      "id": "todo-a-nerve",
+      "itemId": "a-nerve",
+      "stage": 4,
+      "title": "Governed AI nervous system",
+      "status": "done",
+      "why": "Eval, memory governance, cost/latency SLOs.",
+      "exit": "One nerve. Many tissues."
+    },
+    {
+      "id": "todo-a-nat",
+      "itemId": "a-nat",
+      "stage": 6,
+      "title": "Rural-economic intelligence network",
+      "status": "open",
+      "why": "Permissioned exchanges, public programs.",
+      "exit": "Village first."
+    },
+    {
+      "id": "todo-f-petwin",
+      "itemId": "f-petwin",
+      "stage": 6,
+      "title": "Personal Economic Digital Twin",
+      "status": "open",
+      "why": "Household/farm/enterprise simulator.",
+      "exit": "Show what-if. Never auto-execute."
+    },
+    {
+      "id": "todo-f-vtwin",
+      "itemId": "f-vtwin",
+      "stage": 6,
+      "title": "Village / Cluster Digital Twin",
+      "status": "open",
+      "why": "Water/energy/storage/demand model.",
+      "exit": "Identify shared gaps. No invented kWh."
+    },
+    {
+      "id": "todo-f-aron",
+      "itemId": "f-aron",
+      "stage": 5,
+      "title": "Autonomous Rural Operations",
+      "status": "open",
+      "why": "Procurement/logistics agents.",
+      "exit": "Low-risk only. Writes stay human."
+    },
+    {
+      "id": "todo-f-fed",
+      "itemId": "f-fed",
+      "stage": 6,
+      "title": "Federated Rural Intelligence",
+      "status": "blocked",
+      "why": "Learn without centralizing cell data.",
+      "exit": "Local weights. National questions."
+    },
+    {
+      "id": "todo-f-graph",
+      "itemId": "f-graph",
+      "stage": 4,
+      "title": "India Agricultural Knowledge Graph",
+      "status": "open",
+      "why": "Soil/climate/research/scheme graph.",
+      "exit": "Evidence-aware. Cited."
+    },
+    {
+      "id": "todo-f-diet",
+      "itemId": "f-diet",
+      "stage": 3,
+      "title": "Cultural / Dietary Constraint Engine",
+      "status": "open",
+      "why": "Filter, never profile.",
+      "exit": "Cannot set price/credit/eligibility."
+    },
+    {
+      "id": "todo-f-climate",
+      "itemId": "f-climate",
+      "stage": 5,
+      "title": "Climate Adaptation Autopilot",
+      "status": "open",
+      "why": "Simulate adaptation daily.",
+      "exit": "Reflex or hide."
+    },
+    {
+      "id": "todo-f-circ",
+      "itemId": "f-circ",
+      "stage": 6,
+      "title": "Circular Resource Exchange",
+      "status": "open",
+      "why": "By-product, return load, unused capacity.",
+      "exit": "Waste is a rupee if declared."
+    },
+    {
+      "id": "todo-f-cbo",
+      "itemId": "f-cbo",
+      "stage": 6,
+      "title": "Community Benefit Optimizer",
+      "status": "open",
+      "why": "Income+affordability+resilience objective.",
+      "exit": "Not platform GMV."
+    },
+    {
+      "id": "todo-f-policy",
+      "itemId": "f-policy",
+      "stage": 6,
+      "title": "Policy Simulation Laboratory",
+      "status": "blocked",
+      "why": "Scheme twins before gazette.",
+      "exit": "Evidence for government."
+    },
+    {
+      "id": "todo-f-obi",
+      "itemId": "f-obi",
+      "stage": 5,
+      "title": "Outcome-Based Insurance",
+      "status": "open",
+      "why": "Prevention linked to protection.",
+      "exit": "Do not invent a rate."
+    },
+    {
+      "id": "todo-f-infra",
+      "itemId": "f-infra",
+      "stage": 6,
+      "title": "Infrastructure Intelligence Network",
+      "status": "blocked",
+      "why": "Cold store/solar/pond twins.",
+      "exit": "Engineering approval required."
+    },
+    {
+      "id": "todo-f-aidp",
+      "itemId": "f-aidp",
+      "stage": 4,
+      "title": "Verifiable AI Decision Passport",
+      "status": "open",
+      "why": "Portable audit across institutions.",
+      "exit": "Challenge and correct."
+    },
+    {
+      "id": "todo-f-coop",
+      "itemId": "f-coop",
+      "stage": 6,
+      "title": "Personal Data Cooperative",
+      "status": "blocked",
+      "why": "Collective license of permitted data.",
+      "exit": "Value to contributors."
+    },
+    {
+      "id": "todo-f-reflex",
+      "itemId": "f-reflex",
+      "stage": 5,
+      "title": "Disaster / Disruption Reflex",
+      "status": "open",
+      "why": "Flood/heat/price-crash pre-approved bundle.",
+      "exit": "Warning must move a muscle."
+    },
+    {
+      "id": "todo-f-syn",
+      "itemId": "f-syn",
+      "stage": 6,
+      "title": "Synthetic Scenario Exchange",
+      "status": "open",
+      "why": "Generate failures before they happen.",
+      "exit": "Never as live rupees."
+    },
+    {
+      "id": "todo-f-nlb",
+      "itemId": "f-nlb",
+      "stage": 6,
+      "title": "Natural-Language Enterprise Builder",
+      "status": "open",
+      "why": "Goal → screens/controls with human approve.",
+      "exit": "Registry stays canonical."
+    },
+    {
+      "id": "todo-f-heal",
+      "itemId": "f-heal",
+      "stage": 5,
+      "title": "Self-Healing Integration Fabric",
+      "status": "open",
+      "why": "Contract+telemetry repairs. No speculative code.",
+      "exit": "No-orphan continuously."
+    },
+    {
+      "id": "todo-f-map",
+      "itemId": "f-map",
+      "stage": 6,
+      "title": "National Capability Map",
+      "status": "open",
+      "why": "Geo capacity/demand/gaps.",
+      "exit": "Guide investment to shortage."
+    },
+    {
+      "id": "todo-f-const",
+      "itemId": "f-const",
+      "stage": 3,
+      "title": "Ethical Personalization Constitution",
+      "status": "done",
+      "why": "Machine-enforced constitution registry.",
+      "exit": "Assistance ≠ manipulation."
+    }
+  ]
+}

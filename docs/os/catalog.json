@@ -1,0 +1,2152 @@
+{
+  "generatedAt": "2026-09-22",
+  "thesis": "AFRERA is a rural economic operating system, not an agriculture website. Stage 0 classified every concept. Stage 1 bone lives (clerk, remaining grams, journal, workflows). Four-level enhance is on: component, industry, rural, future. GitHub platform remains 7%. Do not generate a thousand pages. Plug a ligament.",
+  "stages": [
+    {
+      "stage": 0,
+      "name": "Concept reconciliation",
+      "target": "Preserve and classify everything.",
+      "exit": "Every concept has source, meaning, class, kernel vs GitHub."
+    },
+    {
+      "stage": 1,
+      "name": "Industry baseline",
+      "target": "Identity, data, APIs, workflows, security, tests, observability.",
+      "exit": "Clerk, remaining grams, journal, workflows, dual-truth registry pass on this kernel."
+    },
+    {
+      "stage": 2,
+      "name": "Sector excellence",
+      "target": "Industry-native journeys.",
+      "exit": "Agriculture walk living. Insurance, banking, travel, engineering still named."
+    },
+    {
+      "stage": 3,
+      "name": "Intelligent assistance",
+      "target": "Grounded AI on each component.",
+      "exit": "Library, companion, firewall, evidence. No invented ₹."
+    },
+    {
+      "stage": 4,
+      "name": "System intelligence",
+      "target": "Events, agents, knowledge, twins coordinate.",
+      "exit": "Module OS bus. Digital twins and federated learning remain proposed."
+    },
+    {
+      "stage": 5,
+      "name": "Autonomous ecosystem",
+      "target": "Bounded execution.",
+      "exit": "Companion proposes. Clerk approves. Consequential writes stay human."
+    },
+    {
+      "stage": 6,
+      "name": "Futuristic platform",
+      "target": "Adaptive economic OS.",
+      "exit": "Named. Not claimed. Village twin and energy cloud still missing."
+    }
+  ],
+  "snapshot": {
+    "items": 110,
+    "classified": 110,
+    "stage0Pct": 100,
+    "stageDone": {
+      "0": {
+        "total": 6,
+        "done": 6,
+        "pct": 100
+      },
+      "1": {
+        "total": 32,
+        "done": 21,
+        "pct": 66
+      },
+      "2": {
+        "total": 22,
+        "done": 3,
+        "pct": 14
+      },
+      "3": {
+        "total": 23,
+        "done": 9,
+        "pct": 39
+      },
+      "4": {
+        "total": 10,
+        "done": 3,
+        "pct": 30
+      },
+      "5": {
+        "total": 5,
+        "done": 0,
+        "pct": 0
+      },
+      "6": {
+        "total": 12,
+        "done": 0,
+        "pct": 0
+      }
+    },
+    "kernelVerified": 20,
+    "kernelPartial": 62,
+    "githubScaffolded": 51,
+    "open": 60,
+    "blocked": 8,
+    "todo": {
+      "total": 110,
+      "done": 42,
+      "open": 60,
+      "blocked": 8
+    }
+  },
+  "items": [
+    {
+      "id": "lv-1",
+      "name": "Transactional platform",
+      "table": "level",
+      "stage": 1,
+      "level": 1,
+      "area": "platform",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Lots, receipts, orders, journal, FPO split.",
+      "missing": "GST, e-invoice, bank rails, 3-way match.",
+      "next": "Keep kernel. Do not invent a second ledger.",
+      "organs": [
+        "erp",
+        "lot",
+        "rupee"
+      ],
+      "href": "/platform",
+      "todo": "done"
+    },
+    {
+      "id": "lv-2",
+      "name": "Sector digital businesses",
+      "table": "level",
+      "stage": 2,
+      "level": 2,
+      "area": "sectors",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Agriculture walk. Cover, kitchen, next Magh.",
+      "missing": "Travel, banking, health, engineering journeys.",
+      "next": "One sector native: spice/horticulture. Others stay named.",
+      "organs": [
+        "crop",
+        "farmer",
+        "marketplace"
+      ],
+      "href": "/pulse",
+      "todo": "open"
+    },
+    {
+      "id": "lv-3",
+      "name": "Shared ERP / identity / workflow",
+      "table": "level",
+      "stage": 1,
+      "level": 3,
+      "area": "erp",
+      "kernel": "partial",
+      "github": "duplicated",
+      "present": "Clerk, remaining grams, Module OS, L1–L12.",
+      "missing": "One GitHub identity. Chart of accounts. Period close.",
+      "next": "This kernel is the shared bone. GitHub folders stay cadavers until they plug.",
+      "organs": [
+        "erp",
+        "spine",
+        "module"
+      ],
+      "href": "/charter",
+      "todo": "done"
+    },
+    {
+      "id": "lv-4",
+      "name": "India / rural-first access",
+      "table": "level",
+      "stage": 2,
+      "level": 4,
+      "area": "rural",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Vernacular copy, mobile books, assisted companion.",
+      "missing": "Offline queue, IVR/SMS, shared-device consent.",
+      "next": "Assisted operator lives. Offline sync is still missing.",
+      "organs": [
+        "farmer",
+        "household"
+      ],
+      "href": "/companion",
+      "todo": "open"
+    },
+    {
+      "id": "lv-5",
+      "name": "AI nervous system on evidence",
+      "table": "level",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "25 plugs, library reflexes, firewall, companion.",
+      "missing": "Model registry, drift, citations, outcome feedback.",
+      "next": "Library-first. LLM only on miss. Never a rupee write.",
+      "organs": [
+        "ai",
+        "spine",
+        "module"
+      ],
+      "href": "/nerve",
+      "todo": "done"
+    },
+    {
+      "id": "lv-6",
+      "name": "Adaptive UX from consented context",
+      "table": "level",
+      "stage": 3,
+      "level": 6,
+      "area": "ux",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Need-based intents. Role is a door, not a profile.",
+      "missing": "Consent ledger, intent engine, non-personalized mode.",
+      "next": "Do not infer caste, religion, health. Voluntary constraints only.",
+      "organs": [
+        "farmer",
+        "household"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "g-sot",
+      "name": "Single source of truth",
+      "table": "gap",
+      "stage": 0,
+      "level": 3,
+      "area": "architecture",
+      "kernel": "verified",
+      "github": "disconnected",
+      "present": "This catalog. 16-link chain. Four-level enhance. Concept → module → feature → user → workflow → rules → database → service → API → authorization → AI → ERP → page → component → test → telemetry.",
+      "missing": "GitHub still has competing registries.",
+      "next": "Never remove. Classify. Dual-truth.",
+      "organs": [
+        "os",
+        "erp",
+        "module"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "g-auth",
+      "name": "Coherent authentication",
+      "table": "gap",
+      "stage": 1,
+      "level": 3,
+      "area": "security",
+      "kernel": "verified",
+      "github": "disconnected",
+      "present": "This organism: clerk. No mock JWT, no plaintext users.",
+      "missing": "GitHub authRoutes in-memory + JWT middleware split.",
+      "next": "Do not mount the mock. Canonicalize on that branch separately.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "g-journey",
+      "name": "Industry journeys",
+      "table": "gap",
+      "stage": 2,
+      "level": 2,
+      "area": "sectors",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Agriculture harvest→godown→offtake→settle.",
+      "missing": "Travel, insurance claims, banking, logistics tower, DPR.",
+      "next": "Finish agriculture. Name the others. Do not clone dashboards.",
+      "organs": [
+        "crop",
+        "orders"
+      ],
+      "href": "/pulse",
+      "todo": "open"
+    },
+    {
+      "id": "g-adaptive",
+      "name": "Governed adaptive webpage",
+      "table": "gap",
+      "stage": 3,
+      "level": 6,
+      "area": "ux",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Need-based nav. No dark patterns.",
+      "missing": "Consent profile, experimentation, outcome measurement.",
+      "next": "Intents only. No inferred sensitive traits.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "g-ai",
+      "name": "Governed AI architecture",
+      "table": "gap",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Gateway, coordinator, library, firewall, human command.",
+      "missing": "Training, drift, bias, cost, citations, eval harness.",
+      "next": "Evidence or hide. Random wrappers are not AI.",
+      "organs": [
+        "ai",
+        "module"
+      ],
+      "href": "/modules",
+      "todo": "open"
+    },
+    {
+      "id": "g-workflow",
+      "name": "State-driven workflows",
+      "table": "gap",
+      "stage": 1,
+      "level": 3,
+      "area": "workflow",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "harvest-mint, warehouse-intake, offtake-settle, nerve-consult.",
+      "missing": "Booking, RFQ, claim, loan, subsidy, grievance, recall.",
+      "next": "Durable steps persist. Unknown events fail.",
+      "organs": [
+        "spine",
+        "lot"
+      ],
+      "href": "/modules",
+      "todo": "open"
+    },
+    {
+      "id": "g-erp",
+      "name": "Unified ERP control",
+      "table": "gap",
+      "stage": 1,
+      "level": 3,
+      "area": "erp",
+      "kernel": "partial",
+      "github": "duplicated",
+      "present": "Paise journal, remaining, FIFO, WAC, FPO split, trial balance.",
+      "missing": "CoA, tax, 3-way, bank rec, assets, SoD, period close.",
+      "next": "Journal is the GL of this village. Do not invent ₹.",
+      "organs": [
+        "erp",
+        "rupee"
+      ],
+      "href": "/platform",
+      "todo": "open"
+    },
+    {
+      "id": "g-india",
+      "name": "India-first intelligence",
+      "table": "gap",
+      "stage": 2,
+      "level": 4,
+      "area": "india",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "GI mint, Magh kitchen, Langthasa cover, FPO cells.",
+      "missing": "Mandi feed, GST, land registry, scheme rules engine.",
+      "next": "Schemes stay missing until effective-dated.",
+      "organs": [
+        "scheme",
+        "fpo",
+        "gcip"
+      ],
+      "href": "/trade",
+      "todo": "open"
+    },
+    {
+      "id": "g-organism",
+      "name": "Executable super-organism",
+      "table": "gap",
+      "stage": 0,
+      "level": 1,
+      "area": "organism",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Organs, ligaments, pulse, library, nerve, charter, OS board.",
+      "missing": "Sensory IoT, immune fraud, circulatory payments.",
+      "next": "Map, do not metaphor.",
+      "organs": [
+        "os",
+        "spine",
+        "ai"
+      ],
+      "href": "/organism",
+      "todo": "done"
+    },
+    {
+      "id": "g-data",
+      "name": "Real analytics lineage",
+      "table": "gap",
+      "stage": 1,
+      "level": 5,
+      "area": "analytics",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Books KPIs from rows. No random dashboards here.",
+      "missing": "GitHub dashboards still simulate.",
+      "next": "No metric without source.",
+      "organs": [
+        "erp",
+        "rcop"
+      ],
+      "href": "/ledger",
+      "todo": "done"
+    },
+    {
+      "id": "g-trust",
+      "name": "Trust and reputation",
+      "table": "gap",
+      "stage": 2,
+      "level": 2,
+      "area": "trust",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "GI mint, paymentRef, remaining, evidence passport.",
+      "missing": "Dispute-adjusted scores, appeal, chain of custody network.",
+      "next": "Passport first. Stars later.",
+      "organs": [
+        "trace",
+        "lot"
+      ],
+      "href": "/lots",
+      "todo": "open"
+    },
+    {
+      "id": "g-rural",
+      "name": "Rural-first access complete",
+      "table": "gap",
+      "stage": 2,
+      "level": 4,
+      "area": "rural",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Mobile books, companion assist, vernacular thesis.",
+      "missing": "Offline queue, SMS/IVR, shared-device consent, sync audit.",
+      "next": "Assisted mode lives. Offline does not.",
+      "organs": [
+        "farmer",
+        "household"
+      ],
+      "href": "/companion",
+      "todo": "open"
+    },
+    {
+      "id": "g-eng",
+      "name": "Engineering calculation chain",
+      "table": "gap",
+      "stage": 2,
+      "level": 2,
+      "area": "engineering",
+      "kernel": "documented",
+      "github": "scaffolded",
+      "present": "Names and MEP hooks on GitHub.",
+      "missing": "Units, standards, BIM, BOQ, professional approval.",
+      "next": "Do not fake CFD.",
+      "organs": [
+        "shared"
+      ],
+      "href": "/os",
+      "todo": "blocked"
+    },
+    {
+      "id": "g-prod",
+      "name": "Production verification",
+      "table": "gap",
+      "stage": 1,
+      "level": 1,
+      "area": "ops",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Unit tests, typecheck, browser smoke on this kernel.",
+      "missing": "Load, backup restore, pen-test, rollback on GitHub.",
+      "next": "File existence is not readiness.",
+      "organs": [
+        "erp"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "c-organism",
+      "name": "Digital Super-Organism",
+      "table": "concept",
+      "stage": 0,
+      "level": 1,
+      "area": "organism",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Brain/nerve/memory as library+module OS+charter.",
+      "missing": "Executable immune, sensory IoT, payment circulation.",
+      "next": "OS board maps every metaphor to a service.",
+      "organs": [
+        "os",
+        "ai",
+        "spine"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "c-modules",
+      "name": "Modular M001–M150 platform",
+      "table": "concept",
+      "stage": 0,
+      "level": 3,
+      "area": "modules",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "25 living plugs. Charter 18 criteria.",
+      "missing": "~760 GitHub services; WIRED skeletons; duplicates.",
+      "next": "Registry with runtime status. Do not delete folders.",
+      "organs": [
+        "module"
+      ],
+      "href": "/modules",
+      "todo": "done"
+    },
+    {
+      "id": "c-agri",
+      "name": "Agriculture operating system",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "agriculture",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Plot/planting, harvest mint, grade, store, sell, settle.",
+      "missing": "Finance-procure-operate loop, fisheries, livestock cashflow.",
+      "next": "Walk is living. Livestock is partial.",
+      "organs": [
+        "crop",
+        "lot",
+        "farmer"
+      ],
+      "href": "/lots",
+      "todo": "open"
+    },
+    {
+      "id": "c-erp",
+      "name": "Enterprise ERP",
+      "table": "concept",
+      "stage": 1,
+      "level": 3,
+      "area": "erp",
+      "kernel": "partial",
+      "github": "duplicated",
+      "present": "Village books, platform trial balance, process mass.",
+      "missing": "Unified CoA, tax, intercompany, period close.",
+      "next": "Connect operational txn to this journal only.",
+      "organs": [
+        "erp",
+        "rupee"
+      ],
+      "href": "/platform",
+      "todo": "open"
+    },
+    {
+      "id": "c-market",
+      "name": "Marketplace",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "commerce",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Offtake, declared price, GI frame, FPO pool.",
+      "missing": "Discovery, returns, trust graph, settlement rails.",
+      "next": "Listing is born from harvest, not a SKU form.",
+      "organs": [
+        "marketplace",
+        "orders"
+      ],
+      "href": "/trade",
+      "todo": "open"
+    },
+    {
+      "id": "c-insure",
+      "name": "Insurance",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "insurance",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Langthasa godown cover. Premium never invented.",
+      "missing": "Need analysis, exclusions, claims, survey, appeal.",
+      "next": "Cover binds. Claims OS is missing.",
+      "organs": [
+        "insurance"
+      ],
+      "href": "/warehouse",
+      "todo": "open"
+    },
+    {
+      "id": "c-bank",
+      "name": "Banking and rural finance",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "finance",
+      "kernel": "documented",
+      "github": "scaffolded",
+      "present": "Hours-to-pay on the cell. Pledge gate.",
+      "missing": "Underwriting, disbursement, recovery, explainability.",
+      "next": "No invented credit score.",
+      "organs": [
+        "finance",
+        "farmer"
+      ],
+      "href": "/ledger",
+      "todo": "open"
+    },
+    {
+      "id": "c-logistics",
+      "name": "Logistics",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "logistics",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Declared freight (zero allowed). Spoilage remainder.",
+      "missing": "Control tower, ETA, PoD, load pooling.",
+      "next": "Freight is a deduction, not a marketplace yet.",
+      "organs": [
+        "logistics"
+      ],
+      "href": "/trade",
+      "todo": "open"
+    },
+    {
+      "id": "c-eng",
+      "name": "Engineering platform",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "engineering",
+      "kernel": "documented",
+      "github": "scaffolded",
+      "present": "GitHub names, MEP plan-to-BOQ mention.",
+      "missing": "Standards, units, BIM, simulation, commissioning.",
+      "next": "Blocked on professional approval boundaries.",
+      "organs": [
+        "shared"
+      ],
+      "href": "/os",
+      "todo": "blocked"
+    },
+    {
+      "id": "c-scheme",
+      "name": "Government schemes",
+      "table": "concept",
+      "stage": 2,
+      "level": 4,
+      "area": "india",
+      "kernel": "missing",
+      "github": "documented",
+      "present": "Named as blood, not PDF.",
+      "missing": "Effective-dated rules, eligibility, grievance.",
+      "next": "Do not scrape PDFs into a chatbot.",
+      "organs": [
+        "scheme"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "c-auth",
+      "name": "Authentication",
+      "table": "concept",
+      "stage": 1,
+      "level": 3,
+      "area": "security",
+      "kernel": "verified",
+      "github": "disconnected",
+      "present": "Clerk on this kernel. Auth off for visitors.",
+      "missing": "GitHub mock users + JWT split.",
+      "next": "One identity authority on that branch later.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "c-personal",
+      "name": "Personalization",
+      "table": "concept",
+      "stage": 3,
+      "level": 6,
+      "area": "ux",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Need-based intents. No hidden profile.",
+      "missing": "Consent ledger, ranking, reset, non-personalized mode.",
+      "next": "Voluntary constraints only.",
+      "organs": [
+        "farmer",
+        "household"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "c-ai",
+      "name": "AI services",
+      "table": "concept",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "duplicated",
+      "present": "One bus, 25 plugs, library-first, firewall.",
+      "missing": "GitHub 16 sibling chats. No eval harness.",
+      "next": "A wrapper is not production AI.",
+      "organs": [
+        "ai",
+        "module"
+      ],
+      "href": "/modules",
+      "todo": "open"
+    },
+    {
+      "id": "c-access",
+      "name": "Rural accessibility",
+      "table": "concept",
+      "stage": 2,
+      "level": 4,
+      "area": "rural",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Mobile layout, companion assist.",
+      "missing": "Offline, IVR, translation review, sync trail.",
+      "next": "Assisted operator is living.",
+      "organs": [
+        "household",
+        "farmer"
+      ],
+      "href": "/companion",
+      "todo": "open"
+    },
+    {
+      "id": "c-analytics",
+      "name": "Analytics",
+      "table": "concept",
+      "stage": 1,
+      "level": 5,
+      "area": "analytics",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "KPIs from remaining and journal.",
+      "missing": "Lineage, freshness, experiments on GitHub.",
+      "next": "Ban simulated business numbers.",
+      "organs": [
+        "erp"
+      ],
+      "href": "/",
+      "todo": "done"
+    },
+    {
+      "id": "c-knowledge",
+      "name": "Knowledge platform",
+      "table": "concept",
+      "stage": 3,
+      "level": 5,
+      "area": "knowledge",
+      "kernel": "verified",
+      "github": "scaffolded",
+      "present": "Library hippocampus, 19+ reflexes, bindings.",
+      "missing": "OCR graph, permissions, cited rules engine.",
+      "next": "Memory lives without an API key.",
+      "organs": [
+        "ai"
+      ],
+      "href": "/library",
+      "todo": "done"
+    },
+    {
+      "id": "c-esg",
+      "name": "Sustainability",
+      "table": "concept",
+      "stage": 2,
+      "level": 2,
+      "area": "esg",
+      "kernel": "missing",
+      "github": "documented",
+      "present": "Village spoilage grams. Declared kWh only.",
+      "missing": "Methodology, factors, audit, attribution.",
+      "next": "Do not invent emissions.",
+      "organs": [
+        "rcop",
+        "recie"
+      ],
+      "href": "/ledger",
+      "todo": "open"
+    },
+    {
+      "id": "b-arch",
+      "name": "Product architecture",
+      "table": "baseline",
+      "stage": 1,
+      "level": 3,
+      "area": "architecture",
+      "kernel": "verified",
+      "github": "overlapping",
+      "present": "Bounded organs + ligaments + module contracts.",
+      "missing": "GitHub overlapping services.",
+      "next": "Capability registry is this catalog.",
+      "organs": [
+        "os",
+        "module"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "b-journey",
+      "name": "User journeys",
+      "table": "baseline",
+      "stage": 1,
+      "level": 2,
+      "area": "ux",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Pulse walk + books flow + need intents.",
+      "missing": "Sector-native maps for travel/banking/health.",
+      "next": "Agriculture journey is the proof.",
+      "organs": [
+        "crop",
+        "farmer"
+      ],
+      "href": "/pulse",
+      "todo": "done"
+    },
+    {
+      "id": "b-api",
+      "name": "API architecture",
+      "table": "baseline",
+      "stage": 1,
+      "level": 3,
+      "area": "api",
+      "kernel": "partial",
+      "github": "disconnected",
+      "present": "Server functions, one kernel.",
+      "missing": "GitHub many naming conventions.",
+      "next": "Idempotent clerk writes only.",
+      "organs": [
+        "erp"
+      ],
+      "href": "/platform",
+      "todo": "done"
+    },
+    {
+      "id": "b-ident",
+      "name": "Authentication baseline",
+      "table": "baseline",
+      "stage": 1,
+      "level": 3,
+      "area": "security",
+      "kernel": "verified",
+      "github": "disconnected",
+      "present": "No mock login on this kernel.",
+      "missing": "Canonicalize GitHub identity later.",
+      "next": "Clerk is the human command.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "b-authz",
+      "name": "Authorization",
+      "table": "baseline",
+      "stage": 1,
+      "level": 3,
+      "area": "security",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "AI rupeeWrite false. Clerk writes.",
+      "missing": "ABAC, SoD, authorization tests on GitHub.",
+      "next": "L8–L9 are the policy.",
+      "organs": [
+        "ai",
+        "rupee"
+      ],
+      "href": "/charter",
+      "todo": "done"
+    },
+    {
+      "id": "b-data",
+      "name": "Data architecture",
+      "table": "baseline",
+      "stage": 1,
+      "level": 3,
+      "area": "data",
+      "kernel": "verified",
+      "github": "overlapping",
+      "present": "PGLite migrations. remaining_grams source of truth.",
+      "missing": "Schema collisions on GitHub (plantings/farms/plots).",
+      "next": "Lot body is one id.",
+      "organs": [
+        "lot",
+        "erp"
+      ],
+      "href": "/lots",
+      "todo": "done"
+    },
+    {
+      "id": "b-wf",
+      "name": "Workflow orchestration",
+      "table": "baseline",
+      "stage": 1,
+      "level": 3,
+      "area": "workflow",
+      "kernel": "verified",
+      "github": "scaffolded",
+      "present": "Durable module_steps. pass/block/defer/propose.",
+      "missing": "Timers, compensation, saga on GitHub.",
+      "next": "Unknown events fail (L12).",
+      "organs": [
+        "spine",
+        "module"
+      ],
+      "href": "/modules",
+      "todo": "done"
+    },
+    {
+      "id": "b-erpctl",
+      "name": "ERP control",
+      "table": "baseline",
+      "stage": 1,
+      "level": 3,
+      "area": "erp",
+      "kernel": "partial",
+      "github": "duplicated",
+      "present": "Journal, FIFO, WAC, trial balance, process mass.",
+      "missing": "Tax, 3-way, bank rec, assets.",
+      "next": "Village GL is enough to be honest.",
+      "organs": [
+        "erp",
+        "rupee"
+      ],
+      "href": "/platform",
+      "todo": "open"
+    },
+    {
+      "id": "b-ui",
+      "name": "UI architecture",
+      "table": "baseline",
+      "stage": 1,
+      "level": 6,
+      "area": "ux",
+      "kernel": "verified",
+      "github": "scaffolded",
+      "present": "Editorial tokens. Sector boards. No purple.",
+      "missing": "GitHub many page inventories.",
+      "next": "Need-based composer starts here.",
+      "organs": [
+        "os"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "b-resp",
+      "name": "Mobile / responsive",
+      "table": "baseline",
+      "stage": 1,
+      "level": 4,
+      "area": "rural",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "390 layout, overflow-x nav.",
+      "missing": "Device matrix, PWA offline.",
+      "next": "Touch targets hold.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/",
+      "todo": "done"
+    },
+    {
+      "id": "b-off",
+      "name": "Offline",
+      "table": "baseline",
+      "stage": 1,
+      "level": 4,
+      "area": "rural",
+      "kernel": "missing",
+      "github": "documented",
+      "present": "PWA chrome exists.",
+      "missing": "Encrypted queue, conflict, sync receipt.",
+      "next": "Do not fake store-and-forward.",
+      "organs": [
+        "spine"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "b-a11y",
+      "name": "Accessibility",
+      "table": "baseline",
+      "stage": 1,
+      "level": 4,
+      "area": "rural",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Labels, contrast, keyboard on controls.",
+      "missing": "Full WCAG journeys, voice confirm.",
+      "next": "Keep forms labelled.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "b-i18n",
+      "name": "Multilingual",
+      "table": "baseline",
+      "stage": 1,
+      "level": 4,
+      "area": "india",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Domain vocabulary in copy (cell, lot, farmgate).",
+      "missing": "Terminology registry, transliteration, review.",
+      "next": "Do not auto-translate rupee laws.",
+      "organs": [
+        "household"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "b-sec",
+      "name": "Security",
+      "table": "baseline",
+      "stage": 1,
+      "level": 3,
+      "area": "security",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "No secrets in repo. Firewall on AI writes.",
+      "missing": "Threat model, pen-test, incident playbook.",
+      "next": "Clerk boundary is the control.",
+      "organs": [
+        "ai"
+      ],
+      "href": "/charter",
+      "todo": "open"
+    },
+    {
+      "id": "b-consent",
+      "name": "Privacy and consent",
+      "table": "baseline",
+      "stage": 1,
+      "level": 6,
+      "area": "privacy",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Constitution E1–E8 enforced. No inferred caste/religion/health. Auth-off default.",
+      "missing": "Consent receipts, deletion, purpose binding.",
+      "next": "Voluntary constraints only.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "b-test",
+      "name": "Testing evidence",
+      "table": "baseline",
+      "stage": 1,
+      "level": 1,
+      "area": "ops",
+      "kernel": "verified",
+      "github": "scaffolded",
+      "present": "Kernel, lattice, charter, library, erp tests.",
+      "missing": "E2E auth, migration, resilience on GitHub.",
+      "next": "Mocked green is not complete.",
+      "organs": [
+        "erp",
+        "module"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "b-obs",
+      "name": "Observability",
+      "table": "baseline",
+      "stage": 1,
+      "level": 5,
+      "area": "ops",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "module_runs, pulses, auto-op.",
+      "missing": "SLOs, traces, redaction on GitHub.",
+      "next": "Correlation is lotId.",
+      "organs": [
+        "spine"
+      ],
+      "href": "/modules",
+      "todo": "open"
+    },
+    {
+      "id": "b-rel",
+      "name": "Reliability",
+      "table": "baseline",
+      "stage": 1,
+      "level": 1,
+      "area": "ops",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Startup revive, migrations idempotent.",
+      "missing": "DR, failover, backup restore.",
+      "next": "PGLite is the village memory here.",
+      "organs": [
+        "erp"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "b-content",
+      "name": "Content governance",
+      "table": "baseline",
+      "stage": 0,
+      "level": 5,
+      "area": "knowledge",
+      "kernel": "verified",
+      "github": "documented",
+      "present": "Library cards sourced. Effective doctrine.",
+      "missing": "GitHub completion certificates vs runtime.",
+      "next": "Cited or it is gossip.",
+      "organs": [
+        "ai"
+      ],
+      "href": "/library",
+      "todo": "done"
+    },
+    {
+      "id": "b-gov",
+      "name": "Completion governance",
+      "table": "baseline",
+      "stage": 0,
+      "level": 1,
+      "area": "architecture",
+      "kernel": "verified",
+      "github": "disconnected",
+      "present": "Nothing complete without runtime+data+tests.",
+      "missing": "Hundreds of COMPLETE reports on GitHub.",
+      "next": "Kernel under 40%. 7% platform. Dual-truth.",
+      "organs": [
+        "os"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "n-composer",
+      "name": "Sector Experience Composer",
+      "table": "innovation",
+      "stage": 2,
+      "level": 6,
+      "area": "ux",
+      "kernel": "partial",
+      "github": "proposed",
+      "present": "Need intents + sector boards (books, warehouse, trade).",
+      "missing": "Travel/insurance/ERP templates.",
+      "next": "Shared primitives. Different journeys.",
+      "organs": [
+        "os"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "n-event",
+      "name": "Life-and-Business Event Engine",
+      "table": "innovation",
+      "stage": 4,
+      "level": 1,
+      "area": "spine",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "harvest.completed, intake, settle, spoilage, cover.bound. Unknown events fail.",
+      "missing": "Marriage, illness, price-crash fan-out.",
+      "next": "Spine publishes. Unknown events fail.",
+      "organs": [
+        "spine"
+      ],
+      "href": "/pulse",
+      "todo": "done"
+    },
+    {
+      "id": "n-passport",
+      "name": "Evidence Passport",
+      "table": "innovation",
+      "stage": 1,
+      "level": 2,
+      "area": "trust",
+      "kernel": "verified",
+      "github": "documented",
+      "present": "Lot passport: GI, cover, remaining, paymentRef, journal.",
+      "missing": "Portable credential across organs on GitHub.",
+      "next": "Absent stays absent.",
+      "organs": [
+        "lot",
+        "trace"
+      ],
+      "href": "/lots",
+      "todo": "done"
+    },
+    {
+      "id": "n-profile",
+      "name": "User-Controlled Digital Profile",
+      "table": "innovation",
+      "stage": 3,
+      "level": 6,
+      "area": "privacy",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Cell is the nucleus. No hidden dossier.",
+      "missing": "Inspect/correct/revoke ledger.",
+      "next": "Auth-off here. Do not fake a profile.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "blocked"
+    },
+    {
+      "id": "n-need",
+      "name": "Need-Based Navigation",
+      "table": "innovation",
+      "stage": 1,
+      "level": 6,
+      "area": "ux",
+      "kernel": "verified",
+      "github": "documented",
+      "present": "Sell crop / mint / store / claim / Magh.",
+      "missing": "Full problem taxonomy.",
+      "next": "Module names are not the door.",
+      "organs": [
+        "farmer",
+        "os"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "n-compare",
+      "name": "Cross-Sector Comparison Engine",
+      "table": "innovation",
+      "stage": 2,
+      "level": 2,
+      "area": "commerce",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "None on this kernel.",
+      "missing": "User-weighted comparison with exclusions.",
+      "next": "Do not rank without declared criteria.",
+      "organs": [
+        "marketplace"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "n-trust",
+      "name": "Trust Graph",
+      "table": "innovation",
+      "stage": 2,
+      "level": 2,
+      "area": "trust",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "GI mint + paymentRef + remaining + passport.",
+      "missing": "Dispute, retaliation-safe reviews.",
+      "next": "Evidence over stars.",
+      "organs": [
+        "trace",
+        "fpo"
+      ],
+      "href": "/lots",
+      "todo": "open"
+    },
+    {
+      "id": "n-benefit",
+      "name": "Benefit Realization Ledger",
+      "table": "innovation",
+      "stage": 3,
+      "level": 5,
+      "area": "analytics",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Village TCO vs declared spoilage. Farmgate vs inputs.",
+      "missing": "Predicted vs actual yield/income with causality label.",
+      "next": "No success without a row.",
+      "organs": [
+        "rcop",
+        "rupee"
+      ],
+      "href": "/ledger",
+      "todo": "done"
+    },
+    {
+      "id": "n-exception",
+      "name": "Exception Command Centre",
+      "table": "innovation",
+      "stage": 1,
+      "level": 3,
+      "area": "ops",
+      "kernel": "verified",
+      "github": "scaffolded",
+      "present": "Platform exceptions G1–G9 with impact, owner, action. Blocking/deferred counts.",
+      "missing": "Escalate and verify closure across GitHub alerts.",
+      "next": "One place. Impact first.",
+      "organs": [
+        "erp",
+        "spine"
+      ],
+      "href": "/platform",
+      "todo": "done"
+    },
+    {
+      "id": "n-assist",
+      "name": "Assisted Digital Operator",
+      "table": "innovation",
+      "stage": 2,
+      "level": 4,
+      "area": "rural",
+      "kernel": "verified",
+      "github": "documented",
+      "present": "Companion proposes. Clerk confirms kg/₹/ref.",
+      "missing": "Delegated consent, recorded assistance on GitHub.",
+      "next": "User confirmation required.",
+      "organs": [
+        "farmer",
+        "module"
+      ],
+      "href": "/companion",
+      "todo": "done"
+    },
+    {
+      "id": "n-rules",
+      "name": "Rules-as-Evidence",
+      "table": "innovation",
+      "stage": 1,
+      "level": 3,
+      "area": "knowledge",
+      "kernel": "verified",
+      "github": "documented",
+      "present": "L1–L12 executable. Gates named.",
+      "missing": "Scheme/GST rules with citation+effective date.",
+      "next": "Authority, date, logic, reviewer.",
+      "organs": [
+        "module",
+        "scheme"
+      ],
+      "href": "/charter",
+      "todo": "done"
+    },
+    {
+      "id": "n-suit",
+      "name": "Suitability Layer",
+      "table": "innovation",
+      "stage": 3,
+      "level": 2,
+      "area": "trust",
+      "kernel": "verified",
+      "github": "documented",
+      "present": "Refuse loan, travel, invented premium, undated scheme. Cover may bind without a quote.",
+      "missing": "Affordability engine, exclusions comparison on GitHub.",
+      "next": "Do not recommend a loan here.",
+      "organs": [
+        "finance",
+        "insurance"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "n-cap",
+      "name": "Capability Marketplace",
+      "table": "innovation",
+      "stage": 4,
+      "level": 3,
+      "area": "modules",
+      "kernel": "partial",
+      "github": "proposed",
+      "present": "Module OS contracts, health, firewall.",
+      "missing": "Signed adapters, migrations, permissions on GitHub.",
+      "next": "Plug without a second organism.",
+      "organs": [
+        "module"
+      ],
+      "href": "/modules",
+      "todo": "open"
+    },
+    {
+      "id": "n-grief",
+      "name": "Digital Grievance Spine",
+      "table": "innovation",
+      "stage": 2,
+      "level": 4,
+      "area": "trust",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Village cases from G1–G5. Complaint → ack → evidence. No invented ₹.",
+      "missing": "Insurance/government appeal machine.",
+      "next": "Do not hide disputes in chat.",
+      "organs": [
+        "farmer",
+        "spine"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "n-ethic",
+      "name": "Ethical Engagement Engine",
+      "table": "innovation",
+      "stage": 3,
+      "level": 6,
+      "area": "ux",
+      "kernel": "verified",
+      "github": "documented",
+      "present": "No dark patterns. Firewall. Library-first. 99.5% token save.",
+      "missing": "Experiment framework, fatigue controls.",
+      "next": "Benefit over addiction.",
+      "organs": [
+        "ai",
+        "farmer"
+      ],
+      "href": "/economy",
+      "todo": "done"
+    },
+    {
+      "id": "a-comp",
+      "name": "Intelligent component",
+      "table": "ai",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Four-level enhance. Boards explain remaining, gates, next action. Envelope on proposals.",
+      "missing": "Language adapt + outcome feedback on GitHub.",
+      "next": "Explain or hide.",
+      "organs": [
+        "ai"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "a-form",
+      "name": "Evidence-aware form",
+      "table": "ai",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Harvest/process/settle forms. Declared only.",
+      "missing": "OCR, voice, inconsistency detection.",
+      "next": "Save/resume is the clerk.",
+      "organs": [
+        "lot"
+      ],
+      "href": "/lots",
+      "todo": "open"
+    },
+    {
+      "id": "a-search",
+      "name": "Multimodal intent search",
+      "table": "ai",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Library query. Nerve consult.",
+      "missing": "Image, geo, vernacular, permissioned retrieval.",
+      "next": "Library-first.",
+      "organs": [
+        "ai"
+      ],
+      "href": "/nerve",
+      "todo": "open"
+    },
+    {
+      "id": "a-rec",
+      "name": "Constraint-aware recommendation",
+      "table": "ai",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Companion ranks settle/intake/harvest. No invented ₹.",
+      "missing": "Causal benefit, season, consent.",
+      "next": "Propose only.",
+      "organs": [
+        "module"
+      ],
+      "href": "/companion",
+      "todo": "done"
+    },
+    {
+      "id": "a-dash",
+      "name": "Adaptive decision workspace",
+      "table": "ai",
+      "stage": 3,
+      "level": 6,
+      "area": "ux",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "OS board + books + exceptions.",
+      "missing": "Role/risk/geography composer.",
+      "next": "Priorities from remaining and gates.",
+      "organs": [
+        "os",
+        "erp"
+      ],
+      "href": "/os",
+      "todo": "done"
+    },
+    {
+      "id": "a-note",
+      "name": "Intelligent intervention",
+      "table": "ai",
+      "stage": 3,
+      "level": 5,
+      "area": "ai",
+      "kernel": "proposed",
+      "github": "scaffolded",
+      "present": "Copilot strip. No push spam.",
+      "missing": "Channel/timing/fatigue engine.",
+      "next": "Do not nag.",
+      "organs": [
+        "ai"
+      ],
+      "href": "/companion",
+      "todo": "open"
+    },
+    {
+      "id": "a-wf",
+      "name": "AI-assisted dynamic workflow",
+      "table": "ai",
+      "stage": 4,
+      "level": 5,
+      "area": "workflow",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Engine selects next step. Missing evidence defers.",
+      "missing": "Predict evidence, escalate.",
+      "next": "pass/block/defer/propose.",
+      "organs": [
+        "spine"
+      ],
+      "href": "/modules",
+      "todo": "done"
+    },
+    {
+      "id": "a-doc",
+      "name": "Document intelligence",
+      "table": "ai",
+      "stage": 3,
+      "level": 5,
+      "area": "knowledge",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Issue harvest/warehouse/settle documents.",
+      "missing": "OCR, layout, compliance coords.",
+      "next": "Human verifies.",
+      "organs": [
+        "erp"
+      ],
+      "href": "/platform",
+      "todo": "open"
+    },
+    {
+      "id": "a-pdp",
+      "name": "Trust-and-suitability page",
+      "table": "ai",
+      "stage": 3,
+      "level": 2,
+      "area": "commerce",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "GI frame, remaining, declared price.",
+      "missing": "Dietary/cultural filters with consent.",
+      "next": "No silent profiling.",
+      "organs": [
+        "marketplace"
+      ],
+      "href": "/trade",
+      "todo": "open"
+    },
+    {
+      "id": "a-ins",
+      "name": "Protection-gap adviser",
+      "table": "ai",
+      "stage": 3,
+      "level": 2,
+      "area": "insurance",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Cover bound without premium.",
+      "missing": "Exclusions, scenarios, affordability.",
+      "next": "Do not invent a quote.",
+      "organs": [
+        "insurance"
+      ],
+      "href": "/warehouse",
+      "todo": "open"
+    },
+    {
+      "id": "a-travel",
+      "name": "Contextual journey planner",
+      "table": "ai",
+      "stage": 2,
+      "level": 2,
+      "area": "travel",
+      "kernel": "proposed",
+      "github": "scaffolded",
+      "present": "Not this village kernel.",
+      "missing": "Budget/weather/food/access.",
+      "next": "Do not clone agriculture UX.",
+      "organs": [
+        "demand"
+      ],
+      "href": "/os",
+      "todo": "blocked"
+    },
+    {
+      "id": "a-twin",
+      "name": "Farm digital-twin decisions",
+      "table": "ai",
+      "stage": 4,
+      "level": 5,
+      "area": "agriculture",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Planting close, remaining, Magh memory.",
+      "missing": "Soil/weather/water simulation.",
+      "next": "No invented yield.",
+      "organs": [
+        "crop",
+        "village"
+      ],
+      "href": "/cells",
+      "todo": "open"
+    },
+    {
+      "id": "a-fin",
+      "name": "Explainable cash-flow",
+      "table": "ai",
+      "stage": 3,
+      "level": 2,
+      "area": "finance",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Hours-to-pay, farmgate, inputs.",
+      "missing": "Stress, early warning, underwriting.",
+      "next": "No silent score.",
+      "organs": [
+        "finance",
+        "rupee"
+      ],
+      "href": "/ledger",
+      "todo": "open"
+    },
+    {
+      "id": "a-log",
+      "name": "Predictive logistics market",
+      "table": "ai",
+      "stage": 4,
+      "level": 2,
+      "area": "logistics",
+      "kernel": "proposed",
+      "github": "scaffolded",
+      "present": "Declared freight. Spoilage event.",
+      "missing": "Pooling, ETA confidence, cold-chain.",
+      "next": "Cost is declared.",
+      "organs": [
+        "logistics"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "a-net",
+      "name": "Demand-supply network",
+      "table": "ai",
+      "stage": 4,
+      "level": 2,
+      "area": "commerce",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Kitchen → next Magh offer at last kg.",
+      "missing": "Fair allocation, waste reduction.",
+      "next": "Price stays blank until declared.",
+      "organs": [
+        "demand",
+        "contract"
+      ],
+      "href": "/trade",
+      "todo": "open"
+    },
+    {
+      "id": "a-ctl",
+      "name": "Continuous intelligent control",
+      "table": "ai",
+      "stage": 4,
+      "level": 3,
+      "area": "erp",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Journal balance gate. Exceptions.",
+      "missing": "Fraud, margin leakage models.",
+      "next": "Anomaly is a defer, not a write.",
+      "organs": [
+        "erp"
+      ],
+      "href": "/platform",
+      "todo": "open"
+    },
+    {
+      "id": "a-nerve",
+      "name": "Governed AI nervous system",
+      "table": "ai",
+      "stage": 4,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "duplicated",
+      "present": "Router, library, agents, policy, human control.",
+      "missing": "Eval, memory governance, cost/latency SLOs.",
+      "next": "One nerve. Many tissues.",
+      "organs": [
+        "ai",
+        "module"
+      ],
+      "href": "/modules",
+      "todo": "done"
+    },
+    {
+      "id": "a-nat",
+      "name": "Rural-economic intelligence network",
+      "table": "ai",
+      "stage": 6,
+      "level": 1,
+      "area": "india",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Langthasa books as the cell of a nation.",
+      "missing": "Permissioned exchanges, public programs.",
+      "next": "Village first.",
+      "organs": [
+        "village",
+        "os"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "f-petwin",
+      "name": "Personal Economic Digital Twin",
+      "table": "future",
+      "stage": 6,
+      "level": 5,
+      "area": "twin",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "None. Would simulate loan/crop/store before write.",
+      "missing": "Household/farm/enterprise simulator.",
+      "next": "Show what-if. Never auto-execute.",
+      "organs": [
+        "farmer",
+        "household"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "f-vtwin",
+      "name": "Village / Cluster Digital Twin",
+      "table": "future",
+      "stage": 6,
+      "level": 5,
+      "area": "twin",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Village ledger + plantings + remaining.",
+      "missing": "Water/energy/storage/demand model.",
+      "next": "Identify shared gaps. No invented kWh.",
+      "organs": [
+        "village",
+        "rcop"
+      ],
+      "href": "/ledger",
+      "todo": "open"
+    },
+    {
+      "id": "f-aron",
+      "name": "Autonomous Rural Operations",
+      "table": "future",
+      "stage": 5,
+      "level": 5,
+      "area": "agents",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Bounded companion. Approval thresholds.",
+      "missing": "Procurement/logistics agents.",
+      "next": "Low-risk only. Writes stay human.",
+      "organs": [
+        "module"
+      ],
+      "href": "/companion",
+      "todo": "open"
+    },
+    {
+      "id": "f-fed",
+      "name": "Federated Rural Intelligence",
+      "table": "future",
+      "stage": 6,
+      "level": 5,
+      "area": "privacy",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "None.",
+      "missing": "Learn without centralizing cell data.",
+      "next": "Local weights. National questions.",
+      "organs": [
+        "ai"
+      ],
+      "href": "/os",
+      "todo": "blocked"
+    },
+    {
+      "id": "f-graph",
+      "name": "India Agricultural Knowledge Graph",
+      "table": "future",
+      "stage": 4,
+      "level": 5,
+      "area": "knowledge",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Kitchen graph Magh → Chakhao. Library cards.",
+      "missing": "Soil/climate/research/scheme graph.",
+      "next": "Evidence-aware. Cited.",
+      "organs": [
+        "foodgraph",
+        "gcip"
+      ],
+      "href": "/library",
+      "todo": "open"
+    },
+    {
+      "id": "f-diet",
+      "name": "Cultural / Dietary Constraint Engine",
+      "table": "future",
+      "stage": 3,
+      "level": 6,
+      "area": "privacy",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Voluntary. Not inferred.",
+      "missing": "Filter, never profile.",
+      "next": "Cannot set price/credit/eligibility.",
+      "organs": [
+        "household",
+        "fvie"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "f-climate",
+      "name": "Climate Adaptation Autopilot",
+      "table": "future",
+      "stage": 5,
+      "level": 5,
+      "area": "reflex",
+      "kernel": "missing",
+      "github": "documented",
+      "present": "Weather still a page on GitHub.",
+      "missing": "Simulate adaptation daily.",
+      "next": "Reflex or hide.",
+      "organs": [
+        "soil",
+        "reflex"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "f-circ",
+      "name": "Circular Resource Exchange",
+      "table": "future",
+      "stage": 6,
+      "level": 2,
+      "area": "esg",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Spoilage as village fever. No waste market.",
+      "missing": "By-product, return load, unused capacity.",
+      "next": "Waste is a rupee if declared.",
+      "organs": [
+        "rcop"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "f-cbo",
+      "name": "Community Benefit Optimizer",
+      "table": "future",
+      "stage": 6,
+      "level": 2,
+      "area": "fairness",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Qty-weighted FPO split. Last cell remainder.",
+      "missing": "Income+affordability+resilience objective.",
+      "next": "Not platform GMV.",
+      "organs": [
+        "fpo",
+        "rupee"
+      ],
+      "href": "/trade",
+      "todo": "open"
+    },
+    {
+      "id": "f-policy",
+      "name": "Policy Simulation Laboratory",
+      "table": "future",
+      "stage": 6,
+      "level": 4,
+      "area": "india",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "None.",
+      "missing": "Scheme twins before gazette.",
+      "next": "Evidence for government.",
+      "organs": [
+        "scheme",
+        "village"
+      ],
+      "href": "/os",
+      "todo": "blocked"
+    },
+    {
+      "id": "f-obi",
+      "name": "Outcome-Based Insurance",
+      "table": "future",
+      "stage": 5,
+      "level": 2,
+      "area": "insurance",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Cover bound. No premium.",
+      "missing": "Prevention linked to protection.",
+      "next": "Do not invent a rate.",
+      "organs": [
+        "insurance"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "f-infra",
+      "name": "Infrastructure Intelligence Network",
+      "table": "future",
+      "stage": 6,
+      "level": 2,
+      "area": "engineering",
+      "kernel": "proposed",
+      "github": "scaffolded",
+      "present": "Godown cover. No thermal twin.",
+      "missing": "Cold store/solar/pond twins.",
+      "next": "Engineering approval required.",
+      "organs": [
+        "warehouse",
+        "recie"
+      ],
+      "href": "/os",
+      "todo": "blocked"
+    },
+    {
+      "id": "f-aidp",
+      "name": "Verifiable AI Decision Passport",
+      "table": "future",
+      "stage": 4,
+      "level": 5,
+      "area": "ai",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Step payload: decision, organ, lotId, algorithm.",
+      "missing": "Portable audit across institutions.",
+      "next": "Challenge and correct.",
+      "organs": [
+        "ai",
+        "lot"
+      ],
+      "href": "/modules",
+      "todo": "open"
+    },
+    {
+      "id": "f-coop",
+      "name": "Personal Data Cooperative",
+      "table": "future",
+      "stage": 6,
+      "level": 6,
+      "area": "privacy",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "None.",
+      "missing": "Collective license of permitted data.",
+      "next": "Value to contributors.",
+      "organs": [
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "blocked"
+    },
+    {
+      "id": "f-reflex",
+      "name": "Disaster / Disruption Reflex",
+      "table": "future",
+      "stage": 5,
+      "level": 5,
+      "area": "reflex",
+      "kernel": "partial",
+      "github": "documented",
+      "present": "Spoilage cuts remaining. Cover binds. EMI pause named.",
+      "missing": "Flood/heat/price-crash pre-approved bundle.",
+      "next": "Warning must move a muscle.",
+      "organs": [
+        "reflex",
+        "insurance"
+      ],
+      "href": "/warehouse",
+      "todo": "open"
+    },
+    {
+      "id": "f-syn",
+      "name": "Synthetic Scenario Exchange",
+      "table": "future",
+      "stage": 6,
+      "level": 5,
+      "area": "ops",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Tests on Magh numbers. No rare-event farm.",
+      "missing": "Generate failures before they happen.",
+      "next": "Never as live rupees.",
+      "organs": [
+        "erp"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "f-nlb",
+      "name": "Natural-Language Enterprise Builder",
+      "table": "future",
+      "stage": 6,
+      "level": 3,
+      "area": "modules",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Companion proposes workflows.",
+      "missing": "Goal → screens/controls with human approve.",
+      "next": "Registry stays canonical.",
+      "organs": [
+        "module"
+      ],
+      "href": "/companion",
+      "todo": "open"
+    },
+    {
+      "id": "f-heal",
+      "name": "Self-Healing Integration Fabric",
+      "table": "future",
+      "stage": 5,
+      "level": 3,
+      "area": "modules",
+      "kernel": "partial",
+      "github": "scaffolded",
+      "present": "Charter names orphans. Selfheal step on bus.",
+      "missing": "Contract+telemetry repairs. No speculative code.",
+      "next": "No-orphan continuously.",
+      "organs": [
+        "module",
+        "spine"
+      ],
+      "href": "/charter",
+      "todo": "open"
+    },
+    {
+      "id": "f-map",
+      "name": "National Capability Map",
+      "table": "future",
+      "stage": 6,
+      "level": 4,
+      "area": "india",
+      "kernel": "proposed",
+      "github": "documented",
+      "present": "Langthasa is one village.",
+      "missing": "Geo capacity/demand/gaps.",
+      "next": "Guide investment to shortage.",
+      "organs": [
+        "village"
+      ],
+      "href": "/os",
+      "todo": "open"
+    },
+    {
+      "id": "f-const",
+      "name": "Ethical Personalization Constitution",
+      "table": "future",
+      "stage": 3,
+      "level": 6,
+      "area": "ux",
+      "kernel": "verified",
+      "github": "documented",
+      "present": "No dark patterns. No inferred sensitive traits. Firewall.",
+      "missing": "Machine-enforced constitution registry.",
+      "next": "Assistance ≠ manipulation.",
+      "organs": [
+        "ai",
+        "farmer"
+      ],
+      "href": "/os",
+      "todo": "done"
+    }
+  ]
+}
