@@ -18,7 +18,7 @@ const { evidencePassport } = require('../os/passport');
 const { evaluateConstitution } = require('../os/constitution');
 const { farmTwin, infraTwin, inspectCell } = require('../os/runtime');
 const { assessSuitability } = require('../os/suitability');
-const { FLOW_BY_ID, FLOWS } = require('./catalog');
+const { FLOW_BY_ID, FLOWS, flowStats } = require('./catalog');
 
 const FIREWALL_STEP = { code: 'F0', moduleId: 'fabric', name: 'Firewall', kind: 'decision', organ: 'rupee', algorithm: 'ai-firewall', emits: 'fabric.allow', rupeeWrite: false };
 
@@ -191,4 +191,4 @@ function runNode(flowId, nodeId, facts = defaultFlowFacts()) {
   return fireNode(node, facts);
 }
 
-module.exports = { defaultFlowFacts, runFlow, runAllFlows, runNode };
+module.exports = { defaultFlowFacts, runFlow, runAllFlows, runNode, flowStats };
