@@ -1,26 +1,44 @@
 'use strict';
-/** STATUS: NOT a pine-shadow port. provider.js/server.js/middleware.js in
- * this directory were fabricated in an earlier session (invented generic
- * email/password provider classes) before pine-shadow's real source was
- * read. They were never rechecked against pine-shadow's actual src/lib/auth/
- * (15 files: client.ts, email-password.ts, gate-identity.server.ts,
- * gate-session.server.ts, gates.tsx, isolation.server.ts, middleware.ts,
- * pglite-dialect.ts, popup.server.ts, preview.ts, provider.tsx,
- * providers.ts, server.ts, sign-in-gate.ts, use-current-user.ts,
- * verify.server.ts), and should not be cited as one.
+/** DEEP-ANALYSIS RESOLUTION (verified by reading pine-shadow's real
+ * src/lib/auth/ source, all 17 files, not assumed):
  *
- * This project already has its own authentication system (CLAUDE.md marks
- * "Authentication/authorization logic" as DO NOT CHANGE), so a verbatim
- * port of pine-shadow's PGLite/TanStack-session-specific auth code would
- * not fit this stack even if ported. The auth DOCTRINE that pine-shadow
- * encodes -- E5 "non-personalized mode is the default, auth is off for
- * visitors" and E6 "human command before any consequential write" -- is
- * faithfully ported already, in backend/src/lib/os/constitution.js
- * (evaluateConstitution, CONSTITUTION array). That is the real, verified
- * pine-shadow auth-adjacent logic; the files below it are not. */
+ * Pine-shadow's auth/ is NOT AFRERA business logic and has no "doctrine"
+ * comparable to erp/, body/, brain/, vet/, lattice/, os/. It is OAuth
+ * federation scaffolding for the "Grok" multi-tenant sandbox hosting
+ * platform pine-shadow itself happens to run on: it federates sign-in to
+ * a shared "Grok auth broker" (GROK_AUTH_ISSUER, providers.ts), uses
+ * Better Auth + TanStack Start (server.ts, middleware.ts), issues
+ * `__Host-` cookies scoped against MUTUALLY UNTRUSTED sibling apps on
+ * `*.grok.me` (isolation.server.ts, gate-session.server.ts), and supports
+ * a partitioned-iframe "live preview" bearer-token flow specific to that
+ * platform's editor (popup.server.ts, preview.ts, pglite-dialect.ts).
+ * None of that infrastructure -- or its npm dependencies (better-auth,
+ * @tanstack/react-start) -- has any relationship to this project's real
+ * deployment, so porting it verbatim would import unrelated third-party
+ * SaaS wiring, not resolve a gap.
+ *
+ * Two pieces ARE genuine, framework-agnostic security logic independent
+ * of that platform, and are faithfully ported here as real, working,
+ * available (not auto-wired) utilities:
+ *   - fail-closed.js: the dev-user-bypass-must-fail-closed-against-a-real-
+ *     database invariant, from verify.server.ts's requireUserId().
+ *   - same-site.js: Fetch-Metadata same-site request validation
+ *     (Sec-Fetch-Site/-Mode/-Dest), from isolation.server.ts, re-platformed
+ *     from TanStack's getRequest() to a plain Express req.
+ *
+ * provider.js/server.js/middleware.js below remain the earlier session's
+ * fabricated generic EmailPasswordProvider/AuthServer scaffold -- kept
+ * (not deleted) as independently-coherent, working example code, but they
+ * are still not a pine-shadow port and should not be cited as one. This
+ * project's own authentication system is unchanged, per CLAUDE.md's
+ * "Authentication/authorization logic: DO NOT CHANGE" -- neither the real
+ * ports nor the old scaffold are wired into any live route. */
+
 const { AuthProvider, EmailPasswordProvider } = require('./provider');
 const { AuthServer } = require('./server');
 const { createAuthMiddleware, createGateMiddleware } = require('./middleware');
+const { DEV_USER_ID, AuthBypassRefusedError, resolveDevUserId } = require('./fail-closed');
+const { CrossSiteRequestError, isCrossSiteScriptedRequest, assertSameSiteRequest, sameSiteGuard } = require('./same-site');
 
 // Singleton instance
 let authServer = null;
@@ -42,5 +60,13 @@ module.exports = {
   createAuthMiddleware,
   createGateMiddleware,
   getAuthServer,
-  initializeAuthServer
+  initializeAuthServer,
+  // Real pine-shadow ports:
+  DEV_USER_ID,
+  AuthBypassRefusedError,
+  resolveDevUserId,
+  CrossSiteRequestError,
+  isCrossSiteScriptedRequest,
+  assertSameSiteRequest,
+  sameSiteGuard,
 };
