@@ -589,6 +589,26 @@ export const hrAPI = {
 export const financeAPI = {
   getFinancialData: () => api.get('/finance'),
   getAccounts: () => api.get('/finance/accounts'),
+
+  // The canonical ledger (journal_entries/journal_lines), per
+  // AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C. LedgerPage called
+  // financeAPI.trialBalance() and financeAPI.verifyLedger(), neither of which
+  // existed on this object -- so the page threw
+  // "financeAPI.trialBalance is not a function" at mount and never rendered.
+  // `verifyLedger` is deliberately NOT recreated under that name: it belonged
+  // to the hash-chained gl_ledger_chain ledger, which is deprecated, and the
+  // canonical ledger is not hash-chained. Calling the new check "verify" would
+  // carry a tamper-evidence claim the canonical ledger does not make.
+  trialBalance: (companyId, params = {}) =>
+    api.get('/ledger/trial-balance', { params: { companyId, ...params } }),
+  ledgerIntegrity: (companyId) =>
+    api.get('/ledger/integrity', { params: { companyId } }),
+  ledgerEntries: (companyId, params = {}) =>
+    api.get('/ledger/entries', { params: { companyId, ...params } }),
+  ledgerAccounts: (companyId, params = {}) =>
+    api.get('/ledger/accounts', { params: { companyId, ...params } }),
+  accountLedger: (companyId, accountCode, params = {}) =>
+    api.get(`/ledger/accounts/${encodeURIComponent(accountCode)}/ledger`, { params: { companyId, ...params } }),
 };
 
 export const legalAPI = {
@@ -4121,7 +4141,11 @@ export const visionAPI = {
   manageVision: (data) => api.post('/vision/manage', data),
 };
 
-export void visualizationAPI = {
+// `export void` is not valid JavaScript. This one token made the WHOLE file
+// unparseable, so every frontend build failed at the bundling step and no
+// module importing from services/api could load. Every sibling export in
+// this file uses `const`.
+export const visualizationAPI = {
   getVisualization: () => api.get('/visualization'),
   manageVisualization: (data) => api.post('/visualization/manage', data),
 };
@@ -4131,7 +4155,7 @@ export const viticultureAPI = {
   manageViticulture: (data) => api.post('/viticulture/manage', data),
 };
 
-export const void warehouseAPI2 = {
+export const warehouseAPI2 = {
   getWarehouse: () => api.get('/warehouse'),
   manageWarehouse: (data) => api.post('/warehouse/manage', data),
 };
@@ -4211,7 +4235,12 @@ export const zooAPI = {
   manageZoo: (data) => api.post('/zoo/manage', data),
 };
 
-export default api;
+// RECOVERED 2026-09-23: this line read `export default api;`, which had
+// replaced the opening of this export group -- leaving its members as
+// bare object properties at module scope and making the file
+// unparseable. The default export is restored at the end of the file,
+// where it belongs.
+export const jurisdictionAPI = {
   getJurisdictions: () => api.get('/jurisdictions'),
   getJurisdiction: (id) => api.get(`/jurisdictions/${id}`),
 };
@@ -5316,3 +5345,10 @@ export const warningAPI = {
   resetWarningMetrics: () => api.post('/warnings/metrics/reset'),
   getWarningHealth: () => api.get('/warnings/health'),
 };
+
+// 169 modules import `{ api }` as a NAMED export from this file, which only
+// ever had a default one -- every one of them failed with
+// `"api" is not exported by "src/services/api.js"` and the build could not
+// complete. Exported both ways so neither import style breaks.
+export { api };
+export default api;
