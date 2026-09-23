@@ -1,33 +1,23 @@
 'use strict';
 /** Organism boot/consult functions. Adapted from pine-shadow src/lib/organism/fns.ts.
  *
- * The original is written as TanStack `createServerFn` handlers backed by
- * PGLite (`getSql()` from `@/lib/db`) and a `boot.server.ts` that creates
- * ai_pulses / organism_state / spine_events tables. This project is
- * Express + PostgreSQL, not TanStack + PGLite, so the persistence layer
- * below is an in-memory reference implementation of the same shape
- * (autoOp/bootedAt/libraryCards/bindings/pulses/events), NOT yet wired to
- * backend/src/database/connection.js. Wiring real Postgres persistence is
- * the concrete next step — see .ai/COMPLETE_INTEGRATION_REPORT.html.
- * The real logic that IS faithfully ported: the diagnose-on-boot pattern,
- * the library-first / LLM-gated consult flow, and the xAI Grok enrichment
- * call shape (same env var, same system prompt, same 5s timeout). */
+ * Now wired to real PostgreSQL persistence via boot.server.js (Priority 3
+ * from the integration report). If the DB pool isn't initialized yet
+ * (backend/src/database/connection.js's initialize() hasn't run — e.g. in
+ * tests, or a cold require before server startup), every DB call below
+ * fails and this module falls back to the same in-memory snapshot shape
+ * it used before, so requiring this module never crashes the process.
+ * The logic that was already faithfully ported (diagnose-on-boot,
+ * library-first / LLM-gated consult, the Grok enrichment call shape) is
+ * unchanged. */
 
 const { diagnose, composeLibraryReading, queryLibraryKnowledge } = require('../library');
 const { compactEnvelope, shouldCallLlm } = require('../tokens/economy');
+const boot = require('./boot.server');
 
-const state = {
-  autoOp: 'missing',
-  bootedAt: null,
-  lastPulseAt: null,
-  lastError: null,
-  pulses: [],
-  events: [],
-  nextPulseId: 1,
-  nextEventId: 1,
-};
+const memory = { autoOp: 'missing', bootedAt: null, lastPulseAt: null, lastError: null, pulses: [], events: [], nextPulseId: 1, nextEventId: 1 };
 
-async function grokEnrich(query, memory) {
+async function grokEnrich(query, memoryText) {
   const apiKey = process.env.XAI_API_KEY;
   if (!apiKey) return null;
   try {
@@ -41,7 +31,7 @@ async function grokEnrich(query, memory) {
         temperature: 0.2,
         messages: [
           { role: 'system', content: 'You are the AFRERA nerve. The library is memory. Speak as an organism doctor: name the organ, the missing ligament, the signal that should fire, and the farmer rupee at stake. Do not invent living runtime that the catalog marks missing. Keep it under 220 words. No emoji.' },
-          { role: 'user', content: `Consult this library memory and answer the pulse.\n\n${memory}\n\nPulse: ${query}` },
+          { role: 'user', content: `Consult this library memory and answer the pulse.\n\n${memoryText}\n\nPulse: ${query}` },
         ],
       }),
     });
@@ -53,44 +43,59 @@ async function grokEnrich(query, memory) {
   }
 }
 
-function snapshot() {
+async function snapshot() {
   const diagnosis = diagnose();
-  return {
-    autoOp: state.autoOp,
-    bootedAt: state.bootedAt,
-    libraryCards: diagnosis.cards,
-    bindings: diagnosis.bindings,
-    lastPulseAt: state.lastPulseAt,
-    lastError: state.lastError,
-    diagnosis,
-    pulses: state.pulses,
-    events: state.events,
-    reflexesAnswered: diagnosis.reflexesAnswered,
-  };
+  try {
+    const state = await boot.readOrganismState();
+    const pulses = await boot.recentPulses();
+    const events = await boot.recentEvents();
+    return {
+      autoOp: state.booted_at ? 'living' : 'missing', bootedAt: state.booted_at, libraryCards: diagnosis.cards,
+      bindings: diagnosis.bindings, lastPulseAt: state.last_pulse_at, lastError: state.last_error,
+      diagnosis, pulses, events, reflexesAnswered: diagnosis.reflexesAnswered, persisted: true,
+    };
+  } catch {
+    return {
+      autoOp: memory.autoOp, bootedAt: memory.bootedAt, libraryCards: diagnosis.cards, bindings: diagnosis.bindings,
+      lastPulseAt: memory.lastPulseAt, lastError: memory.lastError, diagnosis, pulses: memory.pulses,
+      events: memory.events, reflexesAnswered: diagnosis.reflexesAnswered, persisted: false,
+    };
+  }
 }
 
 async function bootOrganism() {
   try {
-    state.bootedAt = state.bootedAt ?? new Date().toISOString();
-    state.autoOp = 'living';
-    state.lastError = null;
-    return { ok: true, ...snapshot() };
+    await boot.markBooted();
   } catch (err) {
-    state.lastError = err instanceof Error ? err.message : 'boot failed';
-    return { ok: false, error: state.lastError, ...snapshot() };
+    memory.bootedAt = memory.bootedAt ?? new Date().toISOString();
+    memory.autoOp = 'living';
+    memory.lastError = null;
+  }
+  try {
+    return { ok: true, ...(await snapshot()) };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'boot failed';
+    memory.lastError = message;
+    return { ok: false, error: message, ...(await snapshot()) };
   }
 }
 
 async function getOrganism() {
-  if (state.autoOp !== 'living') return bootOrganism();
-  return { ok: true, ...snapshot() };
+  const snap = await snapshot();
+  if (snap.autoOp !== 'living') return bootOrganism();
+  return { ok: true, ...snap };
 }
 
 async function publishSpineEvent(input) {
   const signal = String(input?.signal ?? '').slice(0, 240);
   if (!signal) return { ok: false, error: 'missing signal' };
-  state.events.push({ id: state.nextEventId++, signal, organId: input?.organId ?? null, ligamentId: input?.ligamentId ?? null, createdAt: new Date().toISOString() });
-  return { ok: true, events: state.events };
+  try {
+    const events = await boot.publishEvent(signal, input?.organId ?? null, input?.ligamentId ?? null, { via: 'organism.fns' });
+    return { ok: true, events };
+  } catch {
+    memory.events.push({ id: memory.nextEventId++, signal, organId: input?.organId ?? null, ligamentId: input?.ligamentId ?? null, createdAt: new Date().toISOString() });
+    return { ok: true, events: memory.events };
+  }
 }
 
 async function consultLibrary(input) {
@@ -99,8 +104,8 @@ async function consultLibrary(input) {
   await bootOrganism();
   const diagnosis = diagnose();
   const hits = queryLibraryKnowledge(query, { organId: input?.organId ?? null, limit: 8 });
-  const memory = composeLibraryReading(query, hits, diagnosis);
-  let reading = memory;
+  const memoryText = composeLibraryReading(query, hits, diagnosis);
+  let reading = memoryText;
   let source = 'library';
   if (shouldCallLlm(query)) {
     const packed = compactEnvelope(query).text;
@@ -111,10 +116,16 @@ async function consultLibrary(input) {
     }
   }
   await publishSpineEvent({ signal: 'nerve.consult', organId: input?.organId ?? 'ai', ligamentId: null });
-  const pulseId = state.nextPulseId++;
-  state.pulses.push({ id: pulseId, kind: 'consult', query, reading, cardIds: hits.map((h) => h.id), organId: input?.organId ?? null, source, createdAt: new Date().toISOString() });
-  state.lastPulseAt = new Date().toISOString();
-  return { ok: true, source, reading, cardIds: hits.map((h) => h.id), pulseId, pulses: state.pulses, events: state.events };
+  let pulseId;
+  try {
+    pulseId = await boot.insertPulse('consult', query, reading, hits.map((h) => h.id), input?.organId ?? null, source);
+  } catch {
+    pulseId = memory.nextPulseId++;
+    memory.pulses.push({ id: pulseId, kind: 'consult', query, reading, cardIds: hits.map((h) => h.id), organId: input?.organId ?? null, source, createdAt: new Date().toISOString() });
+    memory.lastPulseAt = new Date().toISOString();
+  }
+  const snap = await snapshot();
+  return { ok: true, source, reading, cardIds: hits.map((h) => h.id), pulseId, pulses: snap.pulses, events: snap.events };
 }
 
 module.exports = { bootOrganism, getOrganism, publishSpineEvent, consultLibrary };
