@@ -39,15 +39,9 @@ const AI_SYSTEMS = [
 const MODULE_DIRS_ON_DISK = 544;
 const NAMED_AI_MODULE_FOLDERS = 18;
 
-function systemStats() {
-  return {
-    systems: AI_SYSTEMS.length,
-    wiredButSkeleton: AI_SYSTEMS.filter((s) => s.declared === 'WIRED' && s.actual === 'skeleton').length,
-    stubs: AI_SYSTEMS.filter((s) => s.actual === 'stub' || s.actual === 'skeleton').length,
-    duplicates: AI_SYSTEMS.filter((s) => s.actual === 'duplicate').length,
-    moduleDirs: MODULE_DIRS_ON_DISK,
-    namedAiModules: NAMED_AI_MODULE_FOLDERS,
-  };
-}
-
-module.exports = { AI_SYSTEMS, MODULE_DIRS_ON_DISK, NAMED_AI_MODULE_FOLDERS, systemStats };
+// systemStats() moved to index.js — that's where pine-shadow's real
+// src/lib/systems/index.ts defines it (catalog.ts is pure data only).
+// The version previously here was a slightly-wrong invention (missing
+// the `|| actual === 'duplicate' || !isComplete` condition and the
+// livingPlugs/partialPlugs/missingPlugs fields).
+module.exports = { AI_SYSTEMS, MODULE_DIRS_ON_DISK, NAMED_AI_MODULE_FOLDERS };
