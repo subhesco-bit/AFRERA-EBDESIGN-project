@@ -388,48 +388,177 @@ async function compensateDispatch(ctx, stepResult) {
 
 async function stepPostLedger(ctx) {
   const pg = requirePg();
-  const amount = Number(ctx.order.total_amount || 0);
-  if (!amount) throw new SkipStep('Order total is zero or missing; there is nothing to post.');
+  const total = Number(ctx.order.total_amount || 0);
+  if (!total) throw new SkipStep('Order total is zero or missing; there is nothing to post.');
 
-  const transactionId = shortId('LED');
-  const result = await pg.query(
-    `INSERT INTO unified_ledger
-       (transaction_id, economy, type, amount, currency, description, reference, account_id, category)
-     VALUES ($1, $2, 'credit', $3, $4, $5, $6, $7, 'order_fulfillment')
-     RETURNING transaction_id, amount, type`,
-    [
-      transactionId,
-      ctx.economy || 'marketplace',
-      amount,
-      ctx.order.currency || 'INR',
-      `Order ${ctx.orderId} fulfilled`,
-      String(ctx.orderId),
-      String(ctx.order.user_id || ''),
-    ],
-  );
-  return { transactionId: result.rows[0].transaction_id, amount: Number(result.rows[0].amount) };
+  const companyId = ctx.companyId ?? null;
+  if (companyId === null) {
+    throw new SkipStep(
+      'journal_entries.company_id is NOT NULL and no posting company was supplied for this order.',
+    );
+  }
+
+  // SCOPE: revenue and the trade receivable only -- the taxable value, NOT the
+  // tax component. gstService.postGSTInvoiceToLedger() already posts
+  // Dr GST-AR-TAX / Cr GST-OUT-{CGST,SGST,IGST} for the same order's GST
+  // invoice. Posting the tax here too would double-count the liability.
+  const tax = Number(ctx.order.gst_amount || ctx.order.tax_amount || 0);
+  const taxableValue = Math.round((total - tax) * 100) / 100;
+  if (taxableValue <= 0) {
+    throw new SkipStep('Order is entirely tax; there is no revenue component to post here.');
+  }
+
+  const client = await pg.connect();
+  try {
+    await client.query('BEGIN');
+
+    const arAccountId = await findOrCreateAccount(
+      client, companyId, 'AR-TRADE', 'Accounts Receivable - Trade', 'asset', 'DR',
+    );
+    const revenueAccountId = await findOrCreateAccount(
+      client, companyId, 'REV-SALES', 'Sales Revenue', 'revenue', 'CR',
+    );
+
+    // journal_entries.entry_number is VARCHAR(40). `ORD-<uuid>` is exactly 40,
+    // which fits -- but the reversal below appends `-REV` and would not, so the
+    // order id is compacted to leave room. 20 hex characters is 80 bits of the
+    // uuid, which is not a collision risk at any realistic order volume.
+    const entryNumber = `ORD-${String(ctx.orderId).replace(/-/g, '').slice(0, 20)}`;
+    const entry = await client.query(
+      `INSERT INTO journal_entries
+         (company_id, entry_number, entry_date, journal_type, description,
+          reference_type, reference_id, status, posted_at)
+       VALUES ($1, $2, CURRENT_DATE, 'sales', $3, 'order', $4, 'posted', NOW())
+       RETURNING id, entry_number`,
+      [companyId, entryNumber, `Revenue on fulfilled order ${ctx.orderId}`, String(ctx.orderId)],
+    );
+    const journalEntryId = entry.rows[0].id;
+
+    await client.query(
+      `INSERT INTO journal_lines
+         (journal_entry_id, line_number, account_id, debit, credit, base_debit, base_credit, description)
+       VALUES ($1, 1, $2, $3, 0, $3, 0, $4)`,
+      [journalEntryId, arAccountId, taxableValue, `Trade receivable - order ${ctx.orderId}`],
+    );
+    await client.query(
+      `INSERT INTO journal_lines
+         (journal_entry_id, line_number, account_id, debit, credit, base_debit, base_credit, description)
+       VALUES ($1, 2, $2, 0, $3, 0, $3, $4)`,
+      [journalEntryId, revenueAccountId, taxableValue, `Sales revenue - order ${ctx.orderId}`],
+    );
+
+    await client.query('COMMIT');
+
+    return {
+      journalEntryId,
+      entryNumber: entry.rows[0].entry_number,
+      debit: taxableValue,
+      credit: taxableValue,
+      taxExcluded: tax,
+      taxNote: 'Tax component is posted by gstService.postGSTInvoiceToLedger(), not here.',
+    };
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 async function compensatePostLedger(ctx, stepResult) {
   const pg = requirePg();
-  // A ledger is append-only: the compensation is an equal and opposite entry,
-  // never an UPDATE or DELETE of the original.
-  const reversalId = `${stepResult.transactionId}-REV`;
-  await pg.query(
-    `INSERT INTO unified_ledger
-       (transaction_id, economy, type, amount, currency, description, reference, category)
-     VALUES ($1, $2, 'debit', $3, $4, $5, $6, 'order_fulfillment_reversal')
-     ON CONFLICT (transaction_id) DO NOTHING`,
-    [
-      reversalId,
-      ctx.economy || 'marketplace',
-      stepResult.amount,
-      ctx.order.currency || 'INR',
-      `Reversal of ${stepResult.transactionId} (saga compensated)`,
-      String(ctx.orderId),
-    ],
+
+  // A ledger is append-only: the compensation is a REVERSING ENTRY, never an
+  // UPDATE or DELETE of the original. journal_entries carries reverses_entry_id
+  // and reversed_by_entry_id for exactly this, so the pair stays traceable.
+  const client = await pg.connect();
+  try {
+    await client.query('BEGIN');
+
+    const original = await client.query(
+      `SELECT company_id, entry_number, reference_id, reversed_by_entry_id
+         FROM journal_entries WHERE id = $1`,
+      [stepResult.journalEntryId],
+    );
+    if (!original.rows.length) {
+      await client.query('ROLLBACK');
+      return { reversed: false, reason: 'Original journal entry not found' };
+    }
+    if (original.rows[0].reversed_by_entry_id) {
+      await client.query('ROLLBACK');
+      return { reversed: false, reason: 'Already reversed', reversalEntryId: original.rows[0].reversed_by_entry_id };
+    }
+
+    const reversal = await client.query(
+      `INSERT INTO journal_entries
+         (company_id, entry_number, entry_date, journal_type, description,
+          reference_type, reference_id, status, posted_at, reverses_entry_id)
+       VALUES ($1, $2, CURRENT_DATE, 'sales', $3, 'order', $4, 'posted', NOW(), $5)
+       RETURNING id`,
+      [
+        original.rows[0].company_id,
+        `${original.rows[0].entry_number}-REV`,
+        `Reversal of ${original.rows[0].entry_number} (fulfillment saga compensated)`,
+        original.rows[0].reference_id,
+        stepResult.journalEntryId,
+      ],
+    );
+    const reversalId = reversal.rows[0].id;
+
+    // Copy every line with debit and credit swapped.
+    await client.query(
+      `INSERT INTO journal_lines
+         (journal_entry_id, line_number, account_id, debit, credit, base_debit, base_credit, description)
+       SELECT $1, line_number, account_id, credit, debit, base_credit, base_debit,
+              'Reversal: ' || COALESCE(description, '')
+         FROM journal_lines
+        WHERE journal_entry_id = $2`,
+      [reversalId, stepResult.journalEntryId],
+    );
+
+    await client.query(
+      'UPDATE journal_entries SET reversed_by_entry_id = $1 WHERE id = $2',
+      [reversalId, stepResult.journalEntryId],
+    );
+
+    await client.query('COMMIT');
+    return { reversed: true, reversalEntryId: reversalId };
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Find or create a postable account in the chart of accounts.
+ *
+ * Mirrors gstService.findOrCreateAccount so both post against the same chart,
+ * including its concurrent-create race handling.
+ */
+async function findOrCreateAccount(client, companyId, accountCode, accountName, accountType, normalBalance) {
+  const existing = await client.query(
+    'SELECT id FROM chart_of_accounts WHERE company_id = $1 AND account_code = $2',
+    [companyId, accountCode],
   );
-  return { reversalTransactionId: reversalId };
+  if (existing.rows[0]) return existing.rows[0].id;
+
+  const inserted = await client.query(
+    `INSERT INTO chart_of_accounts
+       (company_id, account_code, account_name, account_type, normal_balance, is_postable)
+     VALUES ($1, $2, $3, $4, $5, TRUE)
+     ON CONFLICT (company_id, account_code) DO NOTHING
+     RETURNING id`,
+    [companyId, accountCode, accountName, accountType, normalBalance],
+  );
+  if (inserted.rows[0]) return inserted.rows[0].id;
+
+  const reread = await client.query(
+    'SELECT id FROM chart_of_accounts WHERE company_id = $1 AND account_code = $2',
+    [companyId, accountCode],
+  );
+  return reread.rows[0].id;
 }
 
 const STEPS = [
@@ -579,14 +708,19 @@ async function readiness(orderId, options = {}) {
     { step: 'hold_escrow', ok: Boolean(Number(order.total_amount) > 0 && order.user_id && (options.sellerId || order.seller_id || order.farmer_id)), why: 'needs a buyer, a seller (order column or sellerId option) and a positive amount' },
     { step: 'raise_invoice', ok: Boolean(Number(order.total_amount) && (options.companyId ?? null) !== null), why: 'needs a total_amount and a companyId option (ar_invoices.company_id is NOT NULL)' },
     { step: 'dispatch', ok: true, why: null },
-    { step: 'post_ledger', ok: Boolean(Number(order.total_amount)), why: 'needs a total_amount' },
+    { step: 'post_ledger', ok: Boolean(Number(order.total_amount) && (options.companyId ?? null) !== null), why: 'needs a total_amount and a companyId option (journal_entries.company_id is NOT NULL)' },
   ];
 
   const tables = await pg.query(
     `SELECT unnest($1::text[]) AS name,
             to_regclass('public.' || unnest($1::text[])) IS NOT NULL AS present`,
+    // journal_entries/journal_lines is the CANONICAL ledger per
+    // AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C. `unified_ledger` belongs to
+    // unifiedLedgerService, whose route surface that directive deprecated
+    // (HTTP 410) on 2026-08-15 -- this saga must not post to it.
     [['warehouse_inventory', 'inventory_reservations', 'shipments', 'policies',
-      'escrow_transactions', 'ar_invoices', 'unified_ledger']],
+      'escrow_transactions', 'ar_invoices', 'journal_entries', 'journal_lines',
+      'chart_of_accounts']],
   );
 
   return {
@@ -610,6 +744,9 @@ module.exports = {
   fulfillOrder,
   readiness,
   resolveOrderContext,
+  // Exposed for the reversal test: post_ledger is the last step, so no ordinary
+  // failure reaches past it and its compensation is otherwise unreachable.
+  __compensatePostLedgerForTest: compensatePostLedger,
   STEP_NAMES: STEPS.map((s) => s.name),
   SkipStep,
 };

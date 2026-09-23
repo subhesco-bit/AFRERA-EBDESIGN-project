@@ -721,6 +721,18 @@ CREATE TRIGGER update_demand_forecasts_updated_at BEFORE UPDATE ON demand_foreca
 -- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
 -- made re-runnable. The trigger name is already taken on a clean run of the
 -- full set, because another migration defines the same trigger on journal_entries.
+-- `update_updated_at_column()` assigns NEW.updated_at, so a table carrying this
+-- trigger MUST have that column. journal_entries does not: the definition in this file
+-- declares no updated_at, and the other migration that defines journal_entries does not
+-- either. The trigger therefore made EVERY UPDATE to journal_entries fail with
+-- `record "new" has no field "updated_at"` -- verified against a live
+-- PostgreSQL 16 run of the full migration set.
+--
+-- The column is added rather than the trigger dropped: an updated_at timestamp
+-- is what this trigger exists to maintain, and dropping it would silently
+-- remove that behaviour from whatever else relies on it.
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 DROP TRIGGER IF EXISTS update_journal_entries_updated_at ON journal_entries;
 CREATE TRIGGER update_journal_entries_updated_at BEFORE UPDATE ON journal_entries
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

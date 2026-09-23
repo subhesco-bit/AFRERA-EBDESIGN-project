@@ -75,7 +75,8 @@ beforeAll(async () => {
   // Refuse to run against a database that has not been migrated, rather than
   // reporting a schema gap as a test failure.
   const required = ['orders', 'order_items', 'warehouse_inventory', 'warehouses', 'products',
-    'shipments', 'escrow_transactions', 'ar_invoices', 'unified_ledger', 'policies',
+    'shipments', 'escrow_transactions', 'ar_invoices', 'policies', 'chart_of_accounts',
+    'journal_entries', 'journal_lines',
     'inventory_reservations', 'fulfillment_sagas', 'fulfillment_saga_steps'];
   const present = await pg.query(
     'SELECT name FROM (SELECT unnest($1::text[]) AS name) t WHERE to_regclass(\'public.\' || name) IS NOT NULL',
@@ -280,9 +281,28 @@ describeIfDb()('fulfillment saga', () => {
     const invoice = await pg.query('SELECT status FROM ar_invoices WHERE source_order_id = $1', [String(orderId)]);
     expect(invoice.rows[0].status).toBe('open');
 
-    const ledger = await pg.query('SELECT type, amount FROM unified_ledger WHERE reference = $1', [String(orderId)]);
-    expect(ledger.rows[0].type).toBe('credit');
-    expect(Number(ledger.rows[0].amount)).toBe(250);
+    // The CANONICAL ledger is journal_entries/journal_lines. `unified_ledger`
+    // belongs to unifiedLedgerService, whose routes the build directive
+    // deprecated (HTTP 410) on 2026-08-15; posting there would be writing to a
+    // rejected architecture.
+    const entry = await pg.query(
+      "SELECT id, entry_number, status FROM journal_entries WHERE reference_type = 'order' AND reference_id = $1",
+      [String(orderId)],
+    );
+    expect(entry.rows).toHaveLength(1);
+    expect(entry.rows[0].status).toBe('posted');
+
+    const lines = await pg.query(
+      'SELECT debit, credit FROM journal_lines WHERE journal_entry_id = $1 ORDER BY line_number',
+      [entry.rows[0].id],
+    );
+    expect(lines.rows).toHaveLength(2);
+    const debits = lines.rows.reduce((sum, l) => sum + Number(l.debit), 0);
+    const credits = lines.rows.reduce((sum, l) => sum + Number(l.credit), 0);
+    // Double entry: the posting balances, and excludes the GST component that
+    // gstService.postGSTInvoiceToLedger() owns (250 total - 12.50 GST).
+    expect(debits).toBe(credits);
+    expect(debits).toBeCloseTo(237.5, 2);
 
     const policy = await pg.query("SELECT coverage_amount FROM policies WHERE policy_data->>'orderId' = $1", [String(orderId)]);
     expect(Number(policy.rows[0].coverage_amount)).toBe(250);
@@ -314,7 +334,10 @@ describeIfDb()('fulfillment saga', () => {
     expect(escrow.rows[0].status).toBe('refunded');
     const policy = await pg.query("SELECT cancelled_at FROM policies WHERE policy_data->>'orderId' = $1", [String(orderId)]);
     expect(policy.rows[0].cancelled_at).not.toBeNull();
-    const ledger = await pg.query('SELECT 1 FROM unified_ledger WHERE reference = $1', [String(orderId)]);
+    const ledger = await pg.query(
+      "SELECT 1 FROM journal_entries WHERE reference_type = 'order' AND reference_id = $1",
+      [String(orderId)],
+    );
     expect(ledger.rows).toHaveLength(0);
   }, 30000);
 
@@ -349,6 +372,43 @@ describeIfDb()('fulfillment saga', () => {
       [result.sagaId],
     );
     expect(steps.rows.length).toBe(result.steps.length);
+  }, 30000);
+
+  it('reverses the journal entry rather than deleting it when compensating a later step', async () => {
+    if (fixtures.companyId === null) return;
+    const productId = await makeProduct(100);
+    const orderId = await makeOrder(productId);
+
+    // Run the full saga so a journal entry exists, then compensate it directly:
+    // post_ledger is the last step, so no ordinary failure reaches past it.
+    const result = await engine.fulfillOrder(orderId, {
+      sellerId: fixtures.sellerId, companyId: fixtures.companyId,
+    });
+    expect(result.status).toBe('completed');
+
+    const posted = result.steps.find((s) => s.step === 'post_ledger').result;
+    const reversal = await engine.__compensatePostLedgerForTest(
+      { orderId, order: {}, companyId: fixtures.companyId }, posted,
+    );
+    expect(reversal.reversed).toBe(true);
+
+    // The original is intact and linked to its reversal; nothing was deleted.
+    const entries = await pg.query(
+      'SELECT id, reverses_entry_id, reversed_by_entry_id FROM journal_entries WHERE id = ANY($1::int[])',
+      [[posted.journalEntryId, reversal.reversalEntryId]],
+    );
+    expect(entries.rows).toHaveLength(2);
+    const original = entries.rows.find((r) => r.id === posted.journalEntryId);
+    const rev = entries.rows.find((r) => r.id === reversal.reversalEntryId);
+    expect(original.reversed_by_entry_id).toBe(reversal.reversalEntryId);
+    expect(rev.reverses_entry_id).toBe(posted.journalEntryId);
+
+    // The pair nets to zero.
+    const net = await pg.query(
+      'SELECT COALESCE(SUM(debit - credit), 0) AS net FROM journal_lines WHERE journal_entry_id = ANY($1::int[])',
+      [[posted.journalEntryId, reversal.reversalEntryId]],
+    );
+    expect(Number(net.rows[0].net)).toBe(0);
   }, 30000);
 
   it('refuses an order id that belongs to no order table', async () => {
