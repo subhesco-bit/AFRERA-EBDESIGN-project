@@ -18,10 +18,54 @@ function getMigrationFiles() {
     .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
 }
 
+/**
+ * Remove top-level BEGIN/COMMIT/END/ROLLBACK, because runMigrations wraps each
+ * file in its own transaction and a nested BEGIN is an error.
+ *
+ * DOLLAR-QUOTE AWARE, and that is the whole point. This used to be two flat
+ * regexes over the file, which also deleted the `END;` that closes a PL/pgSQL
+ * body:
+ *
+ *     CREATE OR REPLACE FUNCTION update_updated_at_column()
+ *     RETURNS TRIGGER AS $$
+ *     BEGIN
+ *         NEW.updated_at = CURRENT_TIMESTAMP;
+ *         RETURN NEW;
+ *     END;            <-- deleted, along with the BEGIN above it
+ *     $$ LANGUAGE plpgsql;
+ *
+ * 000_base_schema.sql contains exactly that, so `npm run migrate` died on the
+ * FIRST file with "syntax error at end of input" and no migration ever ran.
+ * 59 files in this directory carry a line matching that pattern.
+ *
+ * Lines inside a dollar-quoted string ($$ ... $$, $tag$ ... $tag$) are now left
+ * exactly as written; only markers outside one are stripped.
+ */
 function stripTransactionMarkers(sql) {
+  const marker = /^\s*(BEGIN|START\s+TRANSACTION|COMMIT|END|ROLLBACK)\s*;\s*$/i;
+  const dollarTag = /\$[A-Za-z_][A-Za-z0-9_]*\$|\$\$/g;
+
+  let openTag = null;
   return sql
-    .replace(/^\s*(BEGIN|START\s+TRANSACTION)\s*;\s*$/gim, '')
-    .replace(/^\s*(COMMIT|END|ROLLBACK)\s*;\s*$/gim, '');
+    .split('\n')
+    .map((line) => {
+      const stripThisLine = openTag === null && marker.test(line);
+
+      // Track dollar-quote state across the line before deciding the next one.
+      let match;
+      dollarTag.lastIndex = 0;
+      // eslint-disable-next-line no-cond-assign
+      while ((match = dollarTag.exec(line)) !== null) {
+        if (openTag === null) {
+          openTag = match[0];
+        } else if (match[0] === openTag) {
+          openTag = null;
+        }
+      }
+
+      return stripThisLine ? '' : line;
+    })
+    .join('\n');
 }
 
 function runPreflight() {

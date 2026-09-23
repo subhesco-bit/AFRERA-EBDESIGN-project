@@ -41,18 +41,64 @@ CREATE TABLE IF NOT EXISTS ai_agent_performance (
 );
 
 -- AI knowledge base integration table
-CREATE TABLE IF NOT EXISTS ai_knowledge_base (
-    id SERIAL PRIMARY KEY,
-    source_type VARCHAR(50) NOT NULL,
-    source_id VARCHAR(255),
-    knowledge_type VARCHAR(50),
-    content TEXT NOT NULL,
-    embedding_vector VECTOR(1536),
-    metadata JSONB,
-    relevance_score DECIMAL(5, 2),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+--
+-- embedding_vector is declared VECTOR(1536), which needs the pgvector
+-- extension. pgvector is NOT installed on every target -- this whole file
+-- aborted with `type "vector" does not exist` on a clean PostgreSQL 16 run,
+-- taking every table after it down too.
+--
+-- The extension is attempted first. Where it is available the column is a real
+-- VECTOR and similarity search works. Where it is not, the column is created
+-- as JSONB and a NOTICE says so, because a table that exists with the wrong
+-- column type is still better than the eight tables below never being created
+-- at all -- and silently pretending the vector column exists would be worse
+-- than either.
+--
+-- Install pgvector and re-run to get the real column:
+--   CREATE EXTENSION vector;  -- needs the pgvector package on the server
+DO $$
+DECLARE
+  has_vector BOOLEAN := FALSE;
+BEGIN
+  BEGIN
+    CREATE EXTENSION IF NOT EXISTS vector;
+    has_vector := TRUE;
+  EXCEPTION WHEN OTHERS THEN
+    RAISE NOTICE 'pgvector is not available (%); ai_knowledge_base.embedding_vector '
+                 'will be JSONB, not VECTOR(1536). Similarity search will NOT work '
+                 'until pgvector is installed and this column is converted.', SQLERRM;
+  END;
+
+  IF has_vector THEN
+    EXECUTE $ddl$
+      CREATE TABLE IF NOT EXISTS ai_knowledge_base (
+          id SERIAL PRIMARY KEY,
+          source_type VARCHAR(50) NOT NULL,
+          source_id VARCHAR(255),
+          knowledge_type VARCHAR(50),
+          content TEXT NOT NULL,
+          embedding_vector VECTOR(1536),
+          metadata JSONB,
+          relevance_score DECIMAL(5, 2),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )$ddl$;
+  ELSE
+    EXECUTE $ddl$
+      CREATE TABLE IF NOT EXISTS ai_knowledge_base (
+          id SERIAL PRIMARY KEY,
+          source_type VARCHAR(50) NOT NULL,
+          source_id VARCHAR(255),
+          knowledge_type VARCHAR(50),
+          content TEXT NOT NULL,
+          embedding_vector JSONB,
+          metadata JSONB,
+          relevance_score DECIMAL(5, 2),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )$ddl$;
+  END IF;
+END $$;
 
 -- AI context enrichment table
 CREATE TABLE IF NOT EXISTS ai_context_enrichment (

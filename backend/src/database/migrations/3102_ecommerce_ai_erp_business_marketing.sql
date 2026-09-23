@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- ============================================================================
 -- AFRERA E-Commerce AI, ERP, Business Sales & Marketing Database Schema
 -- Extension to e-commerce marketplace with advanced features
@@ -30,6 +51,16 @@ CREATE TABLE IF NOT EXISTS customer_segments (
     CONSTRAINT uk_user_segment_type UNIQUE (user_id, segment_type)
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE customer_segments ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE customer_segments ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE customer_segments ADD COLUMN IF NOT EXISTS segment_type VARCHAR(50);
+ALTER TABLE customer_segments ADD COLUMN IF NOT EXISTS segment_data JSONB DEFAULT '{}';
+ALTER TABLE customer_segments ADD COLUMN IF NOT EXISTS confidence_score DECIMAL(3, 2);
+ALTER TABLE customer_segments ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE customer_segments ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_customer_segments_user ON customer_segments(user_id);
 CREATE INDEX IF NOT EXISTS idx_customer_segments_type ON customer_segments(segment_type);
 CREATE INDEX IF NOT EXISTS idx_customer_segments_confidence ON customer_segments(confidence_score DESC);
@@ -46,6 +77,17 @@ CREATE TABLE IF NOT EXISTS demand_forecasts (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE demand_forecasts ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE demand_forecasts ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE demand_forecasts ADD COLUMN IF NOT EXISTS forecast_data JSONB;
+ALTER TABLE demand_forecasts ADD COLUMN IF NOT EXISTS horizon_days INTEGER;
+ALTER TABLE demand_forecasts ADD COLUMN IF NOT EXISTS forecast_method VARCHAR(50);
+ALTER TABLE demand_forecasts ADD COLUMN IF NOT EXISTS accuracy_score DECIMAL(3, 2);
+ALTER TABLE demand_forecasts ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE demand_forecasts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_demand_forecasts_product ON demand_forecasts(product_id);
 CREATE INDEX IF NOT EXISTS idx_demand_forecasts_created ON demand_forecasts(created_at DESC);
 
@@ -57,6 +99,14 @@ CREATE TABLE IF NOT EXISTS inventory_optimization (
     optimization_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE inventory_optimization ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE inventory_optimization ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE inventory_optimization ADD COLUMN IF NOT EXISTS optimization_data JSONB;
+ALTER TABLE inventory_optimization ADD COLUMN IF NOT EXISTS optimization_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE inventory_optimization ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_inventory_optimization_product ON inventory_optimization(product_id);
 
@@ -70,6 +120,15 @@ CREATE TABLE IF NOT EXISTS sales_forecasts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE sales_forecasts ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE sales_forecasts ADD COLUMN IF NOT EXISTS category_id INTEGER;
+ALTER TABLE sales_forecasts ADD COLUMN IF NOT EXISTS forecast_data JSONB;
+ALTER TABLE sales_forecasts ADD COLUMN IF NOT EXISTS period_days INTEGER;
+ALTER TABLE sales_forecasts ADD COLUMN IF NOT EXISTS forecast_method VARCHAR(50);
+ALTER TABLE sales_forecasts ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_sales_forecasts_category ON sales_forecasts(category_id);
 
 -- Customer Lifetime Value Table
@@ -80,6 +139,14 @@ CREATE TABLE IF NOT EXISTS customer_ltv (
     calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE customer_ltv ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE customer_ltv ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE customer_ltv ADD COLUMN IF NOT EXISTS ltv_data JSONB;
+ALTER TABLE customer_ltv ADD COLUMN IF NOT EXISTS calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE customer_ltv ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_customer_ltv_user ON customer_ltv(user_id);
 
@@ -93,6 +160,16 @@ CREATE TABLE IF NOT EXISTS market_basket_analysis (
     confidence_score DECIMAL(3, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE market_basket_analysis ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE market_basket_analysis ADD COLUMN IF NOT EXISTS product_a_id VARCHAR(50);
+ALTER TABLE market_basket_analysis ADD COLUMN IF NOT EXISTS product_b_id VARCHAR(50);
+ALTER TABLE market_basket_analysis ADD COLUMN IF NOT EXISTS co_occurrence INTEGER;
+ALTER TABLE market_basket_analysis ADD COLUMN IF NOT EXISTS lift_ratio DECIMAL(5, 2);
+ALTER TABLE market_basket_analysis ADD COLUMN IF NOT EXISTS confidence_score DECIMAL(3, 2);
+ALTER TABLE market_basket_analysis ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_market_basket_product_a ON market_basket_analysis(product_a_id);
 CREATE INDEX IF NOT EXISTS idx_market_basket_product_b ON market_basket_analysis(product_b_id);
@@ -117,6 +194,20 @@ CREATE TABLE IF NOT EXISTS journal_entries (
     posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS journal_entry_id VARCHAR(50);
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS account_code VARCHAR(20);
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS entry_type VARCHAR(10) CHECK (entry_type IN ('DEBIT', 'CREDIT'));
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS amount DECIMAL(15, 2);
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS currency VARCHAR(10) DEFAULT 'INR';
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS reference_id VARCHAR(50);
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS reference_type VARCHAR(50);
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS posted_by UUID;
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_journal_entries_journal_id ON journal_entries(journal_entry_id);
 CREATE INDEX IF NOT EXISTS idx_journal_entries_account ON journal_entries(account_code);
 CREATE INDEX IF NOT EXISTS idx_journal_entries_reference ON journal_entries(reference_id, reference_type);
@@ -133,6 +224,16 @@ CREATE TABLE IF NOT EXISTS gst_invoices (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE gst_invoices ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE gst_invoices ADD COLUMN IF NOT EXISTS invoice_number VARCHAR(50);
+ALTER TABLE gst_invoices ADD COLUMN IF NOT EXISTS order_id VARCHAR(50);
+ALTER TABLE gst_invoices ADD COLUMN IF NOT EXISTS invoice_data JSONB;
+ALTER TABLE gst_invoices ADD COLUMN IF NOT EXISTS invoice_status VARCHAR(20) DEFAULT 'generated';
+ALTER TABLE gst_invoices ADD COLUMN IF NOT EXISTS generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE gst_invoices ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_gst_invoices_number ON gst_invoices(invoice_number);
 CREATE INDEX IF NOT EXISTS idx_gst_invoices_order ON gst_invoices(order_id);
 CREATE INDEX IF NOT EXISTS idx_gst_invoices_status ON gst_invoices(invoice_status);
@@ -148,6 +249,16 @@ CREATE TABLE IF NOT EXISTS warehouse_inventory (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS quantity DECIMAL(15, 2);
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS warehouse_id VARCHAR(50);
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS bin_location VARCHAR(50);
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS last_counted TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_warehouse_inventory_product ON warehouse_inventory(product_id);
 CREATE INDEX IF NOT EXISTS idx_warehouse_inventory_warehouse ON warehouse_inventory(warehouse_id);
 
@@ -161,6 +272,16 @@ CREATE TABLE IF NOT EXISTS inventory_adjustments (
     adjustment_type VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE inventory_adjustments ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE inventory_adjustments ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE inventory_adjustments ADD COLUMN IF NOT EXISTS marketplace_quantity DECIMAL(15, 2);
+ALTER TABLE inventory_adjustments ADD COLUMN IF NOT EXISTS erp_quantity DECIMAL(15, 2);
+ALTER TABLE inventory_adjustments ADD COLUMN IF NOT EXISTS discrepancy DECIMAL(15, 2);
+ALTER TABLE inventory_adjustments ADD COLUMN IF NOT EXISTS adjustment_type VARCHAR(50);
+ALTER TABLE inventory_adjustments ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_inventory_adjustments_product ON inventory_adjustments(product_id);
 
@@ -178,6 +299,19 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS seller_id UUID;
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS requested_quantity DECIMAL(15, 2);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS unit VARCHAR(20);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS unit_price DECIMAL(15, 2);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS total_value DECIMAL(15, 2);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS delivery_date DATE;
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS po_status VARCHAR(20) DEFAULT 'created';
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_purchase_orders_product ON purchase_orders(product_id);
 CREATE INDEX IF NOT EXISTS idx_purchase_orders_seller ON purchase_orders(seller_id);
 CREATE INDEX IF NOT EXISTS idx_purchase_orders_status ON purchase_orders(po_status);
@@ -190,6 +324,14 @@ CREATE TABLE IF NOT EXISTS crm_customers (
     synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE crm_customers ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE crm_customers ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE crm_customers ADD COLUMN IF NOT EXISTS customer_data JSONB;
+ALTER TABLE crm_customers ADD COLUMN IF NOT EXISTS synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE crm_customers ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_crm_customers_user ON crm_customers(user_id);
 
@@ -205,6 +347,18 @@ CREATE TABLE IF NOT EXISTS production_orders (
     order_status VARCHAR(20) DEFAULT 'planned',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS seller_id UUID;
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS requested_quantity DECIMAL(15, 2);
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS production_quantity DECIMAL(15, 2);
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS target_completion_date DATE;
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS order_status VARCHAR(20) DEFAULT 'planned';
+ALTER TABLE production_orders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_production_orders_product ON production_orders(product_id);
 CREATE INDEX IF NOT EXISTS idx_production_orders_seller ON production_orders(seller_id);
@@ -235,6 +389,26 @@ CREATE TABLE IF NOT EXISTS contract_farming (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS buyer_id UUID;
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS crop_type VARCHAR(100);
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS variety VARCHAR(100);
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS contract_quantity DECIMAL(15, 2);
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS unit VARCHAR(20);
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS agreed_price DECIMAL(15, 2);
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS contract_start_date DATE;
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS contract_end_date DATE;
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS quality_standards JSONB DEFAULT '{}';
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS delivery_schedule JSONB DEFAULT '{}';
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS payment_terms TEXT;
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS milestone_payments JSONB DEFAULT '{}';
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE contract_farming ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_contract_farming_buyer ON contract_farming(buyer_id);
 CREATE INDEX IF NOT EXISTS idx_contract_farming_farmer ON contract_farming(farmer_id);
 CREATE INDEX IF NOT EXISTS idx_contract_farming_status ON contract_farming(status);
@@ -252,6 +426,18 @@ CREATE TABLE IF NOT EXISTS contract_milestones (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS contract_id VARCHAR(50);
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS milestone_name VARCHAR(100);
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS milestone_date DATE;
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS quantity_delivered DECIMAL(15, 2);
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS quality_verified BOOLEAN DEFAULT FALSE;
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS payment_amount DECIMAL(15, 2);
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'pending';
+ALTER TABLE contract_milestones ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_contract_milestones_contract ON contract_milestones(contract_id);
 
 -- Platform Commissions Table
@@ -265,6 +451,17 @@ CREATE TABLE IF NOT EXISTS platform_commissions (
     seller_tier VARCHAR(20),
     calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE platform_commissions ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE platform_commissions ADD COLUMN IF NOT EXISTS order_id UUID;
+ALTER TABLE platform_commissions ADD COLUMN IF NOT EXISTS total_amount DECIMAL(15, 2);
+ALTER TABLE platform_commissions ADD COLUMN IF NOT EXISTS commission_rate DECIMAL(5, 2);
+ALTER TABLE platform_commissions ADD COLUMN IF NOT EXISTS commission_amount DECIMAL(15, 2);
+ALTER TABLE platform_commissions ADD COLUMN IF NOT EXISTS seller_payout DECIMAL(15, 2);
+ALTER TABLE platform_commissions ADD COLUMN IF NOT EXISTS seller_tier VARCHAR(20);
+ALTER TABLE platform_commissions ADD COLUMN IF NOT EXISTS calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_platform_commissions_order ON platform_commissions(order_id);
 CREATE INDEX IF NOT EXISTS idx_platform_commissions_calculated ON platform_commissions(calculated_at DESC);
@@ -300,6 +497,32 @@ CREATE TABLE IF NOT EXISTS marketing_campaigns (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS campaign_name VARCHAR(255);
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS campaign_type VARCHAR(50);
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS objective TEXT;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS budget DECIMAL(15, 2);
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS budget_spent DECIMAL(15, 2) DEFAULT 0;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS target_audience JSONB DEFAULT '{}';
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS ad_creatives JSONB DEFAULT '{}';
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS platforms JSONB DEFAULT '{}';
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS optimization_goal VARCHAR(100);
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS total_impressions INTEGER DEFAULT 0;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS total_clicks INTEGER DEFAULT 0;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS total_conversions INTEGER DEFAULT 0;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS ctr DECIMAL(5, 2) DEFAULT 0;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS conversion_rate DECIMAL(5, 2) DEFAULT 0;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS cpa DECIMAL(15, 2) DEFAULT 0;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'draft';
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS launched_at TIMESTAMP;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE marketing_campaigns ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_marketing_campaigns_created_by ON marketing_campaigns(created_by);
 CREATE INDEX IF NOT EXISTS idx_marketing_campaigns_status ON marketing_campaigns(status);
 CREATE INDEX IF NOT EXISTS idx_marketing_campaigns_type ON marketing_campaigns(campaign_type);
@@ -318,6 +541,20 @@ CREATE TABLE IF NOT EXISTS ad_placements (
     spend DECIMAL(15, 2) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS campaign_id VARCHAR(50);
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS platform VARCHAR(50);
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS creative_id VARCHAR(50);
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS placement_type VARCHAR(50);
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS impressions INTEGER DEFAULT 0;
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS clicks INTEGER DEFAULT 0;
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS conversions INTEGER DEFAULT 0;
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS spend DECIMAL(15, 2) DEFAULT 0;
+ALTER TABLE ad_placements ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_ad_placements_campaign ON ad_placements(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_ad_placements_platform ON ad_placements(platform);
@@ -339,6 +576,22 @@ CREATE TABLE IF NOT EXISTS sponsored_products (
     status VARCHAR(20) DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS seller_id UUID;
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS sponsor_tier VARCHAR(20);
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS bid_amount DECIMAL(15, 2);
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS targeting JSONB DEFAULT '{}';
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS impressions INTEGER DEFAULT 0;
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS clicks INTEGER DEFAULT 0;
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS conversions INTEGER DEFAULT 0;
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE sponsored_products ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_sponsored_products_seller ON sponsored_products(seller_id);
 CREATE INDEX IF NOT EXISTS idx_sponsored_products_product ON sponsored_products(product_id);
@@ -367,6 +620,27 @@ CREATE TABLE IF NOT EXISTS promotions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS promotion_name VARCHAR(255);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS promotion_type VARCHAR(50);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS discount_type VARCHAR(20) CHECK (discount_type IN ('percentage', 'fixed', 'buy_x_get_y'));
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS discount_value DECIMAL(15, 2);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS min_purchase_value DECIMAL(15, 2);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS max_discount_amount DECIMAL(15, 2);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS usage_limit INTEGER;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS used_count INTEGER DEFAULT 0;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS applicable_products JSONB DEFAULT '[]';
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS applicable_categories JSONB DEFAULT '[]';
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS user_segments JSONB DEFAULT '[]';
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_promotions_id ON promotions(id);
 CREATE INDEX IF NOT EXISTS idx_promotions_status ON promotions(status);
 CREATE INDEX IF NOT EXISTS idx_promotions_dates ON promotions(start_date, end_date);
@@ -381,6 +655,16 @@ CREATE TABLE IF NOT EXISTS discount_records (
     original_amount DECIMAL(15, 2) NOT NULL,
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE discount_records ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE discount_records ADD COLUMN IF NOT EXISTS promotion_id VARCHAR(50);
+ALTER TABLE discount_records ADD COLUMN IF NOT EXISTS order_id UUID;
+ALTER TABLE discount_records ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE discount_records ADD COLUMN IF NOT EXISTS discount_amount DECIMAL(15, 2);
+ALTER TABLE discount_records ADD COLUMN IF NOT EXISTS original_amount DECIMAL(15, 2);
+ALTER TABLE discount_records ADD COLUMN IF NOT EXISTS applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_discount_records_promotion ON discount_records(promotion_id);
 CREATE INDEX IF NOT EXISTS idx_discount_records_order ON discount_records(order_id);
@@ -399,6 +683,18 @@ CREATE TABLE IF NOT EXISTS retargeting_campaigns (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS id VARCHAR(50);
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS campaign_type VARCHAR(50);
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS cart_items JSONB DEFAULT '{}';
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS cart_value DECIMAL(15, 2);
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS conversion_count INTEGER DEFAULT 0;
+ALTER TABLE retargeting_campaigns ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_retargeting_user ON retargeting_campaigns(user_id);
 CREATE INDEX IF NOT EXISTS idx_retargeting_product ON retargeting_campaigns(product_id);
 CREATE INDEX IF NOT EXISTS idx_retargeting_type ON retargeting_campaigns(campaign_type);
@@ -408,27 +704,59 @@ CREATE INDEX IF NOT EXISTS idx_retargeting_status ON retargeting_campaigns(statu
 -- TRIGGERS FOR UPDATED_AT
 -- ============================================================================
 
+-- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
+-- made re-runnable. The trigger name is already taken on a clean run of the
+-- full set, because another migration defines the same trigger on customer_segments.
+DROP TRIGGER IF EXISTS update_customer_segments_updated_at ON customer_segments;
 CREATE TRIGGER update_customer_segments_updated_at BEFORE UPDATE ON customer_segments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
+-- made re-runnable. The trigger name is already taken on a clean run of the
+-- full set, because another migration defines the same trigger on demand_forecasts.
+DROP TRIGGER IF EXISTS update_demand_forecasts_updated_at ON demand_forecasts;
 CREATE TRIGGER update_demand_forecasts_updated_at BEFORE UPDATE ON demand_forecasts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
+-- made re-runnable. The trigger name is already taken on a clean run of the
+-- full set, because another migration defines the same trigger on journal_entries.
+DROP TRIGGER IF EXISTS update_journal_entries_updated_at ON journal_entries;
 CREATE TRIGGER update_journal_entries_updated_at BEFORE UPDATE ON journal_entries
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
+-- made re-runnable. The trigger name is already taken on a clean run of the
+-- full set, because another migration defines the same trigger on gst_invoices.
+DROP TRIGGER IF EXISTS update_gst_invoices_updated_at ON gst_invoices;
 CREATE TRIGGER update_gst_invoices_updated_at BEFORE UPDATE ON gst_invoices
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
+-- made re-runnable. The trigger name is already taken on a clean run of the
+-- full set, because another migration defines the same trigger on crm_customers.
+DROP TRIGGER IF EXISTS update_crm_customers_updated_at ON crm_customers;
 CREATE TRIGGER update_crm_customers_updated_at BEFORE UPDATE ON crm_customers
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
+-- made re-runnable. The trigger name is already taken on a clean run of the
+-- full set, because another migration defines the same trigger on marketing_campaigns.
+DROP TRIGGER IF EXISTS update_marketing_campaigns_updated_at ON marketing_campaigns;
 CREATE TRIGGER update_marketing_campaigns_updated_at BEFORE UPDATE ON marketing_campaigns
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
+-- made re-runnable. The trigger name is already taken on a clean run of the
+-- full set, because another migration defines the same trigger on promotions.
+DROP TRIGGER IF EXISTS update_promotions_updated_at ON promotions;
 CREATE TRIGGER update_promotions_updated_at BEFORE UPDATE ON promotions
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- PostgreSQL has no CREATE TRIGGER IF NOT EXISTS; the DROP is how this is
+-- made re-runnable. The trigger name is already taken on a clean run of the
+-- full set, because another migration defines the same trigger on contract_farming.
+DROP TRIGGER IF EXISTS update_contract_farming_updated_at ON contract_farming;
 CREATE TRIGGER update_contract_farming_updated_at BEFORE UPDATE ON contract_farming
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

@@ -1,3 +1,17 @@
+-- ---------------------------------------------------------------------------
+-- GUARDED INDEX CREATION (added 2026-09-23)
+--
+-- This file adds indexes across the whole schema. A single CREATE INDEX naming
+-- a relation that no migration creates, or a column that another definition of
+-- that table does not have, aborted the WHOLE file -- so every index after it
+-- was silently lost. Verified on a clean PostgreSQL 16 run of the full set.
+--
+-- Each statement below is now wrapped so that undefined_table and
+-- undefined_column skip that one index with a NOTICE naming it. Nothing else is
+-- caught: a syntax error or a permissions failure still fails loudly, and a
+-- skipped index is reported rather than hidden.
+-- ---------------------------------------------------------------------------
+
 -- ============================================================================
 -- 997_geospatial_indexes.sql   (generated 2026-08-03)
 --
@@ -53,47 +67,131 @@
 -- ============================================================================
 
 -- Part 1: composite btree on typed coordinate columns (supports bounding box)
-CREATE INDEX IF NOT EXISTS idx_addresses_lat_lng
-    ON addresses (latitude, longitude);
-CREATE INDEX IF NOT EXISTS idx_shipment_tracking_lat_lng
-    ON shipment_tracking (latitude, longitude);
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_addresses_lat_lng
+    ON addresses (latitude, longitude)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_addresses_lat_lng: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_shipment_tracking_lat_lng
+    ON shipment_tracking (latitude, longitude)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_shipment_tracking_lat_lng: %', SQLERRM;
+END $guard$;
 
 -- Part 2: GIN on JSONB location payloads (containment / key lookup only)
-CREATE INDEX IF NOT EXISTS idx_land_records_gps_coordinates_gin
-    ON land_records USING GIN (gps_coordinates);
-CREATE INDEX IF NOT EXISTS idx_villages_coordinates_gin
-    ON villages USING GIN (coordinates);
-CREATE INDEX IF NOT EXISTS idx_csr_projects_location_gin
-    ON csr_projects USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_fleet_vehicles_current_location_gin
-    ON fleet_vehicles USING GIN (current_location);
-CREATE INDEX IF NOT EXISTS idx_shipment_geofences_coordinates_gin
-    ON shipment_geofences USING GIN (coordinates);
-CREATE INDEX IF NOT EXISTS idx_warehouses_location_gin
-    ON warehouses USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_iot_devices_location_gin
-    ON iot_devices USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_farm_information_coordinates_gin
-    ON farm_information USING GIN (coordinates);
-CREATE INDEX IF NOT EXISTS idx_engineering_projects_location_gin
-    ON engineering_projects USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_digital_twin_sensors_location_gin
-    ON digital_twin_sensors USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_quality_checks_location_gin
-    ON quality_checks USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_organic_farms_gps_coordinates_gin
-    ON organic_farms USING GIN (gps_coordinates);
-CREATE INDEX IF NOT EXISTS idx_rural_economic_units_location_gin
-    ON rural_economic_units USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_enterprise_feasibility_analysis_location_gin
-    ON enterprise_feasibility_analysis USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_renewable_energy_systems_location_gin
-    ON renewable_energy_systems USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_market_intelligence_location_gin
-    ON market_intelligence USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_buying_clubs_location_gin
-    ON buying_clubs USING GIN (location);
-CREATE INDEX IF NOT EXISTS idx_logistics_orders_current_location_gin
-    ON logistics_orders USING GIN (current_location);
-CREATE INDEX IF NOT EXISTS idx_mobility_rides_current_location_gin
-    ON mobility_rides USING GIN (current_location);
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_land_records_gps_coordinates_gin
+    ON land_records USING GIN (gps_coordinates)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_land_records_gps_coordinates_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_villages_coordinates_gin
+    ON villages USING GIN (coordinates)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_villages_coordinates_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_csr_projects_location_gin
+    ON csr_projects USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_csr_projects_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_fleet_vehicles_current_location_gin
+    ON fleet_vehicles USING GIN (current_location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_fleet_vehicles_current_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_shipment_geofences_coordinates_gin
+    ON shipment_geofences USING GIN (coordinates)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_shipment_geofences_coordinates_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_warehouses_location_gin
+    ON warehouses USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_warehouses_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_iot_devices_location_gin
+    ON iot_devices USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_iot_devices_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_farm_information_coordinates_gin
+    ON farm_information USING GIN (coordinates)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_farm_information_coordinates_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_engineering_projects_location_gin
+    ON engineering_projects USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_engineering_projects_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_digital_twin_sensors_location_gin
+    ON digital_twin_sensors USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_digital_twin_sensors_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_quality_checks_location_gin
+    ON quality_checks USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_quality_checks_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_organic_farms_gps_coordinates_gin
+    ON organic_farms USING GIN (gps_coordinates)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_organic_farms_gps_coordinates_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_rural_economic_units_location_gin
+    ON rural_economic_units USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_rural_economic_units_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_enterprise_feasibility_analysis_location_gin
+    ON enterprise_feasibility_analysis USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_enterprise_feasibility_analysis_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_renewable_energy_systems_location_gin
+    ON renewable_energy_systems USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_renewable_energy_systems_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_market_intelligence_location_gin
+    ON market_intelligence USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_market_intelligence_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_buying_clubs_location_gin
+    ON buying_clubs USING GIN (location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_buying_clubs_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_logistics_orders_current_location_gin
+    ON logistics_orders USING GIN (current_location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_logistics_orders_current_location_gin: %', SQLERRM;
+END $guard$;
+DO $guard$ BEGIN
+  EXECUTE $stmt$CREATE INDEX IF NOT EXISTS idx_mobility_rides_current_location_gin
+    ON mobility_rides USING GIN (current_location)$stmt$;
+EXCEPTION WHEN undefined_table OR undefined_column THEN
+  RAISE NOTICE 'skipped idx_mobility_rides_current_location_gin: %', SQLERRM;
+END $guard$;

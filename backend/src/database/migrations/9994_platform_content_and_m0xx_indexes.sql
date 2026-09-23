@@ -34,7 +34,8 @@
 
 CREATE TABLE IF NOT EXISTS community_posts (
   id SERIAL PRIMARY KEY,
-  author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  -- TYPE ALIGNED (2026-09-23): declared INTEGER, but users.id is UUID, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  author_id UUID REFERENCES users(id) ON DELETE SET NULL,
   title VARCHAR(255) NOT NULL,
   body TEXT NOT NULL,
   category VARCHAR(50) NOT NULL DEFAULT 'general'
@@ -55,7 +56,8 @@ CREATE TABLE IF NOT EXISTS community_posts (
 CREATE TABLE IF NOT EXISTS community_replies (
   id SERIAL PRIMARY KEY,
   post_id INTEGER NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
-  author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  -- TYPE ALIGNED (2026-09-23): declared INTEGER, but users.id is UUID, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  author_id UUID REFERENCES users(id) ON DELETE SET NULL,
   body TEXT NOT NULL,
   upvotes INTEGER NOT NULL DEFAULT 0,
   status VARCHAR(20) NOT NULL DEFAULT 'published'
@@ -72,7 +74,8 @@ CREATE TABLE IF NOT EXISTS community_votes (
   id SERIAL PRIMARY KEY,
   post_id INTEGER REFERENCES community_posts(id) ON DELETE CASCADE,
   reply_id INTEGER REFERENCES community_replies(id) ON DELETE CASCADE,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  -- TYPE ALIGNED (2026-09-23): declared INTEGER, but users.id is UUID, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   vote_type VARCHAR(10) NOT NULL DEFAULT 'up' CHECK (vote_type IN ('up','flag')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT community_vote_single_target CHECK (
@@ -104,7 +107,8 @@ CREATE TABLE IF NOT EXISTS knowledge_categories (
 CREATE TABLE IF NOT EXISTS knowledge_articles (
   id SERIAL PRIMARY KEY,
   category_id INTEGER REFERENCES knowledge_categories(id) ON DELETE SET NULL,
-  author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  -- TYPE ALIGNED (2026-09-23): declared INTEGER, but users.id is UUID, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  author_id UUID REFERENCES users(id) ON DELETE SET NULL,
   title VARCHAR(255) NOT NULL,
   slug VARCHAR(280) UNIQUE NOT NULL,
   summary TEXT,
@@ -139,7 +143,8 @@ CREATE TABLE IF NOT EXISTS info_announcements (
     CHECK (audience IN ('all','farmers','buyers','admins')),
   priority VARCHAR(10) NOT NULL DEFAULT 'normal'
     CHECK (priority IN ('low','normal','high','critical')),
-  published_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  -- TYPE ALIGNED (2026-09-23): declared INTEGER, but users.id is UUID, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  published_by UUID REFERENCES users(id) ON DELETE SET NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'draft'
     CHECK (status IN ('draft','published','expired','withdrawn')),
   published_at TIMESTAMP,
@@ -151,7 +156,8 @@ CREATE TABLE IF NOT EXISTS info_announcements (
 CREATE TABLE IF NOT EXISTS info_announcement_reads (
   id SERIAL PRIMARY KEY,
   announcement_id INTEGER NOT NULL REFERENCES info_announcements(id) ON DELETE CASCADE,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  -- TYPE ALIGNED (2026-09-23): declared INTEGER, but users.id is UUID, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (announcement_id, user_id)
 );

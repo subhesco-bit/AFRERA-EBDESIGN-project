@@ -54,10 +54,17 @@ CREATE TABLE IF NOT EXISTS gi_tags (
   unique_characteristics TEXT,
   commercial_potential TEXT,
   registered_date DATE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_state (state_of_origin),
-  INDEX idx_status (application_status)
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- PostgreSQL has no inline INDEX clause inside CREATE TABLE; MySQL does.
+-- These three tables carried MySQL index declarations, which made the whole
+-- migration fail at parse time with "type idx_state does not exist" -- the
+-- parser read `idx_state` as a column type. Declared as real indexes here,
+-- renamed per table because index names are schema-global in PostgreSQL and
+-- idx_state was declared twice in this one file.
+CREATE INDEX IF NOT EXISTS idx_gi_tags_state ON gi_tags (state_of_origin);
+CREATE INDEX IF NOT EXISTS idx_gi_tags_status ON gi_tags (application_status);
 
 -- ============================================================================
 -- 3. PRODUCT MASTER DATA
@@ -95,12 +102,15 @@ CREATE TABLE IF NOT EXISTS ne_variety_products (
   certification_status TEXT,
 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  INDEX idx_category (category_id),
-  INDEX idx_state (primary_state),
-  INDEX idx_product (product_name)
+  -- MySQL's ON UPDATE CURRENT_TIMESTAMP column attribute does not exist in
+  -- PostgreSQL. Auto-touching updated_at needs a BEFORE UPDATE trigger; the
+  -- column keeps its insert default here and a trigger can be added later.
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_ne_variety_products_category ON ne_variety_products (category_id);
+CREATE INDEX IF NOT EXISTS idx_ne_variety_products_state ON ne_variety_products (primary_state);
+CREATE INDEX IF NOT EXISTS idx_ne_variety_products_product ON ne_variety_products (product_name);
 
 -- ============================================================================
 -- 4. FERMENTATION & PROCESSING METHODS
@@ -240,7 +250,8 @@ CREATE TABLE IF NOT EXISTS ne_variety_media (
   usage_instructions_text TEXT,
 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  -- See the note above: ON UPDATE CURRENT_TIMESTAMP is MySQL-only.
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================================================

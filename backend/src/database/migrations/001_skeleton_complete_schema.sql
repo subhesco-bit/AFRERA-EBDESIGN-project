@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- ============================================================================
 -- EBDESIGN COMPLETE DATABASE SCHEMA - SKELETON
 -- Maps all 96 architectural points to database entities
@@ -26,6 +47,20 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   user_agent TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS entity_type VARCHAR(100);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS entity_id UUID;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS action VARCHAR(50);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS details JSONB;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS changes JSONB;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS ip_address INET;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS user_agent TEXT;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
 
@@ -45,6 +80,22 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS first_name VARCHAR(100);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_name VARCHAR(100);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_verified BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
 
@@ -58,6 +109,39 @@ CREATE TABLE IF NOT EXISTS roles (
   is_system BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS code VARCHAR(50);
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS parent_role_id INTEGER;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_system BOOLEAN DEFAULT false;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- RECONCILIATION (added 2026-09-23)
+--
+-- `roles` is defined by more than one migration. 000_base_schema creates it
+-- with (id, name, description, permissions, is_system_role, level, ...); the
+-- CREATE TABLE IF NOT EXISTS above therefore does NOTHING on a clean run, and
+-- the INSERT below then failed with `column "code" of relation "roles" does not
+-- exist`. Verified on a clean PostgreSQL 16 run of the full migration set.
+--
+-- Neither definition is dropped -- per the project rule, a collision is
+-- reconciled, not resolved by deleting one side. The columns this migration
+-- needs are added if they are absent, so both definitions are satisfied by one
+-- table.
+--
+-- `code` is deliberately NOT NULL-free and its uniqueness is a partial index:
+-- rows seeded by the other definition have no code, and making the column NOT
+-- NULL would fail against them.
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS code VARCHAR(50);
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_system BOOLEAN DEFAULT false;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS parent_role_id INTEGER REFERENCES roles(id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_roles_code ON roles (code) WHERE code IS NOT NULL;
+
+-- ON CONFLICT so a re-run is idempotent: the unique index above makes `code`
+-- the natural key for these seeded system roles.
 INSERT INTO roles (code, name, description, is_system) VALUES
 ('farmer', 'Farmer', 'Agricultural producer', true),
 ('fpo_member', 'FPO Member', 'Member of Farmer Producer Organization', true),
@@ -73,7 +157,8 @@ INSERT INTO roles (code, name, description, is_system) VALUES
 ('admin', 'Administrator', 'System administrator', true),
 ('state_admin', 'State Administrator', 'State-level administration', true),
 ('district_admin', 'District Administrator', 'District-level administration', true),
-('cluster_manager', 'Cluster Manager', 'Cluster/block level management', true);
+('cluster_manager', 'Cluster Manager', 'Cluster/block level management', true)
+ON CONFLICT (code) WHERE code IS NOT NULL DO NOTHING;
 
 -- 4. PERMISSIONS (Section 21: RBAC)
 CREATE TABLE IF NOT EXISTS permissions (
@@ -86,12 +171,27 @@ CREATE TABLE IF NOT EXISTS permissions (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS code VARCHAR(100);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS resource VARCHAR(100);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS action VARCHAR(50);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- 5. ROLE_PERMISSIONS (Section 21: RBAC)
 CREATE TABLE IF NOT EXISTS role_permissions (
   role_id INTEGER REFERENCES roles(id),
   permission_id INTEGER REFERENCES permissions(id),
   PRIMARY KEY (role_id, permission_id)
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS role_id INTEGER;
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS permission_id INTEGER;
+
 
 -- 6. USER_ROLES (Section 21: RBAC)
 CREATE TABLE IF NOT EXISTS user_roles (
@@ -104,6 +204,16 @@ CREATE TABLE IF NOT EXISTS user_roles (
   assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, role_id, organization_id)
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS role_id INTEGER;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS organization_id UUID;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS state_code VARCHAR(10);
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS district_code VARCHAR(10);
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS cluster_code VARCHAR(10);
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- 7. ORGANIZATIONS (Section 2: Multi-Entity Architecture)
 CREATE TABLE IF NOT EXISTS organizations (
@@ -118,9 +228,25 @@ CREATE TABLE IF NOT EXISTS organizations (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS type VARCHAR(50);
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS code VARCHAR(50);
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS parent_org_id UUID;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS logo_url TEXT;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 INSERT INTO organizations (name, type, code) VALUES
 ('Lumo Earth', 'NGO', 'lumo_earth'),
-('SV ESCO', 'Partner', 'sv_esco');
+('SV ESCO', 'Partner', 'sv_esco')
+-- Idempotent: 000_base_schema seeds the same reference rows, so a clean run
+-- of the whole set reaches this INSERT with the natural key already present.
+ON CONFLICT DO NOTHING;
 
 -- 8. SESSIONS (Section 21: Authentication & Session Management)
 CREATE TABLE IF NOT EXISTS sessions (
@@ -132,6 +258,16 @@ CREATE TABLE IF NOT EXISTS sessions (
   ip_address INET,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS token_hash VARCHAR(255);
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS device_info JSONB;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS ip_address INET;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at);
 
@@ -146,6 +282,16 @@ CREATE TABLE IF NOT EXISTS mfa_secrets (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE mfa_secrets ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE mfa_secrets ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE mfa_secrets ADD COLUMN IF NOT EXISTS secret_key VARCHAR(255);
+ALTER TABLE mfa_secrets ADD COLUMN IF NOT EXISTS backup_codes TEXT[];
+ALTER TABLE mfa_secrets ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN DEFAULT false;
+ALTER TABLE mfa_secrets ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE mfa_secrets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- ============================================================================
 -- SECTION 2: MASTER DATA MANAGEMENT (Section 20: Master Data)
 -- All these are "single source of truth" entities
@@ -159,6 +305,14 @@ CREATE TABLE IF NOT EXISTS states (
   region VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE states ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE states ADD COLUMN IF NOT EXISTS code VARCHAR(10);
+ALTER TABLE states ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE states ADD COLUMN IF NOT EXISTS region VARCHAR(50);
+ALTER TABLE states ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 INSERT INTO states (code, name, region) VALUES
 ('AS', 'Assam', 'Northeast'),
 ('AR', 'Arunachal Pradesh', 'Northeast'),
@@ -166,7 +320,9 @@ INSERT INTO states (code, name, region) VALUES
 ('ML', 'Meghalaya', 'Northeast'),
 ('MZ', 'Mizoram', 'Northeast'),
 ('NL', 'Nagaland', 'Northeast'),
-('TR', 'Tripura', 'Northeast');
+('TR', 'Tripura', 'Northeast')
+-- Idempotent for the same reason as the organizations seed above.
+ON CONFLICT DO NOTHING;
 
 -- 11. DISTRICTS
 CREATE TABLE IF NOT EXISTS districts (
@@ -177,6 +333,14 @@ CREATE TABLE IF NOT EXISTS districts (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE districts ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE districts ADD COLUMN IF NOT EXISTS state_id INTEGER;
+ALTER TABLE districts ADD COLUMN IF NOT EXISTS code VARCHAR(20);
+ALTER TABLE districts ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE districts ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- 12. BLOCKS
 CREATE TABLE IF NOT EXISTS blocks (
   id SERIAL PRIMARY KEY,
@@ -185,6 +349,14 @@ CREATE TABLE IF NOT EXISTS blocks (
   name VARCHAR(100) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS district_id INTEGER;
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS code VARCHAR(20);
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE blocks ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- 13. VILLAGES (Section 8: Village-Level Management)
 CREATE TABLE IF NOT EXISTS villages (
@@ -199,6 +371,19 @@ CREATE TABLE IF NOT EXISTS villages (
   primary_language VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS block_id INTEGER;
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS code VARCHAR(50);
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 8);
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS longitude DECIMAL(11, 8);
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS population INTEGER;
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS primary_crops TEXT[];
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS primary_language VARCHAR(50);
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_villages_block_id ON villages(block_id);
 CREATE INDEX IF NOT EXISTS idx_villages_location ON villages(latitude, longitude);
 
@@ -218,6 +403,22 @@ CREATE TABLE IF NOT EXISTS farmers (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS village_id UUID;
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS farmer_code VARCHAR(50);
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS aadhar_number VARCHAR(12);
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS pan_number VARCHAR(10);
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS phone_verified BOOLEAN DEFAULT false;
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS aadhar_verified BOOLEAN DEFAULT false;
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS kyc_status VARCHAR(50);
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS fdi_score DECIMAL(3, 1);
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE farmers ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_farmers_user_id ON farmers(user_id);
 CREATE INDEX IF NOT EXISTS idx_farmers_village_id ON farmers(village_id);
 
@@ -236,6 +437,21 @@ CREATE TABLE IF NOT EXISTS farms (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS farm_code VARCHAR(50);
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS total_acreage DECIMAL(10, 2);
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS soil_type VARCHAR(100);
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS water_source VARCHAR(100);
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 8);
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS longitude DECIMAL(11, 8);
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS gps_boundary POLYGON;
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS ownership_type VARCHAR(50);
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_farms_farmer_id ON farms(farmer_id);
 CREATE INDEX IF NOT EXISTS idx_farms_location ON farms(latitude, longitude);
 
@@ -251,6 +467,17 @@ CREATE TABLE IF NOT EXISTS plots (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE plots ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE plots ADD COLUMN IF NOT EXISTS farm_id UUID;
+ALTER TABLE plots ADD COLUMN IF NOT EXISTS plot_code VARCHAR(50);
+ALTER TABLE plots ADD COLUMN IF NOT EXISTS acreage DECIMAL(10, 2);
+ALTER TABLE plots ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 8);
+ALTER TABLE plots ADD COLUMN IF NOT EXISTS longitude DECIMAL(11, 8);
+ALTER TABLE plots ADD COLUMN IF NOT EXISTS gps_boundary POLYGON;
+ALTER TABLE plots ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- 17. CROPS (Section 20: Crop & Commodity Master)
 CREATE TABLE IF NOT EXISTS crops (
   id SERIAL PRIMARY KEY,
@@ -260,6 +487,15 @@ CREATE TABLE IF NOT EXISTS crops (
   category VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS code VARCHAR(50);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS scientific_name VARCHAR(255);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS category VARCHAR(50);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- 18. CROP_VARIETIES (Section 20: Crop & Commodity Master)
 CREATE TABLE IF NOT EXISTS crop_varieties (
@@ -271,6 +507,16 @@ CREATE TABLE IF NOT EXISTS crop_varieties (
   average_yield_kg_per_acre DECIMAL(10, 2),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS crop_id INTEGER;
+ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS code VARCHAR(50);
+ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS average_yield_kg_per_acre DECIMAL(10, 2);
+ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- 19. CROP_PLANS (Section 12: Production Planning)
 CREATE TABLE IF NOT EXISTS crop_plans (
@@ -286,6 +532,20 @@ CREATE TABLE IF NOT EXISTS crop_plans (
   expected_yield_kg DECIMAL(10, 2),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS crop_id INTEGER;
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS variety_id INTEGER;
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS season VARCHAR(50);
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS year INTEGER;
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS plot_id UUID;
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS planting_date DATE;
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS expected_harvest_date DATE;
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS expected_yield_kg DECIMAL(10, 2);
+ALTER TABLE crop_plans ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_crop_plans_farmer_id ON crop_plans(farmer_id);
 
 -- 20. CROP_CYCLES (Section 8: Crop/Production Management)
@@ -299,6 +559,17 @@ CREATE TABLE IF NOT EXISTS crop_cycles (
   food_loss_kg DECIMAL(10, 2),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE crop_cycles ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE crop_cycles ADD COLUMN IF NOT EXISTS crop_plan_id UUID;
+ALTER TABLE crop_cycles ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+ALTER TABLE crop_cycles ADD COLUMN IF NOT EXISTS actual_harvest_date DATE;
+ALTER TABLE crop_cycles ADD COLUMN IF NOT EXISTS actual_yield_kg DECIMAL(10, 2);
+ALTER TABLE crop_cycles ADD COLUMN IF NOT EXISTS quality_score DECIMAL(3, 1);
+ALTER TABLE crop_cycles ADD COLUMN IF NOT EXISTS food_loss_kg DECIMAL(10, 2);
+ALTER TABLE crop_cycles ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- 21. PRODUCTS (Section 20: Product & SKU Master)
 CREATE TABLE IF NOT EXISTS products (
@@ -315,6 +586,21 @@ CREATE TABLE IF NOT EXISTS products (
   is_available BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE products ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS crop_cycle_id UUID;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS sku VARCHAR(100);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS batch_number VARCHAR(50);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS quantity_kg DECIMAL(10, 2);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS quality_grade VARCHAR(20);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS certifications VARCHAR(255)[];
+ALTER TABLE products ADD COLUMN IF NOT EXISTS price_per_kg DECIMAL(10, 2);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS list_date TIMESTAMP;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS is_available BOOLEAN DEFAULT true;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_products_farmer_id ON products(farmer_id);
 
 -- 22. BUYERS (Section 20: Buyer & Supplier Master)
@@ -330,6 +616,19 @@ CREATE TABLE IF NOT EXISTS buyers (
   is_verified BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS buyer_code VARCHAR(50);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS organization_name VARCHAR(255);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS buyer_type VARCHAR(50);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS channel VARCHAR(50);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS location_latitude DECIMAL(10, 8);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS location_longitude DECIMAL(11, 8);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false;
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_buyers_user_id ON buyers(user_id);
 
 -- ============================================================================
@@ -355,6 +654,25 @@ CREATE TABLE IF NOT EXISTS marketplace_listings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS product_id UUID;
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS title VARCHAR(255);
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS photos_urls TEXT[];
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS quality_metadata JSONB;
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS price_per_kg DECIMAL(10, 2);
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS minimum_order_kg DECIMAL(10, 2);
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS available_quantity_kg DECIMAL(10, 2);
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS harvest_date DATE;
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS shelf_life_days INTEGER;
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS certifications VARCHAR(255)[];
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS storage_requirement VARCHAR(100);
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE marketplace_listings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_marketplace_listings_product_id ON marketplace_listings(product_id);
 
 -- 24. BUYER_INQUIRIES (Section 9: Marketplace & E-Commerce)
@@ -371,6 +689,20 @@ CREATE TABLE IF NOT EXISTS buyer_inquiries (
   status VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS buyer_id UUID;
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS crop_id INTEGER;
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS quantity_kg DECIMAL(10, 2);
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS quality_requirements VARCHAR(255);
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS delivery_location VARCHAR(255);
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS expected_delivery_date DATE;
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS confidence_score DECIMAL(3, 1);
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS confidence_rationale TEXT;
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+ALTER TABLE buyer_inquiries ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_buyer_inquiries_buyer_id ON buyer_inquiries(buyer_id);
 
 -- 25. BUYER_MATCHES (Claude AI: Section 9)
@@ -384,6 +716,17 @@ CREATE TABLE IF NOT EXISTS buyer_matches (
   ai_confidence DECIMAL(3, 1),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE buyer_matches ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE buyer_matches ADD COLUMN IF NOT EXISTS inquiry_id UUID;
+ALTER TABLE buyer_matches ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE buyer_matches ADD COLUMN IF NOT EXISTS product_id UUID;
+ALTER TABLE buyer_matches ADD COLUMN IF NOT EXISTS match_score DECIMAL(3, 1);
+ALTER TABLE buyer_matches ADD COLUMN IF NOT EXISTS match_reason TEXT;
+ALTER TABLE buyer_matches ADD COLUMN IF NOT EXISTS ai_confidence DECIMAL(3, 1);
+ALTER TABLE buyer_matches ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- 26. ORDERS (Section 9: Marketplace & E-Commerce)
 CREATE TABLE IF NOT EXISTS orders (
@@ -403,6 +746,24 @@ CREATE TABLE IF NOT EXISTS orders (
   is_repeat_order BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS buyer_id UUID;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS product_id UUID;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS order_number VARCHAR(50);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS quantity_kg DECIMAL(10, 2);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS unit_price DECIMAL(10, 2);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_value DECIMAL(12, 2);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_location VARCHAR(255);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS expected_delivery_date DATE;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS order_status VARCHAR(50);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS quality_feedback TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS buyer_rating DECIMAL(3, 1);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS is_repeat_order BOOLEAN DEFAULT false;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_orders_buyer_id ON orders(buyer_id);
 CREATE INDEX IF NOT EXISTS idx_orders_farmer_id ON orders(farmer_id);
 
@@ -415,6 +776,15 @@ CREATE TABLE IF NOT EXISTS reputation_scores (
   period VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE reputation_scores ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE reputation_scores ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE reputation_scores ADD COLUMN IF NOT EXISTS metric VARCHAR(50);
+ALTER TABLE reputation_scores ADD COLUMN IF NOT EXISTS score DECIMAL(3, 1);
+ALTER TABLE reputation_scores ADD COLUMN IF NOT EXISTS period VARCHAR(50);
+ALTER TABLE reputation_scores ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- ============================================================================
 -- SECTION 4: COLD STORAGE (Core Project) (Section 6: Cold Storage)
@@ -434,6 +804,20 @@ CREATE TABLE IF NOT EXISTS cold_storage_nodes (
   is_operational BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS node_code VARCHAR(50);
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS location_name VARCHAR(255);
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS village_id UUID;
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 8);
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS longitude DECIMAL(11, 8);
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS total_capacity_tonnes DECIMAL(10, 2);
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS primary_commodity VARCHAR(100);
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS owner_organization VARCHAR(100);
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS is_operational BOOLEAN DEFAULT false;
+ALTER TABLE cold_storage_nodes ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_cold_storage_nodes_village_id ON cold_storage_nodes(village_id);
 
 -- 29. STORAGE_CHAMBERS (Section 6: Multi-Temperature Storage)
@@ -449,6 +833,19 @@ CREATE TABLE IF NOT EXISTS storage_chambers (
   current_utilization_percent DECIMAL(5, 2),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS node_id UUID;
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS chamber_code VARCHAR(50);
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS capacity_tonnes DECIMAL(10, 2);
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS min_temperature DECIMAL(5, 2);
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS max_temperature DECIMAL(5, 2);
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS humidity_range VARCHAR(50);
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS suitable_commodities VARCHAR(255)[];
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS current_utilization_percent DECIMAL(5, 2);
+ALTER TABLE storage_chambers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- 30. STORAGE_BOOKINGS (Section 6: Cold Storage Booking Workflow)
 CREATE TABLE IF NOT EXISTS storage_bookings (
@@ -466,6 +863,22 @@ CREATE TABLE IF NOT EXISTS storage_bookings (
   booking_status VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS chamber_id UUID;
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS booking_number VARCHAR(50);
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS product_id UUID;
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS quantity_kg DECIMAL(10, 2);
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS booking_date TIMESTAMP;
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS inbound_date DATE;
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS outbound_date DATE;
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS storage_cost_per_kg DECIMAL(10, 4);
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS total_storage_cost DECIMAL(12, 2);
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS booking_status VARCHAR(50);
+ALTER TABLE storage_bookings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_storage_bookings_farmer_id ON storage_bookings(farmer_id);
 
 -- 31. COLD_STORAGE_INVENTORY (Section 6: Inventory Tracking)
@@ -483,6 +896,20 @@ CREATE TABLE IF NOT EXISTS cold_storage_inventory (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS booking_id UUID;
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS chamber_id UUID;
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS batch_number VARCHAR(50);
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS lot_number VARCHAR(50);
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS current_quantity_kg DECIMAL(10, 2);
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS quality_assessment VARCHAR(255);
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS expiry_date DATE;
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS received_date TIMESTAMP;
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS last_quality_check TIMESTAMP;
+ALTER TABLE cold_storage_inventory ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- 32. TEMPERATURE_MONITORING (Section 6: Temperature Monitoring & Alerts)
 CREATE TABLE IF NOT EXISTS temperature_monitoring (
   id BIGSERIAL PRIMARY KEY,
@@ -493,6 +920,16 @@ CREATE TABLE IF NOT EXISTS temperature_monitoring (
   sensor_id VARCHAR(100),
   is_anomaly BOOLEAN DEFAULT false
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE temperature_monitoring ADD COLUMN IF NOT EXISTS id BIGINT;
+ALTER TABLE temperature_monitoring ADD COLUMN IF NOT EXISTS chamber_id UUID;
+ALTER TABLE temperature_monitoring ADD COLUMN IF NOT EXISTS temperature_celsius DECIMAL(5, 2);
+ALTER TABLE temperature_monitoring ADD COLUMN IF NOT EXISTS humidity_percent DECIMAL(5, 2);
+ALTER TABLE temperature_monitoring ADD COLUMN IF NOT EXISTS recorded_at TIMESTAMP;
+ALTER TABLE temperature_monitoring ADD COLUMN IF NOT EXISTS sensor_id VARCHAR(100);
+ALTER TABLE temperature_monitoring ADD COLUMN IF NOT EXISTS is_anomaly BOOLEAN DEFAULT false;
+
 CREATE INDEX IF NOT EXISTS idx_temperature_monitoring_chamber_id_timestamp ON temperature_monitoring(chamber_id, recorded_at);
 
 -- 33. ENERGY_CONSUMPTION (Section 6: Energy Resilience)
@@ -505,6 +942,16 @@ CREATE TABLE IF NOT EXISTS energy_consumption (
   recorded_at TIMESTAMP,
   efficiency_rating VARCHAR(50)
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE energy_consumption ADD COLUMN IF NOT EXISTS id BIGINT;
+ALTER TABLE energy_consumption ADD COLUMN IF NOT EXISTS node_id UUID;
+ALTER TABLE energy_consumption ADD COLUMN IF NOT EXISTS kwh_consumed DECIMAL(10, 2);
+ALTER TABLE energy_consumption ADD COLUMN IF NOT EXISTS renewable_kwh DECIMAL(10, 2);
+ALTER TABLE energy_consumption ADD COLUMN IF NOT EXISTS battery_discharge_kwh DECIMAL(10, 2);
+ALTER TABLE energy_consumption ADD COLUMN IF NOT EXISTS recorded_at TIMESTAMP;
+ALTER TABLE energy_consumption ADD COLUMN IF NOT EXISTS efficiency_rating VARCHAR(50);
+
 
 -- ============================================================================
 -- SECTION 5: LOGISTICS & SHIPMENT (Section 15: Logistics)
@@ -525,6 +972,20 @@ CREATE TABLE IF NOT EXISTS shipments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS order_id UUID;
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS storage_booking_id UUID;
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS shipment_number VARCHAR(50);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS source_location VARCHAR(255);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS destination_location VARCHAR(255);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS dispatch_date TIMESTAMP;
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS expected_delivery_date DATE;
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS actual_delivery_date DATE;
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS shipment_status VARCHAR(50);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- 35. REEFER_VEHICLES (Section 6: Reefer Fleet Management)
 CREATE TABLE IF NOT EXISTS reefer_vehicles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -538,6 +999,18 @@ CREATE TABLE IF NOT EXISTS reefer_vehicles (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS vehicle_code VARCHAR(50);
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS registration_number VARCHAR(50);
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS capacity_tonnes DECIMAL(10, 2);
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS temperature_range_min DECIMAL(5, 2);
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS temperature_range_max DECIMAL(5, 2);
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS driver_id UUID;
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS is_operational BOOLEAN DEFAULT true;
+ALTER TABLE reefer_vehicles ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- 36. LOGISTICS_TRACKING (Section 15: Real-Time Tracking)
 CREATE TABLE IF NOT EXISTS logistics_tracking (
   id BIGSERIAL PRIMARY KEY,
@@ -549,6 +1022,17 @@ CREATE TABLE IF NOT EXISTS logistics_tracking (
   gps_timestamp TIMESTAMP,
   recorded_at TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE logistics_tracking ADD COLUMN IF NOT EXISTS id BIGINT;
+ALTER TABLE logistics_tracking ADD COLUMN IF NOT EXISTS shipment_id UUID;
+ALTER TABLE logistics_tracking ADD COLUMN IF NOT EXISTS vehicle_id UUID;
+ALTER TABLE logistics_tracking ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 8);
+ALTER TABLE logistics_tracking ADD COLUMN IF NOT EXISTS longitude DECIMAL(11, 8);
+ALTER TABLE logistics_tracking ADD COLUMN IF NOT EXISTS temperature_celsius DECIMAL(5, 2);
+ALTER TABLE logistics_tracking ADD COLUMN IF NOT EXISTS gps_timestamp TIMESTAMP;
+ALTER TABLE logistics_tracking ADD COLUMN IF NOT EXISTS recorded_at TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_logistics_tracking_shipment_id ON logistics_tracking(shipment_id);
 
 -- ============================================================================
@@ -566,6 +1050,16 @@ CREATE TABLE IF NOT EXISTS laboratories (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS lab_code VARCHAR(50);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS location_name VARCHAR(255);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS village_id UUID;
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS test_types VARCHAR(255)[];
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS is_operational BOOLEAN DEFAULT true;
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- 38. LAB_TESTS (Section 4: Laboratory Services)
 CREATE TABLE IF NOT EXISTS lab_tests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -579,6 +1073,19 @@ CREATE TABLE IF NOT EXISTS lab_tests (
   status VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS lab_id UUID;
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS test_type VARCHAR(50);
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS sample_details JSONB;
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS test_results JSONB;
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS test_date DATE;
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS reported_date DATE;
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+ALTER TABLE lab_tests ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 CREATE INDEX IF NOT EXISTS idx_lab_tests_farmer_id ON lab_tests(farmer_id);
 
 -- ============================================================================
@@ -588,8 +1095,13 @@ CREATE INDEX IF NOT EXISTS idx_lab_tests_farmer_id ON lab_tests(farmer_id);
 
 -- Create default admin user (password should be changed immediately)
 INSERT INTO users (email, password_hash, first_name, last_name, is_active) VALUES
-('admin@ebdesign.com', '$2b$10$stub_hash_change_immediately', 'System', 'Administrator', true);
+('admin@ebdesign.com', '$2b$10$stub_hash_change_immediately', 'System', 'Administrator', true)
+-- NOTE: this seeds an admin account with a STUB password hash that no password
+-- matches. It is inert rather than a backdoor, but it should be removed or
+-- given a real credential before any deployment.
+ON CONFLICT DO NOTHING;
 
 -- Assign admin role
 INSERT INTO user_roles (user_id, role_id) 
-SELECT u.id, r.id FROM users u CROSS JOIN roles r WHERE u.email = 'admin@ebdesign.com' AND r.code = 'admin';
+SELECT u.id, r.id FROM users u CROSS JOIN roles r WHERE u.email = 'admin@ebdesign.com' AND r.code = 'admin'
+ON CONFLICT DO NOTHING;

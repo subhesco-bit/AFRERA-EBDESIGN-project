@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- Migration: Advanced Authorization Service (M013)
 -- Created: August 12, 2026
 -- Description: Create tables for AI-powered authorization service with role-based access control
@@ -14,6 +35,18 @@ CREATE TABLE IF NOT EXISTS roles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS hierarchy_level INTEGER DEFAULT 50;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS default_permissions JSONB DEFAULT '[]';
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_system_role BOOLEAN DEFAULT false;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Indexes for roles
 CREATE INDEX IF NOT EXISTS idx_roles_hierarchy_level ON roles(hierarchy_level);
@@ -33,6 +66,20 @@ CREATE TABLE IF NOT EXISTS authorizations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS role_id INTEGER;
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '[]';
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS context JSONB DEFAULT '{}';
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'ACTIVE';
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP;
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS last_used_at TIMESTAMP;
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE authorizations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Indexes for authorizations
 CREATE INDEX IF NOT EXISTS idx_authorizations_user_id ON authorizations(user_id);
@@ -55,6 +102,20 @@ CREATE TABLE IF NOT EXISTS authorization_audit_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS event VARCHAR(50);
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS resource VARCHAR(255);
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS action VARCHAR(100);
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS details JSONB DEFAULT '{}';
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS ip_address INET;
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS user_agent TEXT;
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS success BOOLEAN DEFAULT true;
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS failure_reason TEXT;
+ALTER TABLE authorization_audit_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Indexes for authorization_audit_logs
 CREATE INDEX IF NOT EXISTS idx_authorization_audit_logs_user_id ON authorization_audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_authorization_audit_logs_event ON authorization_audit_logs(event);
@@ -75,6 +136,19 @@ CREATE TABLE IF NOT EXISTS permission_templates (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '[]';
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS applicable_roles JSONB DEFAULT '[]';
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS category VARCHAR(50);
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS is_system_template BOOLEAN DEFAULT false;
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE permission_templates ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Indexes for permission_templates
 CREATE INDEX IF NOT EXISTS idx_permission_templates_category ON permission_templates(category);
 CREATE INDEX IF NOT EXISTS idx_permission_templates_is_system_template ON permission_templates(is_system_template);
@@ -90,6 +164,17 @@ CREATE TABLE IF NOT EXISTS resource_groups (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE resource_groups ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE resource_groups ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE resource_groups ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE resource_groups ADD COLUMN IF NOT EXISTS resources JSONB DEFAULT '[]';
+ALTER TABLE resource_groups ADD COLUMN IF NOT EXISTS parent_group_id INTEGER;
+ALTER TABLE resource_groups ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE resource_groups ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE resource_groups ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Indexes for resource_groups
 CREATE INDEX IF NOT EXISTS idx_resource_groups_parent_group_id ON resource_groups(parent_group_id);

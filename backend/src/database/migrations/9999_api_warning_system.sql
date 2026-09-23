@@ -194,6 +194,17 @@ CREATE INDEX IF NOT EXISTS idx_api_warnings_message_fts
 CREATE INDEX IF NOT EXISTS idx_api_warnings_metadata 
     ON api_warnings USING gin(metadata);
 
+-- migration_log is written here but was created by NO migration in this
+-- repository, so this file aborted on `relation "migration_log" does not
+-- exist` and its indexes above were the last thing to land. Verified on a
+-- clean PostgreSQL 16 run. Created here, next to its only writer.
+CREATE TABLE IF NOT EXISTS migration_log (
+    id             SERIAL PRIMARY KEY,
+    migration_name VARCHAR(255) UNIQUE NOT NULL,
+    executed_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status         VARCHAR(20) NOT NULL DEFAULT 'success'
+);
+
 -- Successful migration completion marker
 INSERT INTO migration_log (migration_name, executed_at, status)
 VALUES ('api_warning_system', CURRENT_TIMESTAMP, 'success')
