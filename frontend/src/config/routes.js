@@ -15,6 +15,36 @@
 import { lazy } from 'react';
 
 /**
+ * AFRERA Kernel pages — real pine-shadow-ported backend (105/105 Jest
+ * tests passing), served live via backend/src/routes/afreraKernel.js.
+ * See frontend/src/pages/kernel/README.md.
+ */
+const KernelIndexPage = lazy(() => import('../pages/kernel/index.jsx'));
+const KernelBodyPage = lazy(() => import('../pages/kernel/body.jsx'));
+const KernelBrainPage = lazy(() => import('../pages/kernel/brain.jsx'));
+const KernelCellsPage = lazy(() => import('../pages/kernel/cells.jsx'));
+const KernelCharterPage = lazy(() => import('../pages/kernel/charter.jsx'));
+const KernelCompanionPage = lazy(() => import('../pages/kernel/companion.jsx'));
+const KernelEconomyPage = lazy(() => import('../pages/kernel/economy.jsx'));
+const KernelFlowsPage = lazy(() => import('../pages/kernel/flows.jsx'));
+const KernelLedgerPage = lazy(() => import('../pages/kernel/ledger.jsx'));
+const KernelLibraryPage = lazy(() => import('../pages/kernel/library.jsx'));
+const KernelLigamentsPage = lazy(() => import('../pages/kernel/ligaments.jsx'));
+const KernelLotsPage = lazy(() => import('../pages/kernel/lots.jsx'));
+const KernelMeshPage = lazy(() => import('../pages/kernel/mesh.jsx'));
+const KernelModulesPage = lazy(() => import('../pages/kernel/modules.jsx'));
+const KernelNervePage = lazy(() => import('../pages/kernel/nerve.jsx'));
+const KernelOrganismPage = lazy(() => import('../pages/kernel/organism.jsx'));
+const KernelOsPage = lazy(() => import('../pages/kernel/os.jsx'));
+const KernelPlatformPage = lazy(() => import('../pages/kernel/platform.jsx'));
+const KernelPulsePage = lazy(() => import('../pages/kernel/pulse.jsx'));
+const KernelSharePage = lazy(() => import('../pages/kernel/share.jsx'));
+const KernelSystemsPage = lazy(() => import('../pages/kernel/systems.jsx'));
+const KernelTradePage = lazy(() => import('../pages/kernel/trade.jsx'));
+const KernelVetPage = lazy(() => import('../pages/kernel/vet.jsx'));
+const KernelWarehousePage = lazy(() => import('../pages/kernel/warehouse.jsx'));
+
+/**
  * Lazy load page components
  */
 const HomePage = lazy(() => import('../pages/HomePage'));
@@ -459,6 +489,32 @@ export const publicRoutes = [
     keywords: 'land use, carbon, credits, agriculture',
     transition: 'fade',
   },
+  // AFRERA Kernel — real pine-shadow-ported backend, see
+  // frontend/src/pages/kernel/README.md and backend/src/routes/afreraKernel.js.
+  { path: '/kernel', component: KernelIndexPage, title: 'AFRERA Kernel - AFRERA', description: 'Real pine-shadow kernel: lattice, brain, body, vet, ERP, flows, and more.', keywords: 'kernel, pine-shadow, lattice, brain, body, vet, erp, flows', transition: 'fade' },
+  { path: '/kernel/body', component: KernelBodyPage, title: 'Kernel: Body - AFRERA', description: '11-part reflex kernel.', keywords: 'kernel, body', transition: 'fade' },
+  { path: '/kernel/brain', component: KernelBrainPage, title: 'Kernel: Brain - AFRERA', description: '5-tissue decision cortex.', keywords: 'kernel, brain', transition: 'fade' },
+  { path: '/kernel/cells', component: KernelCellsPage, title: 'Kernel: Cells - AFRERA', description: 'Person and home-scale stakeholders.', keywords: 'kernel, cells', transition: 'fade' },
+  { path: '/kernel/charter', component: KernelCharterPage, title: 'Kernel: Charter - AFRERA', description: '18-criteria module audit.', keywords: 'kernel, charter', transition: 'fade' },
+  { path: '/kernel/companion', component: KernelCompanionPage, title: 'Kernel: Companion - AFRERA', description: 'Living agentic proposals.', keywords: 'kernel, companion', transition: 'fade' },
+  { path: '/kernel/economy', component: KernelEconomyPage, title: 'Kernel: Economy - AFRERA', description: 'Library-first token savings.', keywords: 'kernel, economy, tokens', transition: 'fade' },
+  { path: '/kernel/flows', component: KernelFlowsPage, title: 'Kernel: Flows - AFRERA', description: '11 real process families.', keywords: 'kernel, flows', transition: 'fade' },
+  { path: '/kernel/ledger', component: KernelLedgerPage, title: 'Kernel: Ledger - AFRERA', description: 'ERP atlas and trial balance.', keywords: 'kernel, ledger, erp', transition: 'fade' },
+  { path: '/kernel/library', component: KernelLibraryPage, title: 'Kernel: Library - AFRERA', description: 'Doctrine knowledge base.', keywords: 'kernel, library', transition: 'fade' },
+  { path: '/kernel/ligaments', component: KernelLigamentsPage, title: 'Kernel: Ligaments - AFRERA', description: 'Bridge catalog by status.', keywords: 'kernel, ligaments, lattice', transition: 'fade' },
+  { path: '/kernel/lots', component: KernelLotsPage, title: 'Kernel: Lots - AFRERA', description: 'Stakeholder write matrix.', keywords: 'kernel, lots', transition: 'fade' },
+  { path: '/kernel/mesh', component: KernelMeshPage, title: 'Kernel: Mesh - AFRERA', description: 'Lattice bridge network.', keywords: 'kernel, mesh, lattice', transition: 'fade' },
+  { path: '/kernel/modules', component: KernelModulesPage, title: 'Kernel: Modules - AFRERA', description: 'Workflow definitions.', keywords: 'kernel, modules', transition: 'fade' },
+  { path: '/kernel/nerve', component: KernelNervePage, title: 'Kernel: Nerve - AFRERA', description: 'Consult the library.', keywords: 'kernel, nerve, consult', transition: 'fade' },
+  { path: '/kernel/organism', component: KernelOrganismPage, title: 'Kernel: Organism - AFRERA', description: 'Boot, diagnose, consult.', keywords: 'kernel, organism', transition: 'fade' },
+  { path: '/kernel/os', component: KernelOsPage, title: 'Kernel: OS - AFRERA', description: 'Governance and classification.', keywords: 'kernel, os', transition: 'fade' },
+  { path: '/kernel/platform', component: KernelPlatformPage, title: 'Kernel: Platform - AFRERA', description: 'Composed ERP platform view.', keywords: 'kernel, platform', transition: 'fade' },
+  { path: '/kernel/pulse', component: KernelPulsePage, title: 'Kernel: Pulse - AFRERA', description: 'The Chakhao lot walk.', keywords: 'kernel, pulse', transition: 'fade' },
+  { path: '/kernel/share', component: KernelSharePage, title: 'Kernel: Share - AFRERA', description: 'Village shared-asset booking.', keywords: 'kernel, share', transition: 'fade' },
+  { path: '/kernel/systems', component: KernelSystemsPage, title: 'Kernel: Systems - AFRERA', description: 'Byte-verified AI audit.', keywords: 'kernel, systems', transition: 'fade' },
+  { path: '/kernel/trade', component: KernelTradePage, title: 'Kernel: Trade - AFRERA', description: 'Offtake-settle flow.', keywords: 'kernel, trade', transition: 'fade' },
+  { path: '/kernel/vet', component: KernelVetPage, title: 'Kernel: Vet - AFRERA', description: 'AFRERA-VET veterinary coding.', keywords: 'kernel, vet', transition: 'fade' },
+  { path: '/kernel/warehouse', component: KernelWarehousePage, title: 'Kernel: Warehouse - AFRERA', description: 'Warehouse-intake flow.', keywords: 'kernel, warehouse', transition: 'fade' },
 ];
 
 /**
