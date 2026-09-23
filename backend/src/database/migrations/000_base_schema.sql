@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(20) UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
     role user_role NOT NULL DEFAULT 'consumer',
     status VARCHAR(20) DEFAULT 'active',
     email_verified BOOLEAN DEFAULT FALSE,

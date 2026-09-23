@@ -494,6 +494,19 @@ async function startup() {
       }
     });
 
+    // Unmatched routes must terminate the chain explicitly. Without this the
+    // request fell through every middleware and hung until the client gave up.
+    app.use((req, res) => {
+      res.status(404).json({
+        success: false,
+        error: {
+          message: `Cannot ${req.method} ${req.originalUrl}`,
+          code: 'NOT_FOUND',
+        },
+        timestamp: new Date().toISOString(),
+      });
+    });
+
     app.use(errorHandler);
 
     process.on('SIGTERM', async () => {

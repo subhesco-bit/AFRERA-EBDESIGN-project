@@ -117,6 +117,12 @@ async function getFallbackUserByEmail(email) {
   return store.users.find((user) => user.email === email.toLowerCase());
 }
 
+async function getFallbackUserById(userId) {
+  if (!userId) return null;
+  const store = await readAuthStore();
+  return store.users.find((user) => String(user.id) === String(userId));
+}
+
 function getUserPasswordHash(user) {
   return user.password_hash || user.password || user.passwordHash || user.passwordhash || null;
 }
@@ -594,7 +600,8 @@ async function refreshAccessToken(refreshToken) {
     const pg = getPostgreSQL();
     if (!pg) {
       assertFallbackAuthStoreAllowed();
-      const user = await getFallbackUserByEmail(payload.email || '');
+      const user = (await getFallbackUserById(payload.userId))
+        || (payload.email ? await getFallbackUserByEmail(payload.email) : null);
       if (!user) {
         throw new Error('User not found');
       }
@@ -1275,7 +1282,8 @@ router.get('/me', async (req, res) => {
 
     if (!pg) {
       assertFallbackAuthStoreAllowed();
-      const user = await getFallbackUserByEmail(payload.email || '');
+      const user = (await getFallbackUserById(payload.userId))
+        || (payload.email ? await getFallbackUserByEmail(payload.email) : null);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
