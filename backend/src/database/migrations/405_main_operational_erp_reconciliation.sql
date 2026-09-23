@@ -132,7 +132,7 @@ CREATE INDEX IF NOT EXISTS idx_supply_chain_events_chain_time
 CREATE TABLE IF NOT EXISTS procurement_orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   requester_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  supplier_id UUID REFERENCES suppliers(id) ON DELETE SET NULL,
+  supplier_id UUID,
   reference_no VARCHAR(100) UNIQUE NOT NULL,
   status VARCHAR(30) NOT NULL DEFAULT 'draft',
   currency VARCHAR(10) NOT NULL DEFAULT 'INR',
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS procurement_orders (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_procurement_orders_supplier_status
-  ON procurement_orders(supplier_id, status);
+  ON procurement_orders(supplier_id, status) WHERE supplier_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS inventory_movements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

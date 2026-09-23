@@ -1,60 +1,35 @@
--- Migration: Create rural_finance table
--- Description: Rural Finance
+-- Migration: Update rural_finance table
+-- Description: Rural Finance - Add missing columns and indexes for existing table
 -- Created: $(date)
 
 BEGIN;
 
--- Create main table
-CREATE TABLE IF NOT EXISTS rural_finance (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-
-  -- Data storage (flexible for different module needs)
-  data JSONB DEFAULT '{}' NOT NULL,
-
-  -- Standard fields
-  status VARCHAR(50) DEFAULT 'active' NOT NULL
-    CHECK (status IN ('active', 'inactive', 'completed', 'pending', 'archived')),
-
-  -- Audit fields
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  deleted_at TIMESTAMP,
-
-  -- Constraints
-  CONSTRAINT rural_finance_user_fk FOREIGN KEY (user_id)
-    REFERENCES users(id) ON DELETE CASCADE
-);
+-- Add missing columns if they don't exist
+DO $$
+BEGIN
+    -- Add deleted_at column if it doesn't exist
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'rural_finance' AND column_name = 'deleted_at'
+    ) THEN
+        ALTER TABLE rural_finance ADD COLUMN deleted_at TIMESTAMP;
+    END IF;
+END $$;
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_rural_finance_user_id
-  ON rural_finance(user_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_rural_finance_reu_id
+  ON rural_finance(reu_id);
 
-CREATE INDEX IF NOT EXISTS idx_rural_finance_status
-  ON rural_finance(status) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_rural_finance_enterprise_id
+  ON rural_finance(enterprise_id);
 
-CREATE INDEX IF NOT EXISTS idx_rural_finance_created_at
-  ON rural_finance(created_at) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_rural_finance_energy_system_id
+  ON rural_finance(energy_system_id);
 
-CREATE INDEX IF NOT EXISTS idx_rural_finance_updated_at
-  ON rural_finance(updated_at) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_rural_finance_lender_id
+  ON rural_finance(lender_id);
 
--- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_rural_finance_data_gin
-  ON rural_finance USING gin(data) WHERE deleted_at IS NULL;
-
--- Create trigger for updated_at
-CREATE OR REPLACE FUNCTION update_rural_finance_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = CURRENT_TIMESTAMP;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER rural_finance_timestamp_trigger
-BEFORE UPDATE ON rural_finance
-FOR EACH ROW
-EXECUTE FUNCTION update_rural_finance_timestamp();
+-- Note: Table already exists with proper structure and indexes
+-- This migration only ensures all required columns are present
 
 COMMIT;
