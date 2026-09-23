@@ -42,3 +42,6 @@ FileAuditIndex.csv
 # it is project source, and the nested worktree would break `git add` if
 # ever swept in. ~2.1GB. Ignored, not deleted.
 New folder/
+
+# Fallback dev/test credential store: bcrypt hashes, never committed.
+backend/src/database/auth_store.json
