@@ -46,6 +46,15 @@ function emitOsCatalog() {
   };
 }
 
+function emitOsTodos() {
+  return {
+    generatedAt: '2026-09-22',
+    counts: todoCounts(),
+    remaining: remainingWork(110),
+    all: osTodos(),
+  };
+}
+
 function filterOs(opts) {
   const q = (opts.query ?? '').trim().toLowerCase();
   return OS_ITEMS.filter((x) => {
@@ -58,4 +67,4 @@ function filterOs(opts) {
   });
 }
 
-module.exports = { composeOs, emitOsCatalog, filterOs, todoCounts, osTodos, remainingWork, chainFor };
+module.exports = { composeOs, emitOsCatalog, emitOsTodos, filterOs, todoCounts, osTodos, remainingWork, chainFor };
