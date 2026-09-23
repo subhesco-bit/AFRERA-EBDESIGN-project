@@ -199,12 +199,27 @@ CREATE TRIGGER trigger_create_sensor_alerts
     EXECUTE FUNCTION create_sensor_alerts();
 
 -- Insert sample sensor configurations
-INSERT INTO pond_sensors (pond_id, sensor_type, device_id, sensor_id, calibration, battery_level, signal_strength) VALUES
-(1, 'PH', 'PH-SENSOR-001', 'SENSOR-1-PH-001', '{"optimal_min": 6.5, "optimal_max": 8.5, "calibration_date": "2026-08-12"}', 85, 92),
-(1, 'TEMPERATURE', 'TEMP-SENSOR-001', 'SENSOR-1-TEMP-001', '{"optimal_min": 25, "optimal_max": 30, "calibration_date": "2026-08-12"}', 90, 88),
-(1, 'DISSOLVED_OXYGEN', 'DO-SENSOR-001', 'SENSOR-1-DO-001', '{"optimal_min": 6, "optimal_max": 8, "calibration_date": "2026-08-12"}', 78, 95),
-(1, 'TURBIDITY', 'TURB-SENSOR-001', 'SENSOR-1-TURB-001', '{"optimal_max": 20, "calibration_date": "2026-08-12"}', 82, 91)
-ON CONFLICT (sensor_id) DO NOTHING;
+-- This seed attaches four sample sensors to pond_id = 1, but nothing in this
+-- repository ever INSERTs a pond -- `ponds` is empty on a clean run, so the
+-- statement failed on pond_sensors_pond_id_fkey and aborted the file.
+-- Verified on a clean PostgreSQL 16 run.
+--
+-- The rows are kept, not deleted: they are sample telemetry that is useful the
+-- moment a pond exists. They are now applied only when pond 1 is actually
+-- there, and the absence is reported rather than passed over.
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM ponds WHERE id = 1) THEN
+    INSERT INTO pond_sensors (pond_id, sensor_type, device_id, sensor_id, calibration, battery_level, signal_strength) VALUES
+    (1, 'PH', 'PH-SENSOR-001', 'SENSOR-1-PH-001', '{"optimal_min": 6.5, "optimal_max": 8.5, "calibration_date": "2026-08-12"}', 85, 92),
+    (1, 'TEMPERATURE', 'TEMP-SENSOR-001', 'SENSOR-1-TEMP-001', '{"optimal_min": 25, "optimal_max": 30, "calibration_date": "2026-08-12"}', 90, 88),
+    (1, 'DISSOLVED_OXYGEN', 'DO-SENSOR-001', 'SENSOR-1-DO-001', '{"optimal_min": 6, "optimal_max": 8, "calibration_date": "2026-08-12"}', 78, 95),
+    (1, 'TURBIDITY', 'TURB-SENSOR-001', 'SENSOR-1-TURB-001', '{"optimal_max": 20, "calibration_date": "2026-08-12"}', 82, 91)
+    ON CONFLICT (sensor_id) DO NOTHING;
+  ELSE
+    RAISE NOTICE 'Skipped the pond_sensors sample rows: no pond with id 1 exists. '
+                 'Seed a pond and re-run this migration to attach them.';
+  END IF;
+END $$;
 
 -- Grant permissions (adjust as needed for your setup)
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON ponds TO your_app_user;

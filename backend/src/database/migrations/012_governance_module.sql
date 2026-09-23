@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- FK TYPE FIX 2026-08-04: 4 column(s) in this file declared INTEGER while
 -- referencing a UUID primary key. PostgreSQL rejects the whole CREATE TABLE
 -- ("foreign key constraint cannot be implemented"), so these tables were
@@ -30,6 +51,19 @@ CREATE TABLE IF NOT EXISTS villages (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS district VARCHAR(255);
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS state VARCHAR(255);
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS population INTEGER;
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS households INTEGER;
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS coordinates JSONB;
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS demographics JSONB;
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE villages ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_villages_district ON villages(district);
 CREATE INDEX IF NOT EXISTS idx_villages_state ON villages(state);
 
@@ -48,6 +82,20 @@ CREATE TABLE IF NOT EXISTS panchayats (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS district VARCHAR(255);
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS state VARCHAR(255);
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS block VARCHAR(255);
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS villages JSONB DEFAULT '[]';
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS contact_info JSONB;
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS chairman VARCHAR(255);
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS established_date DATE;
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE panchayats ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_panchayats_district ON panchayats(district);
 CREATE INDEX IF NOT EXISTS idx_panchayats_state ON panchayats(state);
 
@@ -65,6 +113,20 @@ CREATE TABLE IF NOT EXISTS panchayat_schemes (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS panchayat_id INTEGER;
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS budget DECIMAL(15, 2);
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS target_beneficiaries JSONB;
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'suspended'));
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE panchayat_schemes ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_panchayat_schemes_panchayat_id ON panchayat_schemes(panchayat_id);
 CREATE INDEX IF NOT EXISTS idx_panchayat_schemes_status ON panchayat_schemes(status);
@@ -86,6 +148,22 @@ CREATE TABLE IF NOT EXISTS csr_projects (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS organization VARCHAR(255);
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS budget DECIMAL(15, 2);
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS impact_areas JSONB DEFAULT '[]';
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0 CHECK (progress >= 0 AND progress <= 100);
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'suspended', 'cancelled'));
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE csr_projects ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_csr_projects_organization ON csr_projects(organization);
 CREATE INDEX IF NOT EXISTS idx_csr_projects_status ON csr_projects(status);
 
@@ -99,6 +177,16 @@ CREATE TABLE IF NOT EXISTS csr_contributions (
   description TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE csr_contributions ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE csr_contributions ADD COLUMN IF NOT EXISTS project_id INTEGER;
+ALTER TABLE csr_contributions ADD COLUMN IF NOT EXISTS contributor_id UUID;
+ALTER TABLE csr_contributions ADD COLUMN IF NOT EXISTS amount DECIMAL(12, 2);
+ALTER TABLE csr_contributions ADD COLUMN IF NOT EXISTS type VARCHAR(50) CHECK (type IN ('monetary', 'in_kind', 'volunteer'));
+ALTER TABLE csr_contributions ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE csr_contributions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_csr_contributions_project_id ON csr_contributions(project_id);
 CREATE INDEX IF NOT EXISTS idx_csr_contributions_contributor_id ON csr_contributions(contributor_id);
@@ -122,6 +210,24 @@ CREATE TABLE IF NOT EXISTS compliance_reports (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS type VARCHAR(100);
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS entity VARCHAR(100);
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS entity_id INTEGER;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS period VARCHAR(50);
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS findings JSONB;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS recommendations JSONB;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS submitted_by UUID;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending_review' CHECK (status IN ('pending_review', 'approved', 'rejected', 'action_required'));
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS reviewed_by UUID;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMP;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS review_comments TEXT;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS action_items JSONB;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE compliance_reports ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_compliance_reports_type ON compliance_reports(type);
 CREATE INDEX IF NOT EXISTS idx_compliance_reports_entity ON compliance_reports(entity, entity_id);
 CREATE INDEX IF NOT EXISTS idx_compliance_reports_status ON compliance_reports(status);
@@ -142,6 +248,21 @@ CREATE TABLE IF NOT EXISTS cooperatives (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS type VARCHAR(100);
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS district VARCHAR(255);
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS state VARCHAR(255);
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS registration_number VARCHAR(100);
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS members JSONB DEFAULT '[]';
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS bylaws JSONB;
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'dissolved'));
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS established_date DATE;
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE cooperatives ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_cooperatives_type ON cooperatives(type);
 CREATE INDEX IF NOT EXISTS idx_cooperatives_district ON cooperatives(district);
 
@@ -157,6 +278,17 @@ CREATE TABLE IF NOT EXISTS cooperative_members (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(cooperative_id, user_id)
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE cooperative_members ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE cooperative_members ADD COLUMN IF NOT EXISTS cooperative_id INTEGER;
+ALTER TABLE cooperative_members ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE cooperative_members ADD COLUMN IF NOT EXISTS role VARCHAR(50);
+ALTER TABLE cooperative_members ADD COLUMN IF NOT EXISTS share_holding DECIMAL(10, 2);
+ALTER TABLE cooperative_members ADD COLUMN IF NOT EXISTS joining_date DATE;
+ALTER TABLE cooperative_members ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'withdrawn'));
+ALTER TABLE cooperative_members ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_cooperative_members_cooperative_id ON cooperative_members(cooperative_id);
 CREATE INDEX IF NOT EXISTS idx_cooperative_members_user_id ON cooperative_members(user_id);

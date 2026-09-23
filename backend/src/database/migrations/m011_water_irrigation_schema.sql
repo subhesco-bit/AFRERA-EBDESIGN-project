@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- Migration M011: Water & Irrigation Management Schema
 -- System 11 - Water & Irrigation Management
 -- Created: 2026-09-08
@@ -25,6 +46,20 @@ CREATE TABLE IF NOT EXISTS water_budgets (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS plot_name VARCHAR(255);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS source VARCHAR(100);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS demand_liters DECIMAL(15,2);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS supply_liters DECIMAL(15,2);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS season VARCHAR(50);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS ai_optimization JSONB;
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Water quality readings table
 CREATE TABLE IF NOT EXISTS water_quality_readings (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -39,6 +74,20 @@ CREATE TABLE IF NOT EXISTS water_quality_readings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS parameter VARCHAR(100);
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS value DECIMAL(10,2);
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS unit VARCHAR(50);
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS reading_date DATE;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS ai_analysis JSONB;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS recorded_by UUID;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- ============================================================================
 -- IRRIGATION MANAGEMENT TABLES
@@ -60,6 +109,21 @@ CREATE TABLE IF NOT EXISTS irrigation_schedules (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS field_name VARCHAR(255);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS crop VARCHAR(100);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS method VARCHAR(100);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS frequency_days INTEGER;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS water_source VARCHAR(100);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS ai_timing_optimization JSONB;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Irrigation water sources table
 CREATE TABLE IF NOT EXISTS irrigation_water_sources (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -72,6 +136,18 @@ CREATE TABLE IF NOT EXISTS irrigation_water_sources (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS type VARCHAR(100);
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS capacity_liters DECIMAL(15,2);
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Irrigation logs table
 CREATE TABLE IF NOT EXISTS irrigation_logs (
@@ -87,6 +163,20 @@ CREATE TABLE IF NOT EXISTS irrigation_logs (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS schedule_id UUID;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS field_name VARCHAR(255);
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS volume_liters DECIMAL(15,2);
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS logged_at TIMESTAMP;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS ai_efficiency_analysis JSONB;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS logged_by UUID;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- ============================================================================
 -- RAINWATER HARVESTING TABLES
@@ -107,6 +197,20 @@ CREATE TABLE IF NOT EXISTS rainwater_harvesting_structures (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS structure_name VARCHAR(255);
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS structure_type VARCHAR(100);
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS village VARCHAR(255);
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS capacity_liters DECIMAL(15,2);
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS built_date DATE;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS ai_design_optimization JSONB;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- ============================================================================
 -- WATERSHED MANAGEMENT TABLES
 -- ============================================================================
@@ -125,6 +229,19 @@ CREATE TABLE IF NOT EXISTS watersheds (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS area_hectares DECIMAL(10,2);
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS villages_covered TEXT[];
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS ai_management_plan JSONB;
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- ============================================================================
 -- WATER ANALYTICS TABLES
 -- ============================================================================
@@ -142,6 +259,19 @@ CREATE TABLE IF NOT EXISTS water_analytics_records (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS metric VARCHAR(100);
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS period VARCHAR(50);
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS value DECIMAL(15,2);
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS unit VARCHAR(50);
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS ai_insights JSONB;
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS recorded_by UUID;
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE

@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- Platform Foundation Modules Migration
 -- Phase 1: Platform Foundation Enhancement (M001-M020)
 -- Core platform tables with AI enhancement support
@@ -19,6 +40,22 @@ CREATE TABLE IF NOT EXISTS platform_configurations (
   updated_by UUID REFERENCES users(id)
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS config_key VARCHAR(255);
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS config_value TEXT;
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS config_type VARCHAR(50) DEFAULT 'string';
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS is_sensitive BOOLEAN DEFAULT false;
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS priority INTEGER DEFAULT 0;
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS updated_by UUID;
+
+
 CREATE INDEX idx_platform_configurations_category ON platform_configurations(category);
 CREATE INDEX idx_platform_configurations_active ON platform_configurations(is_active);
 
@@ -37,6 +74,21 @@ CREATE TABLE IF NOT EXISTS tenants (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS domain VARCHAR(255);
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS subdomain VARCHAR(255);
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted'));
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS plan VARCHAR(50) DEFAULT 'basic';
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS max_users INTEGER DEFAULT 100;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS max_storage INTEGER DEFAULT 10737418240;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS settings JSONB DEFAULT '{}';
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX idx_tenants_status ON tenants(status);
 CREATE INDEX idx_tenants_plan ON tenants(plan);
@@ -59,13 +111,31 @@ CREATE TABLE IF NOT EXISTS organizations (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS tenant_id INTEGER;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'business';
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS industry VARCHAR(100);
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS size VARCHAR(50);
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS registration_number VARCHAR(100);
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS tax_id VARCHAR(100);
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS address JSONB;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS contact_info JSONB;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS settings JSONB DEFAULT '{}';
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted'));
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX idx_organizations_tenant ON organizations(tenant_id);
 CREATE INDEX idx_organizations_status ON organizations(status);
 
 -- Environments Table
 CREATE TABLE IF NOT EXISTS environments (
   id SERIAL PRIMARY KEY,
-  organization_id INTEGER REFERENCES organizations(id),
+  -- TYPE ALIGNED (2026-09-23): declared INTEGER, but organizations.id is UUID, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  organization_id UUID REFERENCES organizations(id),
   name VARCHAR(100) NOT NULL,
   type VARCHAR(50) DEFAULT 'production' CHECK (type IN ('development', 'staging', 'production')),
   status VARCHAR(50) DEFAULT 'active',
@@ -74,6 +144,18 @@ CREATE TABLE IF NOT EXISTS environments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS organization_id INTEGER;
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'production' CHECK (type IN ('development', 'staging', 'production'));
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS config JSONB DEFAULT '{}';
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS variables JSONB DEFAULT '{}';
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE environments ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX idx_environments_organization ON environments(organization_id);
 CREATE INDEX idx_environments_type ON environments(type);
@@ -88,6 +170,16 @@ CREATE TABLE IF NOT EXISTS system_administrators (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE system_administrators ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE system_administrators ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE system_administrators ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '[]';
+ALTER TABLE system_administrators ADD COLUMN IF NOT EXISTS access_level VARCHAR(50) DEFAULT 'full';
+ALTER TABLE system_administrators ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMP;
+ALTER TABLE system_administrators ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE system_administrators ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX idx_system_administrators_user ON system_administrators(user_id);
 
@@ -109,6 +201,23 @@ CREATE TABLE IF NOT EXISTS localization_settings (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS language_code VARCHAR(10);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS language_name VARCHAR(100);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS region_code VARCHAR(10);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS region_name VARCHAR(100);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS date_format VARCHAR(50);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS time_format VARCHAR(50);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS number_format VARCHAR(50);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS currency_code VARCHAR(10);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS currency_symbol VARCHAR(10);
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS is_default BOOLEAN DEFAULT false;
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE localization_settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX idx_localization_language ON localization_settings(language_code);
 CREATE INDEX idx_localization_active ON localization_settings(is_active);
 
@@ -123,6 +232,17 @@ CREATE TABLE IF NOT EXISTS time_zone_settings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE time_zone_settings ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE time_zone_settings ADD COLUMN IF NOT EXISTS zone_name VARCHAR(100);
+ALTER TABLE time_zone_settings ADD COLUMN IF NOT EXISTS utc_offset VARCHAR(10);
+ALTER TABLE time_zone_settings ADD COLUMN IF NOT EXISTS display_name VARCHAR(255);
+ALTER TABLE time_zone_settings ADD COLUMN IF NOT EXISTS country_code VARCHAR(10);
+ALTER TABLE time_zone_settings ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE time_zone_settings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE time_zone_settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX idx_time_zone_active ON time_zone_settings(is_active);
 
@@ -141,6 +261,20 @@ CREATE TABLE IF NOT EXISTS master_configurations (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS config_group VARCHAR(100);
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS config_key VARCHAR(255);
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS config_value TEXT;
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS config_type VARCHAR(50) DEFAULT 'string';
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS validation_rules JSONB DEFAULT '{}';
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS is_required BOOLEAN DEFAULT false;
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS is_system BOOLEAN DEFAULT false;
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE master_configurations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX idx_master_config_group ON master_configurations(config_group);
 CREATE INDEX idx_master_config_key ON master_configurations(config_key);
 
@@ -156,6 +290,18 @@ CREATE TABLE IF NOT EXISTS roles (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '[]';
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_system_role BOOLEAN DEFAULT false;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 0;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- 2026-08-30: removed unconditional CREATE INDEX on is_system_role/level -
 -- this file's own CREATE TABLE roles above is a no-op (000_base_schema.sql's
@@ -179,6 +325,19 @@ CREATE TABLE IF NOT EXISTS permissions (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS display_name VARCHAR(255);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS resource VARCHAR(100);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS action VARCHAR(50);
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS is_system BOOLEAN DEFAULT false;
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX idx_permissions_category ON permissions(category);
 CREATE INDEX idx_permissions_resource ON permissions(resource);
 
@@ -193,6 +352,16 @@ CREATE TABLE IF NOT EXISTS user_roles (
   is_active BOOLEAN DEFAULT true,
   UNIQUE(user_id, role_id)
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS role_id INTEGER;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS assigned_by UUID;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+
 
 CREATE INDEX idx_user_roles_user ON user_roles(user_id);
 CREATE INDEX idx_user_roles_role ON user_roles(role_id);
@@ -211,6 +380,13 @@ CREATE TABLE IF NOT EXISTS role_permissions (
   UNIQUE(role_id, permission_id)
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS role_id INTEGER;
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS permission_id INTEGER;
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX idx_role_permissions_role ON role_permissions(role_id);
 CREATE INDEX idx_role_permissions_permission ON role_permissions(permission_id);
 
@@ -219,12 +395,24 @@ CREATE TABLE IF NOT EXISTS sso_configurations (
   id SERIAL PRIMARY KEY,
   provider VARCHAR(50) NOT NULL,
   provider_config JSONB NOT NULL,
-  organization_id INTEGER REFERENCES organizations(id),
+  -- TYPE ALIGNED (2026-09-23): declared INTEGER, but organizations.id is UUID, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  organization_id UUID REFERENCES organizations(id),
   is_enabled BOOLEAN DEFAULT false,
   is_default BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE sso_configurations ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE sso_configurations ADD COLUMN IF NOT EXISTS provider VARCHAR(50);
+ALTER TABLE sso_configurations ADD COLUMN IF NOT EXISTS provider_config JSONB;
+ALTER TABLE sso_configurations ADD COLUMN IF NOT EXISTS organization_id INTEGER;
+ALTER TABLE sso_configurations ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN DEFAULT false;
+ALTER TABLE sso_configurations ADD COLUMN IF NOT EXISTS is_default BOOLEAN DEFAULT false;
+ALTER TABLE sso_configurations ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE sso_configurations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX idx_sso_provider ON sso_configurations(provider);
 CREATE INDEX idx_sso_organization ON sso_configurations(organization_id);
@@ -245,6 +433,21 @@ CREATE TABLE IF NOT EXISTS consents (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS consent_type VARCHAR(100);
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS consent_version VARCHAR(50);
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS consent_text TEXT;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS is_granted BOOLEAN DEFAULT false;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS granted_at TIMESTAMP;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS revoked_at TIMESTAMP;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS ip_address INET;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS user_agent TEXT;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX idx_consents_user ON consents(user_id);
 CREATE INDEX idx_consents_type ON consents(consent_type);
 CREATE INDEX idx_consents_granted ON consents(is_granted);
@@ -263,6 +466,20 @@ CREATE TABLE IF NOT EXISTS user_sessions (
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS session_token VARCHAR(255);
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS refresh_token VARCHAR(255);
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS device_info JSONB;
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS ip_address INET;
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP;
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE user_sessions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX idx_sessions_user ON user_sessions(user_id);
 CREATE INDEX idx_sessions_token ON user_sessions(session_token);
@@ -283,6 +500,20 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   error_message TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS action VARCHAR(100);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS entity_type VARCHAR(100);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS entity_id INTEGER;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS changes JSONB;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS ip_address INET;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS user_agent TEXT;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'success';
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS error_message TEXT;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX idx_audit_user ON audit_logs(user_id);
 CREATE INDEX idx_audit_action ON audit_logs(action);

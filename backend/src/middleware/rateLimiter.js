@@ -163,6 +163,9 @@ module.exports = {
   rateLimiter: apiLimiter,
   strictLimiter,
   authLimiter,
+  // Alias: 16 call sites (SMS/OTP auth, login flows) import `authRateLimit`,
+  // which never existed. authLimiter is the strict auth bucket they intend.
+  authRateLimit: authLimiter,
   apiKeyLimiter,
   uploadLimiter,
   createCustomLimiter,

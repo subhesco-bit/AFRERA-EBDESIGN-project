@@ -1,3 +1,11 @@
+// Environment must load BEFORE any other require: modules such as
+// services/authService.js enforce required env vars (JWT_SECRET) at module
+// load time, and all route requires below execute before the original
+// dotenv.config() call further down this file. Loading here fixes that
+// ordering bug. dotenv does not override already-set vars, so the later
+// call remains a harmless no-op.
+require('dotenv').config();
+
 const index = require('./routes/index.js');
 const yieldManagement = require('./routes/yieldManagement.js');
 const wikipediaRoutes = require('./routes/wikipediaRoutes.js');
@@ -28,7 +36,7 @@ const sheepRoutes = require('./routes/sheepRoutes.js');
 const sellerVerifications = require('./routes/sellerVerifications.js');
 const sellerRankingRoutes = require('./routes/sellerRankingRoutes.js');
 const seedVaultRoutes = require('./routes/seedVaultRoutes.js');
-const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes.js');
+const sapModuleArchitectureRoutes = require('./routes/platform/sapModuleArchitectureRoutes');
 const roleManagementRoutes = require('./routes/roleManagementRoutes.js');
 const riskPricingRoutes = require('./routes/riskPricingRoutes.js');
 const riskAssessment = require('./routes/riskAssessment.js');
@@ -192,6 +200,9 @@ const advancedSearchRoutes = require('./routes/advancedSearchRoutes.js');
 const advancedFeatures = require('./routes/advancedFeatures.js');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
+const engineeringDesignRoutes = require('./routes/engineeringDesignRoutes.js');
+const fulfillmentEngineRoutes = require('./routes/fulfillmentEngineRoutes.js');
+const ledgerRoutes = require('./routes/ledgerRoutes.js');
 /**
  * EBDESIGN Platform Backend - Main Entry Point
  * Auto-Discovery Architecture: Supports 200K+ services & routes
@@ -231,6 +242,9 @@ const {
   correlationId,
   contentNegotiation
 } = require('./middleware/apiResponseStandardizer');
+// authMiddleware/requireRole guard the /api/v1/system/* admin endpoints
+// defined below; they were used there but never imported.
+const { authMiddleware, requireRole } = require('./middleware/auth');
 const mfaMiddleware = require('./middleware/dual-use/mfaMiddleware');
 const loggingService = require('./services/loggingService');
 const libraryKnowledgeService = require('./services/libraryKnowledgeService');
@@ -282,7 +296,16 @@ app.use(routeMonitoring);
 
 // Security enhancements
 app.use(securityHeaders);
-app.use(rateLimit);
+// rateLimit is a FACTORY: (maxRequests, windowMs) => (req, res, next).
+// It was registered as `app.use(rateLimit)`, so Express invoked the factory
+// with (req, res, next), which returned the inner middleware and never called
+// next() -- every API request hung forever and no rate limiting was applied.
+// Invoke the factory. Limits are env-overridable because the 100/15min default
+// is tight for a single-page frontend issuing many calls per view.
+app.use(rateLimit(
+  Number.parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 100,
+  Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
+));
 
 // ============================================================================
 // STARTUP SEQUENCE
@@ -366,17 +389,39 @@ async function startup() {
     const cacheService = require('./services/cacheService');
     const jobService = require('./services/jobService');
     const infrastructure = { cache: 'disabled', jobs: 'disabled' };
+
+    // Optional infrastructure must never be able to block startup. A client
+    // that retries a missing backend indefinitely leaves the await pending, so
+    // the catch blocks below (which exist precisely to degrade gracefully) can
+    // never run and the server never reaches listen(). Bound every attempt.
+    const OPTIONAL_INIT_TIMEOUT_MS =
+      Number.parseInt(process.env.OPTIONAL_INIT_TIMEOUT_MS, 10) || 5000;
+    const withTimeout = (promise, label) =>
+      Promise.race([
+        promise,
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`${label} init timed out after ${OPTIONAL_INIT_TIMEOUT_MS}ms`)),
+            OPTIONAL_INIT_TIMEOUT_MS,
+          ).unref(),
+        ),
+      ]);
+
     try {
-      await cacheService.init();
+      await withTimeout(cacheService.init(), 'Redis cache');
       infrastructure.cache = 'connected';
     } catch (error) {
-      logger.warn('⚠️  Redis cache unavailable; continuing in degraded mode');
+      logger.warn('⚠️  Redis cache unavailable; continuing in degraded mode', {
+        error: error.message,
+      });
     }
     try {
-      await jobService.init();
+      await withTimeout(jobService.init(), 'Background jobs');
       infrastructure.jobs = 'connected';
     } catch (error) {
-      logger.warn('⚠️  Background jobs unavailable; continuing in degraded mode');
+      logger.warn('⚠️  Background jobs unavailable; continuing in degraded mode', {
+        error: error.message,
+      });
     }
     app.locals.infrastructure = infrastructure;
 
@@ -686,6 +731,11 @@ async function startup() {
     app.use('/api/advancedfeatures', advancedFeatures);
     app.use('/api/advancedanalytics', advancedAnalyticsRoutes);
     app.use('/api/v1/warnings', apiWarningRoutes);
+    app.use('/api/v1/engineering-design', engineeringDesignRoutes);
+    app.use('/api/v1/fulfillment-engine', fulfillmentEngineRoutes);
+    // The canonical ledger the 410s on /api/v1/unified-ledger and
+    // /api/v1/finance/ledger redirect callers to.
+    app.use('/api/v1/ledger', ledgerRoutes);
 
     // Routes index is a module exporter, not a router - don't mount it
     // app.use('/api/index', index);

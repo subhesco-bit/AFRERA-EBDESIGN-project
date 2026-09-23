@@ -228,6 +228,18 @@ DROP TRIGGER IF EXISTS update_ingredient_substitutions_updated_at ON ingredient_
 CREATE TRIGGER update_ingredient_substitutions_updated_at BEFORE UPDATE ON ingredient_substitutions
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- `update_updated_at_column()` assigns NEW.updated_at, so a table carrying this
+-- trigger MUST have that column. ingredient_pricing does not: the definition in this file
+-- declares no updated_at, and the other migration that defines ingredient_pricing does not
+-- either. The trigger therefore made EVERY UPDATE to ingredient_pricing fail with
+-- `record "new" has no field "updated_at"` -- verified against a live
+-- PostgreSQL 16 run of the full migration set.
+--
+-- The column is added rather than the trigger dropped: an updated_at timestamp
+-- is what this trigger exists to maintain, and dropping it would silently
+-- remove that behaviour from whatever else relies on it.
+ALTER TABLE ingredient_pricing ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 DROP TRIGGER IF EXISTS update_ingredient_pricing_updated_at ON ingredient_pricing;
 CREATE TRIGGER update_ingredient_pricing_updated_at BEFORE UPDATE ON ingredient_pricing
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

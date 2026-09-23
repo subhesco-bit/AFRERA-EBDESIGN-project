@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- Migration M010: Soil, Nutrient & Land Mapping Schema
 -- System 10 - Soil, Nutrient & Land Mapping
 -- Created: 2026-09-08
@@ -37,6 +58,42 @@ CREATE TABLE IF NOT EXISTS soil_samples (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+-- soil_samples already exists from another migration, keyed on sample_id. This
+-- file keys it on `id` and references soil_samples(id) below, which PostgreSQL
+-- rejected with "there is no unique constraint matching given keys". A unique
+-- index on id makes the foreign key implementable without dropping or re-keying
+-- the existing table -- neither definition is disturbed.
+--
+-- Rows written under the other definition have a NULL id (the unique index
+-- permits many NULLs) and cannot be referenced until they are backfilled. That
+-- is a reconciliation still owed, not something this index papers over.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_soil_samples_id ON soil_samples (id);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS sample_id VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS farm_id UUID;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS state VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS district VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS sample_depth VARCHAR(50);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS sample_type VARCHAR(50);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS crop_planned VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS irrigation_type VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS collection_date DATE;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS collector_name VARCHAR(255);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS lab_preference VARCHAR(255);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS ai_optimization JSONB;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'submitted';
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS tracking_number VARCHAR(50);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS assigned_lab VARCHAR(255);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS estimated_completion_date DATE;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS analyzed_at TIMESTAMP;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS collected_by UUID;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- ============================================================================
 -- SOIL ANALYSIS TABLES
 -- ============================================================================
@@ -58,6 +115,22 @@ CREATE TABLE IF NOT EXISTS soil_analysis (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS sample_id UUID;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS lab_results JSONB;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS nutrient_levels JSONB;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS ph_analysis JSONB;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS organic_matter JSONB;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS soil_texture JSONB;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS ai_recommendations JSONB;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS overall_health_score DECIMAL(3,2);
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS confidence DECIMAL(3,2);
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS analyzed_by UUID;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE soil_analysis ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- ============================================================================
 -- NUTRIENT MANAGEMENT TABLES
 -- ============================================================================
@@ -78,6 +151,22 @@ CREATE TABLE IF NOT EXISTS nutrient_recommendations (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS analysis_id UUID;
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS crop_type VARCHAR(100);
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS variety VARCHAR(100);
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS expected_yield DECIMAL(15,2);
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS fertilizer_plan JSONB;
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS integrated_approach JSONB;
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS sustainability_metrics JSONB;
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS monitoring_schedule JSONB;
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS ai_optimization JSONB;
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS recommended_by UUID;
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE nutrient_recommendations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- ============================================================================
 -- LAND MAPPING TABLES
@@ -106,6 +195,28 @@ CREATE TABLE IF NOT EXISTS land_mapping (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS farm_id UUID;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS survey_number VARCHAR(100);
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS khasra_number VARCHAR(100);
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS area_hectares DECIMAL(15,2);
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS area_acres DECIMAL(15,2);
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS soil_type VARCHAR(100);
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS land_use VARCHAR(100);
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS irrigation_source VARCHAR(100);
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS gis_boundary JSONB;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS ai_boundary_detection JSONB;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS satellite_imagery JSONB;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS verification_status VARCHAR(50) DEFAULT 'pending';
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS verified_by UUID;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS verified_at TIMESTAMP;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE land_mapping ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- GIS boundaries table
 CREATE TABLE IF NOT EXISTS gis_boundaries (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -118,6 +229,18 @@ CREATE TABLE IF NOT EXISTS gis_boundaries (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS boundary_type VARCHAR(100);
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS boundary_name VARCHAR(255);
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS parent_boundary_id UUID;
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS geometry JSONB;
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS properties JSONB;
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS administrative_level VARCHAR(50);
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE gis_boundaries ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- ============================================================================
 -- SOIL HEALTH TABLES
@@ -139,6 +262,22 @@ CREATE TABLE IF NOT EXISTS soil_health_cards (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS farm_id UUID;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS overall_health_score DECIMAL(3,2);
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS nutrient_status JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS ph_status JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS organic_matter_status JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS ai_insights JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS recommendations JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS valid_until DATE;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS generated_by UUID;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE

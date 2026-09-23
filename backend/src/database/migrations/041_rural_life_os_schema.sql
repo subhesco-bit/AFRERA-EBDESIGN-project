@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- NAME FIX 2026-08-04: referenced "subsidy_applications", which exists nowhere.
 -- The real table is "subsidy_claims". This single bad FK failed the
 -- rural_enterprises CREATE TABLE and cascaded into 56 errors from this file.
@@ -43,6 +64,20 @@ CREATE TABLE IF NOT EXISTS crops (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS crop_code VARCHAR(40);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS common_name VARCHAR(120);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS scientific_name VARCHAR(120);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS concept_key VARCHAR(40);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS category VARCHAR(60);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS season VARCHAR(30) CHECK (season IS NULL OR season IN ('kharif','rabi','zaid','perennial'));
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS duration_days INTEGER CHECK (duration_days IS NULL OR duration_days > 0);
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS is_perishable BOOLEAN DEFAULT TRUE;
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE crops ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_crops_category ON crops (category);
 CREATE INDEX IF NOT EXISTS idx_crops_concept ON crops (concept_key);
 
@@ -76,6 +111,25 @@ CREATE TABLE IF NOT EXISTS rural_economic_units (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS reu_number VARCHAR(50);
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS reu_type VARCHAR(50);
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS reu_subtype VARCHAR(50);
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS legal_structure VARCHAR(50);
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS registration_number VARCHAR(100);
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS registration_date DATE;
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS household_profile JSONB;
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS economic_profile JSONB;
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS membership JSONB;
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS tags TEXT[];
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE rural_economic_units ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Indexes for rural_economic_units
 CREATE INDEX IF NOT EXISTS idx_rural_economic_units_user ON rural_economic_units(user_id);
@@ -135,6 +189,38 @@ CREATE TABLE IF NOT EXISTS household_economy (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS monthly_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS annual_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS grocery_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS dairy_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS appliances_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS school_supplies_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS clothing_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS medicines_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS electronics_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS building_materials_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS lpg_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS healthcare_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS education_budget DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS subscription_id UUID;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS subscription_type VARCHAR(50);
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(50);
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS subscription_start_date DATE;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS subscription_end_date DATE;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS delivery_schedule JSONB;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS delivery_address JSONB;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS consumption_savings DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS wholesale_savings DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS total_savings DECIMAL;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS total_orders INTEGER DEFAULT 0;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS total_spent DECIMAL DEFAULT 0;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE household_economy ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_household_economy_reu ON household_economy(reu_id);
 CREATE INDEX IF NOT EXISTS idx_household_economy_subscription ON household_economy(subscription_id);
 CREATE INDEX IF NOT EXISTS idx_household_economy_status ON household_economy(subscription_status);
@@ -177,6 +263,30 @@ CREATE TABLE IF NOT EXISTS household_orders (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS household_economy_id UUID;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS order_number VARCHAR(50);
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS order_type VARCHAR(50);
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS items JSONB;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS subtotal DECIMAL;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS discount DECIMAL;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS delivery_charge DECIMAL;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS total_amount DECIMAL;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS delivery_address JSONB;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS delivery_date DATE;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS delivery_time VARCHAR(50);
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS delivery_status VARCHAR(50);
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS tracking_id VARCHAR(100);
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50);
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50);
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS payment_id VARCHAR(100);
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending';
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE household_orders ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_household_orders_reu ON household_orders(reu_id);
 CREATE INDEX IF NOT EXISTS idx_household_orders_number ON household_orders(order_number);
 CREATE INDEX IF NOT EXISTS idx_household_orders_status ON household_orders(status);
@@ -189,7 +299,8 @@ CREATE INDEX IF NOT EXISTS idx_household_orders_delivery ON household_orders(del
 CREATE TABLE IF NOT EXISTS farm_consumables (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reu_id UUID NOT NULL REFERENCES rural_economic_units(id) ON DELETE CASCADE,
-  crop_id UUID REFERENCES crops(id) ON DELETE SET NULL,
+  -- TYPE ALIGNED (2026-09-23): declared UUID, but crops.id is INTEGER, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  crop_id INTEGER REFERENCES crops(id) ON DELETE SET NULL,
   
   -- Input Details
   input_type VARCHAR(50) NOT NULL, -- seed, fertilizer, protection, micronutrient, mulch, irrigation, feed
@@ -231,6 +342,36 @@ CREATE TABLE IF NOT EXISTS farm_consumables (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS crop_id UUID;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS input_type VARCHAR(50);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS input_category VARCHAR(50);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS input_name VARCHAR(255);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS brand VARCHAR(100);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS specifications JSONB;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS quantity DECIMAL;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS unit VARCHAR(20);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS unit_price DECIMAL;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS total_cost DECIMAL;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS subsidy_eligible BOOLEAN DEFAULT false;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS subsidy_scheme VARCHAR(100);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS subsidy_percentage DECIMAL;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS subsidy_amount DECIMAL;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS net_cost DECIMAL;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS financing_required BOOLEAN DEFAULT false;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS financing_type VARCHAR(50);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS financing_amount DECIMAL;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS financing_status VARCHAR(50);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS season VARCHAR(50);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS year INTEGER;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS source_type VARCHAR(50);
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS supplier_id UUID;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE farm_consumables ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_farm_consumables_reu ON farm_consumables(reu_id);
 CREATE INDEX IF NOT EXISTS idx_farm_consumables_crop ON farm_consumables(crop_id);
 CREATE INDEX IF NOT EXISTS idx_farm_consumables_type ON farm_consumables(input_type);
@@ -271,7 +412,8 @@ CREATE TABLE IF NOT EXISTS machinery_access (
   
   -- Purpose
   purpose VARCHAR(100),
-  crop_id UUID REFERENCES crops(id) ON DELETE SET NULL,
+  -- TYPE ALIGNED (2026-09-23): declared UUID, but crops.id is INTEGER, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  crop_id INTEGER REFERENCES crops(id) ON DELETE SET NULL,
   area DECIMAL, -- in acres
   area_unit VARCHAR(20), -- acre, hectare, sqft
   
@@ -292,6 +434,41 @@ CREATE TABLE IF NOT EXISTS machinery_access (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS machinery_id UUID;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS access_model VARCHAR(50);
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS rental_type VARCHAR(50);
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS booking_id UUID;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS booking_number VARCHAR(50);
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS duration_hours DECIMAL;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS duration_days INTEGER;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS unit_rate DECIMAL;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS total_cost DECIMAL;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS security_deposit DECIMAL;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS pickup_location JSONB;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS delivery_location JSONB;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS delivery_required BOOLEAN DEFAULT false;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS delivery_cost DECIMAL;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS purpose VARCHAR(100);
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS crop_id UUID;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS area DECIMAL;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS area_unit VARCHAR(20);
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending';
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS actual_start_date DATE;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS actual_end_date DATE;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS actual_duration_hours DECIMAL;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS operator_id UUID;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS operator_name VARCHAR(255);
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS rating INTEGER;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS feedback TEXT;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE machinery_access ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_machinery_access_reu ON machinery_access(reu_id);
 CREATE INDEX IF NOT EXISTS idx_machinery_access_machinery ON machinery_access(machinery_id);
@@ -338,7 +515,8 @@ CREATE TABLE IF NOT EXISTS shared_infrastructure_access (
   
   -- Purpose
   purpose VARCHAR(100),
-  crop_id UUID REFERENCES crops(id) ON DELETE SET NULL,
+  -- TYPE ALIGNED (2026-09-23): declared UUID, but crops.id is INTEGER, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  crop_id INTEGER REFERENCES crops(id) ON DELETE SET NULL,
   produce_type VARCHAR(100),
   
   -- Status
@@ -357,6 +535,40 @@ CREATE TABLE IF NOT EXISTS shared_infrastructure_access (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS infrastructure_id UUID;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS access_model VARCHAR(50);
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS service_type VARCHAR(50);
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS booking_id UUID;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS booking_number VARCHAR(50);
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS duration_days INTEGER;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS capacity_required DECIMAL;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS capacity_unit VARCHAR(20);
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS actual_capacity_used DECIMAL;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS unit_rate DECIMAL;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS total_cost DECIMAL;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS specifications JSONB;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS infrastructure_location JSONB;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS delivery_required BOOLEAN DEFAULT false;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS pickup_required BOOLEAN DEFAULT false;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS purpose VARCHAR(100);
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS crop_id UUID;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS produce_type VARCHAR(100);
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending';
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS actual_start_date DATE;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS actual_end_date DATE;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS quality_grade VARCHAR(20);
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS quality_report_url TEXT;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS rating INTEGER;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS feedback TEXT;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE shared_infrastructure_access ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_shared_infrastructure_access_reu ON shared_infrastructure_access(reu_id);
 CREATE INDEX IF NOT EXISTS idx_shared_infrastructure_access_infrastructure ON shared_infrastructure_access(infrastructure_id);
@@ -426,6 +638,42 @@ CREATE TABLE IF NOT EXISTS rural_enterprises (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS enterprise_type VARCHAR(50);
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS enterprise_subtype VARCHAR(50);
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS enterprise_name VARCHAR(255);
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'planning';
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS setup_date DATE;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS operational_date DATE;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS total_investment DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS equity_investment DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS debt_investment DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS subsidy_amount DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS annual_revenue DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS annual_profit DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS annual_expenses DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS roi DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS payback_period_months INTEGER;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS capacity DECIMAL;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS capacity_unit VARCHAR(20);
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS infrastructure_required JSONB;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS infrastructure_allocated JSONB;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS subsidy_id UUID;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS loan_id UUID;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS insurance_id UUID;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS project_id UUID;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS dpr_id UUID;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS training_completed BOOLEAN DEFAULT false;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS training_certification_url TEXT;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS market_channels JSONB;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS tags TEXT[];
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE rural_enterprises ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_rural_enterprises_reu ON rural_enterprises(reu_id);
 CREATE INDEX IF NOT EXISTS idx_rural_enterprises_type ON rural_enterprises(enterprise_type);
 CREATE INDEX IF NOT EXISTS idx_rural_enterprises_status ON rural_enterprises(status);
@@ -478,6 +726,36 @@ CREATE TABLE IF NOT EXISTS enterprise_feasibility_analysis (
   
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS enterprise_id UUID;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS enterprise_type VARCHAR(50);
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS market_demand VARCHAR(50);
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS market_competition VARCHAR(50);
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS market_price_trend VARCHAR(20);
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS technical_feasibility BOOLEAN;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS technical_challenges TEXT[];
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS infrastructure_availability BOOLEAN;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS financial_feasibility BOOLEAN;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS total_investment DECIMAL;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS expected_annual_revenue DECIMAL;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS expected_annual_profit DECIMAL;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS roi DECIMAL;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS payback_period_years DECIMAL;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS break_even_point_years DECIMAL;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS risk_level VARCHAR(50);
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS risks JSONB;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS recommendation VARCHAR(50);
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS recommendation_reason TEXT;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS next_steps TEXT[];
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS analysis_date DATE DEFAULT CURRENT_DATE;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS analyst_id UUID;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS ai_confidence DECIMAL;
+ALTER TABLE enterprise_feasibility_analysis ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_enterprise_feasibility_reu ON enterprise_feasibility_analysis(reu_id);
 CREATE INDEX IF NOT EXISTS idx_enterprise_feasibility_enterprise ON enterprise_feasibility_analysis(enterprise_id);
@@ -555,6 +833,46 @@ CREATE TABLE IF NOT EXISTS renewable_energy_systems (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS enterprise_id UUID;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS system_type VARCHAR(50);
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS system_subtype VARCHAR(50);
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS capacity_kw DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS capacity_unit VARCHAR(20) DEFAULT 'kW';
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS installation_date DATE;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS installer_id UUID;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS total_cost DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS subsidy_amount DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS net_cost DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS financing_id UUID;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS financing_type VARCHAR(50);
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS annual_generation DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS annual_savings DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS annual_export DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS self_consumption_percentage DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS subsidy_scheme VARCHAR(100);
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS subsidy_application_id UUID;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS subsidy_disbursement_date DATE;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS net_metering BOOLEAN DEFAULT false;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS net_metering_id VARCHAR(100);
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS grid_connection_date DATE;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS battery_capacity DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS battery_type VARCHAR(50);
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS monitoring_enabled BOOLEAN DEFAULT false;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS monitoring_device_id VARCHAR(100);
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS maintenance_contract BOOLEAN DEFAULT false;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS maintenance_provider_id UUID;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS last_maintenance_date DATE;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS annual_carbon_savings DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS lifetime_carbon_savings DECIMAL;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'planning';
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE renewable_energy_systems ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_renewable_energy_systems_reu ON renewable_energy_systems(reu_id);
 CREATE INDEX IF NOT EXISTS idx_renewable_energy_systems_enterprise ON renewable_energy_systems(enterprise_id);
 CREATE INDEX IF NOT EXISTS idx_renewable_energy_systems_type ON renewable_energy_systems(system_type);
@@ -587,6 +905,23 @@ CREATE TABLE IF NOT EXISTS energy_generation_data (
   
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS system_id UUID;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS generation_date DATE;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS generation_kwh DECIMAL;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS export_kwh DECIMAL DEFAULT 0;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS self_consumption_kwh DECIMAL DEFAULT 0;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS performance_ratio DECIMAL;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS capacity_factor DECIMAL;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS solar_irradiance DECIMAL;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS temperature DECIMAL;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS grid_import_kwh DECIMAL DEFAULT 0;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS grid_export_kwh DECIMAL DEFAULT 0;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS net_cost DECIMAL;
+ALTER TABLE energy_generation_data ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_energy_generation_data_system ON energy_generation_data(system_id);
 CREATE INDEX IF NOT EXISTS idx_energy_generation_data_date ON energy_generation_data(generation_date DESC);
@@ -624,6 +959,22 @@ CREATE TABLE IF NOT EXISTS lenders (
     interest_rate_min IS NULL OR interest_rate_max IS NULL OR interest_rate_min <= interest_rate_max
   )
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS lender_code VARCHAR(40);
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS lender_type VARCHAR(40) CHECK (lender_type IN ('public_bank','private_bank','rrb','cooperative','nbfc','mfi','shg','fpo','government_scheme','informal'));
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS is_formal BOOLEAN;
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS interest_rate_min NUMERIC(6,3) CHECK (interest_rate_min IS NULL OR interest_rate_min >= 0);
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS interest_rate_max NUMERIC(6,3) CHECK (interest_rate_max IS NULL OR interest_rate_max >= 0);
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS max_loan_amount NUMERIC(20,4);
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS requires_collateral BOOLEAN DEFAULT TRUE;
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS operates_in_states TEXT[];
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS contact_details JSONB;
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE lenders ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_lenders_type ON lenders (lender_type);
 CREATE INDEX IF NOT EXISTS idx_lenders_active ON lenders (is_active);
@@ -692,6 +1043,47 @@ CREATE TABLE IF NOT EXISTS rural_finance (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS enterprise_id UUID;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS energy_system_id UUID;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS financial_product_type VARCHAR(50);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS product_subtype VARCHAR(50);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS loan_number VARCHAR(50);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS loan_amount DECIMAL;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS interest_rate DECIMAL;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS tenure_months INTEGER;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS emi DECIMAL;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS emi_start_date DATE;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS emi_end_date DATE;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS purpose TEXT;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS purpose_category VARCHAR(50);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS collateral_type VARCHAR(50);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS collateral_value DECIMAL;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS collateral_details JSONB;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS subsidy_linked BOOLEAN DEFAULT false;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS subsidy_scheme VARCHAR(100);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS subsidy_amount DECIMAL;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS subsidy_disbursement_date DATE;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS insurance_required BOOLEAN DEFAULT false;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS insurance_policy_id UUID;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'applied';
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS application_date DATE DEFAULT CURRENT_DATE;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS approval_date DATE;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS disbursement_date DATE;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS principal_repaid DECIMAL DEFAULT 0;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS interest_paid DECIMAL DEFAULT 0;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS outstanding_principal DECIMAL;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS next_emi_date DATE;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS lender_id UUID;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS lender_type VARCHAR(50);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS government_scheme VARCHAR(100);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS scheme_reference_number VARCHAR(100);
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE rural_finance ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_rural_finance_reu ON rural_finance(reu_id);
 CREATE INDEX IF NOT EXISTS idx_rural_finance_enterprise ON rural_finance(enterprise_id);
 CREATE INDEX IF NOT EXISTS idx_rural_finance_energy ON rural_finance(energy_system_id);
@@ -741,6 +1133,29 @@ CREATE TABLE IF NOT EXISTS financial_needs_assessment (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS assessment_date DATE DEFAULT CURRENT_DATE;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS household_needs DECIMAL;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS cultivation_needs DECIMAL;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS enterprise_needs DECIMAL;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS infrastructure_needs DECIMAL;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS energy_needs DECIMAL;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS total_financial_requirement DECIMAL;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS available_collateral DECIMAL;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS collateral_details JSONB;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS credit_score INTEGER;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS credit_score_source VARCHAR(50);
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS fdi_score INTEGER;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS recommended_products JSONB;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS subsidy_opportunities JSONB;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS government_schemes JSONB;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS assessed_by UUID;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS ai_confidence DECIMAL;
+ALTER TABLE financial_needs_assessment ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_financial_needs_assessment_reu ON financial_needs_assessment(reu_id);
 CREATE INDEX IF NOT EXISTS idx_financial_needs_assessment_date ON financial_needs_assessment(assessment_date DESC);
 
@@ -751,7 +1166,8 @@ CREATE INDEX IF NOT EXISTS idx_financial_needs_assessment_date ON financial_need
 CREATE TABLE IF NOT EXISTS ai_advisories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reu_id UUID NOT NULL REFERENCES rural_economic_units(id) ON DELETE CASCADE,
-  crop_id UUID REFERENCES crops(id) ON DELETE SET NULL,
+  -- TYPE ALIGNED (2026-09-23): declared UUID, but crops.id is INTEGER, so the foreign key could not be implemented and this whole file aborted. The referenced table is canonical.
+  crop_id INTEGER REFERENCES crops(id) ON DELETE SET NULL,
   enterprise_id UUID REFERENCES rural_enterprises(id) ON DELETE SET NULL,
   
   -- Advisory Details
@@ -793,6 +1209,33 @@ CREATE TABLE IF NOT EXISTS ai_advisories (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS crop_id UUID;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS enterprise_id UUID;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS advisory_type VARCHAR(50);
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS advisory_subtype VARCHAR(50);
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS query TEXT;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS query_type VARCHAR(50);
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS query_context JSONB;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS ai_analysis JSONB;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS response TEXT;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS response_format VARCHAR(50);
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS confidence_score DECIMAL;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS action_items JSONB;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS follow_up_required BOOLEAN DEFAULT false;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS follow_up_date DATE;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS follow_up_status VARCHAR(50);
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS impact_measured BOOLEAN DEFAULT false;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS impact_data JSONB;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS user_rating INTEGER;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS user_feedback TEXT;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS helpful BOOLEAN;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE ai_advisories ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_ai_advisories_reu ON ai_advisories(reu_id);
 CREATE INDEX IF NOT EXISTS idx_ai_advisories_type ON ai_advisories(advisory_type);
 CREATE INDEX IF NOT EXISTS idx_ai_advisories_crop ON ai_advisories(crop_id);
@@ -817,6 +1260,18 @@ CREATE TABLE IF NOT EXISTS advisory_attachments (
   
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS advisory_id UUID;
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS file_url TEXT;
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS file_type VARCHAR(50);
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS file_size BIGINT;
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS file_format VARCHAR(20);
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS ai_analysis JSONB;
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS analysis_result TEXT;
+ALTER TABLE advisory_attachments ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_advisory_attachments_advisory ON advisory_attachments(advisory_id);
 
@@ -853,6 +1308,24 @@ CREATE TABLE IF NOT EXISTS buyers (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS buyer_code VARCHAR(40);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS buyer_type VARCHAR(40) CHECK (buyer_type IN ('aggregator','trader','processor','retailer','institution','exporter','direct_consumer','government','fpo'));
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS chain_position SMALLINT CHECK (chain_position IS NULL OR chain_position BETWEEN 1 AND 6);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS gst_number VARCHAR(20);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS operates_in_states TEXT[];
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS preferred_crops TEXT[];
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS typical_volume_kg NUMERIC(14,2);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS payment_terms_days INTEGER CHECK (payment_terms_days IS NULL OR payment_terms_days >= 0);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS pays_on_time BOOLEAN;
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS contact_details JSONB;
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE;
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_buyers_type ON buyers (buyer_type);
 CREATE INDEX IF NOT EXISTS idx_buyers_active ON buyers (is_active);
 
@@ -886,6 +1359,23 @@ CREATE TABLE IF NOT EXISTS logistics_providers (
   -- provider cannot honour.
   CONSTRAINT provider_temp_needs_reefer CHECK (min_temperature_c IS NULL OR has_reefer = TRUE)
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS provider_code VARCHAR(40);
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS provider_type VARCHAR(40) CHECK (provider_type IN ('individual','fleet_owner','3pl','courier','rail','air','cooperative','aggregator'));
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS supported_modes TEXT[];
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS has_reefer BOOLEAN DEFAULT FALSE;
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS min_temperature_c NUMERIC(5,2);
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS serves_lanes TEXT[];
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS operates_in_states TEXT[];
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS capacity_kg NUMERIC(14,2);
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS contact_details JSONB;
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE;
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE logistics_providers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_logistics_providers_type ON logistics_providers (provider_type);
 CREATE INDEX IF NOT EXISTS idx_logistics_providers_reefer ON logistics_providers (has_reefer);
@@ -952,6 +1442,45 @@ CREATE TABLE IF NOT EXISTS market_access (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS reu_id UUID;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS enterprise_id UUID;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS produce_type VARCHAR(100);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS variety VARCHAR(100);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS quality_grade VARCHAR(20);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS quantity DECIMAL;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS quantity_unit VARCHAR(20);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS market_channel VARCHAR(50);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS channel_subtype VARCHAR(50);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS price_per_unit DECIMAL;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS total_value DECIMAL;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS market_name VARCHAR(255);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS market_location JSONB;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS buyer_id UUID;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS buyer_name VARCHAR(255);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS sale_date DATE;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS sale_number VARCHAR(50);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS logistics_required BOOLEAN DEFAULT false;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS logistics_cost DECIMAL;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS logistics_provider_id UUID;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS quality_certificate_url TEXT;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS quality_inspection_date DATE;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS contract_farming BOOLEAN DEFAULT false;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS contract_id UUID;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS contract_start_date DATE;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS contract_end_date DATE;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50) DEFAULT 'pending';
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS payment_terms VARCHAR(50);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS payment_date DATE;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending';
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS enam_listing BOOLEAN DEFAULT false;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS enam_trade_id VARCHAR(100);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS enam_bid_id VARCHAR(100);
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE market_access ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 CREATE INDEX IF NOT EXISTS idx_market_access_reu ON market_access(reu_id);
 CREATE INDEX IF NOT EXISTS idx_market_access_enterprise ON market_access(enterprise_id);
 CREATE INDEX IF NOT EXISTS idx_market_access_produce ON market_access(produce_type);
@@ -1011,6 +1540,36 @@ CREATE TABLE IF NOT EXISTS market_intelligence (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS produce_type VARCHAR(100);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS variety VARCHAR(100);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS min_price DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS max_price DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS average_price DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS modal_price DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS price_trend VARCHAR(20);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS price_change_percentage DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS price_change_period VARCHAR(20);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS trading_volume DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS volume_unit VARCHAR(20);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS demand_level VARCHAR(50);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS demand_trend VARCHAR(20);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS supply_level VARCHAR(50);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS supply_trend VARCHAR(20);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS quality_a_premium DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS quality_b_premium DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS seasonal_pattern JSONB;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS forecast_price DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS forecast_confidence DECIMAL;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS forecast_period VARCHAR(20);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS data_source VARCHAR(50);
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS data_date DATE;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE market_intelligence ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE INDEX IF NOT EXISTS idx_market_intelligence_produce ON market_intelligence(produce_type);
 CREATE INDEX IF NOT EXISTS idx_market_intelligence_location ON market_intelligence USING GIN(location);

@@ -103,8 +103,35 @@ frontend/src/
 ├── handoffs/          # Handoff records
 └── history/           # Implementation history
 
-_EBDESIGN_LIBRARY/     # Module documentation (524 cards)
+modules/               # THE LIBRARY. 196 module packages, 192 module.json
+                       # manifests. Each package may carry backend/service.js,
+                       # api/routes.js and frontend/index.jsx.
 ```
+
+### Correction, 23 September 2026 — the library
+
+This file previously named `_EBDESIGN_LIBRARY/` here and claimed "524 cards".
+Verified against the working tree on `claude/inspiring-euler-vzuo11`:
+
+* **`_EBDESIGN_LIBRARY/` does not exist in this repository.** There is no such
+  directory and there are no 524 cards. `libraryKnowledgeService` still resolves
+  the path and guards its absence with `fs.existsSync`, so it builds an index
+  from the remaining sources and reports success — the missing tree is silent,
+  not an error.
+* **The real library is `modules/`**: 196 package directories, 192 with a
+  `module.json`.
+* **`"status": "WIRED"` in a manifest means PACKAGED, NOT MOUNTED.** 176 of the
+  192 manifests declare it. Route auto-discovery in `backend/src/index.js`
+  scans only `backend/src/routes` and `backend/src/services`; it never walks
+  `modules/`. `core/moduleAutoLoader.js` does walk a module tree, but it points
+  at `backend/src/modules` (a different tree) and is imported nowhere.
+  `core/moduleRegistry.js` indexes packages for *discovery*, which is not
+  mounting.
+
+So a WIRED module is discoverable and loadable on demand; it is not serving
+HTTP. Do not read the manifest status as evidence that an endpoint exists —
+check the mount, as the CRITICAL RULES at the top of this file require.
+
 
 ## CRITICAL FILES
 
@@ -219,7 +246,9 @@ npm test
 - Complete authorization system
 - Core business modules (marketplace, finance, logistics, insurance)
 - AI decision engine (original)
-- Library system (524 cards)
+- Library system: 196 module packages under `modules/`, 192 with a manifest
+  (NOT 524 cards — see the correction above). 176 declare `"status": "WIRED"`,
+  which means packaged, not mounted.
 
 **Completed Today (Claude Integration):**
 - Claude AI coordinator

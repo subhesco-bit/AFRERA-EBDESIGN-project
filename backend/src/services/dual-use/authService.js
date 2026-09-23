@@ -62,7 +62,12 @@ const OAUTH_PROVIDERS = {
   },
 };
 
-const AUTH_STORE_PATH = path.join(__dirname, '..', '..', 'database', 'auth_store.json');
+// The dev/test fallback credential store. Overridable so a test run does not
+// write bcrypt hashes into the checkout -- the default file was tracked in git
+// with 17 seeded accounts, 9 of them role 'admin', until this change untracked
+// and ignored it.
+const AUTH_STORE_PATH = process.env.AUTH_STORE_PATH
+  || path.join(__dirname, '..', '..', 'database', 'auth_store.json');
 
 function ensureAuthStore() {
   return {
@@ -114,6 +119,15 @@ function assertFallbackAuthStoreAllowed() {
 async function getFallbackUserByEmail(email) {
   const store = await readAuthStore();
   return store.users.find((user) => user.email === email.toLowerCase());
+}
+
+// Refresh tokens carry only { userId, tokenType } -- see generateRefreshToken.
+// Looking a user up by payload.email therefore always missed on the fallback
+// store, so refresh failed on every deployment without PostgreSQL.
+async function getFallbackUserById(userId) {
+  if (userId === undefined || userId === null || userId === '') return undefined;
+  const store = await readAuthStore();
+  return store.users.find((user) => String(user.id) === String(userId));
 }
 
 function getUserPasswordHash(user) {
@@ -317,7 +331,15 @@ async function registerUser(userData) {
         email: normalizedEmail,
         phone: registrationData.phone || '',
         role: registrationData.role,
-        status: registrationData.status,
+        // The fallback store is dev/test only -- assertFallbackAuthStoreAllowed
+        // throws in production -- and email verification needs a database, so
+        // there is no way to activate a 'pending' account on this path. Writing
+        // 'pending' here would make every fallback account permanently unable
+        // to log in once the status check below is enforced. This is not a
+        // relaxation of the production posture: the PostgreSQL path still
+        // registers 'pending' and requires POST /auth/verify-email.
+        status: 'active',
+        email_verified: false,
         password_hash: passwordHash,
         first_name: registrationData.first_name || '',
         last_name: registrationData.last_name || '',
@@ -377,36 +399,55 @@ async function registerUser(userData) {
     // Hash password
     const passwordHash = await hashPassword(registrationData.password);
 
-    // Insert user
-    const userQuery = `
-      INSERT INTO users (email, phone, password_hash, role, status)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, email, phone, role, status, created_at
-    `;
+    // The user row and its profile row are written in one transaction.
+    //
+    // They were previously two independent pool queries. The profile INSERT
+    // named a `phone` column that `user_profiles` does not have (phone lives
+    // on `users`), so on a live PostgreSQL run every registration threw AFTER
+    // the user row had already committed: the account existed with no profile,
+    // the caller saw a 500, and retrying returned "Email already registered".
+    // Verified against PostgreSQL 16 with the full migration set applied.
+    const client = await pg.connect();
+    let user;
+    let profileRow;
+    try {
+      await client.query('BEGIN');
 
-    const userResult = await pg.query(userQuery, [
-      registrationData.email.toLowerCase(),
-      registrationData.phone || null,
-      passwordHash,
-      registrationData.role,
-      registrationData.status,
-    ]);
+      const userResult = await client.query(
+        `INSERT INTO users (email, phone, password_hash, role, status)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, email, phone, role, status, created_at`,
+        [
+          registrationData.email.toLowerCase(),
+          registrationData.phone || null,
+          passwordHash,
+          registrationData.role,
+          registrationData.status,
+        ],
+      );
+      user = userResult.rows[0];
 
-    const user = userResult.rows[0];
+      const profileResult = await client.query(
+        `INSERT INTO user_profiles (user_id, first_name, last_name)
+         VALUES ($1, $2, $3)
+         RETURNING *`,
+        [
+          user.id,
+          registrationData.first_name || '',
+          registrationData.last_name || '',
+        ],
+      );
+      profileRow = profileResult.rows[0];
 
-    // Insert user profile
-    const profileQuery = `
-      INSERT INTO user_profiles (user_id, first_name, last_name, phone)
-      VALUES ($1, $2, $3, $4)
-      RETURNING *
-    `;
+      await client.query('COMMIT');
+    } catch (transactionError) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw transactionError;
+    } finally {
+      client.release();
+    }
 
-    const profileResult = await pg.query(profileQuery, [
-      user.id,
-      registrationData.first_name || '',
-      registrationData.last_name || '',
-      registrationData.phone || '',
-    ]);
+    const profileResult = { rows: [profileRow] };
 
     // Generate tokens
     const accessToken = generateAccessToken(user);
@@ -434,6 +475,155 @@ async function registerUser(userData) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Email verification / account activation
+//
+// registerUser() writes status 'pending' and loginUser() requires 'active'.
+// Nothing in this repository moved an account between the two, so every
+// account registered through the API was permanently unable to log in
+// (verified against live PostgreSQL 16). These two functions are the missing
+// link.
+//
+// DELIVERY IS NOT WIRED. No mail transport is configured in this deployment --
+// `nodemailer` is a declared dependency but is imported nowhere. Rather than
+// pretend a mail was sent, issueEmailVerificationToken returns the raw token
+// to its caller and logs that delivery is unconfigured; the route layer
+// forwards it to the client only outside production. Wire a transport and
+// stop forwarding it before this runs anywhere real.
+// ---------------------------------------------------------------------------
+
+const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
+
+function hashVerificationToken(rawToken) {
+  return crypto.createHash('sha256').update(rawToken).digest('hex');
+}
+
+/**
+ * Look up a pending (unactivated) account by email, for re-issuing an
+ * activation token. Returns undefined when there is no such account -- the
+ * caller must not distinguish that case to the client.
+ */
+async function findPendingUserByEmail(email) {
+  const pg = getPostgreSQL();
+  if (!pg) return undefined;
+  const result = await pg.query(
+    "SELECT id, email, status FROM users WHERE email = $1 AND status = 'pending'",
+    [String(email || '').toLowerCase()],
+  );
+  return result.rows[0];
+}
+
+/**
+ * Issue a single-use activation token for a user id.
+ * Any outstanding unconsumed token for that user is invalidated first, so a
+ * re-send cannot leave two live links.
+ *
+ * @returns {Promise<{token: string, expiresAt: Date, delivered: boolean}>}
+ */
+async function issueEmailVerificationToken(userId) {
+  const pg = getPostgreSQL();
+  if (!pg) {
+    throw new Error('Email verification requires a database connection');
+  }
+
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS);
+
+  const client = await pg.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      `UPDATE email_verification_tokens
+          SET consumed_at = NOW()
+        WHERE user_id = $1 AND consumed_at IS NULL`,
+      [userId],
+    );
+    await client.query(
+      `INSERT INTO email_verification_tokens (user_id, token_hash, expires_at)
+       VALUES ($1, $2, $3)`,
+      [userId, hashVerificationToken(rawToken), expiresAt],
+    );
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
+
+  logger.warn(
+    'Email verification token issued but NOT delivered: no mail transport is '
+    + `configured. user_id=${userId}`,
+  );
+
+  return { token: rawToken, expiresAt, delivered: false };
+}
+
+/**
+ * Consume an activation token: marks the email verified and the account
+ * active. Single-use and time-limited; an unknown, expired or already-used
+ * token is rejected without saying which, so the endpoint cannot be used to
+ * probe for valid tokens.
+ */
+async function verifyEmailToken(rawToken) {
+  const pg = getPostgreSQL();
+  if (!pg) {
+    throw new Error('Email verification requires a database connection');
+  }
+  if (!rawToken || typeof rawToken !== 'string') {
+    throw new Error('Invalid or expired verification token');
+  }
+
+  const client = await pg.connect();
+  try {
+    await client.query('BEGIN');
+
+    // FOR UPDATE so two concurrent submissions of the same token cannot both
+    // pass the consumed_at check.
+    const tokenResult = await client.query(
+      `SELECT id, user_id, expires_at, consumed_at
+         FROM email_verification_tokens
+        WHERE token_hash = $1
+        FOR UPDATE`,
+      [hashVerificationToken(rawToken)],
+    );
+
+    const row = tokenResult.rows[0];
+    if (!row || row.consumed_at || new Date(row.expires_at) <= new Date()) {
+      await client.query('ROLLBACK');
+      throw new Error('Invalid or expired verification token');
+    }
+
+    await client.query(
+      'UPDATE email_verification_tokens SET consumed_at = NOW() WHERE id = $1',
+      [row.id],
+    );
+
+    // Only a pending account is activated. An account that was suspended or
+    // deleted must not be revived by an old activation link.
+    const userResult = await client.query(
+      `UPDATE users
+          SET email_verified = TRUE,
+              status = CASE WHEN status = 'pending' THEN 'active' ELSE status END,
+              updated_at = NOW()
+        WHERE id = $1
+        RETURNING id, email, role, status, email_verified`,
+      [row.user_id],
+    );
+
+    await client.query('COMMIT');
+
+    const user = userResult.rows[0];
+    logger.info(`Email verified for user: ${user.email} (status ${user.status})`);
+    return { user };
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 /**
  * Login user
  */
@@ -452,6 +642,13 @@ async function loginUser(email, password, deviceInfo = {}) {
       const passwordValid = passwordHash ? await comparePassword(password, passwordHash) : false;
       if (!passwordValid) {
         throw new Error('Invalid credentials');
+      }
+
+      // The PostgreSQL path rejects any account that is not active; this path
+      // did not check status at all, so a suspended account could still log in
+      // whenever the database was unreachable. Same rule on both paths now.
+      if (user.status && user.status !== 'active') {
+        throw new Error('Account is not active');
       }
 
       const accessToken = generateAccessToken(user);
@@ -583,7 +780,7 @@ async function refreshAccessToken(refreshToken) {
     const pg = getPostgreSQL();
     if (!pg) {
       assertFallbackAuthStoreAllowed();
-      const user = await getFallbackUserByEmail(payload.email || '');
+      const user = await getFallbackUserById(payload.userId);
       if (!user) {
         throw new Error('User not found');
       }
@@ -1254,7 +1451,8 @@ router.get('/me', async (req, res) => {
 
     if (!pg) {
       assertFallbackAuthStoreAllowed();
-      const user = await getFallbackUserByEmail(payload.email || '');
+      const user = (await getFallbackUserById(payload.userId))
+        || (await getFallbackUserByEmail(payload.email || ''));
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -1297,6 +1495,9 @@ router.get('/me', async (req, res) => {
 module.exports = {
   router,
   registerUser,
+  issueEmailVerificationToken,
+  findPendingUserByEmail,
+  verifyEmailToken,
   loginUser,
   refreshAccessToken,
   logoutUser,

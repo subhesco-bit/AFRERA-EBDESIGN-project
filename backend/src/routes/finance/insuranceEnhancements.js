@@ -5,9 +5,9 @@
 
 const express = require('express');
 const router = express.Router();
-const insurancePremiumService = require('../../services/finance/insurancePremiumService');
+const insurancePremiumService = require('../../services/insurancePremiumService');
 const insurancePolicyIssuanceService = require('../../services/finance/insurancePolicyIssuanceService');
-const insuranceFraudDetectionService = require('../../services/finance/insuranceFraudDetectionService');
+const insuranceFraudDetectionService = require('../../services/insuranceFraudDetectionService');
 const { authMiddleware } = require('../../middleware/auth');
 const { adminMiddleware } = require('../../middleware/admin');
 const { authRateLimit } = require('../../middleware/rateLimiter');

@@ -16,7 +16,7 @@ const MODULE_NAME = 'Library Knowledge';
 
 function optionalDatabase() {
   try {
-    return require('../../../backend/src/database/connection').getPostgreSQL();
+    return require('../../../database/connection').getPostgreSQL();
   } catch (error) {
     return null;
   }

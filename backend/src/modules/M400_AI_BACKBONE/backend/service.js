@@ -3,7 +3,7 @@
  * Enterprise-level AI coordination and decision-making backbone
  */
 
-const { getPostgreSQL } = require('../../../backend/src/database/connection');
+const { getPostgreSQL } = require('../../../database/connection');
 
 class AIBackboneService {
   constructor() {

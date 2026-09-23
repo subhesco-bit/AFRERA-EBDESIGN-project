@@ -868,6 +868,174 @@ function resetAIStatistics() {
 // EXPORT ALL FUNCTIONS
 // ============================================================================
 
+// ============================================================================
+// GOVERNED AI FACADE (aiAPI)
+// ============================================================================
+/**
+ * aiAPI — the governed entry point used by module services
+ * (`const { aiAPI } = require('.../aiBackboneService')`).
+ *
+ * Why this exists
+ * ---------------
+ * 52 module services call `aiAPI.generateRecommendation({ task, parameters })`
+ * and persist the result as JSON (e.g. `ai_content_analysis`). The export did
+ * not exist, so every one of those call sites was a latent TypeError. Rather
+ * than stub it, this facade makes those call sites honest:
+ *
+ *  - It NEVER fabricates a recommendation. With no provider configured
+ *    `callAI()` throws ('… is not configured'); a fabricated or random answer
+ *    persisted into a business column would be indistinguishable from a real
+ *    one. Instead an envelope with `status:'unavailable'` and `output:null` is
+ *    returned, so the platform degrades safely and the gap stays visible.
+ *  - `confidence` is only populated when the model itself reports one.
+ *    It is never synthesised, because a made-up confidence is worse than none.
+ *  - Every result carries provenance so an AI-influenced business record can
+ *    later be audited: which task, model, provider, contract version, when,
+ *    how long, what assumptions, and whether a human approved it.
+ *
+ * Envelope contract (stable; additive changes only)
+ *   status            'ok' | 'unavailable' | 'error' | 'rejected'
+ *   task              echo of the requested task key
+ *   output            model result (parsed object when JSON, else raw text) or null
+ *   confidence        number 0..1 reported BY THE MODEL, else null
+ *   citations         sources the model cited, else []
+ *   assumptions       assumptions the model declared, else []
+ *   explanation       model rationale, else null
+ *   provenance        { provider, model, contractVersion, requestedAt, latencyMs, inputKeys }
+ *   actionBoundary    'advisory_only' — this facade never authorises execution
+ *   humanApproval     { required, status, approvedBy, approvedAt }
+ *   outcome           reserved for benefit-realisation feedback (null until measured)
+ *   error             message when status is 'error' | 'rejected'
+ */
+const AI_CONTRACT_VERSION = '1.0.0';
+
+function buildEnvelope(fields) {
+  return {
+    status: 'error',
+    task: null,
+    output: null,
+    confidence: null,
+    citations: [],
+    assumptions: [],
+    explanation: null,
+    provenance: {
+      provider: null,
+      model: null,
+      contractVersion: AI_CONTRACT_VERSION,
+      requestedAt: null,
+      latencyMs: null,
+      inputKeys: [],
+    },
+    actionBoundary: 'advisory_only',
+    humanApproval: { required: true, status: 'pending', approvedBy: null, approvedAt: null },
+    outcome: null,
+    error: null,
+    ...fields,
+  };
+}
+
+/** Deterministic prompt construction; asks the model for the governance fields. */
+function buildRecommendationPrompt(task, parameters) {
+  return [
+    `Task: ${task}`,
+    '',
+    'Input parameters (JSON):',
+    JSON.stringify(parameters, null, 2),
+    '',
+    'Respond with a single JSON object using exactly these keys:',
+    '{',
+    '  "output": <your recommendation as an object>,',
+    '  "confidence": <number between 0 and 1, or null if you cannot judge>,',
+    '  "citations": [<sources you relied on>],',
+    '  "assumptions": [<assumptions you made>],',
+    '  "explanation": "<why you reached this recommendation>"',
+    '}',
+    '',
+    'Do not invent data that is not present in the input parameters.',
+    'If the input is insufficient, say so in "explanation" and set "confidence" to null.',
+  ].join('\n');
+}
+
+/** Extract a JSON object from a model response that may be fenced or prose-wrapped. */
+function parseModelJSON(raw) {
+  if (raw && typeof raw === 'object') return raw;
+  if (typeof raw !== 'string') return null;
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const candidate = fenced ? fenced[1] : raw;
+  const start = candidate.indexOf('{');
+  const end = candidate.lastIndexOf('}');
+  if (start === -1 || end <= start) return null;
+  try {
+    return JSON.parse(candidate.slice(start, end + 1));
+  } catch {
+    return null;
+  }
+}
+
+function clampConfidence(value) {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1
+    ? value
+    : null;
+}
+
+async function generateRecommendation(request = {}) {
+  const { task, parameters = {}, options = {} } = request || {};
+  const requestedAt = new Date().toISOString();
+  const inputKeys = parameters && typeof parameters === 'object' ? Object.keys(parameters) : [];
+
+  if (!task || typeof task !== 'string') {
+    return buildEnvelope({
+      status: 'rejected',
+      error: 'generateRecommendation requires a string "task"',
+      provenance: { provider: null, model: null, contractVersion: AI_CONTRACT_VERSION, requestedAt, latencyMs: 0, inputKeys },
+    });
+  }
+
+  const provider = options.provider || getPreferredProvider();
+  const cfg = AI_PROVIDERS[provider];
+  const model = (cfg && (options.model || cfg.model)) || null;
+  const baseProvenance = { provider, model, contractVersion: AI_CONTRACT_VERSION, requestedAt, latencyMs: null, inputKeys };
+
+  // Safe fallback: no configured provider means no AI. Report it, do not invent it.
+  if (!cfg || !cfg.enabled || !cfg.apiKey) {
+    return buildEnvelope({
+      status: 'unavailable',
+      task,
+      explanation: `No AI provider is configured (checked '${provider}'). No recommendation was generated.`,
+      provenance: { ...baseProvenance, latencyMs: 0 },
+      humanApproval: { required: false, status: 'not_applicable', approvedBy: null, approvedAt: null },
+    });
+  }
+
+  const startedMs = Date.now();
+  try {
+    const raw = await callAI(buildRecommendationPrompt(task, parameters), options);
+    const parsed = parseModelJSON(raw);
+    return buildEnvelope({
+      status: 'ok',
+      task,
+      output: parsed && 'output' in parsed ? parsed.output : (parsed ?? raw ?? null),
+      confidence: clampConfidence(parsed && parsed.confidence),
+      citations: Array.isArray(parsed && parsed.citations) ? parsed.citations : [],
+      assumptions: Array.isArray(parsed && parsed.assumptions) ? parsed.assumptions : [],
+      explanation: (parsed && typeof parsed.explanation === 'string') ? parsed.explanation : null,
+      provenance: { ...baseProvenance, latencyMs: Date.now() - startedMs },
+    });
+  } catch (error) {
+    return buildEnvelope({
+      status: 'error',
+      task,
+      error: error && error.message ? error.message : String(error),
+      provenance: { ...baseProvenance, latencyMs: Date.now() - startedMs },
+    });
+  }
+}
+
+const aiAPI = {
+  generateRecommendation,
+  contractVersion: AI_CONTRACT_VERSION,
+};
+
 module.exports = {
   // AI Provider Functions
   callClaudeAI,
@@ -898,5 +1066,10 @@ module.exports = {
   // Configuration
   AI_PROVIDERS,
   aiRequestTracker,
+
+  // Governed AI facade used by module services
+  aiAPI,
+  generateRecommendation,
+  AI_CONTRACT_VERSION,
 };
 

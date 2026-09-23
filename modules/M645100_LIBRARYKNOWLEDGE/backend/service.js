@@ -262,7 +262,21 @@ class LibraryKnowledgeService {
         runtimePath: path.dirname(moduleJsonPath),
         hasBackend: fs.existsSync(path.join(this.modulesRoot, dir.name, 'backend', 'service.js')),
         hasApi: fs.existsSync(path.join(this.modulesRoot, dir.name, 'api', 'routes.js')),
-        hasFrontend: fs.existsSync(path.join(this.modulesRoot, dir.name, 'frontend', 'index.jsx'))
+        hasFrontend: fs.existsSync(path.join(this.modulesRoot, dir.name, 'frontend', 'index.jsx')),
+        // 176 of the 192 manifests under modules/ declare "status": "WIRED".
+        // That is a claim in a hand-maintained file, not an observation. Route
+        // auto-discovery in backend/src/index.js walks backend/src/routes and
+        // backend/src/services only -- it never walks modules/ -- and
+        // core/moduleAutoLoader.js (which does walk a module tree) points at
+        // backend/src/modules and is imported nowhere. So a package here is
+        // discoverable and loadable on demand; it is not serving HTTP.
+        //
+        // The declared value is preserved verbatim under declaredStatus and the
+        // reality is stated separately, so no consumer can read one as the other.
+        declaredStatus: data.status || null,
+        mounted: false,
+        mountedNote: 'modules/ is not walked by the server route loader; '
+          + 'declaredStatus reflects the manifest, not a mounted endpoint'
       });
     }
   }
@@ -534,6 +548,48 @@ class LibraryKnowledgeService {
       issues,
       warnings: this.indexingWarnings,
       verificationDate: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Per-source report: which roots this index was actually built from, which
+   * are absent, and how many items each contributed.
+   *
+   * WHY: `_EBDESIGN_LIBRARY/` does not exist in this repository, and every
+   * indexer that reads it opens with `if (!fs.existsSync(...)) return;`. That
+   * is correct defensive code, but it made the absence invisible -- initialize()
+   * reported success and a populated index while four of its sources had
+   * contributed nothing. This method names the gap so a caller can see it.
+   */
+  getSourceStatus() {
+    const counts = {};
+    for (const item of this.index.values()) {
+      counts[item.type] = (counts[item.type] || 0) + 1;
+    }
+
+    const sources = [
+      { root: this.libraryRoot, label: '_EBDESIGN_LIBRARY (documentation cards)', types: ['catalogue', 'module-card', 'modular-system', 'library-file'] },
+      { root: this.modulesRoot, label: 'modules/ (runtime module packages)', types: ['runtime-module'] },
+      { root: this.backendModulesRoot, label: 'backend/src/modules (M0XX family)', types: ['backend-module'] }
+    ].map((source) => {
+      const present = fs.existsSync(source.root);
+      const indexedItems = source.types.reduce((sum, type) => sum + (counts[type] || 0), 0);
+      return {
+        label: source.label,
+        root: source.root,
+        present,
+        indexedItems,
+        note: present ? undefined : 'Directory does not exist; this source contributed nothing to the index.'
+      };
+    });
+
+    return {
+      moduleId: MODULE_ID,
+      initialized: this.initialized,
+      totalItems: this.index.size,
+      sources,
+      missingSources: sources.filter((source) => !source.present).map((source) => source.root),
+      byType: counts
     };
   }
 

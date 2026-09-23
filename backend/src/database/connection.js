@@ -92,6 +92,19 @@ async function initPostgreSQL() {
     logger.info('PostgreSQL connection established successfully');
     return pgPool;
   } catch (error) {
+    // `pgPool` is assigned before the connection test above, so a failed
+    // connection used to leave a live-but-useless Pool object behind.
+    // getPostgreSQL() only checks for null, so every caller that branches on
+    // `if (!pg) { ...fallback... }` -- authService's whole fallback mode among
+    // them -- took the database path anyway and failed with ECONNREFUSED on
+    // each request, instead of degrading as designed. Observed directly:
+    // POST /api/auth/register returned 500 "connect ECONNREFUSED" on a host
+    // with no PostgreSQL, where the fallback store should have served it.
+    if (pgPool) {
+      const failedPool = pgPool;
+      pgPool = null;
+      failedPool.end().catch(() => {});
+    }
     logger.error('PostgreSQL connection failed', { error: error.message, stack: error.stack });
     throw error;
   }

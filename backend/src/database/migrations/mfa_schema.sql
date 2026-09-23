@@ -38,11 +38,11 @@ CREATE TABLE IF NOT EXISTS mfa_verification_attempts (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_mfa_secrets_user_id ON mfa_secrets(user_id);
-CREATE INDEX idx_mfa_backup_codes_user_id ON mfa_backup_codes(user_id);
-CREATE INDEX idx_mfa_backup_codes_used ON mfa_backup_codes(used);
-CREATE INDEX idx_mfa_verification_attempts_user_id ON mfa_verification_attempts(user_id);
-CREATE INDEX idx_mfa_verification_attempts_created_at ON mfa_verification_attempts(created_at);
+CREATE INDEX IF NOT EXISTS idx_mfa_secrets_user_id ON mfa_secrets(user_id);
+CREATE INDEX IF NOT EXISTS idx_mfa_backup_codes_user_id ON mfa_backup_codes(user_id);
+CREATE INDEX IF NOT EXISTS idx_mfa_backup_codes_used ON mfa_backup_codes(used);
+CREATE INDEX IF NOT EXISTS idx_mfa_verification_attempts_user_id ON mfa_verification_attempts(user_id);
+CREATE INDEX IF NOT EXISTS idx_mfa_verification_attempts_created_at ON mfa_verification_attempts(created_at);
 
 -- Comment on tables
 COMMENT ON TABLE mfa_secrets IS 'Stores MFA secrets for users (TOTP, etc.)';

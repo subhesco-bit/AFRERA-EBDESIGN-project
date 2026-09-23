@@ -5,7 +5,12 @@
 
 const { logger } = require('../../utils/logger');
 const { aiAPI } = require('../aiService/index');
-const { sendNotification } = require('../../websocket/index');
+// sendNotification is a METHOD on socketServer (websocket/socketServer.js), not a
+// top-level export of websocket/index.js -- which exports only
+// { initializeWebSocket, socketServer }. Destructuring it yielded undefined
+// and every call site threw TypeError at runtime.
+// services/legacy/governmentSchemeService.js already uses this correct form.
+const { socketServer } = require('../../websocket/index');
 const { authMiddleware } = require('../../middleware/auth');
 
 /**
@@ -132,7 +137,7 @@ async function submitBid(bidData) {
 
     // Notify buyer
     const order = await getPreSeasonOrder(order_id);
-    sendNotification(order.buyer_id, {
+    socketServer.sendNotification(order.buyer_id, {
       type: 'new_bid_received',
       order_id: order_id,
       bid_id: bid.bid_id,
@@ -192,7 +197,7 @@ async function selectWinningBid(orderId, selectionCriteria) {
 
     // Notify selected farmers
     for (const selectedBid of selection.selected_bids) {
-      sendNotification(selectedBid.farmer_id, {
+      socketServer.sendNotification(selectedBid.farmer_id, {
         type: 'bid_selected',
         order_id: orderId,
         bid_id: selectedBid.bid_id,
@@ -568,7 +573,7 @@ async function releaseEscrowPayment(contractId, milestoneId) {
 async function notifyStakeholders(contract, milestone) {
   // Notify stakeholders
   for (const farmer of contract.farmers) {
-    sendNotification(farmer.farmer_id, {
+    socketServer.sendNotification(farmer.farmer_id, {
       type: 'milestone_updated',
       contract_id: contract.contract_id,
       milestone: milestone.milestone_type,

@@ -21,6 +21,23 @@ CREATE TABLE IF NOT EXISTS consents (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23)
+-- `consents` is also defined by an earlier migration with a different column
+-- set, so the CREATE TABLE above does nothing on a clean run and the indexes
+-- below then failed with `column "status" does not exist`. Verified on a clean
+-- PostgreSQL 16 run. Neither definition is dropped: the columns this migration
+-- needs are added if absent, so one table satisfies both. NOT NULL is not
+-- applied because rows seeded by the other definition cannot supply these.
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS consent_category VARCHAR(100);
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS data_categories JSONB;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS valid_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS valid_until TIMESTAMP;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS version INTEGER DEFAULT 1;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS revoked_reason TEXT;
+ALTER TABLE consents ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Consent Categories Table
 CREATE TABLE IF NOT EXISTS consent_categories (
   id SERIAL PRIMARY KEY,

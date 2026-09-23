@@ -16,13 +16,25 @@ describe('AuthService production security', () => {
   });
 
   it('forces public registration to consumer and pending', async () => {
-    const query = jest.fn()
-      .mockResolvedValueOnce({ rows: [] })
+    // The pool-level query: the duplicate-email check registerUser runs first.
+    const query = jest.fn().mockResolvedValue({ rows: [] });
+
+    // registerUser writes the user row and its profile row inside ONE
+    // transaction, on a checked-out client. The double previously exposed only
+    // `query`, which a real pg.Pool does not match -- it also has connect() --
+    // so it could not represent a transactional write at all.
+    const clientQuery = jest.fn()
+      .mockResolvedValueOnce({ rows: [] })                    // BEGIN
       .mockResolvedValueOnce({
         rows: [{ id: 'user-1', email: 'new@example.com', phone: null, role: 'consumer', status: 'pending' }],
-      })
-      .mockResolvedValueOnce({ rows: [{ user_id: 'user-1' }] });
-    getPostgreSQL.mockReturnValue({ query });
+      })                                                      // INSERT INTO users
+      .mockResolvedValueOnce({ rows: [{ user_id: 'user-1' }] }) // INSERT INTO user_profiles
+      .mockResolvedValueOnce({ rows: [] });                   // COMMIT
+    const release = jest.fn();
+    getPostgreSQL.mockReturnValue({
+      query,
+      connect: jest.fn().mockResolvedValue({ query: clientQuery, release }),
+    });
 
     const result = await authService.registerUser({
       email: 'new@example.com',
@@ -31,12 +43,17 @@ describe('AuthService production security', () => {
       status: 'active',
     });
 
-    expect(query).toHaveBeenCalledWith(
+    expect(clientQuery).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO users'),
       ['new@example.com', null, expect.any(String), 'consumer', 'pending'],
     );
     expect(result.user.role).toBe('consumer');
     expect(result.user.status).toBe('pending');
+
+    // The write is transactional and the client goes back to the pool.
+    expect(clientQuery).toHaveBeenCalledWith('BEGIN');
+    expect(clientQuery).toHaveBeenCalledWith('COMMIT');
+    expect(release).toHaveBeenCalled();
   });
 
   it.each([

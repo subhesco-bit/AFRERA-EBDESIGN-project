@@ -1,3 +1,24 @@
+-- ---------------------------------------------------------------------------
+-- RECONCILIATION NOTE (added 2026-09-23)
+--
+-- One or more table names in this file are also defined by another migration
+-- with a different column set. `CREATE TABLE IF NOT EXISTS` then does NOTHING
+-- on a clean run, and this file's later INSERT / CREATE INDEX statements failed
+-- on columns that were never added. Verified on a clean PostgreSQL 16 run of
+-- the full migration set.
+--
+-- Per the project rule, a collision is reconciled and not resolved by dropping
+-- one side. Each CREATE TABLE below is followed by ADD COLUMN IF NOT EXISTS for
+-- its own columns: a no-op where this file really created the table, and the
+-- missing columns where it did not.
+--
+-- NOT NULL, PRIMARY KEY, UNIQUE and REFERENCES are deliberately not carried
+-- over -- the table may already hold rows from the other definition that cannot
+-- satisfy them, and a referenced column's type often differs from what this
+-- file declares. Where that hides a real type mismatch, it is a reconciliation
+-- still owed, not a fix.
+-- ---------------------------------------------------------------------------
+
 -- HR Module Database Schema with AI Integration Support
 -- Migration 3200: HR Module Tables
 
@@ -10,7 +31,12 @@ CREATE TABLE IF NOT EXISTS employees (
   last_name VARCHAR(100) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   phone VARCHAR(20),
-  department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+  -- CIRCULAR REFERENCE (resolved 2026-09-23): employees.department_id points
+  -- at departments, and departments.manager_id points back at employees.
+  -- Neither table can be created first with its foreign key inline, so this
+  -- one is added by ALTER once both tables exist -- see below. The file
+  -- previously failed here with `relation "departments" does not exist`.
+  department_id INTEGER,
   department VARCHAR(100),
   role VARCHAR(100) NOT NULL,
   salary_level VARCHAR(50),
@@ -28,6 +54,33 @@ CREATE TABLE IF NOT EXISTS employees (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS employee_id VARCHAR(20);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS first_name VARCHAR(100);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS last_name VARCHAR(100);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS department_id INTEGER;
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS department VARCHAR(100);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS role VARCHAR(100);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS salary_level VARCHAR(50);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS salary DECIMAL(12, 2);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS hire_date DATE;
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS employment_type VARCHAR(50) DEFAULT 'full_time';
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS skills JSONB DEFAULT '[]';
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS experience INTEGER DEFAULT 0;
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS location VARCHAR(100);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS shift_preferences JSONB DEFAULT '{}';
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS availability JSONB DEFAULT '{}';
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS current_workload DECIMAL(5, 2) DEFAULT 0;
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS ai_recommendations JSONB DEFAULT '{}';
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Departments table
 CREATE TABLE IF NOT EXISTS departments (
@@ -47,6 +100,34 @@ CREATE TABLE IF NOT EXISTS departments (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS department_name VARCHAR(100);
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS department_code VARCHAR(20);
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS manager_id INTEGER;
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS min_staff_per_shift INTEGER DEFAULT 1;
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS max_staff_per_shift INTEGER DEFAULT 10;
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS skill_requirements JSONB DEFAULT '[]';
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS peak_hours JSONB DEFAULT '{}';
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS labor_constraints JSONB DEFAULT '{}';
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS budget DECIMAL(15, 2);
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
+-- The employees -> departments half of the circular reference, added now that
+-- both tables exist. Guarded so a re-run does not fail on the existing
+-- constraint.
+DO $$ BEGIN
+  ALTER TABLE employees
+    ADD CONSTRAINT employees_department_id_fkey
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN
+  NULL;
+END $$;
+
 -- Performance reviews table
 CREATE TABLE IF NOT EXISTS performance_reviews (
   id SERIAL PRIMARY KEY,
@@ -64,6 +145,22 @@ CREATE TABLE IF NOT EXISTS performance_reviews (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS employee_id INTEGER;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS reviewer_id INTEGER;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS review_period_start DATE;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS review_period_end DATE;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS performance_score DECIMAL(3, 2) CHECK (performance_score BETWEEN 1 AND 5);
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS strengths TEXT;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS areas_for_improvement TEXT;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS goals JSONB DEFAULT '[]';
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS comments TEXT;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'pending';
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Leave requests table
 CREATE TABLE IF NOT EXISTS leave_requests (
   id SERIAL PRIMARY KEY,
@@ -80,6 +177,22 @@ CREATE TABLE IF NOT EXISTS leave_requests (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS employee_id INTEGER;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS leave_type VARCHAR(50);
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS total_days DECIMAL(5, 2);
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS reason TEXT;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'pending';
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS approved_by INTEGER;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS approved_at TIMESTAMP;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Training programs table
 CREATE TABLE IF NOT EXISTS training_programs (
@@ -100,6 +213,24 @@ CREATE TABLE IF NOT EXISTS training_programs (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS title VARCHAR(200);
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS skills_taught JSONB DEFAULT '[]';
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS duration INTEGER;
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS difficulty_level VARCHAR(20);
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS instructor VARCHAR(100);
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS cost DECIMAL(10, 2);
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS max_participants INTEGER;
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS success_rate DECIMAL(5, 2);
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS rating DECIMAL(3, 2) CHECK (rating BETWEEN 1 AND 5);
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE training_programs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Training records table
 CREATE TABLE IF NOT EXISTS training_records (
   id SERIAL PRIMARY KEY,
@@ -116,6 +247,20 @@ CREATE TABLE IF NOT EXISTS training_records (
   UNIQUE(employee_id, training_program_id)
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS employee_id INTEGER;
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS training_program_id INTEGER;
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS enrollment_date DATE;
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS completion_date DATE;
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'enrolled';
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS score DECIMAL(5, 2);
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS certificate_issued BOOLEAN DEFAULT FALSE;
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS feedback TEXT;
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Promotions table
 CREATE TABLE IF NOT EXISTS promotions (
   id SERIAL PRIMARY KEY,
@@ -130,6 +275,19 @@ CREATE TABLE IF NOT EXISTS promotions (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS employee_id INTEGER;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS previous_role VARCHAR(100);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS new_role VARCHAR(100);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS previous_salary DECIMAL(12, 2);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS new_salary DECIMAL(12, 2);
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS promotion_date DATE;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS reason TEXT;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS approved_by INTEGER;
+ALTER TABLE promotions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Employee feedback table
 CREATE TABLE IF NOT EXISTS employee_feedback (
   id SERIAL PRIMARY KEY,
@@ -143,6 +301,19 @@ CREATE TABLE IF NOT EXISTS employee_feedback (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS employee_id INTEGER;
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS feedback_type VARCHAR(50);
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS feedback_text TEXT;
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS rating INTEGER CHECK (rating BETWEEN 1 AND 5);
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS is_anonymous BOOLEAN DEFAULT FALSE;
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'submitted';
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE employee_feedback ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Timesheets table
 CREATE TABLE IF NOT EXISTS timesheets (
@@ -159,6 +330,20 @@ CREATE TABLE IF NOT EXISTS timesheets (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS employee_id INTEGER;
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS timesheet_period VARCHAR(20);
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'draft';
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS total_hours DECIMAL(6, 2) DEFAULT 0;
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMP;
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS approved_by INTEGER;
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS approved_at TIMESTAMP;
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE timesheets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- Timesheet entries table
 CREATE TABLE IF NOT EXISTS timesheet_entries (
   id SERIAL PRIMARY KEY,
@@ -171,6 +356,18 @@ CREATE TABLE IF NOT EXISTS timesheet_entries (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS timesheet_id INTEGER;
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS date DATE;
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS project_code VARCHAR(50);
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS task_description TEXT;
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS hours DECIMAL(5, 2) CHECK (hours > 0);
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS is_billable BOOLEAN DEFAULT FALSE;
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE timesheet_entries ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- HR predictions table (for storing AI predictions)
 CREATE TABLE IF NOT EXISTS hr_predictions (
@@ -187,6 +384,19 @@ CREATE TABLE IF NOT EXISTS hr_predictions (
   UNIQUE(employee_id, prediction_type, prediction_date)
 );
 
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS employee_id INTEGER;
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS prediction_type VARCHAR(50);
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS prediction_data JSONB;
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS confidence DECIMAL(5, 2) CHECK (confidence BETWEEN 0 AND 1);
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS prediction_date DATE;
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS actual_outcome JSONB;
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS outcome_recorded_at TIMESTAMP;
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE hr_predictions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 -- HR sentiment analysis table
 CREATE TABLE IF NOT EXISTS hr_sentiment_analysis (
   id SERIAL PRIMARY KEY,
@@ -199,6 +409,18 @@ CREATE TABLE IF NOT EXISTS hr_sentiment_analysis (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS employee_id INTEGER;
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS sentiment_score DECIMAL(5, 2) CHECK (sentiment_score BETWEEN -1 AND 1);
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS sentiment_label VARCHAR(20);
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS themes JSONB DEFAULT '[]';
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS trend_data JSONB DEFAULT '{}';
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS analysis_period VARCHAR(50);
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE hr_sentiment_analysis ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Optimized schedules table
 CREATE TABLE IF NOT EXISTS optimized_schedules (
@@ -213,6 +435,19 @@ CREATE TABLE IF NOT EXISTS optimized_schedules (
   created_by INTEGER REFERENCES employees(id) ON DELETE SET NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- RECONCILIATION (added 2026-09-23): see the note at the top of this file.
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS department_id INTEGER;
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS schedule_data JSONB;
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS optimization_metrics JSONB DEFAULT '{}';
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS is_applied BOOLEAN DEFAULT FALSE;
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS applied_at TIMESTAMP;
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS created_by INTEGER;
+ALTER TABLE optimized_schedules ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_employees_employee_id ON employees(employee_id);
