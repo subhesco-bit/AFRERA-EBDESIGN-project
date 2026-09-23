@@ -4,7 +4,7 @@
   "name": "Organic Traceability",
   "description": "Migrated from legacy service: organicTraceabilityService.js",
   "category": "domain",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\organicTraceabilityService.js",
     "migratedAt": "2026-08-24T17:28:25.326Z",

@@ -4,7 +4,7 @@
   "name": "Ne Product Intelligence",
   "description": "Migrated from legacy service: neProductIntelligenceService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\neProductIntelligenceService.js",
     "migratedAt": "2026-08-24T17:28:25.263Z",

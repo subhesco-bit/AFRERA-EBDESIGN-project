@@ -4,7 +4,7 @@
   "name": "Ecommerce A I",
   "description": "Migrated from legacy service: ecommerceAIService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\ecommerceAIService.js",
     "migratedAt": "2026-08-24T17:28:24.456Z",

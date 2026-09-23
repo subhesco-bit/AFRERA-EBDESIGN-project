@@ -4,7 +4,7 @@
   "name": "Rural Enterprise",
   "description": "Migrated from legacy service: ruralEnterpriseService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\ruralEnterpriseService.js",
     "migratedAt": "2026-08-24T17:28:25.499Z",

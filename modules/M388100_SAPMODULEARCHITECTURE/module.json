@@ -4,7 +4,7 @@
   "name": "Sap Module Architecture",
   "description": "Migrated from legacy service: sapModuleArchitectureService.js",
   "category": "erp",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\sapModuleArchitectureService.js",
     "migratedAt": "2026-08-24T17:28:25.512Z",

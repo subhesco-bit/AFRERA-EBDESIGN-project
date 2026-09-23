@@ -4,7 +4,7 @@
   "name": "Mobility Rides",
   "description": "Migrated from legacy service: mobilityRidesService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\mobilityRidesService.js",
     "migratedAt": "2026-08-24T17:28:25.233Z",

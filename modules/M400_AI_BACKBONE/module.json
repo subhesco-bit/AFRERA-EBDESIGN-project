@@ -345,7 +345,7 @@
   },
 
   "integration": {
-    "status": "WIRED",
+    "status": "PACKAGED",
     "cableConnections": "ESTABLISHED",
     "moduleRegistry": "CONFIGURED",
     "healthProbes": "ACTIVE",

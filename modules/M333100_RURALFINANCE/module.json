@@ -4,7 +4,7 @@
   "name": "Rural Finance",
   "description": "Migrated from legacy service: ruralFinanceService.js",
   "category": "erp",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\ruralFinanceService.js",
     "migratedAt": "2026-08-24T17:28:25.505Z",

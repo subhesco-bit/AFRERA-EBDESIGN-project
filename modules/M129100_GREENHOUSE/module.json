@@ -4,7 +4,7 @@
   "name": "Greenhouse",
   "description": "Migrated from legacy service: greenhouseService.js",
   "category": "platform",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\greenhouseService.js",
     "migratedAt": "2026-08-24T17:28:24.697Z",

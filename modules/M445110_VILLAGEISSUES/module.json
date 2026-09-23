@@ -4,7 +4,7 @@
   "name": "Village Issues & Needs",
   "description": "Village-level operational issues, unmet needs, lifecycle updates and escalation-ready data integrated with the existing village profile master.",
   "category": "community",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "dependencies": {
     "modules": ["M445100_VILLAGEPROFILE"],
     "services": ["postgresql", "authentication"]

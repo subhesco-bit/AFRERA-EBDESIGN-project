@@ -4,7 +4,7 @@
   "name": "Resource Crud Factory",
   "description": "Migrated from legacy service: resourceCrudFactory.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\resourceCrudFactory.js",
     "migratedAt": "2026-08-24T17:28:25.456Z",

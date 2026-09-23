@@ -4,7 +4,7 @@
   "name": "Ai Orchestration",
   "description": "Migrated from legacy service: aiOrchestrationService.js",
   "category": "ai",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\aiOrchestrationService.js",
     "migratedAt": "2026-08-24T17:28:24.079Z",

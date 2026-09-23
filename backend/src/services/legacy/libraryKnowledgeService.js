@@ -10,9 +10,10 @@ const { getPostgreSQL } = require('../../database/connection');
 
 class LibraryKnowledgeService {
   constructor() {
-    this.libraryRoot = path.join(__dirname, '../../../../_EBDESIGN_LIBRARY');
-    this.catalogPath = path.join(this.libraryRoot, '00_CATALOG');
-    this.modulesPath = path.join(this.libraryRoot, '01_MODULES');
+    // Point to the real modules/ directory instead of non-existent _EBDESIGN_LIBRARY
+    // Need to go up to the project root then into modules/
+    this.libraryRoot = path.join(__dirname, '../../../../modules');
+    this.modulesPath = this.libraryRoot;
     this.index = new Map();
     this.contentHashes = new Map();
   }
@@ -33,50 +34,42 @@ class LibraryKnowledgeService {
   }
 
   /**
-   * Build comprehensive library index
+   * Build comprehensive library index from modules/ directory
    */
   async buildIndex() {
-    console.log('Building library index...');
+    console.log('Building library index from modules/ directory...');
 
-    // Index module cards
-    const modulesDir = path.join(this.modulesPath, 'Module_Cards');
-    if (fs.existsSync(modulesDir)) {
-      const moduleFiles = fs.readdirSync(modulesDir).filter(f => f.endsWith('.md'));
+    if (!fs.existsSync(this.modulesPath)) {
+      console.warn('Modules directory does not exist:', this.modulesPath);
+      return;
+    }
 
-      for (const file of moduleFiles) {
-        const filePath = path.join(modulesDir, file);
-        const content = fs.readFileSync(filePath, 'utf8');
-        const moduleData = this.parseModuleCard(content);
+    // Index all module directories
+    const moduleDirs = fs.readdirSync(this.modulesPath).filter(f => {
+      const modulePath = path.join(this.modulesPath, f);
+      return fs.statSync(modulePath).isDirectory() && f.startsWith('M');
+    });
 
-        this.index.set(file, {
-          type: 'module',
-          data: moduleData,
-          path: filePath,
-          lastModified: fs.statSync(filePath).mtime,
-        });
+    for (const moduleDir of moduleDirs) {
+      const moduleJsonPath = path.join(this.modulesPath, moduleDir, 'module.json');
+      if (fs.existsSync(moduleJsonPath)) {
+        try {
+          const content = fs.readFileSync(moduleJsonPath, 'utf8');
+          const moduleData = JSON.parse(content);
+
+          this.index.set(moduleDir, {
+            type: 'module',
+            data: moduleData,
+            path: moduleJsonPath,
+            lastModified: fs.statSync(moduleJsonPath).mtime,
+          });
+        } catch (error) {
+          console.warn(`Failed to parse ${moduleJsonPath}:`, error.message);
+        }
       }
     }
 
-    // Index component cards
-    const componentsDir = path.join(this.modulesPath, 'Component_Cards');
-    if (fs.existsSync(componentsDir)) {
-      const componentFiles = fs.readdirSync(componentsDir).filter(f => f.endsWith('.md'));
-
-      for (const file of componentFiles) {
-        const filePath = path.join(componentsDir, file);
-        const content = fs.readFileSync(filePath, 'utf8');
-        const componentData = this.parseComponentCard(content);
-
-        this.index.set(file, {
-          type: 'component',
-          data: componentData,
-          path: filePath,
-          lastModified: fs.statSync(filePath).mtime,
-        });
-      }
-    }
-
-    console.log(`Indexed ${this.index.size} library items`);
+    console.log(`Indexed ${this.index.size} modules from modules/ directory`);
   }
 
   /**
@@ -106,6 +99,11 @@ class LibraryKnowledgeService {
   async syncToDatabase() {
     try {
       const pool = await getPostgreSQL();
+
+      if (!pool) {
+        console.warn('PostgreSQL not available, skipping database sync');
+        return;
+      }
 
       // Create library_knowledge table if not exists
       await pool.query(`
@@ -182,69 +180,26 @@ class LibraryKnowledgeService {
       console.log('Library data synced to database');
     } catch (error) {
       console.error('Failed to sync to database:', error);
-      throw error;
+      // Don't throw - allow service to work without database
+      console.warn('Continuing without database sync');
     }
   }
 
   /**
-   * Parse module card from markdown
+   * Parse module data from JSON (already parsed in buildIndex)
+   * This method is kept for compatibility but module data is already JSON
    */
   parseModuleCard(content) {
-    const moduleData = {
-      id: '',
-      name: '',
-      domain: '',
-      status: '',
-      implementation: '',
-      components: [],
-    };
-
-    const lines = content.split('\n');
-    for (const line of lines) {
-      if (line.startsWith('# Module ID:')) {
-        moduleData.id = line.replace('# Module ID:', '').trim();
-      } else if (line.startsWith('# Module Name:')) {
-        moduleData.name = line.replace('# Module Name:', '').trim();
-      } else if (line.startsWith('# Domain:')) {
-        moduleData.domain = line.replace('# Domain:', '').trim();
-      } else if (line.startsWith('# Status:')) {
-        moduleData.status = line.replace('# Status:', '').trim();
-      } else if (line.startsWith('# Implementation:')) {
-        moduleData.implementation = line.replace('# Implementation:', '').trim();
-      }
-    }
-
-    return moduleData;
+    // Content is already parsed as JSON in buildIndex
+    return content;
   }
 
   /**
-   * Parse component card from markdown
+   * Parse component data (not used in current implementation)
+   * Kept for compatibility
    */
   parseComponentCard(content) {
-    const componentData = {
-      id: '',
-      name: '',
-      type: '',
-      module: '',
-      status: '',
-    };
-
-    const lines = content.split('\n');
-    for (const line of lines) {
-      if (line.startsWith('# Component ID:')) {
-        componentData.id = line.replace('# Component ID:', '').trim();
-      } else if (line.startsWith('# Component Name:')) {
-        componentData.name = line.replace('# Component Name:', '').trim();
-      } else if (line.startsWith('# Type:')) {
-        componentData.type = line.replace('# Type:', '').trim();
-      } else if (line.startsWith('# Module:')) {
-        componentData.module = line.replace('# Module:', '').trim();
-      } else if (line.startsWith('# Status:')) {
-        componentData.status = line.replace('# Status:', '').trim();
-      }
-    }
-
-    return componentData;
+    return content;
   }
 
   /**
@@ -254,14 +209,23 @@ class LibraryKnowledgeService {
     const results = [];
     const lowerQuery = query.toLowerCase();
 
-    for (const [filename, item] of this.index) {
-      const content = JSON.stringify(item.data).toLowerCase();
-      if (content.includes(lowerQuery)) {
+    for (const [moduleId, item] of this.index) {
+      const moduleData = item.data;
+      const searchableText = [
+        moduleData.moduleId || '',
+        moduleData.name || '',
+        moduleData.description || '',
+        moduleData.category || '',
+        JSON.stringify(moduleData.discovery || {}),
+        JSON.stringify(moduleData.capabilities || [])
+      ].join(' ').toLowerCase();
+
+      if (searchableText.includes(lowerQuery)) {
         results.push({
-          filename,
+          moduleId,
           type: item.type,
-          data: item.data,
-          relevance: this.calculateRelevance(content, lowerQuery),
+          data: moduleData,
+          relevance: this.calculateRelevance(searchableText, lowerQuery),
         });
       }
     }
@@ -294,10 +258,19 @@ class LibraryKnowledgeService {
       components: 0,
       totalHashes: this.contentHashes.size,
       lastIndexed: new Date().toISOString(),
+      categories: {},
+      statusDistribution: {},
     };
 
     for (const [, item] of this.index) {
-      if (item.type === 'module') stats.modules++;
+      if (item.type === 'module') {
+        stats.modules++;
+        const category = item.data.category || 'unknown';
+        stats.categories[category] = (stats.categories[category] || 0) + 1;
+
+        const status = item.data.status || 'unknown';
+        stats.statusDistribution[status] = (stats.statusDistribution[status] || 0) + 1;
+      }
       if (item.type === 'component') stats.components++;
     }
 

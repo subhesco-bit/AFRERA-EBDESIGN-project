@@ -4,7 +4,7 @@
   "name": "Wearable Integration",
   "description": "Migrated from legacy service: wearableIntegrationService.js",
   "category": "ai",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\wearableIntegrationService.js",
     "migratedAt": "2026-08-24T17:28:25.662Z",

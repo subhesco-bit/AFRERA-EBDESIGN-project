@@ -4,7 +4,7 @@
   "name": "Cost Control",
   "description": "Migrated from legacy service: costControlService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\costControlService.js",
     "migratedAt": "2026-08-24T17:28:24.281Z",

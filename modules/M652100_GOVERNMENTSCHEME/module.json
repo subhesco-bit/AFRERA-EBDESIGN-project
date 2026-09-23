@@ -4,7 +4,7 @@
   "name": "Government Scheme",
   "description": "Migrated from legacy service: governmentSchemeService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\governmentSchemeService.js",
     "migratedAt": "2026-08-24T17:28:24.691Z",

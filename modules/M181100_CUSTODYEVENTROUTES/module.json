@@ -4,7 +4,7 @@
   "name": "Custody Event Routes",
   "description": "Migrated from legacy service: custodyEventRoutes.js",
   "category": "platform",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\custodyEventRoutes.js",
     "migratedAt": "2026-08-24T17:28:24.315Z",

@@ -4,7 +4,7 @@
   "name": "Advanced Features",
   "description": "Migrated from legacy service: advancedFeaturesService.js",
   "category": "ai",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\advancedFeaturesService.js",
     "migratedAt": "2026-08-24T17:28:24.019Z",

@@ -71,7 +71,7 @@ To bridge the gap between rural farmers and urban markets, provide fair pricing,
 
 **AI Integration:**
 - Claude AI coordinator (partially implemented)
-- Library knowledge service (implemented)
+- Library knowledge service (implemented, now reads from modules/)
 - AI collaboration service (implemented)
 - Frontend AI components (created)
 
@@ -103,7 +103,7 @@ frontend/src/
 ├── handoffs/          # Handoff records
 └── history/           # Implementation history
 
-_EBDESIGN_LIBRARY/     # Module documentation (524 cards)
+modules/               # Module packages (192 modules with manifests and backend code)
 ```
 
 ## CRITICAL FILES
@@ -219,16 +219,17 @@ npm test
 - Complete authorization system
 - Core business modules (marketplace, finance, logistics, insurance)
 - AI decision engine (original)
-- Library system (524 cards)
+- Module system (192 modules in modules/ directory with manifests and backend code)
 
 **Completed Today (Claude Integration):**
 - Claude AI coordinator
-- Library knowledge service
+- Library knowledge service (fixed to read from modules/ directory)
 - AI collaboration service
 - MFA, GDPR, Platform Core services
 - Tier 1 skeleton modules (M002-M025)
 - Frontend AI/security components
 - Shared intelligence structure (.ai/)
+- Library reference corrections (documented real module state)
 
 ## WHERE PROJECT INTELLIGENCE IS STORED
 
@@ -296,6 +297,34 @@ npm test
 **Testing:** Framework configured, 0% coverage
 **Claude-Devin Collaboration:** Documentation established, no real-time automation
 
+## MODULE LIBRARY STRUCTURE
+
+**Real Library Location:** `modules/` directory contains 192 module packages
+
+**Module Structure:**
+```
+modules/M001_PLATFORM_CORE/
+├── module.json        # Manifest: id, version, category, status, dependencies, etc.
+└── backend/           # Service implementation
+    └── *.js
+```
+
+**Module Categories:**
+- enterprise (84 modules)
+- ai (32 modules)
+- platform (29 modules)
+- erp (24 modules)
+- domain (19 modules)
+- security (2 modules)
+- identity (1 module)
+- organization (1 module)
+
+**Important Notes:**
+- 176 modules declare `"status": "WIRED"` but modules/ is not loaded by server bootstrap
+- 37 modules have frontend code, 155 have backend only
+- libraryKnowledgeService now correctly reads from modules/ directory
+- Previous documentation referenced non-existent `_EBDESIGN_LIBRARY/` directory
+
 ## KNOWN PROBLEMS
 
 **Critical:**
@@ -308,6 +337,7 @@ npm test
 1. Frontend build warning (chunks > 1000 kB)
 2. Services not initialized on startup
 3. Some routes may need verification
+4. Module status labels: 176 modules claim "WIRED" but modules/ directory is not loaded by server bootstrap
 
 ## NEXT PRIORITIES
 

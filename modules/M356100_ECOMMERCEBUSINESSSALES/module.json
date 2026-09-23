@@ -4,7 +4,7 @@
   "name": "Ecommerce Business Sales",
   "description": "Migrated from legacy service: ecommerceBusinessSalesService.js",
   "category": "erp",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\ecommerceBusinessSalesService.js",
     "migratedAt": "2026-08-24T17:28:24.464Z",

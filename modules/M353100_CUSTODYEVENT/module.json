@@ -4,7 +4,7 @@
   "name": "Custody Event",
   "description": "Migrated from legacy service: custodyEventService.js",
   "category": "erp",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\custodyEventService.js",
     "migratedAt": "2026-08-24T17:28:24.323Z",

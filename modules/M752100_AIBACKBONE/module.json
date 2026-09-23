@@ -4,7 +4,7 @@
   "name": "Ai Backbone",
   "description": "Migrated from legacy service: aiBackboneService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\aiBackboneService.js",
     "migratedAt": "2026-08-24T17:28:24.046Z",

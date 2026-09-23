@@ -4,7 +4,7 @@
   "name": "Household Economy",
   "description": "Migrated from legacy service: householdEconomyService.js",
   "category": "erp",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\householdEconomyService.js",
     "migratedAt": "2026-08-24T17:28:24.715Z",

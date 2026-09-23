@@ -4,7 +4,7 @@
   "name": "Erp",
   "description": "Migrated from legacy service: erpService.js",
   "category": "erp",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\erpService.js",
     "migratedAt": "2026-08-24T17:28:24.534Z",

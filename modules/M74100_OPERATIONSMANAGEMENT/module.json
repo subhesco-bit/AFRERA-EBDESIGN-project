@@ -4,7 +4,7 @@
   "name": "Operations Management",
   "description": "Migrated from legacy service: operationsManagementService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\operationsManagementService.js",
     "migratedAt": "2026-08-24T17:28:25.312Z",

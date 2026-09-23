@@ -4,7 +4,7 @@
   "name": "Food Safety",
   "description": "Migrated from legacy service: foodSafetyService.js",
   "category": "domain",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\foodSafetyService.js",
     "migratedAt": "2026-08-24T17:28:24.632Z",

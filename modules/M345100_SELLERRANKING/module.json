@@ -4,7 +4,7 @@
   "name": "Seller Ranking",
   "description": "Migrated from legacy service: sellerRankingService.js",
   "category": "erp",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\sellerRankingService.js",
     "migratedAt": "2026-08-24T17:28:25.524Z",

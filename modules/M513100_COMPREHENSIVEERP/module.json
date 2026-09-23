@@ -4,7 +4,7 @@
   "name": "Comprehensive E R P",
   "description": "Migrated from legacy service: comprehensiveERPService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\comprehensiveERPService.js",
     "migratedAt": "2026-08-24T17:28:24.253Z",

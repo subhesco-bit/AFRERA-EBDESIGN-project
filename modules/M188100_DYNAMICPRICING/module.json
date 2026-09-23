@@ -4,7 +4,7 @@
   "name": "Dynamic Pricing",
   "description": "Migrated from legacy service: dynamicPricingService.js",
   "category": "platform",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\dynamicPricingService.js",
     "migratedAt": "2026-08-24T17:28:24.449Z",

@@ -4,7 +4,7 @@
   "name": "Vermicompost",
   "description": "Migrated from legacy service: vermicompostService.js",
   "category": "platform",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\vermicompostService.js",
     "migratedAt": "2026-08-24T17:28:25.625Z",

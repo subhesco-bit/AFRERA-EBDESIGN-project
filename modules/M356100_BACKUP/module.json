@@ -4,7 +4,7 @@
   "name": "Backup",
   "description": "Migrated from legacy service: backupService.js",
   "category": "erp",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\backupService.js",
     "migratedAt": "2026-08-24T17:28:24.152Z",

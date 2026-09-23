@@ -4,7 +4,7 @@
   "name": "Return Load Board",
   "description": "Migrated from legacy service: returnLoadBoardService.js",
   "category": "ai",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\returnLoadBoardService.js",
     "migratedAt": "2026-08-24T17:28:25.464Z",

@@ -4,7 +4,7 @@
   "name": "Wikipedia",
   "description": "Migrated from legacy service: wikipediaService.js",
   "category": "enterprise",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\wikipediaService.js",
     "migratedAt": "2026-08-24T17:28:25.684Z",

@@ -4,7 +4,7 @@
   "name": "Mushroom",
   "description": "Migrated from legacy service: mushroomService.js",
   "category": "platform",
-  "status": "WIRED",
+  "status": "PACKAGED",
   "migration": {
     "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\mushroomService.js",
     "migratedAt": "2026-08-24T17:28:25.255Z",
