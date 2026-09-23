@@ -1,7 +1,10 @@
 'use strict';
-/** Real port of pine-shadow src/lib/erp's pure kernel (kernel.ts, money.ts,
- * ids.ts, atlas.ts). This is additive to, and distinct from, the Phase 1B
- * generic double-entry files (chartOfAccounts.js, doubleEntryPosting.js,
+/** Real port of pine-shadow src/lib/erp — kernel.ts, money.ts, ids.ts,
+ * atlas.ts, platform.ts (pure logic), plus boot.server.ts (1,945 lines,
+ * real Postgres persistence: 27 tables, full seed data, 17 mutation
+ * functions) and platform.server.ts (documents/process/seasons layer).
+ * This is additive to, and distinct from, the Phase 1B generic
+ * double-entry files (chartOfAccounts.js, doubleEntryPosting.js,
  * subledgerManager.js, taxEngine.js, periodClose.js, bankReconciliation.js)
  * created before this repository's real source was compared line-by-line.
  * Those Phase 1B files model conventional accounting; this kernel models
@@ -13,4 +16,6 @@ module.exports = {
   ...require('./ids'),
   ...require('./atlas'),
   ...require('./platform'),
+  ...require('./boot.server'),
+  ...require('./platform.server'),
 };

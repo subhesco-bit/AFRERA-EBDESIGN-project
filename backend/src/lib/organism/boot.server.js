@@ -39,7 +39,7 @@ async function ensureSchema() {
       signal TEXT NOT NULL,
       organ_id TEXT,
       ligament_id TEXT,
-      meta JSONB NOT NULL DEFAULT '{}',
+      payload JSONB NOT NULL DEFAULT '{}',
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
     INSERT INTO organism_state (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
@@ -66,12 +66,12 @@ async function markBootError(message) {
   await pool.query('UPDATE organism_state SET last_error = $1 WHERE id = 1', [message]);
 }
 
-async function publishEvent(signal, organId, ligamentId, meta = {}) {
+async function publishEvent(signal, organId, ligamentId, payload = {}) {
   await ensureSchema();
   const pool = getPostgreSQL();
   await pool.query(
-    'INSERT INTO spine_events (signal, organ_id, ligament_id, meta) VALUES ($1,$2,$3,$4::jsonb)',
-    [signal, organId ?? null, ligamentId ?? null, JSON.stringify(meta)],
+    'INSERT INTO spine_events (signal, organ_id, ligament_id, payload) VALUES ($1,$2,$3,$4::jsonb)',
+    [signal, organId ?? null, ligamentId ?? null, JSON.stringify(payload)],
   );
   const { rows } = await pool.query('SELECT id, signal, organ_id AS "organId", ligament_id AS "ligamentId", created_at AS "createdAt" FROM spine_events ORDER BY id DESC LIMIT 50');
   return rows;
