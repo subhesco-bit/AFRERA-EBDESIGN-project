@@ -11,4 +11,6 @@ module.exports = {
   ...require('./workflows'),
   ...require('./charter'),
   ...require('./algorithms'),
+  ...require('./engine'),
+  ...require('./companion'),
 };

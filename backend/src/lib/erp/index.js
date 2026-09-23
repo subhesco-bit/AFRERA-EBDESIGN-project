@@ -12,4 +12,5 @@ module.exports = {
   ...require('./money'),
   ...require('./ids'),
   ...require('./atlas'),
+  ...require('./platform'),
 };
