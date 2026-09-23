@@ -5350,5 +5350,650 @@ export const warningAPI = {
 // ever had a default one -- every one of them failed with
 // `"api" is not exported by "src/services/api.js"` and the build could not
 // complete. Exported both ways so neither import style breaks.
+// ---------------------------------------------------------------------------
+// API CLIENTS THAT WERE NEVER WRITTEN  (added 2026-09-23)
+//
+// This app imports 265 distinct client names from this file. 138 of them
+// were never exported by any version of it. That is what broke the production
+// build once the three syntax defects above were repaired: rolldown reports
+// `"farmersAPI" is not exported by "src/services/api.js"` and stops.
+//
+// Between them the pages call 550 distinct methods -- farmersAPI alone has 35
+// (market prices, price seasonality, harvest plans, discovery, demand forecast),
+// and `authAPI` and `productsAPI` are in the list too. This is a product
+// surface that does not exist, not a missing import.
+//
+// THEY ARE NOT ALIASES of the similarly-named exports that do exist. `farmerAPI`
+// has two methods (getProfile, updateProfile) against the 35 called on
+// `farmersAPI`; `climateMonitoringRoutes.js` on the backend is a five-endpoint
+// generic CRUD scaffold with no drought, flood, alert or report endpoint.
+// Pointing these names at those objects would put a working import in front of
+// a missing implementation: the page would render, call an endpoint that is not
+// there, and show an empty result as though it were data.
+//
+// So every method below REJECTS, naming itself, without sending a request. The
+// build completes and the rest of the app works; the affected pages show their
+// own error state saying exactly what is missing. Nothing renders a fabricated
+// number.
+//
+// The method lists are EXTRACTED FROM THE CALL SITES, not invented -- each name
+// below is a call this codebase actually makes. To implement one, replace its
+// entry with a real `api.get(...)` once its backend endpoint has been verified
+// to exist. One at a time; do not swap this barrier for a guess.
+// ---------------------------------------------------------------------------
+function notWired(clientName, methodNames) {
+  const reject = (method) => () => Promise.reject(new Error(
+    `${clientName}.${method}() is not wired: this API client was never implemented. `
+    + 'No request was sent. It must be written against a verified backend endpoint '
+    + 'before this screen can show real data.',
+  ));
+  return methodNames.reduce(
+    (client, method) => Object.assign(client, { [method]: reject(method) }),
+    { __notWired: true, __clientName: clientName, __methods: methodNames },
+  );
+}
+
+export const aeroponicsAPI = notWired('aeroponicsAPI', [
+  'createSystem', 'deleteSystem', 'getSystems', 'updateSystem'
+]);
+
+export const aiAdvisoryAPI = notWired('aiAdvisoryAPI', [
+  'getStatistics'
+]);
+
+export const aquacultureAnalyticsAPI = notWired('aquacultureAnalyticsAPI', [
+  'createMetric', 'deleteMetric', 'getMetrics', 'updateMetric'
+]);
+
+export const assetLifecycleAPI = notWired('assetLifecycleAPI', [
+  'createAsset', 'getAssets'
+]);
+
+export const authAPI = notWired('authAPI', [
+  'login', 'register', 'setup2FA'
+]);
+
+export const bioPesticideAPI = notWired('bioPesticideAPI', [
+  'createItem', 'deleteItem', 'getItems', 'updateItem'
+]);
+
+export const biofertilizerAPI = notWired('biofertilizerAPI', [
+  'createItem', 'deleteItem', 'getItems', 'updateItem'
+]);
+
+export const biofloccFarmAPI = notWired('biofloccFarmAPI', [
+  'createTank', 'deleteTank', 'getTanks', 'updateTank'
+]);
+
+export const blockchainTraceabilityAPI = notWired('blockchainTraceabilityAPI', [
+  'getTraceabilityEvents', 'verifyChainOfCustody'
+]);
+
+export const breakdownMaintenanceAPI = notWired('breakdownMaintenanceAPI', [
+  'createRecord', 'getRecords'
+]);
+
+export const buyingClubAPI = notWired('buyingClubAPI', [
+  'getStatistics'
+]);
+
+export const cattleRegistryAPI = notWired('cattleRegistryAPI', [
+  'createAnimal', 'deleteAnimal', 'getAnimals', 'updateAnimal'
+]);
+
+export const coldFishChainAPI = notWired('coldFishChainAPI', [
+  'createShipment', 'deleteShipment', 'getShipments', 'updateShipment'
+]);
+
+export const consentManagementAPI = notWired('consentManagementAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const contractorManagementAPI = notWired('contractorManagementAPI', [
+  'createContractor', 'deleteContractor', 'getContractors', 'updateContractor'
+]);
+
+export const digitalIdentityAPI = notWired('digitalIdentityAPI', [
+  'createIdentity', 'deleteIdentity', 'getIdentities', 'updateIdentity'
+]);
+
+export const enterpriseMemoryAPI = notWired('enterpriseMemoryAPI', [
+  'createCase', 'getCases', 'getKnowledgeGraph', 'getLearningInsights', 'searchCases',
+  'updateCase'
+]);
+
+export const equipmentInventoryAPI = notWired('equipmentInventoryAPI', [
+  'createEquipment', 'getEquipment'
+]);
+
+export const equipmentRentalAPI = notWired('equipmentRentalAPI', [
+  'createRental', 'getRentals'
+]);
+
+export const equipmentSchedulingAPI = notWired('equipmentSchedulingAPI', [
+  'createSchedule', 'deleteSchedule', 'getSchedules', 'updateSchedule'
+]);
+
+export const erpDashboardAPI = notWired('erpDashboardAPI', [
+  'getDashboard', 'getFinancialReports', 'getGLEntries', 'getReconciliation', 'getSyncStatus',
+  'resolveConflict', 'triggerSync'
+]);
+
+export const farmActivityAPI = notWired('farmActivityAPI', [
+  'createActivity', 'deleteActivity', 'getActivities', 'updateActivity'
+]);
+
+export const farmOperationsDashboardAPI = notWired('farmOperationsDashboardAPI', [
+  'createKpi', 'deleteKpi', 'getKpis', 'updateKpi'
+]);
+
+export const farmProductivityAPI = notWired('farmProductivityAPI', [
+  'createMetric', 'deleteMetric', 'getMetrics', 'updateMetric'
+]);
+
+export const farmTaskAPI = notWired('farmTaskAPI', [
+  'createTask', 'deleteTask', 'getTasks', 'updateTask'
+]);
+
+export const farmerTrainingAPI = notWired('farmerTrainingAPI', [
+  'getCarbonFootprint', 'getPrograms', 'register'
+]);
+
+export const feedManagementAPI = notWired('feedManagementAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const fertilityManagementAPI = notWired('fertilityManagementAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const fishHealthAPI = notWired('fishHealthAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const fishProcessingAPI = notWired('fishProcessingAPI', [
+  'createBatch', 'deleteBatch', 'getBatches', 'updateBatch'
+]);
+
+export const fleetManagementAPI = notWired('fleetManagementAPI', [
+  'addVehicle', 'getFleet', 'getMaintenanceDue', 'updateVehicle'
+]);
+
+export const floricultureAPI = notWired('floricultureAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const foluAPI = notWired('foluAPI', [
+  'landUseSummary', 'schemeStatus'
+]);
+
+export const foluBenchmarkAPI = notWired('foluBenchmarkAPI', [
+  'getBenchmarkReport', 'listTransitions'
+]);
+
+export const formsAPI = notWired('formsAPI', [
+  'createForm', 'getForms', 'submitForm', 'updateForm'
+]);
+
+export const freightPoolingAPI = notWired('freightPoolingAPI', [
+  'closeAndDispatch', 'createPoolWindow', 'findPoolableShipments', 'getPoolWindow',
+  'joinPoolWindow', 'listOpenWindows'
+]);
+
+export const fuelManagementAPI = notWired('fuelManagementAPI', [
+  'createLog', 'getLogs'
+]);
+
+export const geoBoundaryAPI = notWired('geoBoundaryAPI', [
+  'createBoundary', 'deleteBoundary', 'getBoundaries', 'updateBoundary'
+]);
+
+export const gisLandMappingAPI = notWired('gisLandMappingAPI', [
+  'createMapping', 'deleteMapping', 'getMappings', 'updateMapping'
+]);
+
+export const glutWarningAPI = notWired('glutWarningAPI', [
+  'checkGlutRisk', 'scanAllCategories'
+]);
+
+export const goatAIAPI = notWired('goatAIAPI', [
+  'monitorGoatHealth', 'optimizeGoatFeed', 'optimizeGoatMilkProduction',
+  'recommendGoatBreeding'
+]);
+
+export const goatAPI = notWired('goatAPI', [
+  'createAnimal', 'deleteAnimal', 'getBreedingAlerts', 'getHerdPerformance',
+  'getVaccinationAlerts', 'listHerd', 'listMilkProduction', 'recordBreeding',
+  'recordFeedConsumption', 'recordMilkProduction', 'updateAnimal'
+]);
+
+export const goatFarmingAPI = notWired('goatFarmingAPI', [
+  'createAnimal', 'deleteAnimal', 'getAnimals', 'updateAnimal'
+]);
+
+export const governmentAPI = notWired('governmentAPI', [
+  'getComplianceStatus', 'getSchemeAnalytics'
+]);
+
+export const governmentSchemeAPI = notWired('governmentSchemeAPI', [
+  'getAnnouncements', 'getCsrOpportunities', 'getWeatherAlerts'
+]);
+
+export const horticultureAnalyticsAPI = notWired('horticultureAnalyticsAPI', [
+  'createMetric', 'deleteMetric', 'getMetrics', 'updateMetric'
+]);
+
+// No method call for householdEconomyAPI was found in the source; imported but unused.
+export const householdEconomyAPI = notWired('householdEconomyAPI', []);
+
+export const implementManagementAPI = notWired('implementManagementAPI', [
+  'createImplement', 'getImplements'
+]);
+
+export const informationSharingAPI = notWired('informationSharingAPI', [
+  'accessSharingLink', 'checkPermission', 'createCollaborationSession', 'createDocument',
+  'createFolder', 'createSharingLink', 'deleteDocument', 'endCollaborationSession',
+  'generateAIRecommendations', 'getActivityLogs', 'getAnalytics', 'getCollaborationSessions',
+  'getDocument', 'getDocuments', 'getFolderTree', 'getFolders', 'getHealthStatus',
+  'getPermissions', 'joinCollaborationSession', 'searchDocuments', 'setPermission',
+  'updateDocument'
+]);
+
+export const inputConsumptionAPI = notWired('inputConsumptionAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const inputDistributionAPI = notWired('inputDistributionAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const inputProcurementAPI = notWired('inputProcurementAPI', [
+  'createOrder', 'deleteOrder', 'getOrders', 'updateOrder'
+]);
+
+export const inputTraceabilityAPI = notWired('inputTraceabilityAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const irrigationAPI = notWired('irrigationAPI', [
+  'createSchedule', 'deleteSchedule', 'getSchedules', 'getWaterSources', 'updateSchedule'
+]);
+
+export const labourAPI = notWired('labourAPI', [
+  'createWorker', 'getAttendance', 'getPayments', 'getWorkers', 'recordAttendance'
+]);
+
+export const landLeaseAPI = notWired('landLeaseAPI', [
+  'createLease', 'deleteLease', 'getLeases', 'updateLease'
+]);
+
+export const livestockAnalyticsAPI = notWired('livestockAnalyticsAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const logisticsEnhancementAPI = notWired('logisticsEnhancementAPI', [
+  'addInventory', 'addVehicle', 'createWarehouse', 'getActiveDrivers', 'getFleet',
+  'getLiveTracking', 'getShipmentTrail', 'getTemperatureAlerts', 'getTemperatureData',
+  'getTracking', 'getVehicle', 'getWarehouseInventory', 'getWarehouses',
+  'recordDriverLocation', 'recordTemperature', 'scheduleMaintenance', 'setGeofence',
+  'updateTracking', 'updateVehicle'
+]);
+
+// No method call for machineryAccessAPI was found in the source; imported but unused.
+export const machineryAccessAPI = notWired('machineryAccessAPI', []);
+
+export const machineryOperationsAPI = notWired('machineryOperationsAPI', [
+  'createOperation', 'deleteOperation', 'getOperations', 'updateOperation'
+]);
+
+export const marketIntelligenceAPI = notWired('marketIntelligenceAPI', [
+  'createIntelligence', 'getLatestIntelligence'
+]);
+
+export const medicalCodingAPI = notWired('medicalCodingAPI', [
+  'getDietaryRestrictions', 'getMedicalConditionCodes', 'getNutrientRequirements'
+]);
+
+export const mfaManagementAPI = notWired('mfaManagementAPI', [
+  'createDevice', 'deleteDevice', 'getDevices', 'updateDevice'
+]);
+
+export const micronutrientAPI = notWired('micronutrientAPI', [
+  'createItem', 'deleteItem', 'getItems', 'updateItem'
+]);
+
+// No method call for mobilityRidesAPI was found in the source; imported but unused.
+export const mobilityRidesAPI = notWired('mobilityRidesAPI', []);
+
+export const modulesAPI = notWired('modulesAPI', [
+  'askAssistant', 'getModules', 'getOverview'
+]);
+
+export const nervousSystemAPI = notWired('nervousSystemAPI', [
+  'createNeuralPathway', 'createReflexArc', 'deactivateEnterpriseRoute',
+  'executeMotorFunction', 'getActiveMotorFunctions', 'getBrainDecisionHistory',
+  'getBrainFocus', 'getHeartBeatStatus', 'getNervousSystemHealth', 'getNeuralPathways',
+  'getOptimalRoute', 'getReflexArcs', 'getSensorData', 'getSensorsStatus',
+  'processEventThroughBrain', 'registerEnterpriseRoute', 'registerSensor', 'routeRequest',
+  'startHeartBeat', 'stopHeartBeat', 'strengthenNeuralPathway', 'triggerReflex'
+]);
+
+export const nurseryAPI = notWired('nurseryAPI', [
+  'createNursery', 'deleteNursery', 'getNurseries', 'updateNursery'
+]);
+
+export const nutrientValueSalesAPI = notWired('nutrientValueSalesAPI', [
+  'issueNutrientCertificate', 'searchByNutrientCriteria', 'submitNutrientContent'
+]);
+
+export const nutritionIntelligenceAPI = notWired('nutritionIntelligenceAPI', [
+  'calculateNutrientProfile'
+]);
+
+export const operationsAPI = notWired('operationsAPI', [
+  'getOverview'
+]);
+
+export const orchardAPI = notWired('orchardAPI', [
+  'createOrchard', 'deleteOrchard', 'getOrchards', 'recordHarvest', 'updateOrchard'
+]);
+
+export const organicInputAPI = notWired('organicInputAPI', [
+  'createItem', 'deleteItem', 'getItems', 'updateItem'
+]);
+
+export const organicTraceabilityAPI = notWired('organicTraceabilityAPI', [
+  'getConsumerTransparency', 'getStandards', 'registerFarm'
+]);
+
+export const organizationManagementAPI = notWired('organizationManagementAPI', [
+  'createOrganization', 'deleteOrganization', 'getAllOrganizations'
+]);
+
+export const paymentGatewayAPI = notWired('paymentGatewayAPI', [
+  'getPaymentStatus', 'getSupportedGateways', 'processPayment', 'refundPayment'
+]);
+
+export const permissionManagementAPI = notWired('permissionManagementAPI', [
+  'createPermission', 'deletePermission', 'getPermissions', 'updatePermission'
+]);
+
+export const pesticideInventoryAPI = notWired('pesticideInventoryAPI', [
+  'createItem', 'deleteItem', 'getItems', 'updateItem'
+]);
+
+export const pigAIAPI = notWired('pigAIAPI', [
+  'monitorPigHealth', 'optimizeMeatProduction', 'optimizePigFeed', 'recommendPigBreeding'
+]);
+
+export const pigAPI = notWired('pigAPI', [
+  'createAnimal', 'deleteAnimal', 'getBreedingAlerts', 'getFeedConversionRatio',
+  'getHerdPerformance', 'getVaccinationAlerts', 'listHerd', 'listWeightRecords',
+  'recordBreeding', 'recordFeedConsumption', 'recordWeight', 'updateAnimal'
+]);
+
+export const pigFarmingAPI = notWired('pigFarmingAPI', [
+  'createAnimal', 'deleteAnimal', 'getAnimals', 'updateAnimal'
+]);
+
+export const platformConfigurationAPI = notWired('platformConfigurationAPI', [
+  'applyConfiguration', 'getRecommendations'
+]);
+
+export const platformTelemetryAPI = notWired('platformTelemetryAPI', [
+  'getAnalytics', 'getStatus'
+]);
+
+export const polyhouseAPI = notWired('polyhouseAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const pondAPI = notWired('pondAPI', [
+  'createPond', 'deletePond', 'getPonds', 'updatePond'
+]);
+
+export const poultryAIAPI = notWired('poultryAIAPI', [
+  'monitorFlockHealth', 'optimizeEggProduction', 'optimizePoultryFeed', 'predictMortalityRisk'
+]);
+
+export const poultryManagementAPI = notWired('poultryManagementAPI', [
+  'createBatch', 'deleteBatch', 'getBatches', 'updateBatch'
+]);
+
+export const preSeasonAPI = notWired('preSeasonAPI', [
+  'createOrder', 'getDashboard'
+]);
+
+export const precisionHorticultureAPI = notWired('precisionHorticultureAPI', [
+  'createReading', 'deleteReading', 'getReadings', 'updateReading'
+]);
+
+export const predictiveAnalyticsAPI = notWired('predictiveAnalyticsAPI', [
+  'getDemandForecast', 'getForecasts', 'getPredictions', 'getPricingPrediction',
+  'getUnacknowledgedAlerts'
+]);
+
+export const preventiveMaintenanceAPI = notWired('preventiveMaintenanceAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const pricingAPI = notWired('pricingAPI', [
+  'advise', 'forward'
+]);
+
+export const procurementSubscriptionAPI = notWired('procurementSubscriptionAPI', [
+  'getStatistics'
+]);
+
+export const productReviewsAPI = notWired('productReviewsAPI', [
+  'getStats'
+]);
+
+export const productsAPI = notWired('productsAPI', [
+  'createProduct', 'getCategories', 'getProduct', 'getProducts', 'getStates', 'requestImage'
+]);
+
+export const projectSystemsAPI = notWired('projectSystemsAPI', [
+  'completeMilestone', 'createMilestone', 'createProject', 'createWbsElement',
+  'getMilestoneStatusSummary', 'getProjectBudgetVsActual', 'getProjectMilestones',
+  'getProjectWbs', 'getProjects', 'getWbsCostRollup', 'updateProjectStatus', 'updateWbsStatus'
+]);
+
+export const protectedCultivationAPI = notWired('protectedCultivationAPI', [
+  'createStructure', 'deleteStructure', 'getStructures', 'updateStructure'
+]);
+
+export const publicDataAPI = notWired('publicDataAPI', [
+  'extract', 'listSources', 'registerSource'
+]);
+
+export const pushNotificationsAPI = notWired('pushNotificationsAPI', [
+  'subscribe', 'unsubscribe'
+]);
+
+export const rainwaterHarvestingAPI = notWired('rainwaterHarvestingAPI', [
+  'calculateBudget', 'designSystem', 'manageStorage', 'monitorCollection'
+]);
+
+export const rainwaterStructuresAPI = notWired('rainwaterStructuresAPI', [
+  'create', 'list', 'remove', 'update'
+]);
+
+export const renewableEnergyAPI = notWired('renewableEnergyAPI', [
+  'getStatistics'
+]);
+
+export const rolePermissionAPI = notWired('rolePermissionAPI', [
+  'createRole', 'getPermissionMatrix', 'getRoleHierarchy', 'listPermissions', 'listRoles',
+  'recommendRoleForUser'
+]);
+
+export const ruralEnterpriseAPI = notWired('ruralEnterpriseAPI', [
+  'getStatistics'
+]);
+
+// No method call for ruralFinanceAPI was found in the source; imported but unused.
+export const ruralFinanceAPI = notWired('ruralFinanceAPI', []);
+
+export const schemeRegistryAPI = notWired('schemeRegistryAPI', [
+  'getExpiring', 'list'
+]);
+
+export const securityAccessControlAPI = notWired('securityAccessControlAPI', [
+  'calculateSecurityScore', 'getIpLists', 'getSecurityEvents'
+]);
+
+export const seedPlanningAPI = notWired('seedPlanningAPI', [
+  'createPlan', 'deletePlan', 'getPlans', 'updatePlan'
+]);
+
+export const sessionManagementAPI = notWired('sessionManagementAPI', [
+  'deleteSession', 'getSessions', 'updateSession'
+]);
+
+export const sharedInfraAPI = notWired('sharedInfraAPI', [
+  'bookAsset', 'getRenewableSupport', 'registerAsset', 'searchAssets', 'searchSecondLife'
+]);
+
+// No method call for sharedInfrastructureAPI was found in the source; imported but unused.
+export const sharedInfrastructureAPI = notWired('sharedInfrastructureAPI', []);
+
+export const sheepAIAPI = notWired('sheepAIAPI', [
+  'monitorSheepHealth', 'optimizeSheepFeed', 'optimizeWoolProduction',
+  'recommendSheepBreeding'
+]);
+
+export const sheepFarmingAPI = notWired('sheepFarmingAPI', [
+  'createAnimal', 'deleteAnimal', 'getAnimals', 'updateAnimal'
+]);
+
+export const shgAPI = notWired('shgAPI', [
+  'addMember', 'createGroup', 'getGroups', 'getMembers', 'getSavings', 'recordSaving'
+]);
+
+export const soilMappingAPI = notWired('soilMappingAPI', [
+  'createZone', 'deleteZone', 'getZones', 'updateZone'
+]);
+
+export const soilTestingOpsAPI = notWired('soilTestingOpsAPI', [
+  'getHealthCard', 'submitSample', 'trackSample'
+]);
+
+export const sowingAPI = notWired('sowingAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const sparePartsAPI = notWired('sparePartsAPI', [
+  'createPart', 'getParts'
+]);
+
+export const ssoAPI = notWired('ssoAPI', [
+  'createProvider', 'deleteProvider', 'getProviders', 'updateProvider'
+]);
+
+export const subsidyOpsAPI = notWired('subsidyOpsAPI', [
+  'apply', 'calculateGst', 'checkEquipmentSubsidy', 'checkLogisticsSubsidy',
+  'checkProjectSubsidy', 'getSchemes', 'track'
+]);
+
+export const surveyManagementAPI = notWired('surveyManagementAPI', [
+  'createSurvey', 'deleteSurvey', 'getSurveys', 'updateSurvey'
+]);
+
+export const userManagementAPI = notWired('userManagementAPI', [
+  'detectAnomalies', 'getPredictiveMaintenance', 'getSettings', 'getSystemAnalytics',
+  'upsertSetting'
+]);
+
+export const varietyDirectoryAPI = notWired('varietyDirectoryAPI', [
+  'createListing', 'getCategories', 'list', 'requestImage'
+]);
+
+export const vegetableProductionAPI = notWired('vegetableProductionAPI', [
+  'createRecord', 'deleteRecord', 'getRecords', 'updateRecord'
+]);
+
+export const villageAPI = notWired('villageAPI', [
+  'addVillageResource', 'createVillage', 'getVillageAnalytics'
+]);
+
+export const villageProfileAPI = notWired('villageProfileAPI', [
+  'searchVillages'
+]);
+
+export const waterAnalyticsAPI = notWired('waterAnalyticsAPI', [
+  'comparePerformance', 'createDashboard', 'generatePrediction', 'generateUsageAnalytics'
+]);
+
+export const waterAnalyticsRecordsAPI = notWired('waterAnalyticsRecordsAPI', [
+  'create', 'list', 'remove', 'update'
+]);
+
+export const waterBudgetRecordsAPI = notWired('waterBudgetRecordsAPI', [
+  'create', 'list', 'remove', 'update'
+]);
+
+export const waterBudgetingAPI = notWired('waterBudgetingAPI', [
+  'createBudget', 'generateReport', 'optimizeAllocation', 'trackUsage'
+]);
+
+export const waterQualityAPI = notWired('waterQualityAPI', [
+  'getComplianceReport', 'getTreatmentRecommendations', 'monitorQuality', 'recordMeasurement'
+]);
+
+export const waterQualityRecordsAPI = notWired('waterQualityRecordsAPI', [
+  'create', 'list', 'remove', 'update'
+]);
+
+export const waterResourceMappingAPI = notWired('waterResourceMappingAPI', [
+  'createResource', 'deleteResource', 'getResources', 'updateResource'
+]);
+
+export const watershedManagementAPI = notWired('watershedManagementAPI', [
+  'createPlan', 'generateReport', 'implementConservation', 'monitorHealth'
+]);
+
+export const watershedRecordsAPI = notWired('watershedRecordsAPI', [
+  'create', 'list', 'remove', 'update'
+]);
+
+export const wearableAPI = notWired('wearableAPI', [
+  'disconnect', 'getFitbitAuthUrl', 'getRecentActivity', 'getStatus', 'handleFitbitCallback',
+  'syncFitbit'
+]);
+
+export const wikipediaAPI = notWired('wikipediaAPI', [
+  'getSummaryByTitle', 'lookup'
+]);
+
+export const yieldAPI = notWired('yieldAPI', [
+  'bookingCurve', 'lotPrice', 'lotsNeedingAttention', 'openNextBucket'
+]);
+
+export const farmersAPI = notWired('farmersAPI', [
+  'calculateFDI', 'createListing', 'deleteField', 'getAdvisoryContext', 'getBenchmarkPrices',
+  'getBenchmarks', 'getCategories', 'getCropSuggestions', 'getDemandForecast',
+  'getDiscoverCategories', 'getFarmer', 'getFarmerDashboard', 'getFeaturedProducts',
+  'getFields', 'getHarvestPlans', 'getHarvestScore', 'getMarketComparisonData',
+  'getMarketConditions', 'getMarketEvents', 'getMarketPrices', 'getNotifications',
+  'getPreOrders', 'getPriceCategories', 'getPriceDynamics', 'getPriceSeasonality',
+  'getPriceSignals', 'getPriceTrends', 'getProductsForCompare', 'getQuickQuestions',
+  'getRegions', 'getScoreHistory', 'getStates', 'getTimingRecommendations',
+  'getTrendingProducts', 'savePricingModel'
+]);
+
+export const decisionEngineAPI = notWired('decisionEngineAPI', [
+  'createRule', 'deleteRule', 'evaluateDecision', 'getActiveDecisions', 'getDecisionHistory',
+  'getRules', 'getStatus', 'triggerDecision', 'updateRule'
+]);
+
+export const climateMonitoringAPI = notWired('climateMonitoringAPI', [
+  'generateReport', 'getAlerts', 'getDroughtData', 'getFloodData', 'getStatus'
+]);
+
+export const competitorAPI = notWired('competitorAPI', [
+  'observe', 'position'
+]);
+
 export { api };
 export default api;
