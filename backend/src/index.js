@@ -201,6 +201,7 @@ const advancedFeatures = require('./routes/advancedFeatures.js');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
 const engineeringDesignRoutes = require('./routes/engineeringDesignRoutes.js');
+const fulfillmentEngineRoutes = require('./routes/fulfillmentEngineRoutes.js');
 /**
  * EBDESIGN Platform Backend - Main Entry Point
  * Auto-Discovery Architecture: Supports 200K+ services & routes
@@ -730,6 +731,7 @@ async function startup() {
     app.use('/api/advancedanalytics', advancedAnalyticsRoutes);
     app.use('/api/v1/warnings', apiWarningRoutes);
     app.use('/api/v1/engineering-design', engineeringDesignRoutes);
+    app.use('/api/v1/fulfillment-engine', fulfillmentEngineRoutes);
 
     // Routes index is a module exporter, not a router - don't mount it
     // app.use('/api/index', index);
