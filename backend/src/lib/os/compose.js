@@ -1,20 +1,14 @@
 'use strict';
 /** Score the catalog. Stage 0 is classification. Dual-truth with GitHub.
- * Ported from pine-shadow src/lib/os/compose.ts, with two dependencies
- * (./todos.ts osTodos/remainingWork/todoCounts, and ./matrix.ts chainFor)
- * not yet ported — todoCounts() below is a faithful reduction over OS_ITEMS
- * rather than a full port of the missing todos.ts. */
+ * Ported from pine-shadow src/lib/os/compose.ts. Now uses the real
+ * todos.js (osTodos/remainingWork/todoCounts) and matrix.js (chainFor)
+ * ports, both added after the initial pass that left this file with a
+ * placeholder reduction. */
 
 const { OS_ITEMS, OS_STAGES } = require('./catalog');
 const { allStagesComplete, stageClosed } = require('./runtime');
-
-function todoCounts() {
-  return {
-    done: OS_ITEMS.filter((x) => x.todo === 'done').length,
-    open: OS_ITEMS.filter((x) => x.todo === 'open').length,
-    blocked: OS_ITEMS.filter((x) => x.todo === 'blocked').length,
-  };
-}
+const { todoCounts, osTodos, remainingWork } = require('./todos');
+const { chainFor } = require('./matrix');
 
 function composeOs() {
   const items = OS_ITEMS;
@@ -64,4 +58,4 @@ function filterOs(opts) {
   });
 }
 
-module.exports = { composeOs, emitOsCatalog, filterOs, todoCounts };
+module.exports = { composeOs, emitOsCatalog, filterOs, todoCounts, osTodos, remainingWork, chainFor };
