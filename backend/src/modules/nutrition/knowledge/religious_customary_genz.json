@@ -1,0 +1,158 @@
+{
+  "version": "2026.09.calendar-diets-v1",
+  "ethics": "Community and faith dietary patterns are described for cultural competence and voluntary user preference — never for ranking, exclusion, or discrimination. Caste is referenced only as historical customary foodways some users self-identify with; the system does not assign caste.",
+  "religious_calendars": [
+    {
+      "id": "hindu_vrata_navratri",
+      "tradition": "Hindu",
+      "name": "Navratri / common vrata pattern",
+      "pattern": "Many observe grain restrictions, vrat foods (kuttu, singhara, potato, milk, fruits) varying by family",
+      "nutrition_tips": ["Plan protein via dairy/nuts if permitted", "Hydration", "Avoid deep-fried vrat snacks as default"],
+      "medical": "Diabetes: vrat potato/sabudana load can spike glucose — clinician plan"
+    },
+    {
+      "id": "hindu_ekadashi",
+      "tradition": "Hindu",
+      "name": "Ekadashi fasting patterns",
+      "pattern": "Partial or full fasts; fruits, milk, or specific allowed foods by sampradaya",
+      "nutrition_tips": ["Break fast gently", "Elderly/pregnant/ill often exempt — religious + medical counsel"],
+      "medical": "Do not fast if contraindicated (ED history, uncontrolled diabetes, etc.)"
+    },
+    {
+      "id": "jain_diet",
+      "tradition": "Jain",
+      "name": "Jain vegetarian / root restrictions (where observed)",
+      "pattern": "Lacto-vegetarian; many avoid root tubers, strict filters on water/ferments in orthoprax households",
+      "nutrition_tips": ["Pulses, dairy, cereals, above-ground vegetables", "B12 from dairy or supplements if strict"],
+      "medical": "Very strict patterns need B12/iron monitoring"
+    },
+    {
+      "id": "sikh_langar_ethic",
+      "tradition": "Sikh",
+      "name": "Langar / simple sattvic-style community meals",
+      "pattern": "Vegetarian langar norm in gurdwaras; home diets vary",
+      "nutrition_tips": ["Dal, roti, sabzi, kheer pattern is balanced if portions sane"],
+      "medical": "General healthy pattern template"
+    },
+    {
+      "id": "islamic_ramadan",
+      "tradition": "Islam",
+      "name": "Ramadan fasting",
+      "pattern": "Dawn-to-sunset fast; suhoor and iftar meals",
+      "nutrition_tips": ["Suhoor: complex carb + protein + fluid", "Iftar: date + water then balanced meal", "Limit fried iftar spreads"],
+      "medical": "Medical exemptions exist; diabetes fasting only with physician protocol"
+    },
+    {
+      "id": "christian_lent",
+      "tradition": "Christian",
+      "name": "Lent / Friday abstinence (where observed)",
+      "pattern": "Variable meat abstinence or simple meals by denomination",
+      "nutrition_tips": ["Fish/legume protein swaps", "Avoid only-fried substitutes"],
+      "medical": "Standard balanced diet principles apply"
+    },
+    {
+      "id": "buddhist_vegetarian_optional",
+      "tradition": "Buddhist",
+      "name": "Vegetarian preference (lineage-dependent)",
+      "pattern": "Many Indian Buddhist communities vegetarian or reduce meat",
+      "nutrition_tips": ["Complete proteins via cereal-pulse pairs"],
+      "medical": "B12 if fully vegan"
+    },
+    {
+      "id": "parsi_iranian_indian",
+      "tradition": "Parsi / Zoroastrian",
+      "name": "Parsi home cuisine patterns",
+      "pattern": "Mixed diet with distinctive sweets and seafood in coastal families",
+      "nutrition_tips": ["Balance festival sweets", "Seafood omega-3 opportunity"],
+      "medical": "General"
+    }
+  ],
+  "customary_community_foodways": [
+    {
+      "id": "self_id_only",
+      "note": "Users may optionally self-describe community foodway. System never infers caste from name/location.",
+      "examples_educational": [
+        {
+          "id": "traditional_vegetarian_household",
+          "label": "Traditional lacto-vegetarian household pattern",
+          "staples": ["roti/rice", "dal", "sabzi", "dahi", "ghee measured"],
+          "gaps_to_watch": ["B12 if little dairy", "iron with tea at meals"]
+        },
+        {
+          "id": "coastal_fish_rice",
+          "label": "Coastal fish–rice customary pattern",
+          "staples": ["rice", "fish", "coconut", "greens"],
+          "gaps_to_watch": ["fried fish frequency", "salt"]
+        },
+        {
+          "id": "millet_pulse_arid",
+          "label": "Arid-zone millet–pulse pattern",
+          "staples": ["bajra/jowar", "pulses", "buttermilk", "seasonal veg"],
+          "gaps_to_watch": ["drought year micronutrients", "water"]
+        },
+        {
+          "id": "northeast_rice_ferment",
+          "label": "Northeast rice + fermented sides pattern",
+          "staples": ["rice", "fermented soy/bamboo", "greens", "regional meats"],
+          "gaps_to_watch": ["sodium", "smoke-cured excess"]
+        }
+      ]
+    }
+  ],
+  "genz_patterns": [
+    {
+      "id": "genz_high_protein",
+      "name": "GenZ high-protein / gym diet",
+      "traits": ["whey", "egg", "chicken", "paneer", "skip oil"],
+      "balance": ["Add fibre vegetables", "Not all calories from protein powder"],
+      "risks": ["Under-eating fat-soluble vitamins", "Supplement quality"]
+    },
+    {
+      "id": "genz_vegan_urban",
+      "name": "GenZ urban vegan",
+      "traits": ["plant milk", "mock meats", "smoothie bowls"],
+      "balance": ["B12 mandatory", "Iron + C pairing", "Calcium plan"],
+      "risks": ["Ultra-processed vegan junk"]
+    },
+    {
+      "id": "genz_intermittent_fasting",
+      "name": "GenZ intermittent fasting",
+      "traits": ["16:8", "skip breakfast"],
+      "balance": ["Nutrient density in eating window"],
+      "risks": ["Contraindicated in pregnancy, ED, some diabetes — medical advice"]
+    },
+    {
+      "id": "genz_cloud_kitchen",
+      "name": "GenZ delivery / cloud kitchen default",
+      "traits": ["biryani", "fried", "sweet beverages"],
+      "balance": ["Home dal-chawal anchor meals", "Water over soda"],
+      "risks": ["Sodium", "calorie surplus", "low fibre"]
+    },
+    {
+      "id": "genz_ayurveda_aesthetic",
+      "name": "GenZ Ayurveda-aesthetic (social media)",
+      "traits": ["haldi latte", "ashwagandha gummies"],
+      "balance": ["Food first", "Herb supplements ≠ diagnosed treatment"],
+      "risks": ["Herb–drug interactions", "heavy-metal contaminated products"]
+    },
+    {
+      "id": "genz_sustainable_millet",
+      "name": "GenZ millet / climate plate",
+      "traits": ["ragi", "foxtail", "local greens"],
+      "balance": ["Good direction; cook for digestibility"],
+      "risks": ["Low if diverse"]
+    }
+  ],
+  "medical_diet_branches": [
+    {"id":"diabetes_friendly","name":"Diabetes-aware pattern","rules":["Consistent carb distribution","Prefer whole grains/millets","Pair carb with protein/fibre","Limit sugary beverages"],"escalate":"Physician/dietitian for meds + targets"},
+    {"id":"hypertension_dash_like","name":"Blood-pressure-aware","rules":["Reduce packaged salt","Increase vegetables","Limit pickles/papad excess"],"escalate":"Clinician if on antihypertensives"},
+    {"id":"lipid_aware","name":"Lipid-aware","rules":["Measured ghee/oil","Prefer fish/legume protein","Fibre"],"escalate":"Lipid panel guided"},
+    {"id":"thyroid_supportive","name":"Thyroid-supportive general","rules":["Iodised salt where appropriate","Selenium-diverse foods","Avoid extreme raw-cruciferous-only myths"],"escalate":"Endocrine care for hormones"},
+    {"id":"anemia_iron","name":"Iron-conscious","rules":["Heme iron if non-veg accepted","Dal+green+C food","Tea/coffee away from iron meals"],"escalate":"Lab-confirmed anemia treatment"},
+    {"id":"pcos_pattern","name":"PCOS-supportive general","rules":["Glycemic moderation","Adequate protein","No extreme crash diets"],"escalate":"Gyne/endocrine"},
+    {"id":"geriatric","name":"Older adult","rules":["Protein at each meal","Calcium vitamin D", "Texture for dentition","Hydration"],"escalate":"Geriatric review"},
+    {"id":"pediatric_general","name":"Child/adolescent general","rules":["Growth energy","Limit SSBs","Family meals"],"escalate":"Pediatrician; calculator adult formulas not for toddlers"},
+    {"id":"renal_alert","name":"Kidney caution","rules":["Do not high-protein default","Potassium/phosphorus need specialist"],"escalate":"Renal dietitian mandatory"},
+    {"id":"pregnancy_lactation","name":"Pregnancy / lactation","rules":["Food safety","Folate iron calcium", "No alcohol"],"escalate":"Obstetric + prenatal vitamins"}
+  ]
+}

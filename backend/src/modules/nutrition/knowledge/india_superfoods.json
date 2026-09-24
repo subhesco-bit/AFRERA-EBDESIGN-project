@@ -1,0 +1,30 @@
+{
+  "version": "2026.09.superfoods-v1",
+  "disclaimer": "Educational nutrient density notes — not miracle cures. Medical conditions require clinicians.",
+  "superfoods": [
+    {"id":"moringa","name":"Moringa (drumstick leaf)","regions":["pan_india","south","central"],"nutrients":["vitamin_a","calcium","iron","protein"],"evidence":"moderate","uses":["leaf powder in dal","sabzi"],"medical_notes":"Nutrient-dense green; not a drug substitute"},
+    {"id":"amla","name":"Amla (Indian gooseberry)","regions":["pan_india"],"nutrients":["vitamin_c","polyphenols"],"evidence":"moderate","uses":["fresh","murabba","juice dilute"],"medical_notes":"High vitamin C; dental enamel caution with frequent acid contact"},
+    {"id":"turmeric","name":"Haldi (turmeric)","regions":["pan_india"],"nutrients":["curcuminoids"],"evidence":"limited_to_moderate","uses":["cooking","haldi doodh"],"medical_notes":"Culinary doses; high-dose supplements interact with drugs — clinician"},
+    {"id":"ragi","name":"Ragi (finger millet)","regions":["karnataka","tamil_nadu","andhra","hills"],"nutrients":["calcium","fibre","complex_carb"],"evidence":"moderate","uses":["ragi mudde","roti","malt"],"medical_notes":"Useful calcium-rich grain for many traditional diets"},
+    {"id":"jowar","name":"Jowar (sorghum)","regions":["maharashtra","karnataka","rajasthan","telangana"],"nutrients":["fibre","protein","iron"],"evidence":"moderate","uses":["bhakri","roti"],"medical_notes":"Gluten-free whole grain option"},
+    {"id":"bajra","name":"Bajra (pearl millet)","regions":["rajasthan","gujarat","haryana"],"nutrients":["iron","fibre","energy"],"evidence":"moderate","uses":["winter roti"],"medical_notes":"Traditional winter grain; portion for glycemic goals"},
+    {"id":"flax_alsi","name":"Alsi (flaxseed)","regions":["north","central"],"nutrients":["ala_omega3","fibre","lignans"],"evidence":"moderate","uses":["ground on curd","ladoo"],"medical_notes":"Grind fresh; not a fish-oil equivalent dose"},
+    {"id":"sesame","name":"Til (sesame)","regions":["pan_india"],"nutrients":["calcium","healthy_fats"],"evidence":"moderate","uses":["til ladoo","tempering"],"medical_notes":"Energy dense — portion control"},
+    {"id":"jackfruit","name":"Kathal / jackfruit","regions":["south","east","northeast","konkan"],"nutrients":["fibre","potassium","plant_meat_texture"],"evidence":"moderate","uses":["young jackfruit curry","chips limited"],"medical_notes":"Unripe as savoury; ripe high sugar"},
+    {"id":"banana_stem","name":"Banana stem / flower","regions":["south","east"],"nutrients":["fibre","potassium"],"evidence":"limited","uses":["poriyal","thoran"],"medical_notes":"Traditional fibre vegetable"},
+    {"id":"curry_leaf","name":"Karipatta","regions":["south"],"nutrients":["micronutrients","aroma"],"evidence":"limited","uses":["tempering","podi"],"medical_notes":"Culinary herb"},
+    {"id":"methi","name":"Methi (fenugreek)","regions":["pan_india"],"nutrients":["fibre","bitter_principles"],"evidence":"limited","uses":["sabzi","sprouts","seeds soaked"],"medical_notes":"May affect glucose — monitor if on diabetes meds"},
+    {"id":"bitter_gourd","name":"Karela","regions":["pan_india"],"nutrients":["fibre","bioactives"],"evidence":"limited","uses":["sabzi","juice caution"],"medical_notes":"Hypoglycemia risk with meds; not insulin replacement"},
+    {"id":"spinach_palak","name":"Palak / local greens","regions":["pan_india"],"nutrients":["iron","folate","vitamin_k"],"evidence":"strong","uses":["saag","dal"],"medical_notes":"Iron non-heme; pair with vitamin C foods"},
+    {"id":"curd_probiotic","name":"Dahi / curd","regions":["pan_india"],"nutrients":["protein","calcium","live_cultures"],"evidence":"moderate","uses":["raita","chaas"],"medical_notes":"Lactose sensitivity varies"},
+    {"id":"ghee_measured","name":"Ghee (measured)","regions":["pan_india"],"nutrients":["fat_soluble_carrier"],"evidence":"contextual","uses":["tempering","roti smear thin"],"medical_notes":"Traditional; calorie-dense — clinical lipid goals may limit"},
+    {"id":"coconut","name":"Coconut (fresh/oil regional)","regions":["south","coastal","northeast"],"nutrients":["mct_context","minerals"],"evidence":"contextual","uses":["chutney","oil tempering"],"medical_notes":"Portion for energy density"},
+    {"id":"fish_small_oil","name":"Small oily fish (regional)","regions":["coastal","bengal","kerala","goa"],"nutrients":["omega3","protein","calcium_with_bones"],"evidence":"strong","uses":["curry","fry limited"],"medical_notes":"Food safety; pregnancy mercury — prefer small fish guidance"},
+    {"id":"soy_fermented_ne","name":"Fermented soy / bamboo (NE)","regions":["northeast"],"nutrients":["protein","fermentation_metabolites"],"evidence":"limited","uses":["traditional sides"],"medical_notes":"Sodium awareness; hygiene of artisanal ferments"},
+    {"id":"horse_gram","name":"Kulthi / horse gram","regions":["hills","south","central"],"nutrients":["protein","iron"],"evidence":"limited","uses":["rasam","sprouts"],"medical_notes":"Traditional pulse; cook well"},
+    {"id":"foxnut","name":"Makhana","regions":["bihar","east","pan_retail"],"nutrients":["protein","low_fat_snack"],"evidence":"limited","uses":["roasted snack","kheer"],"medical_notes":"Better than many fried snacks if plain roasted"},
+    {"id":"sattu","name":"Sattu (roasted gram flour)","regions":["bihar","up","jharkhand"],"nutrients":["protein","fibre","cooling_folk"],"evidence":"moderate","uses":["sattu sharbat","paratha"],"medical_notes":"Useful portable protein-carb"},
+    {"id":"jamun","name":"Jamun","regions":["pan_india_seasonal"],"nutrients":["polyphenols","fibre"],"evidence":"limited","uses":["fresh fruit"],"medical_notes":"Seasonal; glycemic folklore not a drug"},
+    {"id":"bel_bael","name":"Bael","regions":["north","central","east"],"nutrients":["fibre","traditional_digestive"],"evidence":"traditional_only","uses":["sherbet"],"medical_notes":"Folk digestive; hygiene of street sherbets"}
+  ]
+}
