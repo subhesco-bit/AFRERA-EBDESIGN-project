@@ -11,6 +11,7 @@ const micro = require('../modules/agro/DeepMicrobiomeAI');
 const multi = require('../modules/agro/AgroMultiAIOrchestra');
 const gaps = require('../modules/agro/AgroGapAnalysisInternational');
 const biochar = require('../modules/agro/BiocharEngine');
+const agroEnhanced = require('../modules/agro/AgroEnhancedOperate');
 
 const router = express.Router();
 
@@ -18,11 +19,20 @@ router.get('/health', (_req, res) => {
   res.json({
     ok: true,
     module: 'agro-farming',
-    systems: Object.keys(farming.SYSTEMS),
-    organic_schemes: Object.keys(cert.SCHEMES),
-    microbiome_guilds: micro.FUNCTIONAL_GUILDS.length,
-    biochar_charging_methods: biochar.CHARGING_METHODS.length,
+    systems: Object.keys(farming.SYSTEMS || {}),
+    organic_schemes: Object.keys(cert.SCHEMES || {}),
+    microbiome_guilds: (micro.FUNCTIONAL_GUILDS || []).length,
+    biochar_charging_methods: (biochar.CHARGING_METHODS || []).length,
+    enhanced: true,
   });
+});
+
+router.post('/enhanced', (req, res) => {
+  try {
+    res.json({ success: true, data: agroEnhanced.runAgroEnhanced(req.body || {}) });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message });
+  }
 });
 
 router.get('/systems', (_req, res) => {
@@ -77,7 +87,6 @@ router.post('/organic/certification', (req, res) => {
   }
 });
 
-/** Biochar benefits + charging */
 router.get('/biochar/methods', (_req, res) => {
   res.json({
     success: true,
@@ -94,7 +103,7 @@ router.post('/biochar/conference', (req, res) => {
   try {
     res.json({ success: true, data: biochar.runBiocharConference(req.body || {}) });
   } catch (e) {
-    res.status(400).json({ success: false, error: e.message, disclaimer: biochar.BIOCHAR_DISCLAIMER });
+    res.status(400).json({ success: false, error: e.message });
   }
 });
 
@@ -106,7 +115,6 @@ router.post('/biochar/charging/recommend', (req, res) => {
         recommendation: biochar.recommendCharging(req.body || {}),
         suitability: biochar.assessSuitability(req.body || {}),
       },
-      disclaimer: biochar.BIOCHAR_DISCLAIMER,
     });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });

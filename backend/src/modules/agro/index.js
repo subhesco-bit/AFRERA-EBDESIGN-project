@@ -10,6 +10,7 @@ const micro = require('./DeepMicrobiomeAI');
 const multi = require('./AgroMultiAIOrchestra');
 const gaps = require('./AgroGapAnalysisInternational');
 const biochar = require('./BiocharEngine');
+const enhanced = require('./AgroEnhancedOperate');
 
 module.exports = {
   ...knowledge,
@@ -24,6 +25,7 @@ module.exports = {
   ...multi,
   ...gaps,
   ...biochar,
+  runAgroEnhanced: enhanced.runAgroEnhanced,
   runAgroConference: knowledge.runAgroConference,
   runCropDeepAnalysis: cropIntel.runCropDeepAnalysis,
   interpretMicrobiome: micro.interpretMicrobiome,
