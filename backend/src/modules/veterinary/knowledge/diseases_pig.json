@@ -1,90 +1,22 @@
 {
   "species": "pig",
-  "version": "2026.09",
+  "version": "2026.09.2",
   "diseases": [
-    {
-      "id": "asf",
-      "name": "African Swine Fever",
-      "notifiable": true,
-      "urgency": "emergency",
-      "isolation": true,
-      "key_signs": ["high fever", "skin reddening", "haemorrhages", "high mortality", "sudden deaths"],
-      "differential_hints": ["CSF", "erysipelas", "salmonellosis", "poisoning"],
-      "lab": ["official lab confirmation mandatory"],
-      "herd": "No treatment; strict biosecurity; report immediately",
-      "tags": ["infectious", "viral", "notifiable"]
-    },
-    {
-      "id": "csf",
-      "name": "Classical Swine Fever",
-      "notifiable": true,
-      "urgency": "emergency",
-      "isolation": true,
-      "key_signs": ["fever", "conjunctivitis", "diarrhea or constipation", "cyanosis", "high mortality young"],
-      "differential_hints": ["ASF", "PRRS-like", "salmonella"],
-      "lab": ["official lab"],
-      "herd": "Vaccination policy where permitted; biosecurity",
-      "tags": ["infectious", "viral", "notifiable"]
-    },
-    {
-      "id": "erysipelas",
-      "name": "Swine erysipelas",
-      "notifiable": false,
-      "urgency": "urgent",
-      "isolation": false,
-      "key_signs": ["diamond skin lesions", "fever", "arthritis chronic", "sudden death acute"],
-      "differential_hints": ["ASF", "CSF", "sunburn"],
-      "lab": ["culture if available"],
-      "herd": "Vaccination of breeding stock common",
-      "tags": ["infectious", "bacterial"]
-    },
-    {
-      "id": "neonatal_diarrhea_pig",
-      "name": "Neonatal / preweaning diarrhoea",
-      "notifiable": false,
-      "urgency": "urgent",
-      "isolation": true,
-      "key_signs": ["piglets", "watery diarrhea", "dehydration", "mortality"],
-      "differential_hints": ["E coli", "clostridia", "coccidia", "rotavirus", "TGE-like"],
-      "lab": ["faecal workup in outbreaks"],
-      "herd": "Farrowing hygiene, sow immunity, creep environment",
-      "tags": ["infectious", "neonatal"]
-    },
-    {
-      "id": "mma",
-      "name": "MMA syndrome (mastitis-metritis-agalactia)",
-      "notifiable": false,
-      "urgency": "urgent",
-      "isolation": false,
-      "key_signs": ["postpartum sow", "reduced milk", "fever", "inflamed udder", "hungry piglets"],
-      "differential_hints": ["primary agalactia", "nutrition"],
-      "lab": [],
-      "herd": "Farrowing management, body condition, hygiene",
-      "tags": ["reproduction", "production"]
-    },
-    {
-      "id": "poor_fcr",
-      "name": "Poor feed conversion / growth check",
-      "notifiable": false,
-      "urgency": "routine",
-      "isolation": false,
-      "key_signs": ["low ADG", "high FCR", "variable weights"],
-      "differential_hints": ["subclinical disease", "feed quality", "stocking density", "parasites"],
-      "lab": ["parasite check", "necropsy sample if chronic"],
-      "herd": "Nutrition, environment, health programme review",
-      "tags": ["management", "production"]
-    },
-    {
-      "id": "heat_stress_pig",
-      "name": "Heat stress (pig)",
-      "notifiable": false,
-      "urgency": "soon",
-      "isolation": false,
-      "key_signs": ["panting", "reduced feed", "open-mouth breathing", "higher mortality finishers"],
-      "differential_hints": ["pneumonia", "ASF early"],
-      "lab": [],
-      "herd": "Cooling, stocking, water, wet feeding strategies",
-      "tags": ["environmental"]
-    }
+    {"id":"asf","name":"African Swine Fever","notifiable":true,"urgency":"emergency","isolation":true,"key_signs":["high fever","skin reddening","haemorrhages","high mortality","sudden deaths"],"lab":["official lab mandatory"],"herd":"No treatment; biosecurity; report immediately","tags":["infectious","viral","notifiable"]},
+    {"id":"csf","name":"Classical Swine Fever","notifiable":true,"urgency":"emergency","isolation":true,"key_signs":["fever","conjunctivitis","diarrhea","cyanosis","high mortality young"],"lab":["official lab"],"herd":"Vaccination where permitted; biosecurity","tags":["infectious","viral","notifiable"]},
+    {"id":"erysipelas","name":"Swine erysipelas","notifiable":false,"urgency":"urgent","isolation":false,"key_signs":["diamond skin lesions","fever","arthritis","sudden death"],"lab":["culture"],"herd":"Vaccinate breeding stock","tags":["infectious","bacterial"]},
+    {"id":"prrs_like","name":"PRRS-like respiratory/reproductive syndrome","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["reproductive failure","abortion","pneumonia weaners","poor growth"],"lab":["lab confirmation"],"herd":"Biosecurity; gilt acclimation programmes","tags":["infectious","viral"]},
+    {"id":"salmonellosis_pig","name":"Salmonellosis","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["diarrhea","fever","septicaemia","young pigs"],"lab":["culture"],"herd":"Hygiene; feed; zoonotic caution","tags":["infectious","bacterial","zoonotic_risk"]},
+    {"id":"colibacillosis_pig","name":"Colibacillosis","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["neonatal diarrhea","edema disease weaners","sudden death"],"lab":["culture"],"herd":"Farrowing hygiene; sow immunity","tags":["infectious","bacterial","neonatal"]},
+    {"id":"neonatal_diarrhea_pig","name":"Neonatal / preweaning diarrhoea","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["piglets","watery diarrhea","dehydration","mortality"],"lab":["faecal outbreak workup"],"herd":"Hygiene; environment; immunity","tags":["infectious","neonatal"]},
+    {"id":"clostridial_pig","name":"Clostridial enteritis","notifiable":false,"urgency":"emergency","isolation":true,"key_signs":["bloody diarrhea neonates","sudden death"],"lab":["pathology"],"herd":"Sow vaccination; hygiene","tags":["infectious","clostridial","neonatal"]},
+    {"id":"mma","name":"MMA syndrome","notifiable":false,"urgency":"urgent","isolation":false,"key_signs":["postpartum sow","reduced milk","fever","inflamed udder","hungry piglets"],"lab":[],"herd":"Farrowing management; BCS","tags":["reproduction","production"]},
+    {"id":"swine_influenza","name":"Swine influenza","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["fever","cough","dyspnea","rapid spread"],"lab":["PCR"],"herd":"Air quality; density; zoonotic caution","tags":["infectious","viral","zoonotic_risk"]},
+    {"id":"pcv_ad","name":"PCV-associated disease (suspect)","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["wasting","poor growth","lymphadenopathy","respiratory"],"lab":["lab support"],"herd":"Vaccination programmes common","tags":["infectious","viral"]},
+    {"id":"iron_deficiency","name":"Iron deficiency anaemia (piglets)","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["pale piglets","poor growth","indoor systems"],"lab":[],"herd":"Iron protocols under vet guidance","tags":["metabolic","neonatal","management"]},
+    {"id":"poor_fcr","name":"Poor FCR / growth check","notifiable":false,"urgency":"routine","isolation":false,"key_signs":["low ADG","high FCR","variable weights"],"lab":["parasite check"],"herd":"Nutrition; density; subclinical disease","tags":["management","production"]},
+    {"id":"heat_stress_pig","name":"Heat stress (pig)","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["panting","reduced feed","open-mouth","finisher mortality"],"lab":[],"herd":"Cooling; water; stocking","tags":["environmental"]},
+    {"id":"farrowing_complications","name":"Farrowing complications","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["prolonged farrowing","dystocia","stillbirths","exhausted sow"],"lab":[],"herd":"Obstetric intervention by competent person/vet","tags":["reproduction","emergency"]},
+    {"id":"tail_biting","name":"Tail biting / vice behaviour","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["tail injuries","restlessness","overcrowding"],"lab":[],"herd":"Enrichment; density; climate; health","tags":["management","welfare"]}
   ]
 }
