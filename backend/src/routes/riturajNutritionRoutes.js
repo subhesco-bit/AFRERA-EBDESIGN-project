@@ -1,5 +1,5 @@
 /**
- * Rituraj Nutrition routes — auto-mounted at /api/v1/rituraj-nutrition
+ * Rituraj Nutrition + Diet Culture routes — /api/v1/rituraj-nutrition
  */
 
 const express = require('express');
@@ -25,6 +25,11 @@ router.get('/health', (_req, res) => {
       'natural_therapy',
       'master_chef_plate',
       'geo_local_foods',
+      'india_superfoods',
+      'religious_calendars',
+      'customary_foodways',
+      'genz_diets',
+      'medical_diet_branches',
       'multi_seat_conference',
     ],
     benchmark: 'veterinary_panel_equivalent_or_higher',
@@ -36,18 +41,44 @@ router.get('/ritus', (_req, res) => {
 });
 
 router.get('/natural-therapies', (_req, res) => {
-  res.json({
-    success: true,
-    data: nutri.NATURAL_THERAPIES,
-    disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
-  });
+  res.json({ success: true, data: nutri.NATURAL_THERAPIES, disclaimer: NUTRITION_WELLNESS_DISCLAIMER });
 });
 
 router.get('/geo-regions', (_req, res) => {
   res.json({ success: true, data: nutri.GEO_FOODS });
 });
 
-/** Pure calculator */
+router.get('/superfoods', (req, res) => {
+  res.json({
+    success: true,
+    data: nutri.filterSuperfoods({ region: req.query.region, query: req.query.q }),
+    disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+  });
+});
+
+router.get('/religious-calendars', (req, res) => {
+  const t = req.query.tradition || req.query.q || '';
+  res.json({
+    success: true,
+    data: t ? nutri.resolveReligiousCalendar(t) : nutri.resolveReligiousCalendar(''),
+    ethics: nutri.ethics,
+    disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+  });
+});
+
+router.get('/genz-patterns', (_req, res) => {
+  const pack = require('../modules/nutrition/knowledge/religious_customary_genz.json');
+  res.json({ success: true, data: pack.genz_patterns, disclaimer: NUTRITION_WELLNESS_DISCLAIMER });
+});
+
+router.get('/medical-branches', (_req, res) => {
+  res.json({
+    success: true,
+    data: nutri.listMedicalBranches(),
+    disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+  });
+});
+
 router.post('/calculate', (req, res) => {
   try {
     const data = nutri.calculateNutrition(req.body?.profile || req.body || {});
@@ -57,7 +88,6 @@ router.post('/calculate', (req, res) => {
   }
 });
 
-/** Full multi-seat conference */
 router.post('/conference', (req, res) => {
   try {
     const data = nutri.runNutritionConference(req.body || {});
@@ -67,7 +97,6 @@ router.post('/conference', (req, res) => {
   }
 });
 
-/** Chef plate only (requires calculator fields or nested profile) */
 router.post('/chef-plate', (req, res) => {
   try {
     const profile = req.body?.profile || req.body || {};
@@ -82,6 +111,14 @@ router.post('/chef-plate', (req, res) => {
       cuisine_pref: profile.cuisine_pref,
     });
     res.json({ success: true, data: { calculator: calc, plate }, disclaimer: NUTRITION_WELLNESS_DISCLAIMER });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message });
+  }
+});
+
+router.post('/culture-seat', (req, res) => {
+  try {
+    res.json({ success: true, data: nutri.buildCultureSeat(req.body || {}), disclaimer: NUTRITION_WELLNESS_DISCLAIMER });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
