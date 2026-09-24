@@ -1,6 +1,6 @@
 /**
  * VeterinarySpecialistPanel — Grok-tier multi-specialist case conference
- * Integrates HerdRiskScoring v2 and exposes hooks for One Health staging.
+ * Species: cow, pig, goat, poultry, sheep
  */
 
 const { randomUUID } = require('crypto');
@@ -16,12 +16,13 @@ const {
   VETERINARY_ETHNOVET_NOTE,
 } = require('../../../utils/disclaimers');
 
-const SUPPORTED = new Set(['cow', 'pig', 'goat', 'poultry']);
+const SUPPORTED = new Set(['cow', 'pig', 'goat', 'poultry', 'sheep']);
 
 const NORMS = {
   cow: { tempMin: 38.0, tempMax: 39.3, fever: 39.5, critical: 40.5, hrMin: 40, hrMax: 80, rrMin: 10, rrMax: 30 },
   pig: { tempMin: 38.5, tempMax: 40.0, fever: 40.2, critical: 41.0, hrMin: 60, hrMax: 100, rrMin: 10, rrMax: 30 },
   goat: { tempMin: 38.5, tempMax: 40.5, fever: 40.6, critical: 41.5, hrMin: 70, hrMax: 90, rrMin: 12, rrMax: 30 },
+  sheep: { tempMin: 38.5, tempMax: 40.0, fever: 40.5, critical: 41.5, hrMin: 60, hrMax: 90, rrMin: 12, rrMax: 30 },
   poultry: { tempMin: 40.5, tempMax: 42.0, fever: 42.5, critical: 43.5, hrMin: 250, hrMax: 300, rrMin: 15, rrMax: 30 },
 };
 
@@ -42,6 +43,11 @@ const VAX_CALENDARS = {
     { id: 'et', name: 'Enterotoxaemia', interval_days: 180, notes: 'Diet-change risk periods' },
     { id: 'fmd_goat', name: 'FMD', interval_days: 180, notes: 'Regional programmes' },
   ],
+  sheep: [
+    { id: 'ppr_sheep', name: 'PPR', interval_days: 365, notes: 'Endemic zones' },
+    { id: 'et_sheep', name: 'Enterotoxaemia', interval_days: 180, notes: 'Diet-change risk' },
+    { id: 'sheep_pox', name: 'Sheep pox', interval_days: 365, notes: 'Where indicated' },
+  ],
   poultry: [
     { id: 'marek', name: "Marek's disease", interval_days: null, notes: 'Hatchery / day-old' },
     { id: 'nd', name: 'Newcastle Disease', interval_days: 60, notes: 'Programme-dependent boosters' },
@@ -57,6 +63,7 @@ function normaliseSpecies(species) {
   if (['chicken', 'hen', 'broiler', 'layer', 'cock', 'bird'].includes(s)) return 'poultry';
   if (['swine', 'hog', 'boar', 'sow'].includes(s)) return 'pig';
   if (['caprine', 'doe', 'buck'].includes(s)) return 'goat';
+  if (['ovine', 'lamb', 'ewe', 'ram'].includes(s)) return 'sheep';
   return s;
 }
 
@@ -170,12 +177,12 @@ function scoreDisease(disease, caseInput, vitals) {
     }
   }
   if (stage.includes('pregnant') || stage.includes('gestat')) {
-    if (['pregnancy_toxaemia_goat', 'milk_fever'].includes(disease.id)) {
+    if (['pregnancy_toxaemia_goat', 'pregnancy_toxaemia_sheep', 'milk_fever'].includes(disease.id)) {
       confidence = Math.min(0.95, confidence + 0.08);
       supporting.push('late production / pregnancy context');
     }
   }
-  if (/calf|piglet|kid|chick/.test(stage) && (disease.tags || []).includes('neonatal')) {
+  if (/calf|piglet|kid|chick|lamb/.test(stage) && (disease.tags || []).includes('neonatal')) {
     confidence = Math.min(0.95, confidence + 0.1);
     supporting.push('neonatal / young stock stage');
   }
@@ -308,7 +315,7 @@ function buildTreatmentOptions(species, differentials) {
 function runConference(caseInput = {}) {
   const species = normaliseSpecies(caseInput.species);
   if (!SUPPORTED.has(species)) {
-    throw new Error(`Unsupported species: ${caseInput.species}. Supported: cow, pig, goat, poultry`);
+    throw new Error(`Unsupported species: ${caseInput.species}. Supported: cow, pig, goat, poultry, sheep`);
   }
   const vitals = interpretVitals(species, caseInput.clinical || {});
   const differentials = rankDifferentials(species, caseInput, vitals);
