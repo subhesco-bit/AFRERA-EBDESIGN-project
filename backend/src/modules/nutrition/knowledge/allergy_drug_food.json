@@ -1,0 +1,28 @@
+{
+  "version": "2026.09.allergy-v1",
+  "allergens": [
+    {"id":"milk","label":"Milk / dairy","cross":["casein","whey"],"label_watch":["milk","curd","ghee clarified may be tolerated variably","paneer","butter"]},
+    {"id":"egg","label":"Egg","cross":[],"label_watch":["egg","mayonnaise","bakery"]},
+    {"id":"peanut","label":"Peanut","cross":["legume_context"],"label_watch":["groundnut","peanut oil refined often tolerated debate — clinician"]},
+    {"id":"tree_nut","label":"Tree nuts","cross":[],"label_watch":["almond","cashew","walnut","pista"]},
+    {"id":"wheat_gluten","label":"Wheat / gluten","cross":["barley","rye"],"label_watch":["atta","maida","sooji","wheat"]},
+    {"id":"soy","label":"Soy","cross":[],"label_watch":["soya","tofu","soy lecithin"]},
+    {"id":"fish","label":"Fish","cross":[],"label_watch":["fish sauce","seafood"]},
+    {"id":"shellfish","label":"Shellfish","cross":[],"label_watch":["prawn","shrimp","crab"]},
+    {"id":"sesame","label":"Sesame","cross":[],"label_watch":["til","tahini"]},
+    {"id":"mustard","label":"Mustard","cross":[],"label_watch":["rai","sarson","mustard oil"]}
+  ],
+  "intolerances": [
+    {"id":"lactose","label":"Lactose intolerance","strategy":"Curd/cheese aged sometimes better; lactose-free milk; calcium plan"},
+    {"id":"fodmap_sensitive","label":"FODMAP sensitivity / IBS pattern","strategy":"Clinician-guided low-FODMAP trial — not permanent ultra-restriction"},
+    {"id":"histamine_sensitive","label":"Histamine sensitivity folklore","strategy":"Limit aged/fermented if triggered; medical evaluation for true disorders"}
+  ],
+  "drug_food_flags": [
+    {"id":"warfarin_vitamin_k","drugs":["warfarin"],"foods":["spinach","sarson saag","methi leaves large"],"note":"Consistent vitamin K intake; do not crash greens suddenly — clinician/INR"},
+    {"id":"maoi_tyramine","drugs":["maoi"],"foods":["aged cheese","fermented"],"note":"Tyramine restriction classic — psychiatrist protocol"},
+    {"id":"statin_grapefruit","drugs":["some_statins"],"foods":["grapefruit"],"note":"Interaction potential — pharmacist check"},
+    {"id":"thyroxine_timing","drugs":["levothyroxine"],"foods":["soy","calcium","iron supplements","coffee"],"note":"Separate from dose by hours per clinician advice"},
+    {"id":"diabetes_alcohol","drugs":["insulin","sulfonylurea"],"foods":["alcohol"],"note":"Hypoglycemia risk — medical advice"},
+    {"id":"methotrexate_folate","drugs":["methotrexate"],"foods":["high_folate_supplements_unsupervised"],"note":"Do not self-adjust folate — rheumatology/oncology protocol"}
+  ]
+}

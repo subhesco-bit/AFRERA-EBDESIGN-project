@@ -1,0 +1,14 @@
+{
+  "species": "sheep",
+  "version": "2026.09.1",
+  "diseases": [
+    {"id":"ppr_sheep","name":"PPR (sheep)","notifiable":true,"urgency":"emergency","isolation":true,"key_signs":["fever","discharge","diarrhea","erosions","high mortality"],"lab":["official confirmation"],"herd":"Vaccination; movement control","tags":["infectious","viral","notifiable"]},
+    {"id":"sheep_pox","name":"Sheep pox","notifiable":true,"urgency":"urgent","isolation":true,"key_signs":["skin nodules","fever","respiratory"],"lab":["lab support"],"herd":"Vaccination regional","tags":["infectious","viral","notifiable"]},
+    {"id":"enterotoxaemia_sheep","name":"Enterotoxaemia","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["sudden death","convulsions","grain overload"],"lab":[],"herd":"Vaccination; diet change gradual","tags":["clostridial"]},
+    {"id":"haemonchosis_sheep","name":"Haemonchosis","notifiable":false,"urgency":"urgent","isolation":false,"key_signs":["anaemia","bottle jaw","weakness"],"lab":["FAMACHA","FEC"],"herd":"Strategic deworming; resistance","tags":["parasitic"]},
+    {"id":"footrot_sheep","name":"Footrot","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["lameness","hoof smell","interdigital"],"lab":[],"herd":"Footbaths; trim; hygiene","tags":["bacterial","management"]},
+    {"id":"pregnancy_toxaemia_sheep","name":"Pregnancy toxaemia","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["late pregnancy","twins","neuro","anorexia"],"lab":["ketones"],"herd":"Late gestation energy","tags":["metabolic","reproduction"]},
+    {"id":"orf_sheep","name":"Orf","notifiable":false,"urgency":"soon","isolation":true,"key_signs":["lip lesions","lambs","teat lesions ewes"],"lab":[],"herd":"Zoonotic caution","tags":["viral","zoonotic_risk"]},
+    {"id":"fluke_sheep","name":"Liver fluke (suspect)","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["anaemia","bottle jaw","wet pasture"],"lab":["faecal","ELISA"],"herd":"Snail habitat; strategic flukicide under vet","tags":["parasitic"]}
+  ]
+}
