@@ -5,6 +5,11 @@
  */
 
 const { randomUUID } = require('crypto');
+// Project-wide evidence/provenance standard (see .ai/decisions/0003-evidence-provenance-standard.md).
+// This engine backs the shared /enhanced endpoint for vet, nutrition and agro
+// (via AgroEnhancedOperate.js et al.), so tagging confidence honestly here
+// covers all three modules in one place instead of three separate retrofits.
+const { calculatedSourced, unavailable } = require('../../utils/evidence');
 
 /** Fuse multiple confidence signals (0-1) with optional weights */
 function fuseConfidence(signals = []) {
@@ -109,10 +114,19 @@ function buildDecisionPackage(input = {}) {
     vision_severity: input.vision_severity,
   });
 
+  const confidenceProvenance = signals.length === 0
+    ? unavailable('No confidence signals were supplied — this is the engine\'s default-low fallback, not a measurement.')
+    : calculatedSourced(
+        signals.map((s) => s.source || 'unlabeled').join(', '),
+        true,
+        'weighted mean of confidence_signals (value*weight / total weight), flagged as disagreement when spread > 0.35',
+      );
+
   const pkg = {
     decision_id: randomUUID(),
     action: input.action || escalation.band.toUpperCase(),
     confidence: fused,
+    provenance: { confidence: confidenceProvenance },
     escalation,
     rationale: input.rationale || input.summary || 'See module lenses',
     summary: input.summary,

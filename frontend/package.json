@@ -19,6 +19,9 @@
     "cap:open:android": "cap open android",
     "cap:build:android": "vite build && cap sync android && cd android && gradlew.bat assembleDebug"
   },
+  "overrides": {
+    "uuid": "^11.1.1"
+  },
   "dependencies": {
     "@capacitor/android": "^8.5.1",
     "@capacitor/cli": "^8.5.1",

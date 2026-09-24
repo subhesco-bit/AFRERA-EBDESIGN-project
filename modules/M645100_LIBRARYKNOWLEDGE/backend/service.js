@@ -14,6 +14,36 @@ const crypto = require('crypto');
 const MODULE_ID = 'M645100_LIBRARYKNOWLEDGE';
 const MODULE_NAME = 'Library Knowledge';
 
+// Files above this size are indexed by metadata only — never buffered
+// whole into memory. _EBDESIGN_LIBRARY carries multi-hundred-MB CSV/JSON
+// index dumps (up to ~375MB); reading those fully twice per boot (once
+// for a content preview, once again to hash) is what was exhausting the
+// V8 heap and crashing the server before it ever reached the routes.
+const MAX_PREVIEW_READ_BYTES = 2 * 1024 * 1024; // 2MB
+const PREVIEW_CHARS = 12000;
+
+function streamHashSync(filePath) {
+  // crypto has no readFileSync-free sync streaming hash API, so hash in
+  // fixed-size chunks via a file descriptor instead of loading the file
+  // whole into a Buffer/string.
+  const fd = fs.openSync(filePath, 'r');
+  try {
+    const hash = crypto.createHash('sha256');
+    const chunkSize = 1024 * 1024; // 1MB
+    const buffer = Buffer.alloc(chunkSize);
+    let bytesRead = 0;
+    let totalRead = 0;
+    // eslint-disable-next-line no-cond-assign
+    while ((bytesRead = fs.readSync(fd, buffer, 0, chunkSize, null)) > 0) {
+      hash.update(bytesRead === chunkSize ? buffer : buffer.subarray(0, bytesRead));
+      totalRead += bytesRead;
+    }
+    return { hash: hash.digest('hex'), size: totalRead };
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
 function optionalDatabase() {
   try {
     return require('../../../backend/src/database/connection').getPostgreSQL();
@@ -67,13 +97,36 @@ function parseCsvHeaderLine(line) {
 }
 
 function readCsvHeader(filePath) {
-  const content = stripBom(fs.readFileSync(filePath, 'utf8'));
-  const rows = content.split(/\r?\n/).filter(Boolean);
-  const [header = ''] = rows;
+  // Read only the first line plus a bounded chunk for the row estimate —
+  // some catalogue CSVs in this library run to hundreds of MB, and a
+  // header line never needs more than the first few KB.
+  const fd = fs.openSync(filePath, 'r');
+  let header = '';
+  let sizeSampled = 0;
+  try {
+    const sampleSize = 65536; // 64KB is far more than any real header line
+    const buffer = Buffer.alloc(sampleSize);
+    const bytesRead = fs.readSync(fd, buffer, 0, sampleSize, 0);
+    sizeSampled = bytesRead;
+    const sample = stripBom(buffer.subarray(0, bytesRead).toString('utf8'));
+    const [firstLine = ''] = sample.split(/\r?\n/);
+    header = firstLine;
+  } finally {
+    fs.closeSync(fd);
+  }
+
+  const stat = safeStat(filePath);
+  // Row count is an estimate from the sampled bytes' average line length,
+  // not an exact count — exact counts would require reading the whole file.
+  const sampleLines = sizeSampled > 0 ? Math.max(sizeSampled / Math.max(header.length + 1, 1), 1) : 0;
+  const estimatedRowCount = stat && sizeSampled > 0 ?
+    Math.max(Math.round((stat.size / sizeSampled) * sampleLines) - 1, 0) :
+    0;
 
   return {
     columns: parseCsvHeaderLine(header),
-    rowCount: Math.max(rows.length - 1, 0)
+    rowCount: estimatedRowCount,
+    rowCountEstimated: true
   };
 }
 
@@ -150,17 +203,22 @@ class LibraryKnowledgeService {
 
         const extension = path.extname(entry.name).toLowerCase();
         const stat = safeStat(filePath);
+        const fileSize = stat ? stat.size : 0;
         const data = {
           name: entry.name,
           relativePath,
           extension,
-          fileSize: stat ? stat.size : 0
+          fileSize
         };
 
-        if (['.json', '.jsonl'].includes(extension)) {
+        // Large files (this library holds CSV/JSON index dumps up to
+        // ~375MB) are recorded as metadata only — no content is read.
+        if (fileSize > MAX_PREVIEW_READ_BYTES) {
+          data.contentSkipped = 'file_too_large_for_preview';
+        } else if (['.json', '.jsonl'].includes(extension)) {
           Object.assign(data, readJson(filePath));
         } else if (['.md', '.txt', '.csv', '.yaml', '.yml', '.xml'].includes(extension)) {
-          data.content = fs.readFileSync(filePath, 'utf8').slice(0, 12000);
+          data.content = fs.readFileSync(filePath, 'utf8').slice(0, PREVIEW_CHARS);
         }
 
         this.indexFile(key, 'library-file', filePath, data);
@@ -303,12 +361,12 @@ class LibraryKnowledgeService {
     for (const [key, item] of this.index) {
       const stat = safeStat(item.path);
       if (!stat || !stat.isFile()) continue;
-      const content = fs.readFileSync(item.path);
+      const { hash, size } = streamHashSync(item.path);
       this.contentHashes.set(key, {
         key,
-        hash: crypto.createHash('sha256').update(content).digest('hex'),
+        hash,
         path: item.path,
-        size: content.length,
+        size,
         computedAt: new Date().toISOString()
       });
     }

@@ -4,10 +4,21 @@
 
 'use strict';
 
-const express = require('express');
+// modules/ sits outside backend/'s node_modules resolution tree, so a bare
+// require('express') can't resolve from here (unlike backend/src/*, which
+// this file already reaches via the explicit relative path below) — pull it
+// from backend/node_modules directly, the same way the codebase already
+// crosses this boundary for backend/src/utils/logger two lines down.
+const express = require('../../../backend/node_modules/express');
 const router = express.Router();
 const service = require('./service');
 const { logger } = require('../../../backend/src/utils/logger');
+// M052 (crop_diseases) is a per-user diagnosis log, not a shared reference
+// catalog (its schema is {user_id, data jsonb, status} with a FK to users) —
+// this is the real, working connection point between the two systems:
+// record a diagnosis to the user's history, don't read it as knowledge.
+const cropDiseaseLog = require('../../../backend/src/modules/M052/service');
+const { logToUserHistory } = require('../../../backend/src/utils/historyLog');
 const { randomUUID } = require('crypto');
 
 function ok(res, payload) {
@@ -87,7 +98,25 @@ router.post('/identify', async (req, res) => {
       data: req.body,
       provider: req.body.provider,
     });
-    ok(res, result);
+
+    // Log this diagnosis to the requesting user's crop_diseases history.
+    // No auth middleware is mounted on this router, so a user_id must
+    // arrive explicitly (from an authenticated caller's body/session once
+    // auth is wired here) — logToUserHistory never fabricates one.
+    const userId = req.user?.id || req.body.user_id;
+    const { logged, id: historyId } = result?.result?.top
+      ? await logToUserHistory(cropDiseaseLog, userId, {
+          crop: result.result.crop,
+          domain: result.result.domain,
+          top_disease_id: result.result.top.id,
+          top_disease_name: result.result.top.name,
+          confidence: result.result.confidence,
+          symptoms_used: result.result.symptoms_used,
+          diagnosed_at: new Date().toISOString(),
+        })
+      : { logged: false, id: null };
+
+    ok(res, { ...result, logged_to_history: logged, history_id: historyId });
   } catch (error) {
     fail(res, 500, error);
   }

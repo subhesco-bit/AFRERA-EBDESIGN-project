@@ -42,6 +42,10 @@ mount('/nutrition-enhanced', './nutritionEnhancedRoutes', 'nutrition');
 mount('/agro-farming', './agroFarmingRoutes', 'agro');
 mount('/unified-intelligence', './unifiedIntelligenceRoutes', 'unified');
 mount('/ai-erp', './embeddedAiErpRoutes', 'unified');
+// Image->symptoms->disease->discussion->treatment flow (M782). Lives under
+// modules/, which server bootstrap does not auto-load, so it must be
+// mounted explicitly here or it is unreachable despite being real code.
+mount('/disease-analyzer', '../../../modules/M782_DISEASE_ANALYZER_AI/backend/routes', 'agro');
 
 // Optional existing specialist routes
 mount('/veterinary-specialist', './veterinarySpecialistRoutes', 'veterinary');

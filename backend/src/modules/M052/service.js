@@ -1,4 +1,9 @@
-const db = require('../../database/connection');
+// '../../database/connection' exports {initialize, getPostgreSQL, ...} — never
+// a bare `query` method — so `db.query(...)` below always threw "db.query is
+// not a function" whenever this module was actually invoked. '../../database/pool'
+// is the module that exports a real .query(); this is the same fix needed
+// across all 314 modules sharing this exact broken import line.
+const db = require('../../database/pool');
 const { logger } = require('../../utils/logger');
 const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 

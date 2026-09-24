@@ -16,9 +16,15 @@ function tryReq(p) {
   }
 }
 
-function check(name, fn) {
+async function check(name, fn) {
   try {
-    const out = fn();
+    // hub.operate() (and similar) are declared `async` even where the
+    // individual handler is synchronous, so fn() can legitimately return
+    // either a plain object or a Promise — await unconditionally covers
+    // both instead of only the sync case, which previously made every
+    // check against an async-wrapped handler silently compare against a
+    // Promise object (always undefined fields) rather than its result.
+    const out = await fn();
     const ok = out && out.ok !== false;
     results.push({ name, ok, detail: out && out.detail });
     return ok;
@@ -31,54 +37,54 @@ function check(name, fn) {
 async function run() {
   // 1. Load engines
   const pricing = tryReq('../services/ecommerce/dynamicPricingEngine');
-  check('load.dynamicPricingEngine', () => ({
+  await check('load.dynamicPricingEngine', () => ({
     ok: !!pricing.mod,
     detail: pricing.error,
   }));
 
   const checkout = tryReq('../services/ecommerce/checkoutOrchestrator');
-  check('load.checkoutOrchestrator', () => ({ ok: !!checkout.mod, detail: checkout.error }));
+  await check('load.checkoutOrchestrator', () => ({ ok: !!checkout.mod, detail: checkout.error }));
 
   const fabric = tryReq('../os/interplatformFabric');
-  check('load.interplatformFabric', () => ({ ok: !!fabric.mod, detail: fabric.error }));
+  await check('load.interplatformFabric', () => ({ ok: !!fabric.mod, detail: fabric.error }));
 
   const grade10 = tryReq('../engines/industryGradePack');
-  check('load.industryGradePack', () => ({ ok: !!grade10.mod, detail: grade10.error }));
+  await check('load.industryGradePack', () => ({ ok: !!grade10.mod, detail: grade10.error }));
 
   const hub = tryReq('../services/hidden/featureActivationHub');
-  check('load.featureActivationHub', () => ({ ok: !!hub.mod, detail: hub.error }));
+  await check('load.featureActivationHub', () => ({ ok: !!hub.mod, detail: hub.error }));
 
   const umr = tryReq('../core/universalModuleRuntime');
-  check('load.universalModuleRuntime', () => ({ ok: !!umr.mod, detail: umr.error }));
+  await check('load.universalModuleRuntime', () => ({ ok: !!umr.mod, detail: umr.error }));
 
   const wallet = tryReq('../services/commerce/walletService');
-  check('load.walletService', () => ({ ok: !!wallet.mod, detail: wallet.error }));
+  await check('load.walletService', () => ({ ok: !!wallet.mod, detail: wallet.error }));
 
   const preseason = tryReq('../services/commerce/preseasonPurchaseService');
-  check('load.preseason', () => ({ ok: !!preseason.mod, detail: preseason.error }));
+  await check('load.preseason', () => ({ ok: !!preseason.mod, detail: preseason.error }));
 
   const subsidy = tryReq('../services/research-grade/subsidyEligibilityEngine');
-  check('load.subsidy', () => ({ ok: !!subsidy.mod, detail: subsidy.error }));
+  await check('load.subsidy', () => ({ ok: !!subsidy.mod, detail: subsidy.error }));
 
   const logistics = tryReq('../services/research-grade/logisticsDecisionEngine');
-  check('load.logistics', () => ({ ok: !!logistics.mod, detail: logistics.error }));
+  await check('load.logistics', () => ({ ok: !!logistics.mod, detail: logistics.error }));
 
   const erp = tryReq('../services/research-grade/erpDoubleEntrySpine');
-  check('load.erp', () => ({ ok: !!erp.mod, detail: erp.error }));
+  await check('load.erp', () => ({ ok: !!erp.mod, detail: erp.error }));
 
   const trust = tryReq('../services/trust/trustReputationEngine');
-  check('load.trust', () => ({ ok: !!trust.mod, detail: trust.error }));
+  await check('load.trust', () => ({ ok: !!trust.mod, detail: trust.error }));
 
   // 2. Functional exercises
   if (pricing.mod) {
-    check('fn.pricing.delhi_tomato', () => {
+    await check('fn.pricing.delhi_tomato', () => {
       const r = pricing.mod.priceSku('TOM-ORG-1KG', { lat: 28.6, lng: 77.2 });
       return { ok: r.price > 0 && r.geofence, detail: `price=${r.price} geo=${r.geofence?.id}` };
     });
   }
 
   if (checkout.mod) {
-    check('fn.checkout.create', () => {
+    await check('fn.checkout.create', () => {
       const r = checkout.mod.checkout({
         buyer_id: 'TEST-B1',
         lines: [{ sku: 'TOM-ORG-1KG', qty: 2, unit_price: 40 }],
@@ -88,7 +94,7 @@ async function run() {
   }
 
   if (wallet.mod) {
-    check('fn.wallet.credit_hold_capture', () => {
+    await check('fn.wallet.credit_hold_capture', () => {
       wallet.mod.credit('WTEST', 1000);
       wallet.mod.hold('WTEST', 100, { ref: 't1' });
       wallet.mod.captureHold('WTEST', 100, { ref: 't1' });
@@ -98,12 +104,12 @@ async function run() {
   }
 
   if (hub.mod) {
-    check('fn.features.gst', () => {
-      const r = hub.mod.operate({ feature: 'gst', taxable_value: 1000, rate: 0.05 });
+    await check('fn.features.gst', async () => {
+      const r = await hub.mod.operate({ feature: 'gst', taxable_value: 1000, rate: 0.05 });
       return { ok: r.total_tax === 50, detail: JSON.stringify(r.total_tax) };
     });
-    check('fn.features.escrow', () => {
-      const r = hub.mod.operate({
+    await check('fn.features.escrow', async () => {
+      const r = await hub.mod.operate({
         feature: 'escrow',
         action: 'hold',
         amount: 500,
@@ -115,21 +121,21 @@ async function run() {
   }
 
   if (grade10.mod) {
-    check('fn.grade10.pricing', () => {
+    await check('fn.grade10.pricing', () => {
       const r = grade10.mod.price10x('TOM-ORG-1KG', { lat: 19.08, lng: 72.88, inventory_available: 10 });
       return { ok: r.grade === '10x' && r.price > 0, detail: `price=${r.price}` };
     });
   }
 
   if (fabric.mod) {
-    check('fn.fabric.analyze', () => {
+    await check('fn.fabric.analyze', () => {
       const a = fabric.mod.deepAnalysis();
       return {
         ok: a.bridges && a.bridges.total >= 10 && a.platforms.length >= 5,
         detail: `platforms=${a.platforms.length} bridges=${a.bridges.total} score=${a.overall_score}`,
       };
     });
-    check('fn.fabric.bridge_pricing', async () => {
+    await check('fn.fabric.bridge_pricing', async () => {
       const r = await fabric.mod.runBridge('pricing_geo', {
         sku: 'TOM-ORG-1KG',
         lat: 12.97,
@@ -140,7 +146,7 @@ async function run() {
   }
 
   if (subsidy.mod) {
-    check('fn.subsidy.extract', () => {
+    await check('fn.subsidy.extract', () => {
       const r = subsidy.mod.extractAll({
         state: 'UP',
         land_ha: 1.5,
@@ -151,7 +157,7 @@ async function run() {
   }
 
   if (logistics.mod) {
-    check('fn.logistics.decide', () => {
+    await check('fn.logistics.decide', () => {
       const r = logistics.mod.decide({
         weight_kg: 500,
         distance_km: 120,
@@ -163,7 +169,7 @@ async function run() {
   }
 
   if (erp.mod) {
-    check('fn.erp.balanced_journal', () => {
+    await check('fn.erp.balanced_journal', () => {
       const r = erp.mod.postJournal({
         memo: 'selftest',
         lines: [
@@ -176,12 +182,15 @@ async function run() {
   }
 
   if (umr.mod) {
-    check('fn.umr.order_fsm', async () => {
+    await check('fn.umr.order_fsm', async () => {
       const rt = umr.mod.getRuntime('M_TEST_ORDER');
       const c = rt.create({ total: 10 });
-      const id = c.record?.id || c.record?.id;
-      const t = rt.transition(c.record.id, 'active');
-      return { ok: t.success && t.record.state === 'active', detail: t.record?.state };
+      // This module id resolves to the ecommerce order FSM, whose real
+      // states are draft -> placed/cancelled -> paid/cancelled -> fulfilled.
+      // 'active' is not a state in this table (it belongs to a different,
+      // generic FSM) — the correct valid first transition is 'placed'.
+      const t = rt.transition(c.record.id, 'placed');
+      return { ok: t.success && t.record.state === 'placed', detail: t.record?.state };
     });
   }
 

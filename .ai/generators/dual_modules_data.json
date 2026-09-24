@@ -1,0 +1,6103 @@
+[
+  {
+    "id": "M001",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M001_PLATFORM_CORE",
+        "id": "M001",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 24000,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M001",
+        "id": "M001",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 8,
+        "bytes": 10437,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/platformCoreRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/platformCoreRoutes_merged.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/claude/enhancedLibraryKnowledgeService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/dual-use/platformCoreService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/enterpriseModule550RuntimeService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/enterprisePromotion541Service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050EnterpriseProductService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050HighestStandardEnhancementService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050ProductionIntegrationService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050ProductionRuntimeService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/moduleProductionAssuranceService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/platformCoreService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M001_PLATFORM_CORE",
+        "id": "M001",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 24606,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M002",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M002_USER_MANAGEMENT",
+        "id": "M002",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 15758,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M002",
+        "id": "M002",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 7,
+        "bytes": 14898,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/platformConfigurationService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050EnterpriseProductService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050HighestStandardEnhancementService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/moduleProductionAssuranceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M002_USER_MANAGEMENT",
+        "id": "M002",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 15746,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M003",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M003_ORGANIZATION",
+        "id": "M003",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 13180,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M003",
+        "id": "M003",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 7,
+        "bytes": 16700,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/sapModuleArchitectureService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050EnterpriseProductService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050HighestStandardEnhancementService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/moduleProductionAssuranceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M003_ORGANIZATION",
+        "id": "M003",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 13145,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M004",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M004_ROLE_MANAGEMENT",
+        "id": "M004",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 13731,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M004",
+        "id": "M004",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 7,
+        "bytes": 12501,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050EnterpriseProductService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050HighestStandardEnhancementService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/moduleProductionAssuranceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M004_ROLE_MANAGEMENT",
+        "id": "M004",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 13696,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M005",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M005_PERMISSION_MANAGEMENT",
+        "id": "M005",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 12649,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M005",
+        "id": "M005",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 7,
+        "bytes": 12638,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/platformConfigurationService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050EnterpriseProductService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m001m050HighestStandardEnhancementService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/moduleProductionAssuranceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M005_PERMISSION_MANAGEMENT",
+        "id": "M005",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 12637,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M100100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M100100_LOGISTICSENHANCEMENT",
+        "id": "M100100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 24230,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M100100_LOGISTICSENHANCEMENT",
+        "id": "M100100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 24215,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M100_CROP_MANAGEMENT",
+        "id": "M100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1648,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M100",
+        "id": "M100",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 7,
+        "bytes": 16001,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m051m100ModuleWiringRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M100Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/claude/enhancedLibraryKnowledgeService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/operationsManagementService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m051m100AgricultureProductionService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m051m100DomainIntelligenceService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/m051m100ProductionHardeningService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M100_CROP_MANAGEMENT",
+        "id": "M100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1633,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M10100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M10100_PRODUCTREVIEW",
+        "id": "M10100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1665,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M10100_PRODUCTREVIEW",
+        "id": "M10100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1650,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M101",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M101_LIVESTOCK_MANAGEMENT",
+        "id": "M101",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 28991,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M101",
+        "id": "M101",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 10,
+        "bytes": 21558,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M101Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/preventiveMaintenanceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M101_LIVESTOCK_MANAGEMENT",
+        "id": "M101",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 28976,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M102",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M102_DAIRY_MANAGEMENT",
+        "id": "M102",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 20891,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M102",
+        "id": "M102",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 10,
+        "bytes": 20958,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M102Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/fertilizerInventoryService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/preventiveMaintenanceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M102_DAIRY_MANAGEMENT",
+        "id": "M102",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 20876,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M103",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M103_FISHERIES_MANAGEMENT",
+        "id": "M103",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 23790,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/fisheriesDomainRoutes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M103",
+        "id": "M103",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 8,
+        "bytes": 19444,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/fisheriesDomainRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M103Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/fertilizerInventoryService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/preventiveMaintenanceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M103_FISHERIES_MANAGEMENT",
+        "id": "M103",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 23775,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/fisheriesDomainRoutes.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M104",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M104_SOIL_MANAGEMENT",
+        "id": "M104",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 17663,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M104",
+        "id": "M104",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 8,
+        "bytes": 19723,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M104Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/preventiveMaintenanceService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/revenueService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M104_SOIL_MANAGEMENT",
+        "id": "M104",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 17648,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M105",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M105_WEATHER_INTELLIGENCE",
+        "id": "M105",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 11103,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M105",
+        "id": "M105",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 8,
+        "bytes": 20164,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M105Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/logisticsEnhancementService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/resourceCrudFactory.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M105_WEATHER_INTELLIGENCE",
+        "id": "M105",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 11088,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M108100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M108100_BULKORDER",
+        "id": "M108100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1636,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M108100_BULKORDER",
+        "id": "M108100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1621,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M108",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M108_FERTILIZER_MANAGEMENT",
+        "id": "M108",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 20057,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M108",
+        "id": "M108",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 8,
+        "bytes": 19301,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M108Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/fertilizerInventoryService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/preventiveMaintenanceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M108_FERTILIZER_MANAGEMENT",
+        "id": "M108",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 20042,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M109",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M109_SEED_MANAGEMENT",
+        "id": "M109",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 24212,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M109",
+        "id": "M109",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 8,
+        "bytes": 19547,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M109Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/fertilizerInventoryService.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/preventiveMaintenanceService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M109_SEED_MANAGEMENT",
+        "id": "M109",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 24197,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M117100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M117100_REVENUE",
+        "id": "M117100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1619,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M117100_REVENUE",
+        "id": "M117100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1604,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M120100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M120100_VERMICOMPOST",
+        "id": "M120100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1658,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M120100_VERMICOMPOST",
+        "id": "M120100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1643,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M129100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M129100_GREENHOUSE",
+        "id": "M129100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1641,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M129100_GREENHOUSE",
+        "id": "M129100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1626,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M132100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M132100_FREIGHTPOOLING",
+        "id": "M132100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1677,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M132100_FREIGHTPOOLING",
+        "id": "M132100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1662,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M144100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M144100_MODULECATALOG",
+        "id": "M144100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1642,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M144100_MODULECATALOG",
+        "id": "M144100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1627,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M149100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M149100_MUSHROOM",
+        "id": "M149100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1626,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M149100_MUSHROOM",
+        "id": "M149100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1611,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M150100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M150100_COMPLETEAIINTEGRATION",
+        "id": "M150100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1737,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M150100_COMPLETEAIINTEGRATION",
+        "id": "M150100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1722,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M152100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M152100_PLATFORMCONFIGURATION",
+        "id": "M152100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1731,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M152100_PLATFORMCONFIGURATION",
+        "id": "M152100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1716,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M167100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M167100_FOODINTELLIGENCE",
+        "id": "M167100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1691,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M167100_FOODINTELLIGENCE",
+        "id": "M167100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1676,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M18100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M18100_INSURANCECLAIMS",
+        "id": "M18100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1681,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M18100_POULTRY",
+        "id": "M18100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 18663,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M18100_INSURANCECLAIMS",
+        "id": "M18100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1666,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M18100_POULTRY",
+        "id": "M18100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 18648,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M181100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M181100_CUSTODYEVENTROUTES",
+        "id": "M181100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1656,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M181100_CUSTODYEVENTROUTES",
+        "id": "M181100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1641,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M186100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M186100_IOTSENSOR",
+        "id": "M186100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1636,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M186100_REGIONALVARIETY",
+        "id": "M186100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1686,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M186100_IOTSENSOR",
+        "id": "M186100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1621,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M186100_REGIONALVARIETY",
+        "id": "M186100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1671,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M188100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M188100_DYNAMICPRICING",
+        "id": "M188100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1676,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M188100_DYNAMICPRICING",
+        "id": "M188100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1661,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M190100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M190100_GIINTELLIGENCE",
+        "id": "M190100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1675,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M190100_GIINTELLIGENCE",
+        "id": "M190100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1660,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M192100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M192100_LANDRECORDS",
+        "id": "M192100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1651,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M192100_LANDRECORDS",
+        "id": "M192100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1636,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M200",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M200_ORGANIZATION_MANAGEMENT",
+        "id": "M200",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 4,
+        "bytes": 16846,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M200",
+        "id": "M200",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 5,
+        "bytes": 15688,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M200Routes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M200_ORGANIZATION_MANAGEMENT",
+        "id": "M200",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 4,
+        "bytes": 16834,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M201100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M201100_SERICULTURE",
+        "id": "M201100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1648,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M201100_SERICULTURE",
+        "id": "M201100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1633,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M205100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M205100_RFQ",
+        "id": "M205100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1585,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M205100_RFQ",
+        "id": "M205100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1570,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M205",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M205_COMPLIANCE_MANAGEMENT",
+        "id": "M205",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1656,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M205",
+        "id": "M205",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 5,
+        "bytes": 15712,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M205Routes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M205_COMPLIANCE_MANAGEMENT",
+        "id": "M205",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1641,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M206",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M206_AUDIT_MANAGEMENT",
+        "id": "M206",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1616,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M206",
+        "id": "M206",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 5,
+        "bytes": 15720,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M206Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M206_AUDIT_MANAGEMENT",
+        "id": "M206",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1601,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M208",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M208_GOVERNANCE",
+        "id": "M208",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1634,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M208",
+        "id": "M208",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 5,
+        "bytes": 15724,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M208Routes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M208_GOVERNANCE",
+        "id": "M208",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1619,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M209100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M209100_ROLEMANAGEMENT",
+        "id": "M209100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1674,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M209100_ROLEMANAGEMENT",
+        "id": "M209100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1659,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M220100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M220100_ECOMMERCEMARKETING",
+        "id": "M220100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1706,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M220100_ECOMMERCEMARKETING",
+        "id": "M220100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1691,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M235100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M235100_FOODSAFETY",
+        "id": "M235100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1641,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M235100_FOODSAFETY",
+        "id": "M235100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1626,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M244100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M244100_ORGANICTRACEABILITY",
+        "id": "M244100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1713,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M244100_ORGANICTRACEABILITY",
+        "id": "M244100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1698,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M25100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M25100_OFFLINESYNC",
+        "id": "M25100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1647,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M25100_OFFLINESYNC",
+        "id": "M25100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1632,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M251100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M251100_ECOMMERCEERP",
+        "id": "M251100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1662,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M251100_ECOMMERCEERP",
+        "id": "M251100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1647,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M254100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M254100_DIGITALTWIN",
+        "id": "M254100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1650,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M254100_DIGITALTWIN",
+        "id": "M254100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1635,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M263100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M263100_CLIMATEMONITORING",
+        "id": "M263100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1674,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M263100_CLIMATEMONITORING",
+        "id": "M263100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1659,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M265100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M265100_ENTERPRISEMEMORY",
+        "id": "M265100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1689,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M265100_ENTERPRISEMEMORY",
+        "id": "M265100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1674,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M282100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M282100_LABORATORYERP",
+        "id": "M282100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1669,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M282100_LABORATORYERP",
+        "id": "M282100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1654,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M285100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M285100_NUTRIENTVALUESALES",
+        "id": "M285100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1708,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M285100_NUTRIENTVALUESALES",
+        "id": "M285100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1693,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M290100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M290100_MACHINERYACCESS",
+        "id": "M290100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 32030,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M290100_MACHINERYACCESS",
+        "id": "M290100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 32015,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M292100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M292100_INSURANCEPREMIUM",
+        "id": "M292100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1690,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M292100_INSURANCEPREMIUM",
+        "id": "M292100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1675,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M300",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M300_ERP_CORE",
+        "id": "M300",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 22834,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M300",
+        "id": "M300",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 5,
+        "bytes": 15730,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M300Routes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M300_ERP_CORE",
+        "id": "M300",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 22819,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M30100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M30100_CROPPLANNING",
+        "id": "M30100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1652,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M30100_CROPPLANNING",
+        "id": "M30100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1637,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M301",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M301_FINANCIAL_MANAGEMENT",
+        "id": "M301",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1644,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M301",
+        "id": "M301",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 7,
+        "bytes": 16753,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M301Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M301_FINANCIAL_MANAGEMENT",
+        "id": "M301",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1629,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M306",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M306_HUMAN_RESOURCES",
+        "id": "M306",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1593,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M306",
+        "id": "M306",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 5,
+        "bytes": 15716,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M306Routes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M306_HUMAN_RESOURCES",
+        "id": "M306",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1578,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M308",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M308_ASSET_MANAGEMENT",
+        "id": "M308",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 4,
+        "bytes": 20649,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M308",
+        "id": "M308",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 5,
+        "bytes": 15736,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/assetAccountingDomainRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M308Routes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M308_ASSET_MANAGEMENT",
+        "id": "M308",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 4,
+        "bytes": 20637,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M309",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M309_COST_MANAGEMENT",
+        "id": "M309",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 3,
+        "bytes": 2777,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M309",
+        "id": "M309",
+        "hasManifest": true,
+        "declaredStatus": "generated",
+        "fileCount": 5,
+        "bytes": 15728,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/M309Routes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M309_COST_MANAGEMENT",
+        "id": "M309",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 3,
+        "bytes": 2762,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M3100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M3100_OFFLINEPAYMENT",
+        "id": "M3100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1666,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M3100_OFFLINEPAYMENT",
+        "id": "M3100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1651,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M317100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M317100_AISELFHEALING",
+        "id": "M317100",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 2,
+        "bytes": 1526,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M317100_AISELFHEALING",
+        "id": "M317100",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 2,
+        "bytes": 1514,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M331100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M331100_FARMERTRAINING",
+        "id": "M331100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1670,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M331100_FARMERTRAINING",
+        "id": "M331100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1655,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M333100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M333100_RURALFINANCE",
+        "id": "M333100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1654,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M333100_RURALFINANCE",
+        "id": "M333100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1639,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M345100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M345100_SELLERRANKING",
+        "id": "M345100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1664,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M345100_SELLERRANKING",
+        "id": "M345100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1649,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M353100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M353100_CUSTODYEVENT",
+        "id": "M353100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1655,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M353100_CUSTODYEVENT",
+        "id": "M353100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1640,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M356100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M356100_BACKUP",
+        "id": "M356100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1605,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M356100_ECOMMERCEBUSINESSSALES",
+        "id": "M356100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1737,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ecommerceBusinessSalesService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M356100_BACKUP",
+        "id": "M356100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1590,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M356100_ECOMMERCEBUSINESSSALES",
+        "id": "M356100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1722,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ecommerceBusinessSalesService.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M359100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M359100_INSURANCE",
+        "id": "M359100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 7881,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M359100_INSURANCE",
+        "id": "M359100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 7866,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M37100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M37100_HOUSEHOLDECONOMY",
+        "id": "M37100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1684,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M37100_HOUSEHOLDECONOMY",
+        "id": "M37100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1669,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M374100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M374100_MARKETDATA",
+        "id": "M374100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1638,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M374100_MARKETDATA",
+        "id": "M374100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1623,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M377100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M377100_PRODUCT",
+        "id": "M377100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1612,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M377100_PRODUCT",
+        "id": "M377100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1597,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M379100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M379100_COLDSTORAGE",
+        "id": "M379100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1647,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M379100_COLDSTORAGE",
+        "id": "M379100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1632,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M386100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M386100_NUTRITIONINTELLIGENCE",
+        "id": "M386100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1727,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M386100_SUBSIDY",
+        "id": "M386100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 22208,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M386100_NUTRITIONINTELLIGENCE",
+        "id": "M386100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1712,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M386100_SUBSIDY",
+        "id": "M386100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 22193,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M388100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M388100_BLOCKCHAINTRACEABILITY",
+        "id": "M388100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1734,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M388100_SAPMODULEARCHITECTURE",
+        "id": "M388100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1705,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M388100_BLOCKCHAINTRACEABILITY",
+        "id": "M388100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1719,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M388100_SAPMODULEARCHITECTURE",
+        "id": "M388100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1690,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M39100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M39100_RENEWABLEENERGY",
+        "id": "M39100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 3,
+        "bytes": 2862,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M39100_RENEWABLEENERGY",
+        "id": "M39100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 3,
+        "bytes": 2847,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M400",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M400_AI_BACKBONE",
+        "id": "M400",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 8,
+        "bytes": 98340,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m400AiBackboneRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      },
+      {
+        "tree": "modules",
+        "dirName": "M400_AI_CORE",
+        "id": "M400",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 15249,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m400AiBackboneRoutes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M400_AI_BACKBONE",
+        "id": "M400",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 25346,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m400AiBackboneRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M400_AI_CORE",
+        "id": "M400",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 15634,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m400AiBackboneRoutes.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M401",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M401_AI_GATEWAY",
+        "id": "M401",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 44497,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m400AiBackboneRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M401_AI_GATEWAY",
+        "id": "M401",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 34614,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m400AiBackboneRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M402",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M402_AI_ORCHESTRATION",
+        "id": "M402",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1674,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m400AiBackboneRoutes.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M402_AI_ORCHESTRATION",
+        "id": "M402",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1659,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/m400AiBackboneRoutes.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M403",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M403_AGRICULTURAL_AI",
+        "id": "M403",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 5,
+        "bytes": 14010,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/ai-modules.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M403_AGRICULTURAL_AI",
+        "id": "M403",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 12425,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/ai-modules.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M404",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M404_DECISION_SUPPORT",
+        "id": "M404",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 3,
+        "bytes": 2784,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M404_DECISION_SUPPORT",
+        "id": "M404",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 3,
+        "bytes": 2769,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M405",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M405_PREDICTIVE_ANALYTICS",
+        "id": "M405",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 3,
+        "bytes": 3489,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/ai-modules.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M405_PREDICTIVE_ANALYTICS",
+        "id": "M405",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1690,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/ai-modules.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-integration-service.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M406100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M406100_ECOMMERCEINTEGRATION",
+        "id": "M406100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1718,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ecommerceIntegrationService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M406100_ECOMMERCEINTEGRATION",
+        "id": "M406100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1703,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ecommerceIntegrationService.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M407100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M407100_RECOVEREDFINANCE",
+        "id": "M407100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1685,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M407100_RECOVEREDFINANCE",
+        "id": "M407100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1670,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M407",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M407_CONVERSATIONAL_AI",
+        "id": "M407",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 5,
+        "bytes": 16763,
+        "hasBackend": true,
+        "hasRoutes": true,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/ai-modules.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M407_CONVERSATIONAL_AI",
+        "id": "M407",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 15282,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/ai-modules.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M408",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M408_KNOWLEDGE_MANAGEMENT",
+        "id": "M408",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 17269,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M408_KNOWLEDGE_MANAGEMENT",
+        "id": "M408",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 17254,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/ai-modules-builder.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M409100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M409100_ADVANCEDAI",
+        "id": "M409100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1640,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M409100_ADVANCEDAI",
+        "id": "M409100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1625,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M410",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M410_AI_INTELLIGENCE_FABRIC",
+        "id": "M410",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 3940,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M410_AI_INTELLIGENCE_FABRIC",
+        "id": "M410",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 2,
+        "bytes": 3928,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M412100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M412100_COMMERCERULES",
+        "id": "M412100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1661,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M412100_COMMERCERULES",
+        "id": "M412100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1646,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M414100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M414100_RETURNLOADBOARD",
+        "id": "M414100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1681,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M414100_RETURNLOADBOARD",
+        "id": "M414100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1666,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M415100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M415100_SMSAUTH",
+        "id": "M415100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1613,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M415100_SMSAUTH",
+        "id": "M415100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1598,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M419100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M419100_ORDER",
+        "id": "M419100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1595,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M419100_ORDER",
+        "id": "M419100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1580,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M43100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M43100_APICULTURE",
+        "id": "M43100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1634,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M43100_APICULTURE",
+        "id": "M43100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1619,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M444100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M444100_CROPVALUERESEARCH",
+        "id": "M444100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1696,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M444100_CROPVALUERESEARCH",
+        "id": "M444100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1681,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M445100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M445100_VILLAGEPROFILE",
+        "id": "M445100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 9947,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M445100_VILLAGEPROFILE",
+        "id": "M445100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 15357,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M451100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M451100_SHELFLIFE",
+        "id": "M451100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1629,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M451100_SHELFLIFE",
+        "id": "M451100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1614,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M454100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M454100_ADVANCEDFEATURES",
+        "id": "M454100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1686,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M454100_ADVANCEDFEATURES",
+        "id": "M454100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1671,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M455100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M455100_AICOPILOT",
+        "id": "M455100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1629,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M455100_AICOPILOT",
+        "id": "M455100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1614,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M456100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M456100_FORM",
+        "id": "M456100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1587,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M456100_FORM",
+        "id": "M456100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1572,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M469100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M469100_DEFENSEFITNESSPREP",
+        "id": "M469100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1704,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M469100_DEFENSEFITNESSPREP",
+        "id": "M469100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1689,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M472100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M472100_AIADVISORY",
+        "id": "M472100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1637,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M472100_AIADVISORY",
+        "id": "M472100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1622,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M474100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M474100_VALUECOMMERCE",
+        "id": "M474100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1661,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M474100_VALUECOMMERCE",
+        "id": "M474100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1646,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M477100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M477100_SOILTESTING",
+        "id": "M477100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1645,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M477100_VOICEAI",
+        "id": "M477100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1615,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M477100_SOILTESTING",
+        "id": "M477100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1630,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M477100_VOICEAI",
+        "id": "M477100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1600,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M48100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M48100_BUYINGCLUB",
+        "id": "M48100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1635,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M48100_BUYINGCLUB",
+        "id": "M48100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1620,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M49100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M49100_WEARABLEINTEGRATION",
+        "id": "M49100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1708,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M49100_WEARABLEINTEGRATION",
+        "id": "M49100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1693,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M499100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M499100_SHEEP",
+        "id": "M499100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 22070,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M499100_SHEEP",
+        "id": "M499100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 22055,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M501100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M501100_IDENTITYMANAGEMENT",
+        "id": "M501100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 19532,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M501100_IDENTITYMANAGEMENT",
+        "id": "M501100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 19517,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M510100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M510100_OCR",
+        "id": "M510100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1587,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M510100_OCR",
+        "id": "M510100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1572,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M51100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M51100_MARKETACCESS",
+        "id": "M51100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1659,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M51100_MARKETACCESS",
+        "id": "M51100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1644,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M513100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M513100_COMPREHENSIVEERP",
+        "id": "M513100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1700,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/comprehensiveERPService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M513100_COMPREHENSIVEERP",
+        "id": "M513100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1685,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/comprehensiveERPService.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M522100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M522100_PLATFORMTELEMETRY",
+        "id": "M522100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1701,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M522100_PLATFORMTELEMETRY",
+        "id": "M522100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1686,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M528100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M528100_CIVILDISRUPTION",
+        "id": "M528100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1688,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M528100_CIVILDISRUPTION",
+        "id": "M528100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1673,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M530100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M530100_PROCUREMENTSUBSCRIPTION",
+        "id": "M530100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1749,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M530100_PROCUREMENTSUBSCRIPTION",
+        "id": "M530100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1734,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M538100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M538100_RESOURCECRUDFACTORY",
+        "id": "M538100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1692,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M538100_RESOURCECRUDFACTORY",
+        "id": "M538100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1677,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M543100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M543100_RISKPRICING",
+        "id": "M543100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1654,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M543100_RISKPRICING",
+        "id": "M543100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1639,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M557100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M557100_NEPRODUCTINTELLIGENCE",
+        "id": "M557100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1710,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M557100_NEPRODUCTINTELLIGENCE",
+        "id": "M557100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1695,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M559100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M559100_KNOWLEDGEGRAPH",
+        "id": "M559100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1677,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M559100_KNOWLEDGEGRAPH",
+        "id": "M559100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1662,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M560100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M560100_GEOFENCING",
+        "id": "M560100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1645,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M560100_GEOFENCING",
+        "id": "M560100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1630,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M569100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M569100_COOPERATIVESHARE",
+        "id": "M569100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1694,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M569100_COOPERATIVESHARE",
+        "id": "M569100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1679,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M570100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M570100_COMPANY",
+        "id": "M570100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1620,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M570100_PRESEASONORDER",
+        "id": "M570100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1654,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M570100_COMPANY",
+        "id": "M570100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1605,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M570100_PRESEASONORDER",
+        "id": "M570100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1639,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M573100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M573100_COMPLETEERPINTEGRATION",
+        "id": "M573100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1748,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/completeERPIntegrationService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M573100_COMPLETEERPINTEGRATION",
+        "id": "M573100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1733,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/completeERPIntegrationService.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M576100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M576100_ANALYTICSMONITORING",
+        "id": "M576100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1717,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M576100_ANALYTICSMONITORING",
+        "id": "M576100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1702,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M590100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M590100_BIODIVERSITY",
+        "id": "M590100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1659,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M590100_BIODIVERSITY",
+        "id": "M590100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1644,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M602100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M602100_COMMUNITYMANAGEMENT",
+        "id": "M602100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 20582,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M602100_COMMUNITYMANAGEMENT",
+        "id": "M602100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 20567,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M604100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M604100_INPUTSUPPLYMANAGEMENT",
+        "id": "M604100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1712,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M604100_INPUTSUPPLYMANAGEMENT",
+        "id": "M604100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1697,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M606100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M606100_REALTIMEMONITORING",
+        "id": "M606100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1710,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M606100_REALTIMEMONITORING",
+        "id": "M606100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1695,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M61100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M61100_VISION",
+        "id": "M61100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1611,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M61100_VISION",
+        "id": "M61100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1596,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M615100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M615100_LOGISTICS",
+        "id": "M615100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 7753,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M615100_LOGISTICS",
+        "id": "M615100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 7738,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M618100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M618100_GLUTWARNING",
+        "id": "M618100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1655,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M618100_GLUTWARNING",
+        "id": "M618100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1640,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M62100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M62100_EQUIPMENTEXCHANGE",
+        "id": "M62100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1701,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M62100_EQUIPMENTEXCHANGE",
+        "id": "M62100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1686,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M629100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M629100_MOBILITYRIDES",
+        "id": "M629100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1669,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M629100_MOBILITYRIDES",
+        "id": "M629100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1654,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M639100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M639100_OMNICHANNELAI",
+        "id": "M639100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1671,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M639100_WHATSAPP",
+        "id": "M639100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1627,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M639100_OMNICHANNELAI",
+        "id": "M639100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1656,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M639100_WHATSAPP",
+        "id": "M639100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1612,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M640100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M640100_INSURANCEPOLICYISSUANCE",
+        "id": "M640100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1752,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M640100_INSURANCEPOLICYISSUANCE",
+        "id": "M640100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1737,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M645100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M645100_LIBRARYKNOWLEDGE",
+        "id": "M645100",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 4,
+        "bytes": 32056,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/moduleRegistryRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/libraryKnowledgeService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M645100_LIBRARYKNOWLEDGE",
+        "id": "M645100",
+        "hasManifest": true,
+        "declaredStatus": "production",
+        "fileCount": 5,
+        "bytes": 124984,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/moduleRegistryRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/libraryKnowledgeService.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M651100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M651100_RESEARCHANDDEVELOPMENT",
+        "id": "M651100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1719,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M651100_RESEARCHANDDEVELOPMENT",
+        "id": "M651100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1704,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M652100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M652100_ARVR",
+        "id": "M652100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1597,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M652100_GOVERNMENTSCHEME",
+        "id": "M652100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 21361,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M652100_TENANTMANAGEMENT",
+        "id": "M652100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1694,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M652100_ARVR",
+        "id": "M652100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1582,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M652100_GOVERNMENTSCHEME",
+        "id": "M652100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 21346,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M652100_TENANTMANAGEMENT",
+        "id": "M652100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1679,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M657100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M657100_MULTILINGUAL",
+        "id": "M657100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1659,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M657100_MULTILINGUAL",
+        "id": "M657100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1644,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M663100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M663100_SHAREDINFRA",
+        "id": "M663100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1653,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M663100_SHAREDINFRA",
+        "id": "M663100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1638,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M664100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M664100_MARKETINTELLIGENCE",
+        "id": "M664100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1709,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M664100_MARKETINTELLIGENCE",
+        "id": "M664100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1694,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M675100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M675100_AIAGENTICCOMPANION",
+        "id": "M675100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1712,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M675100_AIAGENTICCOMPANION",
+        "id": "M675100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1697,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M68100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M68100_INDIGENOUSKNOWLEDGE",
+        "id": "M68100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1715,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M68100_INDIGENOUSKNOWLEDGE",
+        "id": "M68100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1700,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M695100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M695100_GST",
+        "id": "M695100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1588,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M695100_GST",
+        "id": "M695100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1573,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M697100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M697100_ESCROW",
+        "id": "M697100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1612,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "modules",
+        "dirName": "M697100_INSURANCEFRAUDDETECTION",
+        "id": "M697100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1752,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M697100_ESCROW",
+        "id": "M697100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1597,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M697100_INSURANCEFRAUDDETECTION",
+        "id": "M697100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1737,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M699100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M699100_AIOPERATIONINTELLIGENCE",
+        "id": "M699100",
+        "hasManifest": true,
+        "declaredStatus": "BACKEND_ONLY",
+        "fileCount": 2,
+        "bytes": 1598,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M699100_AIOPERATIONINTELLIGENCE",
+        "id": "M699100",
+        "hasManifest": true,
+        "declaredStatus": "BACKEND_ONLY",
+        "fileCount": 2,
+        "bytes": 1586,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M70100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M70100_MERCHANDISING",
+        "id": "M70100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1641,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M70100_MERCHANDISING",
+        "id": "M70100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1626,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M701100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M701100_PREVENTIVEMAINTENANCE",
+        "id": "M701100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1710,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M701100_PREVENTIVEMAINTENANCE",
+        "id": "M701100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1695,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M707100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M707100_CATALOGINTELLIGENCE",
+        "id": "M707100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1693,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M707100_CATALOGINTELLIGENCE",
+        "id": "M707100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1678,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M712100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M712100_ENGINEERINGPROJECT",
+        "id": "M712100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1711,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M712100_ENGINEERINGPROJECT",
+        "id": "M712100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1696,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M713100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M713100_WIKIPEDIA",
+        "id": "M713100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1611,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M713100_WIKIPEDIA",
+        "id": "M713100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1596,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M714100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M714100_PRODUCTMEDIAAI",
+        "id": "M714100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1682,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M714100_PRODUCTMEDIAAI",
+        "id": "M714100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1667,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M722100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M722100_FARMER",
+        "id": "M722100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1611,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M722100_FARMER",
+        "id": "M722100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1596,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M723100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M723100_AIBRAIN",
+        "id": "M723100",
+        "hasManifest": true,
+        "declaredStatus": "BACKEND_ONLY",
+        "fileCount": 2,
+        "bytes": 1468,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M723100_AIBRAIN",
+        "id": "M723100",
+        "hasManifest": true,
+        "declaredStatus": "BACKEND_ONLY",
+        "fileCount": 2,
+        "bytes": 1749,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M726100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M726100_FORESTRY",
+        "id": "M726100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1628,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M726100_FORESTRY",
+        "id": "M726100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1613,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M735100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M735100_FOLUBENCHMARK",
+        "id": "M735100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1671,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M735100_FOLUBENCHMARK",
+        "id": "M735100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1656,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M74100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M74100_OPERATIONSMANAGEMENT",
+        "id": "M74100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 23073,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M74100_OPERATIONSMANAGEMENT",
+        "id": "M74100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 23058,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M746100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M746100_ANALYTICS",
+        "id": "M746100",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 4,
+        "bytes": 9450,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/analyticsService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M746100_ANALYTICS",
+        "id": "M746100",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 4,
+        "bytes": 9438,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/analyticsService.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "M752100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M752100_AIBACKBONE",
+        "id": "M752100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1621,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M752100_AIBACKBONE",
+        "id": "M752100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1606,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M759100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M759100_DEMAND",
+        "id": "M759100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1612,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M759100_DEMAND",
+        "id": "M759100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1597,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M763100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M763100_ENTERPRISECONTROL",
+        "id": "M763100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1701,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M763100_ENTERPRISECONTROL",
+        "id": "M763100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1686,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M764100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M764100_V42INTELLIGENCE",
+        "id": "M764100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1685,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M764100_V42INTELLIGENCE",
+        "id": "M764100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1670,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M767100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M767100_DPRGENERATION",
+        "id": "M767100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1670,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M767100_DPRGENERATION",
+        "id": "M767100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1655,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M77100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M77100_WATERMANAGEMENT",
+        "id": "M77100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 16086,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M77100_WATERMANAGEMENT",
+        "id": "M77100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 16071,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M771100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M771100_COSTCONTROL",
+        "id": "M771100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 24542,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M771100_COSTCONTROL",
+        "id": "M771100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 24527,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M775100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M775100_FARMERFAMILY",
+        "id": "M775100",
+        "hasManifest": true,
+        "declaredStatus": "ROUTES_ONLY",
+        "fileCount": 2,
+        "bytes": 1509,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M775100_FARMERFAMILY",
+        "id": "M775100",
+        "hasManifest": true,
+        "declaredStatus": "ROUTES_ONLY",
+        "fileCount": 2,
+        "bytes": 1497,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M781100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M781100_LANDMANAGEMENT",
+        "id": "M781100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1654,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M781100_LANDMANAGEMENT",
+        "id": "M781100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1639,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M791100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M791100_RURALENTERPRISE",
+        "id": "M791100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1685,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M791100_RURALENTERPRISE",
+        "id": "M791100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1670,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M801100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M801100_INSTITUTIONALPROCUREMENT",
+        "id": "M801100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1757,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M801100_INSTITUTIONALPROCUREMENT",
+        "id": "M801100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1742,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M805100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M805100_EXPERIENCELAYER",
+        "id": "M805100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1687,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M805100_EXPERIENCELAYER",
+        "id": "M805100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1672,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M807100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M807100_ECOMMERCEAI",
+        "id": "M807100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1656,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M807100_ECOMMERCEAI",
+        "id": "M807100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1641,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M8100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M8100_RECIPEINTELLIGENCE",
+        "id": "M8100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1705,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M8100_RECIPEINTELLIGENCE",
+        "id": "M8100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1690,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M82100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M82100_GOAT",
+        "id": "M82100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 20532,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M82100_GOAT",
+        "id": "M82100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 20517,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M822100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M822100_MILLCIRCUIT",
+        "id": "M822100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1653,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M822100_MILLCIRCUIT",
+        "id": "M822100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1638,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M825100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M825100_DIGITALPRODUCTPASSPORT",
+        "id": "M825100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1744,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M825100_DIGITALPRODUCTPASSPORT",
+        "id": "M825100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1729,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M826100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M826100_ECOMMERCE",
+        "id": "M826100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1636,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M826100_ECOMMERCE",
+        "id": "M826100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1621,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M840100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M840100_SYSTEMADMINISTRATION",
+        "id": "M840100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 9902,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M840100_SYSTEMADMINISTRATION",
+        "id": "M840100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 9887,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M844100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M844100_FARMERVALUE",
+        "id": "M844100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1653,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M844100_FARMERVALUE",
+        "id": "M844100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1638,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M852100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M852100_SHAREDINFRASTRUCTURE",
+        "id": "M852100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1725,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M852100_SHAREDINFRASTRUCTURE",
+        "id": "M852100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1710,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M854100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M854100_INFORMATIONSHARING",
+        "id": "M854100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1711,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M854100_INFORMATIONSHARING",
+        "id": "M854100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1696,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M858100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M858100_PIG",
+        "id": "M858100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 21044,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M858100_PIG",
+        "id": "M858100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 21029,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M865100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M865100_PROJECTSYSTEMS",
+        "id": "M865100",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 4,
+        "bytes": 27012,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M865100_PROJECTSYSTEMS",
+        "id": "M865100",
+        "hasManifest": true,
+        "declaredStatus": "COMPLETE",
+        "fileCount": 4,
+        "bytes": 27000,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M868100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M868100_HORTICULTUREMANAGEMENT",
+        "id": "M868100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 4,
+        "bytes": 24327,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M868100_HORTICULTUREMANAGEMENT",
+        "id": "M868100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 4,
+        "bytes": 24312,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M87100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M87100_ANIMALHEALTH",
+        "id": "M87100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 5,
+        "bytes": 24950,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M87100_ANIMALHEALTH",
+        "id": "M87100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 5,
+        "bytes": 24935,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M880100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M880100_FISHERIESMANAGEMENT",
+        "id": "M880100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1694,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M880100_FISHERIESMANAGEMENT",
+        "id": "M880100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1679,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M897100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M897100_CONSUMERHEALTH",
+        "id": "M897100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1677,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M897100_CONSUMERHEALTH",
+        "id": "M897100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1662,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "M90100",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "M90100_IOTINTEGRATION",
+        "id": "M90100",
+        "hasManifest": true,
+        "declaredStatus": "PACKAGED",
+        "fileCount": 2,
+        "bytes": 1675,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "M90100_IOTINTEGRATION",
+        "id": "M90100",
+        "hasManifest": true,
+        "declaredStatus": "WIRED",
+        "fileCount": 2,
+        "bytes": 1660,
+        "hasBackend": true,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "MIGRATION_SYSTEM",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "MIGRATION_SYSTEM",
+        "id": "MIGRATION_SYSTEM",
+        "hasManifest": false,
+        "declaredStatus": null,
+        "fileCount": 5,
+        "bytes": 50513,
+        "hasBackend": false,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "MIGRATION_SYSTEM",
+        "id": "MIGRATION_SYSTEM",
+        "hasManifest": false,
+        "declaredStatus": null,
+        "fileCount": 5,
+        "bytes": 50513,
+        "hasBackend": false,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "MODULE_BACKBONE",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "MODULE_BACKBONE",
+        "id": "MODULE_BACKBONE",
+        "hasManifest": false,
+        "declaredStatus": null,
+        "fileCount": 1,
+        "bytes": 9355,
+        "hasBackend": false,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "MODULE_BACKBONE",
+        "id": "MODULE_BACKBONE",
+        "hasManifest": false,
+        "declaredStatus": null,
+        "fileCount": 1,
+        "bytes": 9355,
+        "hasBackend": false,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  },
+  {
+    "id": "TEMPLATES",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "TEMPLATES",
+        "id": "TEMPLATES",
+        "hasManifest": false,
+        "declaredStatus": null,
+        "fileCount": 8,
+        "bytes": 38014,
+        "hasBackend": false,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/mepDesignRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/mepBoqBridge.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/platform/whatsappService.js"
+        ]
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "TEMPLATES",
+        "id": "TEMPLATES",
+        "hasManifest": false,
+        "declaredStatus": null,
+        "fileCount": 8,
+        "bytes": 48058,
+        "hasBackend": false,
+        "hasRoutes": false,
+        "referencedBy": [
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\routes/mepDesignRoutes.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/legacy/mepBoqBridge.js",
+          "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services/platform/whatsappService.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "UIP_SYSTEM",
+    "copies": [
+      {
+        "tree": "modules",
+        "dirName": "UIP_SYSTEM",
+        "id": "UIP_SYSTEM",
+        "hasManifest": false,
+        "declaredStatus": null,
+        "fileCount": 2,
+        "bytes": 21779,
+        "hasBackend": false,
+        "hasRoutes": false,
+        "referencedBy": []
+      },
+      {
+        "tree": "backend/src/modules",
+        "dirName": "UIP_SYSTEM",
+        "id": "UIP_SYSTEM",
+        "hasManifest": false,
+        "declaredStatus": null,
+        "fileCount": 2,
+        "bytes": 21779,
+        "hasBackend": false,
+        "hasRoutes": false,
+        "referencedBy": []
+      }
+    ]
+  }
+]

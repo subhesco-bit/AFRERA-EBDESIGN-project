@@ -3,6 +3,15 @@
  */
 
 const { randomUUID } = require('crypto');
+// Real per-crop connections — these three engines exist specifically because
+// this file's nutrition_path/water_link/erosion notes used to be generic
+// category lists ("soil-test based NPK", "sandy light frequent") with no
+// actual numbers. Enhanced 2026-09-24 to pull the real figures when a crop
+// (and, for erosion, a slope) is known, instead of leaving them as separate,
+// disconnected modules a caller would have to know to query themselves.
+const fertilizerEng = require('./FertilizerEngine');
+const irrigationEng = require('./IrrigationEngine');
+const soilConservationEng = require('./SoilConservationEngine');
 
 const SOIL_DISCLAIMER =
   'Soil and microbiome guidance is educational. Soil laboratory tests override generic advice. Biofertilizer quality varies — use registered products. Chemical fertilizer/pesticide: label and soil-test based only. Biochar: charge before use.';
@@ -89,12 +98,24 @@ function analyzeSoil(input = {}) {
         : inorganic
           ? 'Soil-test NPK + micronutrients; residue/OC; optional charged biochar on sandy soils'
           : 'Integrated: soil-test minerals + continuous OC + microbiome + optional charged biochar',
+      // The category lists above answer "what kinds of inputs exist"; this
+      // answers "how much, for this crop" — real ICAR/state package-of-
+      // practices kg/ha figures from FertilizerEngine, not a placeholder.
+      crop_dose: input.crop ? fertilizerEng.recommendationForCrop({ crop: input.crop, farming_mode: mode }) : null,
     },
     biochar_note: 'Always charge biochar (compost mix preferred) before soil application — see /api/v1/agro-farming/biochar/conference',
     water_link: {
       note: 'Soil texture drives irrigation frequency — sandy light frequent; clay less frequent deeper',
       avoid: 'Waterlogging kills aerobic microbiome',
+      // Real crop-stage schedule (critical growth stage, water-band-specific
+      // timing) instead of the texture-only qualitative note above.
+      crop_schedule: input.crop ? irrigationEng.scheduleForCrop({ crop: input.crop }) : null,
     },
+    // Several SOIL_TYPES_INDIA entries above say "terracing slopes" or
+    // "erosion" in their management notes with no actual slope-based plan —
+    // this resolves that into SoilConservationEngine's real, slope-banded
+    // measures when a slope is known.
+    erosion_control: input.slope_pct != null ? soilConservationEng.conservationPlan({ slope_pct: input.slope_pct }) : null,
     disclaimer: SOIL_DISCLAIMER,
     generatedAt: new Date().toISOString(),
   };

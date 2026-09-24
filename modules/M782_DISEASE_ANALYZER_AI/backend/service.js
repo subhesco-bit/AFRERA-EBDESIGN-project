@@ -9,6 +9,8 @@
 
 const aiBackbone = require('../../M400_AI_BACKBONE/backend/service');
 const { logger } = require('../../../backend/src/utils/logger');
+// Project-wide evidence/provenance standard (see .ai/decisions/0003-evidence-provenance-standard.md)
+const { inferred } = require('../../../backend/src/utils/evidence');
 
 // ---------------------------------------------------------------------------
 // Ontology & knowledge (production-grade stubs; replaceable by live CV/LLM)
@@ -392,11 +394,23 @@ class DISEASEANALYZERAIService {
 
   // ---- 3. Disease identification ----
   identifyDisease(data) {
-    const { domain = 'plant', symptoms = [], crop, species, tags = [] } = data || {};
+    const { domain = 'plant', symptoms = [], crop, species, tags = [], description } = data || {};
     const library = domain === 'animal' ? ANIMAL_DISEASE_LIBRARY : PLANT_DISEASE_LIBRARY;
-    const symptomKeys = Array.isArray(symptoms)
+    let symptomKeys = Array.isArray(symptoms)
       ? symptoms.map((s) => (typeof s === 'string' ? s : s.key)).filter(Boolean)
       : [];
+    let extractionRan = false;
+    // Callers of the standalone /identify endpoint often send raw free text
+    // instead of a pre-extracted symptoms array (the combined /process
+    // pipeline already chains extractSymptoms -> identifyDisease, but a
+    // direct call previously silently scored every candidate at baseline
+    // with zero overlap when `symptoms` was empty, instead of either
+    // extracting from the text it was actually given or saying so).
+    if (symptomKeys.length === 0 && (description || tags.length)) {
+      const extraction = this.extractSymptoms({ domain, tags, description, crop, species });
+      symptomKeys = extraction.symptoms.map((s) => s.key);
+      extractionRan = true;
+    }
     const tagText = (tags || []).join(' ').toLowerCase();
 
     const scored = library.map((d) => {
@@ -429,6 +443,21 @@ class DISEASEANALYZERAIService {
       alternatives,
       differential: scored.slice(0, 5),
       confidence: top?.confidence || 0.3,
+      symptom_extraction_fallback: extractionRan,
+      symptoms_used: symptomKeys,
+      // This is a keyword-overlap heuristic against a fixed disease library,
+      // never a lab result or a trained classifier — `inferred` per the
+      // project evidence standard, so callers can't mistake `confidence`
+      // for a verified fact just because it's a number.
+      provenance: {
+        top_match: inferred(
+          `${domain === 'animal' ? 'ANIMAL_DISEASE_LIBRARY' : 'PLANT_DISEASE_LIBRARY'} keyword overlap`,
+          symptomKeys.length === 0
+            ? 'No symptom keys matched the library vocabulary — this ranking is close to the library\'s baseline prior, not evidence from this case.'
+            : `Ranked by overlap with ${symptomKeys.length} extracted symptom key(s); a low or missing match on the true cause is possible if its symptoms aren't in the extraction vocabulary yet.`,
+          'score = confidence_base*0.5 + 0.15*matched_symptom_count + host/species match bonus + name/tag text bonus, capped at 0.97',
+        ),
+      },
       disclaimer:
         domain === 'animal'
           ? 'Not a diagnosis. Licensed veterinarian required.'

@@ -7,7 +7,10 @@
  * FIXED: previously incorrectly bound to `sales_pipeline`.
  */
 
-const db = require('../../database/connection');
+// '../../database/connection' exports {initialize, getPostgreSQL, ...} - never a bare
+// query method - db.query() below always threw. '../../database/pool' exports
+// a real .query(); batch-fixed 2026-09-24, see .ai/decisions/0003-evidence-provenance-standard.md
+const db = require('../../database/pool');
 const { logger } = require('../../utils/logger');
 const { ValidationError, NotFoundError, DatabaseError } = require('../../utils/errors');
 const { VETERINARY_CLINICAL_DISCLAIMER } = require('../../utils/disclaimers');

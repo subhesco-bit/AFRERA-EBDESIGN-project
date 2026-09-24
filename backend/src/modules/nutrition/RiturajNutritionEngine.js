@@ -136,11 +136,17 @@ function bmi(weight_kg, height_cm) {
 
 /** Master nutrition calculator */
 function calculateNutrition(profile = {}) {
+  // Accept the natural-language field names a real caller is likely to send
+  // (age/weight/height) as fallbacks for the canonical *_years/_kg/_cm names.
+  // Previously an unrecognized name (e.g. `weight` instead of `weight_kg`)
+  // silently produced every downstream field as null with no error —
+  // exactly the "confident but false" gap the evidence standard exists to
+  // catch, except here the bug was upstream of provenance ever seeing it.
   const {
     sex,
-    age_years,
-    weight_kg,
-    height_cm,
+    age_years = profile.age,
+    weight_kg = profile.weight,
+    height_cm = profile.height,
     activity_level = 'moderate',
     goal = 'maintain',
   } = profile;

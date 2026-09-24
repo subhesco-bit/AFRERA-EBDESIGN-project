@@ -400,6 +400,19 @@ async function startup() {
     const serviceRouteStats = await serviceLoader.mountServiceRoutes(app);
     logger.info('✅ Routes mounted', { ...routeStats, serviceSetupRoutes: serviceRouteStats.mounted });
 
+    // Mounted after the auto-discovery pass above so already-working direct
+    // mounts (e.g. /api/v1/agro-farming) keep winning first-match; this only
+    // adds paths auto-discovery can't reach: the catalogue endpoint, the
+    // /app SPA static files, and modules/ content (M782 disease analyzer)
+    // that lives outside the auto-scanned routes/ and services/ directories.
+    try {
+      const { mountThreeModules } = require('./bootstrap/mountThreeModules');
+      mountThreeModules(app);
+      logger.info('✅ Three-module gateway mounted', { catalogue: '/api/v1/three-modules/catalogue', ui: '/app/' });
+    } catch (error) {
+      logger.warn('⚠️  Three-module gateway mount skipped', { error: error.message });
+    }
+
     app.locals.serviceLoader = serviceLoader;
     app.locals.routeLoader = routeLoader;
     app.locals.db = db;

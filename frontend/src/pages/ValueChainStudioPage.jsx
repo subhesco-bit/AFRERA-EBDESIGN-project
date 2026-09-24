@@ -23,19 +23,21 @@ function ProvenanceBadge({ provenance, path }) {
   const styles = {
     db: 'bg-emerald-50 text-emerald-800',
     calculated: 'bg-sky-50 text-sky-800',
+    inferred: 'bg-amber-50 text-amber-900',
     ai: 'bg-violet-50 text-violet-800',
     unavailable: 'bg-slate-100 text-slate-600',
   };
   const label = {
-    db: 'Verified · DB',
-    calculated: 'Calculated',
+    db: entry.verified ? 'Verified · DB' : 'Unverified · DB',
+    calculated: entry.verified ? 'Verified calculation' : 'Unverified calculation',
+    inferred: 'Inferred · verify',
     ai: 'AI · advisory only',
     unavailable: 'Unavailable',
   };
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${styles[entry.source] || styles.unavailable}`}
-      title={entry.note || ''}
+      title={[entry.sourceRef, entry.methodology, entry.note].filter(Boolean).join(' · ')}
     >
       {entry.verified ? <CheckCircle2 className="h-3 w-3" /> : <HelpCircle className="h-3 w-3" />}
       {label[entry.source] || entry.source}
@@ -206,6 +208,7 @@ export default function ValueChainStudioPage() {
                     <p className="mt-1 text-xs text-slate-600">
                       {plan.readiness.verifiedFields}/{plan.readiness.totalTrackedFields} fields verified ·
                       {plan.readiness.unavailableFields} unavailable ·
+                      {plan.readiness.inferredFields || 0} inferred ·
                       {plan.readiness.openComplianceGates} open compliance gate(s)
                     </p>
                   </div>
@@ -221,6 +224,16 @@ export default function ValueChainStudioPage() {
                     </button>
                   </div>
                 </div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {plan.readiness.checks?.map((check) => (
+                    <div key={check.id} className={`rounded-xl border p-3 ${check.passed ? 'border-emerald-200 bg-white' : 'border-amber-200 bg-amber-50'}`}>
+                      <div className="flex items-center justify-between gap-2 text-xs font-bold">
+                        <span>{check.label}</span><span>{check.passed ? `+${check.weight}` : `0/${check.weight}`}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs text-slate-600">Formula: {plan.readiness.formula}</p>
               </div>
             )}
 
@@ -268,6 +281,13 @@ export default function ValueChainStudioPage() {
                     <ProvenanceBadge provenance={provenance} path="pricing.activeLot" />
                   </div>
                 ) : <div className="mt-3"><EmptyNote>No active yield-managed pricing lot for this product.</EmptyNote></div>}
+                {plan.pricing?.transparency && (
+                  <div className="mt-3 rounded-xl border border-sky-100 bg-sky-50 p-3 text-xs text-slate-700">
+                    <div className="flex flex-wrap items-center gap-2"><strong>Auditable pricing math</strong><ProvenanceBadge provenance={provenance} path="pricing.transparency" /></div>
+                    <div className="mt-2">Catalog {fmtMoney(plan.pricing.transparency.catalogBasePriceInr)} · peer midpoint {plan.pricing.transparency.peerFloorMinInr == null ? '—' : fmtMoney((plan.pricing.transparency.peerFloorMinInr + plan.pricing.transparency.peerFloorMaxInr) / 2)} · delta {fmtMoney(plan.pricing.transparency.deltaBaseVsFloorMidInr)}</div>
+                    <div className="mt-1 text-slate-500">base price − ((peer minimum + peer maximum) ÷ 2)</div>
+                  </div>
+                )}
                 <Link to="/dynamic-pricing" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-900">Open pricing workspace<ArrowRight className="h-4 w-4" /></Link>
               </Section>
 
@@ -286,6 +306,12 @@ export default function ValueChainStudioPage() {
                       </li>
                     ))}
                   </ul>
+                )}
+                {plan.coldChain?.requirements && (
+                  <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+                    <div className="flex flex-wrap items-center gap-2"><strong>{plan.coldChain.requirements.likelyRequiresColdChain ? 'Cold-chain likely required' : 'Ambient handling may be suitable'}</strong><ProvenanceBadge provenance={provenance} path="coldChain.requirements" /></div>
+                    <ul className="mt-2 list-disc space-y-1 pl-5">{plan.coldChain.requirements.checklist?.map((item) => <li key={item}>{item}</li>)}</ul>
+                  </div>
                 )}
               </Section>
 
@@ -394,6 +420,19 @@ export default function ValueChainStudioPage() {
               </Section>
             </div>
 
+            <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-950">Data provenance ledger</h2>
+              <p className="mt-1 text-xs text-slate-600">Every plan field declares its source, verification state and method. Inferred and unavailable fields contribute no readiness points.</p>
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full min-w-[680px] text-left text-xs">
+                  <thead><tr className="border-b text-slate-500"><th className="p-2">Field</th><th className="p-2">Status</th><th className="p-2">Source</th><th className="p-2">Method / note</th><th className="p-2">As of</th></tr></thead>
+                  <tbody>{Object.entries(provenance || {}).map(([field, item]) => (
+                    <tr key={field} className="border-b border-slate-100 align-top"><td className="p-2 font-mono">{field}</td><td className="p-2"><ProvenanceBadge provenance={provenance} path={field} /></td><td className="p-2">{item.sourceRef || '—'}</td><td className="p-2 text-slate-600">{item.methodology || item.note || 'Direct record read'}</td><td className="p-2 text-slate-500">{item.asOf ? new Date(item.asOf).toLocaleString() : '—'}</td></tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            </section>
+
             <section className="rounded-3xl border border-violet-200 bg-violet-50/40 p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-violet-700" />
@@ -414,6 +453,7 @@ export default function ValueChainStudioPage() {
                   {positioning.data?.copy && (
                     <p className="mt-3 rounded-xl bg-white p-3 text-sm leading-6 text-slate-700">{positioning.data.copy}</p>
                   )}
+                  {positioning.isError && <p role="alert" className="mt-3 text-sm text-red-700">{positioning.error?.response?.data?.error || 'Positioning generation is unavailable.'}</p>}
                 </div>
                 <div>
                   <label className="block">
@@ -441,6 +481,7 @@ export default function ValueChainStudioPage() {
                         : <span>{image.data.status === 'not_configured' ? 'Image provider not configured.' : (image.data.error || 'Image generation unavailable.')}</span>}
                     </div>
                   )}
+                  {image.isError && <p role="alert" className="mt-3 text-sm text-red-700">{image.error?.response?.data?.error || 'Image generation is unavailable.'}</p>}
                 </div>
               </div>
             </section>

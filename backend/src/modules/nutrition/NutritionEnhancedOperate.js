@@ -31,9 +31,19 @@ function runNutritionEnhanced(input = {}) {
 
   workflow.advance(wf, 'interpret', 'conference_done');
 
+  // `confidence_overall` never existed on the conference output — this
+  // previously always evaluated false and silently fell through to the
+  // engine's "no signals" default, with nothing to indicate the gap. The
+  // real, honest signal available here is whether the Mifflin-St Jeor
+  // calculation actually ran on valid inputs (tdee_kcal non-null) rather
+  // than a fabricated confidence number.
   const signals = [];
-  if (conference?.confidence_overall != null) signals.push({ value: conference.confidence_overall, weight: 1.3, source: 'conference' });
-  if (conference?.calculator?.tdee) signals.push({ value: 0.7, weight: 0.5, source: 'calculator_present' });
+  if (conference?.calculator?.tdee_kcal != null) {
+    signals.push({ value: 0.75, weight: 1, source: 'calculator_computed' });
+  }
+  if (Array.isArray(conference?.clinical_flags) && conference.clinical_flags.length > 0) {
+    signals.push({ value: 0.6, weight: 0.5, source: 'clinical_flags_present' });
+  }
 
   const majorInteraction = !!(conference?.pharmacy_flags?.major || conference?.drug_food_alerts?.some((a) => a.severity === 'major'));
   const clinicalHigh = lifeFlags.some((f) => f.priority === 'high') || !!input.diabetes || !!input.ckd;

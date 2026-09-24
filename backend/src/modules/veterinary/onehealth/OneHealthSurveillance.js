@@ -97,7 +97,7 @@ function nationalEscalationPath(species, stage, location = {}) {
   const state = location.state || 'unknown state';
   const steps = [
     'Isolate affected animals; stop unnecessary movement',
-    `Notify local / block veterinary officer (${state})',
+    `Notify local / block veterinary officer (${state})`,
     'Preserve samples only under professional guidance; do not open carcasses if anthrax suspected',
   ];
   if (stage.id === 'STAGE_2_SUSPECT' || stage.id === 'STAGE_3_CONFIRMED_LOCAL') {

@@ -35,6 +35,7 @@ router.get('/:productId', authMiddleware, async (req, res) => {
     const data = await valueChainStudioService.buildLifecyclePlan({
       productId: req.params.productId,
       farmerId: req.query.farmerId || null,
+      requester: req.user,
     });
     res.set('Cache-Control', 'private, no-store');
     res.set('X-Plan-Version', data.planVersion || '2.0');
@@ -42,25 +43,21 @@ router.get('/:productId', authMiddleware, async (req, res) => {
   } catch (error) {
     const notFound = error.message === 'Product not found';
     const badRequest = error.message === 'productId is required';
-    const status = notFound ? 404 : badRequest ? 400 : 500;
+    const forbidden = error.message === 'Farmer context is not accessible';
+    const status = notFound ? 404 : badRequest ? 400 : forbidden ? 403 : 500;
     res.status(status).json({
       success: false,
       error: error.message,
-      code: notFound ? 'PRODUCT_NOT_FOUND' : badRequest ? 'PRODUCT_ID_REQUIRED' : 'PLAN_BUILD_FAILED',
+      code: notFound ? 'PRODUCT_NOT_FOUND' : badRequest ? 'PRODUCT_ID_REQUIRED' : forbidden ? 'FARMER_CONTEXT_FORBIDDEN' : 'PLAN_BUILD_FAILED',
     });
   }
 });
 
 router.post('/:productId/positioning', authMiddleware, async (req, res) => {
   try {
-    const productData = {
-      id: req.params.productId,
-      name: req.body.name,
-      category: req.body.category,
-      basePrice: req.body.basePrice,
-      valueScore: req.body.valueScore,
-      pricing: req.body.pricing,
-    };
+    const product = await valueChainStudioService.getProductContext(req.params.productId);
+    if (!product) return res.status(404).json({ success: false, error: 'Product not found', code: 'PRODUCT_NOT_FOUND' });
+    const productData = { id: product.id, name: product.name, category: product.category_name, basePrice: product.base_price };
     const result = await valueChainStudioService.generatePositioningCopy(productData);
     res.json({ success: true, data: result });
   } catch (error) {

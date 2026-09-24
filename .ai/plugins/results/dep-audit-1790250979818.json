@@ -1,0 +1,369 @@
+{
+  "target": "frontend",
+  "timestamp": "2026-09-24T11:56:14.363Z",
+  "vulnerabilities": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {
+      "@capacitor/cli": {
+        "name": "@capacitor/cli",
+        "severity": "moderate",
+        "isDirect": true,
+        "via": [
+          "xcode"
+        ],
+        "effects": [],
+        "range": "8.5.0 - 9.0.0-alpha.7",
+        "nodes": [
+          "node_modules/@capacitor/cli"
+        ],
+        "fixAvailable": {
+          "name": "@capacitor/cli",
+          "version": "8.4.3",
+          "isSemVerMajor": true
+        }
+      },
+      "uuid": {
+        "name": "uuid",
+        "severity": "moderate",
+        "isDirect": false,
+        "via": [
+          {
+            "source": 1119441,
+            "name": "uuid",
+            "dependency": "uuid",
+            "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+            "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+            "severity": "moderate",
+            "cwe": [
+              "CWE-787",
+              "CWE-1285"
+            ],
+            "cvss": {
+              "score": 7.5,
+              "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+            },
+            "range": "<11.1.1"
+          }
+        ],
+        "effects": [
+          "xcode"
+        ],
+        "range": "<11.1.1",
+        "nodes": [
+          "node_modules/uuid"
+        ],
+        "fixAvailable": {
+          "name": "@capacitor/cli",
+          "version": "8.4.3",
+          "isSemVerMajor": true
+        }
+      },
+      "xcode": {
+        "name": "xcode",
+        "severity": "moderate",
+        "isDirect": false,
+        "via": [
+          "uuid"
+        ],
+        "effects": [
+          "@capacitor/cli"
+        ],
+        "range": ">=0.9.2",
+        "nodes": [
+          "node_modules/xcode"
+        ],
+        "fixAvailable": {
+          "name": "@capacitor/cli",
+          "version": "8.4.3",
+          "isSemVerMajor": true
+        }
+      }
+    },
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 3,
+        "high": 0,
+        "critical": 0,
+        "total": 3
+      },
+      "dependencies": {
+        "prod": 256,
+        "dev": 859,
+        "optional": 85,
+        "peer": 1,
+        "peerOptional": 0,
+        "total": 1114
+      }
+    }
+  },
+  "outdated": {
+    "@babel/core": {
+      "current": "7.29.7",
+      "wanted": "7.29.7",
+      "latest": "8.0.6",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@babel\\core"
+    },
+    "@babel/preset-env": {
+      "current": "7.29.7",
+      "wanted": "7.29.7",
+      "latest": "8.0.6",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@babel\\preset-env"
+    },
+    "@babel/preset-react": {
+      "current": "7.29.7",
+      "wanted": "7.29.7",
+      "latest": "8.0.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@babel\\preset-react"
+    },
+    "@capacitor/android": {
+      "current": "8.5.1",
+      "wanted": "8.5.2",
+      "latest": "8.5.2",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@capacitor\\android"
+    },
+    "@capacitor/cli": {
+      "current": "8.5.1",
+      "wanted": "8.5.2",
+      "latest": "8.5.2",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@capacitor\\cli"
+    },
+    "@capacitor/core": {
+      "current": "8.5.1",
+      "wanted": "8.5.2",
+      "latest": "8.5.2",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@capacitor\\core"
+    },
+    "@hookform/resolvers": {
+      "current": "3.10.0",
+      "wanted": "3.10.0",
+      "latest": "5.9.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@hookform\\resolvers"
+    },
+    "@sentry/react": {
+      "current": "7.120.4",
+      "wanted": "10.75.3",
+      "latest": "11.0.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@sentry\\react"
+    },
+    "@tanstack/react-query": {
+      "current": "5.102.8",
+      "wanted": "5.103.2",
+      "latest": "5.103.2",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@tanstack\\react-query"
+    },
+    "@tauri-apps/cli": {
+      "current": "1.6.3",
+      "wanted": "1.6.3",
+      "latest": "2.11.5",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@tauri-apps\\cli"
+    },
+    "@testing-library/jest-dom": {
+      "current": "6.9.1",
+      "wanted": "6.9.1",
+      "latest": "7.0.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@testing-library\\jest-dom"
+    },
+    "@testing-library/react": {
+      "current": "14.3.1",
+      "wanted": "14.3.1",
+      "latest": "16.3.3",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@testing-library\\react"
+    },
+    "@types/react": {
+      "current": "18.3.31",
+      "wanted": "18.3.31",
+      "latest": "19.3.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@types\\react"
+    },
+    "@types/react-dom": {
+      "current": "18.3.7",
+      "wanted": "18.3.7",
+      "latest": "19.3.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@types\\react-dom"
+    },
+    "@vitest/ui": {
+      "current": "1.6.1",
+      "wanted": "5.0.1",
+      "latest": "5.0.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\@vitest\\ui"
+    },
+    "autoprefixer": {
+      "current": "10.5.4",
+      "wanted": "10.6.1",
+      "latest": "10.6.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\autoprefixer"
+    },
+    "babel-jest": {
+      "current": "29.7.0",
+      "wanted": "30.5.2",
+      "latest": "30.5.2",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\babel-jest"
+    },
+    "c8": {
+      "current": "8.0.1",
+      "wanted": "8.0.1",
+      "latest": "12.0.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\c8"
+    },
+    "date-fns": {
+      "current": "2.30.0",
+      "wanted": "2.30.0",
+      "latest": "4.4.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\date-fns"
+    },
+    "eslint": {
+      "current": "8.57.1",
+      "wanted": "8.57.1",
+      "latest": "10.11.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\eslint"
+    },
+    "eslint-plugin-react-hooks": {
+      "current": "4.6.2",
+      "wanted": "4.6.2",
+      "latest": "7.1.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\eslint-plugin-react-hooks"
+    },
+    "eslint-plugin-react-refresh": {
+      "current": "0.4.26",
+      "wanted": "0.4.26",
+      "latest": "0.5.7",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\eslint-plugin-react-refresh"
+    },
+    "framer-motion": {
+      "current": "13.2.0",
+      "wanted": "13.4.3",
+      "latest": "13.4.3",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\framer-motion"
+    },
+    "jest": {
+      "current": "29.7.0",
+      "wanted": "29.7.0",
+      "latest": "30.5.2",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\jest"
+    },
+    "jest-environment-jsdom": {
+      "current": "29.7.0",
+      "wanted": "29.7.0",
+      "latest": "30.5.2",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\jest-environment-jsdom"
+    },
+    "jsdom": {
+      "current": "23.2.0",
+      "wanted": "23.2.0",
+      "latest": "30.1.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\jsdom"
+    },
+    "lucide-react": {
+      "current": "0.294.0",
+      "wanted": "0.294.0",
+      "latest": "1.48.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\lucide-react"
+    },
+    "react": {
+      "current": "18.3.1",
+      "wanted": "18.3.1",
+      "latest": "19.3.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\react"
+    },
+    "react-dom": {
+      "current": "18.3.1",
+      "wanted": "18.3.1",
+      "latest": "19.3.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\react-dom"
+    },
+    "react-hook-form": {
+      "current": "7.87.0",
+      "wanted": "7.88.0",
+      "latest": "7.88.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\react-hook-form"
+    },
+    "react-hot-toast": {
+      "current": "2.6.0",
+      "wanted": "2.6.1",
+      "latest": "2.6.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\react-hot-toast"
+    },
+    "react-router-dom": {
+      "current": "7.18.3",
+      "wanted": "7.18.4",
+      "latest": "7.18.4",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\react-router-dom"
+    },
+    "recharts": {
+      "current": "2.15.4",
+      "wanted": "2.15.4",
+      "latest": "3.10.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\recharts"
+    },
+    "rollup-plugin-visualizer": {
+      "current": "5.14.0",
+      "wanted": "7.1.1",
+      "latest": "7.1.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\rollup-plugin-visualizer"
+    },
+    "tailwind-merge": {
+      "current": "2.6.1",
+      "wanted": "2.6.1",
+      "latest": "3.7.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\tailwind-merge"
+    },
+    "vite": {
+      "current": "5.4.21",
+      "wanted": "8.3.0",
+      "latest": "8.3.0",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\vite"
+    },
+    "vitest": {
+      "current": "1.6.1",
+      "wanted": "5.0.1",
+      "latest": "5.0.1",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\vitest"
+    },
+    "zod": {
+      "current": "3.25.76",
+      "wanted": "3.25.76",
+      "latest": "4.6.5",
+      "dependent": "frontend",
+      "location": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\node_modules\\zod"
+    }
+  }
+}

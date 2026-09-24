@@ -186,6 +186,20 @@ class DynamicRouteLoader {
         return;
       }
 
+      // Some route files legitimately mount several sub-routers at several
+      // paths (e.g. wallet + contract-farming + preseason under one file)
+      // and can't be represented as a single `app.use(path, router)` call.
+      // Those export `{ mount(app) }` instead of a router — call it directly.
+      const mountFn = routeModule.mount || routeModule.default?.mount;
+      if (typeof mountFn === 'function' && typeof (routeModule.router || routeModule.default || routeModule) !== 'function') {
+        mountFn(this.app);
+        entry.mounted = true;
+        entry.mountPath = `(mount) ${routeName}`;
+        entry.loadTime = Date.now() - startTime;
+        this.mountedCount++;
+        return;
+      }
+
       const router = routeModule.router || routeModule.default || routeModule;
 
       if (typeof router !== 'function') {

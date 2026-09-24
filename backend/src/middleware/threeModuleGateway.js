@@ -29,7 +29,12 @@ function jsonEnvelope(req, res, next) {
         correlation_id: req.correlationId,
         module: req.afreraModule || body.module || null,
         timestamp: new Date().toISOString(),
-        data: body.data !== undefined ? body.data : body.success !== undefined ? body.data : body,
+        // If the handler already nested its payload under `.data`, use that;
+        // otherwise the whole body *is* the payload. The previous version
+        // fell through to `body.data` (undefined) whenever `body.success`
+        // was set but `body.data` wasn't — silently discarding every real
+        // response shaped like { success, ...payloadFieldsAtTopLevel }.
+        data: body.data !== undefined ? body.data : body,
         error: body.error || null,
         meta: body.meta || undefined,
         _enveloped: true,
