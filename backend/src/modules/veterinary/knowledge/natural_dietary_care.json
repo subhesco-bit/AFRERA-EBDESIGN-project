@@ -1,0 +1,89 @@
+{
+  "version": "2026.09.care-v1",
+  "scope": "Natural care + dietary care protocols — veterinary module decision support",
+  "natural_care_pillars": [
+    {
+      "id": "rest_isolation",
+      "name": "Rest, shade, isolation when indicated",
+      "evidence_level": "strong",
+      "applies": ["cow", "pig", "goat", "poultry"]
+    },
+    {
+      "id": "hydration",
+      "name": "Clean water always; oral fluids if mild dehydration",
+      "evidence_level": "strong",
+      "applies": ["cow", "pig", "goat", "poultry"]
+    },
+    {
+      "id": "thermoneutral",
+      "name": "Thermal comfort — heat/cold mitigation",
+      "evidence_level": "strong",
+      "applies": ["cow", "pig", "goat", "poultry"]
+    },
+    {
+      "id": "wound_hygiene",
+      "name": "Clean minor wounds; avoid contamination",
+      "evidence_level": "strong",
+      "applies": ["cow", "pig", "goat"]
+    },
+    {
+      "id": "stress_reduction",
+      "name": "Reduce handling stress, crowding, predator exposure",
+      "evidence_level": "moderate",
+      "applies": ["cow", "pig", "goat", "poultry"]
+    }
+  ],
+  "dietary_by_species": {
+    "cow": {
+      "principles": [
+        "Stable rumen: adequate effective fibre before concentrates",
+        "Transition (3 weeks pre to 3 weeks post calving): energy and calcium programmes under vet/nutritionist",
+        "Avoid sudden lush legume turnout (bloat)",
+        "Mineral-vitamin mix matched to local deficiency maps"
+      ],
+      "convalescent": [
+        "Soft, highly palatable forage",
+        "Small frequent meals",
+        "Electrolytes if diarrhea under guidance"
+      ],
+      "lactation_support_folklore": [
+        "Fenugreek galactagogue folklore — traditional_only; fix mastitis/nutrition first"
+      ]
+    },
+    "pig": {
+      "principles": [
+        "Phase feeding by weight",
+        "Never untreated kitchen swill in ASF/CSF risk zones",
+        "Iron protocols for indoor piglets under vet guidance",
+        "Water ad libitum critical in heat"
+      ],
+      "convalescent": [
+        "Easily digestible gruel",
+        "Gradual return to full feed"
+      ]
+    },
+    "goat": {
+      "principles": [
+        "Browse + quality roughage; watch Haemonchus in wet seasons",
+        "Late pregnancy energy to prevent pregnancy toxaemia",
+        "Male/castrate: urinary stone risk with high concentrate — salt and water"
+      ],
+      "convalescent": [
+        "Leafy browse if accepted",
+        "Soft feeds; parasite status check"
+      ]
+    },
+    "poultry": {
+      "principles": [
+        "Complete feed age-appropriate; avoid sudden changes",
+        "Heat: electrolytes, cool water, feed in cooler hours",
+        "Layer Ca continuity for shell quality",
+        "Reject mouldy feed"
+      ],
+      "convalescent": [
+        "Supportive electrolytes",
+        "Easy access to feed and water at low height if weak"
+      ]
+    }
+  }
+}

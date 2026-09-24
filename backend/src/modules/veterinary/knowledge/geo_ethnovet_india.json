@@ -1,0 +1,326 @@
+{
+  "version": "2026.09.geo-v1",
+  "scope": "Veterinary module only — geo-fenced ancestral/customary ethnoveterinary knowledge (India)",
+  "disclaimer": "Traditional knowledge is complementary. Evidence grades required. Notifiable/infectious disease must escalate to licensed veterinarian first. Geo match is advisory based on state/district strings.",
+  "regions": [
+    {
+      "id": "indo_gangetic_plain",
+      "states": ["Uttar Pradesh", "UP", "Bihar", "Jharkhand", "West Bengal", "WB", "Haryana", "Punjab", "Delhi"],
+      "climate": "subtropical monsoon",
+      "ancestral_practices": [
+        {
+          "id": "ig_neem_tick",
+          "name": "Neem leaf/branch smoke & decoction (external parasites)",
+          "lineage": "Ancestral farm practice — Indo-Gangetic villages",
+          "uses": ["tick and lice deterrence folklore", "wound wash folklore"],
+          "species": ["cow", "buffalo", "goat", "pig"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "season": "monsoon_post_monsoon",
+          "cautions": ["External preference", "Not substitute for heavy infestation acaricides"]
+        },
+        {
+          "id": "ig_turmeric_wound",
+          "name": "Haldi (turmeric) paste on minor wounds",
+          "lineage": "Household and goshala custom",
+          "uses": ["superficial wound care folklore"],
+          "species": ["cow", "goat", "pig"],
+          "evidence_level": "limited",
+          "requires_vet_consultation": true,
+          "cautions": ["Clean first", "Deep infection needs vet"]
+        },
+        {
+          "id": "ig_jaggery_ajwain",
+          "name": "Gur-ajwain supportive drench folklore (digestive)",
+          "lineage": "North Indian cattle-keeper custom",
+          "uses": ["mild digestive unsettled folklore"],
+          "species": ["cow", "buffalo", "goat"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["Not for bloat emergency", "Not for infectious diarrhea without vet"]
+        },
+        {
+          "id": "ig_mustard_oil_massage",
+          "name": "Sarson oil warm massage (winter stiffness folklore)",
+          "lineage": "Punjab/Haryana/UP winter husbandry",
+          "uses": ["comfort", "circulation folklore"],
+          "species": ["cow", "buffalo", "goat"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": false,
+          "cautions": ["Not for febrile infectious disease as primary care"]
+        }
+      ],
+      "dietary_local": [
+        {
+          "id": "ig_green_fodder_cycle",
+          "name": "Seasonal green fodder + dry bhusa balance",
+          "notes": "Avoid sudden lush legume → bloat risk; gradual transition",
+          "species": ["cow", "buffalo", "goat"]
+        },
+        {
+          "id": "ig_mineral_brick",
+          "name": "Mineral lick / area-specific mineral mix",
+          "notes": "Indo-Gangetic soils often need Ca-P-trace review with local vet/extension",
+          "species": ["cow", "buffalo", "goat"]
+        }
+      ]
+    },
+    {
+      "id": "rajasthan_arid",
+      "states": ["Rajasthan", "RJ"],
+      "climate": "arid semi-arid",
+      "ancestral_practices": [
+        {
+          "id": "rj_khejri_fodder",
+          "name": "Khejri (Prosopis cineraria) leaf fodder tradition",
+          "lineage": "Thar pastoral ancestral knowledge",
+          "uses": ["drought fodder", "nutrition bridge"],
+          "species": ["cow", "goat", "sheep"],
+          "evidence_level": "moderate",
+          "requires_vet_consultation": false,
+          "cautions": ["Balance with other roughage"]
+        },
+        {
+          "id": "rj_alum_wound",
+          "name": "Phitkari (alum) topical folklore",
+          "lineage": "Desert livestock keepers",
+          "uses": ["minor wound astringent folklore"],
+          "species": ["cow", "goat", "camel"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["Not for deep wounds"]
+        },
+        {
+          "id": "rj_water_rationing_care",
+          "name": "Shade + timed watering discipline",
+          "lineage": "Arid-zone survival husbandry",
+          "uses": ["heat stress prevention"],
+          "species": ["cow", "goat", "sheep", "pig"],
+          "evidence_level": "moderate",
+          "requires_vet_consultation": false,
+          "cautions": []
+        }
+      ],
+      "dietary_local": [
+        {
+          "id": "rj_drought_ration",
+          "name": "Crop residue + tree fodder drought ration",
+          "notes": "Watch protein and vitamin A gaps in prolonged drought",
+          "species": ["cow", "goat"]
+        }
+      ]
+    },
+    {
+      "id": "western_ghats_konkan",
+      "states": ["Kerala", "KL", "Karnataka", "KA", "Goa", "GA", "Maharashtra", "MH"],
+      "climate": "humid tropical / coastal",
+      "ancestral_practices": [
+        {
+          "id": "wg_tulsi_respiratory",
+          "name": "Tulsi decoction folklore (respiratory comfort)",
+          "lineage": "Western Ghats household animal care",
+          "uses": ["mild respiratory folklore"],
+          "species": ["goat", "cow", "poultry"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["Does not replace ND/AI/PPR workup"]
+        },
+        {
+          "id": "wg_coconut_oil_topical",
+          "name": "Coconut oil topical (skin/hoof care folklore)",
+          "lineage": "Konkan/Kerala coastal custom",
+          "uses": ["dry skin", "minor external care"],
+          "species": ["cow", "goat"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": false,
+          "cautions": []
+        },
+        {
+          "id": "wg_rice_gruel_convalescent",
+          "name": "Soft rice gruel / kanji convalescent feed",
+          "lineage": "South Indian recovery feeding custom",
+          "uses": ["post-illness soft feed"],
+          "species": ["cow", "goat", "pig"],
+          "evidence_level": "moderate",
+          "requires_vet_consultation": false,
+          "cautions": ["Transition back to normal ration gradually"]
+        }
+      ],
+      "dietary_local": [
+        {
+          "id": "wg_humid_mould_watch",
+          "name": "Humid-climate feed mould vigilance",
+          "notes": "Reject mouldy feed; aflatoxin risk in humid storage",
+          "species": ["cow", "pig", "poultry", "goat"]
+        }
+      ]
+    },
+    {
+      "id": "northeast_hills",
+      "states": ["Assam", "AS", "Meghalaya", "ML", "Nagaland", "NL", "Manipur", "MN", "Mizoram", "MZ", "Tripura", "TR", "Arunachal Pradesh", "AR", "Sikkim", "SK"],
+      "climate": "humid subtropical / highland",
+      "ancestral_practices": [
+        {
+          "id": "ne_bamboo_leaf_fodder",
+          "name": "Bamboo leaf / local tree fodder use",
+          "lineage": "Northeast hill livestock systems",
+          "uses": ["supplementary fodder"],
+          "species": ["cow", "goat", "pig"],
+          "evidence_level": "moderate",
+          "requires_vet_consultation": false,
+          "cautions": ["Species-appropriate quantities"]
+        },
+        {
+          "id": "ne_pig_kitchen_swill_caution",
+          "name": "Traditional swill feeding — biosecurity caution",
+          "lineage": "Village pig systems (ancestral)",
+          "uses": ["historical feeding practice"],
+          "species": ["pig"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["ASF/CSF risk — heat-treat or avoid untreated swill", "Follow current state biosecurity rules"]
+        },
+        {
+          "id": "ne_herbal_steam_respiratory",
+          "name": "Herbal steam / smoke comfort folklore",
+          "lineage": "Hill community animal comfort practices",
+          "uses": ["respiratory comfort folklore"],
+          "species": ["cow", "goat", "pig"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["Ventilation safety", "Not for notifiable disease"]
+        }
+      ],
+      "dietary_local": [
+        {
+          "id": "ne_pig_local_feed",
+          "name": "Local tuber/bran pig rations with protein balance",
+          "notes": "Growth checks often nutrition × parasite × housing",
+          "species": ["pig"]
+        }
+      ]
+    },
+    {
+      "id": "deccan_central",
+      "states": ["Madhya Pradesh", "MP", "Telangana", "TS", "Andhra Pradesh", "AP", "Chhattisgarh", "CG", "Odisha", "OR"],
+      "climate": "tropical wet-dry",
+      "ancestral_practices": [
+        {
+          "id": "dc_astragalus_like_local",
+          "name": "Local bitter herb digestive folklore (region-specific plants)",
+          "lineage": "Deccan pastoral/agricultural custom",
+          "uses": ["digestive folklore"],
+          "species": ["cow", "goat"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["Correct plant ID essential", "Toxicity risk if misidentified"]
+        },
+        {
+          "id": "dc_linseed_mucilage",
+          "name": "Alsi (linseed) mucilage supportive folklore",
+          "lineage": "Central Indian cattle care",
+          "uses": ["mild constipation folklore", "coat condition folklore"],
+          "species": ["cow", "goat"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["Not for acute abdomen"]
+        }
+      ],
+      "dietary_local": [
+        {
+          "id": "dc_cottonseed_caution",
+          "name": "Cottonseed cake protein — gossypol awareness",
+          "notes": "Use under ration formulation guidance; species limits",
+          "species": ["cow", "buffalo"]
+        }
+      ]
+    },
+    {
+      "id": "tamil_sri_lanka_style_south",
+      "states": ["Tamil Nadu", "TN", "Puducherry", "PY"],
+      "climate": "tropical",
+      "ancestral_practices": [
+        {
+          "id": "tn_siddha_influenced_external",
+          "name": "Siddha-influenced external oil applications (customary)",
+          "lineage": "Tamil customary animal care (external)",
+          "uses": ["external comfort folklore"],
+          "species": ["cow", "goat"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["External only unless vet directs", "Infectious disease escalation first"]
+        },
+        {
+          "id": "tn_buttermilk_digestive",
+          "name": "Moru / buttermilk digestive folklore",
+          "lineage": "South Indian cattle-keeper custom",
+          "uses": ["mild digestive support folklore"],
+          "species": ["cow", "buffalo"],
+          "evidence_level": "traditional_only",
+          "requires_vet_consultation": true,
+          "cautions": ["Hygiene of product", "Not for severe diarrhea alone"]
+        }
+      ],
+      "dietary_local": [
+        {
+          "id": "tn_paddy_straw_limit",
+          "name": "Paddy straw — silica/oxalate awareness",
+          "notes": "Balance with greens and minerals; urinary risk in some systems",
+          "species": ["cow", "goat"]
+        }
+      ]
+    }
+  ],
+  "pan_india_ancestral": [
+    {
+      "id": "pan_moringa",
+      "name": "Moringa (drumstick) leaf as nutrient-dense fodder supplement",
+      "lineage": "Widely adopted traditional + modern extension",
+      "uses": ["protein/mineral supplement"],
+      "species": ["cow", "goat", "poultry", "pig"],
+      "evidence_level": "moderate",
+      "requires_vet_consultation": false,
+      "cautions": ["Gradual introduction", "Ration balance"]
+    },
+    {
+      "id": "pan_giloy",
+      "name": "Giloy (Tinospora) fever folklore",
+      "lineage": "Ayurveda-influenced household animal care",
+      "uses": ["fever folklore"],
+      "species": ["cow", "goat"],
+      "evidence_level": "traditional_only",
+      "requires_vet_consultation": true,
+      "cautions": ["Rule out HS/FMD/blood parasites with vet first"]
+    },
+    {
+      "id": "pan_ashwagandha",
+      "name": "Ashwagandha tonic folklore",
+      "lineage": "Classical and folk rasayana traditions applied to livestock",
+      "uses": ["stress/tonic folklore"],
+      "species": ["cow", "goat"],
+      "evidence_level": "traditional_only",
+      "requires_vet_consultation": true,
+      "cautions": ["Not primary therapy for infection"]
+    },
+    {
+      "id": "pan_garlic_limited",
+      "name": "Garlic — limited antiparasitic folklore",
+      "lineage": "Pan-India folk practice",
+      "uses": ["antiparasitic folklore"],
+      "species": ["cow", "goat", "poultry"],
+      "evidence_level": "limited",
+      "requires_vet_consultation": true,
+      "cautions": ["Dose-critical", "Milk flavour", "Toxicity at high levels"]
+    },
+    {
+      "id": "pan_electrolyte_ors",
+      "name": "Oral electrolyte / ORS-style supportive care",
+      "lineage": "Modern + traditional rehydration wisdom",
+      "uses": ["dehydration support"],
+      "species": ["cow", "pig", "goat", "poultry"],
+      "evidence_level": "moderate",
+      "requires_vet_consultation": true,
+      "cautions": ["Severe dehydration needs parenteral vet care"]
+    }
+  ]
+}
