@@ -1,5 +1,5 @@
 /**
- * Unified Health OS readiness — Animals + Pets + Human + Agro + MultiAI
+ * Unified Health OS readiness — three pillars + platform OS
  */
 
 function probe(name, fn) {
@@ -15,59 +15,49 @@ function getReadiness() {
     const vet = require('../veterinary');
     return {
       species: vet.SUPPORTED_SPECIES || require('../veterinary/knowledge').SUPPORTED_SPECIES,
-      features: ['panel', 'herd_v2', 'one_health', 'geo_ancestral', 'pets_duck_rabbit_dog_cat_fish'],
+      features: ['panel', 'herd', 'one_health', 'pcicda', 'pharmacy', 'vision_bridge'],
     };
   });
 
   const nutrition = probe('rituraj_nutrition', () => {
-    const n = require('../nutrition');
+    require('../nutrition');
     return {
-      features: ['calculator', 'asian_bmi', 'allergy_drug_food', 'ritu', 'superfoods', 'genz', 'medical_branches'],
+      features: ['calculator', 'asian_bmi', 'allergy', 'ritu', 'life_stage', 'culture'],
     };
   });
 
   const agro = probe('agro_knowledge', () => {
     const a = require('../agro');
-    return { season: a.currentSeason().id, regions: a.REGIONAL_SYSTEMS.length };
+    return {
+      features: ['systems', 'crops', 'organic', 'microbiome', 'biochar', 'vision', 'multi_ai'],
+      biochar_methods: a.CHARGING_METHODS?.length,
+    };
   });
 
-  const multiAi = probe('multi_ai_orchestra', () => {
-    const m = require('./MultiAIOrchestra');
-    return { modes: m.AI_MODES.map((x) => x.id) };
+  const platform = probe('unified_intelligence_os', () => {
+    const u = require('../platform/UnifiedIntelligenceOS');
+    return { gaps_closed: u.GAP_REGISTRY.closed_this_release.length };
   });
 
-  const allOk = [veterinary, nutrition, agro, multiAi].every((x) => x.ok);
+  const allOk = [veterinary, nutrition, agro, platform].every((x) => x.ok);
 
   return {
-    platform: 'AFRERA Health OS',
+    platform: 'AFRERA Unified Intelligence OS',
     ready: allOk,
-    blockers: allOk ? [] : [veterinary, nutrition, agro, multiAi].filter((x) => !x.ok),
-    tier: 'grok-highest',
+    blockers: allOk ? [] : [veterinary, nutrition, agro, platform].filter((x) => !x.ok),
+    tier: 'grok-highest-industry',
     pillars: {
-      animals_birds_poultry_pets: veterinary,
-      human_nutrition_medical: nutrition,
-      agro_knowledge: agro,
-      multi_ai_decision_analysis: multiAi,
+      veterinary_health: veterinary,
+      human_nutrition: nutrition,
+      agro_farming: agro,
+      unified_os: platform,
     },
     apis: {
+      unified: '/api/v1/unified-intelligence',
       veterinary: '/api/v1/veterinary-specialist',
       nutrition: '/api/v1/rituraj-nutrition',
-      agro: '/api/v1/agro-knowledge',
-      multi_ai: '/api/v1/multi-ai-health',
-      readiness: '/api/v1/health-os/readiness',
+      agro: '/api/v1/agro-farming',
     },
-    species_full: [
-      'cow', 'pig', 'goat', 'sheep', 'poultry', 'duck',
-      'rabbit', 'dog', 'cat', 'fish',
-    ],
-    ai_modes: [
-      'clinical_decision',
-      'scientific_research',
-      'generative_nextgen',
-      'ancient_wisdom',
-      'systems_analytics',
-      'one_health',
-    ],
     generatedAt: new Date().toISOString(),
   };
 }
