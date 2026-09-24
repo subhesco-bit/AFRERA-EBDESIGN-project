@@ -1,17 +1,13 @@
 /**
- * Veterinary Specialist Panel + One Health routes
- * Discovered by DynamicRouteLoader under backend/src/routes/
- * Also mounted explicitly from index.js for stable contract.
- *
- * Base paths (after mount):
- *   /api/veterinary/*
- *   /api/v1/veterinary/*
+ * Veterinary Specialist Panel + One Health + Geo-ancestral care routes
+ * Auto-mounted at /api/v1/veterinary-specialist
  */
 
 const express = require('express');
 const vet = require('../modules/veterinary');
 const { computeHerdRisk } = require('../modules/veterinary/herd/HerdRiskScoring');
 const { assessSurveillance, INTERNATIONAL_STAGES } = require('../modules/veterinary/onehealth/OneHealthSurveillance');
+const { buildLocalCarePackage } = require('../modules/veterinary/geo/GeoFencedCare');
 const { VETERINARY_CLINICAL_DISCLAIMER } = require('../utils/disclaimers');
 const { logger } = require('../utils/logger');
 
@@ -24,7 +20,10 @@ router.get('/health', (_req, res) => {
     species: vet.SUPPORTED_SPECIES,
     knowledge_version: vet.knowledge.KNOWLEDGE_VERSION,
     tier: 'grok-highest',
-    features: ['panel', 'herd_risk', 'one_health', 'international_stages', 'vaccination_gaps'],
+    features: [
+      'panel', 'herd_risk', 'one_health', 'international_stages',
+      'vaccination_gaps', 'geo_ancestral_care', 'natural_care', 'dietary_care',
+    ],
   });
 });
 
@@ -69,15 +68,15 @@ router.get('/international-stages', (_req, res) => {
   res.json({
     success: true,
     stages: INTERNATIONAL_STAGES,
-    note: 'Operational mapping inspired by WOAH outbreak response concepts — not official WOAH status codes.',
+    note: 'Operational mapping inspired by WOAH concepts — not official WOAH codes.',
     disclaimer: VETERINARY_CLINICAL_DISCLAIMER,
   });
 });
 
-/** Full multi-specialist case conference (+ embedded herd risk + optional surveillance) */
+/** Full conference with geo-local ancestral + natural + dietary care */
 router.post('/panel/conference', (req, res) => {
   try {
-    const report = vet.runConference(req.body || {});
+    const report = vet.runConferenceWithLocalCare(req.body || {});
     const surveillance = assessSurveillance({
       species: report.species,
       differentials: report.differentials,
@@ -103,8 +102,7 @@ router.post('/panel/conference', (req, res) => {
 
 router.post('/panel/herd-screen', (req, res) => {
   try {
-    const report = vet.runHerdScreen(req.body || {});
-    res.json({ success: true, data: report });
+    res.json({ success: true, data: vet.runHerdScreen(req.body || {}) });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message, disclaimer: VETERINARY_CLINICAL_DISCLAIMER });
   }
@@ -130,28 +128,58 @@ router.post('/panel/vaccination-gaps', (req, res) => {
   }
 });
 
-/** Standalone herd risk scoring */
 router.post('/herd/risk-score', (req, res) => {
   try {
-    const result = computeHerdRisk({
-      history: req.body?.history,
-      differentials: req.body?.differentials,
-      context: req.body?.context,
-      production_stage_summary: req.body?.production_stage_summary,
-    });
+    const result = computeHerdRisk(req.body || {});
     res.json({ success: true, data: result, disclaimer: VETERINARY_CLINICAL_DISCLAIMER });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
 });
 
-/** One Health surveillance assessment */
 router.post('/one-health/assess', (req, res) => {
   try {
-    const result = assessSurveillance(req.body || {});
-    res.json({ success: true, data: result });
+    res.json({ success: true, data: assessSurveillance(req.body || {}) });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message, disclaimer: VETERINARY_CLINICAL_DISCLAIMER });
+  }
+});
+
+/** Geo-fenced ancestral + natural + dietary care only */
+router.post('/local-care', (req, res) => {
+  try {
+    const species = vet.normaliseSpecies(req.body?.species);
+    const pack = buildLocalCarePackage({
+      species,
+      location: req.body?.location || {},
+      clinical: req.body?.clinical || {},
+      history: req.body?.history || {},
+    });
+    res.json({ success: true, data: pack });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message, disclaimer: VETERINARY_CLINICAL_DISCLAIMER });
+  }
+});
+
+router.get('/local-care/regions', (_req, res) => {
+  try {
+    const geo = require('../modules/veterinary/knowledge/geo_ethnovet_india.json');
+    res.json({
+      success: true,
+      data: {
+        version: geo.version,
+        regions: (geo.regions || []).map((r) => ({
+          id: r.id,
+          states: r.states,
+          climate: r.climate,
+          ancestral_count: (r.ancestral_practices || []).length,
+        })),
+        pan_india_count: (geo.pan_india_ancestral || []).length,
+      },
+      disclaimer: VETERINARY_CLINICAL_DISCLAIMER,
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
   }
 });
 
