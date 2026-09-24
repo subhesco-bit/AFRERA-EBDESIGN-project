@@ -1,0 +1,14 @@
+{
+  "species": "dog",
+  "version": "2026.09.1",
+  "diseases": [
+    {"id":"rabies_dog","name":"Rabies","notifiable":true,"urgency":"emergency","isolation":true,"key_signs":["behaviour change","aggression","paralysis","bite history"],"lab":["official only"],"herd":"Vaccination law; PPE; public health","tags":["infectious","viral","notifiable","zoonotic_risk"]},
+    {"id":"cdv","name":"Canine distemper","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["fever","discharge","respiratory","neuro","hard pad"],"lab":["PCR"],"herd":"Core vaccination","tags":["infectious","viral"]},
+    {"id":"parvo","name":"Canine parvovirus","notifiable":false,"urgency":"emergency","isolation":true,"key_signs":["bloody diarrhea","vomiting","puppies","leukopenia"],"lab":["SNAP PCR"],"herd":"Vaccination; disinfection","tags":["infectious","viral","neonatal"]},
+    {"id":"kennel_cough","name":"Infectious tracheobronchitis","notifiable":false,"urgency":"soon","isolation":true,"key_signs":["honking cough","recent boarding"],"lab":[],"herd":"Vaccination; ventilation","tags":["infectious"]},
+    {"id":"lepto_dog","name":"Leptospirosis","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["fever","jaundice","renal","water exposure"],"lab":["serology PCR"],"herd":"Vaccination; zoonotic caution","tags":["infectious","bacterial","zoonotic_risk"]},
+    {"id":"heat_stroke_dog","name":"Heat stroke","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["panting","collapse","high temp","hot car"],"lab":[],"herd":"Cooling; emergency vet","tags":["environmental","emergency"]},
+    {"id":"gastro_dog","name":"Acute gastroenteritis","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["vomiting","diarrhea","dietary indiscretion"],"lab":[],"herd":"Diet history; red flags escalate","tags":["management"]},
+    {"id":"skin_allergy_dog","name":"Allergic / infectious dermatitis complex","notifiable":false,"urgency":"routine","isolation":false,"key_signs":["itch","alopecia","otitis"],"lab":["skin scrape cytology"],"herd":"Parasite control; vet workup","tags":["management"]}
+  ]
+}

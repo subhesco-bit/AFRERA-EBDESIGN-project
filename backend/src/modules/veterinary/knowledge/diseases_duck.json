@@ -1,0 +1,13 @@
+{
+  "species": "duck",
+  "version": "2026.09.1",
+  "diseases": [
+    {"id":"duck_plague","name":"Duck plague (duck virus enteritis)","notifiable":false,"urgency":"emergency","isolation":true,"key_signs":["sudden death","bloody discharge","photophobia","drooping wings"],"lab":["lab confirmation"],"herd":"Biosecurity; vaccination where used","tags":["infectious","viral"]},
+    {"id":"avian_influenza_duck","name":"Avian influenza (duck)","notifiable":true,"urgency":"emergency","isolation":true,"key_signs":["mortality","swelling","respiratory","drop production"],"lab":["official lab only"],"herd":"Report; zoning","tags":["infectious","viral","notifiable","zoonotic_risk"]},
+    {"id":"newcastle_duck","name":"Newcastle disease (waterfowl context)","notifiable":true,"urgency":"urgent","isolation":true,"key_signs":["respiratory","nervous","mortality variable"],"lab":["official"],"herd":"Vaccination programmes","tags":["infectious","viral","notifiable"]},
+    {"id":"duck_hepatitis","name":"Duck viral hepatitis (young)","notifiable":false,"urgency":"emergency","isolation":true,"key_signs":["ducklings","sudden death","opisthotonos"],"lab":[],"herd":"Breeder vaccination; hygiene","tags":["infectious","viral","neonatal"]},
+    {"id":"aspergillosis_duck","name":"Aspergillosis","notifiable":false,"urgency":"urgent","isolation":false,"key_signs":["respiratory","mouldy litter","young birds"],"lab":[],"herd":"Litter quality; ventilation","tags":["fungal","management"]},
+    {"id":"botulism_duck","name":"Botulism (waterfowl)","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["flaccid paralysis","water quality","maggots"],"lab":[],"herd":"Remove carcasses; water hygiene","tags":["toxin"]},
+    {"id":"heat_stress_duck","name":"Heat stress (duck)","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["panting","open water seeking","prostration"],"lab":[],"herd":"Shade; water access","tags":["environmental"]}
+  ]
+}

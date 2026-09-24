@@ -1,0 +1,13 @@
+{
+  "species": "rabbit",
+  "version": "2026.09.1",
+  "diseases": [
+    {"id":"rhd","name":"Rabbit haemorrhagic disease","notifiable":true,"urgency":"emergency","isolation":true,"key_signs":["sudden death","bloody discharge","fever","lethargy"],"lab":["official lab"],"herd":"Vaccination; biosecurity","tags":["infectious","viral","notifiable"]},
+    {"id":"myxomatosis","name":"Myxomatosis","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["swollen eyelids","discharge","nodules","listlessness"],"lab":[],"herd":"Vaccination; mosquito control","tags":["infectious","viral"]},
+    {"id":"pasteurellosis_rabbit","name":"Pasteurellosis (snuffles)","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["sneezing","nasal discharge","abscesses","torticollis"],"lab":["culture"],"herd":"Ventilation; density; stress reduction","tags":["infectious","bacterial"]},
+    {"id":"e_cuniculi","name":"Encephalitozoon cuniculi","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["head tilt","paresis","renal signs","cataracts"],"lab":["serology"],"herd":"Hygiene; vet protocols","tags":["parasitic","zoonotic_risk"]},
+    {"id":"gi_stasis_rabbit","name":"GI stasis","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["no faeces","anorexia","hunched","pain"],"lab":[],"herd":"Hay-first diet; emergency vet","tags":["management","emergency"]},
+    {"id":"coccidiosis_rabbit","name":"Coccidiosis","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["diarrhea","poor growth","young"],"lab":["oocysts"],"herd":"Hygiene; density","tags":["parasitic","neonatal"]},
+    {"id":"dental_rabbit","name":"Dental disease","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["drooling","selective appetite","weight loss"],"lab":[],"herd":"Hay wear; vet dentistry","tags":["management"]}
+  ]
+}

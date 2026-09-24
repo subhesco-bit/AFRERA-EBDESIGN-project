@@ -1,0 +1,12 @@
+{
+  "species": "fish",
+  "version": "2026.09.1",
+  "diseases": [
+    {"id":"ich","name":"Ich (white spot)","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["white spots","flashing","gasping"],"lab":[],"herd":"Quarantine; water quality; temperature protocols under guidance","tags":["parasitic"]},
+    {"id":"low_do","name":"Low dissolved oxygen","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["gasping surface","mass mortality","hot weather"],"lab":["DO test"],"herd":"Aeration; density; emergency oxygenation","tags":["environmental","emergency"]},
+    {"id":"columnaris","name":"Columnaris / bacterial gill disease","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["cotton mouth","gill lesions","ulcers"],"lab":[],"herd":"Water quality; reduce stress","tags":["bacterial"]},
+    {"id":"arginus_lice","name":"Fish lice / external parasites","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["visible parasites","flashing","irritation"],"lab":[],"herd":"Biosecurity of stock","tags":["parasitic"]},
+    {"id":"dropsy_syndrome","name":"Dropsy syndrome","notifiable":false,"urgency":"urgent","isolation":true,"key_signs":["pinecone scales","bloating","lethargy"],"lab":[],"herd":"Often secondary to water/quality/infection","tags":["management"]},
+    {"id":"ammonia_toxicity","name":"Ammonia / nitrite toxicity","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["gasping","red gills","new tank"],"lab":["water test"],"herd":"Cycle tanks; water changes","tags":["environmental","emergency"]}
+  ]
+}

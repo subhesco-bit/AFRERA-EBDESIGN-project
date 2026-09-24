@@ -1,0 +1,13 @@
+{
+  "species": "cat",
+  "version": "2026.09.1",
+  "diseases": [
+    {"id":"rabies_cat","name":"Rabies (cat)","notifiable":true,"urgency":"emergency","isolation":true,"key_signs":["behaviour change","aggression","paralysis"],"lab":["official"],"herd":"Vaccination; public health","tags":["infectious","viral","notifiable","zoonotic_risk"]},
+    {"id":"panleukopenia","name":"Feline panleukopenia","notifiable":false,"urgency":"emergency","isolation":true,"key_signs":["kittens","vomiting","diarrhea","leukopenia"],"lab":["SNAP PCR"],"herd":"Core vaccination","tags":["infectious","viral","neonatal"]},
+    {"id":"furtd","name":"Feline upper respiratory disease complex","notifiable":false,"urgency":"soon","isolation":true,"key_signs":["sneezing","discharge","conjunctivitis","fever"],"lab":[],"herd":"Vaccination; stress; density","tags":["infectious"]},
+    {"id":"flutd","name":"FLUTD / urethral obstruction risk","notifiable":false,"urgency":"emergency","isolation":false,"key_signs":["straining","no urine","male","vocalising"],"lab":[],"herd":"Emergency vet — life threatening","tags":["emergency","management"]},
+    {"id":"ckd_cat","name":"Chronic kidney disease (suspect)","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["polydipsia","weight loss","senior","vomiting"],"lab":["chemistry SDMA"],"herd":"Senior screening","tags":["chronic"]},
+    {"id":"hyperthyroid_cat","name":"Hyperthyroidism (suspect)","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["weight loss","polyphagia","tachycardia","senior"],"lab":["T4"],"herd":"Senior screening","tags":["endocrine"]},
+    {"id":"abscess_cat","name":"Fight wound abscess","notifiable":false,"urgency":"soon","isolation":false,"key_signs":["swelling","fever","outdoor","pain"],"lab":[],"herd":"Wound care under vet","tags":["bacterial"]}
+  ]
+}
