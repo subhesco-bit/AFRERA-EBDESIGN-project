@@ -1,15 +1,20 @@
 {
   "moduleId": "M782_DISEASE_ANALYZER_AI",
-  "version": "1.0.0",
-  "name": "AI Plant Disease Analyzer",
-  "description": "Plant disease detection and solution with farmer support letters",
+  "version": "2.0.0-10x",
+  "name": "AI Disease & Symptom Intelligence (Plant + Animal)",
+  "description": "Production 10/10 decision-support: image → symptom series extraction → disease identification → multi-turn discussion → treatment/solution. Domains: Agro (plant) primary + Veterinary bridge. Fail-closed safety, confidence fusion, ERP/GST hooks, outcome feedback loop.",
   "category": "ai",
   "status": "production",
   "capabilities": [
-    "disease_identification",
     "image_analysis",
+    "symptom_extraction",
+    "disease_identification",
+    "discussion",
+    "multi_turn",
     "treatment_recommendation",
-    "farmer_letter"
+    "farmer_letter",
+    "vet_bridge",
+    "outcome_feedback"
   ],
   "execution": {
     "backend": {
@@ -17,5 +22,25 @@
       "apiRoutes": "backend/routes.js",
       "baseEndpoint": "/api/v1/m782_disease_analyzer_ai"
     }
+  },
+  "api": {
+    "primary": "POST /analyze",
+    "endpoints": [
+      "POST /analyze",
+      "POST /symptoms",
+      "POST /identify",
+      "POST /discussion",
+      "POST /treatment",
+      "POST /farmer-letter",
+      "POST /vet-bridge",
+      "POST /outcome",
+      "GET /capabilities",
+      "GET /metrics"
+    ]
+  },
+  "domains": ["plant", "animal", "one_health"],
+  "safety": {
+    "plant": "Advisory; CIBRC / organic label mandatory",
+    "animal": "Licensed veterinarian required for diagnosis and prescription"
   }
 }
