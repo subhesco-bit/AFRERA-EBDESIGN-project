@@ -1,6 +1,5 @@
 /**
  * Unified AFRERA OS API surface — auto-discoverable by DynamicRouteLoader
- * Prefix typically /api/v1/afrera (depends on loader naming) — also nested under explicit mounts.
  */
 
 'use strict';
@@ -32,6 +31,7 @@ router.get('/health', (req, res) => {
       'research-grade',
       'ecommerce',
       'layers',
+      'escrow',
       'wiring-test',
     ],
   });
@@ -46,9 +46,9 @@ router.use('/modules', safe('./universalModuleRoutes'));
 router.use('/research-grade', safe('./researchGradeRoutes'));
 router.use('/ecommerce', safe('./ecommerceCheckoutRoutes'));
 router.use('/layers', safe('./layerBoundaryRoutes'));
+router.use('/escrow', safe('./escrowIssueRoutes'));
 router.use('/wiring-test', safe('./afreraWiringTestRoutes'));
 
-// wallet/preseason/contract — inline minimal if mount-only module
 try {
   const wallet = require('../services/commerce/walletService');
   const preseason = require('../services/commerce/preseasonPurchaseService');
