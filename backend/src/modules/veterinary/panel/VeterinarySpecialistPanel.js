@@ -1,6 +1,5 @@
 /**
- * VeterinarySpecialistPanel — Grok-tier multi-specialist case conference
- * Species: cow, pig, goat, poultry, sheep
+ * VeterinarySpecialistPanel — full species: livestock, poultry, duck, rabbit, dog, cat, fish
  */
 
 const { randomUUID } = require('crypto');
@@ -9,6 +8,8 @@ const {
   listDiseases,
   getEthnovetForSpecies,
   lookupWithdrawal,
+  normaliseKey,
+  SUPPORTED_SPECIES: KNOWLEDGE_SPECIES,
 } = require('../knowledge');
 const { computeHerdRisk } = require('../herd/HerdRiskScoring');
 const {
@@ -16,7 +17,7 @@ const {
   VETERINARY_ETHNOVET_NOTE,
 } = require('../../../utils/disclaimers');
 
-const SUPPORTED = new Set(['cow', 'pig', 'goat', 'poultry', 'sheep']);
+const SUPPORTED = new Set(KNOWLEDGE_SPECIES);
 
 const NORMS = {
   cow: { tempMin: 38.0, tempMax: 39.3, fever: 39.5, critical: 40.5, hrMin: 40, hrMax: 80, rrMin: 10, rrMax: 30 },
@@ -24,99 +25,94 @@ const NORMS = {
   goat: { tempMin: 38.5, tempMax: 40.5, fever: 40.6, critical: 41.5, hrMin: 70, hrMax: 90, rrMin: 12, rrMax: 30 },
   sheep: { tempMin: 38.5, tempMax: 40.0, fever: 40.5, critical: 41.5, hrMin: 60, hrMax: 90, rrMin: 12, rrMax: 30 },
   poultry: { tempMin: 40.5, tempMax: 42.0, fever: 42.5, critical: 43.5, hrMin: 250, hrMax: 300, rrMin: 15, rrMax: 30 },
+  duck: { tempMin: 40.5, tempMax: 42.5, fever: 42.8, critical: 43.5, hrMin: 180, hrMax: 250, rrMin: 10, rrMax: 30 },
+  rabbit: { tempMin: 38.5, tempMax: 40.0, fever: 40.2, critical: 41.0, hrMin: 130, hrMax: 325, rrMin: 30, rrMax: 60 },
+  dog: { tempMin: 37.5, tempMax: 39.2, fever: 39.5, critical: 41.0, hrMin: 60, hrMax: 140, rrMin: 10, rrMax: 35 },
+  cat: { tempMin: 37.7, tempMax: 39.2, fever: 39.5, critical: 41.0, hrMin: 140, hrMax: 220, rrMin: 20, rrMax: 40 },
+  fish: { tempMin: null, tempMax: null, fever: null, critical: null, note: 'Use water quality parameters not body temp' },
 };
 
 const VAX_CALENDARS = {
   cow: [
-    { id: 'fmd', name: 'FMD', interval_days: 180, notes: 'National/state schedule' },
-    { id: 'hs', name: 'Haemorrhagic Septicaemia', interval_days: 365, notes: 'Pre-monsoon often preferred' },
-    { id: 'bq', name: 'Black Quarter', interval_days: 365, notes: 'Endemic areas' },
-    { id: 'lsd', name: 'Lumpy Skin Disease', interval_days: 365, notes: 'Where approved/indicated' },
+    { id: 'fmd', name: 'FMD', interval_days: 180 },
+    { id: 'hs', name: 'HS', interval_days: 365 },
+    { id: 'bq', name: 'BQ', interval_days: 365 },
   ],
   pig: [
-    { id: 'csf', name: 'Classical Swine Fever', interval_days: 365, notes: 'Where permitted' },
-    { id: 'erysipelas', name: 'Erysipelas', interval_days: 180, notes: 'Breeding stock emphasis' },
-    { id: 'fmd_pig', name: 'FMD', interval_days: 180, notes: 'Susceptible species' },
+    { id: 'csf', name: 'CSF', interval_days: 365 },
+    { id: 'erysipelas', name: 'Erysipelas', interval_days: 180 },
   ],
   goat: [
-    { id: 'ppr', name: 'PPR', interval_days: 365, notes: 'Foundational in endemic zones' },
-    { id: 'et', name: 'Enterotoxaemia', interval_days: 180, notes: 'Diet-change risk periods' },
-    { id: 'fmd_goat', name: 'FMD', interval_days: 180, notes: 'Regional programmes' },
+    { id: 'ppr', name: 'PPR', interval_days: 365 },
+    { id: 'et', name: 'Enterotoxaemia', interval_days: 180 },
   ],
   sheep: [
-    { id: 'ppr_sheep', name: 'PPR', interval_days: 365, notes: 'Endemic zones' },
-    { id: 'et_sheep', name: 'Enterotoxaemia', interval_days: 180, notes: 'Diet-change risk' },
-    { id: 'sheep_pox', name: 'Sheep pox', interval_days: 365, notes: 'Where indicated' },
+    { id: 'ppr_sheep', name: 'PPR', interval_days: 365 },
+    { id: 'et_sheep', name: 'Enterotoxaemia', interval_days: 180 },
   ],
   poultry: [
-    { id: 'marek', name: "Marek's disease", interval_days: null, notes: 'Hatchery / day-old' },
-    { id: 'nd', name: 'Newcastle Disease', interval_days: 60, notes: 'Programme-dependent boosters' },
-    { id: 'ibd', name: 'IBD (Gumboro)', interval_days: 28, notes: 'Maternal Ab–aware timing' },
-    { id: 'ib', name: 'Infectious Bronchitis', interval_days: 60, notes: 'As per integrator schedule' },
-    { id: 'pox', name: 'Fowl pox', interval_days: 365, notes: 'Wing-web where used' },
+    { id: 'nd', name: 'Newcastle', interval_days: 60 },
+    { id: 'ibd', name: 'IBD', interval_days: 28 },
+    { id: 'marek', name: 'Marek', interval_days: null },
   ],
+  duck: [
+    { id: 'duck_plague_vax', name: 'Duck plague where used', interval_days: 365 },
+  ],
+  rabbit: [
+    { id: 'rhd_vax', name: 'RHD', interval_days: 365 },
+    { id: 'myxo_vax', name: 'Myxomatosis', interval_days: 365 },
+  ],
+  dog: [
+    { id: 'rabies', name: 'Rabies', interval_days: 365 },
+    { id: 'dhpp', name: 'Core DHPP', interval_days: 365 },
+  ],
+  cat: [
+    { id: 'rabies_cat', name: 'Rabies', interval_days: 365 },
+    { id: 'fvrcp', name: 'Core FVRCP', interval_days: 365 },
+  ],
+  fish: [],
 };
 
 function normaliseSpecies(species) {
-  const s = String(species || '').toLowerCase().trim();
-  if (['cattle', 'dairy', 'buffalo', 'ox', 'bull'].includes(s)) return 'cow';
-  if (['chicken', 'hen', 'broiler', 'layer', 'cock', 'bird'].includes(s)) return 'poultry';
-  if (['swine', 'hog', 'boar', 'sow'].includes(s)) return 'pig';
-  if (['caprine', 'doe', 'buck'].includes(s)) return 'goat';
-  if (['ovine', 'lamb', 'ewe', 'ram'].includes(s)) return 'sheep';
-  return s;
+  return normaliseKey(species);
 }
 
 function tokenise(text) {
   return String(text || '').toLowerCase().split(/[^a-z0-9+]+/).filter((t) => t.length > 1);
 }
-
 function uniq(arr) {
   return [...new Set(arr.filter(Boolean))];
 }
 
 function interpretVitals(species, clinical = {}) {
   const n = NORMS[species];
-  if (!n) return { status: 'unknown', findings: [], severity: 'none' };
+  if (!n || n.tempMin == null) {
+    return {
+      status: species === 'fish' ? 'use_water_quality' : 'unknown',
+      findings: species === 'fish' ? [{ parameter: 'water', flag: 'check_DO_ammonia', detail: 'Body temperature N/A — test DO, ammonia, nitrite, temp' }] : [],
+      severity: 'none',
+      reference: n,
+    };
+  }
   const findings = [];
   let severity = 'none';
   const temp = clinical.body_temperature_c;
   if (temp != null) {
     if (temp >= n.critical) {
-      findings.push({ parameter: 'temperature', value: temp, flag: 'critical_hyperthermia', detail: `≥ ${n.critical}°C critical for ${species}` });
+      findings.push({ parameter: 'temperature', value: temp, flag: 'critical_hyperthermia', detail: `critical for ${species}` });
       severity = 'critical';
     } else if (temp >= n.fever) {
-      findings.push({ parameter: 'temperature', value: temp, flag: 'fever', detail: `Above fever threshold ${n.fever}°C` });
-      severity = severity === 'critical' ? 'critical' : 'significant';
+      findings.push({ parameter: 'temperature', value: temp, flag: 'fever', detail: `fever threshold ${n.fever}` });
+      severity = 'significant';
     } else if (temp < n.tempMin - 0.5) {
-      findings.push({ parameter: 'temperature', value: temp, flag: 'hypothermia', detail: 'Below expected range' });
-      severity = severity === 'critical' ? 'critical' : 'significant';
+      findings.push({ parameter: 'temperature', value: temp, flag: 'hypothermia', detail: 'below range' });
+      severity = 'significant';
     } else if (temp >= n.tempMin && temp <= n.tempMax) {
-      findings.push({ parameter: 'temperature', value: temp, flag: 'normal', detail: 'Within reference range' });
+      findings.push({ parameter: 'temperature', value: temp, flag: 'normal', detail: 'in range' });
     }
-  }
-  const hr = clinical.heart_rate_bpm;
-  if (hr != null && n.hrMin != null) {
-    if (hr > n.hrMax * 1.25) {
-      findings.push({ parameter: 'heart_rate', value: hr, flag: 'tachycardia', detail: 'Elevated' });
-      if (severity === 'none') severity = 'moderate';
-    } else if (hr < n.hrMin * 0.75) {
-      findings.push({ parameter: 'heart_rate', value: hr, flag: 'bradycardia', detail: 'Low' });
-      if (severity === 'none') severity = 'moderate';
-    }
-  }
-  const rr = clinical.respiratory_rate_bpm;
-  if (rr != null && n.rrMin != null && rr > n.rrMax * 1.4) {
-    findings.push({ parameter: 'respiratory_rate', value: rr, flag: 'tachypnoea', detail: 'Elevated' });
-    if (severity === 'none') severity = 'moderate';
-  }
-  const bcs = clinical.body_condition_score;
-  if (bcs != null && bcs <= 1.5) {
-    findings.push({ parameter: 'bcs', value: bcs, flag: 'emaciated', detail: 'Severe under-condition' });
-    if (severity === 'none') severity = 'moderate';
   }
   if (clinical.appetite === 'anorexic') {
-    findings.push({ parameter: 'appetite', value: 'anorexic', flag: 'anorexia', detail: 'Complete appetite loss' });
+    findings.push({ parameter: 'appetite', flag: 'anorexia', value: 'anorexic', detail: 'appetite loss' });
     if (severity === 'none') severity = 'moderate';
   }
   return {
@@ -128,15 +124,12 @@ function interpretVitals(species, clinical = {}) {
 }
 
 function scoreDisease(disease, caseInput, vitals) {
-  const species = normaliseSpecies(caseInput.species);
   const symptoms = (caseInput.clinical?.symptoms || []).map((x) => String(x).toLowerCase());
   const owner = tokenise(caseInput.owner_observations);
-  const stage = String(caseInput.signalment?.production_stage || '').toLowerCase();
-  const bag = new Set([...symptoms, ...owner, ...tokenise(stage)]);
+  const bag = new Set([...symptoms, ...owner]);
   const keys = disease.key_signs || [];
   let hits = 0;
   const supporting = [];
-  const against = [];
   for (const k of keys) {
     const parts = tokenise(k);
     if (parts.some((p) => [...bag].some((b) => b.includes(p) || p.includes(b)))) {
@@ -147,63 +140,18 @@ function scoreDisease(disease, caseInput, vitals) {
   const base = keys.length ? hits / keys.length : 0;
   let confidence = Math.min(0.9, base * 0.8 + (hits >= 2 ? 0.12 : 0) + (hits >= 3 ? 0.08 : 0));
   if (vitals.severity === 'critical' || vitals.severity === 'significant') {
-    if ((disease.tags || []).some((t) => ['infectious', 'metabolic', 'clostridial'].includes(t))) {
+    if ((disease.tags || []).some((t) => ['infectious', 'metabolic', 'clostridial', 'toxin', 'emergency'].includes(t))) {
       confidence = Math.min(0.95, confidence + 0.1);
       supporting.push('abnormal vitals compatible');
     }
   }
-  const temp = caseInput.clinical?.body_temperature_c;
-  const norms = NORMS[species];
-  if (temp != null && norms && temp >= norms.fever) {
-    if ((disease.tags || []).includes('infectious') || (disease.tags || []).includes('metabolic')) {
-      confidence = Math.min(0.95, confidence + 0.07);
-    }
-  }
   const affected = Number(caseInput.history?.affected_count || 0);
   const mortality = Number(caseInput.history?.mortality_count || 0);
-  const herdSize = Number(caseInput.history?.herd_size || 0);
-  if (affected > 1 || mortality > 0) {
-    if ((disease.tags || []).includes('infectious')) {
-      confidence = Math.min(0.96, confidence + 0.12);
-      supporting.push('multi-animal / mortality pattern');
-    }
-  } else if (affected <= 1 && disease.notifiable) {
-    against.push('only single animal reported — contagious disease still possible');
+  if ((affected > 1 || mortality > 0) && (disease.tags || []).includes('infectious')) {
+    confidence = Math.min(0.96, confidence + 0.12);
+    supporting.push('multi-animal / mortality pattern');
   }
-  if (stage.includes('lactat') || stage.includes('fresh') || stage.includes('partur')) {
-    if (['milk_fever', 'ketosis', 'mastitis_clinical', 'mma'].includes(disease.id)) {
-      confidence = Math.min(0.95, confidence + 0.1);
-      supporting.push(`production stage: ${stage}`);
-    }
-  }
-  if (stage.includes('pregnant') || stage.includes('gestat')) {
-    if (['pregnancy_toxaemia_goat', 'pregnancy_toxaemia_sheep', 'milk_fever'].includes(disease.id)) {
-      confidence = Math.min(0.95, confidence + 0.08);
-      supporting.push('late production / pregnancy context');
-    }
-  }
-  if (/calf|piglet|kid|chick|lamb/.test(stage) && (disease.tags || []).includes('neonatal')) {
-    confidence = Math.min(0.95, confidence + 0.1);
-    supporting.push('neonatal / young stock stage');
-  }
-  const vax = String(caseInput.history?.vaccination_status || '').toLowerCase();
-  if (['none', 'partial', 'unknown'].includes(vax) && (disease.notifiable || (disease.tags || []).includes('infectious'))) {
-    confidence = Math.min(0.95, confidence + 0.05);
-    supporting.push('incomplete vaccination history');
-  }
-  const weather = String(caseInput.history?.weather_notes || caseInput.owner_observations || '').toLowerCase();
-  if (/heat|summer|humid/.test(weather) && (disease.id || '').includes('heat_stress')) {
-    confidence = Math.min(0.95, confidence + 0.15);
-    supporting.push('environmental heat context');
-  }
-  if (herdSize > 0 && affected > 0) {
-    const rate = affected / herdSize;
-    if (rate >= 0.2 && (disease.tags || []).includes('infectious')) {
-      confidence = Math.min(0.96, confidence + 0.08);
-      supporting.push(`attack rate ~${Math.round(rate * 100)}%`);
-    }
-  }
-  return { confidence: Math.round(confidence * 100) / 100, supporting: uniq(supporting), against: uniq(against) };
+  return { confidence: Math.round(confidence * 100) / 100, supporting: uniq(supporting), against: [] };
 }
 
 function rankDifferentials(species, caseInput, vitals) {
@@ -222,11 +170,6 @@ function rankDifferentials(species, caseInput, vitals) {
         lab: d.lab || [],
         herd: d.herd || '',
         tags: d.tags || [],
-        specialist_notes: {
-          infectious_disease: (d.tags || []).includes('infectious') ? d.herd : null,
-          epidemiology: d.herd || null,
-          pathology_lab: (d.lab || []).join('; ') || null,
-        },
       };
     })
     .filter((d) => d.confidence >= 0.1 || d.supporting.length > 0)
@@ -236,14 +179,11 @@ function rankDifferentials(species, caseInput, vitals) {
 
 function deriveUrgency(differentials, caseInput, vitals) {
   if (vitals.severity === 'critical') return 'emergency';
-  if (differentials.some((d) => d.urgency === 'emergency' && d.confidence >= 0.22)) return 'emergency';
-  const temp = caseInput.clinical?.body_temperature_c;
-  const norms = NORMS[normaliseSpecies(caseInput.species)];
-  if (temp != null && norms && temp >= norms.critical) return 'emergency';
+  if (differentials.some((d) => d.urgency === 'emergency' && d.confidence >= 0.2)) return 'emergency';
   if ((caseInput.history?.mortality_count || 0) > 0) return 'urgent';
-  if (differentials.some((d) => d.urgency === 'urgent' && d.confidence >= 0.28)) return 'urgent';
+  if (differentials.some((d) => d.urgency === 'urgent' && d.confidence >= 0.25)) return 'urgent';
   if (vitals.severity === 'significant') return 'urgent';
-  if (differentials.some((d) => d.urgency === 'soon' && d.confidence >= 0.25)) return 'soon';
+  if (differentials.some((d) => d.urgency === 'soon' && d.confidence >= 0.2)) return 'soon';
   return 'routine';
 }
 
@@ -254,11 +194,9 @@ function vaccinationGapAnalysis(species, caseInput) {
     programme: calendar.map((v) => ({
       ...v,
       status_assumption: status,
-      action: status === 'up_to_date'
-        ? 'Confirm dates on record; maintain schedule'
-        : 'Verify last dose with veterinarian; do not delay notifiable-disease vaccines in endemic areas',
+      action: status === 'up_to_date' ? 'Maintain schedule' : 'Verify with veterinarian',
     })),
-    advisory: 'Schedules are reference anchors only. State veterinary services and product labels govern legal programmes.',
+    advisory: 'Product labels and local law govern vaccines.',
   };
 }
 
@@ -267,30 +205,28 @@ function buildTreatmentOptions(species, differentials) {
   const top = differentials[0];
   options.push({
     modality: 'supportive',
-    name: 'Supportive care — hydration, thermoregulation, nutrition, isolation if indicated',
+    name: 'Supportive care while arranging veterinary examination',
     evidence_level: 'moderate',
     requires_vet_consultation: true,
     withdrawal: lookupWithdrawal('unknown', species, 'meat'),
-    notes: 'First principles while arranging veterinary examination',
   });
   if (top?.notifiable) {
     options.push({
       modality: 'regulatory',
-      name: 'Notifiable disease pathway — report and follow competent authority instructions',
+      name: 'Notifiable pathway — competent authority',
       evidence_level: 'strong',
       requires_vet_consultation: true,
       withdrawal: { withdrawal_days: null, source: 'regulatory', requires_vet_consultation: true },
-      notes: 'Do not delay official notification for complementary therapies',
     });
   }
-  for (const r of getEthnovetForSpecies(species)) {
+  for (const r of getEthnovetForSpecies(species).slice(0, 6)) {
     options.push({
       modality: 'ethnoveterinary',
       name: r.name,
       evidence_level: r.evidence_level,
       requires_vet_consultation: true,
+      notes: `Uses: ${(r.uses || []).join(', ')}. Cautions: ${(r.cautions || []).join('; ')}`,
       withdrawal: { withdrawal_days: null, source: 'n/a', requires_vet_consultation: true },
-      notes: `Uses: ${(r.uses || []).join(', ')}. Cautions: ${(r.cautions || []).join('; ')}${top?.notifiable ? '. Secondary to notifiable-disease response.' : ''}`,
     });
   }
   options.push({
@@ -298,16 +234,7 @@ function buildTreatmentOptions(species, differentials) {
     name: 'Specific therapy — licensed veterinarian only',
     evidence_level: 'strong',
     requires_vet_consultation: true,
-    withdrawal: lookupWithdrawal('unknown', species, species === 'poultry' ? 'eggs' : 'milk'),
-    notes: 'No dose auto-selected. Label withdrawal required for food animals.',
-  });
-  options.push({
-    modality: 'nutritional',
-    name: 'Ration and water quality review',
-    evidence_level: 'moderate',
-    requires_vet_consultation: true,
-    withdrawal: { withdrawal_days: null, source: 'n/a', requires_vet_consultation: false },
-    notes: 'Metabolic disease often ration-linked',
+    withdrawal: lookupWithdrawal('unknown', species, 'meat'),
   });
   return options;
 }
@@ -315,7 +242,7 @@ function buildTreatmentOptions(species, differentials) {
 function runConference(caseInput = {}) {
   const species = normaliseSpecies(caseInput.species);
   if (!SUPPORTED.has(species)) {
-    throw new Error(`Unsupported species: ${caseInput.species}. Supported: cow, pig, goat, poultry, sheep`);
+    throw new Error(`Unsupported species: ${caseInput.species}. Supported: ${[...SUPPORTED].join(', ')}`);
   }
   const vitals = interpretVitals(species, caseInput.clinical || {});
   const differentials = rankDifferentials(species, caseInput, vitals);
@@ -333,20 +260,6 @@ function runConference(caseInput = {}) {
     'Full clinical examination by licensed veterinarian',
     ...differentials.slice(0, 5).flatMap((d) => d.lab || []),
   ]);
-  const treatment_options = buildTreatmentOptions(species, differentials);
-  const local_customary_notes = getEthnovetForSpecies(species).map((r) => ({
-    id: r.id, name: r.name, evidence_level: r.evidence_level, uses: r.uses, cautions: r.cautions,
-  }));
-  const preventive_actions = uniq([
-    differentials[0]?.herd,
-    'Review vaccination and biosecurity with veterinarian',
-    'Quarantine new arrivals ≥14 days where practical',
-    'Record outcome for continuous improvement',
-    herdRisk.band === 'critical' || herdRisk.band === 'high'
-      ? 'Activate heightened herd surveillance and movement controls'
-      : null,
-    ...(herdRisk.recommended_actions || []),
-  ]);
   return {
     case_id: randomUUID(),
     species,
@@ -358,24 +271,25 @@ function runConference(caseInput = {}) {
     vaccination_analysis: vax,
     differentials,
     recommended_diagnostics,
-    treatment_options,
-    preventive_actions,
-    herd_implications: differentials[0]?.herd || 'Assess in-contact animals; review introductions, water, feed, housing.',
-    local_customary_notes,
-    panel_summary: `Chair (${species}): urgency ${urgency}; isolation ${isolation ? 'YES' : 'no'}; herd risk ${herdRisk.band} (${herdRisk.score}/100). ${notifiable ? 'NOTIFIABLE SUSPECT — contact authority. ' : ''}${differentials.slice(0, 3).map((d) => `${d.name} (${Math.round(d.confidence * 100)}%)`).join('; ') || 'No strong pattern match.'}`,
+    treatment_options: buildTreatmentOptions(species, differentials),
+    preventive_actions: uniq([differentials[0]?.herd, 'Biosecurity review', ...(herdRisk.recommended_actions || [])]),
+    herd_implications: differentials[0]?.herd || 'Assess in-contacts and environment',
+    local_customary_notes: getEthnovetForSpecies(species).map((r) => ({
+      id: r.id, name: r.name, evidence_level: r.evidence_level, uses: r.uses,
+    })),
+    panel_summary: `Chair (${species}): ${urgency}; isolation ${isolation ? 'YES' : 'no'}; herd ${herdRisk.band} (${herdRisk.score}). ${notifiable ? 'NOTIFIABLE. ' : ''}${differentials.slice(0, 3).map((d) => `${d.name} (${Math.round(d.confidence * 100)}%)`).join('; ') || 'No strong match.'}`,
     ethnovet_note: VETERINARY_ETHNOVET_NOTE,
     disclaimer: VETERINARY_CLINICAL_DISCLAIMER,
     one_health_note: notifiable || differentials.some((d) => (d.tags || []).includes('zoonotic_risk'))
-      ? 'One Health: possible zoonotic or reportable implications — protect handlers; coordinate public health if exposure.'
-      : 'One Health: standard hygiene; separate livestock and household water where relevant.',
+      ? 'One Health: zoonotic/reportable risk — PPE; public health as indicated'
+      : 'One Health: standard hygiene',
     provenance: {
       knowledge_version: KNOWLEDGE_VERSION,
       engine: 'VeterinarySpecialistPanel',
       engine_tier: 'grok-highest',
       herd_algorithm: herdRisk.algorithm,
-      rules_fired: ['symptom_overlap', 'vitals', 'herd_v2', 'production_stage', 'notifiable_gate', 'vax_prior'],
     },
-    confidence_overall: differentials.length ? differentials[0].confidence : 0.08,
+    confidence_overall: differentials[0]?.confidence || 0.08,
     generatedAt: new Date().toISOString(),
   };
 }
@@ -392,13 +306,11 @@ function runHerdScreen({ species, animals = [], shared_history = {} }) {
       context: a.context,
     }),
   );
-  const notifiableAny = results.some((r) => r.notifiable_suspect);
-  const maxUrgency = ['emergency', 'urgent', 'soon', 'routine'].find((u) => results.some((r) => r.urgency === u));
   return {
     species: normaliseSpecies(species),
     animal_count: results.length,
-    max_urgency: maxUrgency || 'routine',
-    notifiable_any: notifiableAny,
+    max_urgency: ['emergency', 'urgent', 'soon', 'routine'].find((u) => results.some((r) => r.urgency === u)) || 'routine',
+    notifiable_any: results.some((r) => r.notifiable_suspect),
     cases: results,
     disclaimer: VETERINARY_CLINICAL_DISCLAIMER,
     generatedAt: new Date().toISOString(),
