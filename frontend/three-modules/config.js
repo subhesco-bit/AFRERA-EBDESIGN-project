@@ -4,6 +4,7 @@ window.AFRERA_CONFIG = {
     : '/api/v1',
   modules: [
     { id: 'home', title: 'Home', path: '#/' },
+    { id: 'disease', title: 'Disease AI', path: '#/disease', accent: '#b91c1c' },
     { id: 'veterinary', title: 'Veterinary', path: '#/veterinary', accent: '#0f766e' },
     { id: 'nutrition', title: 'Nutrition', path: '#/nutrition', accent: '#b45309' },
     { id: 'agro', title: 'Agro', path: '#/agro', accent: '#166534' },

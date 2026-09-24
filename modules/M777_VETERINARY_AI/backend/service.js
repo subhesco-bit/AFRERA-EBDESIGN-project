@@ -1,12 +1,17 @@
 /**
- * M777_VETERINARY_AI — 10/10 Veterinary Decision-Support
- * Specialist panel path, herd risk, One Health, fail-closed licensed-vet floor
+ * M777_VETERINARY_AI — 10/10 with full specialist panel wiring
  */
 
 'use strict';
 
 const aiBackbone = require('../../M400_AI_BACKBONE/backend/service');
 const { logger } = require('../../../backend/src/utils/logger');
+const {
+  SPECIALISTS,
+  rankSpecialists,
+  buildOpinions,
+  consensus,
+} = require('./panel');
 
 const SPECIES_PACK = ['cattle', 'buffalo', 'goat', 'sheep', 'pig', 'poultry', 'dog', 'cat', 'equine'];
 
@@ -23,20 +28,11 @@ const CLINICAL_ONTOLOGY = {
   sudden_death: { severity: 0.95, systems: ['systemic'] },
 };
 
-const PANEL = [
-  { id: 'medicine', name: 'Veterinary Medicine' },
-  { id: 'surgery', name: 'Surgery' },
-  { id: 'reproduction', name: 'Theriogenology' },
-  { id: 'pathology', name: 'Pathology' },
-  { id: 'epidemiology', name: 'Epidemiology / One Health' },
-  { id: 'ethnovet', name: 'Ethnoveterinary / Geo' },
-];
-
 class VETERINARYAIService {
   constructor() {
     this.moduleId = 'M777_VETERINARY_AI';
     this.name = 'AI Veterinary Decision-Support';
-    this.version = '2.0.0-10x';
+    this.version = '2.1.0-10x';
     this.capabilities = [
       'animal_diagnosis',
       'disease_detection',
@@ -54,19 +50,20 @@ class VETERINARYAIService {
       errorCount: 0,
       escalations: 0,
       outcomesLogged: 0,
+      panelConferences: 0,
     };
     this.sessions = new Map();
   }
 
   async initialize(config) {
-    logger.info(`Initializing ${this.moduleId} 10x`);
+    logger.info(`Initializing ${this.moduleId} 10x full panel`);
     return {
       success: true,
       moduleId: this.moduleId,
       version: this.version,
       capabilities: this.capabilities,
       species_pack: SPECIES_PACK,
-      panel: PANEL,
+      panel: SPECIALISTS,
       safety_floor: 'Licensed veterinarian required for diagnosis and prescription.',
     };
   }
@@ -92,6 +89,7 @@ class VETERINARYAIService {
           break;
         case 'specialist_panel':
           result = await this.panelConference(data, provider);
+          this.metrics.panelConferences++;
           break;
         case 'one_health':
           result = this.oneHealth(data);
@@ -146,20 +144,39 @@ class VETERINARYAIService {
     const {
       species = 'cattle',
       symptoms_text = '',
+      description = '',
       cv_tags = [],
       herd_size,
       geo,
       age_group,
+      run_panel = true,
     } = data || {};
 
-    const symptoms = this.extractSymptoms(symptoms_text, cv_tags);
+    const text = symptoms_text || description || '';
+    const symptoms = this.extractSymptoms(text, cv_tags);
     const maxSev = symptoms.reduce((m, s) => Math.max(m, s.severity), 0);
     const confidence = symptoms.length
       ? Math.min(0.92, 0.45 + symptoms.length * 0.1 + maxSev * 0.15)
       : 0.35;
 
-    let escalate = maxSev >= 0.85 || (symptoms.some((s) => s.key === 'sudden_death'));
+    let escalate = maxSev >= 0.85 || symptoms.some((s) => s.key === 'sudden_death');
     if (escalate) this.metrics.escalations++;
+
+    const ranked = rankSpecialists(symptoms);
+    const panel_suggested = ranked.slice(0, 4).map((s) => ({
+      id: s.id,
+      name: s.name,
+      relevance: s.relevance,
+    }));
+
+    let panel_preview = null;
+    if (run_panel && symptoms.length) {
+      const opinions = buildOpinions(ranked, { species, symptoms });
+      panel_preview = {
+        opinions,
+        consensus: consensus(opinions, symptoms),
+      };
+    }
 
     let ai_reasoning = null;
     try {
@@ -168,7 +185,7 @@ class VETERINARYAIService {
         {
           moduleId: this.moduleId,
           capability: 'animal_diagnosis',
-          data: { species, symptoms, herd_size, geo, age_group },
+          data: { species, symptoms, herd_size, geo, age_group, panel_suggested },
           provider: provider || 'claude',
         }
       );
@@ -186,11 +203,12 @@ class VETERINARYAIService {
       escalate_to_licensed_vet: true,
       escalate_now: escalate,
       differential_hint: symptoms.slice(0, 3).map((s) => s.key),
-      panel_suggested: PANEL.filter((p) =>
-        symptoms.some((s) => (s.systems || []).some((sys) => p.id.includes(sys) || sys.includes(p.id)))
-      ).slice(0, 3),
+      panel_suggested,
+      panel_preview,
       ai_reasoning,
-      one_health_flag: symptoms.some((s) => ['diarrhea', 'neurological', 'abortion', 'sudden_death'].includes(s.key)),
+      one_health_flag: symptoms.some((s) =>
+        ['diarrhea', 'neurological', 'abortion', 'sudden_death'].includes(s.key)
+      ),
       regulatory: 'PCICDA / state animal husbandry notification if outbreak suspected',
       safety_floor:
         'NOT A DIAGNOSIS. Licensed veterinarian must examine and prescribe. Food-animal withdrawal mandatory.',
@@ -201,8 +219,8 @@ class VETERINARYAIService {
       },
       next_actions: [
         'Escalate to licensed vet',
-        'POST specialist_panel for multi-lens',
-        'POST treatment_recommendation only after vet confirmation',
+        'POST /panel for full multi-specialist conference',
+        'Bridge image tags via M782 domain=animal',
         'POST outcome_feedback after resolution',
       ],
     };
@@ -241,26 +259,50 @@ class VETERINARYAIService {
   }
 
   async panelConference(data, provider) {
-    let ai_reasoning = null;
+    const species = data?.species || 'cattle';
+    const text = data?.symptoms_text || data?.description || '';
+    const tags = data?.cv_tags || [];
+    const symptoms =
+      Array.isArray(data?.symptoms) && data.symptoms.length
+        ? data.symptoms
+        : this.extractSymptoms(text, tags);
+
+    const ranked = rankSpecialists(symptoms);
+    const opinions = buildOpinions(ranked, { species, symptoms });
+    const cons = consensus(opinions, symptoms);
+
+    let ai_synthesis = null;
     try {
       const ai = await aiBackbone.makeDecision(
-        { confidence: 0.8 },
+        { confidence: 0.82 },
         {
           moduleId: this.moduleId,
           capability: 'specialist_panel',
-          data: { ...data, panel: PANEL },
+          data: { species, symptoms, opinions: opinions.map((o) => o.specialist_id) },
           provider: provider || 'claude',
         }
       );
-      ai_reasoning = ai?.reasoning || null;
+      ai_synthesis = ai?.reasoning || null;
     } catch (e) {
-      ai_reasoning = 'Panel conference unavailable; use local specialist referral.';
+      ai_synthesis = cons.summary;
     }
+
     return {
-      panel: PANEL,
-      conference_notes: ai_reasoning,
-      confidence: 0.78,
-      safety_floor: 'Panel output is advisory to the attending licensed veterinarian.',
+      species,
+      symptoms,
+      specialists_ranked: ranked.map((s) => ({
+        id: s.id,
+        name: s.name,
+        relevance: s.relevance,
+        focus: s.focus,
+      })),
+      opinions,
+      consensus: cons,
+      ai_synthesis,
+      confidence: 0.84,
+      safety_floor:
+        'FULL PANEL is advisory only. Attending licensed veterinarian retains diagnostic and prescription authority.',
+      next_actions: ['Licensed vet exam', 'Lab plan from pathology lens', 'One Health notify if indicated'],
     };
   }
 

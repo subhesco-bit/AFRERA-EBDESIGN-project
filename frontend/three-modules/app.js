@@ -17,15 +17,30 @@
   }
 
   function home() {
-    title().textContent = 'Three Module OS';
+    title().textContent = 'Three Module OS · 10x';
     main().innerHTML = '';
     main().appendChild(
       card('Platform', [
-        el('p', { text: 'Veterinary · Nutrition · Agro — interlinked decision support with ERP/GST and event bus.' }),
+        el('p', {
+          text: 'Disease AI (image→symptoms→solution) · Veterinary specialist panel · Rituraj clinical MNT · Agro · ERP/GST.',
+        }),
         el('div', { className: 'grid' }, [
-          card('Veterinary', [el('p', { className: 'muted', text: 'Panel, One Health, PCICDA' }), el('a', { href: '#/veterinary', className: 'btn primary', text: 'Open' })]),
-          card('Nutrition', [el('p', { className: 'muted', text: 'Rituraj, life-stage, drug–food' }), el('a', { href: '#/nutrition', className: 'btn primary', text: 'Open' })]),
-          card('Agro', [el('p', { className: 'muted', text: 'Crops, soil, organic, biochar' }), el('a', { href: '#/agro', className: 'btn primary', text: 'Open' })]),
+          card('Disease AI', [
+            el('p', { className: 'muted', text: 'Image / tags → disease → discussion → treatment' }),
+            el('a', { href: '#/disease', className: 'btn primary', text: 'Open' }),
+          ]),
+          card('Veterinary', [
+            el('p', { className: 'muted', text: 'Full specialist panel + One Health' }),
+            el('a', { href: '#/veterinary', className: 'btn primary', text: 'Open' }),
+          ]),
+          card('Nutrition', [
+            el('p', { className: 'muted', text: 'Clinical protocols T2DM CKD HTN…' }),
+            el('a', { href: '#/nutrition', className: 'btn primary', text: 'Open' }),
+          ]),
+          card('Agro', [
+            el('p', { className: 'muted', text: 'Field case + organic systems' }),
+            el('a', { href: '#/agro', className: 'btn primary', text: 'Open' }),
+          ]),
         ]),
       ]),
     );
@@ -33,7 +48,13 @@
 
   function renderResult(container, data, moduleId) {
     container.innerHTML = '';
-    container.appendChild(card('Decision', decisionBlock(data.decision_quality)));
+    if (data.decision_quality) container.appendChild(card('Decision', decisionBlock(data.decision_quality)));
+    if (data.safety_floor || data.meta?.safety_floor) {
+      container.appendChild(
+        card('Safety floor', el('p', { className: 'muted', text: data.safety_floor || data.meta.safety_floor })),
+      );
+    }
+    if (data.confidence != null) container.appendChild(card('Confidence', gauge('Confidence %', data.confidence * 100)));
     if (data.workflow?.history) container.appendChild(card('Workflow', timeline(data.workflow.history)));
     if (data.interaction?.audio?.text) {
       container.appendChild(
@@ -53,99 +74,375 @@
         ]),
       );
     }
-    if (data.interpretation?.human_narrative) {
-      container.appendChild(card('One-runtime interpretation', el('p', { text: data.interpretation.human_narrative })));
-    }
-    if (data.inter_module_events?.length) {
-      container.appendChild(
-        card(
-          'Inter-module events',
-          el(
-            'ul',
-            {},
-            data.inter_module_events.map((e) => el('li', { text: `${e.type} · ${e.event_id?.slice(0, 8) || ''}` })),
-          ),
-        ),
-      );
-    }
     container.appendChild(card('Continue', crossLinks(moduleId)));
-    container.appendChild(card('Raw JSON', el('pre', { className: 'pre', text: JSON.stringify(data, null, 2).slice(0, 8000) })));
+    container.appendChild(card('Raw JSON', el('pre', { className: 'pre', text: JSON.stringify(data, null, 2).slice(0, 12000) })));
   }
 
-  function veterinaryPage() {
-    title().textContent = 'Veterinary Intelligence';
-    const species = el('select', {}, ['cow', 'goat', 'pig', 'poultry', 'buffalo', 'sheep', 'duck', 'rabbit', 'dog', 'cat'].map((s) => el('option', { value: s, text: s })));
-    const symptoms = el('textarea', { placeholder: 'Clinical signs, history…' });
-    const out = el('div', { id: 'vetOut' });
+  // -------- Disease AI (M782) --------
+  function diseasePage() {
+    title().textContent = 'Disease AI · Image → Symptoms → Solution';
+    const domain = el('select', {}, [
+      el('option', { value: 'plant', text: 'Plant (Agro)' }),
+      el('option', { value: 'animal', text: 'Animal (Vet bridge)' }),
+    ]);
+    const crop = el('input', { value: 'tomato', placeholder: 'crop' });
+    const species = el('input', { value: 'cattle', placeholder: 'species' });
+    const desc = el('textarea', { placeholder: 'Describe symptoms or paste CV tags…' });
+    const tags = el('input', { placeholder: 'cv_tags comma-separated e.g. powdery,yellowing' });
+    const organic = el('input', { type: 'checkbox', checked: true });
+    const out = el('div');
+    const discussBox = el('textarea', { placeholder: 'Follow-up question for discussion…' });
+    let sessionId = null;
+    let lastDisease = null;
+
     const run = el('button', {
       className: 'btn primary',
       type: 'button',
-      text: 'Run enhanced analysis',
+      text: 'Analyze (symptoms → disease → treatment)',
       onClick: async () => {
         run.disabled = true;
         try {
-          const res = await AfreraAPI.veterinaryEnhanced({
+          const body = {
+            domain: domain.value,
+            description: desc.value,
+            cv_tags: tags.value.split(',').map((s) => s.trim()).filter(Boolean),
+            organic_preference: organic.checked,
+            crop: crop.value,
             species: species.value,
-            clinical: { symptoms: symptoms.value.split(/[,\n]/).map((s) => s.trim()).filter(Boolean) },
-            description: symptoms.value,
-            lang: document.getElementById('langSelect')?.value || 'en',
+          };
+          const res = await AfreraAPI.diseaseAnalyze(body);
+          const data = res.result || res.data || res;
+          sessionId = res.sessionId || data.sessionId || sessionId;
+          lastDisease = data.diseases?.top || null;
+          out.innerHTML = '';
+          if (data.symptoms) {
+            out.appendChild(
+              card(
+                'Symptom series',
+                el(
+                  'ul',
+                  {},
+                  (data.symptoms.symptom_series || []).map((s) => el('li', { text: s })),
+                ),
+              ),
+            );
+          }
+          if (data.diseases?.top) {
+            out.appendChild(
+              card('Top disease', [
+                el('p', {}, [el('strong', { text: data.diseases.top.name })]),
+                gauge('Confidence %', (data.diseases.top.confidence || 0) * 100),
+                el('p', { className: 'muted', text: data.diseases.disclaimer || '' }),
+              ]),
+            );
+          }
+          if (data.treatment) {
+            out.appendChild(
+              card('Treatment / solution', [
+                el('p', {}, [pill(data.treatment.preferred_path || 'integrated', 'ok')]),
+                el('p', { text: 'Organic: ' + (data.treatment.organic_options || []).join('; ') }),
+                el('p', { text: 'Cultural: ' + (data.treatment.cultural_practices || []).join('; ') }),
+                el('p', { className: 'muted', text: data.treatment.safety_floor || '' }),
+              ]),
+            );
+          }
+          renderResult(out, data, 'disease');
+          toast('Disease analysis complete');
+        } catch (e) {
+          toast(e.message);
+        } finally {
+          run.disabled = false;
+        }
+      },
+    });
+
+    const discussBtn = el('button', {
+      className: 'btn',
+      type: 'button',
+      text: 'Send discussion',
+      onClick: async () => {
+        if (!sessionId) return toast('Run analyze first');
+        try {
+          const res = await AfreraAPI.diseaseDiscussion({
+            sessionId,
+            message: discussBox.value,
+            domain: domain.value,
           });
-          renderResult(out, res.result || res.data || res, 'veterinary');
+          const data = res.result || res.data || res;
+          out.appendChild(card('Discussion reply', el('p', { text: data.assistant || JSON.stringify(data) })));
+          toast('Discussion updated');
+        } catch (e) {
+          toast(e.message);
+        }
+      },
+    });
+
+    main().innerHTML = '';
+    main().appendChild(
+      card('Case intake', [
+        el('div', { className: 'form-row' }, [field('Domain', domain), field('Organic first', organic)]),
+        el('div', { className: 'form-row' }, [field('Crop', crop), field('Species', species)]),
+        field('Description', desc),
+        field('CV tags', tags),
+        run,
+      ]),
+    );
+    main().appendChild(card('Multi-turn discussion', [field('Message', discussBox), discussBtn]));
+    main().appendChild(out);
+    main().appendChild(card('Cross-module', crossLinks('disease')));
+  }
+
+  // -------- Veterinary + full panel --------
+  function veterinaryPage() {
+    title().textContent = 'Veterinary · Specialist Panel';
+    const species = el(
+      'select',
+      {},
+      ['cattle', 'buffalo', 'goat', 'sheep', 'pig', 'poultry', 'dog', 'cat', 'equine'].map((s) =>
+        el('option', { value: s, text: s }),
+      ),
+    );
+    const symptoms = el('textarea', { placeholder: 'Clinical signs, history…' });
+    const herdSize = el('input', { type: 'number', value: '50', min: '0' });
+    const affected = el('input', { type: 'number', value: '3', min: '0' });
+    const out = el('div');
+
+    const runDiag = el('button', {
+      className: 'btn primary',
+      type: 'button',
+      text: 'Diagnose + panel preview',
+      onClick: async () => {
+        runDiag.disabled = true;
+        try {
+          const res = await AfreraAPI.vetDiagnose({
+            species: species.value,
+            symptoms_text: symptoms.value,
+            description: symptoms.value,
+            run_panel: true,
+          });
+          const data = res.result || res.data || res;
+          out.innerHTML = '';
+          out.appendChild(
+            card('Urgency', [
+              pill(data.urgency || '—', data.urgency === 'emergency' ? 'warn' : 'ok'),
+              el('p', { className: 'muted', text: data.safety_floor || '' }),
+            ]),
+          );
+          if (data.symptom_series?.length) {
+            out.appendChild(
+              card(
+                'Symptom series',
+                el(
+                  'ul',
+                  {},
+                  data.symptom_series.map((s) => el('li', { text: s })),
+                ),
+              ),
+            );
+          }
+          if (data.panel_preview?.opinions) {
+            out.appendChild(
+              card(
+                'Specialist panel preview',
+                data.panel_preview.opinions.map((o) =>
+                  el('div', { className: 'panel-opinion' }, [
+                    el('strong', { text: o.specialist_name }),
+                    el('p', { text: o.opinion }),
+                  ]),
+                ),
+              ),
+            );
+            if (data.panel_preview.consensus) {
+              out.appendChild(card('Consensus', el('p', { text: data.panel_preview.consensus.summary })));
+            }
+          }
+          renderResult(out, data, 'veterinary');
           toast('Veterinary analysis complete');
         } catch (e) {
           toast(e.message);
         } finally {
-          run.disabled = false;
+          runDiag.disabled = false;
         }
       },
     });
+
+    const runPanel = el('button', {
+      className: 'btn',
+      type: 'button',
+      text: 'Full specialist panel',
+      onClick: async () => {
+        try {
+          const res = await AfreraAPI.vetPanel({
+            species: species.value,
+            symptoms_text: symptoms.value,
+            description: symptoms.value,
+          });
+          const data = res.result || res.data || res;
+          out.appendChild(
+            card(
+              'Full panel opinions',
+              (data.opinions || []).map((o) =>
+                el('div', {}, [
+                  el('strong', { text: `${o.specialist_name} (${o.relevance})` }),
+                  el('p', { text: o.opinion }),
+                ]),
+              ),
+            ),
+          );
+          if (data.consensus) out.appendChild(card('Consensus', el('p', { text: data.consensus.summary })));
+          if (data.ai_synthesis) out.appendChild(card('AI synthesis', el('p', { text: data.ai_synthesis })));
+          toast('Panel complete');
+        } catch (e) {
+          toast(e.message);
+        }
+      },
+    });
+
+    const runHerd = el('button', {
+      className: 'btn ghost',
+      type: 'button',
+      text: 'Herd risk',
+      onClick: async () => {
+        try {
+          const res = await AfreraAPI.vetHerdRisk({
+            species: species.value,
+            herd_size: Number(herdSize.value),
+            affected: Number(affected.value),
+          });
+          const data = res.result || res.data || res;
+          out.appendChild(
+            card('Herd risk', [
+              pill(data.risk_band || '—', data.risk_band === 'high' ? 'warn' : 'ok'),
+              el('p', { text: `Attack rate: ${data.attack_rate}` }),
+            ]),
+          );
+        } catch (e) {
+          toast(e.message);
+        }
+      },
+    });
+
     main().innerHTML = '';
-    main().appendChild(card('Case intake', [field('Species', species), field('Symptoms / history', symptoms), run]));
+    main().appendChild(
+      card('Case intake', [
+        field('Species', species),
+        field('Symptoms / history', symptoms),
+        el('div', { className: 'form-row' }, [field('Herd size', herdSize), field('Affected', affected)]),
+        el('div', { className: 'form-row' }, [runDiag, runPanel, runHerd]),
+      ]),
+    );
     main().appendChild(out);
     main().appendChild(card('Cross-module', crossLinks('veterinary')));
   }
 
+  // -------- Nutrition + clinical protocols --------
   function nutritionPage() {
-    title().textContent = 'Rituraj Nutrition';
-    const age = el('input', { type: 'number', value: '30', min: '1' });
-    const weight = el('input', { type: 'number', value: '65', min: '1' });
+    title().textContent = 'Rituraj Nutrition · Clinical MNT';
+    const age = el('input', { type: 'number', value: '45', min: '1' });
+    const weight = el('input', { type: 'number', value: '72', min: '1' });
     const height = el('input', { type: 'number', value: '165', min: '50' });
-    const sex = el('select', {}, [el('option', { value: 'female', text: 'Female' }), el('option', { value: 'male', text: 'Male' })]);
-    const goal = el('select', {}, ['maintain', 'loss', 'gain'].map((g) => el('option', { value: g, text: g })));
+    const sex = el('select', {}, [
+      el('option', { value: 'female', text: 'Female' }),
+      el('option', { value: 'male', text: 'Male' }),
+    ]);
+    const protocol = el('select', {}, [
+      el('option', { value: '', text: '— none —' }),
+      ...['t2dm', 'ckd', 'htn', 'hypothyroidism', 'pcos', 'pregnancy', 'geriatric_sarcopenia'].map((p) =>
+        el('option', { value: p, text: p }),
+      ),
+    ]);
+    const meds = el('input', { placeholder: 'medications e.g. metformin, warfarin' });
     const out = el('div');
-    const run = el('button', {
+
+    const runPlan = el('button', {
       className: 'btn primary',
       type: 'button',
-      text: 'Run nutrition conference',
+      text: 'Plan + apply protocol',
       onClick: async () => {
-        run.disabled = true;
+        runPlan.disabled = true;
         try {
-          const res = await AfreraAPI.nutritionEnhanced({
+          const body = {
             profile: {
-              age_years: Number(age.value),
+              age: Number(age.value),
               weight_kg: Number(weight.value),
               height_cm: Number(height.value),
               sex: sex.value,
+              activity: 'moderate',
             },
-            goal: goal.value,
-            lang: document.getElementById('langSelect')?.value || 'en',
-          });
-          renderResult(out, res.result || res.data || res, 'nutrition');
-          toast('Nutrition analysis complete');
+            protocol_id: protocol.value || undefined,
+            diagnoses: protocol.value ? [protocol.value] : [],
+            medications: meds.value.split(',').map((s) => s.trim()).filter(Boolean),
+          };
+          const res = await AfreraAPI.nutritionPlan(body);
+          const data = res.result || res.data || res;
+          out.innerHTML = '';
+          if (data.assessment) {
+            out.appendChild(
+              card('Energy', [
+                el('p', { text: `BMR ${data.assessment.bmr} · TDEE ${data.assessment.tdee}` }),
+                gauge('Confidence %', (data.confidence || 0.8) * 100),
+              ]),
+            );
+          }
+          if (data.clinical_protocols_applied?.length) {
+            out.appendChild(
+              card(
+                'Clinical protocols',
+                data.clinical_protocols_applied.map((p) =>
+                  el('div', {}, [
+                    el('strong', { text: p.name }),
+                    el('p', { className: 'muted', text: (p.goals || []).join(' · ') }),
+                    el('p', { text: p.escalation || '' }),
+                  ]),
+                ),
+              ),
+            );
+          }
+          if (data.plan_summary) out.appendChild(card('Plan summary', el('p', { text: data.plan_summary })));
+          renderResult(out, data, 'nutrition');
+          toast('Nutrition plan complete');
         } catch (e) {
           toast(e.message);
         } finally {
-          run.disabled = false;
+          runPlan.disabled = false;
         }
       },
     });
+
+    const loadProto = el('button', {
+      className: 'btn',
+      type: 'button',
+      text: 'Load full protocol card',
+      onClick: async () => {
+        if (!protocol.value) return toast('Select a protocol');
+        try {
+          const res = await AfreraAPI.nutritionProtocol({ protocol_id: protocol.value });
+          const data = res.result || res.data || res;
+          const p = data.protocol;
+          if (!p) return toast(data.message || 'Not found');
+          out.appendChild(
+            card(p.name, [
+              el('p', { text: 'Energy: ' + (p.energy || '—') }),
+              el('p', { text: 'Protein: ' + (p.protein || '—') }),
+              el('p', { text: 'Key foods: ' + (p.key_foods || []).join(', ') }),
+              el('p', { text: 'Limit: ' + (p.avoid_or_limit || []).join(', ') }),
+              el('p', { className: 'muted', text: data.safety_floor || '' }),
+            ]),
+          );
+        } catch (e) {
+          toast(e.message);
+        }
+      },
+    });
+
     main().innerHTML = '';
     main().appendChild(
-      card('Profile', [
+      card('Profile + clinical', [
         el('div', { className: 'form-row' }, [field('Age', age), field('Sex', sex)]),
         el('div', { className: 'form-row' }, [field('Weight kg', weight), field('Height cm', height)]),
-        field('Goal', goal),
-        run,
+        field('Clinical protocol', protocol),
+        field('Medications', meds),
+        el('div', { className: 'form-row' }, [runPlan, loadProto]),
       ]),
     );
     main().appendChild(out);
@@ -181,12 +478,20 @@
         }
       },
     });
+    const toDisease = el('button', {
+      className: 'btn',
+      type: 'button',
+      text: 'Open in Disease AI',
+      onClick: () => {
+        location.hash = '#/disease';
+      },
+    });
     main().innerHTML = '';
     main().appendChild(
       card('Field case', [
         el('div', { className: 'form-row' }, [field('Crop', crop), field('Mode', mode)]),
         field('Notes / symptoms', desc),
-        run,
+        el('div', { className: 'form-row' }, [run, toDisease]),
       ]),
     );
     main().appendChild(out);
@@ -293,7 +598,8 @@
   function route() {
     nav();
     const h = location.hash || '#/';
-    if (h.startsWith('#/veterinary')) veterinaryPage();
+    if (h.startsWith('#/disease')) diseasePage();
+    else if (h.startsWith('#/veterinary')) veterinaryPage();
     else if (h.startsWith('#/nutrition')) nutritionPage();
     else if (h.startsWith('#/agro')) agroPage();
     else if (h.startsWith('#/unified')) unifiedPage();
