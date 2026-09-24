@@ -5,6 +5,8 @@
 const panel = require('./panel/VeterinarySpecialistPanel');
 const knowledge = require('./knowledge');
 const { createVeterinaryRouter } = require('./routes');
+const { computeHerdRisk, WEIGHTS: HERD_WEIGHTS } = require('./herd/HerdRiskScoring');
+const oneHealth = require('./onehealth/OneHealthSurveillance');
 const cow = require('./species/cow');
 const pig = require('./species/pig');
 const goat = require('./species/goat');
@@ -30,4 +32,9 @@ module.exports = {
   speciesPacks,
   getSpeciesPack,
   createVeterinaryRouter,
+  computeHerdRisk,
+  HERD_WEIGHTS,
+  oneHealth,
+  assessSurveillance: oneHealth.assessSurveillance,
+  INTERNATIONAL_STAGES: oneHealth.INTERNATIONAL_STAGES,
 };
