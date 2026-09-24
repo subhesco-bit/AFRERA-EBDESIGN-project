@@ -1,5 +1,5 @@
 /**
- * AFRERA API client — correlation IDs + 10x module helpers
+ * AFRERA API client — three-modules + enterprise 10x
  */
 (function (global) {
   const cfg = () => global.AFRERA_CONFIG || { apiBase: '/api/v1' };
@@ -44,26 +44,22 @@
     busEvents: () => request('/unified-intelligence/bus/events'),
     financeDashboard: (mod) => request(`/ai-erp/finance/dashboard/${mod}`),
     erpDashboard: (mod) => request(`/ai-erp/erp/dashboard/${mod}`),
-    integrateSync: (body) => request('/ai-erp/integrate/sync', { body }),
-    interpretOnce: (body) => request('/ai-erp/interpret/once', { body }),
-    crops: () => request('/agro-farming/crops'),
 
-    // 10x module APIs
     diseaseAnalyze: (body) => request('/m782_disease_analyzer_ai/analyze', { body }),
     diseaseDiscussion: (body) => request('/m782_disease_analyzer_ai/discussion', { body }),
-    diseaseTreatment: (body) => request('/m782_disease_analyzer_ai/treatment', { body }),
-    diseaseOutcome: (body) => request('/m782_disease_analyzer_ai/outcome', { body }),
-
     vetDiagnose: (body) => request('/m777_veterinary_ai/diagnose', { body }),
     vetPanel: (body) => request('/m777_veterinary_ai/panel', { body }),
     vetHerdRisk: (body) => request('/m777_veterinary_ai/herd-risk', { body }),
-    vetOutcome: (body) => request('/m777_veterinary_ai/outcome', { body }),
-
     nutritionPlan: (body) => request('/m779_nutrition_ai/plan', { body }),
     nutritionProtocols: () => request('/m779_nutrition_ai/protocols'),
     nutritionProtocol: (body) => request('/m779_nutrition_ai/protocol', { body }),
-    nutritionAssess: (body) => request('/m779_nutrition_ai/assess', { body }),
-    nutritionOutcome: (body) => request('/m779_nutrition_ai/outcome', { body }),
+
+    // Enterprise 10x
+    enterpriseHealth: () => request('/enterprise-10x/health'),
+    enterpriseDomains: () => request('/enterprise-10x/domains'),
+    enterpriseOperate: (domain, body) => request(`/enterprise-10x/${domain}/operate`, { body }),
+    enterprisePanel: (domain, body) => request(`/enterprise-10x/${domain}/panel`, { body }),
+    enterpriseMetrics: (domain) => request(`/enterprise-10x/${domain}/metrics`),
   };
 
   global.AfreraAPI = api;
