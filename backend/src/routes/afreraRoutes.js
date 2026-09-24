@@ -31,6 +31,7 @@ router.get('/health', (req, res) => {
       'escrow',
       'village-freelancer',
       'village-contract-labour',
+      'intelligence',
       'wiring-test',
     ],
   });
@@ -48,6 +49,7 @@ router.use('/layers', safe('./layerBoundaryRoutes'));
 router.use('/escrow', safe('./escrowIssueRoutes'));
 router.use('/village-freelancer', safe('./villageFreelancerRoutes'));
 router.use('/village-contract-labour', safe('./villageContractLabourRoutes'));
+router.use('/intelligence', safe('./healthCommerceIntelligenceRoutes'));
 router.use('/wiring-test', safe('./afreraWiringTestRoutes'));
 
 try {

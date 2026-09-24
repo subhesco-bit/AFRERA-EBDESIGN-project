@@ -43,9 +43,10 @@ function mount(app) {
   use('/api/v1/research-grade', safeRequire('./researchGradeRoutes'), 'research-grade');
   use('/api/v1/ecommerce', safeRequire('./ecommerceCheckoutRoutes'), 'checkout');
   use('/api/v1/layers', safeRequire('./layerBoundaryRoutes'), 'layers');
-  use('/api/v1/escrow', safeRequire('./escrowIssueRoutes'), 'escrow+issues');
-  use('/api/v1/village-freelancer', safeRequire('./villageFreelancerRoutes'), 'village freelancer');
-  use('/api/v1/village-contract-labour', safeRequire('./villageContractLabourRoutes'), 'urbanclap farm labour');
+  use('/api/v1/escrow', safeRequire('./escrowIssueRoutes'), 'escrow');
+  use('/api/v1/village-freelancer', safeRequire('./villageFreelancerRoutes'), 'vf');
+  use('/api/v1/village-contract-labour', safeRequire('./villageContractLabourRoutes'), 'vcl');
+  use('/api/v1/intelligence', safeRequire('./healthCommerceIntelligenceRoutes'), 'intelligence');
   use(null, safeRequire('./walletContractPreseasonRoutes'), 'wallet+preseason');
 
   app.get('/api/v1/afrera/wiring-report', (req, res) => {
