@@ -33,7 +33,7 @@ function mount(app) {
     report.push({ path, ok: false, error: 'not_a_router', note });
   }
 
-  use('/api/v1/afrera', safeRequire('./afreraRoutes'), 'unified afrera OS');
+  use('/api/v1/afrera', safeRequire('./afreraRoutes'), 'afrera OS');
   use('/api/v1/interplatform', safeRequire('./interplatformRoutes'), 'interplatform');
   use('/api/v1/grade10', safeRequire('./industryGradeRoutes'), 'grade10');
   use('/api/v1/features', safeRequire('./featureActivationRoutes'), 'features');
@@ -47,6 +47,7 @@ function mount(app) {
   use('/api/v1/village-freelancer', safeRequire('./villageFreelancerRoutes'), 'vf');
   use('/api/v1/village-contract-labour', safeRequire('./villageContractLabourRoutes'), 'vcl');
   use('/api/v1/intelligence', safeRequire('./healthCommerceIntelligenceRoutes'), 'intelligence');
+  use('/api/v1/crop-decision', safeRequire('./weatherCropDecisionRoutes'), 'crop decision');
   use(null, safeRequire('./walletContractPreseasonRoutes'), 'wallet+preseason');
 
   app.get('/api/v1/afrera/wiring-report', (req, res) => {

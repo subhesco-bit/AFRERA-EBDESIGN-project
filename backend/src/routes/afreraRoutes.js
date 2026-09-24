@@ -32,6 +32,7 @@ router.get('/health', (req, res) => {
       'village-freelancer',
       'village-contract-labour',
       'intelligence',
+      'crop-decision',
       'wiring-test',
     ],
   });
@@ -50,6 +51,7 @@ router.use('/escrow', safe('./escrowIssueRoutes'));
 router.use('/village-freelancer', safe('./villageFreelancerRoutes'));
 router.use('/village-contract-labour', safe('./villageContractLabourRoutes'));
 router.use('/intelligence', safe('./healthCommerceIntelligenceRoutes'));
+router.use('/crop-decision', safe('./weatherCropDecisionRoutes'));
 router.use('/wiring-test', safe('./afreraWiringTestRoutes'));
 
 try {
