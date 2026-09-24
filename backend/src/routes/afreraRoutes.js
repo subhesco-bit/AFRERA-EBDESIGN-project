@@ -1,7 +1,4 @@
-/**
- * Unified AFRERA OS API surface
- */
-
+/** Unified AFRERA OS API surface */
 'use strict';
 
 const express = require('express');
@@ -33,6 +30,7 @@ router.get('/health', (req, res) => {
       'layers',
       'escrow',
       'village-freelancer',
+      'village-contract-labour',
       'wiring-test',
     ],
   });
@@ -49,6 +47,7 @@ router.use('/ecommerce', safe('./ecommerceCheckoutRoutes'));
 router.use('/layers', safe('./layerBoundaryRoutes'));
 router.use('/escrow', safe('./escrowIssueRoutes'));
 router.use('/village-freelancer', safe('./villageFreelancerRoutes'));
+router.use('/village-contract-labour', safe('./villageContractLabourRoutes'));
 router.use('/wiring-test', safe('./afreraWiringTestRoutes'));
 
 try {
