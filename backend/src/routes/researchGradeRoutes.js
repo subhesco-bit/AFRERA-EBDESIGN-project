@@ -1,115 +1,75 @@
-/**
- * Research-grade platform routes — real engines, evidence, no stubs
- * Mount: /api/v1/research-grade
- */
-
+/** Aggregate research-grade engines under one router */
 'use strict';
 
 const express = require('express');
 const router = express.Router();
-const gateway = require('../services/research-grade/aiBackboneEvidenceGateway');
-const erp = require('../services/research-grade/erpDoubleEntrySpine');
 
-function ok(res, body) {
-  res.json(body);
+function tryReq(p) {
+  try {
+    return require(p);
+  } catch {
+    return null;
+  }
 }
-function fail(res, status, err) {
-  res.status(status).json({
-    success: false,
-    error: typeof err === 'string' ? err : err.message,
-    code: err.code || undefined,
-  });
-}
+
+const subsidy = tryReq('../services/research-grade/subsidyEligibilityEngine');
+const logistics = tryReq('../services/research-grade/logisticsDecisionEngine');
+const erp = tryReq('../services/research-grade/erpDoubleEntrySpine');
+const erpExt = tryReq('../services/research-grade/erpControlsExtended');
+const mep = tryReq('../services/research-grade/mepEngineeringEngine');
+const ai = tryReq('../services/research-grade/aiBackboneEvidenceGateway');
 
 router.get('/health', (req, res) => {
-  ok(res, {
+  res.json({
     success: true,
-    status: 'healthy',
-    suite: 'research-grade',
-    timestamp: new Date().toISOString(),
+    engines: {
+      subsidy: !!subsidy,
+      logistics: !!logistics,
+      erp: !!erp,
+      erp_ext: !!erpExt,
+      mep: !!mep,
+      ai: !!ai,
+    },
   });
 });
 
-router.get('/capabilities', async (req, res) => {
-  ok(res, await gateway.route('capabilities', {}));
+router.post('/subsidy', (req, res) => {
+  if (!subsidy) return res.status(503).json({ success: false, error: 'subsidy unavailable' });
+  res.json({ success: true, ...subsidy.extractAll(req.body?.farmer || req.body, req.body?.as_of) });
 });
 
-router.post('/ai/:capability', async (req, res) => {
-  try {
-    const out = await gateway.route(req.params.capability, req.body || {});
-    if (!out.success && out.error) return fail(res, 400, out.error);
-    ok(res, out);
-  } catch (e) {
-    fail(res, 500, e);
-  }
-});
-
-router.post('/subsidy/extract', async (req, res) => {
-  try {
-    ok(res, await gateway.route('subsidy_extract', req.body || {}));
-  } catch (e) {
-    fail(res, 500, e);
-  }
-});
-
-router.get('/subsidy/schemes', async (req, res) => {
-  ok(res, await gateway.route('subsidy_list', {}));
-});
-
-router.post('/logistics/decide', async (req, res) => {
-  try {
-    ok(res, await gateway.route('logistics_decide', req.body || {}));
-  } catch (e) {
-    fail(res, 500, e);
-  }
-});
-
-router.post('/mep/package', async (req, res) => {
-  try {
-    ok(res, await gateway.route('mep_package', req.body || {}));
-  } catch (e) {
-    fail(res, 500, e);
-  }
-});
-
-router.post('/ecommerce/o2c/transition', async (req, res) => {
-  try {
-    ok(res, await gateway.route('ecommerce_o2c_transition', req.body || {}));
-  } catch (e) {
-    fail(res, e.code === 'INVALID_TRANSITION' ? 400 : 500, e);
-  }
-});
-
-router.post('/ecommerce/o2c/advance', async (req, res) => {
-  try {
-    ok(res, await gateway.route('ecommerce_o2c_advance', req.body || {}));
-  } catch (e) {
-    fail(res, 500, e);
-  }
-});
-
-router.get('/erp/coa', (req, res) => {
-  ok(res, { success: true, coa: erp.COA });
+router.post('/logistics', (req, res) => {
+  if (!logistics) return res.status(503).json({ success: false, error: 'logistics unavailable' });
+  res.json({ success: true, ...logistics.decide(req.body || {}) });
 });
 
 router.post('/erp/journal', (req, res) => {
+  if (!erp) return res.status(503).json({ success: false, error: 'erp unavailable' });
   try {
-    ok(res, { success: true, ...erp.postJournal(req.body || {}) });
+    res.json({ success: true, ...erp.postJournal(req.body || {}) });
   } catch (e) {
-    fail(res, 400, e);
-  }
-});
-
-router.post('/erp/sale', (req, res) => {
-  try {
-    ok(res, { success: true, ...erp.postSale(req.body || {}) });
-  } catch (e) {
-    fail(res, 400, e);
+    res.status(400).json({ success: false, error: e.message });
   }
 });
 
 router.get('/erp/trial-balance', (req, res) => {
-  ok(res, { success: true, ...erp.trialBalance() });
+  if (!erp) return res.status(503).json({ success: false });
+  res.json({ success: true, ...erp.trialBalance() });
+});
+
+router.post('/erp/three-way-match', (req, res) => {
+  if (!erpExt) return res.status(503).json({ success: false });
+  res.json({ success: true, ...erpExt.threeWayMatch(req.body || {}) });
+});
+
+router.post('/mep', async (req, res) => {
+  if (!mep) return res.status(503).json({ success: false });
+  res.json({ success: true, ...(await mep.operate(req.body || {})) });
+});
+
+router.post('/ai/evidence', (req, res) => {
+  if (!ai) return res.status(503).json({ success: false });
+  res.json({ success: true, evidence: ai.evidenceBase(req.body || {}) });
 });
 
 module.exports = router;
