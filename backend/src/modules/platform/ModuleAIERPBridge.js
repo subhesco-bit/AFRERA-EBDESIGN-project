@@ -2,6 +2,7 @@ const embedded = require('./EmbeddedAI');
 const erp = require('./ERPCore');
 const fin = require('./FinancialERP');
 const oneRT = require('./OneRuntimeInterpretation');
+const sync = require('./erp/ErpSyncEngine');
 
 function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
   const ai = {
@@ -29,16 +30,15 @@ function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
 
   const erp_hints = [];
   if (moduleName === 'veterinary' && enhancedResult.decision_quality?.action?.includes('REPORT')) {
-    erp_hints.push({ action: 'create_document', type: 'treatment_order', reason: 'notifiable_or_treatment' });
+    erp_hints.push({ action: 'treatment_order', reason: 'notifiable_or_treatment' });
   }
   if (moduleName === 'agro' && input.crop) {
-    erp_hints.push({ action: 'check_inventory', sku_hint: 'seed_or_input', crop: input.crop });
+    erp_hints.push({ action: 'check_inventory', crop: input.crop });
   }
   if (moduleName === 'nutrition' && enhancedResult.conference) {
     erp_hints.push({ action: 'meal_indent', reason: 'plan_generated' });
   }
 
-  // One-runtime interpretation (domain + money + GST context)
   const interpretation = oneRT.interpretOnce({
     module: moduleName,
     enhanced: enhancedResult,
@@ -49,6 +49,18 @@ function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
     lang: input.lang,
   });
 
+  // Optional commercial sync preview (never live unless input.sync_live)
+  let commercial = null;
+  if (input.sync_commercial || input.invoice_lines || input.invoice) {
+    // syncCommercial is async — return plan synchronously for bridge; caller can hit /integrate/sync
+    commercial = {
+      plan: 'Call POST /api/v1/ai-erp/integrate/sync with same invoice_lines',
+      adapters: input.targets || ['zoho_books'],
+      default_mode: input.sync_live ? 'live' : 'dry_run',
+      catalogue: sync.adapterCatalogue(),
+    };
+  }
+
   return {
     ...enhancedResult,
     embedded_ai: ai,
@@ -57,6 +69,7 @@ function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
       financial: finSnap,
       hints: erp_hints,
       entity_types: erp.ENTITY_TYPES[moduleName],
+      commercial_integration: commercial,
       disclaimer: erp.ERP_DISCLAIMER,
       financial_disclaimer: fin.FIN_DISCLAIMER,
     },
@@ -67,7 +80,10 @@ function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
       erp_financial: true,
       gst_taxation: true,
       one_runtime_interpretation: true,
-      offline_model_registry: true,
+      zoho_books_adapter: true,
+      tally_xml_adapter: true,
+      gsp_einvoice_adapter: true,
+      erp_sync_engine: true,
     },
   };
 }
