@@ -1,7 +1,4 @@
-/**
- * AFRERA canonical route mounts
- */
-
+/** AFRERA canonical mounts */
 'use strict';
 
 function safeRequire(p) {
@@ -14,7 +11,6 @@ function safeRequire(p) {
 
 function mount(app) {
   const report = [];
-
   function use(path, mod, note) {
     if (!mod || mod.__error) {
       report.push({ path, ok: false, error: mod && mod.__error, note });
@@ -48,6 +44,7 @@ function mount(app) {
   use('/api/v1/ecommerce', safeRequire('./ecommerceCheckoutRoutes'), 'checkout');
   use('/api/v1/layers', safeRequire('./layerBoundaryRoutes'), 'layers');
   use('/api/v1/escrow', safeRequire('./escrowIssueRoutes'), 'escrow+issues');
+  use('/api/v1/village-freelancer', safeRequire('./villageFreelancerRoutes'), 'village freelancer');
   use(null, safeRequire('./walletContractPreseasonRoutes'), 'wallet+preseason');
 
   app.get('/api/v1/afrera/wiring-report', (req, res) => {

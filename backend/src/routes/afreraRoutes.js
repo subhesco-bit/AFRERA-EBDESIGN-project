@@ -1,5 +1,5 @@
 /**
- * Unified AFRERA OS API surface — auto-discoverable by DynamicRouteLoader
+ * Unified AFRERA OS API surface
  */
 
 'use strict';
@@ -32,6 +32,7 @@ router.get('/health', (req, res) => {
       'ecommerce',
       'layers',
       'escrow',
+      'village-freelancer',
       'wiring-test',
     ],
   });
@@ -47,6 +48,7 @@ router.use('/research-grade', safe('./researchGradeRoutes'));
 router.use('/ecommerce', safe('./ecommerceCheckoutRoutes'));
 router.use('/layers', safe('./layerBoundaryRoutes'));
 router.use('/escrow', safe('./escrowIssueRoutes'));
+router.use('/village-freelancer', safe('./villageFreelancerRoutes'));
 router.use('/wiring-test', safe('./afreraWiringTestRoutes'));
 
 try {
