@@ -1,12 +1,16 @@
 /**
- * M779_NUTRITION_AI — 10/10 Rituraj Human Nutrition Decision-Support
- * BMR/TDEE, life-stage, culture calendars, clinical flags, pharmacy interactions, safety
+ * M779_NUTRITION_AI — 10/10 Rituraj + Clinical MNT protocols
  */
 
 'use strict';
 
 const aiBackbone = require('../../M400_AI_BACKBONE/backend/service');
 const { logger } = require('../../../backend/src/utils/logger');
+const {
+  listProtocols,
+  getProtocol,
+  matchProtocolsFromFlags,
+} = require('./clinical_protocols');
 
 const LIFE_STAGES = ['pediatric', 'adolescent', 'adult', 'pregnancy', 'lactation', 'geriatric'];
 const RITU = ['vasanta', 'grishma', 'varsha', 'sharad', 'hemanta', 'shishira'];
@@ -27,8 +31,8 @@ const ACTIVITY = {
 class NUTRITIONAIService {
   constructor() {
     this.moduleId = 'M779_NUTRITION_AI';
-    this.name = 'AI Nutritionist (Rituraj)';
-    this.version = '2.0.0-10x';
+    this.name = 'AI Nutritionist (Rituraj + Clinical MNT)';
+    this.version = '2.1.0-10x';
     this.capabilities = [
       'nutrition_planning',
       'dietary_recommendation',
@@ -37,6 +41,8 @@ class NUTRITIONAIService {
       'life_stage',
       'ritu_conference',
       'drug_food_flags',
+      'clinical_protocol',
+      'clinical_protocols_list',
       'outcome_feedback',
     ];
     this.metrics = {
@@ -44,12 +50,13 @@ class NUTRITIONAIService {
       successCount: 0,
       errorCount: 0,
       outcomesLogged: 0,
+      protocolsServed: 0,
     };
     this.sessions = new Map();
   }
 
   async initialize(config) {
-    logger.info(`Initializing ${this.moduleId} 10x`);
+    logger.info(`Initializing ${this.moduleId} 10x clinical`);
     return {
       success: true,
       moduleId: this.moduleId,
@@ -57,7 +64,9 @@ class NUTRITIONAIService {
       capabilities: this.capabilities,
       life_stages: LIFE_STAGES,
       ritu: RITU,
-      safety_floor: 'Not a substitute for clinical medical nutrition therapy by a qualified professional.',
+      clinical_protocols: listProtocols(),
+      safety_floor:
+        'Not a substitute for clinical medical nutrition therapy by a qualified RD/MD. Protocols are decision-support.',
     };
   }
 
@@ -86,6 +95,13 @@ class NUTRITIONAIService {
           break;
         case 'drug_food_flags':
           result = this.drugFood(data);
+          break;
+        case 'clinical_protocol':
+          result = this.clinicalProtocol(data);
+          this.metrics.protocolsServed++;
+          break;
+        case 'clinical_protocols_list':
+          result = { protocols: listProtocols(), confidence: 1 };
           break;
         case 'outcome_feedback':
           result = this.logOutcome(data, sessionId);
@@ -130,7 +146,7 @@ class NUTRITIONAIService {
         fat_g: Math.round((tdee * 0.3) / 9),
       },
       confidence: 0.85,
-      safety_floor: 'Estimates only; adjust for clinical conditions.',
+      safety_floor: 'Estimates only; adjust for clinical conditions and protocols.',
       erp_hooks: { consult_billing: true, gst_service: true },
     };
   }
@@ -158,6 +174,9 @@ class NUTRITIONAIService {
     if (meds.some((m) => m.includes('metformin'))) flags.push('b12_monitor', 'gi_tolerance');
     if (meds.some((m) => m.includes('statin'))) flags.push('grapefruit_caution');
     if (meds.some((m) => m.includes('maoi'))) flags.push('tyramine_restriction');
+    if (meds.some((m) => m.includes('levothyroxine') || m.includes('thyroxine'))) {
+      flags.push('empty_stomach', 'separate_calcium_iron_4h');
+    }
     return {
       medications: meds,
       interaction_flags: flags,
@@ -166,19 +185,59 @@ class NUTRITIONAIService {
     };
   }
 
+  clinicalProtocol(data) {
+    const id = data?.protocol_id || data?.diagnosis || data?.condition;
+    let protocol = getProtocol(id);
+    if (!protocol) {
+      const matched = matchProtocolsFromFlags(data?.flags || [], data?.diagnoses || [id].filter(Boolean));
+      protocol = matched[0] || null;
+    }
+    if (!protocol) {
+      return {
+        status: 'not_found',
+        available: listProtocols(),
+        message: 'Provide protocol_id (t2dm, ckd, htn, hypothyroidism, pcos, pregnancy, geriatric_sarcopenia)',
+        confidence: 0.3,
+        safety_floor: 'No protocol applied.',
+      };
+    }
+    return {
+      status: 'ok',
+      protocol,
+      confidence: protocol.confidence_base,
+      safety_floor:
+        'CLINICAL DECISION-SUPPORT ONLY. Individualise with labs, meds, and licensed clinician/RD. Not a prescription.',
+      erp_hooks: { consult_code_hint: protocol.icd_hint, mnt_session: true },
+    };
+  }
+
   async plan(data, sessionId, provider) {
     const assessment = this.assess(data);
     const stage = this.lifeStageFlags(data);
     const drug = this.drugFood(data);
+    const diagnoses = data?.diagnoses || data?.conditions || [];
+    const matchedProtocols = matchProtocolsFromFlags(stage.flags, diagnoses);
+    if (data?.protocol_id) {
+      const p = getProtocol(data.protocol_id);
+      if (p && !matchedProtocols.find((x) => x.id === p.id)) matchedProtocols.unshift(p);
+    }
 
     let ai_reasoning = null;
     try {
       const ai = await aiBackbone.makeDecision(
-        { confidence: 0.82 },
+        { confidence: 0.84 },
         {
           moduleId: this.moduleId,
           capability: 'nutrition_planning',
-          data: { assessment, stage, drug, goals: data?.goals, culture: data?.culture, ritu: data?.ritu },
+          data: {
+            assessment,
+            stage,
+            drug,
+            protocols: matchedProtocols.map((p) => p.id),
+            goals: data?.goals,
+            culture: data?.culture,
+            ritu: data?.ritu,
+          },
           provider: provider || 'claude',
         }
       );
@@ -191,17 +250,23 @@ class NUTRITIONAIService {
       assessment,
       life_stage: stage,
       drug_food: drug,
+      clinical_protocols_applied: matchedProtocols,
       ritu: data?.ritu || null,
       culture_notes: data?.culture || null,
-      plan_summary: ai_reasoning || 'Balanced plate aligned to TDEE and life-stage flags.',
-      confidence: 0.82,
+      plan_summary:
+        ai_reasoning ||
+        (matchedProtocols.length
+          ? `Plan aligned to ${matchedProtocols.map((p) => p.name).join(', ')} with TDEE baseline.`
+          : 'Balanced plate aligned to TDEE and life-stage flags.'),
+      confidence: matchedProtocols.length ? 0.86 : 0.82,
       safety_floor:
-        'Not a substitute for RD/MD medical nutrition therapy. Disease-specific protocols need clinical content packs.',
-      erp_hooks: {
-        consult_invoice: true,
-        gst: true,
-      },
-      next_actions: ['Refine goals', 'POST drug_food_flags with full med list', 'POST outcome_feedback'],
+        'Not a substitute for RD/MD medical nutrition therapy. Disease protocols require clinical confirmation and labs.',
+      erp_hooks: { consult_invoice: true, gst: true, mnt_session: matchedProtocols.length > 0 },
+      next_actions: [
+        'POST clinical_protocol with protocol_id for full MNT card',
+        'POST drug_food_flags with full med list',
+        'POST outcome_feedback',
+      ],
     };
 
     if (sessionId) {

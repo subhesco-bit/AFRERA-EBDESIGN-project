@@ -1,5 +1,5 @@
 /**
- * M779_NUTRITION_AI Routes — 10/10 Rituraj
+ * M779_NUTRITION_AI Routes — clinical protocols + Rituraj
  */
 
 'use strict';
@@ -48,6 +48,22 @@ router.post('/plan', async (req, res) => {
         sessionId,
       })
     );
+  } catch (e) {
+    fail(res, 500, e);
+  }
+});
+
+router.get('/protocols', async (req, res) => {
+  try {
+    ok(res, await service.process({ capability: 'clinical_protocols_list', data: {} }));
+  } catch (e) {
+    fail(res, 500, e);
+  }
+});
+
+router.post('/protocol', async (req, res) => {
+  try {
+    ok(res, await service.process({ capability: 'clinical_protocol', data: req.body }));
   } catch (e) {
     fail(res, 500, e);
   }
