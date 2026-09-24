@@ -1,14 +1,9 @@
-/**
- * Veterinary module — full enhancement layer
- * Algorithms, workflow, evaluation, analysis, decision, interpretation,
- * inter-module signals, viz, audio, confidence.
- */
-
 const { randomUUID } = require('crypto');
 const decisionEng = require('../platform/DecisionQualityEngine');
 const workflow = require('../platform/WorkflowOrchestrator');
 const bus = require('../platform/InterModuleBus');
 const interaction = require('../platform/InteractionLayer');
+const { attachAIERP } = require('../platform/ModuleAIERPBridge');
 
 function tryRequire(p) {
   try {
@@ -58,10 +53,6 @@ function runVeterinaryEnhanced(input = {}) {
   if (herdRisk?.score != null) {
     signals.push({ value: 1 - Math.min(1, herdRisk.score / 100), weight: 0.8, source: 'herd_inverse_risk' });
   }
-  if (panel?.differentials?.length) {
-    const top = panel.differentials[0]?.confidence;
-    if (top != null) signals.push({ value: top, weight: 1, source: 'top_differential' });
-  }
 
   const urgency = panel?.urgency || input.urgency || 'routine';
   const notifiable = !!(panel?.notifiable_suspect || oneHealth?.facts?.notifiable_suspect);
@@ -79,11 +70,8 @@ function runVeterinaryEnhanced(input = {}) {
     vision_severity: input.vision_severity,
     summary: panel?.panel_summary || 'Veterinary analysis',
     rationale: panel?.safety_disclaimer || 'Licensed veterinarian is final authority',
-    modules_touched: ['veterinary', notifiable ? 'legal' : null, 'one_health'].filter(Boolean),
-    next_steps: [
-      ...(panel?.immediate_actions || []),
-      ...(notifiable ? ['Notify village officer / VO per PCICDA path'] : []),
-    ].slice(0, 5),
+    modules_touched: ['veterinary', notifiable ? 'legal' : null, 'one_health', 'embedded_ai', 'erp'].filter(Boolean),
+    next_steps: [...(panel?.immediate_actions || []), ...(notifiable ? ['Notify village officer / VO per PCICDA'] : [])].slice(0, 5),
     safety_floor: 'Licensed veterinarian authorises diagnosis, prescription, and official reporting',
   });
 
@@ -91,23 +79,8 @@ function runVeterinaryEnhanced(input = {}) {
 
   const events = [];
   if (notifiable) {
-    events.push(
-      bus.publish(bus.EVENT_TYPES.VET_NOTIFIABLE, { species: input.species, summary: panel?.panel_summary }, {
-        source_module: 'veterinary',
-      }),
-    );
-    events.push(
-      bus.publish(bus.EVENT_TYPES.LEGAL_PCICDA, { stage: 'S2_REPORT' }, { source_module: 'veterinary' }),
-    );
-  }
-  if (panel?.differentials?.some((d) => (d.tags || []).includes('zoonotic_risk'))) {
-    events.push(
-      bus.publish(
-        bus.EVENT_TYPES.VET_ZOONOTIC,
-        { message: 'Notify nutrition/human pillar — farm family hygiene' },
-        { source_module: 'veterinary' },
-      ),
-    );
+    events.push(bus.publish(bus.EVENT_TYPES.VET_NOTIFIABLE, { species: input.species }, { source_module: 'veterinary' }));
+    events.push(bus.publish(bus.EVENT_TYPES.LEGAL_PCICDA, { stage: 'S2_REPORT' }, { source_module: 'veterinary' }));
   }
 
   const interactionBundle = interaction.buildInteractionBundle({
@@ -116,14 +89,12 @@ function runVeterinaryEnhanced(input = {}) {
     workflow: wf,
     lang: input.lang || 'en',
     key_point: notifiable ? 'Possible notifiable disease — official reporting path applies.' : null,
-    modules_touched: decision.modules_touched,
-    next_steps: decision.evaluation ? undefined : undefined,
   });
 
-  return {
+  const base = {
     case_id: randomUUID(),
     module: 'veterinary',
-    enhancement_tier: 'full',
+    enhancement_tier: 'full+embedded_ai+erp',
     panel,
     herd_risk: herdRisk,
     one_health: oneHealth,
@@ -131,14 +102,11 @@ function runVeterinaryEnhanced(input = {}) {
     decision_quality: decision,
     inter_module_events: events.map((e) => e.event),
     interaction: interactionBundle,
-    analysis: {
-      differential_count: panel?.differentials?.length || 0,
-      urgency,
-      notifiable,
-      confidence_fused: decision.confidence,
-    },
+    analysis: { differential_count: panel?.differentials?.length || 0, urgency, notifiable, confidence_fused: decision.confidence },
     generatedAt: new Date().toISOString(),
   };
+
+  return attachAIERP('veterinary', base, input);
 }
 
 module.exports = { runVeterinaryEnhanced };

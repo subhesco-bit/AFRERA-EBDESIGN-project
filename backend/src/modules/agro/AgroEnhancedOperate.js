@@ -1,12 +1,9 @@
-/**
- * Agro module — full enhancement layer
- */
-
 const { randomUUID } = require('crypto');
 const decisionEng = require('../platform/DecisionQualityEngine');
 const workflow = require('../platform/WorkflowOrchestrator');
 const bus = require('../platform/InterModuleBus');
 const interaction = require('../platform/InteractionLayer');
+const { attachAIERP } = require('../platform/ModuleAIERPBridge');
 
 function tryRequire(p) {
   try {
@@ -52,17 +49,8 @@ function runAgroEnhanced(input = {}) {
     {};
   const visionSev = multi?.lenses?.vision_diagnosis?.severity || multi?.vision?.severity;
   const signals = [];
-  if (indices.fertility_index != null) {
-    signals.push({ value: indices.fertility_index / 100, weight: 1, source: 'fertility_index' });
-  }
-  if (multi?.crop_deep?.season_fit === true) {
-    signals.push({ value: 0.75, weight: 0.6, source: 'season_fit' });
-  }
-  if (visionSev === 'high') {
-    signals.push({ value: 0.35, weight: 1, source: 'vision_high_severity' });
-  } else if (visionSev === 'moderate') {
-    signals.push({ value: 0.55, weight: 0.7, source: 'vision_moderate' });
-  }
+  if (indices.fertility_index != null) signals.push({ value: indices.fertility_index / 100, weight: 1, source: 'fertility_index' });
+  if (visionSev === 'high') signals.push({ value: 0.35, weight: 1, source: 'vision_high_severity' });
 
   workflow.advance(wf, 'decide', 'decision');
   const decision = decisionEng.buildDecisionPackage({
@@ -71,42 +59,22 @@ function runAgroEnhanced(input = {}) {
         ? 'FIELD_SANITATION_AND_SCOUT'
         : cert
           ? cert.decision?.action || 'FOLLOW_ORGANIC_PATH'
-          : biochar?.recommendation?.suitability?.band === 'favourable'
-            ? 'CONSIDER_CHARGED_BIOCHAR'
-            : 'FOLLOW_AGRO_PLAN',
+          : 'FOLLOW_AGRO_PLAN',
     confidence_signals: signals,
     urgency: visionSev === 'high' ? 'soon' : 'routine',
     vision_severity: visionSev,
-    summary: multi?.lenses?.generative_nextgen?.plain || multi?.panel_summary || 'Agro analysis',
+    summary: multi?.lenses?.generative_nextgen?.plain || 'Agro analysis',
     rationale: multi?.consensus?.safety_floor || 'Extension and CB remain authorities',
-    modules_touched: ['agro', cert ? 'organic_cert' : null, biochar ? 'biochar' : null].filter(Boolean),
-    next_steps: [
-      ...(multi?.consensus?.next_actions || []),
-      biochar ? `Biochar charge: ${biochar.recommendation?.charging?.primary}` : null,
-    ].filter(Boolean).slice(0, 5),
-    safety_floor: 'Extension officer / accredited CB / soil lab for legal and prescription finality',
+    modules_touched: ['agro', 'embedded_ai', 'erp', cert ? 'organic_cert' : null].filter(Boolean),
+    next_steps: [biochar ? `Biochar charge: ${biochar.recommendation?.charging?.primary}` : null].filter(Boolean),
+    safety_floor: 'Extension officer / accredited CB / soil lab for finality',
   });
 
   workflow.advance(wf, 'communicate', 'bundle');
 
   const events = [];
-  if (visionSev === 'high' || (multi?.crop_deep?.diseases || []).some((d) => d.severity === 'high')) {
-    events.push(
-      bus.publish(
-        bus.EVENT_TYPES.AGRO_OUTBREAK_CROP,
-        { severity: visionSev, crop: input.crop },
-        { source_module: 'agro' },
-      ),
-    );
-  }
-  if (cert) {
-    events.push(
-      bus.publish(
-        bus.EVENT_TYPES.AGRO_ORGANIC_CERT,
-        { scheme: cert.recommendation?.primary },
-        { source_module: 'agro' },
-      ),
-    );
+  if (visionSev === 'high') {
+    events.push(bus.publish(bus.EVENT_TYPES.AGRO_OUTBREAK_CROP, { crop: input.crop }, { source_module: 'agro' }));
   }
 
   const interactionBundle = interaction.buildInteractionBundle({
@@ -114,13 +82,12 @@ function runAgroEnhanced(input = {}) {
     microbiome_indices: indices,
     workflow: wf,
     lang: input.lang || 'en',
-    key_point: visionSev === 'high' ? 'High severity crop signal — scout and contain.' : null,
   });
 
-  return {
+  const base = {
     case_id: randomUUID(),
     module: 'agro',
-    enhancement_tier: 'full',
+    enhancement_tier: 'full+embedded_ai+erp',
     multi,
     biochar,
     certification: cert,
@@ -128,13 +95,11 @@ function runAgroEnhanced(input = {}) {
     decision_quality: decision,
     inter_module_events: events.map((e) => e.event),
     interaction: interactionBundle,
-    analysis: {
-      vision_severity: visionSev,
-      fertility_index: indices.fertility_index,
-      confidence_fused: decision.confidence,
-    },
+    analysis: { vision_severity: visionSev, fertility_index: indices.fertility_index, confidence_fused: decision.confidence },
     generatedAt: new Date().toISOString(),
   };
+
+  return attachAIERP('agro', base, input);
 }
 
 module.exports = { runAgroEnhanced };
