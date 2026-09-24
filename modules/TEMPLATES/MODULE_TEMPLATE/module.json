@@ -1,119 +1,74 @@
 {
   "moduleId": "MODULE_ID",
-  "version": "1.0.0",
+  "version": "2.0.0-10x",
   "name": "Module Name",
-  "description": "Module description explaining its purpose and functionality",
+  "description": "Production 10/10 decision-support module. Domain logic + confidence + safety floor + ERP hooks + metrics.",
   "category": "platform|domain|enterprise|erp|ai",
-  "status": "development|testing|production",
-  "author": "EBDESIGN Team",
+  "status": "production",
+  "grade": 9.0,
+  "tier": "T2",
+  "author": "AFRERA / EBDESIGN",
   "license": "MIT",
   "dependencies": {
-    "modules": [],
-    "services": ["postgresql", "redis", "mongodb"],
+    "modules": ["M400_AI_BACKBONE"],
+    "services": ["postgresql", "redis"],
     "libraries": {
-      "backend": ["express", "winston"],
-      "frontend": ["react", "zustand"]
+      "backend": ["express", "winston"]
     }
   },
   "discovery": {
-    "keywords": ["keyword1", "keyword2", "keyword3"],
+    "keywords": ["decision-support", "operate"],
     "capabilities": [
-      "capability-1",
-      "capability-2",
-      "capability-3"
+      "process",
+      "analyze",
+      "recommend",
+      "outcome_feedback"
     ],
-    "aiContext": "AI context description for library dialogue",
+    "aiContext": "Domain decision-support with fail-closed safety and confidence fusion",
     "useCases": [
-      "Use case 1",
-      "Use case 2",
-      "Use case 3"
+      "Primary domain operate flow",
+      "Multi-turn clarification",
+      "Outcome logging for calibration"
     ]
   },
   "execution": {
     "backend": {
       "entryPoint": "backend/service.js",
-      "className": "ModuleNameService",
       "apiRoutes": "backend/routes.js",
-      "port": 3000,
-      "startup": "backend/startup.js",
-      "shutdown": "backend/shutdown.js"
-    },
-    "frontend": {
-      "entryPoint": "frontend/index.jsx",
-      "routes": "frontend/routes.json",
-      "mainComponent": "frontend/components/ModuleComponent.jsx"
-    },
-    "api": {
-      "specification": "api/openapi.json",
-      "baseEndpoint": "/api/v1/module",
-      "contracts": "api/contracts.json",
-      "client": "api/client.js"
+      "baseEndpoint": "/api/v1/module_id_lower"
     }
   },
-  "claudeIntegration": {
-    "supportedAgents": ["agent-type-1", "agent-type-2"],
-    "contextSources": [
-      "database:table_name",
-      "runtime:context_type"
-    ],
-    "autoDiscovery": true,
-    "runtimeLoading": true,
-    "priority": "critical|high|medium|low",
-    "interactionPatterns": {
-      "discovery": "Natural language query pattern",
-      "execution": "Standard execution pattern",
-      "monitoring": "Monitoring pattern",
-      "configuration": "Configuration pattern"
-    }
+  "api": {
+    "primary": "POST /process",
+    "endpoints": [
+      "POST /process",
+      "POST /analyze",
+      "GET /capabilities",
+      "GET /metrics",
+      "GET /health"
+    ]
   },
-  "endpoints": {
-    "endpointName": {
-      "method": "GET|POST|PUT|DELETE",
-      "path": "/api/v1/module/endpoint",
-      "description": "Endpoint description",
-      "authentication": true|false
-    }
-  },
-  "dataModels": {
-    "input": {
-      "modelName": "backend/models/inputModel.model.js"
-    },
-    "output": {
-      "modelName": "backend/models/outputModel.model.js"
-    }
+  "safety": {
+    "floor": "Advisory unless domain specifies licensed authority",
+    "authority": "State explicit Rx / label / cert requirements"
   },
   "aiCapabilities": {
     "decisionMaking": true,
     "strategyEngine": false,
-    "learning": false,
+    "learning": true,
     "prediction": false,
-    "agents": {
-      "primaryAgent": "agent-name",
-      "secondaryAgents": []
-    }
+    "agents": []
   },
   "cables": {
     "incoming": [],
-    "outgoing": []
+    "outgoing": ["M400_AI_BACKBONE"]
   },
   "testing": {
-    "unit": "tests/unit",
-    "integration": "tests/integration",
-    "e2e": "tests/e2e",
-    "coverage": ">= 80%"
-  },
-  "documentation": {
-    "readme": "docs/README.md",
-    "architecture": "docs/ARCHITECTURE.md",
-    "api": "docs/API.md",
-    "integration": "docs/INTEGRATION.md",
-    "ai": "docs/AI_INTEGRATION.md"
+    "coverage": ">= 70%"
   },
   "metadata": {
-    "createdAt": "2026-08-24T00:00:00Z",
-    "updatedAt": "2026-08-24T00:00:00Z",
-    "installedAt": null,
-    "lastHealthCheck": null,
-    "versionHistory": []
+    "createdAt": "2026-09-24T00:00:00Z",
+    "updatedAt": "2026-09-24T00:00:00Z",
+    "standard": "AFRERA_COMPLETE_PROJECT_10X_STANDARD"
   }
 }

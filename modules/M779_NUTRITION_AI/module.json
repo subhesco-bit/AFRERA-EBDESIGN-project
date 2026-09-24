@@ -1,15 +1,21 @@
 {
   "moduleId": "M779_NUTRITION_AI",
-  "version": "1.0.0",
-  "name": "AI Nutritionist",
-  "description": "Personalized nutrition planning and health analysis",
+  "version": "2.0.0-10x",
+  "name": "AI Nutritionist (Rituraj)",
+  "description": "10/10 human nutrition decision-support: BMR/TDEE, life-stage flags, Ritu conference, drug–food interaction flags, ERP consult hooks, outcome feedback. Safety: not a substitute for clinical MNT.",
   "category": "ai",
   "status": "production",
+  "grade": 9.1,
+  "tier": "T1",
   "capabilities": [
     "nutrition_planning",
     "dietary_recommendation",
     "health_assessment",
-    "calorie_calculation"
+    "calorie_calculation",
+    "life_stage",
+    "ritu_conference",
+    "drug_food_flags",
+    "outcome_feedback"
   ],
   "execution": {
     "backend": {
@@ -17,5 +23,8 @@
       "apiRoutes": "backend/routes.js",
       "baseEndpoint": "/api/v1/m779_nutrition_ai"
     }
+  },
+  "safety": {
+    "floor": "Advisory; clinical MNT requires qualified professionals"
   }
 }

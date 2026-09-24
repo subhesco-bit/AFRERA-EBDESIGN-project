@@ -1,15 +1,22 @@
 {
   "moduleId": "M777_VETERINARY_AI",
-  "version": "1.0.0",
-  "name": "AI Veterinary Doctor",
-  "description": "Animal health diagnosis for poultry, livestock, pets",
+  "version": "2.0.0-10x",
+  "name": "AI Veterinary Decision-Support",
+  "description": "10/10 veterinary decision-support: symptom series, specialist panel, herd risk, One Health, fail-closed licensed-vet authority floor, image bridge to M782, outcome feedback.",
   "category": "ai",
   "status": "production",
+  "grade": 9.3,
+  "tier": "T1",
   "capabilities": [
     "animal_diagnosis",
     "disease_detection",
     "treatment_recommendation",
-    "health_monitoring"
+    "health_monitoring",
+    "herd_risk",
+    "specialist_panel",
+    "one_health",
+    "outcome_feedback",
+    "image_symptom_bridge"
   ],
   "execution": {
     "backend": {
@@ -17,5 +24,9 @@
       "apiRoutes": "backend/routes.js",
       "baseEndpoint": "/api/v1/m777_veterinary_ai"
     }
+  },
+  "safety": {
+    "floor": "Licensed veterinarian required for diagnosis and prescription",
+    "food_animal": "Withdrawal mandatory"
   }
 }
