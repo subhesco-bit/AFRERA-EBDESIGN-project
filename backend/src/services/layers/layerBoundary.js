@@ -15,10 +15,19 @@ const ECOMMERCE_CAPABILITIES = new Set([
   'catalog',
   'quote',
   'cart',
+  'cart_add',
+  'cart_quote',
   'order',
+  'checkout',
   'o2c_transition',
   'o2c_advance',
+  'transition',
+  'advance',
+  'cancel',
   'return',
+  'return_request',
+  'rma_advance',
+  'get_order',
   'refund',
   'seller_rank',
   'payment',
@@ -31,6 +40,7 @@ const FARMER_CAPABILITIES = new Set([
   'herd',
   'subsidy_extract',
   'subsidy_list',
+  'subsidy',
   'advisory',
   'input_plan',
   'scheme_application',
@@ -66,14 +76,15 @@ function rejectCrossContamination(payload = {}) {
     payload.order_id != null ||
     payload.cart_id != null ||
     payload.sku != null ||
-    payload.marketplace_order_id != null;
+    payload.marketplace_order_id != null ||
+    payload.rma_id != null;
   const hasFarmerCore =
     payload.scheme_application_id != null ||
     payload.crop_cycle_id != null ||
     payload.subsidy_claim_id != null;
   if (hasCommerce && hasFarmerCore && !payload.bridge_explicit) {
     const err = new Error(
-      'Cannot mix commerce order/cart/sku with scheme/crop_cycle/subsidy ids without bridge_explicit: true',
+      'Cannot mix commerce order/cart/sku/rma with scheme/crop_cycle/subsidy ids without bridge_explicit: true',
     );
     err.code = 'LAYER_CROSS_CONTAMINATION';
     throw err;
