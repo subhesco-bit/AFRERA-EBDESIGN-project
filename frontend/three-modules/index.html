@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="AFRERA Three Modules — Veterinary, Nutrition, Agro" />
+  <title>AFRERA · Three Module OS</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="app" class="shell">
+    <aside class="sidebar" aria-label="Primary">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">◈</span>
+        <div>
+          <strong>AFRERA</strong>
+          <small>Three Module OS</small>
+        </div>
+      </div>
+      <nav id="nav" class="nav"></nav>
+      <div class="sidebar-foot">
+        <span id="corrBadge" class="badge">—</span>
+        <button type="button" id="btnHealth" class="btn ghost">API health</button>
+      </div>
+    </aside>
+    <div class="main-wrap">
+      <header class="topbar">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="top-actions">
+          <label class="lang">
+            <span class="sr-only">Language</span>
+            <select id="langSelect" aria-label="Language">
+              <option value="en">EN</option>
+              <option value="hi">HI</option>
+            </select>
+          </label>
+          <button type="button" id="btnBus" class="btn ghost">Event bus</button>
+        </div>
+      </header>
+      <main id="main" class="main" tabindex="-1"></main>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./config.js"></script>
+  <script src="./api-client.js"></script>
+  <script src="./components.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
