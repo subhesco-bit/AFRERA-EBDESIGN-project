@@ -1,0 +1,24 @@
+{
+  "version": "2026.09",
+  "policy": "Never invent withdrawal days. If drug not listed or species matrix missing, set requires_vet_consultation true and withdrawal unknown.",
+  "entries": [
+    {
+      "drug_id": "oxytetracycline_example",
+      "name": "Oxytetracycline (example placeholder)",
+      "species": "cow",
+      "matrix": "milk",
+      "withdrawal_days": null,
+      "source": "VERIFY_PRODUCT_LABEL",
+      "note": "Placeholder — replace with label-specific authorised data for jurisdiction"
+    },
+    {
+      "drug_id": "unknown",
+      "name": "Unlisted product",
+      "species": "*",
+      "matrix": "*",
+      "withdrawal_days": null,
+      "source": "unknown",
+      "note": "Always escalate to veterinarian / product label"
+    }
+  ]
+}

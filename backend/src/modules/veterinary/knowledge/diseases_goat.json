@@ -1,0 +1,90 @@
+{
+  "species": "goat",
+  "version": "2026.09",
+  "diseases": [
+    {
+      "id": "ppr",
+      "name": "Peste des Petits Ruminants",
+      "notifiable": true,
+      "urgency": "emergency",
+      "isolation": true,
+      "key_signs": ["fever", "oculonasal discharge", "erosive stomatitis", "diarrhea", "pneumonia", "high mortality"],
+      "differential_hints": ["pasteurellosis", "CCPP", "orf oral lesions alone"],
+      "lab": ["official confirmation"],
+      "herd": "Vaccination cornerstone; movement control",
+      "tags": ["infectious", "viral", "notifiable"]
+    },
+    {
+      "id": "ccpp",
+      "name": "Contagious Caprine Pleuropneumonia",
+      "notifiable": true,
+      "urgency": "emergency",
+      "isolation": true,
+      "key_signs": ["severe respiratory distress", "fever", "nasal discharge", "high mortality"],
+      "differential_hints": ["PPR", "pasteurellosis", "lungworm"],
+      "lab": ["specialised lab"],
+      "herd": "Strict biosecurity; vaccination where available",
+      "tags": ["infectious", "mycoplasma", "notifiable"]
+    },
+    {
+      "id": "enterotoxaemia_goat",
+      "name": "Enterotoxaemia",
+      "notifiable": false,
+      "urgency": "emergency",
+      "isolation": false,
+      "key_signs": ["sudden death", "convulsions", "diarrhea sometimes", "grain overload history"],
+      "differential_hints": ["plant poisoning", "anthrax regional"],
+      "lab": ["postmortem suggestive"],
+      "herd": "Vaccination; gradual diet change",
+      "tags": ["clostridial"]
+    },
+    {
+      "id": "haemonchosis",
+      "name": "Haemonchosis / severe GI parasitism",
+      "notifiable": false,
+      "urgency": "urgent",
+      "isolation": false,
+      "key_signs": ["anaemia", "bottle jaw", "weakness", "poor growth", "diarrhea variable"],
+      "differential_hints": ["liver fluke", "malnutrition", "hemonchus vs mixed worms"],
+      "lab": ["FAMACHA", "faecal egg count"],
+      "herd": "Strategic deworming, pasture management, resistance awareness",
+      "tags": ["parasitic"]
+    },
+    {
+      "id": "orf",
+      "name": "Orf (contagious ecthyma)",
+      "notifiable": false,
+      "urgency": "soon",
+      "isolation": true,
+      "key_signs": ["proliferative lesions lips muzzle teats", "kids nursing difficulty"],
+      "differential_hints": ["goat pox", "trauma"],
+      "lab": ["clinical usually"],
+      "herd": "Zoonotic caution; vaccination in problem flocks",
+      "tags": ["viral", "zoonotic_risk"]
+    },
+    {
+      "id": "pregnancy_toxaemia_goat",
+      "name": "Pregnancy toxaemia",
+      "notifiable": false,
+      "urgency": "emergency",
+      "isolation": false,
+      "key_signs": ["late pregnancy", "twins/triplets", "recumbency", "neurologic", "anorexia"],
+      "differential_hints": ["hypocalcaemia", "listeriosis"],
+      "lab": ["ketones", "glucose"],
+      "herd": "Energy nutrition in late gestation; BCS management",
+      "tags": ["metabolic", "reproduction"]
+    },
+    {
+      "id": "pneumonia_goat",
+      "name": "Respiratory disease complex",
+      "notifiable": false,
+      "urgency": "urgent",
+      "isolation": true,
+      "key_signs": ["cough", "nasal discharge", "fever", "dyspnea"],
+      "differential_hints": ["PPR", "CCPP", "lungworm", "dust"],
+      "lab": ["as indicated"],
+      "herd": "Housing ventilation, density, vaccination programmes",
+      "tags": ["infectious", "management"]
+    }
+  ]
+}

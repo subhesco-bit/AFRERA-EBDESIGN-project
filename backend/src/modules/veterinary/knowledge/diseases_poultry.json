@@ -1,0 +1,102 @@
+{
+  "species": "poultry",
+  "version": "2026.09",
+  "diseases": [
+    {
+      "id": "newcastle",
+      "name": "Newcastle Disease",
+      "notifiable": true,
+      "urgency": "emergency",
+      "isolation": true,
+      "key_signs": ["respiratory signs", "nervous signs", "green diarrhea", "drop in egg production", "high mortality"],
+      "differential_hints": ["AI", "IB", "ILT", "fowl cholera"],
+      "lab": ["official confirmation"],
+      "herd": "Vaccination backbone of control; biosecurity",
+      "tags": ["infectious", "viral", "notifiable"]
+    },
+    {
+      "id": "avian_influenza",
+      "name": "Avian Influenza",
+      "notifiable": true,
+      "urgency": "emergency",
+      "isolation": true,
+      "key_signs": ["sudden high mortality", "swelling head", "cyanosis comb wattles", "respiratory", "drop in eggs"],
+      "differential_hints": ["Newcastle", "acute fowl cholera"],
+      "lab": ["official lab only"],
+      "herd": "Report immediately; zoning and culling policies apply",
+      "tags": ["infectious", "viral", "notifiable", "zoonotic_risk"]
+    },
+    {
+      "id": "ibd",
+      "name": "Infectious Bursal Disease (Gumboro)",
+      "notifiable": false,
+      "urgency": "urgent",
+      "isolation": true,
+      "key_signs": ["3–6 week chicks", "prostration", "diarrhea", "immunosuppression aftermath"],
+      "differential_hints": ["coccidiosis", "ND"],
+      "lab": ["bursal pathology", "serology/PCR"],
+      "herd": "Maternal antibody-aware vaccination programmes",
+      "tags": ["infectious", "viral"]
+    },
+    {
+      "id": "coccidiosis_poultry",
+      "name": "Coccidiosis",
+      "notifiable": false,
+      "urgency": "urgent",
+      "isolation": false,
+      "key_signs": ["bloody droppings possible", "ruffled feathers", "poor growth", "mortality spikes"],
+      "differential_hints": ["necrotic enteritis", "dietary"],
+      "lab": ["faecal oocysts", "lesion score"],
+      "herd": "Litter management; vaccination or anticoccidials per system",
+      "tags": ["parasitic"]
+    },
+    {
+      "id": "crd",
+      "name": "Chronic Respiratory Disease (Mycoplasma)",
+      "notifiable": false,
+      "urgency": "soon",
+      "isolation": false,
+      "key_signs": ["chronic snick", "foam eye", "reduced growth/eggs", "secondary E coli"],
+      "differential_hints": ["IB", "ND mild", "coryza"],
+      "lab": ["mycoplasma testing"],
+      "herd": "Breeder programmes, all-in-all-out, air quality",
+      "tags": ["infectious", "mycoplasma"]
+    },
+    {
+      "id": "heat_stress_poultry",
+      "name": "Heat stress (poultry)",
+      "notifiable": false,
+      "urgency": "urgent",
+      "isolation": false,
+      "key_signs": ["panting", "wing spreading", "prostration", "mortality in hot hours"],
+      "differential_hints": ["acute infection"],
+      "lab": [],
+      "herd": "Ventilation, stocking, electrolytes, cool water, feed timing",
+      "tags": ["environmental"]
+    },
+    {
+      "id": "mareks",
+      "name": "Marek's disease",
+      "notifiable": false,
+      "urgency": "soon",
+      "isolation": false,
+      "key_signs": ["paralysis", "young birds", "tumours", "uneven flock"],
+      "differential_hints": ["nutritional deficiency", "other neuropathy"],
+      "lab": ["pathology"],
+      "herd": "Hatchery vaccination essential",
+      "tags": ["infectious", "viral", "neoplastic"]
+    },
+    {
+      "id": "fowl_pox",
+      "name": "Fowl pox",
+      "notifiable": false,
+      "urgency": "soon",
+      "isolation": false,
+      "key_signs": ["cutaneous nodules comb wattles", "diphtheritic oral form"],
+      "differential_hints": ["trauma", "other skin disease"],
+      "lab": ["clinical / histopath"],
+      "herd": "Vaccination; mosquito control",
+      "tags": ["viral"]
+    }
+  ]
+}

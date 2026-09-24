@@ -1,0 +1,97 @@
+{
+  "version": "2026.09",
+  "region": "India (generic ethnoveterinary reference)",
+  "note": "Complementary only. evidence_level required on every use. Infectious/notifiable disease must escalate to licensed vet first.",
+  "remedies": [
+    {
+      "id": "neem_external",
+      "name": "Neem (Azadirachta indica) — external",
+      "uses": ["external parasites folklore", "wound wash folklore"],
+      "species": ["cow", "pig", "goat", "poultry"],
+      "evidence_level": "traditional_only",
+      "requires_vet_consultation": true,
+      "cautions": ["Avoid excessive internal use", "Not a substitute for acaricides in heavy infestation"]
+    },
+    {
+      "id": "turmeric_topical",
+      "name": "Turmeric (Curcuma longa) paste — topical",
+      "uses": ["wound care folklore", "mild anti-inflammatory folklore"],
+      "species": ["cow", "pig", "goat"],
+      "evidence_level": "limited",
+      "requires_vet_consultation": true,
+      "cautions": ["Clean wound first", "Not for deep infected wounds without vet care"]
+    },
+    {
+      "id": "tulsi_respiratory",
+      "name": "Tulsi (Ocimum sanctum)",
+      "uses": ["respiratory support folklore"],
+      "species": ["goat", "poultry", "cow"],
+      "evidence_level": "traditional_only",
+      "requires_vet_consultation": true,
+      "cautions": ["Does not replace ND/AI workup"]
+    },
+    {
+      "id": "garlic_caution",
+      "name": "Garlic",
+      "uses": ["antiparasitic folklore", "appetite folklore"],
+      "species": ["cow", "goat", "poultry"],
+      "evidence_level": "limited",
+      "requires_vet_consultation": true,
+      "cautions": ["Dose-critical; toxicity risk at high levels", "May affect milk flavour"]
+    },
+    {
+      "id": "aloe_topical",
+      "name": "Aloe vera — topical",
+      "uses": ["minor burns", "superficial wounds folklore"],
+      "species": ["cow", "goat", "pig"],
+      "evidence_level": "limited",
+      "requires_vet_consultation": false,
+      "cautions": ["External; identify plant correctly"]
+    },
+    {
+      "id": "moringa_feed",
+      "name": "Moringa leaf as feed supplement",
+      "uses": ["nutrient density", "protein/mineral supplement"],
+      "species": ["cow", "goat", "poultry", "pig"],
+      "evidence_level": "moderate",
+      "requires_vet_consultation": false,
+      "cautions": ["Balance ration; gradual introduction"]
+    },
+    {
+      "id": "electrolyte_support",
+      "name": "Oral electrolytes / ORS-style supportive fluids",
+      "uses": ["dehydration supportive care"],
+      "species": ["cow", "pig", "goat", "poultry"],
+      "evidence_level": "moderate",
+      "requires_vet_consultation": true,
+      "cautions": ["Severe dehydration needs parenteral vet care", "Species-appropriate formulations"]
+    },
+    {
+      "id": "fenugreek_lactation",
+      "name": "Fenugreek — lactation folklore",
+      "uses": ["galactagogue folklore"],
+      "species": ["cow", "goat"],
+      "evidence_level": "traditional_only",
+      "requires_vet_consultation": true,
+      "cautions": ["Address underlying mastitis/nutrition first"]
+    },
+    {
+      "id": "ashwagandha_tonic",
+      "name": "Ashwagandha — tonic folklore",
+      "uses": ["stress/tonic folklore"],
+      "species": ["cow", "goat"],
+      "evidence_level": "traditional_only",
+      "requires_vet_consultation": true,
+      "cautions": ["Not validated as primary therapy for infection"]
+    },
+    {
+      "id": "giloy_fever",
+      "name": "Giloy (Tinospora) — fever folklore",
+      "uses": ["fever folklore"],
+      "species": ["cow", "goat"],
+      "evidence_level": "traditional_only",
+      "requires_vet_consultation": true,
+      "cautions": ["Rule out HS/FMD/blood parasites with vet"]
+    }
+  ]
+}

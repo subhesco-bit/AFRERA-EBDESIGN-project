@@ -1,0 +1,90 @@
+{
+  "species": "pig",
+  "version": "2026.09",
+  "diseases": [
+    {
+      "id": "asf",
+      "name": "African Swine Fever",
+      "notifiable": true,
+      "urgency": "emergency",
+      "isolation": true,
+      "key_signs": ["high fever", "skin reddening", "haemorrhages", "high mortality", "sudden deaths"],
+      "differential_hints": ["CSF", "erysipelas", "salmonellosis", "poisoning"],
+      "lab": ["official lab confirmation mandatory"],
+      "herd": "No treatment; strict biosecurity; report immediately",
+      "tags": ["infectious", "viral", "notifiable"]
+    },
+    {
+      "id": "csf",
+      "name": "Classical Swine Fever",
+      "notifiable": true,
+      "urgency": "emergency",
+      "isolation": true,
+      "key_signs": ["fever", "conjunctivitis", "diarrhea or constipation", "cyanosis", "high mortality young"],
+      "differential_hints": ["ASF", "PRRS-like", "salmonella"],
+      "lab": ["official lab"],
+      "herd": "Vaccination policy where permitted; biosecurity",
+      "tags": ["infectious", "viral", "notifiable"]
+    },
+    {
+      "id": "erysipelas",
+      "name": "Swine erysipelas",
+      "notifiable": false,
+      "urgency": "urgent",
+      "isolation": false,
+      "key_signs": ["diamond skin lesions", "fever", "arthritis chronic", "sudden death acute"],
+      "differential_hints": ["ASF", "CSF", "sunburn"],
+      "lab": ["culture if available"],
+      "herd": "Vaccination of breeding stock common",
+      "tags": ["infectious", "bacterial"]
+    },
+    {
+      "id": "neonatal_diarrhea_pig",
+      "name": "Neonatal / preweaning diarrhoea",
+      "notifiable": false,
+      "urgency": "urgent",
+      "isolation": true,
+      "key_signs": ["piglets", "watery diarrhea", "dehydration", "mortality"],
+      "differential_hints": ["E coli", "clostridia", "coccidia", "rotavirus", "TGE-like"],
+      "lab": ["faecal workup in outbreaks"],
+      "herd": "Farrowing hygiene, sow immunity, creep environment",
+      "tags": ["infectious", "neonatal"]
+    },
+    {
+      "id": "mma",
+      "name": "MMA syndrome (mastitis-metritis-agalactia)",
+      "notifiable": false,
+      "urgency": "urgent",
+      "isolation": false,
+      "key_signs": ["postpartum sow", "reduced milk", "fever", "inflamed udder", "hungry piglets"],
+      "differential_hints": ["primary agalactia", "nutrition"],
+      "lab": [],
+      "herd": "Farrowing management, body condition, hygiene",
+      "tags": ["reproduction", "production"]
+    },
+    {
+      "id": "poor_fcr",
+      "name": "Poor feed conversion / growth check",
+      "notifiable": false,
+      "urgency": "routine",
+      "isolation": false,
+      "key_signs": ["low ADG", "high FCR", "variable weights"],
+      "differential_hints": ["subclinical disease", "feed quality", "stocking density", "parasites"],
+      "lab": ["parasite check", "necropsy sample if chronic"],
+      "herd": "Nutrition, environment, health programme review",
+      "tags": ["management", "production"]
+    },
+    {
+      "id": "heat_stress_pig",
+      "name": "Heat stress (pig)",
+      "notifiable": false,
+      "urgency": "soon",
+      "isolation": false,
+      "key_signs": ["panting", "reduced feed", "open-mouth breathing", "higher mortality finishers"],
+      "differential_hints": ["pneumonia", "ASF early"],
+      "lab": [],
+      "herd": "Cooling, stocking, water, wet feeding strategies",
+      "tags": ["environmental"]
+    }
+  ]
+}
