@@ -5,6 +5,10 @@ const orchestra = require('./AgroIntelligenceOrchestra');
 const cropIntel = require('./CropIntelligenceEngine');
 const soil = require('./SoilMicrobiomeEngine');
 const apk = require('./ApkFeatureMatrix');
+const cert = require('./OrganicCertificationEngine');
+const micro = require('./DeepMicrobiomeAI');
+const multi = require('./AgroMultiAIOrchestra');
+const gaps = require('./AgroGapAnalysisInternational');
 
 module.exports = {
   ...knowledge,
@@ -14,10 +18,13 @@ module.exports = {
   ...cropIntel,
   ...soil,
   ...apk,
+  ...cert,
+  ...micro,
+  ...multi,
+  ...gaps,
   runAgroConference: knowledge.runAgroConference,
-  runFarmingSystemConference: farming.runFarmingSystemConference,
-  analyzeVision: vision.analyzeVision,
-  runFullAgroIntelligence: orchestra.runFullAgroIntelligence,
   runCropDeepAnalysis: cropIntel.runCropDeepAnalysis,
-  analyzeSoil: soil.analyzeSoil,
+  interpretMicrobiome: micro.interpretMicrobiome,
+  runCertificationConference: cert.runCertificationConference,
+  runAgroMultiAI: multi.runAgroMultiAI,
 };

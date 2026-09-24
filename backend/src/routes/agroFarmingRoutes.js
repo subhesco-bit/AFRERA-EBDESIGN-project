@@ -1,6 +1,3 @@
-/**
- * Agro farming — systems, vision, crops, soil, microbiome, APK matrix
- */
 const express = require('express');
 const farming = require('../modules/agro/FarmingSystemsEngine');
 const vision = require('../modules/agro/AgroVisionAnalysis');
@@ -9,22 +6,25 @@ const knowledge = require('../modules/agro/AgroKnowledgeEngine');
 const cropIntel = require('../modules/agro/CropIntelligenceEngine');
 const soilEng = require('../modules/agro/SoilMicrobiomeEngine');
 const apk = require('../modules/agro/ApkFeatureMatrix');
+const cert = require('../modules/agro/OrganicCertificationEngine');
+const micro = require('../modules/agro/DeepMicrobiomeAI');
+const multi = require('../modules/agro/AgroMultiAIOrchestra');
+const gaps = require('../modules/agro/AgroGapAnalysisInternational');
 
 const router = express.Router();
 
 router.get('/health', (_req, res) => {
-  const crops = cropIntel.listAllCrops();
   res.json({
     ok: true,
     module: 'agro-farming',
     systems: Object.keys(farming.SYSTEMS),
-    crop_categories: Object.keys(crops.categories),
-    disease_cards: cropIntel.diseases.diseases.length,
+    organic_schemes: Object.keys(cert.SCHEMES),
+    microbiome_guilds: micro.FUNCTIONAL_GUILDS.length,
   });
 });
 
 router.get('/systems', (_req, res) => {
-  res.json({ success: true, data: farming.SYSTEMS, disclaimer: farming.FARM_DISCLAIMER });
+  res.json({ success: true, data: farming.SYSTEMS });
 });
 
 router.get('/crops', (_req, res) => {
@@ -55,6 +55,30 @@ router.post('/soil/analyze', (req, res) => {
   }
 });
 
+router.post('/microbiome/interpret', (req, res) => {
+  try {
+    res.json({ success: true, data: micro.interpretMicrobiome(req.body || {}) });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message });
+  }
+});
+
+router.get('/organic/schemes', (_req, res) => {
+  res.json({ success: true, data: cert.SCHEMES, disclaimer: cert.CERT_DISCLAIMER });
+});
+
+router.post('/organic/certification', (req, res) => {
+  try {
+    res.json({ success: true, data: cert.runCertificationConference(req.body || {}) });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message });
+  }
+});
+
+router.get('/gaps/international', (_req, res) => {
+  res.json({ success: true, data: gaps.getGapReport() });
+});
+
 router.get('/apk-features', (_req, res) => {
   res.json({ success: true, data: apk.getMatrix() });
 });
@@ -69,8 +93,10 @@ router.post('/systems/conference', (req, res) => {
 
 router.post('/climate/advise', (req, res) => {
   try {
-    const systemId = farming.normalizeSystem(req.body?.system);
-    res.json({ success: true, data: farming.climateAdvice(systemId, req.body?.telemetry || {}) });
+    res.json({
+      success: true,
+      data: farming.climateAdvice(farming.normalizeSystem(req.body?.system), req.body?.telemetry || {}),
+    });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
@@ -86,12 +112,16 @@ router.post('/vision/analyze', (req, res) => {
 
 router.post('/intelligence', (req, res) => {
   try {
-    const base = orchestra.runFullAgroIntelligence(req.body || {});
-    const deep = cropIntel.runCropDeepAnalysis(req.body || {});
-    res.json({
-      success: true,
-      data: { ...base, crop_deep: deep, apk_parity: apk.getMatrix() },
-    });
+    res.json({ success: true, data: orchestra.runFullAgroIntelligence(req.body || {}) });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message });
+  }
+});
+
+/** Full multi-AI: cert + microbiome + crop + vision + gaps */
+router.post('/multi-ai/analyze', (req, res) => {
+  try {
+    res.json({ success: true, data: multi.runAgroMultiAI(req.body || {}) });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
