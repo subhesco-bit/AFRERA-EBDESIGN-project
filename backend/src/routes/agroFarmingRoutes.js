@@ -10,6 +10,7 @@ const cert = require('../modules/agro/OrganicCertificationEngine');
 const micro = require('../modules/agro/DeepMicrobiomeAI');
 const multi = require('../modules/agro/AgroMultiAIOrchestra');
 const gaps = require('../modules/agro/AgroGapAnalysisInternational');
+const biochar = require('../modules/agro/BiocharEngine');
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.get('/health', (_req, res) => {
     systems: Object.keys(farming.SYSTEMS),
     organic_schemes: Object.keys(cert.SCHEMES),
     microbiome_guilds: micro.FUNCTIONAL_GUILDS.length,
+    biochar_charging_methods: biochar.CHARGING_METHODS.length,
   });
 });
 
@@ -75,6 +77,42 @@ router.post('/organic/certification', (req, res) => {
   }
 });
 
+/** Biochar benefits + charging */
+router.get('/biochar/methods', (_req, res) => {
+  res.json({
+    success: true,
+    data: {
+      charging_methods: biochar.CHARGING_METHODS,
+      benefits: biochar.BENEFITS,
+      india_feedstocks: biochar.INDIA_FEEDSTOCKS,
+    },
+    disclaimer: biochar.BIOCHAR_DISCLAIMER,
+  });
+});
+
+router.post('/biochar/conference', (req, res) => {
+  try {
+    res.json({ success: true, data: biochar.runBiocharConference(req.body || {}) });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message, disclaimer: biochar.BIOCHAR_DISCLAIMER });
+  }
+});
+
+router.post('/biochar/charging/recommend', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: {
+        recommendation: biochar.recommendCharging(req.body || {}),
+        suitability: biochar.assessSuitability(req.body || {}),
+      },
+      disclaimer: biochar.BIOCHAR_DISCLAIMER,
+    });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message });
+  }
+});
+
 router.get('/gaps/international', (_req, res) => {
   res.json({ success: true, data: gaps.getGapReport() });
 });
@@ -118,7 +156,6 @@ router.post('/intelligence', (req, res) => {
   }
 });
 
-/** Full multi-AI: cert + microbiome + crop + vision + gaps */
 router.post('/multi-ai/analyze', (req, res) => {
   try {
     res.json({ success: true, data: multi.runAgroMultiAI(req.body || {}) });

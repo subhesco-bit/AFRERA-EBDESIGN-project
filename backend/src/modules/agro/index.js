@@ -9,6 +9,7 @@ const cert = require('./OrganicCertificationEngine');
 const micro = require('./DeepMicrobiomeAI');
 const multi = require('./AgroMultiAIOrchestra');
 const gaps = require('./AgroGapAnalysisInternational');
+const biochar = require('./BiocharEngine');
 
 module.exports = {
   ...knowledge,
@@ -22,9 +23,11 @@ module.exports = {
   ...micro,
   ...multi,
   ...gaps,
+  ...biochar,
   runAgroConference: knowledge.runAgroConference,
   runCropDeepAnalysis: cropIntel.runCropDeepAnalysis,
   interpretMicrobiome: micro.interpretMicrobiome,
   runCertificationConference: cert.runCertificationConference,
   runAgroMultiAI: multi.runAgroMultiAI,
+  runBiocharConference: biochar.runBiocharConference,
 };
