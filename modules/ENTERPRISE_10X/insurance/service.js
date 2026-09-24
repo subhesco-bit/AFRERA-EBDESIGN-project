@@ -1,89 +1,90 @@
 /**
- * Insurance 10x — policy quote, premium, claims intake, fraud flags (advisory)
+ * ENTERPRISE Insurance 10x — CORPORATE / ECOSYSTEM SUPPORT
+ * Not retail policy sales. Employees, assets, liabilities, transit, credit,
+ * farmer/logistics/cold-storage risk contexts. PolicyBazaar-style support UX backend.
  */
 
 'use strict';
 
 const { makeMetrics, envelope, rankPanel, buildPanelOpinions } = require('../domain_os');
 
-const LENSES = [
-  { id: 'underwriting', name: 'Underwriting', tags: ['risk', 'crop', 'livestock'], focus: 'Risk selection' },
-  { id: 'pricing', name: 'Premium Actuarial', tags: ['premium', 'rate'], focus: 'Rate adequacy' },
-  { id: 'claims', name: 'Claims', tags: ['claim', 'loss', 'survey'], focus: 'FNOL to settlement' },
-  { id: 'fraud', name: 'Fraud Intelligence', tags: ['fraud', 'anomaly'], focus: 'Red flags' },
-  { id: 'compliance', name: 'Regulatory', tags: ['irdai', 'kyc'], focus: 'Disclosure & KYC' },
-  { id: 'reinsurance', name: 'Risk Transfer', tags: ['reinsurance', 'cat'], focus: 'Retention limits' },
-];
+let corporate;
+try {
+  corporate = require('../../../backend/src/services/insurance/corporateInsurancePlatform');
+} catch {
+  try {
+    corporate = require('../../../../backend/src/services/insurance/corporateInsurancePlatform');
+  } catch {
+    corporate = null;
+  }
+}
 
-const PRODUCTS = [
-  { id: 'crop_pmfby_like', name: 'Crop multi-peril (scheme-aligned)', base_rate: 0.02 },
-  { id: 'livestock', name: 'Livestock mortality', base_rate: 0.035 },
-  { id: 'warehouse', name: 'Warehouse / cold stock', base_rate: 0.012 },
-  { id: 'asset', name: 'Farm asset / machinery', base_rate: 0.015 },
+const LENSES = [
+  { id: 'employee', name: 'Employee benefits risk', tags: ['employee', 'hr', 'group'], focus: 'Group health / PA' },
+  { id: 'asset', name: 'Asset & stock', tags: ['cold', 'warehouse', 'plant'], focus: 'Building, machinery, stock' },
+  { id: 'liability', name: 'Liability', tags: ['liability', 'public'], focus: 'Public / product liability' },
+  { id: 'transit', name: 'Transit & cargo', tags: ['transit', 'shipment', 'reefer'], focus: 'Inland + cold transit' },
+  { id: 'credit', name: 'Credit risk', tags: ['credit', 'receivable'], focus: 'Trade credit' },
+  { id: 'claims_ops', name: 'Claims support desk', tags: ['claim', 'fnol'], focus: 'FNOL to insurer handoff' },
+  { id: 'compliance', name: 'Regulatory boundary', tags: ['irdai', 'intermediary'], focus: 'Not the underwriter' },
 ];
 
 class Insurance10xService {
   constructor() {
-    this.moduleId = 'ENTERPRISE_INSURANCE_10X';
-    this.version = '1.0.0-10x';
+    this.moduleId = 'ENTERPRISE_INSURANCE_CORPORATE_10X';
+    this.version = '2.0.0-corporate';
     this.metrics = makeMetrics();
   }
 
   async initialize() {
-    return { success: true, moduleId: this.moduleId, products: PRODUCTS.map((p) => p.id) };
+    return {
+      success: true,
+      moduleId: this.moduleId,
+      version: this.version,
+      model: 'corporate_ecosystem_support_not_retail_sales',
+      covers: corporate ? corporate.COVER_CLASSES.map((c) => c.id) : [],
+    };
   }
 
   async operate(data = {}) {
     this.metrics.requestsProcessed++;
-    const action = data.action || 'quote';
-    let result;
-    if (action === 'quote') {
-      const product = PRODUCTS.find((p) => p.id === data.product_id) || PRODUCTS[0];
-      const sum_insured = Number(data.sum_insured) || 100000;
-      const premium = Math.round(sum_insured * product.base_rate * 100) / 100;
-      result = {
-        product,
-        sum_insured,
-        premium,
-        gst_on_premium_hint: Math.round(premium * 0.18 * 100) / 100,
-        exclusions_hint: ['war', 'nuclear', 'willful negligence'],
-        confidence: 0.84,
-        safety_floor:
-          'NOT A BINDING POLICY. Licensed insurer / intermediary required. IRDAI-regulated product rules apply.',
-        erp_hooks: { premium_receivable: true, policy_register: true },
-      };
-    } else if (action === 'claim_intake') {
-      const amount = Number(data.claimed_amount) || 0;
-      const fraud_score = Math.min(0.95, 0.2 + (amount > 500000 ? 0.3 : 0) + (data.repeat_claim ? 0.25 : 0));
-      result = {
-        claim_id: `CLM-${Date.now()}`,
-        status: 'fnol_received',
-        claimed_amount: amount,
-        fraud_score,
-        next: fraud_score > 0.55 ? ['survey', 'siu_review'] : ['survey', 'assessment'],
-        confidence: 0.8,
-        safety_floor: 'Claims decisions by authorized claims handler only.',
-      };
-    } else if (action === 'products') {
-      result = { products: PRODUCTS, confidence: 1 };
-    } else {
-      result = { message: 'Unknown action', confidence: 0.3 };
+    if (!corporate) {
+      return envelope({
+        moduleId: this.moduleId,
+        capability: data.action || 'unavailable',
+        result: {
+          error: 'corporateInsurancePlatform not resolvable from this path',
+          safety_floor: 'Support platform only — not an insurer.',
+          confidence: 0,
+        },
+      });
     }
+    const result = await corporate.operate(data);
     this.metrics.successCount++;
-    return envelope({ moduleId: this.moduleId, capability: action, result, safety_floor: result.safety_floor });
+    return envelope({
+      moduleId: this.moduleId,
+      capability: data.action || 'operate',
+      result: {
+        ...result,
+        model: 'corporate_ecosystem_support_not_retail_sales',
+      },
+      safety_floor: result.safety_floor || corporate.safetyFloor(),
+    });
   }
 
   async panel(data = {}) {
     this.metrics.panelRuns++;
-    const ranked = rankPanel(LENSES, [data.action, data.product_id]);
+    const ranked = rankPanel(LENSES, [data.action, data.context, data.cover_class]);
     return envelope({
       moduleId: this.moduleId,
       capability: 'panel',
       result: {
         opinions: buildPanelOpinions(ranked, data),
-        consensus: 'Separate underwriting from claims; escalate high fraud_score.',
-        confidence: 0.85,
-        safety_floor: 'Regulated activity — licensed entities only.',
+        consensus:
+          'Platform supports corporate book and claims desk; licensed insurer binds and settles. Separate farmer subsidy eligibility from insurance cover comparison.',
+        confidence: 0.88,
+        safety_floor: corporate ? corporate.safetyFloor() : 'Not an insurer.',
+        model: 'corporate_ecosystem_support_not_retail_sales',
       },
     });
   }
