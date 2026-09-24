@@ -1,12 +1,12 @@
 /**
- * Veterinary knowledge index — loads species disease packs, ethnovet,
- * and withdrawal reference. Versioned seeds for Specialist Panel.
+ * Veterinary knowledge index — species disease packs, ethnovet, withdrawal.
  */
 
 const diseasesCow = require('./diseases_cow.json');
 const diseasesPig = require('./diseases_pig.json');
 const diseasesGoat = require('./diseases_goat.json');
 const diseasesPoultry = require('./diseases_poultry.json');
+const diseasesSheep = require('./diseases_sheep.json');
 const ethnovet = require('./ethnovet_india.json');
 const withdrawal = require('./withdrawal_reference.json');
 
@@ -15,10 +15,14 @@ const DISEASE_PACKS = {
   pig: diseasesPig,
   goat: diseasesGoat,
   poultry: diseasesPoultry,
+  sheep: diseasesSheep,
 };
 
 function getDiseasePack(species) {
-  const key = String(species || '').toLowerCase();
+  let key = String(species || '').toLowerCase();
+  if (key === 'cattle' || key === 'buffalo' || key === 'dairy') key = 'cow';
+  if (key === 'chicken' || key === 'hen' || key === 'bird') key = 'poultry';
+  if (key === 'lamb' || key === 'ovine') key = 'sheep';
   const pack = DISEASE_PACKS[key];
   if (!pack) {
     throw new Error(`No disease pack for species: ${species}. Supported: ${Object.keys(DISEASE_PACKS).join(', ')}`);
@@ -35,9 +39,10 @@ function findDisease(species, diseaseId) {
 }
 
 function getEthnovetForSpecies(species) {
-  const key = String(species || '').toLowerCase();
+  let key = String(species || '').toLowerCase();
+  if (key === 'sheep') key = 'goat'; // shared small-ruminant ethnovet filter often
   return (ethnovet.remedies || []).filter(
-    (r) => !r.species || r.species.includes(key) || r.species.includes('*'),
+    (r) => !r.species || r.species.includes(key) || r.species.includes('sheep') || r.species.includes('*'),
   );
 }
 
@@ -61,7 +66,7 @@ function lookupWithdrawal(drugId, species, matrix) {
 }
 
 module.exports = {
-  KNOWLEDGE_VERSION: '2026.09',
+  KNOWLEDGE_VERSION: '2026.09.2',
   DISEASE_PACKS,
   ethnovet,
   withdrawal,
