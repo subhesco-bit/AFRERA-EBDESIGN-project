@@ -1,20 +1,25 @@
 /**
- * Agro farming systems + vision — /api/v1/agro-farming
+ * Agro farming — systems, vision, crops, soil, microbiome, APK matrix
  */
 const express = require('express');
 const farming = require('../modules/agro/FarmingSystemsEngine');
 const vision = require('../modules/agro/AgroVisionAnalysis');
 const orchestra = require('../modules/agro/AgroIntelligenceOrchestra');
 const knowledge = require('../modules/agro/AgroKnowledgeEngine');
+const cropIntel = require('../modules/agro/CropIntelligenceEngine');
+const soilEng = require('../modules/agro/SoilMicrobiomeEngine');
+const apk = require('../modules/agro/ApkFeatureMatrix');
 
 const router = express.Router();
 
 router.get('/health', (_req, res) => {
+  const crops = cropIntel.listAllCrops();
   res.json({
     ok: true,
     module: 'agro-farming',
     systems: Object.keys(farming.SYSTEMS),
-    vision_symptoms: vision.VISUAL_SYMPTOMS.length,
+    crop_categories: Object.keys(crops.categories),
+    disease_cards: cropIntel.diseases.diseases.length,
   });
 });
 
@@ -23,7 +28,35 @@ router.get('/systems', (_req, res) => {
 });
 
 router.get('/crops', (_req, res) => {
-  res.json({ success: true, data: farming.CROP_RECIPES_INDIA });
+  res.json({ success: true, data: cropIntel.listAllCrops() });
+});
+
+router.get('/crops/search', (req, res) => {
+  res.json({ success: true, data: cropIntel.searchCrops(req.query.q || '') });
+});
+
+router.get('/crops/:id/diseases', (req, res) => {
+  res.json({ success: true, data: cropIntel.diseasesForCrop(req.params.id) });
+});
+
+router.post('/crops/analyze', (req, res) => {
+  try {
+    res.json({ success: true, data: cropIntel.runCropDeepAnalysis(req.body || {}) });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message });
+  }
+});
+
+router.post('/soil/analyze', (req, res) => {
+  try {
+    res.json({ success: true, data: soilEng.analyzeSoil(req.body || {}) });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e.message });
+  }
+});
+
+router.get('/apk-features', (_req, res) => {
+  res.json({ success: true, data: apk.getMatrix() });
 });
 
 router.post('/systems/conference', (req, res) => {
@@ -37,28 +70,28 @@ router.post('/systems/conference', (req, res) => {
 router.post('/climate/advise', (req, res) => {
   try {
     const systemId = farming.normalizeSystem(req.body?.system);
-    res.json({
-      success: true,
-      data: farming.climateAdvice(systemId, req.body?.telemetry || {}),
-    });
+    res.json({ success: true, data: farming.climateAdvice(systemId, req.body?.telemetry || {}) });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
 });
 
-/** Picture / APK vision path */
 router.post('/vision/analyze', (req, res) => {
   try {
     res.json({ success: true, data: vision.analyzeVision(req.body || {}) });
   } catch (e) {
-    res.status(400).json({ success: false, error: e.message, disclaimer: vision.VISION_DISCLAIMER });
+    res.status(400).json({ success: false, error: e.message });
   }
 });
 
-/** Full orchestra: seasonal + system + vision */
 router.post('/intelligence', (req, res) => {
   try {
-    res.json({ success: true, data: orchestra.runFullAgroIntelligence(req.body || {}) });
+    const base = orchestra.runFullAgroIntelligence(req.body || {});
+    const deep = cropIntel.runCropDeepAnalysis(req.body || {});
+    res.json({
+      success: true,
+      data: { ...base, crop_deep: deep, apk_parity: apk.getMatrix() },
+    });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }

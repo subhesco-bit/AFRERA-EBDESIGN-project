@@ -1,0 +1,37 @@
+{
+  "version": "2026.09.india-crops-v1",
+  "note": "Major India crop groups — not every landrace. Extend via JSON without code change.",
+  "categories": {
+    "cereals": ["paddy", "wheat", "maize", "sorghum_jowar", "pearl_millet_bajra", "finger_millet_ragi", "barley", "foxtail_millet"],
+    "pulses": ["chickpea_gram", "pigeon_pea_tur", "green_gram_moong", "black_gram_urad", "lentil_masoor", "pea", "kidney_bean_rajma", "cowpea"],
+    "oilseeds": ["mustard", "groundnut", "soybean", "sesame_til", "sunflower", "safflower", "castor"],
+    "vegetables_fruit": ["tomato", "brinjal", "chilli", "capsicum", "okra_bhindi", "cauliflower", "cabbage", "onion", "garlic", "potato", "carrot", "radish", "beetroot", "cucumber", "bottle_gourd", "bitter_gourd", "ridge_gourd", "pumpkin", "watermelon", "muskmelon"],
+    "vegetables_leafy": ["spinach_palak", "fenugreek_methi", "coriander", "amaranth", "lettuce", "mustard_greens_sarson", "bathua"],
+    "fruits": ["mango", "banana", "guava", "papaya", "citrus_orange_lime", "pomegranate", "grape", "apple_temperate", "sapota", "jackfruit", "custard_apple", "watermelon_fruit"],
+    "herbs_spices": ["tulsi", "mint_pudina", "curry_leaf", "ginger", "turmeric", "black_pepper", "cardamom", "coriander_seed", "cumin", "fenugreek_seed", "ajwain", "lemongrass"],
+    "commercial": ["cotton", "sugarcane", "jute", "tobacco", "tea", "coffee", "coconut", "arecanut"],
+    "fodder": ["napier", "berseem", "sorghum_fodder", "lucerne"]
+  },
+  "crop_profiles": [
+    {"id":"tomato","category":"vegetables_fruit","seasons":["rabi","zaid","greenhouse_year"],"water":"medium","soil":"well_drained_loam_pH_6_7","regions":["pan"],"organic_friendly":true},
+    {"id":"paddy","category":"cereals","seasons":["kharif"],"water":"high_standing","soil":"clay_loam","regions":["indo_gangetic","coastal","south"],"organic_friendly":true},
+    {"id":"wheat","category":"cereals","seasons":["rabi"],"water":"medium","soil":"loam","regions":["indo_gangetic","mp","rajasthan_irrigated"],"organic_friendly":true},
+    {"id":"mango","category":"fruits","seasons":["perennial"],"water":"medium_stress_flowering","soil":"deep_well_drained","regions":["pan_tropical"],"organic_friendly":true},
+    {"id":"chilli","category":"vegetables_fruit","seasons":["kharif","rabi"],"water":"medium","soil":"sandy_loam","regions":["ap","tg","ka","mp"],"organic_friendly":true},
+    {"id":"onion","category":"vegetables_fruit","seasons":["rabi","kharif_some"],"water":"medium","soil":"fertile_loam","regions":["mh","ka","gj","rj"],"organic_friendly":true},
+    {"id":"potato","category":"vegetables_fruit","seasons":["rabi"],"water":"medium","soil":"sandy_loam_cool","regions":["up","wb","bihar","punjab"],"organic_friendly":true},
+    {"id":"banana","category":"fruits","seasons":["perennial"],"water":"high","soil":"deep_loam","regions":["tn","mh","gj","ap","kerala"],"organic_friendly":true},
+    {"id":"cotton","category":"commercial","seasons":["kharif"],"water":"medium","soil":"black_cotton_vertisol","regions":["mh","tg","gj","rj"],"organic_friendly":false},
+    {"id":"turmeric","category":"herbs_spices","seasons":["kharif"],"water":"medium_high","soil":"loam_shade_ok","regions":["tg","ap","tn","odisha"],"organic_friendly":true},
+    {"id":"spinach_palak","category":"vegetables_leafy","seasons":["rabi","zaid_cool"],"water":"medium","soil":"loam_N_rich","regions":["pan"],"organic_friendly":true},
+    {"id":"mint_pudina","category":"herbs_spices","seasons":["multi"],"water":"medium_high","soil":"moist_loam","regions":["pan"],"organic_friendly":true},
+    {"id":"chickpea_gram","category":"pulses","seasons":["rabi"],"water":"low_medium","soil":"well_drained","regions":["mp","mh","rj","up"],"organic_friendly":true},
+    {"id":"groundnut","category":"oilseeds","seasons":["kharif","rabi_irrigated"],"water":"medium","soil":"sandy_loam","regions":["gj","ap","tn","rj"],"organic_friendly":true},
+    {"id":"sugarcane","category":"commercial","seasons":["year_round_plant"],"water":"high","soil":"deep_loam","regions":["up","mh","ka","tn"],"organic_friendly":true},
+    {"id":"brinjal","category":"vegetables_fruit","seasons":["multi"],"water":"medium","soil":"loam","regions":["pan"],"organic_friendly":true},
+    {"id":"okra_bhindi","category":"vegetables_fruit","seasons":["kharif","zaid"],"water":"medium","soil":"loam","regions":["pan"],"organic_friendly":true},
+    {"id":"guava","category":"fruits","seasons":["perennial"],"water":"medium","soil":"wide_adapt","regions":["up","bihar","mh"],"organic_friendly":true},
+    {"id":"ginger","category":"herbs_spices","seasons":["kharif"],"water":"medium_high","soil":"loam_organic","regions":["kerala","ne","ka"],"organic_friendly":true},
+    {"id":"pearl_millet_bajra","category":"cereals","seasons":["kharif"],"water":"low","soil":"sandy","regions":["rj","gj","haryana"],"organic_friendly":true}
+  ]
+}

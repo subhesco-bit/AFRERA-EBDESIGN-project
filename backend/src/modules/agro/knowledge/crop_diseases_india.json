@@ -1,0 +1,24 @@
+{
+  "version": "2026.09.diseases-v1",
+  "diseases": [
+    {"id":"early_blight_tomato","crop":["tomato","potato"],"name":"Early blight","signs":["target spots","older leaves"],"organic":["crop rotation","remove debris","copper_careful_label"],"inorganic":["label fungicide as recommended by extension"],"severity":"moderate"},
+    {"id":"late_blight","crop":["tomato","potato"],"name":"Late blight","signs":["water soaked","white growth humidity"],"organic":["resistant variety","avoid leaf wetness"],"inorganic":["extension fungicide schedule"],"severity":"high"},
+    {"id":"powdery_mildew","crop":["cucumber","pea","grape","chilli"],"name":"Powdery mildew","signs":["white powder leaves"],"organic":["sulfur_label","airflow","avoid excess N"],"inorganic":["label fungicide"],"severity":"moderate"},
+    {"id":"downy_mildew","crop":["cucumber","grape","onion"],"name":"Downy mildew","signs":["angular lesions","humid"],"organic":["drainage","resistant seed"],"inorganic":["label fungicide"],"severity":"high"},
+    {"id":"leaf_curl_virus","crop":["tomato","chilli","papaya"],"name":"Leaf curl virus complex","signs":["upward curl","stunt","whitefly"],"organic":["net nursery","remove infected","yellow traps"],"inorganic":["vector management per label — no direct virus kill"],"severity":"high"},
+    {"id":"blast_rice","crop":["paddy"],"name":"Rice blast","signs":["diamond lesions","node blast"],"organic":["resistant variety","avoid excess N"],"inorganic":["extension fungicide window"],"severity":"high"},
+    {"id":"bph_rice","crop":["paddy"],"name":"Brown planthopper","signs":["hopperburn","base insects"],"organic":["avoid early broad insecticide","alternate wetting"],"inorganic":["ETL based insecticide label"],"severity":"high"},
+    {"id":"rust_wheat","crop":["wheat"],"name":"Wheat rusts","signs":["pustules"],"organic":["resistant variety","timely sow"],"inorganic":["extension advisory"],"severity":"high"},
+    {"id":"wilt_fusarium","crop":["tomato","chickpea_gram","banana","cotton"],"name":"Fusarium wilt","signs":["one-sided wilt","vascular brown"],"organic":["resistant variety","solarisation","trichoderma"],"inorganic":["limited — variety and sanitation primary"],"severity":"high"},
+    {"id":"anthracnose","crop":["mango","chilli","bean"],"name":"Anthracnose","signs":["sunken spots fruit leaf"],"organic":["sanitation","copper_label"],"inorganic":["label fungicide"],"severity":"moderate"},
+    {"id":"fruit_fly","crop":["mango","guava","cucumber","watermelon"],"name":"Fruit fly","signs":["maggot fruit","oviposition marks"],"organic":["bait traps","sanitation","bagging"],"inorganic":["bait stations per protocol"],"severity":"high"},
+    {"id":"aphid_complex","crop":["mustard","cotton","chilli","cabbage"],"name":"Aphids","signs":["clusters","honeydew","curl"],"organic":["soap spray careful","ladybird habitat","neem_label"],"inorganic":["ETL insecticide label"],"severity":"moderate"},
+    {"id":"whitefly","crop":["cotton","tomato","chilli"],"name":"Whitefly","signs":["white insects underside","sooty mould"],"organic":["yellow traps","neem_label","weed host remove"],"inorganic":["rotation chemistries label"],"severity":"high"},
+    {"id":"borer_brinj_tomato","crop":["brinjal","tomato"],"name":"Shoot/fruit borer","signs":["wilted shoot","holed fruit"],"organic":["pheromone","clip shoots","neem_label"],"inorganic":["ETL label"],"severity":"high"},
+    {"id":"sigatoka_banana","crop":["banana"],"name":"Sigatoka leaf spot","signs":["streaks leaf"],"organic":["drainage","remove leaves"],"inorganic":["extension fungicide"],"severity":"moderate"},
+    {"id":"red_rot_cane","crop":["sugarcane"],"name":"Red rot","signs":["reddened pith","sour smell"],"organic":["resistant setts","field sanitation"],"inorganic":["sett treatment protocols"],"severity":"high"},
+    {"id":"damping_off","crop":["tomato","chilli","cabbage","nursery"],"name":"Damping off","signs":["seedling collapse"],"organic":["sterile media","trichoderma","avoid overwater"],"inorganic":["seed treatment label"],"severity":"high"},
+    {"id":"nutrient_n_def","crop":["*"],"name":"Nitrogen deficiency","signs":["general yellow old leaves"],"organic":["compost","legume rotation","oilcake"],"inorganic":["urea/AN as soil test"],"severity":"moderate"},
+    {"id":"nutrient_zn_def","crop":["paddy","wheat","maize"],"name":"Zinc deficiency","signs":["khaira rice","interveinal"],"organic":["FYM","zn_solubilizing_bio"],"inorganic":["ZnSO4 soil/foliar as recommended"],"severity":"moderate"}
+  ]
+}
