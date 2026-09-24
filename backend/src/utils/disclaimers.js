@@ -1,12 +1,11 @@
 /**
  * Shared disclaimer text for nutrition / wellness / energy-expenditure
- * responses. A single source of truth so the wording is identical wherever
- * it is surfaced (nutritionIntelligenceService, consumerHealthService).
+ * and veterinary clinical decision-support responses. A single source of
+ * truth so the wording is identical wherever it is surfaced.
  *
  * Rendered directly on API responses (a `disclaimer` field), not only in
- * documentation, so it is visible at runtime next to the recommendation —
- * matching the discipline this codebase already applies to the veterinary
- * "Natural Therapy Layer" (AFRERA_CLAUDE_BUILD_DIRECTIVE.md PART 5.8).
+ * documentation — matching AFRERA_CLAUDE_BUILD_DIRECTIVE.md PART 5.8 and
+ * AFRERA_VETERINARY_SPECIALIST_PANEL_SPECIFICATION.md safety rules.
  */
 
 const NUTRITION_WELLNESS_DISCLAIMER =
@@ -19,6 +18,25 @@ const NUTRITION_WELLNESS_DISCLAIMER =
   'especially if you are pregnant, nursing, managing a medical condition, ' +
   'or taking medication.';
 
+const VETERINARY_CLINICAL_DISCLAIMER =
+  'This output is veterinary clinical decision-support only. It is not a ' +
+  'diagnosis, prescription, or substitute for examination by a licensed ' +
+  'veterinarian. Drug doses, withdrawal periods, and notifiable-disease ' +
+  'actions must be confirmed against current product labels, local ' +
+  'regulations, and professional judgement. For emergencies, suspected ' +
+  'notifiable diseases, or food-producing animals near slaughter/milking, ' +
+  'contact a licensed veterinarian and relevant authorities immediately. ' +
+  'Ethnoveterinary and complementary suggestions are labelled by evidence ' +
+  'level and must not replace indicated antimicrobial or emergency care.';
+
+const VETERINARY_ETHNOVET_NOTE =
+  'Traditional and ethnoveterinary practices are shown with explicit ' +
+  'evidence grades (strong / moderate / limited / traditional_only / ' +
+  'insufficient). traditional_only means customary use without strong ' +
+  'controlled clinical evidence in this species context.';
+
 module.exports = {
   NUTRITION_WELLNESS_DISCLAIMER,
+  VETERINARY_CLINICAL_DISCLAIMER,
+  VETERINARY_ETHNOVET_NOTE,
 };
