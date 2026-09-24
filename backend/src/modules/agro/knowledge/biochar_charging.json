@@ -1,0 +1,14 @@
+{
+  "version": "2026.09.biochar-v1",
+  "why_charge": "Raw biochar pores can adsorb soil nutrients and cause short-term N lag; charging pre-loads nutrients and/or microbes.",
+  "methods": [
+    {"id": "compost_mix", "time": "2-12 weeks", "ratio_hint": "1:3 to 1:4 biochar:compost or 5-15% in pile"},
+    {"id": "compost_tea_soak", "time": "24-72h"},
+    {"id": "liquid_fertilizer_soak", "time": "12-72h"},
+    {"id": "manure_slurry", "time": "2-14d"},
+    {"id": "dilute_urine", "time": "~7d", "dilution": "1:4 to 1:10"},
+    {"id": "animal_bedding_then_compost", "time": "weeks-months"},
+    {"id": "microbial_inoculant_carrier", "time": "hours-days"},
+    {"id": "in_soil_weathering", "time": "3-6 months"}
+  ]
+}
