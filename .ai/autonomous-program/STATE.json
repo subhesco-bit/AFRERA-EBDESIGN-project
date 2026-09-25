@@ -2,7 +2,7 @@
   "program": "AFRERA_EBDESIGN_PHASE_000_TO_100",
   "version": 2,
   "createdAt": "2026-09-25T09:55:08.8772124Z",
-  "updatedAt": "2026-09-25T15:06:04.839Z",
+  "updatedAt": "2026-09-25T15:07:38.421Z",
   "currentPhase": "046",
   "mode": "AUTO_SEQUENTIAL_EXHAUSTIVE_FILE_BY_FILE",
   "cleanupLockedUntilPhase": "100",
@@ -1326,15 +1326,22 @@
       "completedAt": "2026-09-25T15:06:04.838Z"
     },
     "046": {
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "RUNNING",
+      "attempts": 1,
       "maxAttempts": 3,
       "dependsOn": [
         "045"
       ],
       "evidence": [],
       "blockers": [],
-      "history": []
+      "history": [
+        {
+          "at": "2026-09-25T15:07:38.421Z",
+          "event": "START",
+          "attempt": 1
+        }
+      ],
+      "startedAt": "2026-09-25T15:07:38.420Z"
     },
     "047": {
       "status": "PENDING",
