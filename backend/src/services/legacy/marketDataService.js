@@ -27,6 +27,7 @@
 
 const pool = require('../../database/pool');
 const { logger } = require('../../utils/logger');
+const marketPriceTruth = require('../commerce/marketPriceTruthService');
 
 // ---------------------------------------------------------------------------
 // Agmarknet / e-NAM
@@ -44,7 +45,7 @@ async function ingestMandiPrices(records, source = 'agmarknet') {
     throw new Error(`Unknown price source: ${source}`);
   }
 
-  const out = { inserted: 0, skipped: 0, rejected: [] };
+  const out = { inserted: 0, skipped: 0, rejected: [], projected: 0, projectionSkipped: 0, projectionErrors: [] };
   for (const r of records) {
     // Reject rather than coerce. A record whose band is inverted, or whose
     // modal sits outside its own min/max, is corrupt at the source; storing it
@@ -79,7 +80,44 @@ async function ingestMandiPrices(records, source = 'agmarknet') {
           min, modal, max, num(r.arrivals ?? r.arrivals_tonnes),
           r.date ?? r.price_date, source],
       );
-      if (res.rows.length) out.inserted += 1; else out.skipped += 1;
+      if (res.rows.length) {
+        out.inserted += 1;
+        if (modal !== null) {
+          const sourceKey = {
+            agmarknet: 'AGMARKNET_OGD',
+            enam: 'ENAM_TRADED',
+            apmc_manual: 'APMC_MANUAL',
+            trader_report: 'TRADER_REPORT',
+            estimated: 'ESTIMATED',
+          }[source];
+          try {
+            const projected = await marketPriceTruth.persistObservation({
+              sourceKey,
+              commodity: r.commodity,
+              productName: r.commodity,
+              variety: r.variety ?? null,
+              grade: r.grade ?? null,
+              price: modal,
+              unit: 'qtl',
+              priceKind: 'modal',
+              observedAt: r.date ?? r.price_date,
+              geography: {
+                country: 'India',
+                state: r.state ?? null,
+                district: r.district ?? null,
+                market: r.market ?? r.market_name,
+              },
+              matchConfidence: 1,
+              sourceRecordId: `mandi:${res.rows[0].id}:modal`,
+            }, { db: pool });
+            if (projected.inserted) out.projected += 1; else out.projectionSkipped += 1;
+          } catch (projectionError) {
+            out.projectionErrors.push({ sourceRecordId: `mandi:${res.rows[0].id}:modal`, reason: projectionError.message });
+          }
+        }
+      } else {
+        out.skipped += 1;
+      }
     } catch (err) {
       out.rejected.push({ record: r, reason: err.message });
     }
