@@ -432,5 +432,5 @@ class AiGatewayService {
   }
 }
 
-module.exports = new AiGatewayService();
+module.exports = require('../ai/aiGatewayService');
 

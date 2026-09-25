@@ -552,12 +552,12 @@ router.post('/voice/transcribe', authMiddleware, async (req, res) => {
   try {
     const { audio_file, language } = req.body;
 
-    // Mock transcription - in production, would use speech-to-text API
+    // Transcription fails closed unless a real speech provider is configured
     const transcription = await transcribeAudio(audio_file, language);
 
     res.json({
       transcript: transcription,
-      confidence: 0.95,
+      confidence: null,
       language: language || 'en-US'
     });
   } catch (error) {
@@ -567,9 +567,9 @@ router.post('/voice/transcribe', authMiddleware, async (req, res) => {
 });
 
 async function transcribeAudio(audioFile, language) {
-  // Mock implementation
-  logger.info(`Transcribing audio: ${audioFile}`);
-  return 'This is a mock transcription of the audio content.';
+  const error = new Error('Voice transcription provider is not configured for omnichannel AI.');
+  error.code = 'VOICE_TRANSCRIPTION_NOT_CONFIGURED';
+  throw error;
 }
 
 // ============================================================================

@@ -1,428 +1,196 @@
-/**
- * AI Gateway Service
- * Central AI/ML integration hub for all platform modules
- * Provides standardized AI capabilities: prediction, optimization, analysis, recommendations
- */
+'use strict';
 
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const governedGateway = require('../aiGatewayService');
+const { dispatch } = require('../../core/ai/aiEngineDispatcher');
+
+const SPECIALIST_CONTRACTS = Object.freeze({
+  crop_yield: { kind:'prediction', engine:null, fields:{ predicted_yield:null, confidence:null, factors:[], timeline:null } },
+  weather: { kind:'prediction', engine:null, fields:{ temperature:null, humidity:null, rainfall:null, current_conditions:{}, confidence:null, forecast_days:null } },
+  market_price: { kind:'prediction', engine:null, fields:{ predicted_price:null, trend:null, confidence:null, time_horizon:null } },
+  pest_outbreak: { kind:'prediction', engine:null, fields:{ risk_level:null, confidence:null, affected_area:null, likely_pests:[], recommended_action:null } },
+  resource_allocation: { kind:'optimization', engine:'optimization', fields:{ optimized_allocation:null, efficiency_gain:null, cost_reduction:null } },
+  scheduling: { kind:'optimization', engine:null, fields:{ optimized_schedule:null, time_saved:null, resource_utilization:null } },
+  inventory: { kind:'optimization', engine:null, fields:{ optimized_inventory:null, waste_reduction:null, cost_savings:null } },
+  logistics: { kind:'optimization', engine:'optimization', fields:{ optimized_routes:null, distance_saved:null, fuel_savings:null } },
+  irrigation: { kind:'optimization', engine:null, fields:{ optimized_schedule:null, water_savings:null, efficiency_improvement:null, cost_savings:null, implementation_guide:null, monitoring_requirements:null } },
+  soil: { kind:'analysis', engine:null, fields:{ soil_health_score:null, nutrient_levels:{}, ph_level:null, organic_matter:null, texture:null, recommendations:[] } },
+  water: { kind:'analysis', engine:null, fields:{ water_quality_score:null, parameters:{}, issues:[], recommendations:[] } },
+  crop_health: { kind:'analysis', engine:null, fields:{ health_score:null, stress_factors:[], issues:[], recommendations:[] } },
+  financial: { kind:'analysis', engine:null, fields:{ financial_health:null, profitability:null, risk_factors:[], recommendations:[] } },
+  system: { kind:'analysis', engine:null, fields:{ score:null, bottlenecks:[], recommendations:[], forecast:{} } },
+  crop_selection: { kind:'recommendation', engine:null, fields:{ recommended_crops:[], confidence:null, reasoning:null, expected_yields:{}, market_outlook:{}, resource_requirements:{}, risk_factors:[], alternatives:[] } },
+  fertilizer: { kind:'recommendation', engine:null, fields:{ fertilizer_type:null, application_rate:null, timing:null, method:null, nutrient_breakdown:{}, cost_estimate:null, environmental_impact:{}, alternatives:[] } },
+  irrigation_recommendation: { kind:'recommendation', engine:null, fields:{ irrigation_method:null, frequency:null, duration:null, confidence:null } },
+  pest_control: { kind:'recommendation', engine:null, fields:{ pest_control_method:null, action:null, products:[], confidence:null } },
+  role_matching: { kind:'recommendation', engine:null, fields:{ matches:[], confidence:null } },
+  salary_market: { kind:'analysis', engine:null, fields:{ benchmark:null, range:null, confidence:null } },
+  career_path: { kind:'analysis', engine:null, fields:{ paths:[], confidence:null } },
+  role_assignment: { kind:'optimization', engine:null, fields:{ assignments:[], confidence:null } },
+  permission_usage: { kind:'analysis', engine:null, fields:{ anomalies:[], recommendations:[], confidence:null } },
+  user_behavior: { kind:'analysis', engine:null, fields:{ segments:[], anomalies:[], confidence:null } },
+  user_segmentation: { kind:'analysis', engine:null, fields:{ segments:[], confidence:null } },
+});
+
+function clone(value){ return JSON.parse(JSON.stringify(value)); }
+
+function normalizeInvocation(modelType, payload, third, defaultKind){
+  if(modelType && typeof modelType === 'object' && !Array.isArray(modelType)){
+    const obj=modelType;
+    return {
+      modelType:String(obj.modelType||obj.type||obj.capability||defaultKind||'generic'),
+      payload:obj.parameters||obj.data||obj.context||obj.input||obj,
+      third:obj.constraints||obj.analysisType||obj.options||third||{},
+    };
+  }
+  return {modelType:String(modelType||defaultKind||'generic'),payload:payload||{},third:third||{}};
+}
+
+function unavailable(modelType, kind, fields={}, reason){
+  return {
+    ...clone(fields),
+    implemented:false,
+    status:'not_implemented',
+    model_type:modelType,
+    capability_kind:kind,
+    confidence:null,
+    reason:reason||('No validated '+kind+' engine is bound to '+modelType+' in this compatibility gateway.'),
+    provenance:{source:'services/ai/aiGatewayService',generated:false},
+  };
+}
 
 class AiGatewayService {
-  constructor() {
-    this.aiModels = new Map();
-    this.modelCache = new Map();
-    this.performanceMetrics = new Map();
-    this.initializeAiModels();
+  constructor(){
+    this.performanceMetrics=new Map();
   }
 
-  /**
-   * Initialize AI models
-   */
-  async initializeAiModels() {
-    try {
-      // Initialize model configurations
-      this.aiModels.set('prediction', {
-        endpoint: process.env.AI_PREDICTION_ENDPOINT || 'internal',
-        version: '1.0',
-        accuracy: 0.92,
-        latency: 45
-      });
-      
-      this.aiModels.set('optimization', {
-        endpoint: process.env.AI_OPTIMIZATION_ENDPOINT || 'internal',
-        version: '1.0',
-        accuracy: 0.89,
-        latency: 52
-      });
-      
-      this.aiModels.set('analysis', {
-        endpoint: process.env.AI_ANALYSIS_ENDPOINT || 'internal',
-        version: '1.0',
-        accuracy: 0.94,
-        latency: 38
-      });
-      
-      this.aiModels.set('recommendation', {
-        endpoint: process.env.AI_RECOMMENDATION_ENDPOINT || 'internal',
-        version: '1.0',
-        accuracy: 0.91,
-        latency: 41
-      });
-
-      logger.info('AI Gateway Service initialized with models:', Array.from(this.aiModels.keys()));
-    } catch (error) {
-      logger.error('Error initializing AI models:', error);
-      throw error;
-    }
+  contract(modelType,kind){
+    const c=SPECIALIST_CONTRACTS[modelType];
+    if(c && (!kind || c.kind===kind)) return c;
+    return {kind:kind||'generic',engine:null,fields:{}};
   }
 
-  /**
-   * Generic AI prediction endpoint
-   */
-  async predict(modelType, parameters, context = {}) {
-    try {
-      const startTime = Date.now();
-      
-      const model = this.aiModels.get(modelType);
-      if (!model) {
-        throw new Error(`Model type ${modelType} not found`);
-      }
-
-      // Check cache first
-      const cacheKey = this.generateCacheKey(modelType, parameters);
-      if (this.modelCache.has(cacheKey)) {
-        const cached = this.modelCache.get(cacheKey);
-        if (Date.now() - cached.timestamp < 300000) { // 5 minutes cache
-          logger.info(`Cache hit for ${modelType} prediction`);
-          return cached.result;
-        }
-      }
-
-      // Perform prediction
-      const result = await this.performPrediction(modelType, parameters, context);
-      
-      // Cache result
-      this.modelCache.set(cacheKey, {
+  async _tryEngine(modelType,kind,payload,third){
+    const contract=this.contract(modelType,kind);
+    if(!contract.engine) return unavailable(modelType,kind,contract.fields);
+    try{
+      const result=await dispatch(contract.engine,{
+        modelType,
+        parameters:payload,
+        constraints:kind==='optimization'?third:{},
+        context:kind!=='optimization'?third:{},
+      });
+      return {
+        ...clone(contract.fields),
+        implemented:true,
+        status:'executed',
+        model_type:modelType,
+        capability_kind:kind,
         result,
-        timestamp: Date.now()
-      });
+        confidence:null,
+        provenance:{source:'aiEngineDispatcher',engine:contract.engine,generated:false},
+      };
+    }catch(error){
+      logger.warn('Specialist AI engine unavailable', {modelType,kind,engine:contract.engine,error:error.message});
+      return unavailable(modelType,kind,contract.fields,'Bound engine '+contract.engine+' is currently unavailable: '+error.message);
+    }
+  }
 
-      // Track performance
-      const latency = Date.now() - startTime;
-      this.trackPerformance(modelType, latency, true);
+  async predict(modelType,parameters={},context={}){
+    const a=normalizeInvocation(modelType,parameters,context,'prediction');
+    const start=Date.now();
+    const result=await this._tryEngine(a.modelType,'prediction',a.payload,a.third);
+    this.trackPerformance(a.modelType,Date.now()-start,result.implemented===true);
+    return result;
+  }
 
-      logger.info(`Prediction completed for ${modelType} in ${latency}ms`);
+  async optimize(modelType,parameters={},constraints={}){
+    const a=normalizeInvocation(modelType,parameters,constraints,'optimization');
+    const start=Date.now();
+    const result=await this._tryEngine(a.modelType,'optimization',a.payload,a.third);
+    this.trackPerformance(a.modelType,Date.now()-start,result.implemented===true);
+    return result;
+  }
+
+  async analyze(modelType,data={},analysisType='standard'){
+    const a=normalizeInvocation(modelType,data,analysisType,'analysis');
+    const start=Date.now();
+    const result=await this._tryEngine(a.modelType,'analysis',a.payload,a.third);
+    this.trackPerformance(a.modelType,Date.now()-start,result.implemented===true);
+    return result;
+  }
+
+  async recommend(modelType,context={},options={}){
+    const a=normalizeInvocation(modelType,context,options,'recommendation');
+    const start=Date.now();
+    const contract=this.contract(a.modelType,'recommendation');
+    if(contract.engine){
+      const result=await this._tryEngine(a.modelType,'recommendation',a.payload,a.third);
+      this.trackPerformance(a.modelType,Date.now()-start,result.implemented===true);
       return result;
-    } catch (error) {
-      logger.error(`Prediction error for ${modelType}:`, error);
-      this.trackPerformance(modelType, 0, false);
-      throw error;
-    }
-  }
-
-  /**
-   * AI optimization endpoint
-   */
-  async optimize(modelType, parameters, constraints = {}) {
-    try {
-      const startTime = Date.now();
-      
-      const model = this.aiModels.get(modelType);
-      if (!model) {
-        throw new Error(`Model type ${modelType} not found`);
-      }
-
-      const result = await this.performOptimization(modelType, parameters, constraints);
-      
-      const latency = Date.now() - startTime;
-      this.trackPerformance(modelType, latency, true);
-
-      logger.info(`Optimization completed for ${modelType} in ${latency}ms`);
-      return result;
-    } catch (error) {
-      logger.error(`Optimization error for ${modelType}:`, error);
-      this.trackPerformance(modelType, 0, false);
-      throw error;
-    }
-  }
-
-  /**
-   * AI analysis endpoint
-   */
-  async analyze(modelType, data, analysisType = 'standard') {
-    try {
-      const startTime = Date.now();
-      
-      const model = this.aiModels.get(modelType);
-      if (!model) {
-        throw new Error(`Model type ${modelType} not found`);
-      }
-
-      const result = await this.performAnalysis(modelType, data, analysisType);
-      
-      const latency = Date.now() - startTime;
-      this.trackPerformance(modelType, latency, true);
-
-      logger.info(`Analysis completed for ${modelType} in ${latency}ms`);
-      return result;
-    } catch (error) {
-      logger.error(`Analysis error for ${modelType}:`, error);
-      this.trackPerformance(modelType, 0, false);
-      throw error;
-    }
-  }
-
-  /**
-   * AI recommendation endpoint
-   */
-  async recommend(modelType, context, options = {}) {
-    try {
-      const startTime = Date.now();
-      
-      const model = this.aiModels.get(modelType);
-      if (!model) {
-        throw new Error(`Model type ${modelType} not found`);
-      }
-
-      const result = await this.performRecommendation(modelType, context, options);
-      
-      const latency = Date.now() - startTime;
-      this.trackPerformance(modelType, latency, true);
-
-      logger.info(`Recommendation completed for ${modelType} in ${latency}ms`);
-      return result;
-    } catch (error) {
-      logger.error(`Recommendation error for ${modelType}:`, error);
-      this.trackPerformance(modelType, 0, false);
-      throw error;
-    }
-  }
-
-  /**
-   * Internal prediction implementation
-   */
-  async performPrediction(modelType, parameters, context) {
-    // In production, this would call external AI services
-    // For now, return mock predictions based on model type
-    
-    const predictions = {
-      'crop_yield': this.predictCropYield(parameters, context),
-      'weather': this.predictWeather(parameters, context),
-      'market_price': this.predictMarketPrice(parameters, context),
-      'pest_outbreak': this.predictPestOutbreak(parameters, context),
-      'default': this.genericPrediction(parameters, context)
-    };
-
-    return predictions[modelType] || predictions['default'];
-  }
-
-  /**
-   * Internal optimization implementation
-   */
-  async performOptimization(modelType, parameters, constraints) {
-    const optimizations = {
-      'resource_allocation': this.optimizeResourceAllocation(parameters, constraints),
-      'scheduling': this.optimizeScheduling(parameters, constraints),
-      'inventory': this.optimizeInventory(parameters, constraints),
-      'logistics': this.optimizeLogistics(parameters, constraints),
-      'default': this.genericOptimization(parameters, constraints)
-    };
-
-    return optimizations[modelType] || optimizations['default'];
-  }
-
-  /**
-   * Internal analysis implementation
-   */
-  async performAnalysis(modelType, data, analysisType) {
-    const analyses = {
-      'soil': this.analyzeSoil(data, analysisType),
-      'water': this.analyzeWater(data, analysisType),
-      'crop_health': this.analyzeCropHealth(data, analysisType),
-      'financial': this.analyzeFinancial(data, analysisType),
-      'default': this.genericAnalysis(data, analysisType)
-    };
-
-    return analyses[modelType] || analyses['default'];
-  }
-
-  /**
-   * Internal recommendation implementation
-   */
-  async performRecommendation(modelType, context, options) {
-    const recommendations = {
-      'crop_selection': this.recommendCropSelection(context, options),
-      'fertilizer': this.recommendFertilizer(context, options),
-      'irrigation': this.recommendIrrigation(context, options),
-      'pest_control': this.recommendPestControl(context, options),
-      'default': this.genericRecommendation(context, options)
-    };
-
-    return recommendations[modelType] || recommendations['default'];
-  }
-
-  // Missed in the 2026-08-15 pass below (predictMarketPrice etc.) — same
-  // fabrication, same fix: honest null/implemented:false instead of a
-  // randomized fake yield or weather forecast presented as real output.
-  predictCropYield(parameters, context) {
-    return { predicted_yield: null, confidence: null, factors: [], timeline: null, implemented: false, reason: 'No real crop-yield prediction model is connected to this gateway.' };
-  }
-
-  predictWeather(parameters, context) {
-    return { temperature: null, humidity: null, rainfall: null, confidence: null, forecast_days: null, implemented: false, reason: 'No real weather-forecast provider is connected to this gateway — see whatever real weather integration exists elsewhere in the platform, if any, rather than this gateway.' };
-  }
-
-  // NOTE (2026-08-15): every method below this point previously used
-  // Math.random() to fabricate predictions/scores/optimizations presented as
-  // real AI output to 10 real consumers (see git blame). Replaced with an
-  // honest `{implemented: false, ...}` shape — the field names callers
-  // already destructure (confidence, score, etc.) are preserved as `null`
-  // rather than removed, so nothing crashes, but nothing lies either. Real
-  // computation for any of these would need real underlying data/models this
-  // file has no connection to (soil/water/crop data already exists for real
-  // elsewhere — see soilTestingService.js, weatherService.js — but wiring
-  // this gateway to them is a real integration task, not a one-line fix).
-  predictMarketPrice(parameters, context) {
-    return { predicted_price: null, trend: null, confidence: null, time_horizon: null, implemented: false, reason: 'No real market-price prediction model is connected to this gateway.' };
-  }
-
-  predictPestOutbreak(parameters, context) {
-    return { risk_level: null, confidence: null, affected_area: null, recommended_action: null, implemented: false, reason: 'No real pest-outbreak prediction model is connected to this gateway.' };
-  }
-
-  genericPrediction(parameters, context) {
-    return { prediction: null, confidence: null, timestamp: new Date().toISOString(), implemented: false, reason: 'No real prediction model is connected to this gateway.' };
-  }
-
-  // Mock optimization methods
-  optimizeResourceAllocation(parameters, constraints) {
-    return { optimized_allocation: parameters, efficiency_gain: null, cost_reduction: null, implemented: false, reason: 'No real resource-allocation optimizer is connected to this gateway.' };
-  }
-
-  optimizeScheduling(parameters, constraints) {
-    return { optimized_schedule: parameters, time_saved: null, resource_utilization: null, implemented: false, reason: 'No real scheduling optimizer is connected to this gateway.' };
-  }
-
-  optimizeInventory(parameters, constraints) {
-    return { optimized_inventory: parameters, waste_reduction: null, cost_savings: null, implemented: false, reason: 'No real inventory optimizer is connected to this gateway.' };
-  }
-
-  optimizeLogistics(parameters, constraints) {
-    return { optimized_routes: parameters, distance_saved: null, fuel_savings: null, implemented: false, reason: 'No real logistics optimizer is connected to this gateway — see logisticsService.js/logisticsEnhancementService.js for real freight-lane logic outside this gateway.' };
-  }
-
-  genericOptimization(parameters, constraints) {
-    return { optimized_result: parameters, improvement: null, implemented: false, reason: 'No real optimizer is connected to this gateway.' };
-  }
-
-  // Mock analysis methods
-  analyzeSoil(data, analysisType) {
-    return { soil_health_score: null, nutrient_levels: null, recommendations: [], implemented: false, reason: 'No real soil-analysis model is connected to this gateway — see soilTestingService.js for real recorded soil-test data.' };
-  }
-
-  analyzeWater(data, analysisType) {
-    return { water_quality_score: null, ph_level: null, contamination_risk: null, implemented: false, reason: 'No real water-analysis model is connected to this gateway.' };
-  }
-
-  analyzeCropHealth(data, analysisType) {
-    return { health_score: null, stress_factors: [], growth_stage: null, implemented: false, reason: 'No real crop-health model is connected to this gateway.' };
-  }
-
-  analyzeFinancial(data, analysisType) {
-    return { financial_health: null, profitability: null, risk_factors: [], implemented: false, reason: 'No real financial-analysis model is connected to this gateway — see financialService.js for real, DB-backed financial computations outside this gateway.' };
-  }
-
-  genericAnalysis(data, analysisType) {
-    return { analysis_result: null, score: null, insights: [], implemented: false, reason: 'No real analysis model is connected to this gateway.' };
-  }
-
-  // Mock recommendation methods
-  recommendCropSelection(context, options) {
-    return { recommended_crops: [], confidence: null, reasoning: null, implemented: false, reason: 'No real crop-recommendation model is connected to this gateway.' };
-  }
-
-  recommendFertilizer(context, options) {
-    return {
-      fertilizer_type: 'NPK_10_26_26',
-      application_rate: '50kg/acre',
-      timing: 'before_sowing'
-    };
-  }
-
-  recommendIrrigation(context, options) {
-    return {
-      irrigation_method: 'drip',
-      frequency: 'daily',
-      duration: '2_hours'
-    };
-  }
-
-  recommendPestControl(context, options) {
-    return {
-      pest_control_method: 'integrated_pest_management',
-      action: 'monitor_and_treat_as_needed',
-      products: ['bio_pesticide', 'trap_crops']
-    };
-  }
-
-  genericRecommendation(context, options) {
-    return { recommendation: null, confidence: null, priority: null, implemented: false, reason: 'No real recommendation model is connected to this gateway.' };
-  }
-
-  /**
-   * Generate cache key for predictions
-   */
-  generateCacheKey(modelType, parameters) {
-    return `${modelType}_${JSON.stringify(parameters)}`;
-  }
-
-  /**
-   * Track AI model performance
-   */
-  trackPerformance(modelType, latency, success) {
-    if (!this.performanceMetrics.has(modelType)) {
-      this.performanceMetrics.set(modelType, {
-        total_calls: 0,
-        successful_calls: 0,
-        failed_calls: 0,
-        total_latency: 0,
-        avg_latency: 0
-      });
     }
 
-    const metrics = this.performanceMetrics.get(modelType);
-    metrics.total_calls++;
-    metrics.total_latency += latency;
-    metrics.avg_latency = metrics.total_latency / metrics.total_calls;
+    const governed=await governedGateway.run({
+      moduleId:'specialist-ai-compatibility',
+      capability:'recommend-'+a.modelType,
+      prompt:[
+        "Provide advisory reasoning for capability '"+a.modelType+"'.",
+        'Do not invent measurements, dosages, prices, diagnoses, or completed actions.',
+        'CONTEXT_JSON: '+JSON.stringify(a.payload),
+      ].join('\n'),
+      context:a.third||{},
+    });
 
-    if (success) {
-      metrics.successful_calls++;
-    } else {
-      metrics.failed_calls++;
-    }
-
-    this.performanceMetrics.set(modelType, metrics);
+    const result={
+      ...clone(contract.fields),
+      implemented:governed.success===true,
+      status:governed.success?'generated_advisory':'not_configured',
+      model_type:a.modelType,
+      capability_kind:'recommendation',
+      content:governed.content||null,
+      confidence:null,
+      reason:governed.success?null:(governed.error||'No governed provider is configured.'),
+      provenance:{
+        source:'governed-ai-gateway',
+        provider:governed.provider||null,
+        model:governed.model||null,
+        generated:governed.success===true,
+      },
+      safety:{humanReviewRequired:true,externalActionsTaken:false},
+    };
+    this.trackPerformance(a.modelType,Date.now()-start,result.implemented===true);
+    return result;
   }
 
-  /**
-   * Get performance metrics
-   */
-  getPerformanceMetrics(modelType = null) {
-    if (modelType) {
-      return this.performanceMetrics.get(modelType) || {};
-    }
+  trackPerformance(modelType,latency,success){
+    const current=this.performanceMetrics.get(modelType)||{total_calls:0,successful_calls:0,failed_calls:0,total_latency:0,avg_latency:0};
+    current.total_calls+=1;
+    current.total_latency+=Number(latency)||0;
+    current.avg_latency=current.total_latency/current.total_calls;
+    if(success) current.successful_calls+=1; else current.failed_calls+=1;
+    this.performanceMetrics.set(modelType,current);
+  }
+
+  getPerformanceMetrics(modelType=null){
+    if(modelType) return this.performanceMetrics.get(modelType)||{};
     return Object.fromEntries(this.performanceMetrics);
   }
 
-  /**
-   * Health check for AI Gateway
-   */
-  async healthCheck() {
-    try {
-      const modelStatus = {};
-      for (const [modelType, model] of this.aiModels) {
-        modelStatus[modelType] = {
-          status: 'healthy',
-          version: model.version,
-          accuracy: model.accuracy
-        };
-      }
-
-      return {
-        status: 'healthy',
-        models: modelStatus,
-        performance: this.getPerformanceMetrics(),
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      logger.error('AI Gateway health check failed:', error);
-      return {
-        status: 'unhealthy',
-        error: error.message,
-        timestamp: new Date().toISOString()
-      };
-    }
+  async healthCheck(){
+    const governed=await governedGateway.healthCheck();
+    return {
+      status: governed.status==='configured'?'configured':'degraded',
+      governedProvider:governed,
+      specialistContracts:Object.keys(SPECIALIST_CONTRACTS).length,
+      executableSpecialistContracts:Object.entries(SPECIALIST_CONTRACTS).filter(([,c])=>Boolean(c.engine)).map(([id])=>id),
+      truthRule:'Unbound specialist capabilities return implemented:false and null structured fields; no fabricated model accuracy or recommendations.',
+      performance:this.getPerformanceMetrics(),
+      timestamp:new Date().toISOString(),
+    };
   }
 }
 
-module.exports = new AiGatewayService();
+const singleton=new AiGatewayService();
+module.exports=singleton;
+module.exports.AiGatewayService=AiGatewayService;
+module.exports.SPECIALIST_CONTRACTS=SPECIALIST_CONTRACTS;

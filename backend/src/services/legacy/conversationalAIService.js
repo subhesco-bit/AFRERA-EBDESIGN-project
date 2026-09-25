@@ -276,6 +276,7 @@ async function generateResponse(sessionId, userMessage, context = {}) {
       content: response,
       intent: intentResult.intent,
       confidence: intentResult.confidence,
+      source: 'fallback',
       requires_action: determineIfActionRequired(intentResult.intent),
     };
   } catch (error) {

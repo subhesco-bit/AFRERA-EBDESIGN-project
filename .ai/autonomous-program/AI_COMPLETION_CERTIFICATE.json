@@ -1,0 +1,39 @@
+{
+    "program":  "AI_COMPLETION",
+    "architecture":  "isolated-hybrid-enterprise-ai",
+    "codeComplete":  true,
+    "runtimeFullyOperational":  false,
+    "codeBlockers":  [
+
+                     ],
+    "configurationBlockers":  [
+                                  "external_agent_runtime_not_configured",
+                                  "external_provider_pricing_not_configured",
+                                  "some_domain_capabilities_require_unconfigured_external_runtime"
+                              ],
+    "canonicalDomains":  36,
+    "coveredDomains":  36,
+    "agenticTemplateCoveredDomains":  36,
+    "embeddedContractCoveredDomains":  36,
+    "declaredEngineCoveredDomains":  36,
+    "templates":  44,
+    "streams":  36,
+    "prompts":  44,
+    "tools":  6,
+    "medicalTemplates":  9,
+    "registeredEngines":  29,
+    "currentlyExecutableEngines":  20,
+    "knownProviders":  10,
+    "configuredProviders":  0,
+    "protection":  {
+                       "isolatedExternalBackbone":  true,
+                       "externalMutationAuthority":  false,
+                       "readOnlyExternalTools":  true,
+                       "cognitiveStepUp":  true,
+                       "authorityStepDown":  true,
+                       "deterministicReconciliation":  true
+                   },
+    "tests":  "85/85 passed across 19 suites",
+    "runtimeFakeOutputScan":  "0 active-path matches",
+    "truthRule":  "Code completion is separate from external runtime configuration; no provider/model is reported live unless configured and executable."
+}

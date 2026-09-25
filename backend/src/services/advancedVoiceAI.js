@@ -10,6 +10,7 @@
  */
 
 const express = require('express');
+const crypto = require('crypto');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 const { authMiddleware } = require('../middleware/auth');
@@ -386,33 +387,35 @@ async function fetchIntentData(intent, entities, userId) {
 }
 
 /**
- * Get Current Price (Mock implementation)
+ * Get Current Price (observed market intelligence; unavailable when no evidence exists)
  */
 async function getCurrentPrice(crop, location) {
-  // In production, fetch from real database
-  const mockPrices = {
-    rice: { price: 25 },
-    wheat: { price: 22 },
-    maize: { price: 18 },
-    potato: { price: 15 },
-    tomato: { price: 30 },
-    onion: { price: 35 },
-  };
-
-  return mockPrices[crop.toLowerCase()] || { price: 20 };
+  try {
+    const marketPriceTruth = require('./commerce/marketPriceTruthService');
+    const snapshot = await marketPriceTruth.marketSnapshot({ productName: String(crop || ''), days: 30 });
+    const current = snapshot.current;
+    if (!current || !Number.isFinite(Number(current.pricePerKgInr))) {
+      return { price: null, status: 'unavailable', source: null, observed_at: null };
+    }
+    return {
+      price: Number(current.pricePerKgInr),
+      status: 'observed',
+      source: current.sourceName || current.sourceType || null,
+      observed_at: current.observedAt || null,
+      location: location || current.geography || null,
+    };
+  } catch (error) {
+    logger.warn('Voice price lookup unavailable', { crop, location, error: error.message });
+    return { price: null, status: 'unavailable', source: null, observed_at: null };
+  }
 }
-
 /**
- * Get Market Demand (Mock implementation)
+ * Get Market Demand (explicitly unimplemented until a validated forecast model is connected)
  */
 async function getMarketDemand(crop) {
-  // In production, fetch from AI demand forecasting
-  return {
-    demand: 'high',
-    price: 25,
-  };
+  const price = await getCurrentPrice(crop);
+  return { demand: null, price: price.price, status: 'not_implemented', reason: 'No validated demand-forecast model is connected to the voice service.' };
 }
-
 /**
  * Get User Credit Profile
  */
@@ -568,13 +571,13 @@ async function processAdvancedVoiceCommand(userId, audioData, language, conversa
 }
 
 /**
- * Transcribe Audio (Mock implementation)
+ * Transcribe Audio (fail-closed until a real speech provider is connected)
  */
 async function transcribeAudio(audioData, language) {
-  // In production, use Google Speech-to-Text, Azure Speech, or similar
-  return 'What is the current price of rice in the local market?';
+  const error = new Error('Voice transcription provider is not configured for this service.');
+  error.code = 'VOICE_TRANSCRIPTION_NOT_CONFIGURED';
+  throw error;
 }
-
 /**
  * Get Conversation History
  */
@@ -617,7 +620,7 @@ async function storeConversationTurn(conversationId, userId, transcript, intentR
  * Create Voice Conversation Session
  */
 async function createVoiceConversation(userId, language = 'en') {
-  const conversationId = `CONV-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const conversationId = 'CONV-'+crypto.randomUUID();
 
   const query = `
     INSERT INTO voice_conversations

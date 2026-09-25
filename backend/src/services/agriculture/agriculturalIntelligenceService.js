@@ -245,197 +245,92 @@ class AgriculturalIntelligenceService {
    * Generate yield recommendations
    */
   generateYieldRecommendations(prediction) {
-    const recommendations = [];
-    
-    if (prediction.predicted_yield < 3) {
-      recommendations.push('Consider soil amendment to improve yield potential');
-    }
-    
-    if (prediction.factors?.includes('soil_quality')) {
-      recommendations.push('Implement soil testing and targeted fertilization');
-    }
-    
-    if (prediction.factors?.includes('weather')) {
-      recommendations.push('Install weather monitoring systems for better predictions');
-    }
-    
-    return recommendations;
+    if (!prediction || prediction.implemented !== true) return [];
+    return Array.isArray(prediction.recommendations) ? prediction.recommendations : [];
   }
 
   /**
-   * Generate fertilizer recommendations
+   * Pass through only validated, engine-supplied fertilizer recommendations.
+   * No generic dosage or product is invented here.
    */
   generateFertilizerRecommendations(analysis) {
-    const recommendations = [];
-    
-    if (analysis.nutrient_levels?.nitrogen < 50) {
-      recommendations.push({
-        nutrient: 'nitrogen',
-        recommendation: 'Apply nitrogen-rich fertilizer',
-        type: 'urea',
-        rate: '50kg/ha'
-      });
-    }
-    
-    if (analysis.nutrient_levels?.phosphorus < 30) {
-      recommendations.push({
-        nutrient: 'phosphorus',
-        recommendation: 'Apply phosphorus-rich fertilizer',
-        type: 'DAP',
-        rate: '25kg/ha'
-      });
-    }
-    
-    if (analysis.nutrient_levels?.potassium < 40) {
-      recommendations.push({
-        nutrient: 'potassium',
-        recommendation: 'Apply potassium-rich fertilizer',
-        type: 'MOP',
-        rate: '30kg/ha'
-      });
-    }
-    
-    return recommendations;
+    if (!analysis || analysis.implemented !== true) return [];
+    return Array.isArray(analysis.fertilizer_recommendations) ? analysis.fertilizer_recommendations : [];
   }
 
   /**
-   * Generate irrigation recommendations
+   * Pass through only validated, engine-supplied irrigation recommendations.
    */
   generateIrrigationRecommendations(analysis) {
-    const recommendations = [];
-    
-    if (analysis.soil_health_score < 60) {
-      recommendations.push('Implement drip irrigation for water conservation');
-    }
-    
-    if (analysis.ph_level < 6 || analysis.ph_level > 7.5) {
-      recommendations.push('Monitor soil moisture levels to optimize irrigation schedule');
-    }
-    
-    return recommendations;
+    if (!analysis || analysis.implemented !== true) return [];
+    return Array.isArray(analysis.irrigation_recommendations) ? analysis.irrigation_recommendations : [];
   }
 
-  /**
-   * Generate weather advisory
-   */
   async generateWeatherAdvisory(weatherPrediction) {
-    const advisory = {
-      level: 'normal',
+    if (!weatherPrediction || weatherPrediction.implemented !== true) {
+      return {
+        status: 'unavailable',
+        level: null,
+        actions: [],
+        alerts: [],
+        reason: weatherPrediction?.reason || 'No validated weather intelligence engine is connected.',
+        requiresQualifiedReview: true,
+      };
+    }
+    return weatherPrediction.advisory || {
+      status: 'engine_output_missing_advisory',
+      level: null,
       actions: [],
-      alerts: []
+      alerts: [],
+      requiresQualifiedReview: true,
     };
-
-    if (weatherPrediction.temperature > 35) {
-      advisory.level = 'high';
-      advisory.actions.push('Increase irrigation frequency');
-      advisory.alerts.push('High temperature alert');
-    }
-
-    if (weatherPrediction.rainfall < 10) {
-      advisory.actions.push('Prepare for drought conditions');
-    }
-
-    if (weatherPrediction.rainfall > 100) {
-      advisory.level = 'high';
-      advisory.actions.push('Ensure proper drainage');
-      advisory.alerts.push('Heavy rainfall alert');
-    }
-
-    return advisory;
   }
 
-  /**
-   * Assess weather risks
-   */
   assessWeatherRisks(weatherPrediction) {
-    const risks = {
-      overall: 'low',
-      factors: []
+    if (!weatherPrediction || weatherPrediction.implemented !== true) {
+      return { overall: null, factors: [], status: 'unavailable', requiresQualifiedReview: true };
+    }
+    return weatherPrediction.risk_assessment || {
+      overall: null, factors: [], status: 'engine_output_missing_risk_assessment', requiresQualifiedReview: true,
     };
-
-    if (weatherPrediction.temperature > 38) {
-      risks.overall = 'high';
-      risks.factors.push('heat_stress');
-    }
-
-    if (weatherPrediction.rainfall > 150) {
-      risks.overall = 'high';
-      risks.factors.push('flooding');
-    }
-
-    if (weatherPrediction.humidity > 90) {
-      risks.factors.push('disease_risk');
-    }
-
-    return risks;
   }
 
-  /**
-   * Generate weather recommendations
-   */
   generateWeatherRecommendations(weatherPrediction) {
-    const recommendations = [];
-
-    if (weatherPrediction.temperature > 30) {
-      recommendations.push('Provide shade for sensitive crops');
-    }
-
-    if (weatherPrediction.rainfall < 20) {
-      recommendations.push('Plan supplemental irrigation');
-    }
-
-    if (weatherPrediction.rainfall > 80) {
-      recommendations.push('Ensure proper drainage systems');
-    }
-
-    return recommendations;
+    if (!weatherPrediction || weatherPrediction.implemented !== true) return [];
+    return Array.isArray(weatherPrediction.recommendations) ? weatherPrediction.recommendations : [];
   }
 
-  /**
-   * Generate pest preventive measures
-   */
   generatePestPreventiveMeasures(prediction) {
-    return [
-      'Implement crop rotation',
-      'Use resistant varieties',
-      'Maintain proper field sanitation',
-      'Monitor pest populations regularly',
-      'Use biological control methods'
-    ];
+    if (!prediction || prediction.implemented !== true) return [];
+    return Array.isArray(prediction.preventive_measures) ? prediction.preventive_measures : [];
   }
 
-  /**
-   * Generate pest treatment recommendations
-   */
   generatePestTreatmentRecommendations(prediction) {
-    return {
-      chemical: {
-        recommended: false,
-        alternatives: ['biopesticides', 'organic_methods']
-      },
-      biological: {
-        recommended: true,
-        methods: ['predatory_insects', 'pathogens', 'parasites']
-      },
-      cultural: {
-        recommended: true,
-        methods: ['crop_rotation', 'trap_crops', 'timing_adjustments']
-      }
+    if (!prediction || prediction.implemented !== true) {
+      return {
+        status: 'unavailable',
+        chemical: null,
+        biological: null,
+        cultural: null,
+        requiresQualifiedReview: true,
+      };
+    }
+    return prediction.treatment_recommendations || {
+      status: 'engine_output_missing_treatment_recommendations',
+      chemical: null, biological: null, cultural: null, requiresQualifiedReview: true,
     };
   }
 
-  /**
-   * Generate pest monitoring protocol
-   */
   generatePestMonitoringProtocol(prediction) {
-    return {
-      frequency: 'weekly',
-      methods: ['visual_inspection', 'pheromone_traps', 'scouting'],
-      threshold_levels: {
-        economic: '5%_damage',
-        action: '10%_infestation'
-      },
-      reporting: 'immediate_for_critical_pests'
+    if (!prediction || prediction.implemented !== true) {
+      return {
+        status: 'unavailable',
+        frequency: null, methods: [], threshold_levels: null, reporting: null, requiresQualifiedReview: true,
+      };
+    }
+    return prediction.monitoring_protocol || {
+      status: 'engine_output_missing_monitoring_protocol',
+      frequency: null, methods: [], threshold_levels: null, reporting: null, requiresQualifiedReview: true,
     };
   }
 
@@ -448,7 +343,7 @@ class AgriculturalIntelligenceService {
       const analyticsHealth = await this.analytics.healthCheck();
 
       return {
-        status: aiHealth.status === 'healthy' && analyticsHealth.status === 'healthy' ? 'healthy' : 'degraded',
+        status: ['healthy','configured'].includes(aiHealth.status) && analyticsHealth.status === 'healthy' ? 'healthy' : 'degraded',
         services: {
           ai_gateway: aiHealth,
           analytics: analyticsHealth

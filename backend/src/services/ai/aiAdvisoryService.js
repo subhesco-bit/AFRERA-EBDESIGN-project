@@ -2,24 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { authMiddleware } = require('../../middleware/auth');
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
 
 // aiAdvisoryService — minimal in-memory scaffold.
 let _items = [];
 let _nextId = 1;
 
 router.get('/', async (req, res) => {
-  try {
-    const pg = getPostgreSQL();
-    if (pg && false) {
-      const result = await pg.query('SELECT * FROM _placeholder ORDER BY created_at DESC LIMIT 100');
-      return res.json({ success: true, data: result.rows });
-    }
-    res.json({ success: true, data: _items });
-  } catch (error) {
-    logger.warn('aiAdvisoryService list query failed, falling back to in-memory store', { error: error.message });
-    res.json({ success: true, data: _items });
-  }
+  res.json({ success: true, data: _items, storage: 'ephemeral_in_memory', authoritative: false });
 });
 
 router.post('/', authMiddleware, (req, res) => {

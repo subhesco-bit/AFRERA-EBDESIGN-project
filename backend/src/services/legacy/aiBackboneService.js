@@ -14,6 +14,7 @@
 
 const { logger } = require('../../utils/logger');
 const fetch = require('node-fetch');
+const express = require('express');
 
 // ============================================================================
 // AI PROVIDER CONFIGURATIONS
@@ -21,35 +22,35 @@ const fetch = require('node-fetch');
 
 const AI_PROVIDERS = {
   claude: {
-    enabled: process.env.CLAUDE_ENABLED === 'true',
-    apiKey: process.env.CLAUDE_API_KEY,
+    enabled: process.env.CLAUDE_ENABLED === 'false' ? false : Boolean(process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY),
+    apiKey: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY,
     baseUrl: 'https://api.anthropic.com/v1',
     model: process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20241022',
     maxTokens: parseInt(process.env.CLAUDE_MAX_TOKENS) || 4096,
   },
   openai: {
-    enabled: process.env.OPENAI_ENABLED === 'true',
+    enabled: process.env.OPENAI_ENABLED === 'false' ? false : Boolean(process.env.OPENAI_API_KEY),
     apiKey: process.env.OPENAI_API_KEY,
     baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
     model: process.env.OPENAI_MODEL || 'gpt-4-turbo',
     maxTokens: parseInt(process.env.OPENAI_MAX_TOKENS) || 4096,
   },
   gemini: {
-    enabled: process.env.GEMINI_ENABLED === 'true',
-    apiKey: process.env.GEMINI_API_KEY,
+    enabled: process.env.GEMINI_ENABLED === 'false' ? false : Boolean(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY),
+    apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY,
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
     model: process.env.GEMINI_MODEL || 'gemini-pro',
     maxTokens: parseInt(process.env.GEMINI_MAX_TOKENS) || 4096,
   },
   azure: {
-    enabled: process.env.AZURE_OPENAI_ENABLED === 'true',
+    enabled: process.env.AZURE_OPENAI_ENABLED === 'false' ? false : Boolean(process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_ENDPOINT),
     apiKey: process.env.AZURE_OPENAI_API_KEY,
     endpoint: process.env.AZURE_OPENAI_ENDPOINT,
     deployment: process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4',
     apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-02-15-preview',
   },
   huggingface: {
-    enabled: process.env.HUGGINGFACE_ENABLED === 'true',
+    enabled: process.env.HUGGINGFACE_ENABLED === 'false' ? false : Boolean(process.env.HUGGINGFACE_API_KEY),
     apiKey: process.env.HUGGINGFACE_API_KEY,
     baseUrl: 'https://api-inference.huggingface.co',
     defaultModel: process.env.HUGGINGFACE_DEFAULT_MODEL || 'meta-llama/Llama-2-7b-chat-hf',
@@ -170,16 +171,13 @@ async function callOpenAI(prompt, options = {}) {
   if (!AI_PROVIDERS.openai.enabled || !AI_PROVIDERS.openai.apiKey) {
     throw new Error('OpenAI is not configured');
   }
-
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.openai.total++;
-
   const maxRetries = 3;
-  let retryCount = 0;
-
-  while (retryCount < maxRetries) {
+  let attempt = 0;
+  while (attempt < maxRetries) {
     try {
-      const response = await fetch(`${AI_PROVIDERS.openai.baseUrl}/chat/completions`, {
+      const response = await fetch(`${AI_PROVIDERS.openai.baseUrl}/responses`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -187,58 +185,39 @@ async function callOpenAI(prompt, options = {}) {
         },
         body: JSON.stringify({
           model: options.model || AI_PROVIDERS.openai.model,
-          messages: [
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          max_tokens: options.maxTokens || AI_PROVIDERS.openai.maxTokens,
-          temperature: options.temperature || 0.7,
-          ...options,
+          input: String(prompt),
+          max_output_tokens: Number(options.maxTokens || AI_PROVIDERS.openai.maxTokens),
         }),
       });
-
       if (!response.ok) {
-        const error = await response.text();
-        if (response.status === 429 && retryCount < maxRetries - 1) {
-          retryCount++;
-          const delay = Math.pow(2, retryCount) * 1000;
-          logger.warn(`OpenAI API rate limited, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          continue;
+        const body = await response.text();
+        if (response.status === 429 && /credit_balance_exhausted|insufficient_quota|quota.{0,30}exhaust/i.test(body)) {
+          const error = new Error('OpenAI API quota is exhausted');
+          error.nonRetryable = true;
+          throw error;
         }
-        throw new Error(`OpenAI API error: ${response.status} - ${error}`);
-      }
-
-      const data = await response.json();
-
-      aiRequestTracker.successfulRequests++;
-      aiRequestTracker.providerStats.openai.success++;
-
-      logger.info('OpenAI request successful', {
-        model: AI_PROVIDERS.openai.model,
-        tokens: data.usage?.total_tokens,
-      });
-
-      return {
-        provider: 'openai',
-        model: AI_PROVIDERS.openai.model,
-        content: data.choices[0].message.content,
-        usage: data.usage,
-        finishReason: data.choices[0].finish_reason,
-      };
-    } catch (error) {
-      aiRequestTracker.failedRequests++;
-      aiRequestTracker.providerStats.openai.failed++;
-      logger.error('OpenAI request failed', { error: error.message, retryCount });
-      if (retryCount >= maxRetries - 1) {
+        const error = new Error(`OpenAI API error: ${response.status} - ${body}`);
+        error.nonRetryable = response.status >= 400 && response.status < 500 && response.status !== 408 && response.status !== 429;
         throw error;
       }
-      retryCount++;
-      const delay = Math.pow(2, retryCount) * 1000;
-      logger.warn(`OpenAI API error, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      const data = await response.json();
+      aiRequestTracker.successfulRequests++;
+      aiRequestTracker.providerStats.openai.success++;
+      return {
+        provider: 'openai',
+        model: data.model || options.model || AI_PROVIDERS.openai.model,
+        content: data.output_text || data.output?.[0]?.content?.[0]?.text || '',
+        usage: data.usage || null,
+        finishReason: data.status || null,
+      };
+    } catch (error) {
+      attempt++;
+      if (error.nonRetryable || attempt >= maxRetries) {
+        aiRequestTracker.failedRequests++;
+        aiRequestTracker.providerStats.openai.failed++;
+        throw error;
+      }
+      await new Promise(resolve => setTimeout(resolve, 25 * attempt));
     }
   }
 }
@@ -560,50 +539,32 @@ async function callOllamaAI(prompt, options = {}) {
  * Unified AI call function with automatic provider selection
  */
 async function callAI(prompt, options = {}) {
-  const provider = options.provider || getPreferredProvider();
-
-  switch (provider) {
-    case 'claude':
-      return await callClaudeAI(prompt, options);
-    case 'openai':
-      return await callOpenAI(prompt, options);
-    case 'gemini':
-      return await callGeminiAI(prompt, options);
-    case 'azure':
-      return await callAzureOpenAI(prompt, options);
-    case 'huggingface':
-      return await callHuggingFace(prompt, options);
-    case 'ollama':
-      return await callOllamaAI(prompt, options);
-    default: {
-      // Try providers in order of preference
-      const providers = ['claude', 'openai', 'gemini', 'azure', 'huggingface', 'ollama'];
-      for (const p of providers) {
-        if (AI_PROVIDERS[p].enabled) {
-          try {
-            return await callAI(prompt, { ...options, provider: p });
-          } catch (error) {
-            logger.warn(`Provider ${p} failed, trying next`, { error: error.message });
-            continue;
-          }
-        }
-      }
-      throw new Error('No AI provider is available or configured');
-    }
-  }
+  const calls = {
+    claude: callClaudeAI,
+    openai: callOpenAI,
+    gemini: callGeminiAI,
+    azure: callAzureOpenAI,
+    huggingface: callHuggingFace,
+    ollama: callOllamaAI,
+  };
+  const requested = options.provider;
+  if (requested && !calls[requested]) throw new Error(`Unknown AI provider: ${requested}`);
+  const provider = requested || getPreferredProvider();
+  if (!provider) throw new Error('No AI provider is available or configured');
+  const cfg = AI_PROVIDERS[provider];
+  const configured = provider === 'ollama' ? Boolean(cfg.enabled) : Boolean(cfg.enabled && cfg.apiKey);
+  if (!configured) throw new Error(`${provider} is not configured`);
+  return calls[provider](prompt, options);
 }
 
-/**
- * Get preferred AI provider based on configuration
- */
 function getPreferredProvider() {
-  if (AI_PROVIDERS.claude.enabled) return 'claude';
-  if (AI_PROVIDERS.openai.enabled) return 'openai';
-  if (AI_PROVIDERS.gemini.enabled) return 'gemini';
-  if (AI_PROVIDERS.azure.enabled) return 'azure';
-  if (AI_PROVIDERS.huggingface.enabled) return 'huggingface';
-  if (AI_PROVIDERS.ollama.enabled) return 'ollama';
-  return 'claude'; // Default fallback
+  const order = ['claude', 'openai', 'gemini', 'azure', 'huggingface', 'ollama'];
+  for (const name of order) {
+    const cfg = AI_PROVIDERS[name];
+    const configured = name === 'ollama' ? Boolean(cfg.enabled) : Boolean(cfg.enabled && cfg.apiKey);
+    if (configured) return name;
+  }
+  return null;
 }
 
 // ============================================================================
@@ -1037,6 +998,28 @@ const aiAPI = {
   contractVersion: AI_CONTRACT_VERSION,
 };
 
+async function analyze(input = {}) {
+  const result = await generateRecommendation({ task: 'analysis', parameters: input });
+  return { ...result, source: result.status === 'ok' ? 'ai' : 'fallback' };
+}
+async function optimize(input = {}) {
+  const result = await generateRecommendation({ task: 'optimization', parameters: input });
+  return { ...result, source: result.status === 'ok' ? 'ai' : 'fallback' };
+}
+async function predict(input = {}) {
+  const result = await generateRecommendation({ task: 'prediction', parameters: input });
+  return { ...result, source: result.status === 'ok' ? 'ai' : 'fallback' };
+}
+async function recommend(input = {}) {
+  const result = await generateRecommendation({ task: 'recommendation', parameters: input });
+  return { ...result, source: result.status === 'ok' ? 'ai' : 'fallback' };
+}
+async function optimizeSheepProduction(input = {}) { return optimizeLivestock({ species: 'sheep', ...input }); }
+async function optimizePigProduction(input = {}) { return optimizeLivestock({ species: 'pig', ...input }); }
+
+const router = express.Router();
+router.get('/provider-status', (req, res) => res.json({ success: true, data: getAIProviderStatus() }));
+
 module.exports = {
   // AI Provider Functions
   callClaudeAI,
@@ -1072,5 +1055,12 @@ module.exports = {
   aiAPI,
   generateRecommendation,
   AI_CONTRACT_VERSION,
+  analyze,
+  optimize,
+  predict,
+  recommend,
+  optimizeSheepProduction,
+  optimizePigProduction,
+  router,
 };
 
