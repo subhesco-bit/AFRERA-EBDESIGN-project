@@ -15,7 +15,7 @@ id	title	objective
 013	GitHub History Discovery	Map branches commits PR-era variants and files absent from local canonical source.
 014	Backup and Archive Discovery	Find old backup archive recovery and pre-consolidation material without assuming obsolescence.
 015	Worktree Pine SUBH Recovery	Discover Claude worktrees pine/Grok SUBH-DEEP and merge-lab capability sources.
-016	Hidden and Free File Discovery	Find untracked hidden free-standing and misplaced authored files and classify them.
+016	Exhaustive File-by-File Review	Read and individually record every file across EBDESIGN, EBDESIGN-consolidated and NE including ignored, hidden, archive, backup, worktree, dependency and binary files; no disposition decision is allowed in this phase.
 017	Universal File Identity	Assign stable source identity path metadata role and provenance to every relevant artifact.
 018	Cryptographic Fingerprinting	SHA-256 fingerprint relevant files to prove exact duplicates and preservation.
 019	Exact Duplicate Families	Group byte-identical artifacts without deleting authoritative or provenance copies prematurely.

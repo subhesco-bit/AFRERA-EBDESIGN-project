@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "effectivePhase": "016",
+  "mode": "EXHAUSTIVE_FILE_BY_FILE_REVIEW",
+  "scopeRoots": [
+    "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN",
+    "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN-consolidated",
+    "C:\\Users\\DIYA GOEL\\Desktop\\ne"
+  ],
+  "mandatoryRules": [
+    "Every file must receive an individual review record before any disposition decision.",
+    "Git ignored, hidden, backup, archive, worktree, cache-looking, generated-looking, dependency, binary and database files are included.",
+    "Directory name, filename, extension, Git ignore status, age, duplicate appearance or location may guide review but may never decide disposition by itself.",
+    "Every file is read byte-for-byte for SHA-256 and size verification.",
+    "Text-like files receive streamed content inspection for structural and domain signals.",
+    "Binary files receive magic/signature inspection plus cryptographic hash and metadata; specialist parsers are used in later phases where format-specific interpretation is required.",
+    "All Phase 16 dispositions remain UNDECIDED. Later phases may classify only with content evidence and provenance.",
+    "No delete, move, prune, truncate, reset, clean, garbage-collect or overwrite-for-cleanup action is permitted before Phase 100.",
+    "If a prior phase used bounded or pruned discovery, that evidence is navigation-only and cannot support deletion."
+  ],
+  "decisionStates": ["UNDECIDED","REVIEWED_CONTENT","NEEDS_SPECIALIST_PARSE","POTENTIAL_DUPLICATE","PROTECTED_SOURCE","PROTECTED_EVIDENCE"],
+  "finalDispositionStatesAllowedOnlyAfterPhase100": ["KEEP_CANONICAL","KEEP_HISTORICAL","KEEP_EVIDENCE","SUPERSEDED_WITH_TRACEABILITY","REGENERABLE_AND_SAFE_TO_REMOVE"],
+  "artifactRule": "Review ledgers must be sharded below 20 MB; no generated file may exceed 25 MB."
+}

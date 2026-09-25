@@ -1,1405 +1,1952 @@
 {
-  "program": "AFRERA_EBDESIGN_PHASE_000_TO_100",
-  "version": 2,
-  "createdAt": "2026-09-25T09:55:08.8772124Z",
-  "updatedAt": "2026-09-25T11:17:21.817Z",
-  "currentPhase": "019",
-  "mode": "AUTO_SEQUENTIAL",
-  "cleanupLockedUntilPhase": "100",
-  "phases": {
-    "100": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "099"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "000": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [],
-      "evidence": [
-        ".audit/phase-program/phase-000-restart/baseline.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:55:33.317Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:55:33.502Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-000-restart/baseline.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:55:33.317Z",
-      "completedAt": "2026-09-25T09:55:33.498Z"
-    },
-    "001": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "000"
-      ],
-      "evidence": [
-        ".ai/autonomous-program/PROJECT_CONSTITUTION.md"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:56:05.563Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:56:05.737Z",
-          "event": "PASS",
-          "evidence": ".ai/autonomous-program/PROJECT_CONSTITUTION.md"
-        }
-      ],
-      "startedAt": "2026-09-25T09:56:05.562Z",
-      "completedAt": "2026-09-25T09:56:05.736Z"
-    },
-    "002": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "001"
-      ],
-      "evidence": [
-        ".ai/autonomous-program/SOURCE_BOUNDARIES.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:56:38.490Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:56:38.676Z",
-          "event": "PASS",
-          "evidence": ".ai/autonomous-program/SOURCE_BOUNDARIES.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:56:38.489Z",
-      "completedAt": "2026-09-25T09:56:38.675Z"
-    },
-    "003": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "002"
-      ],
-      "evidence": [
-        ".ai/autonomous-program/EVIDENCE_POLICY.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:56:57.347Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:56:57.521Z",
-          "event": "PASS",
-          "evidence": ".ai/autonomous-program/EVIDENCE_POLICY.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:56:57.346Z",
-      "completedAt": "2026-09-25T09:56:57.520Z"
-    },
-    "004": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "003"
-      ],
-      "evidence": [
-        ".ai/autonomous-program/STATE_MODEL.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:57:05.834Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:57:06.004Z",
-          "event": "PASS",
-          "evidence": ".ai/autonomous-program/STATE_MODEL.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:57:05.833Z",
-      "completedAt": "2026-09-25T09:57:06.003Z"
-    },
-    "005": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "004"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-005-controller-negative-tests.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:57:17.374Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:57:17.933Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-005-controller-negative-tests.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:57:17.372Z",
-      "completedAt": "2026-09-25T09:57:17.932Z"
-    },
-    "006": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "005"
-      ],
-      "evidence": [
-        ".ai/autonomous-program/RETRY_POLICY.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:57:27.249Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:57:27.435Z",
-          "event": "PASS",
-          "evidence": ".ai/autonomous-program/RETRY_POLICY.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:57:27.248Z",
-      "completedAt": "2026-09-25T09:57:27.434Z"
-    },
-    "007": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "006"
-      ],
-      "evidence": [
-        ".audit/phase-program/checkpoints/2026-09-25T09-57-36-272Z-phase-007/checkpoint.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:57:36.185Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:57:37.665Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/checkpoints/2026-09-25T09-57-36-272Z-phase-007/checkpoint.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:57:36.184Z",
-      "completedAt": "2026-09-25T09:57:37.664Z"
-    },
-    "008": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "007"
-      ],
-      "evidence": [
-        ".ai/autonomous-program/CLEANUP_POLICY.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:57:47.942Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:57:48.125Z",
-          "event": "PASS",
-          "evidence": ".ai/autonomous-program/CLEANUP_POLICY.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:57:47.941Z",
-      "completedAt": "2026-09-25T09:57:48.124Z"
-    },
-    "009": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "008"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-009-source-registry.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:58:27.065Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:58:27.242Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-009-source-registry.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:58:27.064Z",
-      "completedAt": "2026-09-25T09:58:27.241Z"
-    },
-    "010": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "009"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-010-ebdesign-inventory.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:58:38.230Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T09:59:09.652Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-010-ebdesign-inventory.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:58:38.229Z",
-      "completedAt": "2026-09-25T09:59:09.651Z"
-    },
-    "011": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "010"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-011-compare/summary.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T09:59:55.169Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T11:02:01.045Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-011-compare/summary.json"
-        }
-      ],
-      "startedAt": "2026-09-25T09:59:55.169Z",
-      "completedAt": "2026-09-25T11:02:01.044Z"
-    },
-    "012": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "011"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-012-ne-hash-families.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T11:02:17.161Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T11:02:36.311Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-012-ne-hash-families.json"
-        }
-      ],
-      "startedAt": "2026-09-25T11:02:17.160Z",
-      "completedAt": "2026-09-25T11:02:36.311Z"
-    },
-    "013": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "012"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-013-github-history.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T11:02:52.993Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T11:09:34.205Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-013-github-history.json"
-        }
-      ],
-      "startedAt": "2026-09-25T11:02:52.993Z",
-      "completedAt": "2026-09-25T11:09:34.204Z"
-    },
-    "014": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "013"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-014-backup-archive-discovery.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T11:09:52.674Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T11:09:56.864Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-014-backup-archive-discovery.json"
-        }
-      ],
-      "startedAt": "2026-09-25T11:09:52.673Z",
-      "completedAt": "2026-09-25T11:09:56.863Z"
-    },
-    "015": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "014"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-015-worktree-pine-subh-discovery.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T11:10:14.540Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T11:11:08.502Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-015-worktree-pine-subh-discovery.json"
-        }
-      ],
-      "startedAt": "2026-09-25T11:10:14.539Z",
-      "completedAt": "2026-09-25T11:11:08.501Z"
-    },
-    "016": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "015"
-      ],
-      "evidence": [
-        ".audit/phase-program/phase-016-hidden-free-files.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T11:11:28.432Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T11:11:59.808Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/phase-016-hidden-free-files.json"
-        }
-      ],
-      "startedAt": "2026-09-25T11:11:28.431Z",
-      "completedAt": "2026-09-25T11:11:59.807Z"
-    },
-    "017": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "016"
-      ],
-      "evidence": [
-        ".audit/phase-program/identity-registry/manifest.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T11:13:32.480Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T11:14:17.528Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/identity-registry/manifest.json"
-        }
-      ],
-      "startedAt": "2026-09-25T11:13:32.479Z",
-      "completedAt": "2026-09-25T11:14:17.527Z"
-    },
-    "018": {
-      "status": "PASSED",
-      "attempts": 1,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "017"
-      ],
-      "evidence": [
-        ".audit/phase-program/content-hashes/manifest.json"
-      ],
-      "blockers": [],
-      "history": [
-        {
-          "at": "2026-09-25T11:14:58.340Z",
-          "event": "START",
-          "attempt": 1
-        },
-        {
-          "at": "2026-09-25T11:17:21.816Z",
-          "event": "PASS",
-          "evidence": ".audit/phase-program/content-hashes/manifest.json"
-        }
-      ],
-      "startedAt": "2026-09-25T11:14:58.338Z",
-      "completedAt": "2026-09-25T11:17:21.816Z"
-    },
-    "019": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "018"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "020": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "019"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "021": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "020"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "022": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "021"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "023": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "022"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "024": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "023"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "025": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "024"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "026": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "025"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "027": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "026"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "028": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "027"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "029": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "028"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "030": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "029"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "031": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "030"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "032": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "031"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "033": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "032"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "034": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "033"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "035": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "034"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "036": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "035"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "037": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "036"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "038": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "037"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "039": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "038"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "040": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "039"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "041": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "040"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "042": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "041"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "043": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "042"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "044": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "043"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "045": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "044"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "046": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "045"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "047": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "046"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "048": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "047"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "049": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "048"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "050": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "049"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "051": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "050"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "052": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "051"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "053": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "052"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "054": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "053"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "055": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "054"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "056": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "055"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "057": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "056"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "058": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "057"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "059": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "058"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "060": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "059"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "061": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "060"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "062": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "061"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "063": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "062"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "064": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "063"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "065": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "064"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "066": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "065"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "067": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "066"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "068": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "067"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "069": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "068"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "070": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "069"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "071": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "070"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "072": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "071"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "073": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "072"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "074": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "073"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "075": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "074"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "076": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "075"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "077": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "076"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "078": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "077"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "079": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "078"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "080": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "079"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "081": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "080"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "082": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "081"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "083": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "082"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "084": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "083"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "085": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "084"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "086": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "085"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "087": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "086"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "088": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "087"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "089": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "088"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "090": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "089"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "091": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "090"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "092": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "091"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "093": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "092"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "094": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "093"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "095": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "094"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "096": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "095"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "097": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "096"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "098": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "097"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    },
-    "099": {
-      "status": "PENDING",
-      "attempts": 0,
-      "maxAttempts": 3,
-      "dependsOn": [
-        "098"
-      ],
-      "evidence": [],
-      "blockers": [],
-      "history": []
-    }
-  }
+    "program":  "AFRERA_EBDESIGN_PHASE_000_TO_100",
+    "version":  2,
+    "createdAt":  "2026-09-25T09:55:08.8772124Z",
+    "updatedAt":  "2026-09-25T11:44:14.7991187Z",
+    "currentPhase":  "017",
+    "mode":  "AUTO_SEQUENTIAL_EXHAUSTIVE_FILE_REVIEW",
+    "cleanupLockedUntilPhase":  "100",
+    "phases":  {
+                   "100":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "099"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "000":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-000-restart/baseline.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:55:33.317Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:55:33.502Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-000-restart/baseline.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:55:33.317Z",
+                               "completedAt":  "2026-09-25T09:55:33.498Z"
+                           },
+                   "001":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "000"
+                                             ],
+                               "evidence":  [
+                                                ".ai/autonomous-program/PROJECT_CONSTITUTION.md"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:56:05.563Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:56:05.737Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".ai/autonomous-program/PROJECT_CONSTITUTION.md"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:56:05.562Z",
+                               "completedAt":  "2026-09-25T09:56:05.736Z"
+                           },
+                   "002":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "001"
+                                             ],
+                               "evidence":  [
+                                                ".ai/autonomous-program/SOURCE_BOUNDARIES.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:56:38.490Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:56:38.676Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".ai/autonomous-program/SOURCE_BOUNDARIES.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:56:38.489Z",
+                               "completedAt":  "2026-09-25T09:56:38.675Z"
+                           },
+                   "003":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "002"
+                                             ],
+                               "evidence":  [
+                                                ".ai/autonomous-program/EVIDENCE_POLICY.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:56:57.347Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:56:57.521Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".ai/autonomous-program/EVIDENCE_POLICY.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:56:57.346Z",
+                               "completedAt":  "2026-09-25T09:56:57.520Z"
+                           },
+                   "004":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "003"
+                                             ],
+                               "evidence":  [
+                                                ".ai/autonomous-program/STATE_MODEL.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:57:05.834Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:57:06.004Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".ai/autonomous-program/STATE_MODEL.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:57:05.833Z",
+                               "completedAt":  "2026-09-25T09:57:06.003Z"
+                           },
+                   "005":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "004"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-005-controller-negative-tests.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:57:17.374Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:57:17.933Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-005-controller-negative-tests.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:57:17.372Z",
+                               "completedAt":  "2026-09-25T09:57:17.932Z"
+                           },
+                   "006":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "005"
+                                             ],
+                               "evidence":  [
+                                                ".ai/autonomous-program/RETRY_POLICY.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:57:27.249Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:57:27.435Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".ai/autonomous-program/RETRY_POLICY.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:57:27.248Z",
+                               "completedAt":  "2026-09-25T09:57:27.434Z"
+                           },
+                   "007":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "006"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/checkpoints/2026-09-25T09-57-36-272Z-phase-007/checkpoint.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:57:36.185Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:57:37.665Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/checkpoints/2026-09-25T09-57-36-272Z-phase-007/checkpoint.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:57:36.184Z",
+                               "completedAt":  "2026-09-25T09:57:37.664Z"
+                           },
+                   "008":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "007"
+                                             ],
+                               "evidence":  [
+                                                ".ai/autonomous-program/CLEANUP_POLICY.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:57:47.942Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:57:48.125Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".ai/autonomous-program/CLEANUP_POLICY.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:57:47.941Z",
+                               "completedAt":  "2026-09-25T09:57:48.124Z"
+                           },
+                   "009":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "008"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-009-source-registry.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:58:27.065Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:58:27.242Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-009-source-registry.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:58:27.064Z",
+                               "completedAt":  "2026-09-25T09:58:27.241Z"
+                           },
+                   "010":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "009"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-010-ebdesign-inventory.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:58:38.230Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T09:59:09.652Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-010-ebdesign-inventory.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:58:38.229Z",
+                               "completedAt":  "2026-09-25T09:59:09.651Z"
+                           },
+                   "011":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "010"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-011-compare/summary.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T09:59:55.169Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T11:02:01.045Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-011-compare/summary.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T09:59:55.169Z",
+                               "completedAt":  "2026-09-25T11:02:01.044Z"
+                           },
+                   "012":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "011"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-012-ne-hash-families.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T11:02:17.161Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T11:02:36.311Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-012-ne-hash-families.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T11:02:17.160Z",
+                               "completedAt":  "2026-09-25T11:02:36.311Z"
+                           },
+                   "013":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "012"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-013-github-history.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T11:02:52.993Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T11:09:34.205Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-013-github-history.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T11:02:52.993Z",
+                               "completedAt":  "2026-09-25T11:09:34.204Z"
+                           },
+                   "014":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "013"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-014-backup-archive-discovery.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T11:09:52.674Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T11:09:56.864Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-014-backup-archive-discovery.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T11:09:52.673Z",
+                               "completedAt":  "2026-09-25T11:09:56.863Z"
+                           },
+                   "015":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "014"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/phase-015-worktree-pine-subh-discovery.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "at":  "2026-09-25T11:10:14.540Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T11:11:08.502Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/phase-015-worktree-pine-subh-discovery.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T11:10:14.539Z",
+                               "completedAt":  "2026-09-25T11:11:08.501Z"
+                           },
+                   "016":  {
+                               "status":  "PASSED",
+                               "attempts":  1,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "015"
+                                             ],
+                               "evidence":  [
+                                                ".audit/phase-program/exhaustive-file-review/manifest.json"
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1120799Z"
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T11:34:34.583Z",
+                                                   "event":  "START",
+                                                   "attempt":  1
+                                               },
+                                               {
+                                                   "at":  "2026-09-25T11:43:54.533Z",
+                                                   "event":  "PASS",
+                                                   "evidence":  ".audit/phase-program/exhaustive-file-review/manifest.json"
+                                               }
+                                           ],
+                               "startedAt":  "2026-09-25T11:34:34.570Z",
+                               "completedAt":  "2026-09-25T11:43:54.532Z"
+                           },
+                   "017":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "016"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1305642Z"
+                                               }
+                                           ]
+                           },
+                   "018":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "017"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1394762Z"
+                                               }
+                                           ]
+                           },
+                   "019":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "018"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1485334Z"
+                                               }
+                                           ]
+                           },
+                   "020":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "019"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1525375Z"
+                                               }
+                                           ]
+                           },
+                   "021":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "020"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1525375Z"
+                                               }
+                                           ]
+                           },
+                   "022":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "021"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1678062Z"
+                                               }
+                                           ]
+                           },
+                   "023":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "022"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1836534Z"
+                                               }
+                                           ]
+                           },
+                   "024":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "023"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+                                               {
+                                                   "reason":  "All files, including ignored/hidden/archive/worktree/cache-looking/generated-looking, must be individually checked before disposition.",
+                                                   "event":  "REOPENED_FOR_EXHAUSTIVE_FILE_REVIEW",
+                                                   "at":  "2026-09-25T11:31:50.1911265Z"
+                                               }
+                                           ]
+                           },
+                   "025":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "024"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "026":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "025"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "027":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "026"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "028":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "027"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "029":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "028"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "030":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "029"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "031":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "030"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "032":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "031"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "033":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "032"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "034":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "033"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "035":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "034"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "036":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "035"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "037":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "036"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "038":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "037"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "039":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "038"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "040":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "039"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "041":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "040"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "042":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "041"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "043":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "042"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "044":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "043"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "045":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "044"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "046":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "045"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "047":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "046"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "048":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "047"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "049":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "048"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "050":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "049"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "051":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "050"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "052":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "051"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "053":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "052"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "054":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "053"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "055":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "054"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "056":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "055"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "057":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "056"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "058":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "057"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "059":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "058"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "060":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "059"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "061":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "060"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "062":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "061"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "063":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "062"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "064":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "063"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "065":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "064"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "066":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "065"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "067":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "066"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "068":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "067"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "069":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "068"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "070":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "069"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "071":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "070"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "072":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "071"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "073":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "072"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "074":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "073"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "075":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "074"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "076":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "075"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "077":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "076"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "078":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "077"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "079":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "078"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "080":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "079"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "081":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "080"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "082":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "081"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "083":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "082"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "084":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "083"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "085":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "084"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "086":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "085"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "087":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "086"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "088":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "087"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "089":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "088"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "090":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "089"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "091":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "090"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "092":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "091"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "093":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "092"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "094":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "093"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "095":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "094"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "096":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "095"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "097":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "096"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "098":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "097"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           },
+                   "099":  {
+                               "status":  "PENDING",
+                               "attempts":  0,
+                               "maxAttempts":  3,
+                               "dependsOn":  [
+                                                 "098"
+                                             ],
+                               "evidence":  [
+
+                                            ],
+                               "blockers":  [
+
+                                            ],
+                               "history":  [
+
+                                           ]
+                           }
+               }
 }
