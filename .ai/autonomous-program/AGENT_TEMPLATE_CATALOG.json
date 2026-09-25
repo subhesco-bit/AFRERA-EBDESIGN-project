@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "templateCount": 26,
-  "promptCount": 26,
+  "templateCount": 44,
+  "promptCount": 44,
   "toolCount": 6,
   "byStream": {
     "research": 1,
@@ -21,21 +21,39 @@
     "veterinary": 1,
     "medical": 9,
     "compliance": 1,
-    "funding": 1
+    "funding": 1,
+    "identity-governance": 1,
+    "hcm": 1,
+    "inventory-wms": 1,
+    "scm": 1,
+    "manufacturing": 1,
+    "quality-ehs": 1,
+    "asset-eam": 1,
+    "retail": 1,
+    "logistics": 1,
+    "project-epc": 1,
+    "ai-intelligence": 1,
+    "mobile-edge": 1,
+    "iot-telemetry": 1,
+    "processing": 1,
+    "document-dms": 1,
+    "plm-engineering": 1,
+    "payments-credit": 1,
+    "traceability-gi": 1
   },
   "byRisk": {
     "standard": 2,
-    "elevated": 7,
-    "high": 17
+    "elevated": 16,
+    "high": 26
   },
   "byPattern": {
-    "evaluator_optimizer": 7,
+    "evaluator_optimizer": 11,
     "augmented_llm": 3,
-    "tool_loop": 3,
+    "tool_loop": 10,
     "routing": 1,
     "parallel_specialists": 1,
-    "human_approval_workflow": 6,
-    "supervisor_handoff": 2,
+    "human_approval_workflow": 11,
+    "supervisor_handoff": 4,
     "prompt_chain": 3
   },
   "medicalTemplateIds": [
@@ -1780,6 +1798,1217 @@
         "status": "active",
         "instructionsSha256": "8ad7f03871e09f572e3b353c2dfeee7260ceec8fa036921127d6c5c42ccbb3a2"
       }
+    },
+    {
+      "id": "IDENTITY_GOVERNANCE_AGENT",
+      "version": "1.0.0",
+      "name": "Identity & Access Governance Agent",
+      "stream": "identity-governance",
+      "domain": "IDENTITY_GOVERNANCE",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "identity.governance",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "iam",
+        "rbac",
+        "sod",
+        "privileged-access"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "identity.governance",
+        "version": "1.0.0",
+        "name": "identity.governance",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "43383d39d39e7178833fe41526d3b1742302d4897192d74836608fd7058e1490"
+      }
+    },
+    {
+      "id": "HCM_WORKFORCE_AGENT",
+      "version": "1.0.0",
+      "name": "HCM & Workforce Agent",
+      "stream": "hcm",
+      "domain": "HCM",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "hcm.workforce",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "hr",
+        "payroll",
+        "workforce",
+        "skills"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "hcm.workforce",
+        "version": "1.0.0",
+        "name": "hcm.workforce",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "200ae5e07f27d95ba6eef0ea394e4d47919fa01a9fe5242b33d28c0196081605"
+      }
+    },
+    {
+      "id": "INVENTORY_WMS_AGENT",
+      "version": "1.0.0",
+      "name": "Inventory & WMS Agent",
+      "stream": "inventory-wms",
+      "domain": "INVENTORY_WMS",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "elevated",
+      "promptId": "inventory.wms",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "inventory",
+        "warehouse",
+        "wms",
+        "traceability"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "inventory.wms",
+        "version": "1.0.0",
+        "name": "inventory.wms",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "7840ece8fbceb4a1732088dd66d5cde44d65cb5545ab01913097df3cfcab9fc6"
+      }
+    },
+    {
+      "id": "SCM_CONTROL_TOWER_AGENT",
+      "version": "1.0.0",
+      "name": "SCM Control-Tower Agent",
+      "stream": "scm",
+      "domain": "SCM",
+      "description": "",
+      "pattern": "supervisor_handoff",
+      "riskClass": "elevated",
+      "promptId": "scm.controltower",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 12,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "scm",
+        "sop",
+        "mrp",
+        "distribution",
+        "planning"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "scm.controltower",
+        "version": "1.0.0",
+        "name": "scm.controltower",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "9e2ca886b7723828baf7105e8fa7b1588bcd342ef1732b2e33cb52f679a14e38"
+      }
+    },
+    {
+      "id": "MANUFACTURING_PRODUCTION_AGENT",
+      "version": "1.0.0",
+      "name": "Manufacturing & Production Agent",
+      "stream": "manufacturing",
+      "domain": "MANUFACTURING",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "elevated",
+      "promptId": "manufacturing.production",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "manufacturing",
+        "bom",
+        "routing",
+        "oee",
+        "shop-floor"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "manufacturing.production",
+        "version": "1.0.0",
+        "name": "manufacturing.production",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "987b14d6fa921f4f71a1d886028c24d45656da2c6d06ce6534b38c3667f789b0"
+      }
+    },
+    {
+      "id": "QUALITY_EHS_AGENT",
+      "version": "1.0.0",
+      "name": "Quality & EHS Agent",
+      "stream": "quality-ehs",
+      "domain": "QUALITY_EHS",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "quality.ehs",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "quality",
+        "ehs",
+        "capa",
+        "ncr",
+        "safety"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "quality.ehs",
+        "version": "1.0.0",
+        "name": "quality.ehs",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "c80792091e65598cc686a86e761811624fd4ff35eb73e1e035d77d00ea48793c"
+      }
+    },
+    {
+      "id": "ASSET_EAM_AGENT",
+      "version": "1.0.0",
+      "name": "Enterprise Asset & Maintenance Agent",
+      "stream": "asset-eam",
+      "domain": "ASSET_EAM",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "elevated",
+      "promptId": "asset.eam",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "eam",
+        "maintenance",
+        "reliability",
+        "calibration"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "asset.eam",
+        "version": "1.0.0",
+        "name": "asset.eam",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "da18134d6d82b95dd355a371b43ee890000a536c1864409ac09faf115a8a1cd0"
+      }
+    },
+    {
+      "id": "RETAIL_STORE_AGENT",
+      "version": "1.0.0",
+      "name": "Retail & Store Operations Agent",
+      "stream": "retail",
+      "domain": "RETAIL",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "elevated",
+      "promptId": "retail.store",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "retail",
+        "pos",
+        "assortment",
+        "promotion",
+        "loyalty"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "retail.store",
+        "version": "1.0.0",
+        "name": "retail.store",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "58e207cdf2b62aa0e263d353ea5f01d2ae2431fed562e48f7e43086de3eabdaa"
+      }
+    },
+    {
+      "id": "LOGISTICS_TMS_AGENT",
+      "version": "1.0.0",
+      "name": "Logistics & TMS Agent",
+      "stream": "logistics",
+      "domain": "LOGISTICS",
+      "description": "",
+      "pattern": "supervisor_handoff",
+      "riskClass": "elevated",
+      "promptId": "logistics.tms",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 12,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "logistics",
+        "tms",
+        "fleet",
+        "route",
+        "pod"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "logistics.tms",
+        "version": "1.0.0",
+        "name": "logistics.tms",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "8cd321c0fa204cbc884ab63de82afd0ff393552040dafd451d386c30573ae4bb"
+      }
+    },
+    {
+      "id": "PROJECT_EPC_AGENT",
+      "version": "1.0.0",
+      "name": "Project & EPC Controls Agent",
+      "stream": "project-epc",
+      "domain": "PROJECT_EPC",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "project.epc",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "project",
+        "epc",
+        "wbs",
+        "boq",
+        "rfi"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "project.epc",
+        "version": "1.0.0",
+        "name": "project.epc",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "fbb193677f60f93c36ddd231484b1434857cbe176ceea9fd59283a265b7aa510"
+      }
+    },
+    {
+      "id": "AI_GOVERNANCE_AGENT",
+      "version": "1.0.0",
+      "name": "AI Governance & ModelOps Agent",
+      "stream": "ai-intelligence",
+      "domain": "AI_INTELLIGENCE",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "high",
+      "promptId": "ai.governance",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "ai-governance",
+        "modelops",
+        "evaluation",
+        "guardrails"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "ai.governance",
+        "version": "1.0.0",
+        "name": "ai.governance",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "3ad9444324e35f639d98d32d2b74fdcde7930b6e013124fcf471eee3cc5d2a6f"
+      }
+    },
+    {
+      "id": "MOBILE_EDGE_AGENT",
+      "version": "1.0.0",
+      "name": "Mobile, APK, PWA & Edge Agent",
+      "stream": "mobile-edge",
+      "domain": "MOBILE_EDGE",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "elevated",
+      "promptId": "mobile.edge",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "mobile",
+        "apk",
+        "pwa",
+        "desktop",
+        "offline"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "mobile.edge",
+        "version": "1.0.0",
+        "name": "mobile.edge",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "05e159f3dbd9347d537aba41567818f627d4e19d74f96596bae270078c3b603b"
+      }
+    },
+    {
+      "id": "IOT_TELEMETRY_AGENT",
+      "version": "1.0.0",
+      "name": "IoT & Telemetry Agent",
+      "stream": "iot-telemetry",
+      "domain": "IOT_TELEMETRY",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "high",
+      "promptId": "iot.telemetry",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "iot",
+        "telemetry",
+        "gps",
+        "sensor",
+        "tracking"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "iot.telemetry",
+        "version": "1.0.0",
+        "name": "iot.telemetry",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "d4298f9e807c1b0ea39c709d752436c427a8ac07ba2ec973a7337c33ee6ff097"
+      }
+    },
+    {
+      "id": "PROCESSING_VALUE_ADD_AGENT",
+      "version": "1.0.0",
+      "name": "Processing, Value-Add & Packaging Agent",
+      "stream": "processing",
+      "domain": "PROCESSING",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "high",
+      "promptId": "processing.valueadd",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "processing",
+        "packaging",
+        "yield",
+        "shelf-life"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "processing.valueadd",
+        "version": "1.0.0",
+        "name": "processing.valueadd",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "d7f43b770bed5b4386e69f55b503d917cc871398d387b3c927fc25a348992419"
+      }
+    },
+    {
+      "id": "DOCUMENT_DMS_AGENT",
+      "version": "1.0.0",
+      "name": "Document, OCR & Records Agent",
+      "stream": "document-dms",
+      "domain": "DOCUMENT_DMS",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "elevated",
+      "promptId": "document.dms",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "dms",
+        "ocr",
+        "records",
+        "version-control"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "document.dms",
+        "version": "1.0.0",
+        "name": "document.dms",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "a232946ed8c138ba88016a1af1fffa9574fa37660e88c16a9d7cac52b78aa9b0"
+      }
+    },
+    {
+      "id": "PLM_ENGINEERING_AGENT",
+      "version": "1.0.0",
+      "name": "PLM & Engineering Digital-Thread Agent",
+      "stream": "plm-engineering",
+      "domain": "PLM_ENGINEERING",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "high",
+      "promptId": "plm.engineering",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "plm",
+        "cad",
+        "bim",
+        "engineering",
+        "digital-thread"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "plm.engineering",
+        "version": "1.0.0",
+        "name": "plm.engineering",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "676026b3a524d086f601f3e544820963a6a4fa383850b727d88ef04681a09163"
+      }
+    },
+    {
+      "id": "PAYMENTS_CREDIT_AGENT",
+      "version": "1.0.0",
+      "name": "Payments, Credit & Settlement Agent",
+      "stream": "payments-credit",
+      "domain": "PAYMENTS_CREDIT",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "payments.credit",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "payments",
+        "credit",
+        "banking",
+        "settlement",
+        "escrow"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "payments.credit",
+        "version": "1.0.0",
+        "name": "payments.credit",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "72fe66efb53169248ba4b9288be0ce204b2822286af98e1036cbd54a6bb8302d"
+      }
+    },
+    {
+      "id": "TRACEABILITY_GI_AGENT",
+      "version": "1.0.0",
+      "name": "Traceability, GI & Provenance Agent",
+      "stream": "traceability-gi",
+      "domain": "TRACEABILITY_GI",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "elevated",
+      "promptId": "traceability.gi",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "ne_product_search"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "enterprise-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "traceability",
+        "gi",
+        "provenance",
+        "trust"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "traceability.gi",
+        "version": "1.0.0",
+        "name": "traceability.gi",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "5388eff1315357b7da985da2b00aa13c28d851862b9db7574130dc7f809cc98a"
+      }
     }
   ],
   "prompts": [
@@ -2126,6 +3355,240 @@
       "sourcePatterns": [],
       "status": "active",
       "instructionsSha256": "8ad7f03871e09f572e3b353c2dfeee7260ceec8fa036921127d6c5c42ccbb3a2"
+    },
+    {
+      "id": "identity.governance",
+      "version": "1.0.0",
+      "name": "identity.governance",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "43383d39d39e7178833fe41526d3b1742302d4897192d74836608fd7058e1490"
+    },
+    {
+      "id": "hcm.workforce",
+      "version": "1.0.0",
+      "name": "hcm.workforce",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "200ae5e07f27d95ba6eef0ea394e4d47919fa01a9fe5242b33d28c0196081605"
+    },
+    {
+      "id": "inventory.wms",
+      "version": "1.0.0",
+      "name": "inventory.wms",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "7840ece8fbceb4a1732088dd66d5cde44d65cb5545ab01913097df3cfcab9fc6"
+    },
+    {
+      "id": "scm.controltower",
+      "version": "1.0.0",
+      "name": "scm.controltower",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "9e2ca886b7723828baf7105e8fa7b1588bcd342ef1732b2e33cb52f679a14e38"
+    },
+    {
+      "id": "manufacturing.production",
+      "version": "1.0.0",
+      "name": "manufacturing.production",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "987b14d6fa921f4f71a1d886028c24d45656da2c6d06ce6534b38c3667f789b0"
+    },
+    {
+      "id": "quality.ehs",
+      "version": "1.0.0",
+      "name": "quality.ehs",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "c80792091e65598cc686a86e761811624fd4ff35eb73e1e035d77d00ea48793c"
+    },
+    {
+      "id": "asset.eam",
+      "version": "1.0.0",
+      "name": "asset.eam",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "da18134d6d82b95dd355a371b43ee890000a536c1864409ac09faf115a8a1cd0"
+    },
+    {
+      "id": "retail.store",
+      "version": "1.0.0",
+      "name": "retail.store",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "58e207cdf2b62aa0e263d353ea5f01d2ae2431fed562e48f7e43086de3eabdaa"
+    },
+    {
+      "id": "logistics.tms",
+      "version": "1.0.0",
+      "name": "logistics.tms",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "8cd321c0fa204cbc884ab63de82afd0ff393552040dafd451d386c30573ae4bb"
+    },
+    {
+      "id": "project.epc",
+      "version": "1.0.0",
+      "name": "project.epc",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "fbb193677f60f93c36ddd231484b1434857cbe176ceea9fd59283a265b7aa510"
+    },
+    {
+      "id": "ai.governance",
+      "version": "1.0.0",
+      "name": "ai.governance",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "3ad9444324e35f639d98d32d2b74fdcde7930b6e013124fcf471eee3cc5d2a6f"
+    },
+    {
+      "id": "mobile.edge",
+      "version": "1.0.0",
+      "name": "mobile.edge",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "05e159f3dbd9347d537aba41567818f627d4e19d74f96596bae270078c3b603b"
+    },
+    {
+      "id": "iot.telemetry",
+      "version": "1.0.0",
+      "name": "iot.telemetry",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "d4298f9e807c1b0ea39c709d752436c427a8ac07ba2ec973a7337c33ee6ff097"
+    },
+    {
+      "id": "processing.valueadd",
+      "version": "1.0.0",
+      "name": "processing.valueadd",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "d7f43b770bed5b4386e69f55b503d917cc871398d387b3c927fc25a348992419"
+    },
+    {
+      "id": "document.dms",
+      "version": "1.0.0",
+      "name": "document.dms",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "a232946ed8c138ba88016a1af1fffa9574fa37660e88c16a9d7cac52b78aa9b0"
+    },
+    {
+      "id": "plm.engineering",
+      "version": "1.0.0",
+      "name": "plm.engineering",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "676026b3a524d086f601f3e544820963a6a4fa383850b727d88ef04681a09163"
+    },
+    {
+      "id": "payments.credit",
+      "version": "1.0.0",
+      "name": "payments.credit",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "72fe66efb53169248ba4b9288be0ce204b2822286af98e1036cbd54a6bb8302d"
+    },
+    {
+      "id": "traceability.gi",
+      "version": "1.0.0",
+      "name": "traceability.gi",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "5388eff1315357b7da985da2b00aa13c28d851862b9db7574130dc7f809cc98a"
     }
   ],
   "tools": [

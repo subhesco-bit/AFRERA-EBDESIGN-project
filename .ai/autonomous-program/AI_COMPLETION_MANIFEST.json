@@ -1,0 +1,883 @@
+{
+  "architecture": "isolated-hybrid-enterprise-ai",
+  "codeComplete": true,
+  "runtimeFullyOperational": false,
+  "codeBlockers": [],
+  "configurationBlockers": [
+    "external_agent_runtime_not_configured",
+    "external_provider_pricing_not_configured",
+    "some_domain_capabilities_require_unconfigured_external_runtime"
+  ],
+  "domains": {
+    "canonicalDomains": 36,
+    "coveredDomains": 36,
+    "agenticTemplateCoveredDomains": 36,
+    "embeddedContractCoveredDomains": 36,
+    "embeddedDirectRuleCoveredDomains": 23,
+    "declaredEngineCoveredDomains": 36,
+    "currentlyExecutableEngineCoveredDomains": 13,
+    "missingDomains": [],
+    "agenticMissingDomains": [],
+    "embeddedDirectRuleGaps": [
+      "COMMERCE",
+      "PROJECT_EPC",
+      "BI_ANALYTICS",
+      "AI_INTELLIGENCE",
+      "MOBILE_EDGE",
+      "IOT_TELEMETRY",
+      "FARMER_FPO",
+      "LIVESTOCK_VET",
+      "FOOD_NUTRITION",
+      "SUSTAINABILITY",
+      "RESEARCH",
+      "SCHEMES_SUBSIDY",
+      "TRACEABILITY_GI"
+    ],
+    "declaredEngineCoverageGaps": [],
+    "currentRuntimeEngineGaps": [
+      "FOUNDATION",
+      "IDENTITY_GOVERNANCE",
+      "FINANCE",
+      "HCM",
+      "PROCUREMENT",
+      "COMMERCE",
+      "CRM_SERVICE",
+      "PROJECT_EPC",
+      "BI_ANALYTICS",
+      "AI_INTELLIGENCE",
+      "MOBILE_EDGE",
+      "AGRI_PRODUCTION",
+      "FARMER_FPO",
+      "LIVESTOCK_VET",
+      "FOOD_NUTRITION",
+      "PROCESSING",
+      "SUSTAINABILITY",
+      "RESEARCH",
+      "REGULATORY",
+      "PLM_ENGINEERING",
+      "PAYMENTS_CREDIT",
+      "SCHEMES_SUBSIDY",
+      "SECURITY_RESILIENCE"
+    ]
+  },
+  "agents": {
+    "templates": 44,
+    "streams": 36,
+    "prompts": 44,
+    "tools": 6,
+    "missingToolReferences": [],
+    "medicalTemplates": 9
+  },
+  "engines": {
+    "registered": 29,
+    "locallyOrCurrentlyExecutable": 20,
+    "capabilityCoverage": {
+      "abstention_metrics": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "evaluation"
+        ]
+      },
+      "analysis": {
+        "declared": 6,
+        "available": 0,
+        "engineKeys": [
+          "llm_claude",
+          "llm_openai",
+          "llm_gemini",
+          "llm_deepseek",
+          "llm_grok",
+          "agent_runtime_gateway"
+        ]
+      },
+      "analytics": {
+        "declared": 2,
+        "available": 2,
+        "engineKeys": [
+          "decision_mcda",
+          "forecasting"
+        ]
+      },
+      "anomaly_detection": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "statistical_anomaly"
+        ]
+      },
+      "calibration": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "evaluation"
+        ]
+      },
+      "capability_dispatch": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "module_dispatch"
+        ]
+      },
+      "case_retrieval": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "enterprise_memory"
+        ]
+      },
+      "category_mapping": {
+        "declared": 1,
+        "available": 0,
+        "engineKeys": [
+          "classification"
+        ]
+      },
+      "classification": {
+        "declared": 7,
+        "available": 1,
+        "engineKeys": [
+          "llm_claude",
+          "llm_openai",
+          "llm_gemini",
+          "llm_deepseek",
+          "llm_grok",
+          "rule_engine",
+          "agent_runtime_gateway"
+        ]
+      },
+      "classification_metrics": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "evaluation"
+        ]
+      },
+      "decision_support": {
+        "declared": 3,
+        "available": 3,
+        "engineKeys": [
+          "business_logic",
+          "decision_mcda",
+          "transparent_risk"
+        ]
+      },
+      "deterministic_calculation": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "deterministic_algorithms"
+        ]
+      },
+      "deterministic_rules": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "business_logic"
+        ]
+      },
+      "distance": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "geospatial"
+        ]
+      },
+      "document_processing": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "vision_ocr"
+        ]
+      },
+      "evaluation": {
+        "declared": 2,
+        "available": 1,
+        "engineKeys": [
+          "evaluation",
+          "agent_runtime_gateway"
+        ]
+      },
+      "event_reasoning": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "rule_engine"
+        ]
+      },
+      "financial_math": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "deterministic_algorithms"
+        ]
+      },
+      "forecasting": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "forecasting"
+        ]
+      },
+      "formula": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "deterministic_algorithms"
+        ]
+      },
+      "fraud_detection": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "business_logic"
+        ]
+      },
+      "geofence": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "geospatial"
+        ]
+      },
+      "geospatial": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "geospatial"
+        ]
+      },
+      "graph_retrieval": {
+        "declared": 2,
+        "available": 2,
+        "engineKeys": [
+          "knowledge_graph",
+          "hybrid_retrieval"
+        ]
+      },
+      "human_approval": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "workflow_proposal"
+        ]
+      },
+      "image_analysis": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "vision_quality"
+        ]
+      },
+      "lexical_retrieval": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "hybrid_retrieval"
+        ]
+      },
+      "mcda": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "optimization"
+        ]
+      },
+      "memory": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "enterprise_memory"
+        ]
+      },
+      "metadata": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "vision_quality"
+        ]
+      },
+      "metadata_filtering": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "hybrid_retrieval"
+        ]
+      },
+      "model_governance": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "model_registry"
+        ]
+      },
+      "model_registry": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "model_registry"
+        ]
+      },
+      "module_discovery": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "module_dispatch"
+        ]
+      },
+      "ocr": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "vision_ocr"
+        ]
+      },
+      "optimization": {
+        "declared": 2,
+        "available": 2,
+        "engineKeys": [
+          "decision_mcda",
+          "optimization"
+        ]
+      },
+      "outcome_context": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "enterprise_memory"
+        ]
+      },
+      "planning": {
+        "declared": 1,
+        "available": 0,
+        "engineKeys": [
+          "agent_runtime_gateway"
+        ]
+      },
+      "product_recommendation": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "recommendation"
+        ]
+      },
+      "proposal_generation": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "workflow_proposal"
+        ]
+      },
+      "quality_check": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "vision_quality"
+        ]
+      },
+      "ranking": {
+        "declared": 2,
+        "available": 2,
+        "engineKeys": [
+          "decision_mcda",
+          "optimization"
+        ]
+      },
+      "reasoning": {
+        "declared": 6,
+        "available": 0,
+        "engineKeys": [
+          "llm_claude",
+          "llm_openai",
+          "llm_gemini",
+          "llm_deepseek",
+          "llm_grok",
+          "agent_runtime_gateway"
+        ]
+      },
+      "recommendation": {
+        "declared": 2,
+        "available": 1,
+        "engineKeys": [
+          "recommendation",
+          "agent_runtime_gateway"
+        ]
+      },
+      "regression_metrics": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "evaluation"
+        ]
+      },
+      "relationship_reasoning": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "knowledge_graph"
+        ]
+      },
+      "retrieval": {
+        "declared": 3,
+        "available": 3,
+        "engineKeys": [
+          "knowledge_graph",
+          "enterprise_memory",
+          "hybrid_retrieval"
+        ]
+      },
+      "risk_scoring": {
+        "declared": 2,
+        "available": 2,
+        "engineKeys": [
+          "business_logic",
+          "transparent_risk"
+        ]
+      },
+      "route_measurement": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "geospatial"
+        ]
+      },
+      "rrf_fusion": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "hybrid_retrieval"
+        ]
+      },
+      "rules": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "rule_engine"
+        ]
+      },
+      "scenario_analysis": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "simulation"
+        ]
+      },
+      "semantic_retrieval": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "hybrid_retrieval"
+        ]
+      },
+      "simulation": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "simulation"
+        ]
+      },
+      "statistics": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "statistical_anomaly"
+        ]
+      },
+      "structured_output": {
+        "declared": 6,
+        "available": 0,
+        "engineKeys": [
+          "llm_claude",
+          "llm_openai",
+          "llm_gemini",
+          "llm_deepseek",
+          "llm_grok",
+          "agent_runtime_gateway"
+        ]
+      },
+      "summarization": {
+        "declared": 6,
+        "available": 0,
+        "engineKeys": [
+          "llm_claude",
+          "llm_openai",
+          "llm_gemini",
+          "llm_deepseek",
+          "llm_grok",
+          "agent_runtime_gateway"
+        ]
+      },
+      "synthesis": {
+        "declared": 2,
+        "available": 0,
+        "engineKeys": [
+          "speech_google",
+          "speech_azure"
+        ]
+      },
+      "text_classification": {
+        "declared": 1,
+        "available": 0,
+        "engineKeys": [
+          "classification"
+        ]
+      },
+      "text_extraction": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "vision_ocr"
+        ]
+      },
+      "text_generation": {
+        "declared": 5,
+        "available": 0,
+        "engineKeys": [
+          "llm_claude",
+          "llm_openai",
+          "llm_gemini",
+          "llm_deepseek",
+          "llm_grok"
+        ]
+      },
+      "time_series": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "forecasting"
+        ]
+      },
+      "tool_use": {
+        "declared": 2,
+        "available": 1,
+        "engineKeys": [
+          "module_dispatch",
+          "agent_runtime_gateway"
+        ]
+      },
+      "transcription": {
+        "declared": 2,
+        "available": 0,
+        "engineKeys": [
+          "speech_google",
+          "speech_azure"
+        ]
+      },
+      "vision": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "vision_quality"
+        ]
+      },
+      "wellness_advice": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "recommendation"
+        ]
+      },
+      "workflow": {
+        "declared": 1,
+        "available": 1,
+        "engineKeys": [
+          "workflow_proposal"
+        ]
+      }
+    }
+  },
+  "providers": {
+    "known": 10,
+    "configured": 0,
+    "entries": [
+      {
+        "provider": "claude",
+        "configured": false,
+        "mode": "direct-adapter-metadata",
+        "missingRequired": [
+          "one-of:ANTHROPIC_API_KEY"
+        ]
+      },
+      {
+        "provider": "openai",
+        "configured": false,
+        "mode": "direct-adapter-metadata",
+        "missingRequired": [
+          "one-of:OPENAI_API_KEY"
+        ]
+      },
+      {
+        "provider": "gemini",
+        "configured": false,
+        "mode": "direct-adapter-metadata",
+        "missingRequired": [
+          "one-of:GEMINI_API_KEY|GOOGLE_API_KEY"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "configured": false,
+        "mode": "direct-adapter-metadata",
+        "missingRequired": [
+          "one-of:DEEPSEEK_API_KEY"
+        ]
+      },
+      {
+        "provider": "grok",
+        "configured": false,
+        "mode": "direct-adapter-metadata",
+        "missingRequired": [
+          "one-of:XAI_API_KEY"
+        ]
+      },
+      {
+        "provider": "vercel_gateway",
+        "configured": false,
+        "mode": "live-agent-runtime",
+        "missingRequired": [
+          "one-of:AI_GATEWAY_API_KEY|VERCEL_OIDC_TOKEN"
+        ]
+      },
+      {
+        "provider": "azure_openai",
+        "configured": false,
+        "mode": "declared-external-provider",
+        "missingRequired": [
+          "AZURE_OPENAI_API_KEY",
+          "AZURE_OPENAI_ENDPOINT"
+        ]
+      },
+      {
+        "provider": "ollama",
+        "configured": false,
+        "mode": "declared-local-provider",
+        "missingRequired": [
+          "OLLAMA_BASE_URL"
+        ]
+      },
+      {
+        "provider": "huggingface",
+        "configured": false,
+        "mode": "declared-external-provider",
+        "missingRequired": [
+          "one-of:HUGGINGFACE_API_KEY"
+        ]
+      },
+      {
+        "provider": "devin",
+        "configured": false,
+        "mode": "declared-agent-service",
+        "missingRequired": [
+          "DEVIN_API_KEY",
+          "DEVIN_API_URL"
+        ]
+      }
+    ],
+    "agentRuntime": {
+      "sdk": "ai",
+      "sdkExpectedMajor": 7,
+      "modelConfigured": false,
+      "defaultModel": null,
+      "gatewayConfigured": false,
+      "executable": false,
+      "credentialSources": {
+        "aiGatewayApiKey": false,
+        "vercelOidcToken": false
+      }
+    }
+  },
+  "memory": {
+    "status": "ready",
+    "backings": {
+      "knowledge": {
+        "path": "backend/src/services/hybridRetrievalService.js",
+        "exists": true
+      },
+      "enterpriseCases": {
+        "path": "backend/src/services/platform/enterpriseMemoryService.js",
+        "exists": true
+      },
+      "outcomeSink": {
+        "path": "backend/src/core/outcomeSink.js",
+        "exists": true
+      },
+      "outcomeResolver": {
+        "path": "backend/src/core/outcomeResolver.js",
+        "exists": true
+      },
+      "schema": {
+        "path": "backend/src/database/migrations/9997_enterprise_memory_schema.sql",
+        "exists": true
+      }
+    },
+    "memoryClasses": {
+      "taskScoped": {
+        "status": "runtime",
+        "owner": "agentRuntimeService",
+        "persistence": "none by default"
+      },
+      "knowledge": {
+        "status": "ready",
+        "mode": "hybrid retrieval"
+      },
+      "enterpriseCase": {
+        "status": "ready",
+        "mode": "Postgres case memory"
+      },
+      "outcome": {
+        "status": "ready",
+        "mode": "prediction/outcome/calibration memory"
+      }
+    },
+    "externalAccessPolicy": "No raw enterprise memory is sent to external agents by default; isolation transformer minimization applies."
+  },
+  "evaluation": {
+    "status": "ready",
+    "backings": {
+      "offlineHarness": {
+        "path": "backend/src/core/ai/evaluationHarness.js",
+        "exists": true
+      },
+      "outcomeResolver": {
+        "path": "backend/src/core/outcomeResolver.js",
+        "exists": true
+      },
+      "outcomeSink": {
+        "path": "backend/src/core/outcomeSink.js",
+        "exists": true
+      },
+      "predictionSchema": {
+        "path": "backend/src/database/migrations/990_ai_outcomes.sql",
+        "exists": true
+      },
+      "legacyEvaluationService": {
+        "path": "backend/src/services/aiEvaluationService.js",
+        "exists": true
+      }
+    },
+    "authoritativeEvaluationPaths": [
+      "offline deterministic metrics for held-out examples",
+      "resolved prediction/outcome calibration from outcomeSink/outcomeResolver"
+    ],
+    "quarantinedOrLimited": [
+      "legacy aiEvaluationService metrics are not treated as evaluation authority because some methods collapse precision/recall to accuracy or assume success."
+    ]
+  },
+  "cost": {
+    "pricing": {
+      "configured": [
+        {
+          "provider": "local",
+          "inputPer1k": 0,
+          "outputPer1k": 0,
+          "request": 0,
+          "currency": "USD",
+          "authority": "local_no_external_bill",
+          "verifiedAt": null
+        }
+      ],
+      "legacy": [
+        {
+          "provider": "claude",
+          "rate": 0.003,
+          "authority": "legacy-static-unverified"
+        },
+        {
+          "provider": "openai",
+          "rate": 0.002,
+          "authority": "legacy-static-unverified"
+        },
+        {
+          "provider": "gemini",
+          "rate": 0.001,
+          "authority": "legacy-static-unverified"
+        },
+        {
+          "provider": "deepseek",
+          "rate": 0.001,
+          "authority": "legacy-static-unverified"
+        }
+      ]
+    },
+    "state": {
+      "hourlyBudget": 10,
+      "dailyBudget": 100,
+      "hourlySpend": 0,
+      "dailySpend": 0,
+      "tokenCount": 0,
+      "requestCount": 0,
+      "unknownCostRequests": 0,
+      "lastHourlyReset": 1790358330402,
+      "lastDailyReset": 1790358330402,
+      "hourlyUtilization": 0,
+      "dailyUtilization": 0,
+      "averageKnownCostPerRequest": null,
+      "pricingConfiguredProviders": [
+        "local"
+      ],
+      "legacyRatesAuthority": "legacy-static-unverified-not-billing-authority"
+    },
+    "truthRule": "legacy static rates are not billing authority"
+  },
+  "protection": {
+    "isolatedExternalBackbone": true,
+    "externalMutationAuthority": false,
+    "readOnlyExternalTools": true,
+    "cognitiveStepUp": true,
+    "authorityStepDown": true,
+    "deterministicReconciliation": true
+  },
+  "criticalFiles": {
+    "isolation": {
+      "path": "backend/src/core/ai/aiIsolationTransformer.js",
+      "exists": true
+    },
+    "dualOrchestrator": {
+      "path": "backend/src/core/ai/dualBackboneOrchestrator.js",
+      "exists": true
+    },
+    "engineDispatcher": {
+      "path": "backend/src/core/ai/aiEngineDispatcher.js",
+      "exists": true
+    },
+    "agentRuntime": {
+      "path": "backend/src/core/ai/agentRuntimeService.js",
+      "exists": true
+    },
+    "guardrails": {
+      "path": "backend/src/core/ai/aiGuardrails.js",
+      "exists": true
+    },
+    "audit": {
+      "path": "backend/src/core/ai/aiAuditLogger.js",
+      "exists": true
+    },
+    "confidence": {
+      "path": "backend/src/core/ai/aiConfidenceEngine.js",
+      "exists": true
+    },
+    "cost": {
+      "path": "backend/src/core/ai/aiCostController.js",
+      "exists": true
+    },
+    "memory": {
+      "path": "backend/src/core/ai/aiMemoryRouter.js",
+      "exists": true
+    },
+    "evaluation": {
+      "path": "backend/src/core/ai/aiEvaluationRegistry.js",
+      "exists": true
+    }
+  },
+  "generatedAt": "2026-09-25T17:45:30.438Z",
+  "tests": {
+    "focusedAiSuites": 7,
+    "focusedAiTests": 41,
+    "focusedAiResult": "PASS"
+  },
+  "git": {
+    "branch": "chatgpt/auto-100-phase-20260925",
+    "preCheckpointHead": "7c8a559051822bb6474d32ecaee23e53cefd51da"
+  }
+}

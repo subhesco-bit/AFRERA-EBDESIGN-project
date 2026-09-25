@@ -1,60 +1,35 @@
 /**
- * AI Orchestrator Core
- * Component ID: EBD-CMP-00000001
- * Purpose: Central AI task routing and classification
- *
- * This is the main orchestrator that coordinates all AI components:
- * - Provider adapters for vendor-agnostic access
- * - Engine registry for capability management
- * - Confidence engine for decision quality
- * - Cost controller for economic governance
- * - Guardrails for security and validation
- * - Audit logger for provenance tracking
+ * Governed AI Orchestrator Core.
+ * Validation -> authorization -> rate/cost -> real engine dispatch ->
+ * output validation -> evidence-aware confidence -> audit.
  */
-
 'use strict';
 
 const { logger } = require('../../utils/logger');
 const pool = require('../../database/pool');
-
-// Import AI components
-const { providerStatus, listConfiguredProviders, getProviderEnv } = require('./aiProviderAdapters');
-const { findBestEngine, getEnginesByCapability } = require('./aiEngineRegistry');
-const { evaluateConfidence, getRecommendedAction } = require('./aiConfidenceEngine');
-const { recordCost, getCostState, estimateCost } = require('./aiCostController');
+const { listConfiguredProviders } = require('./aiProviderAdapters');
+const {
+  findBestEngine,
+  listReadyEngines,
+  capabilityCoverage,
+} = require('./aiEngineRegistry');
+const { dispatch } = require('./aiEngineDispatcher');
+const {
+  CONFIDENCE_DIMENSIONS,
+  evaluateConfidenceStrict,
+  getRecommendedAction,
+} = require('./aiConfidenceEngine');
+const {
+  recordCost,
+  getCostState,
+  estimateCost,
+  checkBudgetConstraints,
+  pricingStatus,
+} = require('./aiCostController');
 const { validateInput, validateOutput, checkAuthorization, checkRateLimit } = require('./aiGuardrails');
 const { logAIDecision, generateTraceId } = require('./aiAuditLogger');
 
-/**
- * Maps an ./aiEngineRegistry.js AI_ENGINES entry onto the corresponding real
- * core/aiOrchestrator.js ENGINES task-type key. Returns null (not a fallback
- * task type) when no honest mapping exists yet — the caller reports that
- * explicitly rather than guessing.
- */
-function mapEngineToRealTaskType(engine) {
-  if (engine.type === 'llm') return 'llm';
-  if (engine.name === 'Vision Quality Analysis') return 'vision_engine';
-  if (engine.name === 'OCR Engine') return 'ocr_engine';
-  if (engine.type === 'speech') return 'speech_engine';
-  if (engine.name === 'Recommendation Engine') return 'recommendation_engine';
-  // "Classification Engine" (domain/local) has no real backing anywhere in
-  // core/aiOrchestrator.js's ENGINES today - text classification only exists
-  // as a capability label on the LLM entries there, not a standalone engine.
-  return null;
-}
-
-/**
- * Builds the payload shape core/aiOrchestrator.js's real ENGINES[taskType].invoke
- * expects, from this class's more generic (engine, input, options) call shape.
- */
-function buildRealOrchestratorPayload(taskType, engine, input, options) {
-  if (taskType === 'llm') {
-    return {
-      provider: engine.provider,
-      prompt: typeof input === 'string' ? input : JSON.stringify(input),
-      allowTemplateFallback: options.allowTemplateFallback || false,
-    };
-  }
+function buildRealOrchestratorPayload(taskType, engine, input, options={}) {
   if (taskType === 'vision_engine') {
     return {
       buffer: options.buffer,
@@ -81,50 +56,78 @@ function buildRealOrchestratorPayload(taskType, engine, input, options) {
   }
   if (taskType === 'recommendation_engine') {
     return {
-      concern: options.concern || (typeof input === 'string' ? input : undefined),
-      month: options.month,
+      concern: options.concern || input?.concern || (typeof input === 'string' ? input : undefined),
+      month: options.month ?? input?.month,
     };
   }
-  return { input, ...options };
+  if (input && typeof input === 'object' && !Array.isArray(input)) return input;
+  return { input };
 }
 
-/**
- * Main AI Orchestrator Class
- */
-class AIOrchestrator {
-  constructor(config = {}) {
-    this.config = {
-      defaultProvider: config.defaultProvider || 'claude',
-      fallbackProvider: config.fallbackProvider || 'openai',
-      confidenceThreshold: config.confidenceThreshold || 0.7,
-      costBudgetHourly: config.costBudgetHourly || 10.0,
-      enableAuditLogging: config.enableAuditLogging !== false,
-    };
+function requiredConfidenceDimensions(engine) {
+  if (!engine) return Object.values(CONFIDENCE_DIMENSIONS);
+  if (['rules','deterministic','decision','geospatial','evaluation'].includes(engine.type)) {
+    return [CONFIDENCE_DIMENSIONS.RULE_CONFIDENCE, CONFIDENCE_DIMENSIONS.CONSISTENCY];
+  }
+  if (engine.type === 'retrieval' || engine.type === 'memory') {
+    return [CONFIDENCE_DIMENSIONS.RETRIEVAL_CONFIDENCE, CONFIDENCE_DIMENSIONS.SOURCE_CONFIDENCE];
+  }
+  if (engine.type === 'forecast') {
+    return [CONFIDENCE_DIMENSIONS.HISTORICAL_ACCURACY, CONFIDENCE_DIMENSIONS.DATA_QUALITY];
+  }
+  if (engine.type === 'vision') {
+    return [CONFIDENCE_DIMENSIONS.MODEL_CONFIDENCE, CONFIDENCE_DIMENSIONS.DATA_QUALITY];
+  }
+  return Object.values(CONFIDENCE_DIMENSIONS);
+}
 
-    this.initialized = false;
+function confidenceEvidence(engine, result, options={}) {
+  const supplied = { ...(options.confidenceEvidence || {}) };
+  if (['rules','deterministic','decision','geospatial','evaluation'].includes(engine.type)) {
+    if (supplied.ruleMatchStrength == null) supplied.ruleMatchStrength = 1;
+    if (supplied.consistencyScore == null) supplied.consistencyScore = 1;
+  }
+  const output = result?.output ?? result;
+  const measured = Number(output?.confidence ?? output?.confidenceScore ?? output?.accuracy);
+  if (Number.isFinite(measured) && supplied.modelScore == null) {
+    supplied.modelScore = measured > 1 ? measured / 100 : measured;
+  }
+  return supplied;
+}
+
+function usageFrom(result, options={}) {
+  const usage=result?.usage||result?.totalUsage||result?.output?.usage||result?.output?.totalUsage||{};
+  const inputTokens=Number(options.inputTokens ?? usage.inputTokens ?? usage.promptTokens ?? 0);
+  const outputTokens=Number(options.outputTokens ?? usage.outputTokens ?? usage.completionTokens ?? 0);
+  return {
+    inputTokens:Number.isFinite(inputTokens)?Math.max(0,inputTokens):0,
+    outputTokens:Number.isFinite(outputTokens)?Math.max(0,outputTokens):0,
+  };
+}
+
+class AIOrchestrator {
+  constructor(config={}) {
+    this.config={
+      confidenceThreshold:config.confidenceThreshold ?? 0.7,
+      costBudgetHourly:config.costBudgetHourly ?? 10,
+      enableAuditLogging:config.enableAuditLogging !== false,
+    };
+    this.initialized=false;
   }
 
-  /**
-   * Initialize the orchestrator
-   */
   async initialize() {
     try {
-      // Create audit table if it doesn't exist
       await this.createAuditTable();
-
-      this.initialized = true;
+      this.initialized=true;
       logger.info('AI Orchestrator initialized successfully');
-    } catch (error) {
+    } catch(error) {
       logger.error(`Failed to initialize AI Orchestrator: ${error.message}`);
       throw error;
     }
   }
 
-  /**
-   * Create audit table
-   */
   async createAuditTable() {
-    const createTableQuery = `
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS ai_audit_logs (
         id VARCHAR(100) PRIMARY KEY,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -151,208 +154,184 @@ class AIOrchestrator {
         latency_ms INTEGER,
         error TEXT,
         trace_id VARCHAR(100)
-      );
-    `;
-
-    await pool.query(createTableQuery);
+      )
+    `);
   }
 
-  /**
-   * Route AI task to appropriate engine
-   */
-  async route(taskType, payload, options = {}) {
-    const traceId = generateTraceId();
-    const startTime = Date.now();
+  async route(taskType,payload={},options={}) {
+    const traceId=generateTraceId();
+    const startTime=Date.now();
+    let selectedEngine=null;
 
     try {
-      // Find best engine for the task
-      const engine = findBestEngine(taskType, {
-        preferProvider: options.provider || this.config.defaultProvider,
-        maxCost: options.maxCost,
-        minConfidence: this.config.confidenceThreshold,
+      selectedEngine=findBestEngine(taskType,{
+        preferProvider:options.provider,
+        maxCost:options.maxCost,
+        minConfidence:options.minConfidence,
+        requireAvailable:options.requireAvailable !== false,
+      });
+      if(!selectedEngine) {
+        const e=new Error(`No executable engine found for capability: ${taskType}`);
+        e.code='AI_ENGINE_NOT_FOUND';
+        throw e;
+      }
+
+      const rawInput=payload?.input !== undefined ? payload.input : payload;
+      const inputValidation=validateInput(rawInput,options.inputContext);
+      if(!inputValidation.valid) {
+        const e=new Error(`Input validation failed: ${inputValidation.violations[0]?.message||'unknown violation'}`);
+        e.code='AI_INPUT_INVALID';
+        throw e;
+      }
+
+      const authCheck=checkAuthorization(options.user,taskType,options.resource);
+      if(!authCheck.authorized) {
+        const e=new Error(`Authorization failed: ${authCheck.reason}`);e.code='AI_AUTHORIZATION_FAILED';throw e;
+      }
+      const rateLimit=checkRateLimit(options.userId,taskType);
+      if(!rateLimit.withinLimit) {
+        const e=new Error('Rate limit exceeded');e.code='AI_RATE_LIMITED';throw e;
+      }
+
+      const estimatedTokens=Number(options.estimatedTokens||0);
+      const estimatedCost=estimateCost(selectedEngine.provider,estimatedTokens,{
+        inputTokens:options.estimatedInputTokens,
+        outputTokens:options.estimatedOutputTokens,
+      });
+      if(estimatedCost!=null) {
+        const budget=checkBudgetConstraints(estimatedCost);
+        if(!budget.withinBudget) {
+          const e=new Error(budget.reason||'AI budget limit would be exceeded');e.code='AI_BUDGET_EXCEEDED';throw e;
+        }
+      } else if(options.requireKnownCost===true && selectedEngine.provider!=='local') {
+        const e=new Error('Provider cost is unknown; configure AI_PROVIDER_PRICING_JSON or supply observed runtime cost');
+        e.code='AI_COST_UNKNOWN';
+        throw e;
+      }
+
+      const dispatched=await this.executeEngine(selectedEngine,inputValidation.sanitized,{...options,sourcePayload:payload});
+      const outputValidation=validateOutput(dispatched.output,options.outputContext);
+
+      const evidence=confidenceEvidence(selectedEngine,dispatched,options);
+      const confidence=evaluateConfidenceStrict(evidence,{
+        requiredDimensions:options.requiredConfidenceDimensions||requiredConfidenceDimensions(selectedEngine),
+      });
+      let recommendedAction=getRecommendedAction(confidence);
+      if(options.requiresHumanApproval===true || options.riskClass==='high') {
+        recommendedAction={action:'review',reason:'Policy requires human approval for this operation',requiresHumanApproval:true};
+      }
+
+      const usage=usageFrom(dispatched,options);
+      const actualCost=recordCost(selectedEngine.provider,usage.inputTokens,{
+        inputTokens:usage.inputTokens,
+        outputTokens:usage.outputTokens,
+        costUsd:options.observedCostUsd,
+        costAuthority:options.observedCostUsd!=null?'observed_runtime_cost':undefined,
+        traceId,engineId:selectedEngine.id,taskType,
       });
 
-      if (!engine) {
-        throw new Error(`No suitable engine found for task type: ${taskType}`);
-      }
-
-      // Validate input
-      const inputValidation = validateInput(payload.input, options.inputContext);
-      if (!inputValidation.valid) {
-        throw new Error(`Input validation failed: ${inputValidation.violations[0].message}`);
-      }
-
-      // Check authorization
-      const authCheck = checkAuthorization(options.user, taskType, options.resource);
-      if (!authCheck.authorized) {
-        throw new Error(`Authorization failed: ${authCheck.reason}`);
-      }
-
-      // Check rate limit
-      const rateLimit = checkRateLimit(options.userId, taskType);
-      if (!rateLimit.withinLimit) {
-        throw new Error(`Rate limit exceeded: ${rateLimit.remaining} requests remaining`);
-      }
-
-      // Estimate cost
-      const estimatedCost = estimateCost(engine.provider, options.estimatedTokens || 1000);
-
-      // Check budget
-      const costState = getCostState();
-      if (costState.hourlySpend + estimatedCost > this.config.costBudgetHourly) {
-        throw new Error('Budget limit would be exceeded');
-      }
-
-      // Execute the task (this would dispatch to the actual engine)
-      const result = await this.executeEngine(engine, inputValidation.sanitized, options);
-
-      // Validate output
-      const outputValidation = validateOutput(result.output, options.outputContext);
-
-      // Calculate confidence
-      const confidence = evaluateConfidence({
-        modelScore: engine.confidence_threshold,
-        sourceReliability: 0.9, // Would be calculated from data sources
-        ruleMatchStrength: 0.8, // Would be calculated from rule matching
-        dataFreshness: 1.0, // Would be calculated from data age
-        consistencyScore: 0.9, // Would be calculated from consistency checks
-        historicalAccuracy: 0.85, // Would be loaded from historical data
-      });
-
-      // Get recommended action
-      const recommendedAction = getRecommendedAction(confidence);
-
-      // Record actual cost
-      const actualCost = recordCost(engine.provider, options.actualTokens || 1000, {
-        traceId,
-        engineId: engine.id,
-        taskType,
-      });
-
-      // Log decision
-      if (this.config.enableAuditLogging) {
+      if(this.config.enableAuditLogging) {
         await logAIDecision({
-          actorType: options.user?.type || 'system',
-          actorId: options.user?.id || 'system',
-          operation: taskType,
-          engineId: engine.id,
-          provider: engine.provider,
-          model: engine.name,
-          promptVersion: options.promptVersion || '1.0',
-          input: inputValidation.sanitized,
-          output: result.output,
-          confidenceScore: confidence.overall,
-          confidenceDimensions: confidence.dimensions,
-          dataSources: options.dataSources || [],
-          toolsUsed: options.toolsUsed || [],
-          rulesTriggered: options.rulesTriggered || [],
-          decisionFactors: confidence.dimensions,
-          validationStatus: outputValidation.valid ? 'approved' : 'rejected',
-          humanApproved: recommendedAction.requiresHumanApproval ? false : true,
-          approverId: recommendedAction.requiresHumanApproval ? null : 'system',
-          costTokens: options.actualTokens || 1000,
-          costUsd: actualCost.cost,
-          latencyMs: Date.now() - startTime,
+          actorType:options.user?.type||'system',
+          actorId:options.user?.id||'system',
+          operation:taskType,
+          engineId:selectedEngine.id,
+          provider:selectedEngine.provider,
+          model:selectedEngine.name,
+          promptVersion:options.promptVersion||null,
+          input:inputValidation.sanitized,
+          output:dispatched.output,
+          confidenceScore:confidence.overall,
+          confidenceDimensions:confidence.dimensions,
+          dataSources:options.dataSources||[],
+          toolsUsed:options.toolsUsed||[],
+          rulesTriggered:options.rulesTriggered||[],
+          decisionFactors:{
+            ...confidence.dimensions,
+            evidenceCoverage:confidence.evidenceCoverage,
+            missingDimensions:confidence.missingDimensions,
+          },
+          validationStatus:outputValidation.valid?'approved':'rejected',
+          humanApproved:Boolean(options.humanApproved),
+          approverId:options.humanApproved ? (options.approverId||null) : null,
+          costTokens:usage.inputTokens+usage.outputTokens,
+          costUsd:actualCost.cost,
+          latencyMs:Date.now()-startTime,
           traceId,
         });
       }
 
       return {
-        success: true,
-        result: result.output,
-        engine: engine.name,
-        provider: engine.provider,
+        success:true,
+        result:dispatched.output,
+        engine:selectedEngine.name,
+        engineId:selectedEngine.id,
+        provider:selectedEngine.provider,
         confidence,
         recommendedAction,
-        cost: actualCost,
+        cost:actualCost,
+        estimatedCost:{known:estimatedCost!=null,costUsd:estimatedCost},
         traceId,
         inputValidation,
         outputValidation,
       };
-    } catch (error) {
+    } catch(error) {
       logger.error(`AI task routing failed: ${error.message}`);
-
-      // Log error decision
-      if (this.config.enableAuditLogging) {
+      if(this.config.enableAuditLogging) {
         await logAIDecision({
-          actorType: options.user?.type || 'system',
-          actorId: options.user?.id || 'system',
-          operation: taskType,
-          engineId: 'error',
-          provider: 'error',
-          model: 'error',
-          input: payload.input,
-          output: null,
-          confidenceScore: 0,
-          error: error.message,
+          actorType:options.user?.type||'system',
+          actorId:options.user?.id||'system',
+          operation:taskType,
+          engineId:selectedEngine?.id||'error',
+          provider:selectedEngine?.provider||'error',
+          model:selectedEngine?.name||'error',
+          input:payload?.input??payload,
+          output:null,
+          confidenceScore:0,
+          humanApproved:false,
+          error:error.message,
           traceId,
         });
       }
-
       throw error;
     }
   }
 
-  /**
-   * Execute AI engine.
-   *
-   * (2026-08-29) This used to be a literal placeholder — every call through
-   * this class's route() (validate -> authorize -> rate-limit -> cost ->
-   * HERE -> confidence -> audit-log, all real, working guardrail logic) was
-   * gating a fabricated `{message: 'AI engine execution placeholder'}`
-   * regardless of what engine findBestEngine() picked. The engine catalog in
-   * ./aiEngineRegistry.js is metadata-only (cost/confidence-threshold
-   * numbers for selection) and was never connected to anything that could
-   * actually run a task. core/aiOrchestrator.js (a sibling file one
-   * directory up, NOT this one) is the real dispatcher — 12 genuinely wired
-   * engines, each citing the exact service file backing it, honest
-   * not_configured/stub results where no real implementation exists. This
-   * method now maps the AI_ENGINES entry picked by findBestEngine() onto
-   * that real dispatcher's task-type keys and calls it, so every guardrail
-   * above is now gating something real. Where no honest mapping exists
-   * (e.g. AI_ENGINES' "Classification Engine" has no real backing anywhere
-   * in the codebase), this returns an explicit not_configured result rather
-   * than inventing one — same discipline core/aiOrchestrator.js already
-   * holds itself to.
-   */
-  async executeEngine(engine, input, options = {}) {
-    const realOrchestrator = require('../aiOrchestrator');
-    const mapped = mapEngineToRealTaskType(engine);
-
-    if (!mapped) {
-      return {
-        output: {
-          ok: false,
-          status: 'not_configured',
-          engine: engine.name,
-          reason: `"${engine.name}" (${engine.id}) has no real implementation wired anywhere ` +
-            'in the codebase yet. Reported honestly rather than fabricating a result.',
-        },
-      };
-    }
-
-    const realPayload = buildRealOrchestratorPayload(mapped, engine, input, options);
-    const routed = await realOrchestrator.route(mapped, realPayload, options);
-    return { output: routed };
+  async executeEngine(engine,input,options={}) {
+    const realPayload=engine.executionAdapter==='real_orchestrator'
+      ? buildRealOrchestratorPayload(engine.realTaskType,engine,input,options)
+      : undefined;
+    const output=await dispatch(engine,input,{
+      ...options,
+      realPayload,
+      templateId:options.templateId,
+      agentOptions:options.agentOptions,
+      context:options.agentContext,
+    });
+    return {output};
   }
 
-  /**
-   * Get orchestrator status
-   */
   getStatus() {
+    const ready=listReadyEngines();
     return {
-      initialized: this.initialized,
-      config: this.config,
-      costState: getCostState(),
-      configuredProviders: listConfiguredProviders(),
+      initialized:this.initialized,
+      config:{...this.config},
+      costState:getCostState(),
+      pricing:pricingStatus(),
+      configuredProviders:listConfiguredProviders(),
+      readyEngines:ready.map((e)=>({id:e.id,name:e.name,type:e.type,provider:e.provider,runtime:e.runtime})),
+      capabilityCoverage:capabilityCoverage(),
     };
   }
 }
 
-// Export singleton instance
-const orchestrator = new AIOrchestrator();
+const orchestrator=new AIOrchestrator();
 
-module.exports = {
+module.exports={
   AIOrchestrator,
   orchestrator,
+  buildRealOrchestratorPayload,
+  requiredConfidenceDimensions,
+  confidenceEvidence,
+  usageFrom,
 };

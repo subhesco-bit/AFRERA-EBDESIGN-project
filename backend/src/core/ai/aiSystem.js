@@ -136,17 +136,32 @@ async function start(options = {}) {
     record('aiBackbone', false, { error: error.message });
   }
 
-  // ---- 6. ERP agents ---------------------------------------------------
-  // Not started — they are invoked on demand through aiOrchestrator's
-  // workflow_engine entry. Recorded so the inventory is not silent about them.
+  // ---- 6. ERP proposal agents (legacy embedded compatibility) ----------
   try {
     const erpAgents = require('../erpAgents');
     record('erpAgents', true, {
       agents: erpAgents.listAgents().length,
-      note: 'on-demand via aiOrchestrator; not scheduled',
+      note: 'on-demand embedded proposal rules; execution authority remains outside AI',
     });
   } catch (error) {
     record('erpAgents', false, { error: error.message });
+  }
+
+  // ---- 7. isolated hybrid agent/domain backbone -----------------------
+  try {
+    const completion = require('./aiCompletionRegistry').build();
+    record('agentTemplateRegistry', completion.codeComplete, {
+      templates: completion.agents.templates,
+      streams: completion.agents.streams,
+      domains: completion.domains.coveredDomains,
+      codeBlockers: completion.codeBlockers,
+    });
+    const dual = require('./dualBackboneOrchestrator').health();
+    record('dualBackbone', dual.status === 'healthy', dual);
+    record('memoryRouter', completion.memory.status === 'ready', completion.memory);
+    record('evaluationRegistry', completion.evaluation.status === 'ready', completion.evaluation);
+  } catch (error) {
+    record('agentTemplateRegistry', false, { error: error.message });
   }
 
   state.started = true;
@@ -181,14 +196,19 @@ function status() {
   const started = Object.entries(components).filter(([, v]) => v.ok).map(([k]) => k);
   const degraded = Object.entries(components).filter(([, v]) => !v.ok).map(([k]) => k);
 
+  let completion = null;
+  try { completion = require('./aiCompletionRegistry').build(); } catch (error) { completion = { codeComplete: false, codeBlockers: ['completion_status_error'], error: error.message }; }
+
   return {
     started: state.started,
     startedAt: state.startedAt,
-    healthy: state.started && degraded.length === 0,
+    healthy: state.started && degraded.length === 0 && completion.codeComplete === true,
+    runtimeFullyOperational: completion.runtimeFullyOperational === true,
     components,
     summary: { started, degraded },
     capabilities,
     integration,
+    completion,
   };
 }
 

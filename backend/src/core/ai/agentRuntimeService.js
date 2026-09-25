@@ -72,11 +72,13 @@ class AgentRuntimeService {
     const {_private,...safe}=plan;return safe;
   }
 
-  async _compileTools(template,sdk){
+  async _compileTools(template,sdk,options={}){
     const compiled={};
+    const readOnly=options.toolPolicy==='read_only';
     for(const toolId of template.tools){
       const def=this.toolRegistry.get(toolId);
       if(!def){const e=new Error('Template references unregistered tool: '+toolId);e.code='AGENT_TOOL_UNREGISTERED';throw e;}
+      if(readOnly && (def.mutates || def.needsApproval)) continue;
       compiled[toolId]=sdk.tool({
         description:def.description,
         inputSchema:def.inputSchema,
@@ -100,7 +102,7 @@ class AgentRuntimeService {
     if(typeof sdk.ToolLoopAgent!=='function'||typeof sdk.tool!=='function'||typeof sdk.stepCountIs!=='function'){
       const e=new Error('Installed AI SDK does not provide ToolLoopAgent/tool/stepCountIs');e.code='AI_SDK_INCOMPATIBLE';throw e;
     }
-    const tools=await this._compileTools(template,sdk);
+    const tools=await this._compileTools(template,sdk,options);
     const agent=new sdk.ToolLoopAgent({
       model:plan.selectedModel,
       instructions:plan._private.instructions,
@@ -123,7 +125,7 @@ class AgentRuntimeService {
       decision:'allowed_assistive_draft',
       approvalRequired:Boolean(template.approvalPolicy.executionApprovalRequired),
       approvalId:context.approvalId||null,
-      metadata:{templateId,templateVersion:template.version,model:plan.selectedModel,promptHash:plan.prompt.instructionsSha256,usage},
+      metadata:{templateId,templateVersion:template.version,model:plan.selectedModel,promptHash:plan.prompt.instructionsSha256,usage,toolPolicy:options.toolPolicy||'governed'},
     });
     return {
       success:true,
@@ -137,6 +139,8 @@ class AgentRuntimeService {
       usage,
       steps:Array.isArray(result.steps)?result.steps.length:null,
       warnings:result.warnings||[],
+      toolPolicy:options.toolPolicy||'governed',
+      toolCountPresented:Object.keys(tools).length,
       reviewRequired:Boolean(template.approvalPolicy.humanReviewRequired||template.outputUsePolicy.draftOnly),
       outputUsePolicy:template.outputUsePolicy,
       audit,

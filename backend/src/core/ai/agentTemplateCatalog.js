@@ -1,6 +1,7 @@
 'use strict';
 
 const { PromptTemplateRegistry, AgentTemplateRegistry } = require('./agentTemplateRegistry');
+const { registerEnterpriseAgentExtensions } = require('./enterpriseAgentTemplateExtensions');
 
 const SOURCE_PATTERNS = Object.freeze({
   composable:['Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes'],
@@ -194,6 +195,8 @@ function buildAgentTemplateRegistry(){
 
   register('COMPLIANCE_AUDIT_AGENT',{name:'Compliance & Audit Evidence Agent',stream:'compliance',domain:'REGULATORY',pattern:'evaluator_optimizer',riskClass:'high',promptId:'compliance.audit',tools:['knowledge_search','workflow_catalog'],maxSteps:10,approvalPolicy:{humanReviewRequired:true,finalizationRequiresHuman:true},tags:['compliance','audit','grc']});
   register('GRANT_SUBSIDY_AGENT',{name:'Grant/Subsidy Readiness Agent',stream:'funding',domain:'SCHEMES_SUBSIDY',pattern:'augmented_llm',riskClass:'elevated',promptId:'grant.subsidy',tools:['knowledge_search'],maxSteps:10,approvalPolicy:{humanReviewRequired:true},tags:['grant','subsidy','funding']});
+
+  registerEnterpriseAgentExtensions(prompts, agents);
 
   return {promptRegistry:prompts,agentRegistry:agents};
 }

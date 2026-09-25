@@ -11,6 +11,7 @@
 
 const { logger } = require('../../utils/logger');
 const pool = require('../../database/pool');
+const { randomUUID } = require('crypto');
 
 /**
  * Audit log entry structure
@@ -225,14 +226,14 @@ async function getOperationAuditLogs(operation, options = {}) {
  * Generate unique audit ID
  */
 function generateAuditId() {
-  return `AUD-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  return `AUD-${randomUUID()}`;
 }
 
 /**
  * Generate unique trace ID
  */
 function generateTraceId() {
-  return `TRACE-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  return `TRACE-${randomUUID()}`;
 }
 
 /**
