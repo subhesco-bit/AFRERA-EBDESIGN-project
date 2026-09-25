@@ -1,0 +1,10 @@
+from pathlib import Path
+p=Path(r"C:\Users\DIYA GOEL\Downloads\EBDESIGN\backend\src\core\deterministicAlgorithmCatalog.js")
+t=p.read_text(encoding="utf-8")
+t=t.replace("const massBalance = require('../value-chain-control/massBalanceEngine');\nconst thermal = require('../services/engineering/thermalEngine');\n\n","")
+t=t.replace("execute:massBalance.reconcile","execute:(input)=>require('../value-chain-control/massBalanceEngine').reconcile(input)")
+t=t.replace("execute:(input)=>massBalance.projectChain(input.harvestQty,input.stages)","execute:(input)=>require('../value-chain-control/massBalanceEngine').projectChain(input.harvestQty,input.stages)")
+t=t.replace("execute:thermal.coldRoomLoad","execute:(input)=>require('../services/engineering/thermalEngine').coldRoomLoad(input)")
+t=t.replace("execute:thermal.insulationThickness","execute:(input)=>require('../services/engineering/thermalEngine').insulationThickness(input)")
+p.write_text(t,encoding="utf-8")
+print("deterministic catalog lazy execution patched")

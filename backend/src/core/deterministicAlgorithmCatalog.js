@@ -1,0 +1,13 @@
+'use strict';
+
+const { DeterministicAlgorithmRegistry } = require('./deterministicAlgorithmRegistry');
+function buildDeterministicAlgorithmRegistry(){
+  const registry=new DeterministicAlgorithmRegistry();
+  registry.register('VC_MASS_BALANCE_RECONCILE',{domain:'PROCESSING',kind:'mass-balance',deterministic:true,inputs:['qtyIn','qtyOut','byproduct','waste','loss','unit'],outputs:['accounted','unexplainedVariance','balanced'],units:{default:'kg'},basis:'INPUT = OUTPUT + byproduct + waste + loss; unexplained variance is residual.',source:'backend/src/value-chain-control/massBalanceEngine.js',tests:['backend/src/value-chain-control'] ,execute:(input)=>require('../value-chain-control/massBalanceEngine').reconcile(input)});
+  registry.register('VC_MASS_BALANCE_PROJECT_CHAIN',{domain:'PROCESSING',kind:'loss-projection',deterministic:true,inputs:['harvestQty','stages[].lossFraction'],outputs:['saleableQty','steps'],units:{default:'kg'},basis:'Sequential multiplicative loss projection from caller-supplied stage loss fractions.',source:'backend/src/value-chain-control/massBalanceEngine.js',limitations:['Loss fractions are supplied assumptions/evidence; engine does not invent them.'],execute:(input)=>require('../value-chain-control/massBalanceEngine').projectChain(input.harvestQty,input.stages)});
+  registry.register('COLD_ROOM_LOAD_ADVISORY',{domain:'COLD_CHAIN',kind:'thermal-advisory',deterministic:true,inputs:['volume_m3','delta_t_c','u_wall','surface_area_m2','product_load_w'],outputs:['transmission_w','infiltration_w','product_pull_w','total_w','cooling_kw','tons_refrigeration'],units:{cooling_kw:'kW',tons_refrigeration:'TR'},basis:'Steady-state U*A*DeltaT plus documented infiltration/product proxies.',source:'backend/src/services/engineering/thermalEngine.js',limitations:['Not transient CFD/FEM','Uses proxy infiltration and product load when caller omits values'],evidenceClass:'CALCULATED_FROM_DECLARED_OR_DEFAULT_ASSUMPTIONS',execute:(input)=>require('../services/engineering/thermalEngine').coldRoomLoad(input)});
+  registry.register('INSULATION_THICKNESS_ADVISORY',{domain:'COLD_CHAIN',kind:'thermal-advisory',deterministic:true,inputs:['k_w_mk','target_u'],outputs:['thickness_mm'],units:{thickness_mm:'mm'},basis:'One-dimensional U = k/d relation.',source:'backend/src/services/engineering/thermalEngine.js',limitations:['Ignores thermal bridges and ageing'],evidenceClass:'CALCULATED_FROM_DECLARED_OR_DEFAULT_ASSUMPTIONS',execute:(input)=>require('../services/engineering/thermalEngine').insulationThickness(input)});
+  return registry;
+}
+
+module.exports={buildDeterministicAlgorithmRegistry};

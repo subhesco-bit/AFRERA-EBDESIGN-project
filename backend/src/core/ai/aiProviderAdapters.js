@@ -20,6 +20,7 @@ const PROVIDER_ENV = {
   openai: { primary: 'OPENAI_API_KEY' },
   gemini: { primary: 'GEMINI_API_KEY', alt: 'GOOGLE_API_KEY' },
   deepseek: { primary: 'DEEPSEEK_API_KEY' },
+  grok: { primary: 'XAI_API_KEY' },
 };
 
 /**

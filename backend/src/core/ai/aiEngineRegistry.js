@@ -30,6 +30,10 @@
 'use strict';
 
 const { logger } = require('../../utils/logger');
+const { randomUUID } = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const { providerStatus } = require('./aiProviderAdapters');
 
 /**
  * AI Engine Registry
@@ -68,6 +72,28 @@ const AI_ENGINES = {
     capabilities: ['text_generation', 'analysis', 'classification', 'summarization'],
     cost_per_1k_tokens: 0.001,
     max_tokens: 8192,
+    confidence_threshold: 0.75,
+  },
+  llm_deepseek: {
+    id: 'EBD-ENG-00000010',
+    name: 'DeepSeek LLM Adapter',
+    type: 'llm',
+    provider: 'deepseek',
+    status: 'declared',
+    capabilities: ['text_generation', 'analysis', 'classification', 'summarization'],
+    cost_per_1k_tokens: null,
+    max_tokens: null,
+    confidence_threshold: 0.75,
+  },
+  llm_grok: {
+    id: 'EBD-ENG-00000011',
+    name: 'Grok/xAI LLM Adapter',
+    type: 'llm',
+    provider: 'grok',
+    status: 'declared',
+    capabilities: ['text_generation', 'analysis', 'classification', 'summarization'],
+    cost_per_1k_tokens: null,
+    max_tokens: null,
     confidence_threshold: 0.75,
   },
 
@@ -141,6 +167,52 @@ const AI_ENGINES = {
   },
 };
 
+const ENGINE_BACKING = {
+  vision_quality: '../../services/legacy/visionService.js',
+  vision_ocr: '../../services/legacy/ocrService.js',
+  recommendation: '../../services/legacy/catalogIntelligenceService.js',
+};
+
+function engineKey(engine) {
+  const found = Object.entries(AI_ENGINES).find(([, value]) => value === engine || value.id === engine?.id);
+  return found ? found[0] : null;
+}
+
+function getEngineRuntimeStatus(engineOrName) {
+  const engine = typeof engineOrName === 'string' ? (AI_ENGINES[engineOrName] || getEngine(engineOrName)) : engineOrName;
+  if (!engine) return { state: 'unknown', available: false, configured: false, mapped: false };
+  const key = engineKey(engine);
+  if (engine.type === 'llm') {
+    const provider = providerStatus(engine.provider);
+    return {
+      state: provider.configured ? 'configured_adapter_not_live' : 'not_configured',
+      available: false,
+      configured: provider.configured,
+      mapped: true,
+      reason: 'Provider adapter metadata exists but live SDK/network execution is intentionally not implemented.',
+    };
+  }
+  if (engine.type === 'speech') {
+    const envName = engine.provider === 'google' ? 'GOOGLE_SPEECH_API_KEY' : engine.provider === 'azure' ? 'AZURE_SPEECH_KEY' : null;
+    const configured = Boolean(envName && process.env[envName]);
+    return { state: configured ? 'configured_adapter_not_live' : 'not_configured', available: false, configured, mapped: true, reason: 'Speech adapter has no live provider invocation yet.' };
+  }
+  if (key === 'classification') return { state: 'unmapped', available: false, configured: true, mapped: false, reason: 'No standalone classification backing exists; use an LLM capability when live or a deterministic classifier.' };
+  const backing = ENGINE_BACKING[key];
+  if (backing) {
+    const backingPath = path.resolve(__dirname, backing);
+    const exists = fs.existsSync(backingPath);
+    return { state: exists ? 'verified_local_backing' : 'missing_backing', available: exists, configured: exists, mapped: exists, backing: path.relative(path.resolve(__dirname, '../..'), backingPath).replace(/\\/g, '/') };
+  }
+  return { state: engine.status || 'declared', available: false, configured: false, mapped: false, reason: 'No runtime backing classification recorded.' };
+}
+
+function getEngineRuntimeView(engineOrName) {
+  const engine = typeof engineOrName === 'string' ? (AI_ENGINES[engineOrName] || getEngine(engineOrName)) : engineOrName;
+  if (!engine) return null;
+  return { ...engine, registryKey: engineKey(engine), runtime: getEngineRuntimeStatus(engine) };
+}
+
 /**
  * Get engine by ID
  */
@@ -182,9 +254,9 @@ function listEngines() {
  * Get ready engines only
  */
 function listReadyEngines() {
-  return Object.values(AI_ENGINES).filter(engine =>
-    engine.status === 'ready' || engine.status === 'configured',
-  );
+  return Object.entries(AI_ENGINES)
+    .map(([key, engine]) => ({ ...engine, registryKey: key, runtime: getEngineRuntimeStatus(engine) }))
+    .filter(engine => engine.runtime.available);
 }
 
 /**
@@ -193,7 +265,8 @@ function listReadyEngines() {
 function registerEngine(engineConfig) {
   const engineId = engineConfig.id || `EBD-ENG-${generateEngineId()}`;
 
-  AI_ENGINES[engineConfig.name] = {
+  const registryKey = engineConfig.key || String(engineConfig.name || engineId).trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  AI_ENGINES[registryKey] = {
     id: engineId,
     name: engineConfig.name,
     type: engineConfig.type,
@@ -213,14 +286,14 @@ function registerEngine(engineConfig) {
  * Generate unique engine ID
  */
 function generateEngineId() {
-  return Date.now().toString(16).toUpperCase();
+  return randomUUID().replace(/-/g, '').slice(0, 16).toUpperCase();
 }
 
 /**
  * Find best engine for capability
  */
 function findBestEngine(capability, options = {}) {
-  const { preferProvider, maxCost, minConfidence } = options;
+  const { preferProvider, maxCost, minConfidence, requireAvailable = false } = options;
 
   let candidates = getEnginesByCapability(capability);
 
@@ -228,11 +301,15 @@ function findBestEngine(capability, options = {}) {
     candidates = candidates.filter(e => e.provider === preferProvider);
   }
 
-  if (maxCost) {
-    candidates = candidates.filter(e => e.cost_per_1k_tokens <= maxCost);
+  if (requireAvailable) {
+    candidates = candidates.filter(e => getEngineRuntimeStatus(e).available);
   }
 
-  if (minConfidence) {
+  if (maxCost != null) {
+    candidates = candidates.filter(e => Number.isFinite(e.cost_per_1k_tokens) && e.cost_per_1k_tokens <= maxCost);
+  }
+
+  if (minConfidence != null) {
     candidates = candidates.filter(e => e.confidence_threshold >= minConfidence);
   }
 
@@ -255,6 +332,8 @@ module.exports = {
   getEnginesByCapability,
   listEngines,
   listReadyEngines,
+  getEngineRuntimeStatus,
+  getEngineRuntimeView,
   registerEngine,
   findBestEngine,
 };

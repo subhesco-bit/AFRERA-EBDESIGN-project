@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "principle": "Use specialist plugins where they materially improve evidence or implementation. Do not invoke unrelated plugins merely to increase tool count.",
+  "authoritativeSources": {
+    "localWorkingTree": "Remote Desktop Commander",
+    "sourceControl": "GitHub",
+    "runtimeDeployment": "Platform-specific plugin selected by actual deployment target"
+  },
+  "toolchain": [
+    {
+      "area": "local-files-code",
+      "tools": [
+        "Remote Desktop Commander"
+      ],
+      "requiredWhen": [
+        "reading/modifying EBDESIGN local working tree",
+        "hidden/backup/consolidated review",
+        "local tests/builds"
+      ],
+      "evidence": [
+        "actual file paths",
+        "command output",
+        "git diff/status"
+      ]
+    },
+    {
+      "area": "source-control",
+      "tools": [
+        "GitHub"
+      ],
+      "requiredWhen": [
+        "remote branch verification",
+        "PR/commit evidence",
+        "remote history recovery",
+        "checkpoint verification"
+      ],
+      "evidence": [
+        "branch/commit/PR refs"
+      ]
+    },
+    {
+      "area": "frontend-react",
+      "skills": [
+        "skills://plugins/vercel/react-best-practices/skill.md"
+      ],
+      "requiredWhen": [
+        "multi-component React/JSX refactor",
+        "frontend performance/accessibility review"
+      ],
+      "evidence": [
+        "rule-specific review findings",
+        "test/build results"
+      ]
+    },
+    {
+      "area": "browser-e2e",
+      "skills": [
+        "skills://plugins/vercel/agent-browser-verify/skill.md",
+        "skills://plugins/vercel/verification/skill.md"
+      ],
+      "requiredWhen": [
+        "dev server starts",
+        "end-to-end feature verification",
+        "UI/API/data flow certification"
+      ],
+      "evidence": [
+        "browser state",
+        "console/network evidence",
+        "boundary-by-boundary verification"
+      ]
+    },
+    {
+      "area": "ai-agents",
+      "skills": [
+        "skills://plugins/vercel/ai-sdk/skill.md",
+        "skills://plugins/vercel/ai-gateway/skill.md",
+        "skills://plugins/vercel/workflow/skill.md",
+        "skills://plugins/vercel/ai-elements/skill.md"
+      ],
+      "requiredWhen": [
+        "LLM provider integration",
+        "agent/tool-calling",
+        "streaming AI UX",
+        "durable AI workflows"
+      ],
+      "evidence": [
+        "current SDK docs/source verification",
+        "typecheck",
+        "provider/model runtime truth"
+      ]
+    },
+    {
+      "area": "backend-deployment-ops",
+      "skills": [
+        "skills://plugins/app-6a502589384081919c5decf93496c9d1/use-railway/skill.md"
+      ],
+      "tools": [
+        "Railway"
+      ],
+      "requiredWhen": [
+        "backend/service/database deployment",
+        "runtime logs/metrics",
+        "staging/production infrastructure"
+      ],
+      "evidence": [
+        "deployment id/status",
+        "build/runtime logs",
+        "health metrics"
+      ]
+    },
+    {
+      "area": "vercel-deployment-ops",
+      "skills": [
+        "skills://plugins/vercel/deployments-cicd/skill.md",
+        "skills://plugins/vercel/observability/skill.md",
+        "skills://plugins/vercel/vercel-firewall/skill.md"
+      ],
+      "tools": [
+        "Vercel"
+      ],
+      "requiredWhen": [
+        "frontend or service deployed on Vercel",
+        "preview/prod deployment",
+        "edge/firewall/observability"
+      ],
+      "evidence": [
+        "deployment/status/logs/security configuration"
+      ]
+    },
+    {
+      "area": "visual-design",
+      "skills": [
+        "skills://plugins/canva/canva-design-feedback/skill.md",
+        "skills://plugins/canva/canva-edit-design/skill.md"
+      ],
+      "tools": [
+        "Canva"
+      ],
+      "requiredWhen": [
+        "brand system",
+        "visual asset/deck review",
+        "design accessibility"
+      ],
+      "evidence": [
+        "design audit or concrete design changes"
+      ]
+    },
+    {
+      "area": "full-stack-prototyping",
+      "tools": [
+        "Floot"
+      ],
+      "requiredWhen": [
+        "isolated prototype/spike adds value without replacing canonical repo"
+      ],
+      "evidence": [
+        "prototype scope and merge/rejection decision"
+      ]
+    }
+  ],
+  "constraints": [
+    "Never migrate the canonical project to a plugin-specific framework merely to use a plugin.",
+    "Never let plugin-generated output override actual-file evidence without validation.",
+    "Never claim a plugin verified something unless its output was actually inspected.",
+    "Do not invoke unrelated scientific, legal, design, or business plugins for software phases.",
+    "Every plugin-assisted change must still pass repository-native tests and phase gates.",
+    "Deployment plugins are used only when the target platform is selected or a temporary verification deployment is justified."
+  ]
+}

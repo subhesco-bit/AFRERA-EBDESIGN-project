@@ -191,6 +191,7 @@ const aiAgentRoutes = require('./routes/aiAgentRoutes.js');
 const agriculturalIntelligenceRoutes = require('./routes/agriculturalIntelligenceRoutes.js');
 const advancedSearchRoutes = require('./routes/advancedSearchRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
+const neProductMasterRoutes = require('./routes/neProductMasterRoutes.js');
 const advancedFeatures = require('./routes/advancedFeatures.js');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes.js');
 const apiWarningRoutes = require('./routes/apiWarningRoutes.js');
@@ -300,6 +301,7 @@ app.use(rateLimit(
 app.use('/api/v1/operational-modules', operationalModuleRoutes);
 app.use('/api/v1/value-chain', productValueChainRoutes);
 app.use('/api/v1/search', searchRoutes);
+app.use('/api/v1/catalog/ne-products', neProductMasterRoutes);
 app.use('/api/v1/advanced-medical-coding', advancedMedicalCodingRoutes);
 
 // M007 Role & Permission Management (AI-enhanced) lives under

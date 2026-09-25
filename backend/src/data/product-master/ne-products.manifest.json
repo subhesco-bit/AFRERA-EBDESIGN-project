@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "productCount": 1171,
+  "catalogSha256": "9f28cb60278d4e036ffe5526392c68e655af1b28d10b958e1a0d6c2920f9f091",
+  "sourceFileSha256": "11a3b6df5a7b962097253f9a65dede8372c93a95a140a26482e63ca1f7714789",
+  "sourceFile": "afrera_platform_v44 (3).html",
+  "distinctCatalogHashCount": 2,
+  "historicalVariantRecordCount": 1,
+  "privacyRule": "Farmer MAP/floor price is private and must never be exposed to buyer-facing interfaces.",
+  "truthRules": [
+    "Prototype GI flags remain unverified until Phase 047 authoritative validation.",
+    "Prototype prices remain non-current/non-authoritative until Phase 048 price intelligence.",
+    "Product identity and raw source rows are preserved losslessly.",
+    "No source HTML is modified or deleted by this phase."
+  ],
+  "generatedBy": "tools/extract_ne_product_master.py",
+  "dataFileSha256": "af25b411dcd988cf3c132d628de892865e1b24638e5d21166e3c284946c32a4b"
+}
