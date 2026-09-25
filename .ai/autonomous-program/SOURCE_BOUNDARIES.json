@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "canonicalWritableRoot": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN",
+  "canonicalBranch": "chatgpt/auto-100-phase-20260925",
+  "executionMode": "single-threaded-sequential",
+  "cleanupLockedUntilPhase": "100",
+  "sources": [
+    {"path":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN","class":"active-canonical","writePolicy":"controlled","cleanupPolicy":"no-delete-before-100"},
+    {"path":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN-consolidated","class":"secondary-project-tree","writePolicy":"read-only-during-reconciliation","cleanupPolicy":"no-delete-before-100"},
+    {"path":"C:\\Users\\DIYA GOEL\\Desktop\\ne","class":"historical-product-ux-content-source","writePolicy":"read-only","cleanupPolicy":"preserve-until-reconciled"},
+    {"path":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\_EBDESIGN_LIBRARY","class":"library-and-reconciliation-source","writePolicy":"read-only-during-reconciliation","cleanupPolicy":"no-delete-before-100"},
+    {"path":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.archive","class":"historical-recovery-source","writePolicy":"read-only-during-reconciliation","cleanupPolicy":"no-delete-before-100"},
+    {"path":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees","class":"alternate-project-worktrees","writePolicy":"read-only-during-reconciliation","cleanupPolicy":"no-delete-before-100"},
+    {"path":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\New folder","class":"backup-and-legacy-source","writePolicy":"read-only-during-reconciliation","cleanupPolicy":"no-delete-before-100"},
+    {"path":"github:subhesco-bit/AFRERA-EBDESIGN-project","class":"scm-history-recovery","writePolicy":"controlled","cleanupPolicy":"not-applicable"}
+  ],
+  "rules": [
+    "Source authority is determined by content, capability, tests, provenance and integration—not folder name, date or index.",
+    "No source tree is bulk-copied over another.",
+    "No source tree is bulk-deleted or cleaned before Phase 100.",
+    "Feature families are reconciled file-by-file or module-by-module.",
+    "Indexes and reports may guide navigation but never override actual source evidence."
+  ]
+}

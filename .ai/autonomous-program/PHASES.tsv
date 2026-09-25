@@ -1,0 +1,102 @@
+id	title	objective
+000	Baseline Freeze	Capture branch HEAD working-tree evidence environment resources and rollback anchors without altering pre-existing work.
+001	Completion Constitution	Make preservation evidence-first enhancement no-mock and gate rules executable project policy.
+002	Canonical Source Boundaries	Classify active source historical source generated vendor evidence archive and external-source boundaries.
+003	Immutable Evidence Store	Create append-only evidence conventions with hashes timestamps provenance and source references.
+004	Phase State Model	Persist phase status attempts blockers evidence and dependencies in machine-readable form.
+005	AUTO Phase Controller	Implement deterministic PASS advances FAIL repairs BLOCKED stops logic with no silent skipping.
+006	Bounded Repair Engine	Define retry budgets root-cause capture escalation and safe stop conditions.
+007	Checkpoint and Rollback	Create Git and file-level checkpoints before modifying phases and prove restoration paths.
+008	No-Delete Cleanup Freeze	Classify cleanup candidates only; prohibit deletion, pruning, reset, clean, GC, move or overwrite of project material until Phase 100 full-tree forensic audit.
+009	Source Corpus Registry	Register EBDESIGN consolidated Desktop/ne backups worktrees archives GitHub and future sources.
+010	EBDESIGN Discovery	Inventory actual primary-tree files structures manifests databases assets and authored artifacts.
+011	Consolidated Discovery	Inventory EBDESIGN-consolidated and map every item against the primary tree.
+012	Desktop NE Discovery	Inventory NE HTML PDF DOCX ZIP product image and prototype families as first-class sources.
+013	GitHub History Discovery	Map branches commits PR-era variants and files absent from local canonical source.
+014	Backup and Archive Discovery	Find old backup archive recovery and pre-consolidation material without assuming obsolescence.
+015	Worktree Pine SUBH Recovery	Discover Claude worktrees pine/Grok SUBH-DEEP and merge-lab capability sources.
+016	Hidden and Free File Discovery	Find untracked hidden free-standing and misplaced authored files and classify them.
+017	Universal File Identity	Assign stable source identity path metadata role and provenance to every relevant artifact.
+018	Cryptographic Fingerprinting	SHA-256 fingerprint relevant files to prove exact duplicates and preservation.
+019	Exact Duplicate Families	Group byte-identical artifacts without deleting authoritative or provenance copies prematurely.
+020	Near-Duplicate Families	Detect similar code documents HTML and data versions that differ materially.
+021	Structural Code Parsing	Extract imports exports classes functions routes handlers schemas workers and dependency edges.
+022	Concept and Document Parsing	Extract requirements rules algorithms workflows decisions and domain concepts from raw originals.
+023	HTML Prototype Recovery	Parse AFRERA and NE Harvest HTML versions for screens data workflows copy handlers prompts and lost features.
+024	Visual Asset Recovery	Inventory images dimensions hashes references and candidate semantic/product relationships.
+025	PDF DOCX Binary Recovery	Extract usable structured facts tables images requirements and provenance from rich documents.
+026	Source Provenance Graph	Connect each recovered capability to source versions evidence lineage and later implementations.
+027	Feature Recovery Matrix	Create concept-to-implementation matrix across current old backup NE and GitHub sources.
+028	Conflict and Regression Detection	Identify incompatible implementations lost behavior stale rules fake persistence and regressions.
+029	Lossless Reconciliation Design	Choose merge supersede bridge archive or retain outcomes with explicit no-loss rationale.
+030	Canonical Domain Taxonomy	Define enterprise domain system module submodule capability feature service and business-cell hierarchy.
+031	Software Anatomy Model	Enforce input validation context knowledge rules logic decision workflow storage event audit learning anatomy.
+032	Discovery Wire Contract	Standardize module metadata capability context dependencies and natural-language discovery interface.
+033	Execution Wire Contract	Standardize initialization health execute errors authorization idempotency and result envelopes.
+034	Module Lifecycle	Implement discovered loaded initialized ready executing degraded error shutdown lifecycle semantics.
+035	Dependency Graph	Build real module service data external and runtime dependency resolution with cycle/orphan detection.
+036	Event and Signal Nervous System	Unify events signals reflex triggers queues and cross-domain reactions with schema governance.
+037	Canonical Data Model Catalog	Reconcile database schemas entities ownership retention lineage and source-of-truth rules.
+038	API Contract Catalog	Extract and validate real REST GraphQL WebSocket event and integration contracts.
+039	UI Route Experience Catalog	Map every page component state route role permission and responsive experience.
+040	Workflow and State-Machine Catalog	Model business workflows states transitions SLAs exceptions compensations and approvals.
+041	Rules Algorithms Formula Catalog	Recover deterministic rules calculations optimization scoring simulation and scientific algorithms.
+042	AI Engine Catalog	Register ML CV OCR speech forecasting LLM agents knowledge engines and capability fitness.
+043	External Integration Catalog	Map payment banking logistics weather government messaging maps identity and partner dependencies.
+044	NE 1171 Product Master	Extract and normalize the verified 1171-entry prototype catalog into canonical product master data.
+045	NE Variety Enrichment	Merge taxonomic GI biochemical agronomic processing and value-chain fields from variety sources.
+046	Product Image Intelligence	Deduplicate identify license/provenance-check and map visual assets to products categories stories and variants.
+047	GI Certification Provenance	Validate GI status identifiers origin claims and temporal/legal evidence against authoritative sources.
+048	Market Price Intelligence	Build source-aware current historical seasonality wholesale retail farm-gate and confidence architecture.
+049	Procurement Value Chain	Implement farmer-to-aggregation-processing-packaging-certification-logistics-market workflow and economics.
+050	Cold Chain and Storage	Complete pre-cooling storage reefer temperature integrity capacity energy spoilage and exception workflows.
+051	Farmer FPO Cooperative Core	Complete onboarding farms members aggregation bargaining ledger advisory and collective operations.
+052	Consumer Marketplace	Complete discovery search compare cart checkout orders subscriptions personalization returns and trust.
+053	Institutional B2B Procurement	Complete RWA HoReCa corporate defence welfare RFQ tender contract budget and recurring procurement.
+054	Finance Credit Payments	Complete cashflow credit facilitation bank passport escrow payment reconciliation risk and audit controls.
+055	Insurance Policy Claims	Complete quotation policy eligibility coverage evidence FNOL assessment claims settlement and fraud controls.
+056	Scheme Subsidy Intelligence	Implement versioned eligibility evidence application tracking expiry and current-policy validation.
+057	Governance Compliance Legal	Complete DPDP regulatory governance consent audit approvals retention and jurisdiction-aware controls.
+058	Food Safety Quality Labs	Complete HACCP FSSAI sampling COA grading recalls CAPA audit quality gates and lab interoperability.
+059	Nutrition Wellness Dietitian	Complete evidence-level nutrition potency diet planning contraindication and recommendation architecture.
+060	Veterinary Livestock	Complete species packs health records diagnostics vaccination breeding feed disease and specialist escalation.
+061	Crop Agronomy Weather	Complete crop choice field plans weather geospatial disease pest irrigation harvest and yield intelligence.
+062	Seed Biodiversity Indigenous Knowledge	Complete seed vault landrace extinction-risk heritage knowledge IP consent and conservation workflows.
+063	Processing Manufacturing Value Addition	Complete recipe/process routing equipment yield QC costing packaging and traceable transformation.
+064	Warehouse Inventory eNWR	Complete lots bins batches FEFO reservations warehouse receipts shrinkage cycle counts and quality holds.
+065	Logistics Fleet Route	Complete multimodal planning fleet cold-chain routing proof-of-delivery disruption and return-truck optimization.
+066	ERP Accounting Tax	Complete ledgers AP AR GST tax inventory valuation cost centers financial statements controls and reconciliation.
+067	CRM Support Loyalty	Complete customer 360 issues SLA service recovery loyalty campaigns feedback and retention intelligence.
+068	HR Workforce Training	Complete roles skills schedules payroll links training competency safety and field workforce operations.
+069	Engineering Digital Twin	Complete DPR structural solar cold-storage energy facility design BOM simulation and lifecycle digital twins.
+070	Sustainability Circularity Climate	Complete waste-to-value water energy carbon biodiversity ESG and resource-efficiency measurement.
+071	Research Innovation Experimentation	Create evidence-managed experiments pilots hypotheses results technology readiness and innovation pipeline.
+072	Intelligence Registry	Implement canonical registry of algorithms rules models tools plugins costs risks capabilities and evidence.
+073	Reflex Engine	Implement low-latency deterministic event reactions before expensive reasoning where policy allows.
+074	Strategy Router	Select algorithms data tools models plugins and workflows by fitness risk cost latency confidence and permissions.
+075	Hybrid Retrieval	Implement lexical semantic metadata structural graph retrieval fusion reranking and measurable retrieval quality.
+076	Knowledge Graph	Build entity relationship provenance temporal evidence and domain-connection graph across the platform.
+077	Memory Context Knowledge	Separate session memory user context operational state canonical knowledge evidence and retention rules.
+078	Specialist Plugin Routing	Integrate GitHub research legal deployment bio science and future plugins as replaceable governed specialists.
+079	Multi-Agent Governance	Implement task ownership handoffs conflict prevention approvals budgets and one-writer canonical-worktree policy.
+080	Explainability Confidence Evidence	Attach source confidence rationale uncertainty counterevidence and human-review thresholds to decisions.
+081	Evaluation Learning Improvement	Build offline evals online metrics feedback drift detection outcome learning and safe improvement loops.
+082	Adaptive UX Personalization	Implement consent-bounded role location preference behavior accessibility and context-adaptive experiences.
+083	Multilingual Accessibility Offline	Complete language voice low-literacy WCAG kiosk PWA offline sync conflict resolution and assistive modes.
+084	Mobile Desktop Edge IoT	Complete React Native/Tauri/device IoT sensor camera GPS and edge/offline integration architecture.
+085	IAM MFA Authorization	Harden identity OIDC MFA RBAC/ABAC tenant isolation session device and privileged-access controls.
+086	Secrets Data Security Audit	Harden encryption secrets PII redaction data residency immutable audit and security event handling.
+087	Resilience Self-Healing DR	Implement health degradation circuit breaking retries queues backup restore failover and disaster recovery.
+088	Observability	Implement traces metrics structured logs business telemetry AI/plugin telemetry SLOs and actionable alerting.
+089	Performance Scale Cost	Benchmark and optimize latency memory CPU database caching concurrency token/plugin cost and horizontal scale.
+090	Unit Contract Integration Testing	Close test gaps with real databases/contracts and deterministic fixtures while rejecting fake PASS states.
+091	E2E Browser Accessibility Testing	Verify critical journeys through browser API data response visual and accessibility layers.
+092	Data Migration Seed Reconciliation	Create repeatable migrations canonical seed data product imports deduplication and rollback validation.
+093	DevSecOps CI CD Supply Chain	Harden pipelines branch policy SBOM provenance dependency scanning secret scanning and reproducible builds.
+094	Staging Deployment	Deploy realistic staging frontend backend workers databases and integrations through controlled deployment plugins.
+095	Load Security Resilience Qualification	Run performance load security fault backup-restore and chaos-style qualification against acceptance gates.
+096	Pilot Canary Feature Flags	Implement controlled pilot cohorts canaries feature flags rollback telemetry and measured acceptance.
+097	Production Readiness Gap Closure	Re-audit every domain and cross-cutting concern and implement remaining production blockers.
+098	Orphan Resolution and Library Index	Resolve orphan classifications, preserve/reconcile useful capability, and build the canonical versioned Library index without deleting project material.
+099	Release Certification Continuous Evolution	Sign evidence-backed release baseline and activate observe-research-simulate-improve-test-canary-learn evolution loop.
+100	Final Full-Tree Forensic Audit and Cleanup Gate	Use PowerShell to inspect EBDESIGN and EBDESIGN-consolidated contents, compare unique code/features/data/assets/history, recover anything missing, produce evidence-backed cleanup disposition, and only then permit proven-safe cleanup.

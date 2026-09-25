@@ -1,0 +1,26 @@
+{
+    "program":  "AFRERA_EBDESIGN_100_PHASE_AUTO",
+    "phaseCount":  101,
+    "statusValues":  [
+                         "PENDING",
+                         "RUNNING",
+                         "FAILED",
+                         "BLOCKED",
+                         "PASSED"
+                     ],
+    "phaseFields":  [
+                        "status",
+                        "attempts",
+                        "maxAttempts",
+                        "dependsOn",
+                        "evidence",
+                        "blockers",
+                        "history"
+                    ],
+    "defaultMaxAttempts":  3,
+    "dependencyMode":  "strict-sequential",
+    "passRule":  "current phase must be RUNNING and evidence path must exist",
+    "failureRule":  "FAIL/BLOCK never advances currentPhase",
+    "migrationRule":  "existing phase history and PASS states are preserved when state schema gains fields",
+    "cleanupLockedUntilPhase":  "100"
+}

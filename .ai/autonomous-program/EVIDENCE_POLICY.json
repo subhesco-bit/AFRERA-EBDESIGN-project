@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "root": ".audit/phase-program",
+  "appendOnlyLog": ".audit/phase-program/evidence.jsonl",
+  "requiredFields": ["timestamp","phase","type","note"],
+  "hashAlgorithm": "sha256",
+  "rules": [
+    "Evidence records are appended; historical records are not edited in place.",
+    "File evidence records include repository-relative path and SHA-256 when the file exists.",
+    "Runtime claims require captured command/test output or a referenced artifact, not narrative assertion.",
+    "Generated indexes are evidence of index generation only, not proof that indexed capabilities work.",
+    "Secrets and credential values must never be written into evidence."
+  ]
+}

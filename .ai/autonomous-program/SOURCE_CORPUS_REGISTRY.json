@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "registeredAt": "2026-09-25",
+  "mode": "single-threaded-no-delete-until-100",
+  "corpora": [
+    {"id":"LOCAL.EBDESIGN","location":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN","role":"canonical active working repository","authority":"current implementation candidate","mode":"controlled-read-write"},
+    {"id":"LOCAL.CONSOLIDATED","location":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN-consolidated","role":"secondary project tree","authority":"recovery and comparison source","mode":"read-only during reconciliation"},
+    {"id":"LOCAL.NE","location":"C:\\Users\\DIYA GOEL\\Desktop\\ne","role":"NE Harvest/AFRERA product, UX, value-chain, image and prototype source","authority":"historical requirement/content evidence","mode":"read-only"},
+    {"id":"LOCAL.LIBRARY","location":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\_EBDESIGN_LIBRARY","role":"library, catalogue, authority and discovery artifacts","authority":"navigation and reconciliation evidence only; raw source outranks generated indexes","mode":"read-only during reconciliation"},
+    {"id":"LOCAL.ARCHIVE","location":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.archive","role":"historical recovery corpus","authority":"potential complete/partial historical project state","mode":"read-only during reconciliation"},
+    {"id":"LOCAL.CLAUDE_WORKTREES","location":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees","role":"alternate Claude development lines","authority":"potential unique implementation/commit source","mode":"read-only during reconciliation"},
+    {"id":"LOCAL.BACKUPS","location":"C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\New folder","role":"legacy backups, historical GitHub copies and agent worktrees","authority":"feature-recovery source","mode":"read-only during reconciliation"},
+    {"id":"SCM.GITHUB","location":"github:subhesco-bit/AFRERA-EBDESIGN-project","role":"remote SCM history and branches","authority":"version/provenance source","mode":"controlled-read-write"}
+  ],
+  "priorityRules": [
+    "Actual raw source and runtime evidence outrank generated indexes.",
+    "Historical or alternate trees may contain more complete implementation than current branch and remain authoritative candidates until reconciled.",
+    "No corpus is cleaned before Phase 100."
+  ]
+}

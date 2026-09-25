@@ -1,0 +1,8 @@
+{
+  "defaultMaxAttempts": 3,
+  "startPreconditions": ["current-phase-only","dependencies-passed","retry-budget-available"],
+  "onFailure": ["retain-current-phase","append-root-cause","retain-attempt-number","do-not-advance"],
+  "onBudgetExhaustion": "BLOCKED",
+  "blockedBehavior": "No automatic PASS or skip. Remediation must produce new evidence and an explicit controlled state decision.",
+  "safety": "Never use indefinite loops for repair, scans, tests, network calls, or agent delegation."
+}

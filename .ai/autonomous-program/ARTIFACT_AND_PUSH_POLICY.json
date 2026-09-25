@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "maxSingleGeneratedFileBytes": 26214400,
+  "maxSingleGeneratedFileMB": 25,
+  "rule": "No new project/evidence/generated artifact may exceed 25 MB.",
+  "oversizeDisposition": "Split deterministically into numbered chunks below 25 MB plus a manifest containing ordering, original logical name, total bytes, chunk hashes and reassembly instructions.",
+  "git": {
+    "preCommitGuard": ".githooks/pre-commit",
+    "stagedOversizePolicy": "reject commit"
+  },
+  "phaseGate": "Run tools/file-size-guard.js before PASS.",
+  "pushCadence": {
+    "minimum": "push at least every 5 completed phases",
+    "alsoPush": ["before risky migration/reconciliation", "after major implementation milestone", "before branch-changing operation"],
+    "protectedUserChanges": "Never stage or commit pre-existing user modifications unless explicitly reconciled."
+  }
+}

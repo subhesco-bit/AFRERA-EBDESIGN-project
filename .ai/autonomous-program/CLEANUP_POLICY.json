@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "mode": "NO_DELETE_UNTIL_CONTENT_RECONCILIATION",
+  "effectiveAt": "2026-09-25",
+  "roots": [
+    "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN",
+    "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN-consolidated",
+    "C:\\Users\\DIYA GOEL\\Desktop\\ne"
+  ],
+  "automaticDeleteAllowed": [],
+  "rules": [
+    "Do not delete, move, truncate, overwrite, reset, clean, prune, garbage-collect, archive, or deaccession any project-related file or directory before content-level reconciliation.",
+    "Folder names such as archive, backup, worktree, generated, library, cache, old, duplicate, consolidated, temp, build, or node_modules are not sufficient grounds for deletion.",
+    "Before any future disposition: inspect contents, hash exact duplicates, compare branches/commits, detect uncommitted changes, recover unique code/features/concepts/data/assets, map provenance, and record evidence.",
+    "A source may contain a more complete project than the current repository and must be treated as potentially authoritative until disproven.",
+    "Cleanup during discovery is classification-only. Physical deletion requires a later explicit evidence-backed disposition gate.",
+    "Git gc/prune/clean/reset and filesystem recursive deletion are prohibited during discovery/reconciliation phases."
+  ],
+  "priorActionDisclosure": "Before this policy change, six historical/worktree node_modules trees were removed after package.json/package-lock verification; no authored source file was intentionally deleted. No further deletion is permitted under this policy."
+}

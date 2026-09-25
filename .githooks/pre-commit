@@ -1,0 +1,8 @@
+#!/bin/sh
+node tools/file-size-guard.js --staged
+status=$?
+if [ $status -ne 0 ]; then
+  echo "Commit blocked: staged file exceeds the 25 MB project limit. Split it into deterministic chunks first." >&2
+  exit $status
+fi
+exit 0
