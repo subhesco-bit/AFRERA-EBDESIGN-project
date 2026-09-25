@@ -138,7 +138,7 @@ class DecisionEngine {
 
   _record(rule, signal, decision) {
     const record = {
-      id: `dec_${Date.now()}_${Math.round(Math.random() * 1e6)}`,
+      id: 'dec_' + crypto.randomUUID(),
       rule: rule.id,
       mode: decision.mode || 'reasoned',
       actions: decision.actions || [],

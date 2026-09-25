@@ -1,18 +1,7 @@
-import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-
-function ProtectedRoute({ children, requiredRole = null }) {
-  const { isAuthenticated, user } = useAuthStore();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-}
-
-export default ProtectedRoute;
+/**
+ * Compatibility export.
+ *
+ * RouteGuard.jsx is the canonical authentication/authorization implementation.
+ * This file is retained so historical imports cannot drift into a second policy.
+ */
+export { ProtectedRoute as default, ProtectedRoute } from './RouteGuard';

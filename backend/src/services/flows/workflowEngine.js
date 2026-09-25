@@ -7,8 +7,12 @@
 
 'use strict';
 
+const { randomUUID } = require('crypto');
+const { workflowRegistry: defaultWorkflowRegistry } = require('../../core/workflowDefinitionRegistry');
+
 class WorkflowEngine {
-  constructor() {
+  constructor(options = {}) {
+    this.registry = options.registry || defaultWorkflowRegistry;
     this.workflows = new Map();      // workflowId → definition
     this.executions = new Map();     // executionId → execution record
     this.stepHandlers = new Map();   // stepType → handler function
@@ -18,12 +22,12 @@ class WorkflowEngine {
    * Register a workflow definition
    */
   registerWorkflow(workflowId, definition) {
+    const governed = this.registry.register(workflowId, {
+      ...definition,
+      source: definition.source || 'runtime',
+    });
     this.workflows.set(workflowId, {
-      id: workflowId,
-      name: definition.name,
-      description: definition.description,
-      steps: definition.steps, // [{id, type, config, compensation}]
-      triggers: definition.triggers || [],
+      ...governed,
       createdAt: new Date(),
     });
     return this.workflows.get(workflowId);
@@ -45,7 +49,7 @@ class WorkflowEngine {
       throw new Error(`Workflow ${workflowId} not found`);
     }
 
-    const executionId = `EXEC-${workflowId}-${Date.now()}`;
+    const executionId = `EXEC-${workflowId}-${randomUUID()}`;
     const execution = {
       id: executionId,
       workflowId,
@@ -55,6 +59,7 @@ class WorkflowEngine {
       startedAt: new Date(),
       completedAt: null,
       error: null,
+      compensations: [],
     };
 
     try {
@@ -67,7 +72,7 @@ class WorkflowEngine {
 
         if (stepExecution.status === 'failed') {
           // Compensation logic
-          await this._compensate(workflow.steps.slice(0, i).reverse(), context);
+          execution.compensations = await this._compensate(workflow.steps.slice(0, i).reverse(), context);
           execution.status = 'failed';
           execution.error = stepExecution.error;
           break;
@@ -81,7 +86,7 @@ class WorkflowEngine {
       execution.status = 'failed';
       execution.error = e.message;
       // Attempt compensation
-      await this._compensate(workflow.steps.reverse(), context);
+      execution.compensations = await this._compensate([...workflow.steps].reverse(), context);
     }
 
     execution.completedAt = new Date();
@@ -132,19 +137,26 @@ class WorkflowEngine {
    * Compensation (rollback) logic
    */
   async _compensate(reversedSteps, context) {
+    const outcomes = [];
     for (const step of reversedSteps) {
       if (!step.compensation) continue;
-
+      const record = { stepId: step.id, type: step.compensation.type, status: 'skipped', error: null };
       try {
         const handler = this.stepHandlers.get(step.compensation.type);
         if (handler) {
-          await handler(context, step.compensation.config);
+          record.output = await handler(context, step.compensation.config);
+          record.status = 'completed';
+        } else {
+          record.error = 'No handler for compensation type ' + step.compensation.type;
         }
       } catch (e) {
+        record.status = 'failed';
+        record.error = e.message;
         console.error(`Compensation failed for step ${step.id}:`, e);
-        // Continue with other compensations even if one fails
       }
+      outcomes.push(record);
     }
+    return outcomes;
   }
 
   /**

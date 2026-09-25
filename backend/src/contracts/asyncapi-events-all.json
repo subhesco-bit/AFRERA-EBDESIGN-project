@@ -1,0 +1,1267 @@
+{
+  "asyncapi": "3.1.0",
+  "info": {
+    "title": "AFRERA Complete Governed Event Contract",
+    "version": "1.0.0",
+    "description": "All registered AFRERA signal types are contract-addressable. Detailed payload schemas are preserved where verified; remaining signals use an explicit generic governed envelope until specialized."
+  },
+  "defaultContentType": "application/json",
+  "channels": {
+    "commerceOrderPlaced": {
+      "address": "commerce/order/placed",
+      "messages": {
+        "commerceOrderPlaced": {
+          "$ref": "#/components/messages/commerceOrderPlaced"
+        }
+      }
+    },
+    "iotTemperatureBreach": {
+      "address": "iot/temperature/breach",
+      "messages": {
+        "iotTemperatureBreach": {
+          "$ref": "#/components/messages/iotTemperatureBreach"
+        }
+      }
+    },
+    "logisticsShipmentDelayed": {
+      "address": "logistics/shipment/delayed",
+      "messages": {
+        "logisticsShipmentDelayed": {
+          "$ref": "#/components/messages/logisticsShipmentDelayed"
+        }
+      }
+    },
+    "riskClaimSubmitted": {
+      "address": "risk/claim/submitted",
+      "messages": {
+        "riskClaimSubmitted": {
+          "$ref": "#/components/messages/riskClaimSubmitted"
+        }
+      }
+    },
+    "platformDecisionMade": {
+      "address": "platform/decision/made",
+      "messages": {
+        "platformDecisionMade": {
+          "$ref": "#/components/messages/platformDecisionMade"
+        }
+      }
+    },
+    "platformSecurityThreatDetected": {
+      "address": "platform/security/threat_detected",
+      "messages": {
+        "platformSecurityThreatDetected": {
+          "$ref": "#/components/messages/platformSecurityThreatDetected"
+        }
+      }
+    },
+    "commerceProductListed": {
+      "address": "commerce/product/listed",
+      "messages": {
+        "commerceProductListed": {
+          "$ref": "#/components/messages/commerceProductListed"
+        }
+      }
+    },
+    "commerceProductEnriched": {
+      "address": "commerce/product/enriched",
+      "messages": {
+        "commerceProductEnriched": {
+          "$ref": "#/components/messages/commerceProductEnriched"
+        }
+      }
+    },
+    "commerceOrderFulfilmentAssessed": {
+      "address": "commerce/order/fulfilment_assessed",
+      "messages": {
+        "commerceOrderFulfilmentAssessed": {
+          "$ref": "#/components/messages/commerceOrderFulfilmentAssessed"
+        }
+      }
+    },
+    "commerceOrderCancelled": {
+      "address": "commerce/order/cancelled",
+      "messages": {
+        "commerceOrderCancelled": {
+          "$ref": "#/components/messages/commerceOrderCancelled"
+        }
+      }
+    },
+    "commercePaymentReceived": {
+      "address": "commerce/payment/received",
+      "messages": {
+        "commercePaymentReceived": {
+          "$ref": "#/components/messages/commercePaymentReceived"
+        }
+      }
+    },
+    "commerceDemandForecastUpdated": {
+      "address": "commerce/demand/forecast_updated",
+      "messages": {
+        "commerceDemandForecastUpdated": {
+          "$ref": "#/components/messages/commerceDemandForecastUpdated"
+        }
+      }
+    },
+    "commercePriceChanged": {
+      "address": "commerce/price/changed",
+      "messages": {
+        "commercePriceChanged": {
+          "$ref": "#/components/messages/commercePriceChanged"
+        }
+      }
+    },
+    "riskFraudSuspected": {
+      "address": "risk/fraud/suspected",
+      "messages": {
+        "riskFraudSuspected": {
+          "$ref": "#/components/messages/riskFraudSuspected"
+        }
+      }
+    },
+    "riskCreditAssessed": {
+      "address": "risk/credit/assessed",
+      "messages": {
+        "riskCreditAssessed": {
+          "$ref": "#/components/messages/riskCreditAssessed"
+        }
+      }
+    },
+    "iotSensorOffline": {
+      "address": "iot/sensor/offline",
+      "messages": {
+        "iotSensorOffline": {
+          "$ref": "#/components/messages/iotSensorOffline"
+        }
+      }
+    },
+    "logisticsDisruptionReported": {
+      "address": "logistics/disruption/reported",
+      "messages": {
+        "logisticsDisruptionReported": {
+          "$ref": "#/components/messages/logisticsDisruptionReported"
+        }
+      }
+    },
+    "logisticsDisruptionResolved": {
+      "address": "logistics/disruption/resolved",
+      "messages": {
+        "logisticsDisruptionResolved": {
+          "$ref": "#/components/messages/logisticsDisruptionResolved"
+        }
+      }
+    },
+    "logisticsGeofenceEntered": {
+      "address": "logistics/geofence/entered",
+      "messages": {
+        "logisticsGeofenceEntered": {
+          "$ref": "#/components/messages/logisticsGeofenceEntered"
+        }
+      }
+    },
+    "logisticsGeofenceExited": {
+      "address": "logistics/geofence/exited",
+      "messages": {
+        "logisticsGeofenceExited": {
+          "$ref": "#/components/messages/logisticsGeofenceExited"
+        }
+      }
+    },
+    "qualityTestFailed": {
+      "address": "quality/test/failed",
+      "messages": {
+        "qualityTestFailed": {
+          "$ref": "#/components/messages/qualityTestFailed"
+        }
+      }
+    },
+    "qualityRecallIssued": {
+      "address": "quality/recall/issued",
+      "messages": {
+        "qualityRecallIssued": {
+          "$ref": "#/components/messages/qualityRecallIssued"
+        }
+      }
+    },
+    "qualityShelfLifeCritical": {
+      "address": "quality/shelf_life/critical",
+      "messages": {
+        "qualityShelfLifeCritical": {
+          "$ref": "#/components/messages/qualityShelfLifeCritical"
+        }
+      }
+    },
+    "agronomySoilResultReady": {
+      "address": "agronomy/soil/result_ready",
+      "messages": {
+        "agronomySoilResultReady": {
+          "$ref": "#/components/messages/agronomySoilResultReady"
+        }
+      }
+    },
+    "agronomySoilRecordChanged": {
+      "address": "agronomy/soil/record_changed",
+      "messages": {
+        "agronomySoilRecordChanged": {
+          "$ref": "#/components/messages/agronomySoilRecordChanged"
+        }
+      }
+    },
+    "agronomyWaterRecordChanged": {
+      "address": "agronomy/water/record_changed",
+      "messages": {
+        "agronomyWaterRecordChanged": {
+          "$ref": "#/components/messages/agronomyWaterRecordChanged"
+        }
+      }
+    },
+    "operationsRecordChanged": {
+      "address": "operations/record_changed",
+      "messages": {
+        "operationsRecordChanged": {
+          "$ref": "#/components/messages/operationsRecordChanged"
+        }
+      }
+    },
+    "operationsMaintenanceRecordChanged": {
+      "address": "operations/maintenance/record_changed",
+      "messages": {
+        "operationsMaintenanceRecordChanged": {
+          "$ref": "#/components/messages/operationsMaintenanceRecordChanged"
+        }
+      }
+    },
+    "operationsEquipmentExchangeChanged": {
+      "address": "operations/equipment_exchange/changed",
+      "messages": {
+        "operationsEquipmentExchangeChanged": {
+          "$ref": "#/components/messages/operationsEquipmentExchangeChanged"
+        }
+      }
+    },
+    "agronomyDiseaseDetected": {
+      "address": "agronomy/disease/detected",
+      "messages": {
+        "agronomyDiseaseDetected": {
+          "$ref": "#/components/messages/agronomyDiseaseDetected"
+        }
+      }
+    },
+    "agronomyWeatherAlert": {
+      "address": "agronomy/weather/alert",
+      "messages": {
+        "agronomyWeatherAlert": {
+          "$ref": "#/components/messages/agronomyWeatherAlert"
+        }
+      }
+    },
+    "livestockAnimalHealthCheck": {
+      "address": "livestock/animal/health_check",
+      "messages": {
+        "livestockAnimalHealthCheck": {
+          "$ref": "#/components/messages/livestockAnimalHealthCheck"
+        }
+      }
+    },
+    "livestockAnimalTreatment": {
+      "address": "livestock/animal/treatment",
+      "messages": {
+        "livestockAnimalTreatment": {
+          "$ref": "#/components/messages/livestockAnimalTreatment"
+        }
+      }
+    },
+    "livestockDiseaseOutbreak": {
+      "address": "livestock/disease/outbreak",
+      "messages": {
+        "livestockDiseaseOutbreak": {
+          "$ref": "#/components/messages/livestockDiseaseOutbreak"
+        }
+      }
+    },
+    "livestockQuarantineEstablished": {
+      "address": "livestock/quarantine/established",
+      "messages": {
+        "livestockQuarantineEstablished": {
+          "$ref": "#/components/messages/livestockQuarantineEstablished"
+        }
+      }
+    },
+    "livestockQuarantineLifted": {
+      "address": "livestock/quarantine/lifted",
+      "messages": {
+        "livestockQuarantineLifted": {
+          "$ref": "#/components/messages/livestockQuarantineLifted"
+        }
+      }
+    },
+    "livestockMilkProductionRecorded": {
+      "address": "livestock/milk/production_recorded",
+      "messages": {
+        "livestockMilkProductionRecorded": {
+          "$ref": "#/components/messages/livestockMilkProductionRecorded"
+        }
+      }
+    },
+    "livestockBreedingRecorded": {
+      "address": "livestock/breeding/recorded",
+      "messages": {
+        "livestockBreedingRecorded": {
+          "$ref": "#/components/messages/livestockBreedingRecorded"
+        }
+      }
+    },
+    "livestockVaccinationAdministered": {
+      "address": "livestock/vaccination/administered",
+      "messages": {
+        "livestockVaccinationAdministered": {
+          "$ref": "#/components/messages/livestockVaccinationAdministered"
+        }
+      }
+    },
+    "livestockFeedConsumptionRecorded": {
+      "address": "livestock/feed/consumption_recorded",
+      "messages": {
+        "livestockFeedConsumptionRecorded": {
+          "$ref": "#/components/messages/livestockFeedConsumptionRecorded"
+        }
+      }
+    },
+    "livestockHerdPerformanceUpdated": {
+      "address": "livestock/herd/performance_updated",
+      "messages": {
+        "livestockHerdPerformanceUpdated": {
+          "$ref": "#/components/messages/livestockHerdPerformanceUpdated"
+        }
+      }
+    },
+    "livestockRecordChanged": {
+      "address": "livestock/record/changed",
+      "messages": {
+        "livestockRecordChanged": {
+          "$ref": "#/components/messages/livestockRecordChanged"
+        }
+      }
+    },
+    "fisheriesRecordChanged": {
+      "address": "fisheries/record/changed",
+      "messages": {
+        "fisheriesRecordChanged": {
+          "$ref": "#/components/messages/fisheriesRecordChanged"
+        }
+      }
+    },
+    "platformTenantCreated": {
+      "address": "platform/tenant/created",
+      "messages": {
+        "platformTenantCreated": {
+          "$ref": "#/components/messages/platformTenantCreated"
+        }
+      }
+    },
+    "platformTenantUpdated": {
+      "address": "platform/tenant/updated",
+      "messages": {
+        "platformTenantUpdated": {
+          "$ref": "#/components/messages/platformTenantUpdated"
+        }
+      }
+    },
+    "platformTenantDeleted": {
+      "address": "platform/tenant/deleted",
+      "messages": {
+        "platformTenantDeleted": {
+          "$ref": "#/components/messages/platformTenantDeleted"
+        }
+      }
+    },
+    "platformOrganizationCreated": {
+      "address": "platform/organization/created",
+      "messages": {
+        "platformOrganizationCreated": {
+          "$ref": "#/components/messages/platformOrganizationCreated"
+        }
+      }
+    },
+    "platformOrganizationUpdated": {
+      "address": "platform/organization/updated",
+      "messages": {
+        "platformOrganizationUpdated": {
+          "$ref": "#/components/messages/platformOrganizationUpdated"
+        }
+      }
+    },
+    "platformConfigurationChanged": {
+      "address": "platform/configuration/changed",
+      "messages": {
+        "platformConfigurationChanged": {
+          "$ref": "#/components/messages/platformConfigurationChanged"
+        }
+      }
+    },
+    "platformSystemHealthChanged": {
+      "address": "platform/system/health_changed",
+      "messages": {
+        "platformSystemHealthChanged": {
+          "$ref": "#/components/messages/platformSystemHealthChanged"
+        }
+      }
+    },
+    "platformCapacityForecastUpdated": {
+      "address": "platform/capacity/forecast_updated",
+      "messages": {
+        "platformCapacityForecastUpdated": {
+          "$ref": "#/components/messages/platformCapacityForecastUpdated"
+        }
+      }
+    },
+    "controlWorkflowStarted": {
+      "address": "control/workflow/started",
+      "messages": {
+        "controlWorkflowStarted": {
+          "$ref": "#/components/messages/controlWorkflowStarted"
+        }
+      }
+    },
+    "controlWorkflowSlaBreached": {
+      "address": "control/workflow/sla_breached",
+      "messages": {
+        "controlWorkflowSlaBreached": {
+          "$ref": "#/components/messages/controlWorkflowSlaBreached"
+        }
+      }
+    },
+    "controlCrmLeadQualified": {
+      "address": "control/crm/lead_qualified",
+      "messages": {
+        "controlCrmLeadQualified": {
+          "$ref": "#/components/messages/controlCrmLeadQualified"
+        }
+      }
+    },
+    "controlLegalObligationDue": {
+      "address": "control/legal/obligation_due",
+      "messages": {
+        "controlLegalObligationDue": {
+          "$ref": "#/components/messages/controlLegalObligationDue"
+        }
+      }
+    },
+    "controlRiskCritical": {
+      "address": "control/risk/critical",
+      "messages": {
+        "controlRiskCritical": {
+          "$ref": "#/components/messages/controlRiskCritical"
+        }
+      }
+    },
+    "controlEmergencyRaised": {
+      "address": "control/emergency/raised",
+      "messages": {
+        "controlEmergencyRaised": {
+          "$ref": "#/components/messages/controlEmergencyRaised"
+        }
+      }
+    },
+    "controlEmergencyEscalated": {
+      "address": "control/emergency/escalated",
+      "messages": {
+        "controlEmergencyEscalated": {
+          "$ref": "#/components/messages/controlEmergencyEscalated"
+        }
+      }
+    }
+  },
+  "components": {
+    "messages": {
+      "commerceOrderPlaced": {
+        "name": "commerceOrderPlaced",
+        "title": "Commerce order placed",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "ORDER_PLACED",
+        "x-afrera-governance-level": "detailed-payload"
+      },
+      "iotTemperatureBreach": {
+        "name": "iotTemperatureBreach",
+        "title": "IoT temperature breach",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "required": [
+            "temp"
+          ],
+          "properties": {
+            "temp": {
+              "type": "number"
+            }
+          }
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "TEMPERATURE_BREACH",
+        "x-afrera-governance-level": "detailed-payload"
+      },
+      "logisticsShipmentDelayed": {
+        "name": "logisticsShipmentDelayed",
+        "title": "Shipment delayed",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "SHIPMENT_DELAYED",
+        "x-afrera-governance-level": "detailed-payload"
+      },
+      "riskClaimSubmitted": {
+        "name": "riskClaimSubmitted",
+        "title": "Insurance/risk claim submitted",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "CLAIM_SUBMITTED",
+        "x-afrera-governance-level": "detailed-payload"
+      },
+      "platformDecisionMade": {
+        "name": "platformDecisionMade",
+        "title": "Decision engine output",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "required": [
+            "id",
+            "rule",
+            "actions",
+            "rationale"
+          ],
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "DECISION_MADE",
+        "x-afrera-governance-level": "detailed-payload"
+      },
+      "platformSecurityThreatDetected": {
+        "name": "platformSecurityThreatDetected",
+        "title": "Security threat detected",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "SECURITY_THREAT_DETECTED",
+        "x-afrera-governance-level": "detailed-payload"
+      },
+      "commerceProductListed": {
+        "name": "commerceProductListed",
+        "title": "commerce.product.listed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "PRODUCT_LISTED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "commerceProductEnriched": {
+        "name": "commerceProductEnriched",
+        "title": "commerce.product.enriched",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "PRODUCT_ENRICHED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "commerceOrderFulfilmentAssessed": {
+        "name": "commerceOrderFulfilmentAssessed",
+        "title": "commerce.order.fulfilment_assessed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "ORDER_FULFILMENT_ASSESSED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "commerceOrderCancelled": {
+        "name": "commerceOrderCancelled",
+        "title": "commerce.order.cancelled",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "ORDER_CANCELLED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "commercePaymentReceived": {
+        "name": "commercePaymentReceived",
+        "title": "commerce.payment.received",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "PAYMENT_RECEIVED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "commerceDemandForecastUpdated": {
+        "name": "commerceDemandForecastUpdated",
+        "title": "commerce.demand.forecast_updated",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "DEMAND_FORECAST_UPDATED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "commercePriceChanged": {
+        "name": "commercePriceChanged",
+        "title": "commerce.price.changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "PRICE_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "riskFraudSuspected": {
+        "name": "riskFraudSuspected",
+        "title": "risk.fraud.suspected",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "FRAUD_SUSPECTED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "riskCreditAssessed": {
+        "name": "riskCreditAssessed",
+        "title": "risk.credit.assessed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "CREDIT_RISK_ASSESSED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "iotSensorOffline": {
+        "name": "iotSensorOffline",
+        "title": "iot.sensor.offline",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "SENSOR_OFFLINE",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "logisticsDisruptionReported": {
+        "name": "logisticsDisruptionReported",
+        "title": "logistics.disruption.reported",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "CIVIL_DISRUPTION_REPORTED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "logisticsDisruptionResolved": {
+        "name": "logisticsDisruptionResolved",
+        "title": "logistics.disruption.resolved",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "CIVIL_DISRUPTION_RESOLVED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "logisticsGeofenceEntered": {
+        "name": "logisticsGeofenceEntered",
+        "title": "logistics.geofence.entered",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "GEOFENCE_ENTERED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "logisticsGeofenceExited": {
+        "name": "logisticsGeofenceExited",
+        "title": "logistics.geofence.exited",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "GEOFENCE_EXITED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "qualityTestFailed": {
+        "name": "qualityTestFailed",
+        "title": "quality.test.failed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "QUALITY_FAILED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "qualityRecallIssued": {
+        "name": "qualityRecallIssued",
+        "title": "quality.recall.issued",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "RECALL_ISSUED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "qualityShelfLifeCritical": {
+        "name": "qualityShelfLifeCritical",
+        "title": "quality.shelf_life.critical",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "SHELF_LIFE_CRITICAL",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "agronomySoilResultReady": {
+        "name": "agronomySoilResultReady",
+        "title": "agronomy.soil.result_ready",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "SOIL_RESULT_READY",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "agronomySoilRecordChanged": {
+        "name": "agronomySoilRecordChanged",
+        "title": "agronomy.soil.record_changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "SOIL_RECORD_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "agronomyWaterRecordChanged": {
+        "name": "agronomyWaterRecordChanged",
+        "title": "agronomy.water.record_changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "WATER_RECORD_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "operationsRecordChanged": {
+        "name": "operationsRecordChanged",
+        "title": "operations.record_changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "OPERATIONS_RECORD_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "operationsMaintenanceRecordChanged": {
+        "name": "operationsMaintenanceRecordChanged",
+        "title": "operations.maintenance.record_changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "MAINTENANCE_RECORD_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "operationsEquipmentExchangeChanged": {
+        "name": "operationsEquipmentExchangeChanged",
+        "title": "operations.equipment_exchange.changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "EQUIPMENT_EXCHANGE_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "agronomyDiseaseDetected": {
+        "name": "agronomyDiseaseDetected",
+        "title": "agronomy.disease.detected",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "CROP_DISEASE_DETECTED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "agronomyWeatherAlert": {
+        "name": "agronomyWeatherAlert",
+        "title": "agronomy.weather.alert",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "WEATHER_ALERT",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockAnimalHealthCheck": {
+        "name": "livestockAnimalHealthCheck",
+        "title": "livestock.animal.health_check",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "ANIMAL_HEALTH_CHECK",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockAnimalTreatment": {
+        "name": "livestockAnimalTreatment",
+        "title": "livestock.animal.treatment",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "ANIMAL_TREATMENT",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockDiseaseOutbreak": {
+        "name": "livestockDiseaseOutbreak",
+        "title": "livestock.disease.outbreak",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "DISEASE_OUTBREAK",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockQuarantineEstablished": {
+        "name": "livestockQuarantineEstablished",
+        "title": "livestock.quarantine.established",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "QUARANTINE_ESTABLISHED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockQuarantineLifted": {
+        "name": "livestockQuarantineLifted",
+        "title": "livestock.quarantine.lifted",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "QUARANTINE_LIFTED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockMilkProductionRecorded": {
+        "name": "livestockMilkProductionRecorded",
+        "title": "livestock.milk.production_recorded",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "MILK_PRODUCTION_RECORDED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockBreedingRecorded": {
+        "name": "livestockBreedingRecorded",
+        "title": "livestock.breeding.recorded",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "BREEDING_RECORDED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockVaccinationAdministered": {
+        "name": "livestockVaccinationAdministered",
+        "title": "livestock.vaccination.administered",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "VACCINATION_ADMINISTERED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockFeedConsumptionRecorded": {
+        "name": "livestockFeedConsumptionRecorded",
+        "title": "livestock.feed.consumption_recorded",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "FEED_CONSUMPTION_RECORDED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockHerdPerformanceUpdated": {
+        "name": "livestockHerdPerformanceUpdated",
+        "title": "livestock.herd.performance_updated",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "HERD_PERFORMANCE_UPDATED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "livestockRecordChanged": {
+        "name": "livestockRecordChanged",
+        "title": "livestock.record.changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "LIVESTOCK_RECORD_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "fisheriesRecordChanged": {
+        "name": "fisheriesRecordChanged",
+        "title": "fisheries.record.changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "FISHERIES_RECORD_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "platformTenantCreated": {
+        "name": "platformTenantCreated",
+        "title": "platform.tenant.created",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "TENANT_CREATED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "platformTenantUpdated": {
+        "name": "platformTenantUpdated",
+        "title": "platform.tenant.updated",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "TENANT_UPDATED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "platformTenantDeleted": {
+        "name": "platformTenantDeleted",
+        "title": "platform.tenant.deleted",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "TENANT_DELETED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "platformOrganizationCreated": {
+        "name": "platformOrganizationCreated",
+        "title": "platform.organization.created",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "ORGANIZATION_CREATED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "platformOrganizationUpdated": {
+        "name": "platformOrganizationUpdated",
+        "title": "platform.organization.updated",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "ORGANIZATION_UPDATED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "platformConfigurationChanged": {
+        "name": "platformConfigurationChanged",
+        "title": "platform.configuration.changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "CONFIGURATION_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "platformSystemHealthChanged": {
+        "name": "platformSystemHealthChanged",
+        "title": "platform.system.health_changed",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "SYSTEM_HEALTH_CHANGED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "platformCapacityForecastUpdated": {
+        "name": "platformCapacityForecastUpdated",
+        "title": "platform.capacity.forecast_updated",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "CAPACITY_FORECAST_UPDATED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "controlWorkflowStarted": {
+        "name": "controlWorkflowStarted",
+        "title": "control.workflow.started",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "WORKFLOW_STARTED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "controlWorkflowSlaBreached": {
+        "name": "controlWorkflowSlaBreached",
+        "title": "control.workflow.sla_breached",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "WORKFLOW_SLA_BREACHED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "controlCrmLeadQualified": {
+        "name": "controlCrmLeadQualified",
+        "title": "control.crm.lead_qualified",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "LEAD_QUALIFIED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "controlLegalObligationDue": {
+        "name": "controlLegalObligationDue",
+        "title": "control.legal.obligation_due",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "OBLIGATION_DUE",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "controlRiskCritical": {
+        "name": "controlRiskCritical",
+        "title": "control.risk.critical",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "RISK_CRITICAL",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "controlEmergencyRaised": {
+        "name": "controlEmergencyRaised",
+        "title": "control.emergency.raised",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "EMERGENCY_RAISED",
+        "x-afrera-governance-level": "generic-envelope"
+      },
+      "controlEmergencyEscalated": {
+        "name": "controlEmergencyEscalated",
+        "title": "control.emergency.escalated",
+        "summary": "Generic governed envelope contract; domain payload schema remains to be specialized.",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0",
+        "x-afrera-signal-constant": "EMERGENCY_ESCALATED",
+        "x-afrera-governance-level": "generic-envelope"
+      }
+    }
+  },
+  "x-cloudevents": {
+    "specversion": "1.0",
+    "required": [
+      "specversion",
+      "id",
+      "source",
+      "type",
+      "time",
+      "datacontenttype",
+      "data"
+    ]
+  },
+  "x-observability": {
+    "semanticConvention": "OpenTelemetry messaging semantic attributes",
+    "requiredAttributes": [
+      "messaging.system",
+      "messaging.operation.name",
+      "messaging.message.id",
+      "messaging.destination.name"
+    ]
+  },
+  "x-afrera-governance": {
+    "signalCount": 58,
+    "genericEnvelopeContracts": 52,
+    "detailedPayloadContracts": 6,
+    "rule": "Generic envelope contracts are not evidence of detailed domain payload validation."
+  }
+}

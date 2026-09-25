@@ -375,14 +375,6 @@ export const publicRoutes = [
     transition: 'slide',
   },
   {
-    path: '/wallet',
-    component: DigitalWalletPage,
-    title: 'Digital Wallet - Manage Your Funds',
-    description: 'Manage your digital wallet, check balance, and view transactions',
-    keywords: 'wallet, digital, balance, funds',
-    transition: 'slide',
-  },
-  {
     path: '/transactions',
     component: TransactionHistoryPage,
     title: 'Transaction History - Track Your Payments',

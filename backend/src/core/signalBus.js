@@ -149,8 +149,12 @@ class SignalBus extends EventEmitter {
       severity: meta.severity ?? SEVERITY.INFO,
       source: meta.source || 'unknown',
       entityId: meta.entityId ?? null,
-      correlationId: meta.correlationId || `sig_${Date.now()}_${Math.round(Math.random() * 1e6)}`,
+      correlationId: meta.correlationId || crypto.randomUUID(),
       timestamp: new Date().toISOString(),
+      eventId: meta.eventId || null,
+      schemaVersion: meta.schemaVersion || null,
+      traceparent: meta.traceparent || null,
+      cloudEvent: meta.cloudEvent || null,
     };
 
     this._record(signal);

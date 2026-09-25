@@ -1,0 +1,157 @@
+{
+  "asyncapi": "3.1.0",
+  "info": {
+    "title": "AFRERA Governed Event Nervous System",
+    "version": "1.0.0",
+    "description": "Canonical message contract for governed cross-domain events. Runtime envelopes expose CloudEvents 1.0-compatible context fields."
+  },
+  "defaultContentType": "application/json",
+  "channels": {
+    "commerceOrderPlaced": {
+      "address": "commerce/order/placed",
+      "messages": {
+        "commerceOrderPlaced": {
+          "$ref": "#/components/messages/commerceOrderPlaced"
+        }
+      }
+    },
+    "iotTemperatureBreach": {
+      "address": "iot/temperature/breach",
+      "messages": {
+        "iotTemperatureBreach": {
+          "$ref": "#/components/messages/iotTemperatureBreach"
+        }
+      }
+    },
+    "logisticsShipmentDelayed": {
+      "address": "logistics/shipment/delayed",
+      "messages": {
+        "logisticsShipmentDelayed": {
+          "$ref": "#/components/messages/logisticsShipmentDelayed"
+        }
+      }
+    },
+    "riskClaimSubmitted": {
+      "address": "risk/claim/submitted",
+      "messages": {
+        "riskClaimSubmitted": {
+          "$ref": "#/components/messages/riskClaimSubmitted"
+        }
+      }
+    },
+    "platformDecisionMade": {
+      "address": "platform/decision/made",
+      "messages": {
+        "platformDecisionMade": {
+          "$ref": "#/components/messages/platformDecisionMade"
+        }
+      }
+    },
+    "platformSecurityThreatDetected": {
+      "address": "platform/security/threat_detected",
+      "messages": {
+        "platformSecurityThreatDetected": {
+          "$ref": "#/components/messages/platformSecurityThreatDetected"
+        }
+      }
+    }
+  },
+  "components": {
+    "messages": {
+      "commerceOrderPlaced": {
+        "name": "commerceOrderPlaced",
+        "title": "Commerce order placed",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0"
+      },
+      "iotTemperatureBreach": {
+        "name": "iotTemperatureBreach",
+        "title": "IoT temperature breach",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "required": [
+            "temp"
+          ],
+          "properties": {
+            "temp": {
+              "type": "number"
+            }
+          }
+        },
+        "x-afrera-schema-version": "1.0.0"
+      },
+      "logisticsShipmentDelayed": {
+        "name": "logisticsShipmentDelayed",
+        "title": "Shipment delayed",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0"
+      },
+      "riskClaimSubmitted": {
+        "name": "riskClaimSubmitted",
+        "title": "Insurance/risk claim submitted",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0"
+      },
+      "platformDecisionMade": {
+        "name": "platformDecisionMade",
+        "title": "Decision engine output",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "required": [
+            "id",
+            "rule",
+            "actions",
+            "rationale"
+          ],
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0"
+      },
+      "platformSecurityThreatDetected": {
+        "name": "platformSecurityThreatDetected",
+        "title": "Security threat detected",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "x-afrera-schema-version": "1.0.0"
+      }
+    }
+  },
+  "x-cloudevents": {
+    "specversion": "1.0",
+    "required": [
+      "specversion",
+      "id",
+      "source",
+      "type",
+      "time",
+      "datacontenttype",
+      "data"
+    ]
+  },
+  "x-observability": {
+    "semanticConvention": "OpenTelemetry messaging semantic attributes",
+    "requiredAttributes": [
+      "messaging.system",
+      "messaging.operation.name",
+      "messaging.message.id",
+      "messaging.destination.name"
+    ]
+  }
+}
