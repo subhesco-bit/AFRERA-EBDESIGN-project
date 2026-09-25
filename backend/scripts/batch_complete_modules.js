@@ -206,6 +206,7 @@ moduleNames.forEach(moduleName => {
       fs.writeFileSync(controllerPath, completeController);
       console.log('   Controller: COMPLETED');
     }
+  }
 });
 
 console.log('');

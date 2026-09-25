@@ -79,7 +79,7 @@ const LOAD_FACTORS = {
 function requirePositive(value, name) {
   const n = Number(value);
   if (!Number.isFinite(n) || n <= 0) {
-    throw new Error(\\ must be a positive number\);
+    throw new Error(`${name} must be a positive number`);
   }
   return n;
 }
@@ -87,7 +87,7 @@ function requirePositive(value, name) {
 function calculateWindLoad({ zone = 'II', heightM = 6, k1 = 1.0, k3 = 1.0 }) {
   const Vb = WIND_ZONES[String(zone).toUpperCase()];
   if (!Vb) {
-    throw new Error(\Unknown wind zone "\". Expected one of: \\);
+    throw new Error(`Unknown wind zone "${zone}". Expected one of: ${Object.keys(WIND_ZONES).join(", ")}`);
   }
   const h = requirePositive(heightM, 'heightM');
   const k2 = interpolateK2(h);
@@ -109,7 +109,7 @@ function calculateWindLoad({ zone = 'II', heightM = 6, k1 = 1.0, k3 = 1.0 }) {
 function calculateSeismicLoad({ zone = 'III', seismicWeight_kN, importanceFactor = 1.0, responseReduction = 4.0, saOverG = 2.5 }) {
   const Z = SEISMIC_ZONES[String(zone).toUpperCase()];
   if (!Z) {
-    throw new Error(\Unknown seismic zone "\". Expected one of: \\);
+    throw new Error(`Unknown seismic zone "${zone}". Expected one of: ${Object.keys(SEISMIC_ZONES).join(", ")}`);
   }
   const W = requirePositive(seismicWeight_kN, 'seismicWeight_kN');
   const R = requirePositive(responseReduction, 'responseReduction');
@@ -130,7 +130,7 @@ function designBeam({ spanM, udl_kNm, grade = 'E250', deflectionLimitRatio = 240
   const w = requirePositive(udl_kNm, 'udl_kNm') * 1000;
   const steel = STEEL_GRADES[String(grade).toUpperCase()];
   if (!steel) {
-    throw new Error(\Unknown steel grade "\". Expected one of: \\);
+    throw new Error(`Unknown steel grade "${grade}". Expected one of: ${Object.keys(STEEL_GRADES).join(", ")}`);
   }
 
   const Mu = (w * L * L) / 8;
@@ -161,7 +161,7 @@ function designColumn({ heightM, axialLoad_kN, grade = 'E250', effectiveLengthFa
   const P = requirePositive(axialLoad_kN, 'axialLoad_kN') * 1000;
   const steel = STEEL_GRADES[String(grade).toUpperCase()];
   if (!steel) {
-    throw new Error(\Unknown steel grade "\". Expected one of: \\);
+    throw new Error(`Unknown steel grade "${grade}". Expected one of: ${Object.keys(STEEL_GRADES).join(", ")}`);
   }
   const A_m2 = requirePositive(area_cm2, 'area_cm2') / 1e4;
   const I_m4 = requirePositive(momentOfInertia_cm4, 'momentOfInertia_cm4') / 1e8;
@@ -173,7 +173,7 @@ function designColumn({ heightM, axialLoad_kN, grade = 'E250', effectiveLengthFa
 
   const alpha = BUCKLING_CLASS_ALPHA[String(bucklingClass).toLowerCase()];
   if (alpha === undefined) {
-    throw new Error(\Unknown bucklingClass "\". Expected one of: \\);
+    throw new Error(`Unknown bucklingClass "${bucklingClass}". Expected one of: ${Object.keys(BUCKLING_CLASS_ALPHA).join(", ")}`);
   }
   const fcc = (Math.PI ** 2 * steel.E) / ((Le / radiusOfGyration) ** 2);
   const lambda = Math.sqrt(steel.fy / fcc);
@@ -206,7 +206,7 @@ function designFoundation({ axialLoad_kN, safeBearingCapacity_kNm2, concreteGrad
   const P = requirePositive(axialLoad_kN, 'axialLoad_kN');
   const sbcRaw = requirePositive(safeBearingCapacity_kNm2, 'safeBearingCapacity_kNm2');
   if (!CONCRETE_GRADES[String(concreteGrade).toUpperCase()]) {
-    throw new Error(\Unknown concrete grade "\". Expected one of: \\);
+    throw new Error(`Unknown concrete grade "${concreteGrade}". Expected one of: ${Object.keys(CONCRETE_GRADES).join(", ")}`);
   }
   const allowable = sbcRaw / BEARING_SAFETY_FACTOR;
   const areaReq = P / allowable;
@@ -214,7 +214,7 @@ function designFoundation({ axialLoad_kN, safeBearingCapacity_kNm2, concreteGrad
 
   return {
     advisory: true,
-    basis: \Rankine bearing check: A = P/(SBC/FoS), FoS = \ (IS 456 / IS 6403)\,
+    basis: "Rankine bearing check: A = P/(SBC/FoS), FoS = 2.5 (IS 456 / IS 6403)",
     axialLoad_kN: P,
     allowableBearingPressure_kNm2: Number(allowable.toFixed(1)),
     requiredArea_m2: Number(areaReq.toFixed(3)),
@@ -228,7 +228,7 @@ function designFoundation({ axialLoad_kN, safeBearingCapacity_kNm2, concreteGrad
 
 function calculateLoadCombinations({ dead_kN = 0, live_kN = 0, wind_kN = 0, seismic_kN = 0 }) {
   for (const [name, value] of Object.entries({ dead_kN, live_kN, wind_kN, seismic_kN })) {
-    if (!Number.isFinite(Number(value))) throw new Error(\\ must be a number\);
+    if (!Number.isFinite(Number(value))) throw new Error(`${name} must be a number`);
   }
 
   const combinations = Object.entries(LOAD_FACTORS).map(([name, f]) => {
