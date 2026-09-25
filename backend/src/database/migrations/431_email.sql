@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS email (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_email_user_id
-  ON email(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_user_id ON email(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_user_id ON email(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_email_status
-  ON email(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_status ON email(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_status ON email(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_email_created_at
-  ON email(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_created_at ON email(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_created_at ON email(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_email_updated_at
-  ON email(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_updated_at ON email(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_updated_at ON email(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_email_data_gin
-  ON email USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_data_gin ON email USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_email_data_gin ON email USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_email_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER email_timestamp_trigger
-BEFORE UPDATE ON email
-FOR EACH ROW
-EXECUTE FUNCTION update_email_timestamp();
+DROP TRIGGER IF EXISTS email_timestamp_trigger ON email;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='email' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER email_timestamp_trigger BEFORE UPDATE ON email FOR EACH ROW EXECUTE FUNCTION update_email_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

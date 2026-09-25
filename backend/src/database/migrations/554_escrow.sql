@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS escrow (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_escrow_user_id
-  ON escrow(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_user_id ON escrow(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_user_id ON escrow(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_escrow_status
-  ON escrow(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_status ON escrow(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_status ON escrow(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_escrow_created_at
-  ON escrow(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_created_at ON escrow(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_created_at ON escrow(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_escrow_updated_at
-  ON escrow(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_updated_at ON escrow(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_updated_at ON escrow(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_escrow_data_gin
-  ON escrow USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_data_gin ON escrow USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_escrow_data_gin ON escrow USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_escrow_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER escrow_timestamp_trigger
-BEFORE UPDATE ON escrow
-FOR EACH ROW
-EXECUTE FUNCTION update_escrow_timestamp();
+DROP TRIGGER IF EXISTS escrow_timestamp_trigger ON escrow;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='escrow' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER escrow_timestamp_trigger BEFORE UPDATE ON escrow FOR EACH ROW EXECUTE FUNCTION update_escrow_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

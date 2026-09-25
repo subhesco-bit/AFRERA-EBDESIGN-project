@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS event_sourcing (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_event_sourcing_user_id
-  ON event_sourcing(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_user_id ON event_sourcing(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_user_id ON event_sourcing(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_event_sourcing_status
-  ON event_sourcing(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_status ON event_sourcing(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_status ON event_sourcing(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_event_sourcing_created_at
-  ON event_sourcing(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_created_at ON event_sourcing(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_created_at ON event_sourcing(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_event_sourcing_updated_at
-  ON event_sourcing(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_updated_at ON event_sourcing(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_updated_at ON event_sourcing(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_event_sourcing_data_gin
-  ON event_sourcing USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_data_gin ON event_sourcing USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_event_sourcing_data_gin ON event_sourcing USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_event_sourcing_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER event_sourcing_timestamp_trigger
-BEFORE UPDATE ON event_sourcing
-FOR EACH ROW
-EXECUTE FUNCTION update_event_sourcing_timestamp();
+DROP TRIGGER IF EXISTS event_sourcing_timestamp_trigger ON event_sourcing;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='event_sourcing' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER event_sourcing_timestamp_trigger BEFORE UPDATE ON event_sourcing FOR EACH ROW EXECUTE FUNCTION update_event_sourcing_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

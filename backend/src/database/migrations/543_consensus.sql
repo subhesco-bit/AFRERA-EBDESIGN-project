@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS consensus (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_consensus_user_id
-  ON consensus(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_user_id ON consensus(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_user_id ON consensus(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_consensus_status
-  ON consensus(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_status ON consensus(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_status ON consensus(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_consensus_created_at
-  ON consensus(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_created_at ON consensus(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_created_at ON consensus(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_consensus_updated_at
-  ON consensus(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_updated_at ON consensus(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_updated_at ON consensus(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_consensus_data_gin
-  ON consensus USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_data_gin ON consensus USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_consensus_data_gin ON consensus USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_consensus_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER consensus_timestamp_trigger
-BEFORE UPDATE ON consensus
-FOR EACH ROW
-EXECUTE FUNCTION update_consensus_timestamp();
+DROP TRIGGER IF EXISTS consensus_timestamp_trigger ON consensus;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='consensus' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER consensus_timestamp_trigger BEFORE UPDATE ON consensus FOR EACH ROW EXECUTE FUNCTION update_consensus_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

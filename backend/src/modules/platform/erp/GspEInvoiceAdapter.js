@@ -133,7 +133,8 @@ async function generateIrn(invoice, ctx = {}) {
       adapter: 'gsp_einvoice',
       mode: 'dry_run',
       request,
-      simulated_irn: ctx.live ? null : `SIM-IRN-${randomUUID().slice(0, 12).toUpperCase()}`,
+      irn: null,
+      authoritative: false,
       note: 'Set GSP_API_BASE + gsp_token + live:true for production IRP',
     };
   }
@@ -160,7 +161,8 @@ async function generateEwayBill(invoice, transport, ctx = {}) {
       adapter: 'gsp_eway',
       mode: 'dry_run',
       body: payload,
-      simulated_ewb: `SIM-EWB-${Date.now()}`,
+      eway_bill_number: null,
+      authoritative: false,
     };
   }
   try {

@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS oauth (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_oauth_user_id
-  ON oauth(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_user_id ON oauth(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_user_id ON oauth(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_oauth_status
-  ON oauth(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_status ON oauth(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_status ON oauth(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_oauth_created_at
-  ON oauth(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_created_at ON oauth(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_created_at ON oauth(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_oauth_updated_at
-  ON oauth(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_updated_at ON oauth(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_updated_at ON oauth(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_oauth_data_gin
-  ON oauth USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_data_gin ON oauth USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_oauth_data_gin ON oauth USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_oauth_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER oauth_timestamp_trigger
-BEFORE UPDATE ON oauth
-FOR EACH ROW
-EXECUTE FUNCTION update_oauth_timestamp();
+DROP TRIGGER IF EXISTS oauth_timestamp_trigger ON oauth;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='oauth' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER oauth_timestamp_trigger BEFORE UPDATE ON oauth FOR EACH ROW EXECUTE FUNCTION update_oauth_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

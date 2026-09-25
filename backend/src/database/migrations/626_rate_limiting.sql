@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS rate_limiting (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_rate_limiting_user_id
-  ON rate_limiting(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_user_id ON rate_limiting(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_user_id ON rate_limiting(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_rate_limiting_status
-  ON rate_limiting(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_status ON rate_limiting(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_status ON rate_limiting(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_rate_limiting_created_at
-  ON rate_limiting(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_created_at ON rate_limiting(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_created_at ON rate_limiting(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_rate_limiting_updated_at
-  ON rate_limiting(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_updated_at ON rate_limiting(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_updated_at ON rate_limiting(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_rate_limiting_data_gin
-  ON rate_limiting USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_data_gin ON rate_limiting USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limiting_data_gin ON rate_limiting USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_rate_limiting_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER rate_limiting_timestamp_trigger
-BEFORE UPDATE ON rate_limiting
-FOR EACH ROW
-EXECUTE FUNCTION update_rate_limiting_timestamp();
+DROP TRIGGER IF EXISTS rate_limiting_timestamp_trigger ON rate_limiting;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='rate_limiting' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER rate_limiting_timestamp_trigger BEFORE UPDATE ON rate_limiting FOR EACH ROW EXECUTE FUNCTION update_rate_limiting_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

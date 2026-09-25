@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS mqtt (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_mqtt_user_id
-  ON mqtt(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_user_id ON mqtt(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_user_id ON mqtt(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_mqtt_status
-  ON mqtt(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_status ON mqtt(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_status ON mqtt(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_mqtt_created_at
-  ON mqtt(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_created_at ON mqtt(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_created_at ON mqtt(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_mqtt_updated_at
-  ON mqtt(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_updated_at ON mqtt(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_updated_at ON mqtt(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_mqtt_data_gin
-  ON mqtt USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_data_gin ON mqtt USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_mqtt_data_gin ON mqtt USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_mqtt_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER mqtt_timestamp_trigger
-BEFORE UPDATE ON mqtt
-FOR EACH ROW
-EXECUTE FUNCTION update_mqtt_timestamp();
+DROP TRIGGER IF EXISTS mqtt_timestamp_trigger ON mqtt;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='mqtt' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER mqtt_timestamp_trigger BEFORE UPDATE ON mqtt FOR EACH ROW EXECUTE FUNCTION update_mqtt_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

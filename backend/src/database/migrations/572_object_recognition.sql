@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS object_recognition (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_object_recognition_user_id
-  ON object_recognition(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_user_id ON object_recognition(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_user_id ON object_recognition(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_object_recognition_status
-  ON object_recognition(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_status ON object_recognition(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_status ON object_recognition(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_object_recognition_created_at
-  ON object_recognition(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_created_at ON object_recognition(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_created_at ON object_recognition(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_object_recognition_updated_at
-  ON object_recognition(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_updated_at ON object_recognition(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_updated_at ON object_recognition(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_object_recognition_data_gin
-  ON object_recognition USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_data_gin ON object_recognition USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_object_recognition_data_gin ON object_recognition USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_object_recognition_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER object_recognition_timestamp_trigger
-BEFORE UPDATE ON object_recognition
-FOR EACH ROW
-EXECUTE FUNCTION update_object_recognition_timestamp();
+DROP TRIGGER IF EXISTS object_recognition_timestamp_trigger ON object_recognition;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='object_recognition' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER object_recognition_timestamp_trigger BEFORE UPDATE ON object_recognition FOR EACH ROW EXECUTE FUNCTION update_object_recognition_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

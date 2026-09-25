@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS marker_detection (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_marker_detection_user_id
-  ON marker_detection(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_user_id ON marker_detection(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_user_id ON marker_detection(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_marker_detection_status
-  ON marker_detection(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_status ON marker_detection(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_status ON marker_detection(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_marker_detection_created_at
-  ON marker_detection(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_created_at ON marker_detection(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_created_at ON marker_detection(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_marker_detection_updated_at
-  ON marker_detection(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_updated_at ON marker_detection(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_updated_at ON marker_detection(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_marker_detection_data_gin
-  ON marker_detection USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_data_gin ON marker_detection USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_marker_detection_data_gin ON marker_detection USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_marker_detection_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER marker_detection_timestamp_trigger
-BEFORE UPDATE ON marker_detection
-FOR EACH ROW
-EXECUTE FUNCTION update_marker_detection_timestamp();
+DROP TRIGGER IF EXISTS marker_detection_timestamp_trigger ON marker_detection;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='marker_detection' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER marker_detection_timestamp_trigger BEFORE UPDATE ON marker_detection FOR EACH ROW EXECUTE FUNCTION update_marker_detection_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

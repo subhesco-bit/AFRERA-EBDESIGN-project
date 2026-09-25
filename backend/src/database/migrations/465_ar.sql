@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS ar (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_ar_user_id
-  ON ar(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_user_id ON ar(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_user_id ON ar(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_ar_status
-  ON ar(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_status ON ar(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_status ON ar(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_ar_created_at
-  ON ar(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_created_at ON ar(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_created_at ON ar(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_ar_updated_at
-  ON ar(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_updated_at ON ar(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_updated_at ON ar(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_ar_data_gin
-  ON ar USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_data_gin ON ar USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ar_data_gin ON ar USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_ar_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER ar_timestamp_trigger
-BEFORE UPDATE ON ar
-FOR EACH ROW
-EXECUTE FUNCTION update_ar_timestamp();
+DROP TRIGGER IF EXISTS ar_timestamp_trigger ON ar;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ar' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER ar_timestamp_trigger BEFORE UPDATE ON ar FOR EACH ROW EXECUTE FUNCTION update_ar_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

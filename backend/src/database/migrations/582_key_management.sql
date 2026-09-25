@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS key_management (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_key_management_user_id
-  ON key_management(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_user_id ON key_management(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_user_id ON key_management(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_key_management_status
-  ON key_management(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_status ON key_management(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_status ON key_management(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_key_management_created_at
-  ON key_management(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_created_at ON key_management(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_created_at ON key_management(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_key_management_updated_at
-  ON key_management(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_updated_at ON key_management(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_updated_at ON key_management(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_key_management_data_gin
-  ON key_management USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_data_gin ON key_management USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_key_management_data_gin ON key_management USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_key_management_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER key_management_timestamp_trigger
-BEFORE UPDATE ON key_management
-FOR EACH ROW
-EXECUTE FUNCTION update_key_management_timestamp();
+DROP TRIGGER IF EXISTS key_management_timestamp_trigger ON key_management;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='key_management' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER key_management_timestamp_trigger BEFORE UPDATE ON key_management FOR EACH ROW EXECUTE FUNCTION update_key_management_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

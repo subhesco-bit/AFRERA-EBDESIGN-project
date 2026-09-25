@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS access_control (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_access_control_user_id
-  ON access_control(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_user_id ON access_control(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_user_id ON access_control(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_access_control_status
-  ON access_control(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_status ON access_control(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_status ON access_control(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_access_control_created_at
-  ON access_control(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_created_at ON access_control(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_created_at ON access_control(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_access_control_updated_at
-  ON access_control(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_updated_at ON access_control(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_updated_at ON access_control(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_access_control_data_gin
-  ON access_control USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_data_gin ON access_control USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_access_control_data_gin ON access_control USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_access_control_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER access_control_timestamp_trigger
-BEFORE UPDATE ON access_control
-FOR EACH ROW
-EXECUTE FUNCTION update_access_control_timestamp();
+DROP TRIGGER IF EXISTS access_control_timestamp_trigger ON access_control;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='access_control' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER access_control_timestamp_trigger BEFORE UPDATE ON access_control FOR EACH ROW EXECUTE FUNCTION update_access_control_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

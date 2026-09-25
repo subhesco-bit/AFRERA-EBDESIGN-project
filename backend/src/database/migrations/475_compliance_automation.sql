@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS compliance_automation (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_compliance_automation_user_id
-  ON compliance_automation(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_user_id ON compliance_automation(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_user_id ON compliance_automation(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_compliance_automation_status
-  ON compliance_automation(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_status ON compliance_automation(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_status ON compliance_automation(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_compliance_automation_created_at
-  ON compliance_automation(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_created_at ON compliance_automation(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_created_at ON compliance_automation(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_compliance_automation_updated_at
-  ON compliance_automation(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_updated_at ON compliance_automation(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_updated_at ON compliance_automation(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_compliance_automation_data_gin
-  ON compliance_automation USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_data_gin ON compliance_automation USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_automation_data_gin ON compliance_automation USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_compliance_automation_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER compliance_automation_timestamp_trigger
-BEFORE UPDATE ON compliance_automation
-FOR EACH ROW
-EXECUTE FUNCTION update_compliance_automation_timestamp();
+DROP TRIGGER IF EXISTS compliance_automation_timestamp_trigger ON compliance_automation;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='compliance_automation' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER compliance_automation_timestamp_trigger BEFORE UPDATE ON compliance_automation FOR EACH ROW EXECUTE FUNCTION update_compliance_automation_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

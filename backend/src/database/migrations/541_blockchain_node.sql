@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS blockchain_node (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_blockchain_node_user_id
-  ON blockchain_node(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_user_id ON blockchain_node(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_user_id ON blockchain_node(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_blockchain_node_status
-  ON blockchain_node(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_status ON blockchain_node(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_status ON blockchain_node(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_blockchain_node_created_at
-  ON blockchain_node(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_created_at ON blockchain_node(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_created_at ON blockchain_node(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_blockchain_node_updated_at
-  ON blockchain_node(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_updated_at ON blockchain_node(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_updated_at ON blockchain_node(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_blockchain_node_data_gin
-  ON blockchain_node USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_data_gin ON blockchain_node USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_blockchain_node_data_gin ON blockchain_node USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_blockchain_node_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER blockchain_node_timestamp_trigger
-BEFORE UPDATE ON blockchain_node
-FOR EACH ROW
-EXECUTE FUNCTION update_blockchain_node_timestamp();
+DROP TRIGGER IF EXISTS blockchain_node_timestamp_trigger ON blockchain_node;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='blockchain_node' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER blockchain_node_timestamp_trigger BEFORE UPDATE ON blockchain_node FOR EACH ROW EXECUTE FUNCTION update_blockchain_node_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

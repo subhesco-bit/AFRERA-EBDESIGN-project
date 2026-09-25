@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS backup (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_backup_user_id
-  ON backup(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_user_id ON backup(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_user_id ON backup(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_backup_status
-  ON backup(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_status ON backup(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_status ON backup(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_backup_created_at
-  ON backup(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_created_at ON backup(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_created_at ON backup(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_backup_updated_at
-  ON backup(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_updated_at ON backup(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_updated_at ON backup(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_backup_data_gin
-  ON backup USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_data_gin ON backup USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_backup_data_gin ON backup USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_backup_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER backup_timestamp_trigger
-BEFORE UPDATE ON backup
-FOR EACH ROW
-EXECUTE FUNCTION update_backup_timestamp();
+DROP TRIGGER IF EXISTS backup_timestamp_trigger ON backup;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='backup' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER backup_timestamp_trigger BEFORE UPDATE ON backup FOR EACH ROW EXECUTE FUNCTION update_backup_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

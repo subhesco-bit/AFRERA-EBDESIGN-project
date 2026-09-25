@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS intrusion_prevention (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_user_id
-  ON intrusion_prevention(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_user_id ON intrusion_prevention(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_user_id ON intrusion_prevention(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_status
-  ON intrusion_prevention(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_status ON intrusion_prevention(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_status ON intrusion_prevention(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_created_at
-  ON intrusion_prevention(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_created_at ON intrusion_prevention(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_created_at ON intrusion_prevention(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_updated_at
-  ON intrusion_prevention(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_updated_at ON intrusion_prevention(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_updated_at ON intrusion_prevention(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_data_gin
-  ON intrusion_prevention USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_data_gin ON intrusion_prevention USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_intrusion_prevention_data_gin ON intrusion_prevention USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_intrusion_prevention_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER intrusion_prevention_timestamp_trigger
-BEFORE UPDATE ON intrusion_prevention
-FOR EACH ROW
-EXECUTE FUNCTION update_intrusion_prevention_timestamp();
+DROP TRIGGER IF EXISTS intrusion_prevention_timestamp_trigger ON intrusion_prevention;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='intrusion_prevention' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER intrusion_prevention_timestamp_trigger BEFORE UPDATE ON intrusion_prevention FOR EACH ROW EXECUTE FUNCTION update_intrusion_prevention_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

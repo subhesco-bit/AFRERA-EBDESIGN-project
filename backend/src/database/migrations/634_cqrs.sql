@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS cqrs (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_cqrs_user_id
-  ON cqrs(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_user_id ON cqrs(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_user_id ON cqrs(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_cqrs_status
-  ON cqrs(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_status ON cqrs(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_status ON cqrs(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_cqrs_created_at
-  ON cqrs(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_created_at ON cqrs(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_created_at ON cqrs(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_cqrs_updated_at
-  ON cqrs(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_updated_at ON cqrs(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_updated_at ON cqrs(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_cqrs_data_gin
-  ON cqrs USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_data_gin ON cqrs USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_cqrs_data_gin ON cqrs USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_cqrs_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER cqrs_timestamp_trigger
-BEFORE UPDATE ON cqrs
-FOR EACH ROW
-EXECUTE FUNCTION update_cqrs_timestamp();
+DROP TRIGGER IF EXISTS cqrs_timestamp_trigger ON cqrs;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cqrs' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER cqrs_timestamp_trigger BEFORE UPDATE ON cqrs FOR EACH ROW EXECUTE FUNCTION update_cqrs_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

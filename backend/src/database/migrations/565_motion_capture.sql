@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS motion_capture (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_motion_capture_user_id
-  ON motion_capture(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_user_id ON motion_capture(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_user_id ON motion_capture(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_motion_capture_status
-  ON motion_capture(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_status ON motion_capture(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_status ON motion_capture(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_motion_capture_created_at
-  ON motion_capture(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_created_at ON motion_capture(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_created_at ON motion_capture(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_motion_capture_updated_at
-  ON motion_capture(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_updated_at ON motion_capture(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_updated_at ON motion_capture(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_motion_capture_data_gin
-  ON motion_capture USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_data_gin ON motion_capture USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_motion_capture_data_gin ON motion_capture USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_motion_capture_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER motion_capture_timestamp_trigger
-BEFORE UPDATE ON motion_capture
-FOR EACH ROW
-EXECUTE FUNCTION update_motion_capture_timestamp();
+DROP TRIGGER IF EXISTS motion_capture_timestamp_trigger ON motion_capture;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='motion_capture' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER motion_capture_timestamp_trigger BEFORE UPDATE ON motion_capture FOR EACH ROW EXECUTE FUNCTION update_motion_capture_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS webhooks (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_webhooks_user_id
-  ON webhooks(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_user_id ON webhooks(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_user_id ON webhooks(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_webhooks_status
-  ON webhooks(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_status ON webhooks(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_status ON webhooks(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_webhooks_created_at
-  ON webhooks(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_created_at ON webhooks(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_created_at ON webhooks(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_webhooks_updated_at
-  ON webhooks(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_updated_at ON webhooks(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_updated_at ON webhooks(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_webhooks_data_gin
-  ON webhooks USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_data_gin ON webhooks USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_webhooks_data_gin ON webhooks USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_webhooks_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER webhooks_timestamp_trigger
-BEFORE UPDATE ON webhooks
-FOR EACH ROW
-EXECUTE FUNCTION update_webhooks_timestamp();
+DROP TRIGGER IF EXISTS webhooks_timestamp_trigger ON webhooks;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='webhooks' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER webhooks_timestamp_trigger BEFORE UPDATE ON webhooks FOR EACH ROW EXECUTE FUNCTION update_webhooks_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

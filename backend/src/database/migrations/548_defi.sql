@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS defi (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_defi_user_id
-  ON defi(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_user_id ON defi(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_user_id ON defi(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_defi_status
-  ON defi(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_status ON defi(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_status ON defi(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_defi_created_at
-  ON defi(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_created_at ON defi(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_created_at ON defi(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_defi_updated_at
-  ON defi(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_updated_at ON defi(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_updated_at ON defi(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_defi_data_gin
-  ON defi USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_data_gin ON defi USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_defi_data_gin ON defi USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_defi_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER defi_timestamp_trigger
-BEFORE UPDATE ON defi
-FOR EACH ROW
-EXECUTE FUNCTION update_defi_timestamp();
+DROP TRIGGER IF EXISTS defi_timestamp_trigger ON defi;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='defi' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER defi_timestamp_trigger BEFORE UPDATE ON defi FOR EACH ROW EXECUTE FUNCTION update_defi_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

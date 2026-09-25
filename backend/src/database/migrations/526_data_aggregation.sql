@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS data_aggregation (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_data_aggregation_user_id
-  ON data_aggregation(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_user_id ON data_aggregation(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_user_id ON data_aggregation(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_aggregation_status
-  ON data_aggregation(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_status ON data_aggregation(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_status ON data_aggregation(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_aggregation_created_at
-  ON data_aggregation(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_created_at ON data_aggregation(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_created_at ON data_aggregation(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_aggregation_updated_at
-  ON data_aggregation(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_updated_at ON data_aggregation(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_updated_at ON data_aggregation(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_data_aggregation_data_gin
-  ON data_aggregation USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_data_gin ON data_aggregation USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_aggregation_data_gin ON data_aggregation USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_data_aggregation_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER data_aggregation_timestamp_trigger
-BEFORE UPDATE ON data_aggregation
-FOR EACH ROW
-EXECUTE FUNCTION update_data_aggregation_timestamp();
+DROP TRIGGER IF EXISTS data_aggregation_timestamp_trigger ON data_aggregation;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_aggregation' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER data_aggregation_timestamp_trigger BEFORE UPDATE ON data_aggregation FOR EACH ROW EXECUTE FUNCTION update_data_aggregation_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS grpc (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_grpc_user_id
-  ON grpc(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_user_id ON grpc(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_user_id ON grpc(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_grpc_status
-  ON grpc(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_status ON grpc(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_status ON grpc(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_grpc_created_at
-  ON grpc(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_created_at ON grpc(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_created_at ON grpc(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_grpc_updated_at
-  ON grpc(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_updated_at ON grpc(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_updated_at ON grpc(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_grpc_data_gin
-  ON grpc USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_data_gin ON grpc USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_grpc_data_gin ON grpc USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_grpc_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER grpc_timestamp_trigger
-BEFORE UPDATE ON grpc
-FOR EACH ROW
-EXECUTE FUNCTION update_grpc_timestamp();
+DROP TRIGGER IF EXISTS grpc_timestamp_trigger ON grpc;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='grpc' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER grpc_timestamp_trigger BEFORE UPDATE ON grpc FOR EACH ROW EXECUTE FUNCTION update_grpc_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

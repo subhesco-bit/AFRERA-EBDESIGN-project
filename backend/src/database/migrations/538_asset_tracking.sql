@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS asset_tracking (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_asset_tracking_user_id
-  ON asset_tracking(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_user_id ON asset_tracking(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_user_id ON asset_tracking(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_asset_tracking_status
-  ON asset_tracking(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_status ON asset_tracking(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_status ON asset_tracking(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_asset_tracking_created_at
-  ON asset_tracking(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_created_at ON asset_tracking(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_created_at ON asset_tracking(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_asset_tracking_updated_at
-  ON asset_tracking(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_updated_at ON asset_tracking(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_updated_at ON asset_tracking(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_asset_tracking_data_gin
-  ON asset_tracking USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_data_gin ON asset_tracking USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_asset_tracking_data_gin ON asset_tracking USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_asset_tracking_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER asset_tracking_timestamp_trigger
-BEFORE UPDATE ON asset_tracking
-FOR EACH ROW
-EXECUTE FUNCTION update_asset_tracking_timestamp();
+DROP TRIGGER IF EXISTS asset_tracking_timestamp_trigger ON asset_tracking;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='asset_tracking' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER asset_tracking_timestamp_trigger BEFORE UPDATE ON asset_tracking FOR EACH ROW EXECUTE FUNCTION update_asset_tracking_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

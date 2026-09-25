@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS haptic_feedback (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_haptic_feedback_user_id
-  ON haptic_feedback(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_user_id ON haptic_feedback(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_user_id ON haptic_feedback(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_haptic_feedback_status
-  ON haptic_feedback(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_status ON haptic_feedback(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_status ON haptic_feedback(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_haptic_feedback_created_at
-  ON haptic_feedback(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_created_at ON haptic_feedback(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_created_at ON haptic_feedback(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_haptic_feedback_updated_at
-  ON haptic_feedback(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_updated_at ON haptic_feedback(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_updated_at ON haptic_feedback(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_haptic_feedback_data_gin
-  ON haptic_feedback USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_data_gin ON haptic_feedback USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_haptic_feedback_data_gin ON haptic_feedback USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_haptic_feedback_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER haptic_feedback_timestamp_trigger
-BEFORE UPDATE ON haptic_feedback
-FOR EACH ROW
-EXECUTE FUNCTION update_haptic_feedback_timestamp();
+DROP TRIGGER IF EXISTS haptic_feedback_timestamp_trigger ON haptic_feedback;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='haptic_feedback' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER haptic_feedback_timestamp_trigger BEFORE UPDATE ON haptic_feedback FOR EACH ROW EXECUTE FUNCTION update_haptic_feedback_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

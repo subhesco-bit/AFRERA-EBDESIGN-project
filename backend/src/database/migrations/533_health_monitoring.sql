@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS health_monitoring (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_health_monitoring_user_id
-  ON health_monitoring(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_user_id ON health_monitoring(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_user_id ON health_monitoring(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_health_monitoring_status
-  ON health_monitoring(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_status ON health_monitoring(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_status ON health_monitoring(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_health_monitoring_created_at
-  ON health_monitoring(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_created_at ON health_monitoring(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_created_at ON health_monitoring(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_health_monitoring_updated_at
-  ON health_monitoring(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_updated_at ON health_monitoring(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_updated_at ON health_monitoring(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_health_monitoring_data_gin
-  ON health_monitoring USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_data_gin ON health_monitoring USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_health_monitoring_data_gin ON health_monitoring USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_health_monitoring_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER health_monitoring_timestamp_trigger
-BEFORE UPDATE ON health_monitoring
-FOR EACH ROW
-EXECUTE FUNCTION update_health_monitoring_timestamp();
+DROP TRIGGER IF EXISTS health_monitoring_timestamp_trigger ON health_monitoring;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='health_monitoring' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER health_monitoring_timestamp_trigger BEFORE UPDATE ON health_monitoring FOR EACH ROW EXECUTE FUNCTION update_health_monitoring_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

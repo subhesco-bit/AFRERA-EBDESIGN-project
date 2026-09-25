@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS computer_vision (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_computer_vision_user_id
-  ON computer_vision(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_user_id ON computer_vision(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_user_id ON computer_vision(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_computer_vision_status
-  ON computer_vision(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_status ON computer_vision(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_status ON computer_vision(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_computer_vision_created_at
-  ON computer_vision(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_created_at ON computer_vision(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_created_at ON computer_vision(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_computer_vision_updated_at
-  ON computer_vision(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_updated_at ON computer_vision(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_updated_at ON computer_vision(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_computer_vision_data_gin
-  ON computer_vision USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_data_gin ON computer_vision USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_computer_vision_data_gin ON computer_vision USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_computer_vision_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER computer_vision_timestamp_trigger
-BEFORE UPDATE ON computer_vision
-FOR EACH ROW
-EXECUTE FUNCTION update_computer_vision_timestamp();
+DROP TRIGGER IF EXISTS computer_vision_timestamp_trigger ON computer_vision;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='computer_vision' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER computer_vision_timestamp_trigger BEFORE UPDATE ON computer_vision FOR EACH ROW EXECUTE FUNCTION update_computer_vision_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

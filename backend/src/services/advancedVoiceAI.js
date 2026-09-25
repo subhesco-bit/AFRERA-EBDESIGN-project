@@ -138,17 +138,17 @@ const AGRICULTURAL_INTENTS = {
   loan_inquiry: {
     keywords: ['loan', 'credit', 'finance', 'कर्ज़', 'ঋণ', 'ঋণ'],
     entities: ['amount', 'purpose', 'duration'],
-    response_template: 'You are eligible for a loan of ₹{amount} at {interest_rate}% interest.',
+    response_template: 'I can explain loan options and collect your request. Eligibility, amount and interest rate must come from the verified lending workflow.',
   },
   subsidy_inquiry: {
     keywords: ['subsidy', 'scheme', 'government', 'सब्सिडी', 'অনুদান', 'যোজনা'],
     entities: ['crop', 'scheme_type'],
-    response_template: 'You are eligible for {scheme} subsidy of ₹{amount}.',
+    response_template: 'I can explain government schemes and collect the details needed for a verified eligibility check. I will not promise a scheme or amount.',
   },
   insurance_inquiry: {
     keywords: ['insurance', 'crop insurance', 'बीमा', 'বীমা', 'বীমা কৰা'],
     entities: ['crop', 'coverage_type'],
-    response_template: 'Crop insurance for {crop} costs ₹{premium} with coverage up to ₹{coverage}.',
+    response_template: 'I can explain crop insurance options and help start a verified quote or assistance workflow. I will not invent premium or coverage.',
   },
 
   // Platform-related
@@ -355,14 +355,12 @@ async function fetchIntentData(intent, entities, userId) {
 
       case 'loan_inquiry': {
         const userData = await getUserCreditProfile(userId);
-        data.amount = userData.eligible_amount;
-        data.interest_rate = userData.interest_rate;
+        Object.assign(data, userData);
         break;
       }
       case 'subsidy_inquiry': {
         const subsidyData = await getUserEligibleSubsidies(userId, entities.crop);
-        data.scheme = subsidyData.scheme_name;
-        data.amount = subsidyData.amount;
+        Object.assign(data, subsidyData);
         break;
       }
 
@@ -427,18 +425,15 @@ async function getUserCreditProfile(userId) {
   `;
 
   const result = await pool.query(query, [userId]);
-
-  if (result.rows.length > 0) {
-    const fdi = result.rows[0].fdi_score || 50;
-    return {
-      eligible_amount: fdi * 10000,
-      interest_rate: fdi > 70 ? 8.5 : 12.0,
-    };
+  if (!result.rows.length) {
+    return { status: 'profile_unavailable', eligibility: 'not_determined' };
   }
-
   return {
-    eligible_amount: 50000,
-    interest_rate: 12.0,
+    status: 'profile_available',
+    fdi_score: result.rows[0].fdi_score ?? null,
+    repayment_history: result.rows[0].repayment_history ?? null,
+    eligibility: 'not_determined',
+    reason: 'Voice channel does not determine lending eligibility, amount, or interest rate.',
   };
 }
 
@@ -446,10 +441,13 @@ async function getUserCreditProfile(userId) {
  * Get User Eligible Subsidies
  */
 async function getUserEligibleSubsidies(userId, crop) {
-  // In production, fetch from government scheme database
   return {
-    scheme_name: 'PM-KISAN',
-    amount: 6000,
+    status: 'requires_verified_scheme_eligibility_workflow',
+    user_id: userId || null,
+    crop: crop || null,
+    scheme_name: null,
+    amount: null,
+    eligibility: 'not_determined',
   };
 }
 

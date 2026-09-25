@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS ddos_protection (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_ddos_protection_user_id
-  ON ddos_protection(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_user_id ON ddos_protection(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_user_id ON ddos_protection(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_ddos_protection_status
-  ON ddos_protection(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_status ON ddos_protection(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_status ON ddos_protection(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_ddos_protection_created_at
-  ON ddos_protection(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_created_at ON ddos_protection(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_created_at ON ddos_protection(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_ddos_protection_updated_at
-  ON ddos_protection(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_updated_at ON ddos_protection(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_updated_at ON ddos_protection(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_ddos_protection_data_gin
-  ON ddos_protection USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_data_gin ON ddos_protection USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_ddos_protection_data_gin ON ddos_protection USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_ddos_protection_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER ddos_protection_timestamp_trigger
-BEFORE UPDATE ON ddos_protection
-FOR EACH ROW
-EXECUTE FUNCTION update_ddos_protection_timestamp();
+DROP TRIGGER IF EXISTS ddos_protection_timestamp_trigger ON ddos_protection;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ddos_protection' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER ddos_protection_timestamp_trigger BEFORE UPDATE ON ddos_protection FOR EACH ROW EXECUTE FUNCTION update_ddos_protection_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

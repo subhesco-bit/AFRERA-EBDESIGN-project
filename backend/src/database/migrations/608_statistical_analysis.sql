@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS statistical_analysis (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_statistical_analysis_user_id
-  ON statistical_analysis(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_user_id ON statistical_analysis(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_user_id ON statistical_analysis(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_statistical_analysis_status
-  ON statistical_analysis(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_status ON statistical_analysis(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_status ON statistical_analysis(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_statistical_analysis_created_at
-  ON statistical_analysis(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_created_at ON statistical_analysis(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_created_at ON statistical_analysis(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_statistical_analysis_updated_at
-  ON statistical_analysis(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_updated_at ON statistical_analysis(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_updated_at ON statistical_analysis(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_statistical_analysis_data_gin
-  ON statistical_analysis USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_data_gin ON statistical_analysis USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_statistical_analysis_data_gin ON statistical_analysis USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_statistical_analysis_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER statistical_analysis_timestamp_trigger
-BEFORE UPDATE ON statistical_analysis
-FOR EACH ROW
-EXECUTE FUNCTION update_statistical_analysis_timestamp();
+DROP TRIGGER IF EXISTS statistical_analysis_timestamp_trigger ON statistical_analysis;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='statistical_analysis' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER statistical_analysis_timestamp_trigger BEFORE UPDATE ON statistical_analysis FOR EACH ROW EXECUTE FUNCTION update_statistical_analysis_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

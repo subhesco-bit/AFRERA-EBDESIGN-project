@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS text_classification (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_text_classification_user_id
-  ON text_classification(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_user_id ON text_classification(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_user_id ON text_classification(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_text_classification_status
-  ON text_classification(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_status ON text_classification(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_status ON text_classification(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_text_classification_created_at
-  ON text_classification(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_created_at ON text_classification(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_created_at ON text_classification(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_text_classification_updated_at
-  ON text_classification(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_updated_at ON text_classification(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_updated_at ON text_classification(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_text_classification_data_gin
-  ON text_classification USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_data_gin ON text_classification USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_text_classification_data_gin ON text_classification USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_text_classification_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER text_classification_timestamp_trigger
-BEFORE UPDATE ON text_classification
-FOR EACH ROW
-EXECUTE FUNCTION update_text_classification_timestamp();
+DROP TRIGGER IF EXISTS text_classification_timestamp_trigger ON text_classification;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='text_classification' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER text_classification_timestamp_trigger BEFORE UPDATE ON text_classification FOR EACH ROW EXECUTE FUNCTION update_text_classification_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

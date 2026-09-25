@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS graphql (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_graphql_user_id
-  ON graphql(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_user_id ON graphql(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_user_id ON graphql(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_graphql_status
-  ON graphql(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_status ON graphql(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_status ON graphql(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_graphql_created_at
-  ON graphql(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_created_at ON graphql(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_created_at ON graphql(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_graphql_updated_at
-  ON graphql(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_updated_at ON graphql(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_updated_at ON graphql(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_graphql_data_gin
-  ON graphql USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_data_gin ON graphql USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_graphql_data_gin ON graphql USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_graphql_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER graphql_timestamp_trigger
-BEFORE UPDATE ON graphql
-FOR EACH ROW
-EXECUTE FUNCTION update_graphql_timestamp();
+DROP TRIGGER IF EXISTS graphql_timestamp_trigger ON graphql;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='graphql' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER graphql_timestamp_trigger BEFORE UPDATE ON graphql FOR EACH ROW EXECUTE FUNCTION update_graphql_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

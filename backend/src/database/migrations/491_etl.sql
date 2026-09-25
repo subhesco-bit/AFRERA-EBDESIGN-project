@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS etl (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_etl_user_id
-  ON etl(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_user_id ON etl(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_user_id ON etl(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_etl_status
-  ON etl(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_status ON etl(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_status ON etl(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_etl_created_at
-  ON etl(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_created_at ON etl(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_created_at ON etl(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_etl_updated_at
-  ON etl(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_updated_at ON etl(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_updated_at ON etl(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_etl_data_gin
-  ON etl USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_data_gin ON etl USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_etl_data_gin ON etl USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_etl_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER etl_timestamp_trigger
-BEFORE UPDATE ON etl
-FOR EACH ROW
-EXECUTE FUNCTION update_etl_timestamp();
+DROP TRIGGER IF EXISTS etl_timestamp_trigger ON etl;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='etl' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER etl_timestamp_trigger BEFORE UPDATE ON etl FOR EACH ROW EXECUTE FUNCTION update_etl_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

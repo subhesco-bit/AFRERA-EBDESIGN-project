@@ -13,6 +13,8 @@ const erpCostOptimizer = require('../core/erpCostOptimizationService');
 const erpTemplates = require('../core/erpTemplateEvolutionService');
 const erpCompletion = require('../core/erpCompletionRegistry');
 const { authMiddleware } = require('../middleware/auth');
+const accountingIntelligence = require('../services/finance/accountingIntelligenceService');
+const accountingCompletion = require('../services/finance/accountingCompletionRegistry');
 
 const router = express.Router();
 
@@ -95,6 +97,46 @@ router.post('/erp/workflow', (req, res) => {
 router.get('/erp/inventory', (req, res) => res.json({ success: true, data: erp.listInventory(req.query.module) }));
 router.get('/erp/documents', (req, res) => res.json({ success: true, data: erp.listDocuments(req.query.module, req.query.type) }));
 
+// Accounting intelligence / compliance controls
+router.get('/finance/intelligence/completion', authMiddleware, (_req, res) => {
+  res.json({success:true,data:accountingCompletion.build()});
+});
+
+router.post('/finance/intelligence/withholding/compute', authMiddleware, (req, res) => {
+  try {
+    res.json({success:true,data:accountingIntelligence.computeWithholding(req.body||{})});
+  } catch(e) { res.status(400).json({success:false,error:e.message,code:e.code||'WITHHOLDING_COMPUTE_ERROR'}); }
+});
+
+router.post('/finance/intelligence/reconcile', authMiddleware, (req, res) => {
+  try {
+    const body=req.body||{};
+    res.json({success:true,data:accountingIntelligence.reconcile(body.sourceRows||[],body.targetRows||[],body.options||{}),authority:'DETERMINISTIC_RECONCILIATION'});
+  } catch(e) { res.status(400).json({success:false,error:e.message}); }
+});
+
+router.post('/finance/intelligence/close-readiness', authMiddleware, (req, res) => {
+  try { res.json({success:true,data:accountingIntelligence.closeReadiness(req.body||{})}); }
+  catch(e) { res.status(400).json({success:false,error:e.message}); }
+});
+
+router.post('/finance/intelligence/cash-flow', authMiddleware, (req, res) => {
+  try { res.json({success:true,data:accountingIntelligence.cashFlowSummary(req.body?.transactions||[])}); }
+  catch(e) { res.status(400).json({success:false,error:e.message}); }
+});
+
+router.post('/finance/intelligence/working-capital', authMiddleware, (req, res) => {
+  try { res.json({success:true,data:accountingIntelligence.workingCapitalMetrics(req.body||{})}); }
+  catch(e) { res.status(400).json({success:false,error:e.message}); }
+});
+
+router.post('/finance/intelligence/ai-plan', authMiddleware, (req, res) => {
+  try {
+    const body=req.body||{};
+    res.json({success:true,status:'proposal_only',data:accountingIntelligence.accountingAIPlan(body.task||{},body.options||{})});
+  } catch(e) { res.status(400).json({success:false,error:e.message,code:e.code||'ACCOUNTING_AI_PLAN_ERROR'}); }
+});
+
 // Financial / GST
 router.get('/finance/coa', (_req, res) => res.json({ success: true, data: fin.COA, disclaimer: fin.FIN_DISCLAIMER }));
 router.get('/finance/dashboard/:module', (req, res) => res.json({ success: true, data: fin.financialDashboard(req.params.module) }));
@@ -102,13 +144,20 @@ router.get('/finance/trial-balance', (req, res) => res.json({ success: true, dat
 router.get('/finance/pnl', (req, res) => res.json({ success: true, data: fin.profitAndLoss(req.query.module) }));
 router.get('/finance/gst', (req, res) => res.json({ success: true, data: fin.gstSummary(req.query.module) }));
 router.get('/finance/gst/rates', (_req, res) =>
-  res.json({ success: true, data: { rates: fin.GST_RATE_CARDS, hsn_hints: fin.HSN_HINTS, disclaimer: fin.FIN_DISCLAIMER } }),
+  res.json({ success: true, data: { rates: fin.GST_RATE_CARDS, hsn_hints: fin.HSN_HINTS, authoritative:false, status:'illustrative_legacy_reference_only', disclaimer: fin.FIN_DISCLAIMER } }),
 );
 router.post('/finance/gst/compute', (req, res) => {
   try {
-    res.json({ success: true, data: fin.computeGst(req.body || {}), disclaimer: fin.FIN_DISCLAIMER });
-  } catch (e) {
-    res.status(400).json({ success: false, error: e.message });
+    const body=req.body||{};
+    if(!body.rule) return res.status(409).json({success:false,error:'A verified effective-dated GST rule is required',code:'GST_RULE_REQUIRED'});
+    const data=accountingIntelligence.computeGST({
+      taxableAmount:body.taxableAmount ?? body.taxable_value,
+      supplyType:String(body.supplyType ?? body.supply_type ?? '').toLowerCase().startsWith('inter')?'inter_state':'intra_state',
+      rule:body.rule,
+    });
+    res.json({success:true,data,authority:'DETERMINISTIC_FROM_VERIFIED_RULE'});
+  } catch(e) {
+    res.status(400).json({success:false,error:e.message,code:e.code||'GST_COMPUTE_ERROR'});
   }
 });
 router.post('/finance/invoice', (req, res) => {

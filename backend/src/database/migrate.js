@@ -50,7 +50,7 @@ function stripTransactionMarkers(sql) {
   for (const line of lines) {
     if (dollarTag === null) {
       if (/^\s*(BEGIN|START\s+TRANSACTION)\s*;\s*$/i.test(line) ||
-          /^\s*(COMMIT|END|ROLLBACK)\s*;\s*$/i.test(line)) {
+          /^\s*(COMMIT|ROLLBACK)\s*;\s*$/i.test(line)) {
         continue;
       }
     }

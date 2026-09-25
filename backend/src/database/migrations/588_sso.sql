@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS sso (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_sso_user_id
-  ON sso(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_user_id ON sso(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_user_id ON sso(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_sso_status
-  ON sso(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_status ON sso(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_status ON sso(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_sso_created_at
-  ON sso(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_created_at ON sso(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_created_at ON sso(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_sso_updated_at
-  ON sso(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_updated_at ON sso(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_updated_at ON sso(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_sso_data_gin
-  ON sso USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_data_gin ON sso USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_sso_data_gin ON sso USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_sso_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER sso_timestamp_trigger
-BEFORE UPDATE ON sso
-FOR EACH ROW
-EXECUTE FUNCTION update_sso_timestamp();
+DROP TRIGGER IF EXISTS sso_timestamp_trigger ON sso;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sso' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER sso_timestamp_trigger BEFORE UPDATE ON sso FOR EACH ROW EXECUTE FUNCTION update_sso_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

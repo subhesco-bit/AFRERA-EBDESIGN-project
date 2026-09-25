@@ -382,6 +382,65 @@ CREATE TABLE IF NOT EXISTS complaints (
                OR (resolution IS NOT NULL AND length(trim(resolution)) > 0))
 );
 
+-- Reconcile the richer complaint workflow with the earlier generic
+-- compatibility table if that table already owns the name.
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS complaint_code VARCHAR(40);
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS raised_by UUID;
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS raised_by_role VARCHAR(40);
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS category VARCHAR(40);
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS subject VARCHAR(200);
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS severity VARCHAR(20) DEFAULT 'medium';
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS assigned_to UUID;
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS resolution TEXT;
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMP;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_schema='public' AND table_name='complaints' AND column_name='user_id') THEN
+    UPDATE complaints SET raised_by = COALESCE(raised_by, user_id);
+    EXECUTE 'ALTER TABLE complaints ALTER COLUMN user_id DROP NOT NULL';
+  END IF;
+END $$;
+
+ALTER TABLE complaints DROP CONSTRAINT IF EXISTS complaints_status_check;
+ALTER TABLE complaints ALTER COLUMN status SET DEFAULT 'open';
+
+UPDATE complaints
+SET complaint_code = COALESCE(complaint_code, 'CMP-' || replace(id::text,'-','')),
+    category = COALESCE(category, 'general'),
+    subject = COALESCE(subject, 'Legacy complaint ' || left(id::text,8)),
+    description = COALESCE(description, 'Legacy complaint retained from compatibility record'),
+    severity = CASE WHEN severity IN ('low','medium','high','critical') THEN severity ELSE 'medium' END,
+    status = CASE
+      WHEN status IN ('open','acknowledged','investigating','resolved','closed','rejected') THEN status
+      WHEN status IN ('completed','inactive','archived') THEN 'closed'
+      ELSE 'open'
+    END;
+
+ALTER TABLE complaints ALTER COLUMN complaint_code SET NOT NULL;
+ALTER TABLE complaints ALTER COLUMN category SET NOT NULL;
+ALTER TABLE complaints ALTER COLUMN subject SET NOT NULL;
+ALTER TABLE complaints ALTER COLUMN description SET NOT NULL;
+ALTER TABLE complaints ALTER COLUMN severity SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_complaints_complaint_code ON complaints(complaint_code);
+
+ALTER TABLE complaints DROP CONSTRAINT IF EXISTS complaints_status_canonical_check;
+ALTER TABLE complaints ADD CONSTRAINT complaints_status_canonical_check
+  CHECK (status IN ('open','acknowledged','investigating','resolved','closed','rejected'));
+
+ALTER TABLE complaints DROP CONSTRAINT IF EXISTS complaints_severity_check;
+ALTER TABLE complaints DROP CONSTRAINT IF EXISTS complaints_severity_canonical_check;
+ALTER TABLE complaints ADD CONSTRAINT complaints_severity_canonical_check
+  CHECK (severity IN ('low','medium','high','critical'));
+
+ALTER TABLE complaints DROP CONSTRAINT IF EXISTS resolution_needs_text;
+ALTER TABLE complaints ADD CONSTRAINT resolution_needs_text
+  CHECK (status NOT IN ('resolved','rejected')
+         OR (resolution IS NOT NULL AND length(trim(resolution)) > 0));
+
 -- ---------------------------------------------------------------------------
 -- VIEWS
 -- ---------------------------------------------------------------------------

@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS change_mgmt (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_change_mgmt_user_id
-  ON change_mgmt(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_user_id ON change_mgmt(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_user_id ON change_mgmt(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_change_mgmt_status
-  ON change_mgmt(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_status ON change_mgmt(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_status ON change_mgmt(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_change_mgmt_created_at
-  ON change_mgmt(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_created_at ON change_mgmt(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_created_at ON change_mgmt(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_change_mgmt_updated_at
-  ON change_mgmt(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_updated_at ON change_mgmt(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_updated_at ON change_mgmt(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_change_mgmt_data_gin
-  ON change_mgmt USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_data_gin ON change_mgmt USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_change_mgmt_data_gin ON change_mgmt USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_change_mgmt_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER change_mgmt_timestamp_trigger
-BEFORE UPDATE ON change_mgmt
-FOR EACH ROW
-EXECUTE FUNCTION update_change_mgmt_timestamp();
+DROP TRIGGER IF EXISTS change_mgmt_timestamp_trigger ON change_mgmt;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='change_mgmt' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER change_mgmt_timestamp_trigger BEFORE UPDATE ON change_mgmt FOR EACH ROW EXECUTE FUNCTION update_change_mgmt_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

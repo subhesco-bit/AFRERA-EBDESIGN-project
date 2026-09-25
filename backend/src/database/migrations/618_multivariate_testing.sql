@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS multivariate_testing (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_multivariate_testing_user_id
-  ON multivariate_testing(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_user_id ON multivariate_testing(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_user_id ON multivariate_testing(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_multivariate_testing_status
-  ON multivariate_testing(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_status ON multivariate_testing(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_status ON multivariate_testing(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_multivariate_testing_created_at
-  ON multivariate_testing(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_created_at ON multivariate_testing(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_created_at ON multivariate_testing(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_multivariate_testing_updated_at
-  ON multivariate_testing(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_updated_at ON multivariate_testing(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_updated_at ON multivariate_testing(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_multivariate_testing_data_gin
-  ON multivariate_testing USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_data_gin ON multivariate_testing USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_multivariate_testing_data_gin ON multivariate_testing USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_multivariate_testing_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER multivariate_testing_timestamp_trigger
-BEFORE UPDATE ON multivariate_testing
-FOR EACH ROW
-EXECUTE FUNCTION update_multivariate_testing_timestamp();
+DROP TRIGGER IF EXISTS multivariate_testing_timestamp_trigger ON multivariate_testing;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='multivariate_testing' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER multivariate_testing_timestamp_trigger BEFORE UPDATE ON multivariate_testing FOR EACH ROW EXECUTE FUNCTION update_multivariate_testing_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

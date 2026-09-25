@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS holograms (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_holograms_user_id
-  ON holograms(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_user_id ON holograms(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_user_id ON holograms(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_holograms_status
-  ON holograms(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_status ON holograms(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_status ON holograms(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_holograms_created_at
-  ON holograms(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_created_at ON holograms(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_created_at ON holograms(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_holograms_updated_at
-  ON holograms(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_updated_at ON holograms(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_updated_at ON holograms(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_holograms_data_gin
-  ON holograms USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_data_gin ON holograms USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_holograms_data_gin ON holograms USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_holograms_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER holograms_timestamp_trigger
-BEFORE UPDATE ON holograms
-FOR EACH ROW
-EXECUTE FUNCTION update_holograms_timestamp();
+DROP TRIGGER IF EXISTS holograms_timestamp_trigger ON holograms;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='holograms' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER holograms_timestamp_trigger BEFORE UPDATE ON holograms FOR EACH ROW EXECUTE FUNCTION update_holograms_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

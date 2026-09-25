@@ -93,6 +93,7 @@ const iotSensors = require('./routes/iotSensors.js');
 const iotIntegrationRoutes = require('./routes/iotIntegrationRoutes.js');
 const insuranceEnhancements = require('./routes/insuranceEnhancements.js');
 const inputSupplyManagementRoutes = require('./routes/inputSupplyManagementRoutes.js');
+const indiaErpAccountingRoutes = require('./routes/indiaErpAccountingRoutes.js');
 const informationSharingRoutes = require('./routes/informationSharingRoutes.js');
 const identityManagementRoutes = require('./routes/identityManagementRoutes.js');
 const hrRoutes = require('./routes/hrRoutes.js');
@@ -113,6 +114,7 @@ const fisheriesManagementRoutes = require('./routes/fisheriesManagementRoutes.js
 const financialAnalytics = require('./routes/financialAnalytics.js');
 const fertilizerRoutes = require('./routes/fertilizerRoutes.js');
 const farmerValueRoutes = require('./routes/farmerValueRoutes.js');
+const farmerVoiceAgentRoutes = require('./routes/farmerVoiceAgentRoutes.js');
 const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes.js');
 const farmerRoutes = require('./routes/farmerRoutes.js');
 const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements.js');
@@ -303,6 +305,8 @@ app.use('/api/v1/value-chain', productValueChainRoutes);
 app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/catalog/ne-products', neProductMasterRoutes);
 app.use('/api/v1/ai/agents', aiAgentRoutes);
+app.use('/api/v1/accounting', indiaErpAccountingRoutes);
+app.use('/api/v1/voice-agent', farmerVoiceAgentRoutes);
 app.use('/api/v1/advanced-medical-coding', advancedMedicalCodingRoutes);
 
 // M007 Role & Permission Management (AI-enhanced) lives under

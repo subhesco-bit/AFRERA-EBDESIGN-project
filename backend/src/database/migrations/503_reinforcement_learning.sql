@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS reinforcement_learning (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_user_id
-  ON reinforcement_learning(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_user_id ON reinforcement_learning(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_user_id ON reinforcement_learning(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_status
-  ON reinforcement_learning(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_status ON reinforcement_learning(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_status ON reinforcement_learning(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_created_at
-  ON reinforcement_learning(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_created_at ON reinforcement_learning(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_created_at ON reinforcement_learning(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_updated_at
-  ON reinforcement_learning(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_updated_at ON reinforcement_learning(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_updated_at ON reinforcement_learning(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_data_gin
-  ON reinforcement_learning USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_data_gin ON reinforcement_learning USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_reinforcement_learning_data_gin ON reinforcement_learning USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_reinforcement_learning_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER reinforcement_learning_timestamp_trigger
-BEFORE UPDATE ON reinforcement_learning
-FOR EACH ROW
-EXECUTE FUNCTION update_reinforcement_learning_timestamp();
+DROP TRIGGER IF EXISTS reinforcement_learning_timestamp_trigger ON reinforcement_learning;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='reinforcement_learning' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER reinforcement_learning_timestamp_trigger BEFORE UPDATE ON reinforcement_learning FOR EACH ROW EXECUTE FUNCTION update_reinforcement_learning_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

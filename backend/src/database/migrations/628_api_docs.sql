@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS api_docs (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_api_docs_user_id
-  ON api_docs(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_user_id ON api_docs(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_user_id ON api_docs(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_api_docs_status
-  ON api_docs(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_status ON api_docs(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_status ON api_docs(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_api_docs_created_at
-  ON api_docs(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_created_at ON api_docs(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_created_at ON api_docs(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_api_docs_updated_at
-  ON api_docs(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_updated_at ON api_docs(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_updated_at ON api_docs(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_api_docs_data_gin
-  ON api_docs USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_data_gin ON api_docs USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_docs_data_gin ON api_docs USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_api_docs_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER api_docs_timestamp_trigger
-BEFORE UPDATE ON api_docs
-FOR EACH ROW
-EXECUTE FUNCTION update_api_docs_timestamp();
+DROP TRIGGER IF EXISTS api_docs_timestamp_trigger ON api_docs;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_docs' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER api_docs_timestamp_trigger BEFORE UPDATE ON api_docs FOR EACH ROW EXECUTE FUNCTION update_api_docs_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

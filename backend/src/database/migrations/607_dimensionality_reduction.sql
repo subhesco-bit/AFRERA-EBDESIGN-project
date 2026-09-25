@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS dimensionality_reduction (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_user_id
-  ON dimensionality_reduction(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_user_id ON dimensionality_reduction(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_user_id ON dimensionality_reduction(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_status
-  ON dimensionality_reduction(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_status ON dimensionality_reduction(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_status ON dimensionality_reduction(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_created_at
-  ON dimensionality_reduction(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_created_at ON dimensionality_reduction(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_created_at ON dimensionality_reduction(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_updated_at
-  ON dimensionality_reduction(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_updated_at ON dimensionality_reduction(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_updated_at ON dimensionality_reduction(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_data_gin
-  ON dimensionality_reduction USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_data_gin ON dimensionality_reduction USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_dimensionality_reduction_data_gin ON dimensionality_reduction USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_dimensionality_reduction_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER dimensionality_reduction_timestamp_trigger
-BEFORE UPDATE ON dimensionality_reduction
-FOR EACH ROW
-EXECUTE FUNCTION update_dimensionality_reduction_timestamp();
+DROP TRIGGER IF EXISTS dimensionality_reduction_timestamp_trigger ON dimensionality_reduction;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='dimensionality_reduction' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER dimensionality_reduction_timestamp_trigger BEFORE UPDATE ON dimensionality_reduction FOR EACH ROW EXECUTE FUNCTION update_dimensionality_reduction_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

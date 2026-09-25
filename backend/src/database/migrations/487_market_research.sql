@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS market_research (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_market_research_user_id
-  ON market_research(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_user_id ON market_research(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_user_id ON market_research(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_market_research_status
-  ON market_research(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_status ON market_research(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_status ON market_research(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_market_research_created_at
-  ON market_research(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_created_at ON market_research(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_created_at ON market_research(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_market_research_updated_at
-  ON market_research(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_updated_at ON market_research(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_updated_at ON market_research(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_market_research_data_gin
-  ON market_research USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_data_gin ON market_research USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_market_research_data_gin ON market_research USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_market_research_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER market_research_timestamp_trigger
-BEFORE UPDATE ON market_research
-FOR EACH ROW
-EXECUTE FUNCTION update_market_research_timestamp();
+DROP TRIGGER IF EXISTS market_research_timestamp_trigger ON market_research;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='market_research' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER market_research_timestamp_trigger BEFORE UPDATE ON market_research FOR EACH ROW EXECUTE FUNCTION update_market_research_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

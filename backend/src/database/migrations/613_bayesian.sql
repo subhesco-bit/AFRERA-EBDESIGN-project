@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS bayesian (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_bayesian_user_id
-  ON bayesian(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_user_id ON bayesian(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_user_id ON bayesian(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_bayesian_status
-  ON bayesian(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_status ON bayesian(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_status ON bayesian(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_bayesian_created_at
-  ON bayesian(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_created_at ON bayesian(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_created_at ON bayesian(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_bayesian_updated_at
-  ON bayesian(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_updated_at ON bayesian(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_updated_at ON bayesian(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_bayesian_data_gin
-  ON bayesian USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_data_gin ON bayesian USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_bayesian_data_gin ON bayesian USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_bayesian_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER bayesian_timestamp_trigger
-BEFORE UPDATE ON bayesian
-FOR EACH ROW
-EXECUTE FUNCTION update_bayesian_timestamp();
+DROP TRIGGER IF EXISTS bayesian_timestamp_trigger ON bayesian;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='bayesian' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER bayesian_timestamp_trigger BEFORE UPDATE ON bayesian FOR EACH ROW EXECUTE FUNCTION update_bayesian_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

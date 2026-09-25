@@ -752,10 +752,5 @@ router.get('/health', (req, res) => {
   });
 });
 
-module.exports = {
-  router,
-  processAdvancedVoiceCommand,
-  createVoiceConversation,
-  detectIntentWithContext,
-  generateVoiceResponse
-};
+// Canonical voice implementation lives at services/advancedVoiceAI.js.
+module.exports = require('../advancedVoiceAI');

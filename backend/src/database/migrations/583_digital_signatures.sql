@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS digital_signatures (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_digital_signatures_user_id
-  ON digital_signatures(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_user_id ON digital_signatures(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_user_id ON digital_signatures(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_digital_signatures_status
-  ON digital_signatures(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_status ON digital_signatures(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_status ON digital_signatures(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_digital_signatures_created_at
-  ON digital_signatures(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_created_at ON digital_signatures(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_created_at ON digital_signatures(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_digital_signatures_updated_at
-  ON digital_signatures(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_updated_at ON digital_signatures(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_updated_at ON digital_signatures(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_digital_signatures_data_gin
-  ON digital_signatures USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_data_gin ON digital_signatures USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_digital_signatures_data_gin ON digital_signatures USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_digital_signatures_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER digital_signatures_timestamp_trigger
-BEFORE UPDATE ON digital_signatures
-FOR EACH ROW
-EXECUTE FUNCTION update_digital_signatures_timestamp();
+DROP TRIGGER IF EXISTS digital_signatures_timestamp_trigger ON digital_signatures;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='digital_signatures' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER digital_signatures_timestamp_trigger BEFORE UPDATE ON digital_signatures FOR EACH ROW EXECUTE FUNCTION update_digital_signatures_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS device_mgmt (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_device_mgmt_user_id
-  ON device_mgmt(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_user_id ON device_mgmt(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_user_id ON device_mgmt(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_device_mgmt_status
-  ON device_mgmt(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_status ON device_mgmt(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_status ON device_mgmt(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_device_mgmt_created_at
-  ON device_mgmt(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_created_at ON device_mgmt(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_created_at ON device_mgmt(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_device_mgmt_updated_at
-  ON device_mgmt(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_updated_at ON device_mgmt(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_updated_at ON device_mgmt(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_device_mgmt_data_gin
-  ON device_mgmt USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_data_gin ON device_mgmt USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_device_mgmt_data_gin ON device_mgmt USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_device_mgmt_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER device_mgmt_timestamp_trigger
-BEFORE UPDATE ON device_mgmt
-FOR EACH ROW
-EXECUTE FUNCTION update_device_mgmt_timestamp();
+DROP TRIGGER IF EXISTS device_mgmt_timestamp_trigger ON device_mgmt;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='device_mgmt' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER device_mgmt_timestamp_trigger BEFORE UPDATE ON device_mgmt FOR EACH ROW EXECUTE FUNCTION update_device_mgmt_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

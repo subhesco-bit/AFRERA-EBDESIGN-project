@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS api_gateway (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_api_gateway_user_id
-  ON api_gateway(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_user_id ON api_gateway(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_user_id ON api_gateway(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_api_gateway_status
-  ON api_gateway(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_status ON api_gateway(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_status ON api_gateway(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_api_gateway_created_at
-  ON api_gateway(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_created_at ON api_gateway(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_created_at ON api_gateway(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_api_gateway_updated_at
-  ON api_gateway(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_updated_at ON api_gateway(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_updated_at ON api_gateway(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_api_gateway_data_gin
-  ON api_gateway USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_data_gin ON api_gateway USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_api_gateway_data_gin ON api_gateway USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_api_gateway_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER api_gateway_timestamp_trigger
-BEFORE UPDATE ON api_gateway
-FOR EACH ROW
-EXECUTE FUNCTION update_api_gateway_timestamp();
+DROP TRIGGER IF EXISTS api_gateway_timestamp_trigger ON api_gateway;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='api_gateway' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER api_gateway_timestamp_trigger BEFORE UPDATE ON api_gateway FOR EACH ROW EXECUTE FUNCTION update_api_gateway_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

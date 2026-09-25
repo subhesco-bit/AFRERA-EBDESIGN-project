@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS crypto_payments (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_crypto_payments_user_id
-  ON crypto_payments(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_user_id ON crypto_payments(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_user_id ON crypto_payments(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_crypto_payments_status
-  ON crypto_payments(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_status ON crypto_payments(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_status ON crypto_payments(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_crypto_payments_created_at
-  ON crypto_payments(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_created_at ON crypto_payments(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_created_at ON crypto_payments(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_crypto_payments_updated_at
-  ON crypto_payments(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_updated_at ON crypto_payments(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_updated_at ON crypto_payments(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_crypto_payments_data_gin
-  ON crypto_payments USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_data_gin ON crypto_payments USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crypto_payments_data_gin ON crypto_payments USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_crypto_payments_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER crypto_payments_timestamp_trigger
-BEFORE UPDATE ON crypto_payments
-FOR EACH ROW
-EXECUTE FUNCTION update_crypto_payments_timestamp();
+DROP TRIGGER IF EXISTS crypto_payments_timestamp_trigger ON crypto_payments;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crypto_payments' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER crypto_payments_timestamp_trigger BEFORE UPDATE ON crypto_payments FOR EACH ROW EXECUTE FUNCTION update_crypto_payments_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

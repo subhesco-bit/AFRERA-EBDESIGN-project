@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS financial_modeling (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_financial_modeling_user_id
-  ON financial_modeling(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_user_id ON financial_modeling(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_user_id ON financial_modeling(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_financial_modeling_status
-  ON financial_modeling(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_status ON financial_modeling(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_status ON financial_modeling(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_financial_modeling_created_at
-  ON financial_modeling(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_created_at ON financial_modeling(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_created_at ON financial_modeling(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_financial_modeling_updated_at
-  ON financial_modeling(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_updated_at ON financial_modeling(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_updated_at ON financial_modeling(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_financial_modeling_data_gin
-  ON financial_modeling USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_data_gin ON financial_modeling USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_financial_modeling_data_gin ON financial_modeling USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_financial_modeling_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER financial_modeling_timestamp_trigger
-BEFORE UPDATE ON financial_modeling
-FOR EACH ROW
-EXECUTE FUNCTION update_financial_modeling_timestamp();
+DROP TRIGGER IF EXISTS financial_modeling_timestamp_trigger ON financial_modeling;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='financial_modeling' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER financial_modeling_timestamp_trigger BEFORE UPDATE ON financial_modeling FOR EACH ROW EXECUTE FUNCTION update_financial_modeling_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

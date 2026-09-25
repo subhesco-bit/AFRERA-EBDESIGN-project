@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS communication (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_communication_user_id
-  ON communication(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_user_id ON communication(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_user_id ON communication(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_communication_status
-  ON communication(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_status ON communication(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_status ON communication(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_communication_created_at
-  ON communication(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_created_at ON communication(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_created_at ON communication(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_communication_updated_at
-  ON communication(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_updated_at ON communication(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_updated_at ON communication(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_communication_data_gin
-  ON communication USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_data_gin ON communication USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_communication_data_gin ON communication USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_communication_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER communication_timestamp_trigger
-BEFORE UPDATE ON communication
-FOR EACH ROW
-EXECUTE FUNCTION update_communication_timestamp();
+DROP TRIGGER IF EXISTS communication_timestamp_trigger ON communication;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='communication' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER communication_timestamp_trigger BEFORE UPDATE ON communication FOR EACH ROW EXECUTE FUNCTION update_communication_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

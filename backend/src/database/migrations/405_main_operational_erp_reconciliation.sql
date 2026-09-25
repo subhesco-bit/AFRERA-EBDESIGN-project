@@ -143,8 +143,20 @@ CREATE TABLE IF NOT EXISTS procurement_orders (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS idx_procurement_orders_supplier_status
-  ON procurement_orders(supplier_id, status) WHERE supplier_id IS NOT NULL;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='procurement_orders' AND column_name='supplier_id'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_procurement_orders_supplier_status ON procurement_orders(supplier_id, status) WHERE supplier_id IS NOT NULL';
+  ELSIF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='procurement_orders' AND column_name='source_id'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_procurement_orders_source_status ON procurement_orders(source_id, status) WHERE source_id IS NOT NULL';
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS inventory_movements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -158,8 +170,20 @@ CREATE TABLE IF NOT EXISTS inventory_movements (
   occurred_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   metadata JSONB NOT NULL DEFAULT '{}'::jsonb
 );
-CREATE INDEX IF NOT EXISTS idx_inventory_movements_inventory_time
-  ON inventory_movements(inventory_id, occurred_at DESC);
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='inventory_movements' AND column_name='occurred_at'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inventory_movements_inventory_time ON inventory_movements(inventory_id, occurred_at DESC)';
+  ELSIF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='inventory_movements' AND column_name='created_at'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inventory_movements_inventory_created ON inventory_movements(inventory_id, created_at DESC)';
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS delivery_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

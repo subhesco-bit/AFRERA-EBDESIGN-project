@@ -652,5 +652,6 @@ class GSTService {
   }
 }
 
-module.exports = new GSTService();
+// Canonical authority lives in services/finance/gstService. Preserve this legacy implementation above for history, but delegate runtime callers to one singleton.
+module.exports = require('../finance/gstService');
 

@@ -237,6 +237,49 @@ CREATE TABLE IF NOT EXISTS wallets (
     )
 );
 
+-- Reconcile the real wallet contract with the earlier generic compatibility
+-- shell if it already owns the wallets table name.
+ALTER TABLE wallets ADD COLUMN IF NOT EXISTS owner_type VARCHAR(20);
+ALTER TABLE wallets ADD COLUMN IF NOT EXISTS owner_id VARCHAR(100);
+ALTER TABLE wallets ADD COLUMN IF NOT EXISTS currency CHAR(3) DEFAULT 'INR';
+ALTER TABLE wallets ADD COLUMN IF NOT EXISTS balance NUMERIC(20,4) DEFAULT 0;
+ALTER TABLE wallets ADD COLUMN IF NOT EXISTS loyalty_points NUMERIC(18,2) DEFAULT 0;
+ALTER TABLE wallets ADD COLUMN IF NOT EXISTS is_frozen BOOLEAN DEFAULT FALSE;
+ALTER TABLE wallets ADD COLUMN IF NOT EXISTS frozen_reason TEXT;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_schema='public' AND table_name='wallets' AND column_name='user_id') THEN
+    UPDATE wallets
+       SET owner_type = COALESCE(owner_type, 'user'),
+           owner_id = COALESCE(owner_id, user_id::text);
+    EXECUTE 'ALTER TABLE wallets ALTER COLUMN user_id DROP NOT NULL';
+  END IF;
+END $$;
+
+UPDATE wallets
+SET owner_type = COALESCE(owner_type, 'user'),
+    owner_id = COALESCE(owner_id, id::text),
+    currency = COALESCE(currency, 'INR'),
+    balance = COALESCE(balance, 0),
+    loyalty_points = COALESCE(loyalty_points, 0),
+    is_frozen = COALESCE(is_frozen, FALSE);
+
+ALTER TABLE wallets ALTER COLUMN owner_type SET NOT NULL;
+ALTER TABLE wallets ALTER COLUMN owner_id SET NOT NULL;
+ALTER TABLE wallets ALTER COLUMN currency SET NOT NULL;
+ALTER TABLE wallets ALTER COLUMN balance SET NOT NULL;
+ALTER TABLE wallets ALTER COLUMN loyalty_points SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_wallets_owner_currency
+  ON wallets(owner_type, owner_id, currency);
+
+ALTER TABLE wallets DROP CONSTRAINT IF EXISTS wallet_freeze_needs_reason;
+ALTER TABLE wallets ADD CONSTRAINT wallet_freeze_needs_reason CHECK (
+  is_frozen = FALSE OR (frozen_reason IS NOT NULL AND length(trim(frozen_reason)) > 0)
+);
+
 -- ---------------------------------------------------------------------------
 -- Portal roles — the multi-tenant map (12 roles from the lineage)
 -- ---------------------------------------------------------------------------

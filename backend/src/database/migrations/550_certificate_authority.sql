@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS certificate_authority (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_certificate_authority_user_id
-  ON certificate_authority(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_user_id ON certificate_authority(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_user_id ON certificate_authority(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_certificate_authority_status
-  ON certificate_authority(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_status ON certificate_authority(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_status ON certificate_authority(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_certificate_authority_created_at
-  ON certificate_authority(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_created_at ON certificate_authority(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_created_at ON certificate_authority(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_certificate_authority_updated_at
-  ON certificate_authority(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_updated_at ON certificate_authority(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_updated_at ON certificate_authority(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_certificate_authority_data_gin
-  ON certificate_authority USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_data_gin ON certificate_authority USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_certificate_authority_data_gin ON certificate_authority USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_certificate_authority_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER certificate_authority_timestamp_trigger
-BEFORE UPDATE ON certificate_authority
-FOR EACH ROW
-EXECUTE FUNCTION update_certificate_authority_timestamp();
+DROP TRIGGER IF EXISTS certificate_authority_timestamp_trigger ON certificate_authority;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='certificate_authority' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER certificate_authority_timestamp_trigger BEFORE UPDATE ON certificate_authority FOR EACH ROW EXECUTE FUNCTION update_certificate_authority_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

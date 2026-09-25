@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS crm (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_crm_user_id
-  ON crm(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_user_id ON crm(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_user_id ON crm(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_crm_status
-  ON crm(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_status ON crm(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_status ON crm(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_crm_created_at
-  ON crm(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_created_at ON crm(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_created_at ON crm(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_crm_updated_at
-  ON crm(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_updated_at ON crm(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_updated_at ON crm(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_crm_data_gin
-  ON crm USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_data_gin ON crm USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_crm_data_gin ON crm USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_crm_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER crm_timestamp_trigger
-BEFORE UPDATE ON crm
-FOR EACH ROW
-EXECUTE FUNCTION update_crm_timestamp();
+DROP TRIGGER IF EXISTS crm_timestamp_trigger ON crm;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER crm_timestamp_trigger BEFORE UPDATE ON crm FOR EACH ROW EXECUTE FUNCTION update_crm_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS edge_computing (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_edge_computing_user_id
-  ON edge_computing(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_user_id ON edge_computing(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_user_id ON edge_computing(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_edge_computing_status
-  ON edge_computing(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_status ON edge_computing(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_status ON edge_computing(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_edge_computing_created_at
-  ON edge_computing(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_created_at ON edge_computing(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_created_at ON edge_computing(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_edge_computing_updated_at
-  ON edge_computing(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_updated_at ON edge_computing(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_updated_at ON edge_computing(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_edge_computing_data_gin
-  ON edge_computing USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_data_gin ON edge_computing USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_edge_computing_data_gin ON edge_computing USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_edge_computing_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER edge_computing_timestamp_trigger
-BEFORE UPDATE ON edge_computing
-FOR EACH ROW
-EXECUTE FUNCTION update_edge_computing_timestamp();
+DROP TRIGGER IF EXISTS edge_computing_timestamp_trigger ON edge_computing;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='edge_computing' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER edge_computing_timestamp_trigger BEFORE UPDATE ON edge_computing FOR EACH ROW EXECUTE FUNCTION update_edge_computing_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

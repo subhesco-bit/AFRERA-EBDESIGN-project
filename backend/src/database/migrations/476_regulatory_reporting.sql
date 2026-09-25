@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS regulatory_reporting (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_user_id
-  ON regulatory_reporting(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_user_id ON regulatory_reporting(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_user_id ON regulatory_reporting(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_status
-  ON regulatory_reporting(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_status ON regulatory_reporting(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_status ON regulatory_reporting(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_created_at
-  ON regulatory_reporting(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_created_at ON regulatory_reporting(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_created_at ON regulatory_reporting(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_updated_at
-  ON regulatory_reporting(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_updated_at ON regulatory_reporting(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_updated_at ON regulatory_reporting(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_data_gin
-  ON regulatory_reporting USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_data_gin ON regulatory_reporting USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_regulatory_reporting_data_gin ON regulatory_reporting USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_regulatory_reporting_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER regulatory_reporting_timestamp_trigger
-BEFORE UPDATE ON regulatory_reporting
-FOR EACH ROW
-EXECUTE FUNCTION update_regulatory_reporting_timestamp();
+DROP TRIGGER IF EXISTS regulatory_reporting_timestamp_trigger ON regulatory_reporting;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='regulatory_reporting' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER regulatory_reporting_timestamp_trigger BEFORE UPDATE ON regulatory_reporting FOR EACH ROW EXECUTE FUNCTION update_regulatory_reporting_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

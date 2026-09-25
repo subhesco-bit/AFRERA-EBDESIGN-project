@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS causal_inference (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_causal_inference_user_id
-  ON causal_inference(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_user_id ON causal_inference(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_user_id ON causal_inference(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_causal_inference_status
-  ON causal_inference(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_status ON causal_inference(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_status ON causal_inference(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_causal_inference_created_at
-  ON causal_inference(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_created_at ON causal_inference(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_created_at ON causal_inference(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_causal_inference_updated_at
-  ON causal_inference(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_updated_at ON causal_inference(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_updated_at ON causal_inference(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_causal_inference_data_gin
-  ON causal_inference USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_data_gin ON causal_inference USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_causal_inference_data_gin ON causal_inference USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_causal_inference_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER causal_inference_timestamp_trigger
-BEFORE UPDATE ON causal_inference
-FOR EACH ROW
-EXECUTE FUNCTION update_causal_inference_timestamp();
+DROP TRIGGER IF EXISTS causal_inference_timestamp_trigger ON causal_inference;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='causal_inference' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER causal_inference_timestamp_trigger BEFORE UPDATE ON causal_inference FOR EACH ROW EXECUTE FUNCTION update_causal_inference_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

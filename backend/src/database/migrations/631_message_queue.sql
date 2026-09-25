@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS message_queue (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_message_queue_user_id
-  ON message_queue(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_user_id ON message_queue(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_user_id ON message_queue(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_message_queue_status
-  ON message_queue(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_status ON message_queue(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_status ON message_queue(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_message_queue_created_at
-  ON message_queue(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_created_at ON message_queue(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_created_at ON message_queue(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_message_queue_updated_at
-  ON message_queue(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_updated_at ON message_queue(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_updated_at ON message_queue(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_message_queue_data_gin
-  ON message_queue USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_data_gin ON message_queue USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_message_queue_data_gin ON message_queue USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_message_queue_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER message_queue_timestamp_trigger
-BEFORE UPDATE ON message_queue
-FOR EACH ROW
-EXECUTE FUNCTION update_message_queue_timestamp();
+DROP TRIGGER IF EXISTS message_queue_timestamp_trigger ON message_queue;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='message_queue' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER message_queue_timestamp_trigger BEFORE UPDATE ON message_queue FOR EACH ROW EXECUTE FUNCTION update_message_queue_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS supply_verification (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_supply_verification_user_id
-  ON supply_verification(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_user_id ON supply_verification(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_user_id ON supply_verification(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_supply_verification_status
-  ON supply_verification(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_status ON supply_verification(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_status ON supply_verification(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_supply_verification_created_at
-  ON supply_verification(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_created_at ON supply_verification(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_created_at ON supply_verification(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_supply_verification_updated_at
-  ON supply_verification(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_updated_at ON supply_verification(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_updated_at ON supply_verification(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_supply_verification_data_gin
-  ON supply_verification USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_data_gin ON supply_verification USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_supply_verification_data_gin ON supply_verification USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_supply_verification_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER supply_verification_timestamp_trigger
-BEFORE UPDATE ON supply_verification
-FOR EACH ROW
-EXECUTE FUNCTION update_supply_verification_timestamp();
+DROP TRIGGER IF EXISTS supply_verification_timestamp_trigger ON supply_verification;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='supply_verification' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER supply_verification_timestamp_trigger BEFORE UPDATE ON supply_verification FOR EACH ROW EXECUTE FUNCTION update_supply_verification_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

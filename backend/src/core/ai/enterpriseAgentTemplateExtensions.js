@@ -237,6 +237,40 @@ function registerEnterpriseAgentExtensions(promptRegistry, agentRegistry) {
     tags:['traceability','gi','provenance','trust'],
   });
 
+  addPrompt('accounting.close', [
+    'Act as an accounting close-review specialist. Evaluate trial-balance balance, bank/tax/subledger/intercompany reconciliation, open draft journals and high-risk exceptions.',
+    'Do not close or reopen a fiscal period. Produce a close-readiness proposal with evidence and blocking controls for an authorized finance approver.',
+  ]);
+  register('ACCOUNTING_CLOSE_AGENT', {
+    ...shared,name:'Accounting Close Review Agent',stream:'finance',domain:'FINANCE',pattern:'human_approval_workflow',riskClass:'high',
+    promptId:'accounting.close',tools:['knowledge_search','workflow_catalog','deterministic_calculation'],maxSteps:8,
+    approvalPolicy:{humanReviewRequired:true,finalizationRequiresHuman:true,mutationToolsRequireApproval:true},
+    tags:['accounting','period-close','reconciliation'],
+  });
+
+  addPrompt('accounting.gst.reconcile', [
+    'Act as a GST reconciliation assistant. Compare source invoices, recorded tax transactions, ITC/2B evidence and filing-period records using only validated evidence.',
+    'Do not invent GST rates, HSN/SAC classifications, ITC eligibility or filing status. Statutory calculations require an effective-dated verified rule.',
+    'Output exceptions and clarification items; do not file, accept ITC or alter tax ledgers autonomously.',
+  ]);
+  register('GST_RECONCILIATION_AGENT', {
+    ...shared,name:'GST Reconciliation Agent',stream:'finance',domain:'FINANCE',pattern:'evaluator_optimizer',riskClass:'high',
+    promptId:'accounting.gst.reconcile',tools:['knowledge_search','workflow_catalog','deterministic_calculation'],maxSteps:10,
+    approvalPolicy:{humanReviewRequired:true,finalizationRequiresHuman:true,mutationToolsRequireApproval:true},
+    tags:['gst','itc','reconciliation','tax'],
+  });
+
+  addPrompt('accounting.treasury', [
+    'Act as a treasury and working-capital assistant. Use recorded cash, receivable, payable, inventory and settlement evidence plus deterministic metrics.',
+    'Separate actual cash flow from forecast scenarios. Never release payment, alter credit limits, borrow funds or move cash autonomously.',
+  ]);
+  register('TREASURY_WORKING_CAPITAL_AGENT', {
+    ...shared,name:'Treasury & Working Capital Agent',stream:'finance',domain:'FINANCE',pattern:'tool_loop',riskClass:'high',
+    promptId:'accounting.treasury',tools:['knowledge_search','workflow_catalog','deterministic_calculation'],maxSteps:10,
+    approvalPolicy:{humanReviewRequired:true,finalizationRequiresHuman:true,mutationToolsRequireApproval:true},
+    tags:['treasury','working-capital','cash-flow'],
+  });
+
   return {promptRegistry, agentRegistry};
 }
 

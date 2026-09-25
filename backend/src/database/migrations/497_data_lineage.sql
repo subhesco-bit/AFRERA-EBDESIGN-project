@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS data_lineage (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_data_lineage_user_id
-  ON data_lineage(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_user_id ON data_lineage(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_user_id ON data_lineage(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_lineage_status
-  ON data_lineage(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_status ON data_lineage(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_status ON data_lineage(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_lineage_created_at
-  ON data_lineage(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_created_at ON data_lineage(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_created_at ON data_lineage(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_lineage_updated_at
-  ON data_lineage(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_updated_at ON data_lineage(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_updated_at ON data_lineage(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_data_lineage_data_gin
-  ON data_lineage USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_data_gin ON data_lineage USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_lineage_data_gin ON data_lineage USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_data_lineage_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER data_lineage_timestamp_trigger
-BEFORE UPDATE ON data_lineage
-FOR EACH ROW
-EXECUTE FUNCTION update_data_lineage_timestamp();
+DROP TRIGGER IF EXISTS data_lineage_timestamp_trigger ON data_lineage;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_lineage' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER data_lineage_timestamp_trigger BEFORE UPDATE ON data_lineage FOR EACH ROW EXECUTE FUNCTION update_data_lineage_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

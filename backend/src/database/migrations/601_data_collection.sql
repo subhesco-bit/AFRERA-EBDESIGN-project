@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS data_collection (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_data_collection_user_id
-  ON data_collection(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_user_id ON data_collection(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_user_id ON data_collection(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_collection_status
-  ON data_collection(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_status ON data_collection(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_status ON data_collection(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_collection_created_at
-  ON data_collection(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_created_at ON data_collection(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_created_at ON data_collection(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_data_collection_updated_at
-  ON data_collection(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_updated_at ON data_collection(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_updated_at ON data_collection(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_data_collection_data_gin
-  ON data_collection USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_data_gin ON data_collection USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_data_collection_data_gin ON data_collection USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_data_collection_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER data_collection_timestamp_trigger
-BEFORE UPDATE ON data_collection
-FOR EACH ROW
-EXECUTE FUNCTION update_data_collection_timestamp();
+DROP TRIGGER IF EXISTS data_collection_timestamp_trigger ON data_collection;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='data_collection' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER data_collection_timestamp_trigger BEFORE UPDATE ON data_collection FOR EACH ROW EXECUTE FUNCTION update_data_collection_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

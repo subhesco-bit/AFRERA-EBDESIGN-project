@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS anova (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_anova_user_id
-  ON anova(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_user_id ON anova(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_user_id ON anova(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_anova_status
-  ON anova(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_status ON anova(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_status ON anova(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_anova_created_at
-  ON anova(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_created_at ON anova(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_created_at ON anova(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_anova_updated_at
-  ON anova(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_updated_at ON anova(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_updated_at ON anova(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_anova_data_gin
-  ON anova USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_data_gin ON anova USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_anova_data_gin ON anova USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_anova_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER anova_timestamp_trigger
-BEFORE UPDATE ON anova
-FOR EACH ROW
-EXECUTE FUNCTION update_anova_timestamp();
+DROP TRIGGER IF EXISTS anova_timestamp_trigger ON anova;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='anova' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER anova_timestamp_trigger BEFORE UPDATE ON anova FOR EACH ROW EXECUTE FUNCTION update_anova_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;

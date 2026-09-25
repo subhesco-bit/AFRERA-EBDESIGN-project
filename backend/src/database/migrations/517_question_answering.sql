@@ -27,21 +27,51 @@ CREATE TABLE IF NOT EXISTS question_answering (
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_question_answering_user_id
-  ON question_answering(user_id) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='user_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_user_id ON question_answering(user_id) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='user_id') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_user_id ON question_answering(user_id)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_question_answering_status
-  ON question_answering(status) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='status') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_status ON question_answering(status) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='status') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_status ON question_answering(status)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_question_answering_created_at
-  ON question_answering(created_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='created_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_created_at ON question_answering(created_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='created_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_created_at ON question_answering(created_at)';
+  END IF;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_question_answering_updated_at
-  ON question_answering(updated_at) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='updated_at') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_updated_at ON question_answering(updated_at) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_updated_at ON question_answering(updated_at)';
+  END IF;
+END $$;
 
 -- Index for JSONB data searches
-CREATE INDEX IF NOT EXISTS idx_question_answering_data_gin
-  ON question_answering USING gin(data) WHERE deleted_at IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='data') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='deleted_at') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_data_gin ON question_answering USING gin(data) WHERE deleted_at IS NULL';
+  ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='data') THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_question_answering_data_gin ON question_answering USING gin(data)';
+  END IF;
+END $$;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_question_answering_timestamp()
@@ -52,9 +82,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER question_answering_timestamp_trigger
-BEFORE UPDATE ON question_answering
-FOR EACH ROW
-EXECUTE FUNCTION update_question_answering_timestamp();
+DROP TRIGGER IF EXISTS question_answering_timestamp_trigger ON question_answering;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='question_answering' AND column_name='updated_at') THEN
+    EXECUTE 'CREATE TRIGGER question_answering_timestamp_trigger BEFORE UPDATE ON question_answering FOR EACH ROW EXECUTE FUNCTION update_question_answering_timestamp()';
+  END IF;
+END $$;
 
 COMMIT;
