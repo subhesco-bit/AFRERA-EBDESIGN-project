@@ -3,6 +3,31 @@ const erp = require('./ERPCore');
 const fin = require('./FinancialERP');
 const oneRT = require('./OneRuntimeInterpretation');
 const sync = require('./erp/ErpSyncEngine');
+const erpCells = require('../../core/erpIntelligenceCellRegistry');
+const erpOptimizer = require('../../core/erpOptimizationEngine');
+const erpCostOptimizer = require('../../core/erpCostOptimizationService');
+
+
+const MODULE_TO_ERP_DOMAIN = Object.freeze({
+  agro:'production', agriculture:'production', processing:'production', manufacturing:'production',
+  veterinary:'erm', livestock:'erm', farmer:'erm', fpo:'erm', village:'erm',
+  nutrition:'quality', laboratory:'quality', quality:'quality',
+  finance:'finance', accounting:'finance', banking:'finance', payments:'finance',
+  procurement:'supply_chain', inventory:'supply_chain', warehouse:'supply_chain', scm:'supply_chain',
+  logistics:'logistics', cold_chain:'logistics', transport:'logistics',
+  insurance:'insurance', claims:'insurance',
+  retail:'retail', ecommerce:'ecommerce', marketplace:'ecommerce',
+  sales:'sales', marketing:'marketing', crm:'crm', service:'crm',
+  workforce:'workforce', hr:'workforce', hcm:'workforce',
+  asset:'asset', maintenance:'asset', project:'projects', epc:'projects',
+  governance:'governance', compliance:'governance', ai:'data_ai', analytics:'data_ai',
+});
+
+function resolveERPDomain(moduleName,input={}){
+  const explicit=input.erp_domain||input.erpDomain;
+  if(explicit && erpCells.buildCell(explicit)) return explicit;
+  return MODULE_TO_ERP_DOMAIN[String(moduleName||'').toLowerCase()] || null;
+}
 
 function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
   const ai = {
@@ -27,6 +52,19 @@ function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
 
   const erpSnap = erp.erpDashboard(moduleName);
   const finSnap = fin.financialDashboard(moduleName);
+  const erpDomainId = resolveERPDomain(moduleName, input);
+  const intelligenceCell = erpDomainId ? erpCells.buildCell(erpDomainId) : null;
+  let optimization = null;
+  if (erpDomainId && input.erp_optimization && Array.isArray(input.erp_optimization.candidates)) {
+    optimization = erpOptimizer.optimize(erpDomainId, input.erp_optimization);
+  }
+  let costOptimization = null;
+  if (erpDomainId && input.erp_cost_optimization) {
+    costOptimization = erpCostOptimizer.optimize(erpDomainId, {
+      drivers: intelligenceCell?.layers?.costOptimization?.businessCostDrivers || [],
+      ...input.erp_cost_optimization,
+    });
+  }
 
   const erp_hints = [];
   if (moduleName === 'veterinary' && enhancedResult.decision_quality?.action?.includes('REPORT')) {
@@ -70,6 +108,10 @@ function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
       hints: erp_hints,
       entity_types: erp.ENTITY_TYPES[moduleName],
       commercial_integration: commercial,
+      intelligence_cell: intelligenceCell,
+      optimization,
+      cost_optimization: costOptimization,
+      optimization_authority: 'PROPOSAL_ONLY_UNTIL_ERP_WORKFLOW_APPROVAL',
       disclaimer: erp.ERP_DISCLAIMER,
       financial_disclaimer: fin.FIN_DISCLAIMER,
     },
@@ -84,8 +126,12 @@ function attachAIERP(moduleName, enhancedResult = {}, input = {}) {
       tally_xml_adapter: true,
       gsp_einvoice_adapter: true,
       erp_sync_engine: true,
+      erp_intelligence_cell: Boolean(intelligenceCell),
+      business_optimization: Boolean(intelligenceCell),
+      cost_optimization: Boolean(intelligenceCell),
+      isolated_agent_step_up: Boolean(intelligenceCell),
     },
   };
 }
 
-module.exports = { attachAIERP };
+module.exports = { attachAIERP, resolveERPDomain, MODULE_TO_ERP_DOMAIN };

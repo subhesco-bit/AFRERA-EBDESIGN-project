@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const { ERP_DOMAINS } = require('../services/erp/unifiedERPRegistry');
 const { buildAgentTemplateRegistry } = require('./ai/agentTemplateCatalog');
-const optimisation = require('./ai/optimisation');
+const erpOptimization = require('./erpOptimizationEngine');
+const erpCostOptimization = require('./erpCostOptimizationService');
 
 const ERP_TO_CANONICAL = Object.freeze({
   finance: ['FINANCE','PAYMENTS_CREDIT'],
@@ -117,8 +118,9 @@ function buildCell(domainId, options={}) {
   const templates=templateIndex();
   const canonicalDomains=ERP_TO_CANONICAL[domainId] || [];
   const agentTemplates=canonicalDomains.flatMap((d)=>templates[d]||[]);
-  const objectiveIds=BUSINESS_OPTIMIZATION_OBJECTIVES[domainId] || [];
-  const executableObjectives=objectiveIds.filter((id)=>optimisation.OBJECTIVES.has(id));
+  const objectiveProfile=erpOptimization.OBJECTIVE_PROFILES[domainId] || null;
+  const objectiveIds=objectiveProfile?[objectiveProfile.id]:[];
+  const executableObjectives=objectiveProfile?[objectiveProfile.id]:[];
   const serviceRefs=(DOMAIN_SERVICES[domainId]||[]).map((ref)=>({path:ref,exists:sourceExists(projectRoot,ref)}));
 
   return {
@@ -141,24 +143,25 @@ function buildCell(domainId, options={}) {
         status:'IMPLEMENTED_PARTIAL_RECONCILIATION_REQUIRED',
       },
       businessOptimization:{
-        engine:'backend/src/core/ai/optimisation.js',
+        engine:'backend/src/core/erpOptimizationEngine.js',
         objectiveIds,
         executableObjectiveIds:executableObjectives,
-        status:objectiveIds.length===0?'CONTRACT_DEFINED_OBJECTIVE_NOT_YET_IMPLEMENTED':
-          executableObjectives.length===objectiveIds.length?'EXECUTABLE':'PARTIAL_EXECUTION',
-        guarantee:'Optimization must report feasibility, achieved cost and limitations; no unproven optimality claim.',
+        profile:objectiveProfile?{description:objectiveProfile.description,metrics:objectiveProfile.metrics,monetaryMetrics:objectiveProfile.monetary,specializedObjectives:objectiveProfile.specializedObjectives||[]}:null,
+        status:objectiveProfile?'EXECUTABLE':'OBJECTIVE_GAP',
+        guarantee:'Exact ranking among supplied feasible candidates under the declared objective; no unproven global optimality claim.',
       },
       costOptimization:{
         businessCostDrivers:[...(COST_DRIVERS[domainId]||[])],
+        engine:'backend/src/core/erpCostOptimizationService.js',
         runtimeCostController:'backend/src/core/ai/aiCostController.js',
-        providerCostTruth:'LEGACY_STATIC_RATE_TABLE_REQUIRES_CURRENT_PROVIDER_PRICING_REFRESH',
+        providerCostTruth:'CURRENT_CONFIG_REQUIRED_FOR_EXTERNAL_PROVIDER_COST_ROUTING',
         routingPolicy:[
           'deterministic/local before external when equivalent quality is available',
           'external step-up only when capability/evidence/confidence requires it',
           'capability/security/SLA gates override cheapest-provider choice',
           'record baseline cost, optimized cost, savings basis and observed outcome',
         ],
-        status:'CONTRACT_DEFINED_EXISTING_CONTROLLER_REQUIRES_RATE_REFRESH',
+        status:'EXECUTABLE_WITH_EXPLICIT_COST_INPUTS',
       },
       isolatedAgentStepUp:{
         transformer:'backend/src/core/ai/aiIsolationTransformer.js',
@@ -214,7 +217,8 @@ function coverage(options={}) {
     })[layer])).length,
     agentTemplateCovered:cells.filter((c)=>c.layers.isolatedAgentStepUp.templates.length>0).length,
     executableBusinessOptimization:cells.filter((c)=>c.layers.businessOptimization.status==='EXECUTABLE').length,
-    businessOptimizationObjectiveGaps:cells.filter((c)=>c.layers.businessOptimization.status==='CONTRACT_DEFINED_OBJECTIVE_NOT_YET_IMPLEMENTED').map((c)=>c.erpDomainId),
+    businessOptimizationObjectiveGaps:cells.filter((c)=>c.layers.businessOptimization.status!=='EXECUTABLE').map((c)=>c.erpDomainId),
+    executableCostOptimization:cells.filter((c)=>c.layers.costOptimization.status==='EXECUTABLE_WITH_EXPLICIT_COST_INPUTS').length,
     serviceSourceGaps:cells.filter((c)=>!c.layers.transactionalCore.sourceServices.some((s)=>s.exists)).map((c)=>c.erpDomainId),
     costRateRefreshRequired:cells.filter((c)=>c.layers.costOptimization.providerCostTruth.includes('REQUIRES')).map((c)=>c.erpDomainId),
   };

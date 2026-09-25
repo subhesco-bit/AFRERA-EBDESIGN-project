@@ -7,6 +7,12 @@ const sync = require('../modules/platform/erp/ErpSyncEngine');
 const zoho = require('../modules/platform/erp/ZohoBooksAdapter');
 const tally = require('../modules/platform/erp/TallyXmlAdapter');
 const gsp = require('../modules/platform/erp/GspEInvoiceAdapter');
+const erpCells = require('../core/erpIntelligenceCellRegistry');
+const erpOptimizer = require('../core/erpOptimizationEngine');
+const erpCostOptimizer = require('../core/erpCostOptimizationService');
+const erpTemplates = require('../core/erpTemplateEvolutionService');
+const erpCompletion = require('../core/erpCompletionRegistry');
+const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -27,6 +33,55 @@ router.get('/ai/models', (req, res) => res.json({ success: true, data: embedded.
 router.get('/ai/rag', (req, res) => res.json({ success: true, data: embedded.listRag(req.query.module) }));
 router.post('/ai/route', (req, res) => res.json({ success: true, data: embedded.routeInference(req.body || {}) }));
 router.post('/ai/embedded/analyze', (req, res) => res.json({ success: true, data: embedded.runEmbeddedAnalyze(req.body || {}) }));
+
+
+// ERP intelligence-cell completion / optimization layer
+router.get('/erp/intelligence/completion', (_req, res) => {
+  res.json({ success:true, data:erpCompletion.build() });
+});
+
+router.get('/erp/intelligence/cells', (_req, res) => {
+  res.json({ success:true, data:erpCells.listCells() });
+});
+
+router.get('/erp/intelligence/cells/:domainId', (req, res) => {
+  const cell=erpCells.buildCell(req.params.domainId);
+  if(!cell)return res.status(404).json({success:false,error:'Unknown ERP domain'});
+  return res.json({success:true,data:cell});
+});
+
+router.post('/erp/intelligence/:domainId/optimize', authMiddleware, (req, res) => {
+  try {
+    const result=erpOptimizer.optimize(req.params.domainId,req.body||{});
+    res.json({success:true,status:'proposal_only',data:result,authority:'ERP_WORKFLOW_APPROVAL_REQUIRED_FOR_MUTATION'});
+  } catch(e) {
+    res.status(400).json({success:false,error:e.message});
+  }
+});
+
+router.post('/erp/intelligence/:domainId/cost-optimize', authMiddleware, (req, res) => {
+  try {
+    const cell=erpCells.buildCell(req.params.domainId);
+    if(!cell)return res.status(404).json({success:false,error:'Unknown ERP domain'});
+    const result=erpCostOptimizer.optimize(req.params.domainId,{
+      drivers:cell.layers.costOptimization.businessCostDrivers,
+      ...(req.body||{}),
+    });
+    res.json({success:true,status:'proposal_only',data:result,authority:'ERP_WORKFLOW_APPROVAL_REQUIRED_FOR_MUTATION'});
+  } catch(e) {
+    res.status(400).json({success:false,error:e.message});
+  }
+});
+
+router.post('/erp/intelligence/templates/plan', authMiddleware, (req, res) => {
+  try {
+    const normalized=erpTemplates.normalizeTemplate(req.body||{});
+    const plan=erpTemplates.developEnhancementPlan(normalized);
+    res.json({success:true,status:'not_production_authority',normalized,plan});
+  } catch(e) {
+    res.status(400).json({success:false,error:e.message});
+  }
+});
 
 // Operational ERP
 router.get('/erp/dashboard/:module', (req, res) => res.json({ success: true, data: erp.erpDashboard(req.params.module) }));
