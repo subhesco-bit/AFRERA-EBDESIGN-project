@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "productCount": 1171,
+  "dataFileSha256": "aa38993bbf6f2803be1f36f199a0168e8e3cb6298e0d7162d33b7f64002e7961",
+  "sourcePdfSha256": "e401f55dc35b29f88f2b984417fdaebd1dcbfe89b93486bd6c6885987d4f50fa",
+  "registerEffectiveThrough": "2025-12-31",
+  "generatedBy": "tools/build_ne_gi_provenance.py",
+  "truthRules": [
+    "Only a direct or explicitly-normalized match to an official registered GI entry with compatible geography is marked REGISTERED_DIRECT_MATCH.",
+    "Processed derivatives are not automatically treated as registered GIs merely because the source agricultural good is registered.",
+    "A project name/state conflict is surfaced, not silently corrected.",
+    "A missing match in this snapshot is not proof that no later GI exists; the snapshot is effective through 2025-12-31.",
+    "Possible aliases require independent product-identity evidence before they can inherit a registered match.",
+    "Prototype GI flags remain preserved as source claims even when contradicted or unproven."
+  ]
+}

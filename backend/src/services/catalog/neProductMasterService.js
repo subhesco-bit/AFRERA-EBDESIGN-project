@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const giProvenance = require('./neGiProvenanceService');
 
 const DEFAULT_DATA_FILE = path.resolve(__dirname, '../../data/product-master/ne-products.jsonl');
 const DEFAULT_MANIFEST_FILE = path.resolve(__dirname, '../../data/product-master/ne-products.manifest.json');
@@ -32,6 +33,7 @@ class NeProductMasterService {
     this.byId = new Map();
     this.byName = new Map();
     this.manifest = null;
+    this.giProvenance = options.giProvenance || giProvenance;
   }
 
   ensureLoaded() {
@@ -73,6 +75,8 @@ class NeProductMasterService {
       categoryCount: categories.size,
       originCount: origins.size,
       giPrototypeClaimCount: giPrototypeClaims,
+      giRegisteredDirectCount: this.giProvenance.stats().registeredDirectCount,
+      giPrototypeFalseNegativeDirectCount: this.giProvenance.stats().prototypeFalseNegativeDirectCount,
       qualityFlaggedCount: qualityFlagged,
       catalogSha256: this.manifest.catalogSha256,
       sourceFile: this.manifest.sourceFile,
@@ -82,13 +86,20 @@ class NeProductMasterService {
 
   _publicView(product) {
     if (!product) return null;
+    const giLegal = this.giProvenance.getByProductId(product.productId);
     return {
       productId: product.productId,
       identity: { ...product.identity },
       gi: {
         prototypeClaim: product.gi.prototypeClaim,
-        verificationStatus: product.gi.verificationStatus,
-        registryId: product.gi.registryId,
+        sourceVerificationStatus: product.gi.verificationStatus,
+        verificationStatus: giLegal ? giLegal.verificationStatus : product.gi.verificationStatus,
+        verificationOutcome: giLegal ? giLegal.verificationOutcome : null,
+        registeredAsListedGood: giLegal ? giLegal.registeredAsListedGood : false,
+        registryId: giLegal?.officialEvidence?.applicationNumberRaw || product.gi.registryId || null,
+        officialEvidence: giLegal?.officialEvidence || null,
+        notes: giLegal?.notes || [],
+        sourceSnapshot: giLegal?.sourceSnapshot || null,
       },
       pricing: {
         currency: product.pricing.currency,
@@ -103,7 +114,21 @@ class NeProductMasterService {
   }
 
   _privilegedView(product) {
-    return product ? JSON.parse(JSON.stringify(product)) : null;
+    if (!product) return null;
+    const out = JSON.parse(JSON.stringify(product));
+    const giLegal = this.giProvenance.getByProductId(product.productId);
+    out.gi = {
+      ...out.gi,
+      sourceVerificationStatus: out.gi.verificationStatus,
+      verificationStatus: giLegal ? giLegal.verificationStatus : out.gi.verificationStatus,
+      verificationOutcome: giLegal ? giLegal.verificationOutcome : null,
+      registeredAsListedGood: giLegal ? giLegal.registeredAsListedGood : false,
+      registryId: giLegal?.officialEvidence?.applicationNumberRaw || out.gi.registryId || null,
+      officialEvidence: giLegal?.officialEvidence || null,
+      notes: giLegal?.notes || [],
+      sourceSnapshot: giLegal?.sourceSnapshot || null,
+    };
+    return out;
   }
 
   serialize(product, context = {}) {
@@ -127,6 +152,7 @@ class NeProductMasterService {
     const category = normalize(options.category);
     const origin = normalize(options.origin);
     const giClaim = options.giClaim == null ? null : Boolean(options.giClaim);
+    const giRegistered = options.giRegistered == null ? null : Boolean(options.giRegistered);
     const limit = clampLimit(options.limit);
     const offset = Math.max(0, Math.trunc(Number(options.offset) || 0));
 
@@ -134,6 +160,10 @@ class NeProductMasterService {
       if (category && normalize(product.identity.category) !== category) return false;
       if (origin && normalize(product.identity.originLabel) !== origin) return false;
       if (giClaim != null && Boolean(product.gi.prototypeClaim) !== giClaim) return false;
+      if (giRegistered != null) {
+        const giLegal = this.giProvenance.getByProductId(product.productId);
+        if (Boolean(giLegal?.registeredAsListedGood) !== giRegistered) return false;
+      }
       if (!q) return true;
       const haystack = normalize([
         product.identity.name,

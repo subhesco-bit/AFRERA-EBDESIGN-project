@@ -2,8 +2,8 @@
   "program": "AFRERA_EBDESIGN_PHASE_000_TO_100",
   "version": 2,
   "createdAt": "2026-09-25T09:55:08.8772124Z",
-  "updatedAt": "2026-09-25T15:07:38.421Z",
-  "currentPhase": "046",
+  "updatedAt": "2026-09-25T16:21:36.739Z",
+  "currentPhase": "048",
   "mode": "AUTO_SEQUENTIAL_EXHAUSTIVE_FILE_BY_FILE",
   "cleanupLockedUntilPhase": "100",
   "phases": {
@@ -1326,33 +1326,56 @@
       "completedAt": "2026-09-25T15:06:04.838Z"
     },
     "046": {
-      "status": "RUNNING",
+      "status": "PASSED",
       "attempts": 1,
       "maxAttempts": 3,
       "dependsOn": [
         "045"
       ],
-      "evidence": [],
+      "evidence": [
+        ".audit/phase-program/phase-046-product-image-intelligence-proof.json"
+      ],
       "blockers": [],
       "history": [
         {
           "at": "2026-09-25T15:07:38.421Z",
           "event": "START",
           "attempt": 1
+        },
+        {
+          "at": "2026-09-25T15:57:12.598Z",
+          "event": "PASS",
+          "evidence": ".audit/phase-program/phase-046-product-image-intelligence-proof.json"
         }
       ],
-      "startedAt": "2026-09-25T15:07:38.420Z"
+      "startedAt": "2026-09-25T15:07:38.420Z",
+      "completedAt": "2026-09-25T15:57:12.597Z"
     },
     "047": {
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "PASSED",
+      "attempts": 1,
       "maxAttempts": 3,
       "dependsOn": [
         "046"
       ],
-      "evidence": [],
+      "evidence": [
+        ".audit/phase-program/phase-047-gi-certification-proof.json"
+      ],
       "blockers": [],
-      "history": []
+      "history": [
+        {
+          "at": "2026-09-25T16:07:36.067Z",
+          "event": "START",
+          "attempt": 1
+        },
+        {
+          "at": "2026-09-25T16:21:36.739Z",
+          "event": "PASS",
+          "evidence": ".audit/phase-program/phase-047-gi-certification-proof.json"
+        }
+      ],
+      "startedAt": "2026-09-25T16:07:36.053Z",
+      "completedAt": "2026-09-25T16:21:36.738Z"
     },
     "048": {
       "status": "PENDING",
