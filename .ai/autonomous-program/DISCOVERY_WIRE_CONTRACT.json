@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "required": [
+    "moduleId",
+    "name",
+    "version",
+    "domainId",
+    "capabilities",
+    "keywords",
+    "contexts",
+    "dependencies",
+    "interfaces",
+    "naturalLanguage"
+  ],
+  "moduleIdPattern": "^[A-Z][A-Z0-9_:-]{2,127}$",
+  "fields": {
+    "capabilities": "Array of stable capability IDs",
+    "keywords": "Normalized discovery terms and aliases",
+    "contexts": "Supported tenant/role/geography/workflow/data contexts",
+    "dependencies": "modules/services/data/external/tool dependencies",
+    "interfaces": "api/events/jobs/ui/mobile/agent/plugin interfaces",
+    "naturalLanguage": "intents/examples/disambiguation for human-language discovery"
+  },
+  "rules": [
+    "Discovery metadata describes capability; it never proves runtime readiness.",
+    "Aliases cannot create duplicate canonical module ownership.",
+    "Natural-language discovery must return evidence and match reasons.",
+    "Dependency declarations are identifiers, not executable code.",
+    "Status and production readiness are verified separately by execution/lifecycle contracts."
+  ]
+}

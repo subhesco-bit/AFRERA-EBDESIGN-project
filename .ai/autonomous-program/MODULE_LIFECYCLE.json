@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "states": [
+    "discovered",
+    "loaded",
+    "initialized",
+    "ready",
+    "executing",
+    "degraded",
+    "error",
+    "shutdown"
+  ],
+  "transitions": {
+    "discovered": [
+      "loaded",
+      "error",
+      "shutdown"
+    ],
+    "loaded": [
+      "initialized",
+      "error",
+      "shutdown"
+    ],
+    "initialized": [
+      "ready",
+      "degraded",
+      "error",
+      "shutdown"
+    ],
+    "ready": [
+      "executing",
+      "degraded",
+      "error",
+      "shutdown"
+    ],
+    "executing": [
+      "ready",
+      "degraded",
+      "error",
+      "shutdown"
+    ],
+    "degraded": [
+      "ready",
+      "executing",
+      "error",
+      "shutdown"
+    ],
+    "error": [
+      "initialized",
+      "degraded",
+      "shutdown"
+    ],
+    "shutdown": []
+  },
+  "rules": [
+    "Every transition is timestamped and carries reason/evidence.",
+    "Ready means dependencies and health gates are satisfied; it is not a production certification.",
+    "Executing is transient and returns to ready/degraded/error.",
+    "Shutdown is terminal for an instance.",
+    "Error recovery must be explicit; no silent state jumps.",
+    "Degraded state exposes reduced capability and health reason."
+  ]
+}

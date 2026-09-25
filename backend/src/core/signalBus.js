@@ -25,6 +25,7 @@
  */
 
 const EventEmitter = require('events');
+const crypto = require('crypto');
 const { logger } = require('../utils/logger');
 
 /** Signal severity, ordered. Used for triage and reflex thresholds. */

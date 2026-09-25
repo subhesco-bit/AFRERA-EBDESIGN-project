@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "requiredModuleMethods": [
+    "initialize",
+    "healthCheck",
+    "execute"
+  ],
+  "contextFields": [
+    "requestId",
+    "correlationId",
+    "actor",
+    "tenantId",
+    "roles",
+    "permissions",
+    "idempotencyKey",
+    "deadlineMs",
+    "mutating"
+  ],
+  "resultEnvelope": [
+    "success",
+    "moduleId",
+    "operation",
+    "requestId",
+    "correlationId",
+    "timestamp",
+    "durationMs",
+    "data",
+    "error",
+    "warnings",
+    "evidence"
+  ],
+  "errorShape": [
+    "code",
+    "message",
+    "category",
+    "retryable",
+    "details"
+  ],
+  "rules": [
+    "Mutating operations require an idempotency key unless explicitly exempted by policy.",
+    "Authorization is evaluated before execution and fails closed.",
+    "Module exceptions are translated into typed error envelopes and are never silently swallowed.",
+    "Execution deadlines are bounded.",
+    "Success envelopes contain data; failure envelopes contain typed errors.",
+    "Request and correlation IDs use cryptographically strong UUIDs.",
+    "Health checks cannot claim production readiness; they report runtime health only."
+  ]
+}

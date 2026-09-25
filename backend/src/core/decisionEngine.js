@@ -26,6 +26,7 @@
  */
 
 const { signalBus, SIGNAL, SEVERITY } = require('./signalBus');
+const crypto = require('crypto');
 const { logger } = require('../utils/logger');
 
 const ACTION = Object.freeze({
