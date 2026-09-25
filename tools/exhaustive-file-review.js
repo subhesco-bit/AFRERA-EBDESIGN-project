@@ -5,7 +5,7 @@ const path=require('path');
 const crypto=require('crypto');
 
 const repoRoot=path.resolve(__dirname,'..');
-const outDir=path.join(repoRoot,'.audit','phase-program','exhaustive-file-review');
+const outDir=process.argv[2]?path.resolve(process.argv[2]):path.join(repoRoot,'.audit','phase-program','exhaustive-file-review');
 const MAX_SHARD=20*1024*1024;
 const READ_CHUNK=1024*1024;
 const roots=[
