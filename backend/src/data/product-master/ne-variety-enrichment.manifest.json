@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "productCount": 1171,
+  "dataFileSha256": "770c06d3c62ec38c3dd4e489d2fe9c07be24557fa57b17687235fa293ed68601",
+  "generatedBy": "tools/build_ne_variety_enrichment.py",
+  "truthRules": [
+    "Unknown fields remain null/UNKNOWN; absence is not filled by model guesswork.",
+    "scientificName is populated only for an explicit parenthetical binomial in local evidence; Latin-looking name prefixes are retained separately as unresolved candidates.",
+    "Quantitative biochemical values require an explicit local source snippet containing both the product match and reported value.",
+    "GI remains unverified until Phase 047 authoritative validation.",
+    "Extraction confidence/status does not equal scientific or legal verification.",
+    "Category-derived classification is labelled as such and is not evidence of cold-chain, regulatory or agronomic requirements."
+  ]
+}

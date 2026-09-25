@@ -302,6 +302,7 @@ app.use('/api/v1/operational-modules', operationalModuleRoutes);
 app.use('/api/v1/value-chain', productValueChainRoutes);
 app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/catalog/ne-products', neProductMasterRoutes);
+app.use('/api/v1/ai/agents', aiAgentRoutes);
 app.use('/api/v1/advanced-medical-coding', advancedMedicalCodingRoutes);
 
 // M007 Role & Permission Management (AI-enhanced) lives under

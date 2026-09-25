@@ -1,0 +1,2216 @@
+{
+  "schemaVersion": 1,
+  "templateCount": 26,
+  "promptCount": 26,
+  "toolCount": 6,
+  "byStream": {
+    "research": 1,
+    "knowledge": 1,
+    "analytics": 1,
+    "support": 1,
+    "software": 1,
+    "operations": 1,
+    "finance": 1,
+    "procurement": 1,
+    "commerce": 1,
+    "cold-chain": 1,
+    "insurance": 1,
+    "agriculture": 1,
+    "fpo": 1,
+    "sustainability": 1,
+    "veterinary": 1,
+    "medical": 9,
+    "compliance": 1,
+    "funding": 1
+  },
+  "byRisk": {
+    "standard": 2,
+    "elevated": 7,
+    "high": 17
+  },
+  "byPattern": {
+    "evaluator_optimizer": 7,
+    "augmented_llm": 3,
+    "tool_loop": 3,
+    "routing": 1,
+    "parallel_specialists": 1,
+    "human_approval_workflow": 6,
+    "supervisor_handoff": 2,
+    "prompt_chain": 3
+  },
+  "medicalTemplateIds": [
+    "MEDICAL_CODING_ASSISTANT",
+    "CLINICAL_TERMINOLOGY_NORMALIZER",
+    "LOINC_OBSERVATION_MAPPER",
+    "ABDM_FHIR_TRANSFORMER",
+    "NHCX_CLAIM_ASSISTANT",
+    "CLINICAL_DOCUMENTATION_QA",
+    "CLINICAL_SAFETY_REVIEWER",
+    "MEDICAL_RESEARCH_AGENT",
+    "HUMAN_CODING_ESCALATION_AGENT"
+  ],
+  "templates": [
+    {
+      "id": "DEEP_RESEARCH",
+      "version": "1.0.0",
+      "name": "Deep Research + Critique",
+      "stream": "research",
+      "domain": "RESEARCH",
+      "description": "Iterative evidence retrieval with critique and bounded search.",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "standard",
+      "promptId": "research.deep",
+      "tools": [
+        "knowledge_search"
+      ],
+      "maxSteps": 12,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "tool_use",
+          "long_context"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "research-specialist"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [
+        "source_presence",
+        "unsupported_claim_check"
+      ],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "research",
+        "critique",
+        "evidence"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "research.deep",
+        "version": "1.0.0",
+        "name": "research.deep",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [
+          "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+          "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs"
+        ],
+        "status": "active",
+        "instructionsSha256": "f65e7a1d56cdb5e06fee7a36f3af797fa1e8e16838b8f4f8cc70ec198c2630ec"
+      }
+    },
+    {
+      "id": "KNOWLEDGE_RAG",
+      "version": "1.0.0",
+      "name": "Enterprise Knowledge RAG",
+      "stream": "knowledge",
+      "domain": "KNOWLEDGE_RETRIEVAL",
+      "description": "",
+      "pattern": "augmented_llm",
+      "riskClass": "standard",
+      "promptId": "knowledge.rag",
+      "tools": [
+        "knowledge_search"
+      ],
+      "maxSteps": 6,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "tool_use",
+          "grounded_generation"
+        ],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "rag",
+        "knowledge"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "knowledge.rag",
+        "version": "1.0.0",
+        "name": "knowledge.rag",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "7aad6d5be4653161aae8568666e67fcd83699471e42ec18d5c287217d344fd99"
+      }
+    },
+    {
+      "id": "DATA_ANALYST",
+      "version": "1.0.0",
+      "name": "Data & KPI Analyst",
+      "stream": "analytics",
+      "domain": "BI_ANALYTICS",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "elevated",
+      "promptId": "data.analyst",
+      "tools": [
+        "knowledge_search",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [
+        "units_population_time_window"
+      ],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "data",
+        "kpi",
+        "analysis"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "data.analyst",
+        "version": "1.0.0",
+        "name": "data.analyst",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "c55704f2d3438c7a36f325be15daffdb74dd74422afe9207c95acdf4c87aed3f"
+      }
+    },
+    {
+      "id": "SUPPORT_CASE_AGENT",
+      "version": "1.0.0",
+      "name": "Policy-Grounded Support Case Agent",
+      "stream": "support",
+      "domain": "CRM_SERVICE",
+      "description": "",
+      "pattern": "routing",
+      "riskClass": "elevated",
+      "promptId": "support.case",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "ne_product_search"
+      ],
+      "maxSteps": 8,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "tool_use",
+          "classification"
+        ],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "support",
+        "case-management"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "support.case",
+        "version": "1.0.0",
+        "name": "support.case",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "4c844e01fc719ce88ce018db9fc1448cf5318147de29e35ea376af105821584b"
+      }
+    },
+    {
+      "id": "SOFTWARE_REVIEW_AGENT",
+      "version": "1.0.0",
+      "name": "Software Architecture & Code Review Agent",
+      "stream": "software",
+      "domain": "FOUNDATION",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "elevated",
+      "promptId": "software.reviewer",
+      "tools": [
+        "knowledge_search"
+      ],
+      "maxSteps": 12,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "code",
+          "reasoning",
+          "tool_use",
+          "long_context"
+        ],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "code",
+        "architecture",
+        "review"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "software.reviewer",
+        "version": "1.0.0",
+        "name": "software.reviewer",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "e933d7a8d463210b0e64fa544135250bb911941eda40262894b9383e5796ba39"
+      }
+    },
+    {
+      "id": "INCIDENT_SUPERVISOR",
+      "version": "1.0.0",
+      "name": "Parallel Incident Supervisor",
+      "stream": "operations",
+      "domain": "SECURITY_RESILIENCE",
+      "description": "",
+      "pattern": "parallel_specialists",
+      "riskClass": "high",
+      "promptId": "incident.parallel",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog"
+      ],
+      "maxSteps": 12,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "tool_use"
+        ],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "incident",
+        "sre",
+        "parallel"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "incident.parallel",
+        "version": "1.0.0",
+        "name": "incident.parallel",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "0f80e5d3299a9f7cc2f456f6d2778c7d62bb49af127c7b64b406ac906b1aacf5"
+      }
+    },
+    {
+      "id": "ERP_FINANCE_AGENT",
+      "version": "1.0.0",
+      "name": "ERP Finance Control Agent",
+      "stream": "finance",
+      "domain": "FINANCE",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "erp.finance",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "erp",
+        "finance",
+        "audit"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "erp.finance",
+        "version": "1.0.0",
+        "name": "erp.finance",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "c6f3f9f8f791de35dc6475dbc3bd80139a1af9b971fe62d0bcddb80faee944d3"
+      }
+    },
+    {
+      "id": "PROCUREMENT_AGENT",
+      "version": "1.0.0",
+      "name": "Procurement & Supplier Lifecycle Agent",
+      "stream": "procurement",
+      "domain": "PROCUREMENT",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "erp.procurement",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "procurement",
+        "supplier",
+        "approval"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "erp.procurement",
+        "version": "1.0.0",
+        "name": "erp.procurement",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "296e27984f96a1367d7253f84400286e8b4a80b1078526784c86fd0915145cb5"
+      }
+    },
+    {
+      "id": "MARKETPLACE_CATALOG_AGENT",
+      "version": "1.0.0",
+      "name": "Marketplace Catalog Intelligence Agent",
+      "stream": "commerce",
+      "domain": "COMMERCE",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "elevated",
+      "promptId": "commerce.catalog",
+      "tools": [
+        "ne_product_search",
+        "knowledge_search"
+      ],
+      "maxSteps": 8,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "tool_use",
+          "structured_output"
+        ],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [
+        "farmer_map_redaction",
+        "gi_truth_status",
+        "price_truth_status"
+      ],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "catalog",
+        "marketplace",
+        "products"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "commerce.catalog",
+        "version": "1.0.0",
+        "name": "commerce.catalog",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "3993bd47d243d6f7ecb753390695211687f4ae3009a00180f4fbf07148f01297"
+      }
+    },
+    {
+      "id": "COLD_CHAIN_EXCEPTION_AGENT",
+      "version": "1.0.0",
+      "name": "Cold-Chain Exception Agent",
+      "stream": "cold-chain",
+      "domain": "COLD_CHAIN",
+      "description": "",
+      "pattern": "supervisor_handoff",
+      "riskClass": "high",
+      "promptId": "logistics.coldchain",
+      "tools": [
+        "knowledge_search",
+        "deterministic_calculation",
+        "workflow_catalog",
+        "ne_product_search"
+      ],
+      "maxSteps": 12,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "cold-chain",
+        "logistics",
+        "exceptions"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "logistics.coldchain",
+        "version": "1.0.0",
+        "name": "logistics.coldchain",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "5f1b3bc97a857f4eb53e153012616f1e208289a5e017635b4762a3e757997c66"
+      }
+    },
+    {
+      "id": "INSURANCE_CLAIM_REVIEW_AGENT",
+      "version": "1.0.0",
+      "name": "Insurance Claim Review Agent",
+      "stream": "insurance",
+      "domain": "INSURANCE",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "insurance.claim",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "claims",
+        "insurance",
+        "fraud-review"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "insurance.claim",
+        "version": "1.0.0",
+        "name": "insurance.claim",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "94824d69aa594ab0140ea20615e4fbdcfbf001d86dc3355963a01dc18ef4e5e5"
+      }
+    },
+    {
+      "id": "AGRONOMY_ADVISOR",
+      "version": "1.0.0",
+      "name": "Agronomy Evidence Advisor",
+      "stream": "agriculture",
+      "domain": "AGRI_PRODUCTION",
+      "description": "",
+      "pattern": "augmented_llm",
+      "riskClass": "high",
+      "promptId": "agri.agronomy",
+      "tools": [
+        "knowledge_search",
+        "ne_product_search"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "agronomy",
+        "farmer",
+        "advisory"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "agri.agronomy",
+        "version": "1.0.0",
+        "name": "agri.agronomy",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "7687b8ccb0d94ecfd79c8fb3e353489721c8f96509e77e90f45ada7368cd69a9"
+      }
+    },
+    {
+      "id": "FPO_OPERATIONS_AGENT",
+      "version": "1.0.0",
+      "name": "Village-FPO-Farmer Operations Agent",
+      "stream": "fpo",
+      "domain": "FARMER_FPO",
+      "description": "",
+      "pattern": "supervisor_handoff",
+      "riskClass": "elevated",
+      "promptId": "agri.fpo",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "ne_product_search"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": false,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "village",
+        "fpo",
+        "farmer",
+        "operations"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "agri.fpo",
+        "version": "1.0.0",
+        "name": "agri.fpo",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "9810a66b1d0f650d1773b92247edda4e010a540260967ad1a2c5ee8f78af5802"
+      }
+    },
+    {
+      "id": "ESG_EVIDENCE_AGENT",
+      "version": "1.0.0",
+      "name": "ESG & Carbon Evidence Agent",
+      "stream": "sustainability",
+      "domain": "SUSTAINABILITY",
+      "description": "",
+      "pattern": "tool_loop",
+      "riskClass": "elevated",
+      "promptId": "sustainability.esg",
+      "tools": [
+        "knowledge_search",
+        "deterministic_calculation"
+      ],
+      "maxSteps": 8,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "esg",
+        "carbon",
+        "evidence"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "sustainability.esg",
+        "version": "1.0.0",
+        "name": "sustainability.esg",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "4fc315c83bbadecf6379b14448ac612d5e94bcb60b43e8f7bc1c8e81022f99df"
+      }
+    },
+    {
+      "id": "VETERINARY_REVIEW_AGENT",
+      "version": "1.0.0",
+      "name": "Veterinary Decision-Support Agent",
+      "stream": "veterinary",
+      "domain": "LIVESTOCK_VET",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "veterinary.review",
+      "tools": [
+        "knowledge_search"
+      ],
+      "maxSteps": 8,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_veterinarian",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous dosing"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "veterinary",
+        "animal-health"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "veterinary.review",
+        "version": "1.0.0",
+        "name": "veterinary.review",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "fc07d9ca204c56fd037b64a19c2673992813bb06b08ce6f96bcd56adbd4581b2"
+      }
+    },
+    {
+      "id": "MEDICAL_CODING_ASSISTANT",
+      "version": "1.0.0",
+      "name": "Medical Coding Assistant",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "Documentation-grounded candidate coding with mandatory abstention when authoritative terminology is unavailable.",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "high",
+      "promptId": "medical.coding",
+      "tools": [
+        "knowledge_search",
+        "medical_code_systems"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_clinician_or_medical_coder",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "coding",
+        "icd",
+        "snomed"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.coding",
+        "version": "1.0.0",
+        "name": "medical.coding",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": "India-first; optional jurisdiction packs",
+        "safetyNotes": [
+          "human coding review required",
+          "authoritative terminology service required for finalization"
+        ],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "df842e6e096854bfa2ed39ad74fa0ad5fdbb01c488a1684a4e5230956fa3370d"
+      }
+    },
+    {
+      "id": "CLINICAL_TERMINOLOGY_NORMALIZER",
+      "version": "1.0.0",
+      "name": "Clinical Terminology Normalizer",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "",
+      "pattern": "prompt_chain",
+      "riskClass": "high",
+      "promptId": "medical.terminology",
+      "tools": [
+        "knowledge_search",
+        "medical_code_systems"
+      ],
+      "maxSteps": 8,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_clinician_or_medical_coder",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "terminology",
+        "snomed"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.terminology",
+        "version": "1.0.0",
+        "name": "medical.terminology",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": "India-first; terminology-version aware",
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "f6c73d2338d5732ef853dfa7b4ae9bce00e2a8a1110ca1bbd3943bab81fd5c30"
+      }
+    },
+    {
+      "id": "LOINC_OBSERVATION_MAPPER",
+      "version": "1.0.0",
+      "name": "LOINC Observation Mapping Assistant",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "",
+      "pattern": "prompt_chain",
+      "riskClass": "high",
+      "promptId": "medical.loinc",
+      "tools": [
+        "knowledge_search",
+        "medical_code_systems"
+      ],
+      "maxSteps": 8,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_clinician_or_medical_coder",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "loinc",
+        "laboratory"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.loinc",
+        "version": "1.0.0",
+        "name": "medical.loinc",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": "LOINC edition/version required",
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "7ea24d3f996d3d163591ea16460f811c18691bbc3e654a86dd3f676b44a06db1"
+      }
+    },
+    {
+      "id": "ABDM_FHIR_TRANSFORMER",
+      "version": "1.0.0",
+      "name": "ABDM FHIR Transformation Agent",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "",
+      "pattern": "prompt_chain",
+      "riskClass": "high",
+      "promptId": "medical.abdm.fhir",
+      "tools": [
+        "knowledge_search"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_clinician_or_medical_coder",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "abdm",
+        "fhir",
+        "india"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.abdm.fhir",
+        "version": "1.0.0",
+        "name": "medical.abdm.fhir",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": "India / ABDM",
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "49c0c4a412a9cebef3e96e8cd4df247cdbf567e83e3ebad54b1757d3be132427"
+      }
+    },
+    {
+      "id": "NHCX_CLAIM_ASSISTANT",
+      "version": "1.0.0",
+      "name": "NHCX Claim/Preauthorization Assistant",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "medical.nhcx",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog",
+        "medical_code_systems"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_clinician_or_medical_coder",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "nhcx",
+        "claim",
+        "india"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.nhcx",
+        "version": "1.0.0",
+        "name": "medical.nhcx",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": "India / NHCX",
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "cefcc0693dc15f03135df105e79f0b0dd109fdb7ba0ca94e075282a3440ba064"
+      }
+    },
+    {
+      "id": "CLINICAL_DOCUMENTATION_QA",
+      "version": "1.0.0",
+      "name": "Clinical Documentation Integrity Agent",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "high",
+      "promptId": "medical.documentation.qa",
+      "tools": [
+        "knowledge_search"
+      ],
+      "maxSteps": 8,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_clinician_or_medical_coder",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "documentation",
+        "cdi"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.documentation.qa",
+        "version": "1.0.0",
+        "name": "medical.documentation.qa",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "ff65e593d3e408d80ebce7117953accc1e277b107dd0bc79a7b7bbfdb49d2240"
+      }
+    },
+    {
+      "id": "CLINICAL_SAFETY_REVIEWER",
+      "version": "1.0.0",
+      "name": "Independent Clinical Safety Reviewer",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "high",
+      "promptId": "medical.safety",
+      "tools": [
+        "knowledge_search",
+        "medical_code_systems"
+      ],
+      "maxSteps": 8,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_clinician_or_medical_coder",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "safety",
+        "review"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.safety",
+        "version": "1.0.0",
+        "name": "medical.safety",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "32a76e5549bac47499075b7758861e8d17998b2dae6bb6afd7531a2d19b89e3d"
+      }
+    },
+    {
+      "id": "MEDICAL_RESEARCH_AGENT",
+      "version": "1.0.0",
+      "name": "Medical Research Agent",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "high",
+      "promptId": "medical.research",
+      "tools": [
+        "knowledge_search"
+      ],
+      "maxSteps": 12,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "research_assistance_only",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "research",
+        "literature"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.research",
+        "version": "1.0.0",
+        "name": "medical.research",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "ac3a4e117ad73c36e508acb6ec0e9b02654a502d92e2dd511eaf5f3dd31b18b2"
+      }
+    },
+    {
+      "id": "HUMAN_CODING_ESCALATION_AGENT",
+      "version": "1.0.0",
+      "name": "Human Coding Escalation Packager",
+      "stream": "medical",
+      "domain": "FOOD_NUTRITION",
+      "description": "",
+      "pattern": "human_approval_workflow",
+      "riskClass": "high",
+      "promptId": "medical.human.escalation",
+      "tools": [
+        "knowledge_search",
+        "medical_code_systems"
+      ],
+      "maxSteps": 6,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [
+          "reasoning",
+          "structured_output",
+          "tool_use"
+        ],
+        "preferredFamilies": [
+          "frontier-general",
+          "medical-capable"
+        ],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": true,
+        "decisionAuthority": "qualified_clinician_or_medical_coder",
+        "prohibitedUses": [
+          "autonomous diagnosis",
+          "autonomous prescription",
+          "autonomous treatment",
+          "autonomous claim adjudication"
+        ]
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "Vercel AI SDK: ToolLoopAgent with bounded stop conditions and tool approval",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs",
+        "Google ADK: sequential, parallel and loop agent composition"
+      ],
+      "tags": [
+        "medical",
+        "human-review",
+        "escalation",
+        "review-packet"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "medical.human.escalation",
+        "version": "1.0.0",
+        "name": "medical.human.escalation",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "c8dac328d8bdfd1a74309a36b3607ee817e9cb18bb57e21e2a6e9ed7c3c7437a"
+      }
+    },
+    {
+      "id": "COMPLIANCE_AUDIT_AGENT",
+      "version": "1.0.0",
+      "name": "Compliance & Audit Evidence Agent",
+      "stream": "compliance",
+      "domain": "REGULATORY",
+      "description": "",
+      "pattern": "evaluator_optimizer",
+      "riskClass": "high",
+      "promptId": "compliance.audit",
+      "tools": [
+        "knowledge_search",
+        "workflow_catalog"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": true
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "compliance",
+        "audit",
+        "grc"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "compliance.audit",
+        "version": "1.0.0",
+        "name": "compliance.audit",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "f7faeaa8649b168481576c2714d9325ce2872a4827b0fe2fc33c09a6f3dd2867"
+      }
+    },
+    {
+      "id": "GRANT_SUBSIDY_AGENT",
+      "version": "1.0.0",
+      "name": "Grant/Subsidy Readiness Agent",
+      "stream": "funding",
+      "domain": "SCHEMES_SUBSIDY",
+      "description": "",
+      "pattern": "augmented_llm",
+      "riskClass": "elevated",
+      "promptId": "grant.subsidy",
+      "tools": [
+        "knowledge_search"
+      ],
+      "maxSteps": 10,
+      "providerPolicy": {
+        "mode": "capability_routed",
+        "requiredCapabilities": [],
+        "preferredFamilies": [],
+        "allowGateway": true,
+        "allowLocal": true
+      },
+      "inputGuardrails": [],
+      "outputGuardrails": [],
+      "approvalPolicy": {
+        "executionApprovalRequired": false,
+        "mutationToolsRequireApproval": true,
+        "humanReviewRequired": true,
+        "finalizationRequiresHuman": false
+      },
+      "outputUsePolicy": {
+        "draftOnly": false,
+        "decisionAuthority": "assistive",
+        "prohibitedUses": []
+      },
+      "memoryPolicy": "task_scoped",
+      "sourcePatterns": [],
+      "tags": [
+        "grant",
+        "subsidy",
+        "funding"
+      ],
+      "enabled": true,
+      "status": "active",
+      "prompt": {
+        "id": "grant.subsidy",
+        "version": "1.0.0",
+        "name": "grant.subsidy",
+        "variables": [],
+        "outputContract": {},
+        "evidencePolicy": "cite_tool_or_source_evidence",
+        "jurisdiction": null,
+        "safetyNotes": [],
+        "sourcePatterns": [],
+        "status": "active",
+        "instructionsSha256": "8ad7f03871e09f572e3b353c2dfeee7260ceec8fa036921127d6c5c42ccbb3a2"
+      }
+    }
+  ],
+  "prompts": [
+    {
+      "id": "research.deep",
+      "version": "1.0.0",
+      "name": "research.deep",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [
+        "Anthropic: simple composable workflow/agent patterns; use complexity only when it improves outcomes",
+        "OpenAI agent patterns: input/output/tool guardrails, human approvals, tracing/handoffs"
+      ],
+      "status": "active",
+      "instructionsSha256": "f65e7a1d56cdb5e06fee7a36f3af797fa1e8e16838b8f4f8cc70ec198c2630ec"
+    },
+    {
+      "id": "knowledge.rag",
+      "version": "1.0.0",
+      "name": "knowledge.rag",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "7aad6d5be4653161aae8568666e67fcd83699471e42ec18d5c287217d344fd99"
+    },
+    {
+      "id": "data.analyst",
+      "version": "1.0.0",
+      "name": "data.analyst",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "c55704f2d3438c7a36f325be15daffdb74dd74422afe9207c95acdf4c87aed3f"
+    },
+    {
+      "id": "support.case",
+      "version": "1.0.0",
+      "name": "support.case",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "4c844e01fc719ce88ce018db9fc1448cf5318147de29e35ea376af105821584b"
+    },
+    {
+      "id": "software.reviewer",
+      "version": "1.0.0",
+      "name": "software.reviewer",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "e933d7a8d463210b0e64fa544135250bb911941eda40262894b9383e5796ba39"
+    },
+    {
+      "id": "incident.parallel",
+      "version": "1.0.0",
+      "name": "incident.parallel",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "0f80e5d3299a9f7cc2f456f6d2778c7d62bb49af127c7b64b406ac906b1aacf5"
+    },
+    {
+      "id": "erp.finance",
+      "version": "1.0.0",
+      "name": "erp.finance",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "c6f3f9f8f791de35dc6475dbc3bd80139a1af9b971fe62d0bcddb80faee944d3"
+    },
+    {
+      "id": "erp.procurement",
+      "version": "1.0.0",
+      "name": "erp.procurement",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "296e27984f96a1367d7253f84400286e8b4a80b1078526784c86fd0915145cb5"
+    },
+    {
+      "id": "commerce.catalog",
+      "version": "1.0.0",
+      "name": "commerce.catalog",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "3993bd47d243d6f7ecb753390695211687f4ae3009a00180f4fbf07148f01297"
+    },
+    {
+      "id": "logistics.coldchain",
+      "version": "1.0.0",
+      "name": "logistics.coldchain",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "5f1b3bc97a857f4eb53e153012616f1e208289a5e017635b4762a3e757997c66"
+    },
+    {
+      "id": "insurance.claim",
+      "version": "1.0.0",
+      "name": "insurance.claim",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "94824d69aa594ab0140ea20615e4fbdcfbf001d86dc3355963a01dc18ef4e5e5"
+    },
+    {
+      "id": "agri.agronomy",
+      "version": "1.0.0",
+      "name": "agri.agronomy",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "7687b8ccb0d94ecfd79c8fb3e353489721c8f96509e77e90f45ada7368cd69a9"
+    },
+    {
+      "id": "agri.fpo",
+      "version": "1.0.0",
+      "name": "agri.fpo",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "9810a66b1d0f650d1773b92247edda4e010a540260967ad1a2c5ee8f78af5802"
+    },
+    {
+      "id": "sustainability.esg",
+      "version": "1.0.0",
+      "name": "sustainability.esg",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "4fc315c83bbadecf6379b14448ac612d5e94bcb60b43e8f7bc1c8e81022f99df"
+    },
+    {
+      "id": "veterinary.review",
+      "version": "1.0.0",
+      "name": "veterinary.review",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "fc07d9ca204c56fd037b64a19c2673992813bb06b08ce6f96bcd56adbd4581b2"
+    },
+    {
+      "id": "medical.coding",
+      "version": "1.0.0",
+      "name": "medical.coding",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": "India-first; optional jurisdiction packs",
+      "safetyNotes": [
+        "human coding review required",
+        "authoritative terminology service required for finalization"
+      ],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "df842e6e096854bfa2ed39ad74fa0ad5fdbb01c488a1684a4e5230956fa3370d"
+    },
+    {
+      "id": "medical.terminology",
+      "version": "1.0.0",
+      "name": "medical.terminology",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": "India-first; terminology-version aware",
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "f6c73d2338d5732ef853dfa7b4ae9bce00e2a8a1110ca1bbd3943bab81fd5c30"
+    },
+    {
+      "id": "medical.loinc",
+      "version": "1.0.0",
+      "name": "medical.loinc",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": "LOINC edition/version required",
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "7ea24d3f996d3d163591ea16460f811c18691bbc3e654a86dd3f676b44a06db1"
+    },
+    {
+      "id": "medical.abdm.fhir",
+      "version": "1.0.0",
+      "name": "medical.abdm.fhir",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": "India / ABDM",
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "49c0c4a412a9cebef3e96e8cd4df247cdbf567e83e3ebad54b1757d3be132427"
+    },
+    {
+      "id": "medical.nhcx",
+      "version": "1.0.0",
+      "name": "medical.nhcx",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": "India / NHCX",
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "cefcc0693dc15f03135df105e79f0b0dd109fdb7ba0ca94e075282a3440ba064"
+    },
+    {
+      "id": "medical.documentation.qa",
+      "version": "1.0.0",
+      "name": "medical.documentation.qa",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "ff65e593d3e408d80ebce7117953accc1e277b107dd0bc79a7b7bbfdb49d2240"
+    },
+    {
+      "id": "medical.safety",
+      "version": "1.0.0",
+      "name": "medical.safety",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "32a76e5549bac47499075b7758861e8d17998b2dae6bb6afd7531a2d19b89e3d"
+    },
+    {
+      "id": "medical.research",
+      "version": "1.0.0",
+      "name": "medical.research",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "ac3a4e117ad73c36e508acb6ec0e9b02654a502d92e2dd511eaf5f3dd31b18b2"
+    },
+    {
+      "id": "medical.human.escalation",
+      "version": "1.0.0",
+      "name": "medical.human.escalation",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "c8dac328d8bdfd1a74309a36b3607ee817e9cb18bb57e21e2a6e9ed7c3c7437a"
+    },
+    {
+      "id": "compliance.audit",
+      "version": "1.0.0",
+      "name": "compliance.audit",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "f7faeaa8649b168481576c2714d9325ce2872a4827b0fe2fc33c09a6f3dd2867"
+    },
+    {
+      "id": "grant.subsidy",
+      "version": "1.0.0",
+      "name": "grant.subsidy",
+      "variables": [],
+      "outputContract": {},
+      "evidencePolicy": "cite_tool_or_source_evidence",
+      "jurisdiction": null,
+      "safetyNotes": [],
+      "sourcePatterns": [],
+      "status": "active",
+      "instructionsSha256": "8ad7f03871e09f572e3b353c2dfeee7260ceec8fa036921127d6c5c42ccbb3a2"
+    }
+  ],
+  "tools": [
+    {
+      "id": "knowledge_search",
+      "description": "Search the canonical AFRERA/EBDESIGN knowledge library using lexical, semantic, field and dependency-graph evidence.",
+      "riskClass": "standard",
+      "mutates": false,
+      "needsApproval": false,
+      "source": "backend/src/services/hybridRetrievalService.js",
+      "dataAccess": "internal",
+      "evidencePolicy": "return_source_metadata"
+    },
+    {
+      "id": "ne_product_search",
+      "description": "Search the canonical 1,171-product North-East product master. Farmer MAP/floor prices remain redacted.",
+      "riskClass": "standard",
+      "mutates": false,
+      "needsApproval": false,
+      "source": "backend/src/services/catalog/neProductMasterService.js",
+      "dataAccess": "internal",
+      "evidencePolicy": "return_source_metadata"
+    },
+    {
+      "id": "deterministic_calculation",
+      "description": "Execute a registered deterministic calculation with explicit basis, provenance and limitations. Never substitutes an LLM estimate for a formula.",
+      "riskClass": "standard",
+      "mutates": false,
+      "needsApproval": false,
+      "source": "backend/src/core/deterministicAlgorithmRegistry.js",
+      "dataAccess": "internal",
+      "evidencePolicy": "return_source_metadata"
+    },
+    {
+      "id": "workflow_catalog",
+      "description": "Read the governed workflow/state-machine catalog including states, transitions, SLA metadata, approvals and source implementation.",
+      "riskClass": "standard",
+      "mutates": false,
+      "needsApproval": false,
+      "source": "backend/src/core/workflowCatalog.js",
+      "dataAccess": "internal",
+      "evidencePolicy": "return_source_metadata"
+    },
+    {
+      "id": "medical_code_systems",
+      "description": "Read the legacy/local medical coding-system inventory and integration status. This tool does not validate or finalize a medical code.",
+      "riskClass": "high",
+      "mutates": false,
+      "needsApproval": false,
+      "source": "backend/src/services/advancedMedicalCodingService.js",
+      "dataAccess": "internal",
+      "evidencePolicy": "return_source_metadata"
+    },
+    {
+      "id": "medical_context_lookup",
+      "description": "Read local clinical/nutrition/complementary-care context for drafting assistance. Output is legacy local knowledge and never a diagnosis, prescription or final code.",
+      "riskClass": "high",
+      "mutates": false,
+      "needsApproval": false,
+      "source": "backend/src/services/advancedMedicalCodingService.js",
+      "dataAccess": "internal",
+      "evidencePolicy": "return_source_metadata"
+    }
+  ],
+  "runtimeAdapter": {
+    "sdk": "ai",
+    "expectedMajor": 7,
+    "executionClass": "ToolLoopAgent",
+    "credentialNames": [
+      "AI_GATEWAY_API_KEY",
+      "VERCEL_OIDC_TOKEN"
+    ],
+    "modelConfigNames": [
+      "AI_AGENT_DEFAULT_MODEL",
+      "AI_GATEWAY_DEFAULT_MODEL"
+    ],
+    "boundedSteps": true,
+    "toolApprovalSupported": true
+  },
+  "truthRules": [
+    "Template availability does not imply a live model credential is configured.",
+    "Provider/model selection is runtime-configured and not hard-wired into business templates.",
+    "System instructions are not emitted by public catalog APIs; only prompt hashes and metadata are exposed.",
+    "Mutation tools require approval; current canonical tool set is read-only/deterministic.",
+    "Medical agent output is draft-only and requires qualified human review.",
+    "The legacy medical code search is not treated as authoritative terminology mapping."
+  ]
+}

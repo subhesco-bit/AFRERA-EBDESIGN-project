@@ -1,90 +1,67 @@
 /**
  * AI Provider Adapters
- * Component ID: EBD-CMP-00000002
- * Purpose: Provider-agnostic LLM provider interfaces
- *
- * This module provides a unified interface for multiple AI providers
- * ensuring the system is not coupled to any single vendor.
+ * Provider-agnostic configuration metadata. This module never reads or emits
+ * credential values; it only reports whether named configuration inputs exist.
  */
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
+const PROVIDER_ENV = Object.freeze({
+  claude: { primary: 'ANTHROPIC_API_KEY', anyOf: ['ANTHROPIC_API_KEY'], mode: 'direct-adapter-metadata' },
+  openai: { primary: 'OPENAI_API_KEY', anyOf: ['OPENAI_API_KEY'], mode: 'direct-adapter-metadata' },
+  gemini: { primary: 'GEMINI_API_KEY', alt: 'GOOGLE_API_KEY', anyOf: ['GEMINI_API_KEY','GOOGLE_API_KEY'], mode: 'direct-adapter-metadata' },
+  deepseek: { primary: 'DEEPSEEK_API_KEY', anyOf: ['DEEPSEEK_API_KEY'], mode: 'direct-adapter-metadata' },
+  grok: { primary: 'XAI_API_KEY', anyOf: ['XAI_API_KEY'], mode: 'direct-adapter-metadata' },
+  vercel_gateway: { primary: 'AI_GATEWAY_API_KEY', alt: 'VERCEL_OIDC_TOKEN', anyOf: ['AI_GATEWAY_API_KEY','VERCEL_OIDC_TOKEN'], optional: ['AI_AGENT_DEFAULT_MODEL','AI_GATEWAY_DEFAULT_MODEL'], mode: 'live-agent-runtime' },
+  azure_openai: { primary: 'AZURE_OPENAI_API_KEY', allOf: ['AZURE_OPENAI_API_KEY','AZURE_OPENAI_ENDPOINT'], optional: ['AZURE_OPENAI_API_VERSION'], mode: 'declared-external-provider' },
+  ollama: { primary: 'OLLAMA_BASE_URL', allOf: ['OLLAMA_BASE_URL'], optional: ['OLLAMA_MAX_TOKENS'], mode: 'declared-local-provider' },
+  huggingface: { primary: 'HUGGINGFACE_API_KEY', anyOf: ['HUGGINGFACE_API_KEY'], mode: 'declared-external-provider' },
+  devin: { primary: 'DEVIN_API_KEY', allOf: ['DEVIN_API_KEY','DEVIN_API_URL'], mode: 'declared-agent-service' },
+});
 
-/**
- * Provider environment configuration
- * Maps provider keys to their required environment variables
- */
-const PROVIDER_ENV = {
-  claude: { primary: 'ANTHROPIC_API_KEY' },
-  openai: { primary: 'OPENAI_API_KEY' },
-  gemini: { primary: 'GEMINI_API_KEY', alt: 'GOOGLE_API_KEY' },
-  deepseek: { primary: 'DEEPSEEK_API_KEY' },
-  grok: { primary: 'XAI_API_KEY' },
-};
+function namesFor(env={}) {
+  return [...new Set([...(env.allOf||[]),...(env.anyOf||[]),...(env.optional||[])])];
+}
 
-/**
- * Provider configuration state
- * Returns configuration status without exposing actual key values
- */
-function providerStatus(providerKey) {
-  const env = PROVIDER_ENV[providerKey];
-  if (!env) return { provider: providerKey, known: false, configured: false };
+function configurationState(env={}, source=process.env) {
+  const allOf=env.allOf||[];
+  const anyOf=env.anyOf||([]);
+  const missingAll=allOf.filter((name)=>!source[name]);
+  const anySatisfied=anyOf.length===0||anyOf.some((name)=>Boolean(source[name]));
+  const configured=missingAll.length===0&&anySatisfied;
+  const missingRequired=[...missingAll];
+  if(!anySatisfied&&anyOf.length)missingRequired.push('one-of:'+anyOf.join('|'));
+  return {configured,missingRequired};
+}
 
-  const configured = Boolean(process.env[env.primary] || (env.alt && process.env[env.alt]));
+function providerStatus(providerKey, source=process.env) {
+  const env=PROVIDER_ENV[providerKey];
+  if(!env)return {provider:providerKey,known:false,configured:false};
+  const state=configurationState(env,source);
   return {
-    provider: providerKey,
-    known: true,
-    envVar: env.alt ? `${env.primary} or ${env.alt}` : env.primary,
-    configured,
+    provider:providerKey,
+    known:true,
+    configured:state.configured,
+    missingRequired:state.missingRequired,
+    configurationNames:namesFor(env),
+    envVar:env.alt?env.primary+' or '+env.alt:env.primary,
+    mode:env.mode||'declared',
   };
 }
 
-/**
- * Get all provider statuses
- */
-function listProviders() {
-  return Object.keys(PROVIDER_ENV).map(key => providerStatus(key));
+function listProviders(source=process.env){return Object.keys(PROVIDER_ENV).map((key)=>providerStatus(key,source));}
+function listConfiguredProviders(source=process.env){return listProviders(source).filter((p)=>p.configured);}
+function getProviderEnv(providerKey){return PROVIDER_ENV[providerKey];}
+
+function validateProviderConfig(providerKey, source=process.env) {
+  const env=PROVIDER_ENV[providerKey];
+  if(!env)return {valid:false,reason:'Unknown provider'};
+  const state=configurationState(env,source);
+  const hasPrimary=Boolean(env.primary&&source[env.primary]);
+  const hasAlt=Boolean(env.alt&&source[env.alt]);
+  return state.configured
+    ? {valid:true,hasPrimary,hasAlt,missingRequired:[]}
+    : {valid:false,reason:'Required provider configuration is missing',hasPrimary,hasAlt,missingRequired:state.missingRequired};
 }
 
-/**
- * Get configured providers only
- */
-function listConfiguredProviders() {
-  return listProviders().filter(p => p.configured);
-}
-
-/**
- * Get provider environment variables
- */
-function getProviderEnv(providerKey) {
-  return PROVIDER_ENV[providerKey];
-}
-
-/**
- * Validate provider configuration
- */
-function validateProviderConfig(providerKey) {
-  const env = PROVIDER_ENV[providerKey];
-  if (!env) {
-    return { valid: false, reason: 'Unknown provider' };
-  }
-
-  const hasPrimary = Boolean(process.env[env.primary]);
-  const hasAlt = env.alt && Boolean(process.env[env.alt]);
-
-  if (!hasPrimary && !hasAlt) {
-    return { valid: false, reason: 'No API key configured' };
-  }
-
-  return { valid: true, hasPrimary, hasAlt };
-}
-
-module.exports = {
-  PROVIDER_ENV,
-  providerStatus,
-  listProviders,
-  listConfiguredProviders,
-  getProviderEnv,
-  validateProviderConfig,
-};
+module.exports={PROVIDER_ENV,providerStatus,listProviders,listConfiguredProviders,getProviderEnv,validateProviderConfig,configurationState};
