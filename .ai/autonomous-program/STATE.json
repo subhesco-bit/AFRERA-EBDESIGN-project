@@ -2,8 +2,8 @@
   "program": "AFRERA_EBDESIGN_PHASE_000_TO_100",
   "version": 2,
   "createdAt": "2026-09-25T09:55:08.8772124Z",
-  "updatedAt": "2026-09-25T12:25:41.839Z",
-  "currentPhase": "027",
+  "updatedAt": "2026-09-25T12:49:35.953Z",
+  "currentPhase": "032",
   "mode": "AUTO_SEQUENTIAL_EXHAUSTIVE_FILE_BY_FILE",
   "cleanupLockedUntilPhase": "100",
   "phases": {
@@ -832,59 +832,134 @@
       "completedAt": "2026-09-25T12:25:41.838Z"
     },
     "027": {
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "PASSED",
+      "attempts": 1,
       "maxAttempts": 3,
       "dependsOn": [
         "026"
       ],
-      "evidence": [],
+      "evidence": [
+        ".audit/phase-program/phase-027-feature-recovery-proof.json"
+      ],
       "blockers": [],
-      "history": []
+      "history": [
+        {
+          "at": "2026-09-25T12:32:28.072Z",
+          "event": "START",
+          "attempt": 1
+        },
+        {
+          "at": "2026-09-25T12:42:19.710Z",
+          "event": "PASS",
+          "evidence": ".audit/phase-program/phase-027-feature-recovery-proof.json"
+        }
+      ],
+      "startedAt": "2026-09-25T12:32:28.071Z",
+      "completedAt": "2026-09-25T12:42:19.709Z"
     },
     "028": {
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "PASSED",
+      "attempts": 1,
       "maxAttempts": 3,
       "dependsOn": [
         "027"
       ],
-      "evidence": [],
+      "evidence": [
+        ".audit/phase-program/conflict-regression/manifest.json"
+      ],
       "blockers": [],
-      "history": []
+      "history": [
+        {
+          "at": "2026-09-25T12:43:29.090Z",
+          "event": "START",
+          "attempt": 1
+        },
+        {
+          "at": "2026-09-25T12:44:13.389Z",
+          "event": "PASS",
+          "evidence": ".audit/phase-program/conflict-regression/manifest.json"
+        }
+      ],
+      "startedAt": "2026-09-25T12:43:29.089Z",
+      "completedAt": "2026-09-25T12:44:13.389Z"
     },
     "029": {
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "PASSED",
+      "attempts": 1,
       "maxAttempts": 3,
       "dependsOn": [
         "028"
       ],
-      "evidence": [],
+      "evidence": [
+        ".audit/phase-program/reconciliation-design/manifest.json"
+      ],
       "blockers": [],
-      "history": []
+      "history": [
+        {
+          "at": "2026-09-25T12:45:28.544Z",
+          "event": "START",
+          "attempt": 1
+        },
+        {
+          "at": "2026-09-25T12:45:54.579Z",
+          "event": "PASS",
+          "evidence": ".audit/phase-program/reconciliation-design/manifest.json"
+        }
+      ],
+      "startedAt": "2026-09-25T12:45:28.543Z",
+      "completedAt": "2026-09-25T12:45:54.578Z"
     },
     "030": {
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "PASSED",
+      "attempts": 1,
       "maxAttempts": 3,
       "dependsOn": [
         "029"
       ],
-      "evidence": [],
+      "evidence": [
+        ".ai/autonomous-program/CANONICAL_DOMAIN_TAXONOMY.json"
+      ],
       "blockers": [],
-      "history": []
+      "history": [
+        {
+          "at": "2026-09-25T12:48:07.424Z",
+          "event": "START",
+          "attempt": 1
+        },
+        {
+          "at": "2026-09-25T12:48:07.653Z",
+          "event": "PASS",
+          "evidence": ".ai/autonomous-program/CANONICAL_DOMAIN_TAXONOMY.json"
+        }
+      ],
+      "startedAt": "2026-09-25T12:48:07.423Z",
+      "completedAt": "2026-09-25T12:48:07.653Z"
     },
     "031": {
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "PASSED",
+      "attempts": 1,
       "maxAttempts": 3,
       "dependsOn": [
         "030"
       ],
-      "evidence": [],
+      "evidence": [
+        ".ai/autonomous-program/SOFTWARE_ANATOMY.json"
+      ],
       "blockers": [],
-      "history": []
+      "history": [
+        {
+          "at": "2026-09-25T12:49:35.736Z",
+          "event": "START",
+          "attempt": 1
+        },
+        {
+          "at": "2026-09-25T12:49:35.953Z",
+          "event": "PASS",
+          "evidence": ".ai/autonomous-program/SOFTWARE_ANATOMY.json"
+        }
+      ],
+      "startedAt": "2026-09-25T12:49:35.736Z",
+      "completedAt": "2026-09-25T12:49:35.951Z"
     },
     "032": {
       "status": "PENDING",

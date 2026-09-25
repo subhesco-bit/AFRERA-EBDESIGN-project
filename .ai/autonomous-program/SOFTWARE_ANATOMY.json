@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "requiredLayers": [
+    "input",
+    "validation",
+    "context",
+    "knowledge",
+    "rules",
+    "logic",
+    "decision",
+    "workflow",
+    "storage",
+    "events",
+    "audit",
+    "learning"
+  ],
+  "crossCutting": [
+    "security",
+    "authorization",
+    "observability",
+    "resilience",
+    "idempotency",
+    "provenance"
+  ],
+  "layerContracts": {
+    "input": [
+      "sources",
+      "schema",
+      "normalization"
+    ],
+    "validation": [
+      "syntactic",
+      "semantic",
+      "business",
+      "authorization"
+    ],
+    "context": [
+      "tenant",
+      "user",
+      "role",
+      "geography",
+      "time",
+      "workflowState"
+    ],
+    "knowledge": [
+      "canonicalRecords",
+      "retrieval",
+      "referenceData",
+      "provenance"
+    ],
+    "rules": [
+      "deterministicRules",
+      "policyVersion",
+      "effectiveDates"
+    ],
+    "logic": [
+      "calculations",
+      "algorithms",
+      "transformations"
+    ],
+    "decision": [
+      "decisionId",
+      "rationale",
+      "confidence",
+      "humanReview"
+    ],
+    "workflow": [
+      "stateMachine",
+      "approvals",
+      "sla",
+      "exceptions",
+      "compensation"
+    ],
+    "storage": [
+      "systemOfRecord",
+      "repository",
+      "transactionBoundary",
+      "retention"
+    ],
+    "events": [
+      "published",
+      "consumed",
+      "schemaVersion",
+      "idempotencyKey"
+    ],
+    "audit": [
+      "actor",
+      "timestamp",
+      "before",
+      "after",
+      "evidence",
+      "correlationId"
+    ],
+    "learning": [
+      "feedback",
+      "evaluation",
+      "drift",
+      "modelOrRuleUpdateAuthority"
+    ]
+  },
+  "rules": [
+    "A completed business module declares every required layer.",
+    "A layer may be not-applicable only with explicit rationale and reviewer.",
+    "LLM output cannot replace deterministic validation, calculation, authorization, storage or audit responsibilities.",
+    "Canonical business state must identify a system of record.",
+    "Decision-producing modules must expose rationale/evidence appropriate to the decision risk.",
+    "Workflow mutations must be idempotent or compensatable.",
+    "Every event and audit record carries correlation/provenance information."
+  ]
+}

@@ -8,7 +8,7 @@ function runServiceHarness(extraSetup = '') {
     const fs = require('fs');
     const os = require('os');
     const path = require('path');
-    const Service = require('../modules/M645100_LIBRARYKNOWLEDGE/backend/service.js');
+    const Service = require('./modules/M645100_LIBRARYKNOWLEDGE/backend/service.js');
 
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'library-knowledge-'));
     const libraryRoot = path.join(root, '_EBDESIGN_LIBRARY');
