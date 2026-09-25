@@ -14,6 +14,9 @@ router.use(authMiddleware);
 router.use(apiLimiter);
 
 router.get('/status', productMediaAIController.getProviderStatus);
+router.get('/registry/status', productMediaAIController.getMediaRegistryStatus);
+router.get('/coverage', productMediaAIController.getMediaCoverage);
+router.get('/products/:productId/media-candidates', productMediaAIController.getProductMediaCandidates);
 router.post('/products/:productId/image', productMediaAIController.generateProductImage);
 router.post('/products/:productId/video-script', productMediaAIController.buildNutrientVideoScript);
 router.post('/products/:productId/video', productMediaAIController.generateProductVideo);

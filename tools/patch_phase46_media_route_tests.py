@@ -1,18 +1,14 @@
-const express = require('express');
-const request = require('supertest');
-
-jest.mock('../middleware/auth', () => ({
-  authMiddleware: (req, _res, next) => {
-    req.user = { id: 'test-user' };
-    next();
-  },
+from pathlib import Path
+p=Path(r"C:\Users\DIYA GOEL\Downloads\EBDESIGN\backend\src\tests\productMediaAIRoutes.test.js")
+t=p.read_text(encoding="utf-8")
+old="""jest.mock('../controllers/productMediaAIController', () => ({
+  getProviderStatus: (_req, res) => res.json({ success: true, data: { imageProviders: [] } }),
+  generateProductImage: (req, res) => res.json({ success: true, data: { productId: req.params.productId } }),
+  buildNutrientVideoScript: (req, res) => res.json({ success: true, data: { productId: req.params.productId } }),
+  generateProductVideo: (req, res) => res.json({ success: true, data: { productId: req.params.productId } }),
 }));
-
-jest.mock('../middleware/rateLimiter', () => ({
-  apiLimiter: (_req, _res, next) => next(),
-}));
-
-jest.mock('../controllers/productMediaAIController', () => ({
+"""
+new="""jest.mock('../controllers/productMediaAIController', () => ({
   getProviderStatus: (_req, res) => res.json({ success: true, data: { imageProviders: [] } }),
   getMediaRegistryStatus: (_req, res) => res.json({ success: true, data: { mappingCount: 14 } }),
   getMediaCoverage: (_req, res) => res.json({ success: true, data: { totalProducts: 1171, productionClearedProducts: 0 } }),
@@ -21,25 +17,10 @@ jest.mock('../controllers/productMediaAIController', () => ({
   buildNutrientVideoScript: (req, res) => res.json({ success: true, data: { productId: req.params.productId } }),
   generateProductVideo: (req, res) => res.json({ success: true, data: { productId: req.params.productId } }),
 }));
-
-const mediaRoutes = require('../routes/productMediaAIRoutes');
-
-function createApp() {
-  const app = express();
-  app.use(express.json());
-  app.use('/media', mediaRoutes);
-  return app;
-}
-
-describe('product media AI routes', () => {
-  it('exposes provider status behind authentication', async () => {
-    const response = await request(createApp()).get('/media/status');
-
-    expect(response.status).toBe(200);
-    expect(response.body.data.imageProviders).toEqual([]);
-  });
-
-
+"""
+if old not in t: raise RuntimeError("controller mock block missing")
+t=t.replace(old,new,1)
+insert="""
   it('exposes governed recovered-media coverage', async () => {
     const response = await request(createApp()).get('/media/coverage');
     expect(response.status).toBe(200);
@@ -53,13 +34,10 @@ describe('product media AI routes', () => {
     expect(response.body.productId).toBe('NEP-123');
     expect(response.body.candidates).toEqual([]);
   });
-
-  it('delegates image generation with the product identifier', async () => {
-    const response = await request(createApp())
-      .post('/media/products/product-123/image')
-      .send({ prompt: 'clean product photograph' });
-
-    expect(response.status).toBe(200);
-    expect(response.body.data.productId).toBe('product-123');
-  });
-});
+"""
+anchor="  it('delegates image generation with the product identifier', async () => {"
+if insert.strip() not in t:
+    if anchor not in t: raise RuntimeError("test insertion anchor missing")
+    t=t.replace(anchor,insert+"\n"+anchor,1)
+p.write_text(t,encoding="utf-8")
+print("product media route tests extended")

@@ -4,9 +4,45 @@
  */
 
 const productMediaAIService = require('../services/legacy/productMediaAIService');
+const productMediaRegistryService = require('../services/catalog/productMediaRegistryService');
 const { logger } = require('../utils/logger');
 
 const productMediaAIController = {
+  getMediaRegistryStatus: async (req, res) => {
+    try {
+      res.json({ success: true, data: productMediaRegistryService.status() });
+    } catch (error) {
+      logger.error('Error getting product media registry status', { error: error.message });
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+
+  getProductMediaCandidates: async (req, res) => {
+    try {
+      const productId = req.params.productId;
+      const candidates = productMediaRegistryService.getCandidates(productId);
+      res.json({
+        success: true,
+        productId,
+        productionEligible: productMediaRegistryService.hasProductionMedia(productId),
+        candidates,
+        truthStatus: 'RECOVERED_CANDIDATES_REQUIRE_LICENSE_AND_PROVENANCE_CLEARANCE',
+      });
+    } catch (error) {
+      logger.error('Error getting product media candidates', { error: error.message });
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+
+  getMediaCoverage: async (req, res) => {
+    try {
+      res.json({ success: true, data: productMediaRegistryService.coverage() });
+    } catch (error) {
+      logger.error('Error getting product media coverage', { error: error.message });
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+
   getProviderStatus: async (req, res) => {
     try {
       res.json({

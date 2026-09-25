@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "mode": "AUTO_SEQUENTIAL_PHASES_BATCH_PARALLEL_WITHIN_PHASE",
+  "invariantProcess": [
+    "DEEP RESEARCH",
+    "CURRENT-STATE FORENSICS",
+    "GAP ANALYSIS",
+    "ENHANCED DESIGN",
+    "IMPLEMENTATION",
+    "UNIT TEST",
+    "INTEGRATION TEST",
+    "REGRESSION",
+    "SECURITY/PERFORMANCE CHECK",
+    "EVIDENCE PACK",
+    "COMMIT/CHECKPOINT",
+    "PHASE GATE",
+    "AUTO-NEXT"
+  ],
+  "batchingRules": [
+    "Never skip a phase or gate.",
+    "Batch file discovery/hash/classification across many files in one deterministic run.",
+    "Process every file through inventory/classification even when deep inspection is only needed for unique/conflicting/unknown families.",
+    "Reuse prior evidence only when SHA-256/content identity is unchanged.",
+    "Parallelize independent research, code analysis, implementation preparation, and test groups within the same phase.",
+    "Merge parallel outputs only after reconciliation checks detect conflicts and provenance is retained.",
+    "Run focused tests in parallel where test isolation permits; retain deterministic rerun on any failure.",
+    "No destructive cleanup until the relevant file family has been inspected/reconciled and rollback evidence exists.",
+    "No PASS if any mandatory sub-lane is incomplete, failed, ambiguous, or lacks evidence.",
+    "Checkpoint/push in verified phase batches while preserving the 25MB staged-file guard and excluding unrelated protected files."
+  ],
+  "lanes": [
+    {
+      "id": "A",
+      "name": "forensics",
+      "work": [
+        "inventory",
+        "hashing",
+        "duplicate-family",
+        "actual-file inspection",
+        "old/consolidated/backups/history reconciliation"
+      ]
+    },
+    {
+      "id": "B",
+      "name": "research",
+      "work": [
+        "current authoritative web/standards/API research",
+        "benchmarking",
+        "industry/domain comparison"
+      ]
+    },
+    {
+      "id": "C",
+      "name": "implementation",
+      "work": [
+        "schema",
+        "service",
+        "route",
+        "UI",
+        "agent",
+        "workflow",
+        "integration changes"
+      ]
+    },
+    {
+      "id": "D",
+      "name": "verification",
+      "work": [
+        "unit",
+        "integration",
+        "regression",
+        "security",
+        "performance",
+        "privacy",
+        "size guard"
+      ]
+    },
+    {
+      "id": "E",
+      "name": "evidence",
+      "work": [
+        "manifest",
+        "proof hashes",
+        "phase evidence",
+        "git checkpoint",
+        "remote verification"
+      ]
+    }
+  ],
+  "conflictPolicy": "Any disagreement between lanes is resolved before phase PASS; evidence wins over assumptions.",
+  "userSafetyInvariants": [
+    "no deletion before deep inspection/reconciliation",
+    "no file loss",
+    "no hidden phase skipping",
+    "no fake capability/readiness",
+    "no silent FAIL-to-PASS conversion",
+    "no file over 25MB committed",
+    "no trust in indexes without source-file evidence"
+  ]
+}

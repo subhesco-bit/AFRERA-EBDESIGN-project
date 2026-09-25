@@ -224,11 +224,13 @@ async function requestProductVideoGeneration(productId) {
   return { productId, script, ...result, recordedStatus: status };
 }
 
+const modernImageGeneration = require('../media/productImageGenerationService');
+
 module.exports = {
-  listImageProviders,
-  callImageProvider,
-  requestProductImageGeneration,
-  requestProductCartoonGeneration,
+  listImageProviders: () => modernImageGeneration.listProviders(),
+  callImageProvider: (...args) => modernImageGeneration.callProvider(...args),
+  requestProductImageGeneration: (...args) => modernImageGeneration.requestProductImageGeneration(...args),
+  requestProductCartoonGeneration: (...args) => modernImageGeneration.requestProductCartoonGeneration(...args),
   listVideoProviders,
   callVideoProvider,
   buildNutrientComparisonScript,
