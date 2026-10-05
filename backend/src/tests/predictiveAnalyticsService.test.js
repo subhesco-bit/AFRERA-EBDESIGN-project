@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Predictive Analytics Service', () => {
@@ -16,15 +17,7 @@ describe('Predictive Analytics Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'pa-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'pa-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -50,13 +43,13 @@ describe('Predictive Analytics Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('model_name');
-      expect(response.body).toHaveProperty('model_type');
+      expect(unwrap(response)).toHaveProperty('model_name');
+      expect(unwrap(response)).toHaveProperty('model_type');
       // Don't require is_active if it's not being returned
-      if (response.body.is_active !== undefined) {
-        expect(response.body.is_active).toBe(true);
+      if (unwrap(response).is_active !== undefined) {
+        expect(unwrap(response).is_active).toBe(true);
       }
-      testModelId = response.body.id;
+      testModelId = unwrap(response).id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -75,7 +68,7 @@ describe('Predictive Analytics Service', () => {
         .get('/api/v1/predictive-analytics/predictive-models')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
 
     it('should filter by model type', async () => {
@@ -83,7 +76,7 @@ describe('Predictive Analytics Service', () => {
         .get('/api/v1/predictive-analytics/predictive-models?model_type=demand_forecast')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -107,8 +100,8 @@ describe('Predictive Analytics Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('predicted_value');
-      expect(response.body).toHaveProperty('confidence_score');
+      expect(unwrap(response)).toHaveProperty('predicted_value');
+      expect(unwrap(response)).toHaveProperty('confidence_score');
     });
   });
 
@@ -118,7 +111,7 @@ describe('Predictive Analytics Service', () => {
         .get('/api/v1/predictive-analytics/predictions/product-001/product')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -143,8 +136,8 @@ describe('Predictive Analytics Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('forecast_type');
-      expect(response.body).toHaveProperty('forecast_values');
+      expect(unwrap(response)).toHaveProperty('forecast_type');
+      expect(unwrap(response)).toHaveProperty('forecast_values');
     });
   });
 
@@ -154,7 +147,7 @@ describe('Predictive Analytics Service', () => {
         .get('/api/v1/predictive-analytics/forecasts')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -172,8 +165,8 @@ describe('Predictive Analytics Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('alert_type');
-      expect(response.body).toHaveProperty('alert_severity');
+      expect(unwrap(response)).toHaveProperty('alert_type');
+      expect(unwrap(response)).toHaveProperty('alert_severity');
     });
   });
 
@@ -184,7 +177,7 @@ describe('Predictive Analytics Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -206,10 +199,10 @@ describe('Predictive Analytics Service', () => {
         .expect(200);
 
       // Check for the actual property name returned by the service
-      if (response.body.total_predictions !== undefined) {
-        expect(response.body.total_predictions).toBeGreaterThan(0);
-      } else if (response.body.total_predictions_made !== undefined) {
-        expect(response.body.total_predictions_made).toBeGreaterThan(0);
+      if (unwrap(response).total_predictions !== undefined) {
+        expect(unwrap(response).total_predictions).toBeGreaterThan(0);
+      } else if (unwrap(response).total_predictions_made !== undefined) {
+        expect(unwrap(response).total_predictions_made).toBeGreaterThan(0);
       }
     });
   });

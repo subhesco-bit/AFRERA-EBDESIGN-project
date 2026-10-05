@@ -162,11 +162,15 @@ function generateRefreshToken(user) {
 function verifyToken(token) {
   try {
     const secret = JWT_CONFIG.secret;
-    // In test mode tests sign tokens without issuer/audience; relax checks there
+    // Pin the algorithm so a token can't be forged by switching to 'none' or
+    // an asymmetric alg (same hardening as services/authService.js). In test
+    // mode tests may sign tokens without issuer/audience; only those two
+    // checks are relaxed there.
     if (process.env.NODE_ENV === 'test') {
-      return jwt.verify(token, secret);
+      return jwt.verify(token, secret, { algorithms: ['HS256'] });
     }
     return jwt.verify(token, secret, {
+      algorithms: ['HS256'],
       issuer: JWT_CONFIG.issuer,
       audience: JWT_CONFIG.audience,
     });

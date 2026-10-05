@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('AR/VR Experience Service', () => {
@@ -16,20 +17,7 @@ describe('AR/VR Experience Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'arvr-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
-    // TEMP DIAGNOSTIC 2026-08-30: registerResponse.body.token has been coming
-    // back undefined in CI, causing every subsequent request to 401. Logging
-    // the actual status/body to find the real cause before guessing further.
-    // eslint-disable-next-line no-console
-    console.log('DIAG registerResponse', registerResponse.status, JSON.stringify(registerResponse.body));
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'arvr-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -54,10 +42,10 @@ describe('AR/VR Experience Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('experience_name');
-      expect(response.body).toHaveProperty('experience_type');
-      expect(response.body.is_published).toBe(false);
-      testExperienceId = response.body.id;
+      expect(unwrap(response)).toHaveProperty('experience_name');
+      expect(unwrap(response)).toHaveProperty('experience_type');
+      expect(unwrap(response).is_published).toBe(false);
+      testExperienceId = unwrap(response).id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -76,7 +64,7 @@ describe('AR/VR Experience Service', () => {
         .get('/api/v1/ar-vr/experiences')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
 
     it('should filter by experience type', async () => {
@@ -84,7 +72,7 @@ describe('AR/VR Experience Service', () => {
         .get('/api/v1/ar-vr/experiences?experience_type=ar')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -95,7 +83,7 @@ describe('AR/VR Experience Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body.is_published).toBe(true);
+      expect(unwrap(response).is_published).toBe(true);
     });
   });
 
@@ -115,8 +103,8 @@ describe('AR/VR Experience Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('asset_name');
-      expect(response.body).toHaveProperty('asset_type');
+      expect(unwrap(response)).toHaveProperty('asset_name');
+      expect(unwrap(response)).toHaveProperty('asset_type');
     });
   });
 
@@ -127,7 +115,7 @@ describe('AR/VR Experience Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -147,8 +135,8 @@ describe('AR/VR Experience Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('point_name');
-      expect(response.body).toHaveProperty('point_type');
+      expect(unwrap(response)).toHaveProperty('point_name');
+      expect(unwrap(response)).toHaveProperty('point_type');
     });
   });
 
@@ -158,7 +146,7 @@ describe('AR/VR Experience Service', () => {
         .get(`/api/v1/ar-vr/experiences/${testExperienceId}/interaction-points`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -175,8 +163,8 @@ describe('AR/VR Experience Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('session_type');
-      expect(response.body).toHaveProperty('device_type');
+      expect(unwrap(response)).toHaveProperty('session_type');
+      expect(unwrap(response)).toHaveProperty('device_type');
     });
   });
 
@@ -190,7 +178,7 @@ describe('AR/VR Experience Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('ended_at');
+      expect(unwrap(response)).toHaveProperty('ended_at');
     });
   });
 
@@ -211,7 +199,7 @@ describe('AR/VR Experience Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('total_sessions');
+      expect(unwrap(response)).toHaveProperty('total_sessions');
     });
   });
 });

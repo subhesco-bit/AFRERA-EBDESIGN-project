@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Organic Traceability Service', () => {
@@ -17,15 +18,8 @@ describe('Organic Traceability Service', () => {
     });
 
     // Create test user and get auth token
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'organic-test@example.com',
-        password: 'Test123!@#',
-        role: 'farmer',
-      });
 
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'organic-test@example.com', role: 'farmer' }));
   });
 
   afterAll(async () => {
@@ -38,10 +32,10 @@ describe('Organic Traceability Service', () => {
         .get('/api/v1/organic-traceability/standards')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
-      expect(response.body[0]).toHaveProperty('code');
-      expect(response.body[0]).toHaveProperty('name');
+      expect(unwrap(response)).toBeInstanceOf(Array);
+      expect(unwrap(response).length).toBeGreaterThan(0);
+      expect(unwrap(response)[0]).toHaveProperty('code');
+      expect(unwrap(response)[0]).toHaveProperty('name');
     });
   });
 
@@ -61,11 +55,11 @@ describe('Organic Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('farm_id');
-      expect(response.body).toHaveProperty('farm_name');
-      expect(response.body).toHaveProperty('certification_status');
-      expect(response.body.certification_status).toBe('pending');
-      testFarmId = response.body.id;
+      expect(unwrap(response)).toHaveProperty('farm_id');
+      expect(unwrap(response)).toHaveProperty('farm_name');
+      expect(unwrap(response)).toHaveProperty('certification_status');
+      expect(unwrap(response).certification_status).toBe('pending');
+      testFarmId = unwrap(response).id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -85,7 +79,7 @@ describe('Organic Traceability Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -106,8 +100,8 @@ describe('Organic Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('plot_number');
-      expect(response.body).toHaveProperty('area_hectares');
+      expect(unwrap(response)).toHaveProperty('plot_number');
+      expect(unwrap(response)).toHaveProperty('area_hectares');
     });
   });
 
@@ -133,9 +127,9 @@ describe('Organic Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('crop_name');
-      expect(response.body).toHaveProperty('status');
-      expect(response.body.status).toBe('growing');
+      expect(unwrap(response)).toHaveProperty('crop_name');
+      expect(unwrap(response)).toHaveProperty('status');
+      expect(unwrap(response).status).toBe('growing');
     });
   });
 
@@ -156,8 +150,8 @@ describe('Organic Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('harvest_number');
-      expect(response.body).toHaveProperty('batch_number');
+      expect(unwrap(response)).toHaveProperty('harvest_number');
+      expect(unwrap(response)).toHaveProperty('batch_number');
     });
   });
 
@@ -179,8 +173,8 @@ describe('Organic Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('lot_number');
-      expect(response.body).toHaveProperty('current_holder_type');
+      expect(unwrap(response)).toHaveProperty('lot_number');
+      expect(unwrap(response)).toHaveProperty('current_holder_type');
     });
   });
 
@@ -208,7 +202,7 @@ describe('Organic Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('qr_code');
+      expect(unwrap(response)).toHaveProperty('qr_code');
     });
   });
 
@@ -218,8 +212,8 @@ describe('Organic Traceability Service', () => {
         .get('/api/v1/organic-traceability/consumer-transparency/qr/QR-TEST-001')
         .expect(200);
 
-      expect(response.body).toHaveProperty('qr_code');
-      expect(response.body).toHaveProperty('farmer_name');
+      expect(unwrap(response)).toHaveProperty('qr_code');
+      expect(unwrap(response)).toHaveProperty('farmer_name');
     });
 
     it('should return 404 for non-existent QR code', async () => {
@@ -244,9 +238,9 @@ describe('Organic Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('alert_type');
-      expect(response.body).toHaveProperty('severity');
-      expect(response.body).toHaveProperty('investigation_status');
+      expect(unwrap(response)).toHaveProperty('alert_type');
+      expect(unwrap(response)).toHaveProperty('severity');
+      expect(unwrap(response)).toHaveProperty('investigation_status');
     });
   });
 });

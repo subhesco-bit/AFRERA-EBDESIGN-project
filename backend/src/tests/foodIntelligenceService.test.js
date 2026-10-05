@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Food Intelligence Service', () => {
@@ -16,15 +17,7 @@ describe('Food Intelligence Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'food-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'food-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -54,9 +47,9 @@ describe('Food Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('name');
-      expect(response.body).toHaveProperty('food_group');
-      testFoodItemId = response.body.id;
+      expect(unwrap(response)).toHaveProperty('name');
+      expect(unwrap(response)).toHaveProperty('food_group');
+      testFoodItemId = unwrap(response).id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -75,7 +68,7 @@ describe('Food Intelligence Service', () => {
         .get('/api/v1/food-intelligence/food-items/search?q=rice')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
 
     it('should return 400 without query parameter', async () => {
@@ -105,8 +98,8 @@ describe('Food Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('overall_quality_score');
-      expect(response.body).toHaveProperty('quality_grade');
+      expect(unwrap(response)).toHaveProperty('overall_quality_score');
+      expect(unwrap(response)).toHaveProperty('quality_grade');
     });
   });
 
@@ -117,7 +110,7 @@ describe('Food Intelligence Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -138,7 +131,7 @@ describe('Food Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('result_status');
+      expect(unwrap(response)).toHaveProperty('result_status');
     });
   });
 
@@ -149,7 +142,7 @@ describe('Food Intelligence Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -170,8 +163,8 @@ describe('Food Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('freshness_status');
-      expect(response.body).toHaveProperty('estimated_remaining_days');
+      expect(unwrap(response)).toHaveProperty('freshness_status');
+      expect(unwrap(response)).toHaveProperty('estimated_remaining_days');
     });
   });
 
@@ -193,8 +186,8 @@ describe('Food Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('recall_number');
-      expect(response.body.recall_status).toBe('active');
+      expect(unwrap(response)).toHaveProperty('recall_number');
+      expect(unwrap(response).recall_status).toBe('active');
     });
   });
 
@@ -204,7 +197,7 @@ describe('Food Intelligence Service', () => {
         .get('/api/v1/food-intelligence/food-recalls/active')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -228,7 +221,7 @@ describe('Food Intelligence Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('total_inspections');
+      expect(unwrap(response)).toHaveProperty('total_inspections');
     });
   });
 });

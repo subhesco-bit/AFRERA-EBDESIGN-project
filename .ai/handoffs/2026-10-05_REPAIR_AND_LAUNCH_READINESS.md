@@ -121,20 +121,40 @@ Result: lint clean; frontend build + 55/55; 409/409 migrations fresh; backend
 20 failing suites (was 24 at the first PR commit, 28 at `0830fb7`), no new
 failures; production boot; claim status/payout and escrow now 401 without auth.
 
-## Not fixed — needs a decision (see PR description)
+## Follow-up 2: remaining failures and security gaps
+
+- `/api/v1/erp/status` 500: `products` lacked `erp_synced_at`/`erp_reference`
+  (new migration); `syncProductToERP()` now records them like orders/farmers.
+- **Wallet routes** (`routes/walletRoutes.js`, defensive; not mounted by the
+  current `index.js`): any authenticated user could read any balance by id,
+  create wallets for others and credit arbitrary amounts to any wallet. Now:
+  own wallet or admin; add-funds admin-only with a positive amount.
+- `dual-use/authService.verifyToken()` now pins `HS256` (rejects `alg: none`).
+- `legacy/aiBackboneService.js` and `legacy/conversationalAIService.js`:
+  main's versions restored (router export, honest `source: 'fallback'`);
+  fixed `require('../../utils/logger').warn` (threw at load when an AI SDK key
+  was set but the SDK missing).
+- 15 DB-backed integration suites: `src/tests/helpers/testAuth.js` seeds an
+  active user with the needed role and signs a real token; responses are read
+  through the standard `{ success, data }` envelope (`unwrap`).
+- Rewrote `walletRoutes.test.js` and `authService.test.js` (both targeted APIs
+  that no longer/never existed); fixed a logger mock shape and an
+  order-dependent assertion.
+- Note: the restored main `index.js` mounts routes explicitly and does not
+  use `core/dynamicRouteLoader.js`, so the loader's flat-alias change is
+  currently inactive (harmless; kept for if the auto-loader is re-enabled).
+- Result: backend **808/808 suites, 1373 tests pass**; the CI `Test` step is
+  now blocking. `routes/userRoutes.js` and `routes/authRoutes.js` are unmounted
+  in-memory stubs that trust the raw bearer string as a user id; recommend
+  deleting them.
+
+## Open items
 
 1. **Account activation (product decision).** Self-registration creates
    `role: consumer, status: pending` by design (asserted by
    `authService.security.test.js`), but no activation endpoint exists, so new
-   users cannot log in. Needs either email/OTP verification or an admin
-   approval endpoint (or a decision that consumers start `active`).
-2. 14 DB-backed integration suites (`src/tests/*Service.test.js`) self-register
-   with `role: 'admin'` and expect a token. Secure registration never grants
-   that, so every call is 401. They need a test helper that seeds an admin user
-   and signs a JWT.
-3. `services/__tests__/authService.test.js` (from recovery commit `c39316f`)
-   tests functions the service never exported.
-4. `/api/v1/erp/status` 500s (`erp_synced_at` column missing).
-5. Required production secrets (the app refuses to start without them):
+   users cannot log in. Needs email/OTP verification, an admin approval
+   endpoint, or a decision that consumers start `active`.
+2. Required production secrets (the app refuses to start without them):
    `JWT_SECRET` (>=32 chars), `ENCRYPTION_KEY` (>=32), `OFFLINE_PAYMENT_SECRET`,
    `SYNC_SECRET`, and `FRONTEND_URL` or `ALLOWED_ORIGINS`.

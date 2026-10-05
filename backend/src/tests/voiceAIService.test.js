@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Voice AI Service', () => {
@@ -16,15 +17,7 @@ describe('Voice AI Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'voice-test@example.com',
-        password: 'Test123!@#',
-        role: 'consumer',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'voice-test@example.com', role: 'consumer' }));
   });
 
   afterAll(async () => {
@@ -41,10 +34,10 @@ describe('Voice AI Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('session_id');
-      expect(response.body).toHaveProperty('language');
-      expect(response.body.status).toBe('active');
-      testSessionId = response.body.session_id;
+      expect(unwrap(response)).toHaveProperty('session_id');
+      expect(unwrap(response)).toHaveProperty('language');
+      expect(unwrap(response).status).toBe('active');
+      testSessionId = unwrap(response).session_id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -65,10 +58,10 @@ describe('Voice AI Service', () => {
         .expect(200);
 
       // Check if response has body and status
-      if (response.body && response.body.status) {
-        expect(response.body.status).toBe('ended');
-        if (response.body.ended_at !== undefined) {
-          expect(response.body).toHaveProperty('ended_at');
+      if (unwrap(response) && unwrap(response).status) {
+        expect(unwrap(response).status).toBe('ended');
+        if (unwrap(response).ended_at !== undefined) {
+          expect(unwrap(response)).toHaveProperty('ended_at');
         }
       } else {
         // If body is empty or status not present, just check status was 200
@@ -90,9 +83,9 @@ describe('Voice AI Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('transcript');
-      expect(response.body).toHaveProperty('intent');
-      expect(response.body.execution_status).toBe('executed');
+      expect(unwrap(response)).toHaveProperty('transcript');
+      expect(unwrap(response)).toHaveProperty('intent');
+      expect(unwrap(response).execution_status).toBe('executed');
     });
 
     it('should return 401 without auth token', async () => {
@@ -112,7 +105,7 @@ describe('Voice AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -132,8 +125,8 @@ describe('Voice AI Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('transcript');
-      expect(response.body).toHaveProperty('confidence_score');
+      expect(unwrap(response)).toHaveProperty('transcript');
+      expect(unwrap(response)).toHaveProperty('confidence_score');
     });
   });
 
@@ -151,8 +144,8 @@ describe('Voice AI Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('response_type');
-      expect(response.body).toHaveProperty('content');
+      expect(unwrap(response)).toHaveProperty('response_type');
+      expect(unwrap(response)).toHaveProperty('content');
     });
   });
 
@@ -171,8 +164,8 @@ describe('Voice AI Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('preferred_language');
-      expect(response.body).toHaveProperty('voice_gender');
+      expect(unwrap(response)).toHaveProperty('preferred_language');
+      expect(unwrap(response)).toHaveProperty('voice_gender');
     });
   });
 
@@ -183,7 +176,7 @@ describe('Voice AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('preferred_language');
+      expect(unwrap(response)).toHaveProperty('preferred_language');
     });
   });
 
@@ -205,7 +198,7 @@ describe('Voice AI Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('total_sessions');
+      expect(unwrap(response)).toHaveProperty('total_sessions');
     });
   });
 
@@ -216,7 +209,7 @@ describe('Voice AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 });

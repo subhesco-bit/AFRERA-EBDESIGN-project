@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('IoT Integration Service', () => {
@@ -16,15 +17,7 @@ describe('IoT Integration Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'iot-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'iot-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -49,10 +42,10 @@ describe('IoT Integration Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('device_id');
-      expect(response.body).toHaveProperty('device_name');
-      expect(response.body.status).toBe('active');
-      testDeviceId = response.body.id;
+      expect(unwrap(response)).toHaveProperty('device_id');
+      expect(unwrap(response)).toHaveProperty('device_name');
+      expect(unwrap(response).status).toBe('active');
+      testDeviceId = unwrap(response).id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -73,7 +66,7 @@ describe('IoT Integration Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
 
     it('should filter by device type', async () => {
@@ -82,7 +75,7 @@ describe('IoT Integration Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -98,8 +91,8 @@ describe('IoT Integration Service', () => {
         })
         .expect(200);
 
-      expect(response.body.battery_level).toBe(85);
-      expect(response.body.signal_strength).toBe(90);
+      expect(unwrap(response).battery_level).toBe(85);
+      expect(unwrap(response).signal_strength).toBe(90);
     });
   });
 
@@ -118,8 +111,8 @@ describe('IoT Integration Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('sensor_type');
-      expect(response.body).toHaveProperty('sensor_value');
+      expect(unwrap(response)).toHaveProperty('sensor_type');
+      expect(unwrap(response)).toHaveProperty('sensor_value');
     });
   });
 
@@ -129,7 +122,7 @@ describe('IoT Integration Service', () => {
         .get(`/api/v1/iot-integration/sensor-data/${testDeviceId}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -145,8 +138,8 @@ describe('IoT Integration Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('command_type');
-      expect(response.body.status).toBe('sent');
+      expect(unwrap(response)).toHaveProperty('command_type');
+      expect(unwrap(response).status).toBe('sent');
     });
   });
 
@@ -157,7 +150,7 @@ describe('IoT Integration Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -175,8 +168,8 @@ describe('IoT Integration Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('alert_type');
-      expect(response.body).toHaveProperty('alert_severity');
+      expect(unwrap(response)).toHaveProperty('alert_type');
+      expect(unwrap(response)).toHaveProperty('alert_severity');
     });
   });
 
@@ -187,7 +180,7 @@ describe('IoT Integration Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -198,7 +191,7 @@ describe('IoT Integration Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('health_status');
+      expect(unwrap(response)).toHaveProperty('health_status');
     });
   });
 
@@ -221,7 +214,7 @@ describe('IoT Integration Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('total_devices');
+      expect(unwrap(response)).toHaveProperty('total_devices');
     });
   });
 });

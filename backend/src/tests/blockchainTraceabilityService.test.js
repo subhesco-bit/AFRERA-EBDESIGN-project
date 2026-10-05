@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Blockchain Traceability Service', () => {
@@ -16,15 +17,7 @@ describe('Blockchain Traceability Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'blockchain-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'blockchain-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -52,8 +45,8 @@ describe('Blockchain Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('transaction_hash');
-      expect(response.body.status).toBe('confirmed');
+      expect(unwrap(response)).toHaveProperty('transaction_hash');
+      expect(unwrap(response).status).toBe('confirmed');
     });
 
     it('should return 401 without auth token', async () => {
@@ -72,7 +65,7 @@ describe('Blockchain Traceability Service', () => {
         .get(`/api/v1/blockchain-traceability/blockchain-transactions/${testTransactionHash}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('transaction_hash');
+      expect(unwrap(response)).toHaveProperty('transaction_hash');
     });
 
     it('should return 404 for non-existent transaction', async () => {
@@ -99,8 +92,8 @@ describe('Blockchain Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('event_type');
-      expect(response.body.is_verified).toBe(true);
+      expect(unwrap(response)).toHaveProperty('event_type');
+      expect(unwrap(response).is_verified).toBe(true);
     });
 
     it('should return 401 without auth token', async () => {
@@ -119,7 +112,7 @@ describe('Blockchain Traceability Service', () => {
         .get('/api/v1/blockchain-traceability/traceability-events/test-product-id')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -139,8 +132,8 @@ describe('Blockchain Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('holder_type');
-      expect(response.body.is_verified).toBe(true);
+      expect(unwrap(response)).toHaveProperty('holder_type');
+      expect(unwrap(response).is_verified).toBe(true);
     });
   });
 
@@ -150,8 +143,8 @@ describe('Blockchain Traceability Service', () => {
         .get('/api/v1/blockchain-traceability/chain-of-custody/verify/test-product-id')
         .expect(200);
 
-      expect(response.body).toHaveProperty('is_complete');
-      expect(response.body).toHaveProperty('chain');
+      expect(unwrap(response)).toHaveProperty('is_complete');
+      expect(unwrap(response)).toHaveProperty('chain');
     });
   });
 
@@ -174,8 +167,8 @@ describe('Blockchain Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('certificate_number');
-      expect(response.body.is_revoked).toBe(false);
+      expect(unwrap(response)).toHaveProperty('certificate_number');
+      expect(unwrap(response).is_revoked).toBe(false);
     });
   });
 
@@ -185,7 +178,7 @@ describe('Blockchain Traceability Service', () => {
         .get('/api/v1/blockchain-traceability/blockchain-certificates/verify/CERT-2024-001')
         .expect(200);
 
-      expect(response.body).toHaveProperty('certificate_type');
+      expect(unwrap(response)).toHaveProperty('certificate_type');
     });
 
     it('should return 404 for non-existent certificate', async () => {
@@ -207,8 +200,8 @@ describe('Blockchain Traceability Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('request_type');
-      expect(response.body.verification_status).toBe('pending');
+      expect(unwrap(response)).toHaveProperty('request_type');
+      expect(unwrap(response).verification_status).toBe('pending');
     });
   });
 
@@ -231,7 +224,7 @@ describe('Blockchain Traceability Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('total_transactions');
+      expect(unwrap(response)).toHaveProperty('total_transactions');
     });
   });
 });

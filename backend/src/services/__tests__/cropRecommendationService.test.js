@@ -9,9 +9,11 @@
 jest.mock('../../core/claudeAICoordinator', () => ({
   coordinateAIRequest: jest.fn(),
 }));
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(), error: jest.fn(), warn: jest.fn(),
-}));
+// utils/logger exports { logger, ... }; the service destructures `logger`.
+jest.mock('../../utils/logger', () => {
+  const logger = { info: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+  return { logger, ...logger };
+});
 
 const claudeAICoordinator = require('../../core/claudeAICoordinator');
 const cropRecommendationService = require('../cropRecommendationService');

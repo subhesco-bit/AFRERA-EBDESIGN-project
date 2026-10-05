@@ -107,9 +107,11 @@ describe('User Routes', () => {
     });
 
     it('should set first address as default', async () => {
+      // A user with no addresses yet: the earlier tests in this block already
+      // added one for `userToken`, so reusing it made this test order-dependent.
       const response = await request(app)
         .post('/users/addresses')
-        .set('Authorization', userToken)
+        .set('Authorization', 'Bearer user-with-no-addresses')
         .send({
           street: '456 Oak Ave',
           city: 'Mumbai',

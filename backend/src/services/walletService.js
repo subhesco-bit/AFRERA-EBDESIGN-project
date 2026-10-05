@@ -52,6 +52,15 @@ class WalletService {
   }
 
   /**
+   * Owner (user_id) of a wallet, or null if it does not exist. Used by the
+   * controller to enforce that callers only touch their own wallets.
+   */
+  async getWalletOwner(walletId) {
+    const result = await this.db.query('SELECT user_id FROM wallets WHERE wallet_id = $1', [walletId]);
+    return result.rows[0] ? result.rows[0].user_id : null;
+  }
+
+  /**
    * Create a new wallet for a user
    */
   async createWallet(walletData) {

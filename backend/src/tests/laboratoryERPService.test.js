@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Laboratory ERP Service', () => {
@@ -17,15 +18,8 @@ describe('Laboratory ERP Service', () => {
     });
 
     // Create test user and get auth token
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'lab-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
 
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'lab-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -54,9 +48,9 @@ describe('Laboratory ERP Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('lab_code');
-      expect(response.body).toHaveProperty('lab_name');
-      expect(response.body.nabl_accredited).toBe(true);
+      expect(unwrap(response)).toHaveProperty('lab_code');
+      expect(unwrap(response)).toHaveProperty('lab_name');
+      expect(unwrap(response).nabl_accredited).toBe(true);
     });
 
     it('should return 401 without auth token', async () => {
@@ -76,7 +70,7 @@ describe('Laboratory ERP Service', () => {
         .get('/api/v1/laboratory-erp/laboratories')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -86,8 +80,8 @@ describe('Laboratory ERP Service', () => {
         .get('/api/v1/laboratory-erp/test-categories')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
+      expect(unwrap(response)).toBeInstanceOf(Array);
+      expect(unwrap(response).length).toBeGreaterThan(0);
     });
   });
 
@@ -97,7 +91,7 @@ describe('Laboratory ERP Service', () => {
         .get('/api/v1/laboratory-erp/test-methods')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
 
     it('should return test methods filtered by category', async () => {
@@ -105,7 +99,7 @@ describe('Laboratory ERP Service', () => {
         .get('/api/v1/laboratory-erp/test-methods?category_id=1')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -129,10 +123,10 @@ describe('Laboratory ERP Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('sample_number');
-      expect(response.body).toHaveProperty('status');
-      expect(response.body.status).toBe('received');
-      testSampleId = response.body.id;
+      expect(unwrap(response)).toHaveProperty('sample_number');
+      expect(unwrap(response)).toHaveProperty('status');
+      expect(unwrap(response).status).toBe('received');
+      testSampleId = unwrap(response).id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -152,7 +146,7 @@ describe('Laboratory ERP Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -168,8 +162,8 @@ describe('Laboratory ERP Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('status');
-      expect(response.body.status).toBe('assigned');
+      expect(unwrap(response)).toHaveProperty('status');
+      expect(unwrap(response).status).toBe('assigned');
     });
   });
 
@@ -184,7 +178,7 @@ describe('Laboratory ERP Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('status');
+      expect(unwrap(response)).toHaveProperty('status');
     });
   });
 
@@ -199,9 +193,9 @@ describe('Laboratory ERP Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('report_number');
-      expect(response.body).toHaveProperty('status');
-      expect(response.body.status).toBe('draft');
+      expect(unwrap(response)).toHaveProperty('report_number');
+      expect(unwrap(response)).toHaveProperty('status');
+      expect(unwrap(response).status).toBe('draft');
     });
   });
 
@@ -218,7 +212,7 @@ describe('Laboratory ERP Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('status');
+      expect(unwrap(response)).toHaveProperty('status');
     });
   });
 
@@ -229,7 +223,7 @@ describe('Laboratory ERP Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 });

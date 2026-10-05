@@ -614,8 +614,8 @@ async function reportFraud(data) {
   try {
     const result = await pool.query(
       `INSERT INTO organic_fraud_alerts 
-       (alert_type, severity, entity_type, entity_id, description, evidence)
-       VALUES ($1, $2, $3, $4, $5, $6)
+       (alert_type, severity, entity_type, entity_id, description, evidence, investigation_status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
        RETURNING *`,
       [
         alert_type,

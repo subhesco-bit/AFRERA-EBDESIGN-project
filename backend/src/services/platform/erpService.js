@@ -138,6 +138,13 @@ async function syncProductToERP(productId, erpType = 'sap') {
       erpResponse = await syncToCustomERP('product', erpProduct);
     }
     
+    // Record the ERP reference like orders/farmers/assets do, so
+    // getSyncStatus() and the bulk "unsynced products" sync can see it.
+    await pg.query(
+      'UPDATE products SET erp_reference = $1, erp_synced_at = NOW() WHERE id = $2',
+      [erpResponse.materialId || erpResponse.itemId || null, productId]
+    );
+
     // Log synchronization
     await logSyncOperation('product', productId, erpType, 'success', erpResponse);
     

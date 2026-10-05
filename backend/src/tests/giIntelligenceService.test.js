@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('GI Intelligence Service', () => {
@@ -16,15 +17,7 @@ describe('GI Intelligence Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'gi-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'gi-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -53,9 +46,9 @@ describe('GI Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('gi_name');
-      expect(response.body).toHaveProperty('gi_registration_number');
-      testGIProductId = response.body.id;
+      expect(unwrap(response)).toHaveProperty('gi_name');
+      expect(unwrap(response)).toHaveProperty('gi_registration_number');
+      testGIProductId = unwrap(response).id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -74,7 +67,7 @@ describe('GI Intelligence Service', () => {
         .get('/api/v1/gi-intelligence/gi-products')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
 
     it('should return GI products filtered by state', async () => {
@@ -82,7 +75,7 @@ describe('GI Intelligence Service', () => {
         .get('/api/v1/gi-intelligence/gi-products?state=Assam')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -101,8 +94,8 @@ describe('GI Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('registration_number');
-      expect(response.body.certification_status).toBe('active');
+      expect(unwrap(response)).toHaveProperty('registration_number');
+      expect(unwrap(response).certification_status).toBe('active');
     });
   });
 
@@ -112,7 +105,7 @@ describe('GI Intelligence Service', () => {
         .get(`/api/v1/gi-intelligence/gi-products/${testGIProductId}/producers`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -128,11 +121,11 @@ describe('GI Intelligence Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('base_price');
-      expect(response.body).toHaveProperty('gi_premium');
-      expect(response.body).toHaveProperty('final_price');
-      expect(response.body).toHaveProperty('premium_percentage');
-      expect(response.body.final_price).toBeGreaterThan(response.body.base_price);
+      expect(unwrap(response)).toHaveProperty('base_price');
+      expect(unwrap(response)).toHaveProperty('gi_premium');
+      expect(unwrap(response)).toHaveProperty('final_price');
+      expect(unwrap(response)).toHaveProperty('premium_percentage');
+      expect(unwrap(response).final_price).toBeGreaterThan(unwrap(response).base_price);
     });
   });
 
@@ -148,8 +141,8 @@ describe('GI Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('authentication_code');
-      expect(response.body.authentication_status).toBe('verified');
+      expect(unwrap(response)).toHaveProperty('authentication_code');
+      expect(unwrap(response).authentication_status).toBe('verified');
     });
   });
 
@@ -159,7 +152,7 @@ describe('GI Intelligence Service', () => {
         .get('/api/v1/gi-intelligence/gi-authentication/verify/INVALID-CODE')
         .expect(404);
 
-      expect(response.body).toHaveProperty('error');
+      expect(unwrap(response)).toHaveProperty('error');
     });
   });
 
@@ -182,8 +175,8 @@ describe('GI Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('listing_title');
-      expect(response.body.is_premium_priced).toBe(true);
+      expect(unwrap(response)).toHaveProperty('listing_title');
+      expect(unwrap(response).is_premium_priced).toBe(true);
     });
   });
 
@@ -193,7 +186,7 @@ describe('GI Intelligence Service', () => {
         .get('/api/v1/gi-intelligence/gi-marketplace')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -216,7 +209,7 @@ describe('GI Intelligence Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('total_views');
+      expect(unwrap(response)).toHaveProperty('total_views');
     });
   });
 
@@ -227,7 +220,7 @@ describe('GI Intelligence Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 });
