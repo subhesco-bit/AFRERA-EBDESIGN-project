@@ -37,9 +37,12 @@ ALTER TABLE tenants
 
 -- organizationManagementService.getOrganizationUnits/addUnit query
 -- `organizational_units` - never created anywhere in the migration set.
+-- 2026-10-05: 001_skeleton_complete_schema.sql was moved out of the migration
+-- chain (see ../drafts/README.md) - it never applied on a fresh database. The
+-- live table is now the real owner noted below, so this FK follows it.
 CREATE TABLE IF NOT EXISTS organizational_units (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  organization_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE, -- 014 organizations (id SERIAL)
   name VARCHAR(255) NOT NULL,
   parent_id UUID REFERENCES organizational_units(id),
   hierarchy_level INTEGER DEFAULT 0,

@@ -31,7 +31,7 @@ import GDPRConsentPage from '../pages/GDPRConsentPage';
 
 // Shared pages
 import HomePage from '../pages/HomePage';
-import NotFoundPage from '../pages/PlaceholderPage';
+import NotFoundPage from '../components/PlaceholderPage';
 
 /**
  * Route Configuration

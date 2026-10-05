@@ -82,4 +82,8 @@ const routes = {
   fertilityManagementRoutes: crudRouter(fertilityManagement, (body) => validateSoilBody(body, ['plot_name'])),
 };
 
-module.exports = router;
+// The named routers are what index.js destructures and mounts. A 2026-09-05
+// change exported only the bare (empty) `router`, leaving every one of them
+// undefined at their mount points. Attach them to the router so both the
+// destructuring imports and the auto-loader's default import work.
+module.exports = Object.assign(router, routes);

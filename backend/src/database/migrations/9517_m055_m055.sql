@@ -25,6 +25,16 @@ CREATE TABLE IF NOT EXISTS price_history (
     context JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:price_history - `price_history` is already created by 3005_phase2_price_forecasting.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE price_history ADD COLUMN IF NOT EXISTS history_id VARCHAR(50);
+ALTER TABLE price_history ADD COLUMN IF NOT EXISTS product_id VARCHAR(50);
+ALTER TABLE price_history ADD COLUMN IF NOT EXISTS price DECIMAL(15,2);
+ALTER TABLE price_history ADD COLUMN IF NOT EXISTS rule_id VARCHAR(50);
+ALTER TABLE price_history ADD COLUMN IF NOT EXISTS context JSONB;
+ALTER TABLE price_history ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 CREATE TABLE IF NOT EXISTS competitor_pricing (
     competitor_id VARCHAR(50) PRIMARY KEY,

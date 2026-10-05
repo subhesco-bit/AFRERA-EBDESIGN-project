@@ -1,5 +1,14 @@
 # ACTIVE TASKS
 
+## RESUME HERE — 2026-10-05 repair & launch readiness (Claude)
+
+Full write-up: `.ai/handoffs/2026-10-05_REPAIR_AND_LAUNCH_READINESS.md`.
+Build, boot, migrations, CI gates and frontend<->backend wiring were repaired
+and verified. **Open decision:** the Batch 4 merge (`1ec392d`) discarded main's
+version of ~1,080 files; restoring them (incl. the Sept 7 security fixes and
+account activation) is pending owner approval. Do not assume the Sept 7-8 fixes
+are live until that is done.
+
 ## TODO — "make all gaps zero" (2026-08-29, in progress, resume here)
 
 User asked to close every code-achievable gap from the AFRERA Gap Index

@@ -33,6 +33,31 @@ CREATE TABLE IF NOT EXISTS vendors (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:vendors - `vendors` is already created by 023_engineering_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS vendor_name VARCHAR(255);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS vendor_type VARCHAR(100);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS business_registration VARCHAR(100);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS contact_person VARCHAR(255);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS city VARCHAR(100);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS state VARCHAR(100);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS pincode VARCHAR(10);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS gstin VARCHAR(15);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS pan VARCHAR(10);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS business_category VARCHAR(100);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS risk_level VARCHAR(20) DEFAULT 'medium';
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS ai_classification JSONB;
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending_verification';
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_vendors_id_merge ON vendors(id);
 
 -- Vendor profiles table
 CREATE TABLE IF NOT EXISTS vendor_profiles (
@@ -145,6 +170,23 @@ CREATE TABLE IF NOT EXISTS supply_chain_nodes (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:supply_chain_nodes - `supply_chain_nodes` is already created by 3008_phase3_supply_chain.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS node_id VARCHAR(100);
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS node_type VARCHAR(50);
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS parent_node_id UUID;
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS organization_id UUID;
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS capacity DECIMAL(15,2);
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS current_utilization DECIMAL(3,2);
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS metadata JSONB;
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE supply_chain_nodes ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_supply_chain_nodes_id_merge ON supply_chain_nodes(id);
 
 -- Supply chain optimization table
 CREATE TABLE IF NOT EXISTS supply_chain_optimization (
@@ -215,27 +257,35 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_vendors_updated_at ON vendors;
 CREATE TRIGGER update_vendors_updated_at BEFORE UPDATE ON vendors
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_vendor_profiles_updated_at ON vendor_profiles;
 CREATE TRIGGER update_vendor_profiles_updated_at BEFORE UPDATE ON vendor_profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_vendor_certifications_updated_at ON vendor_certifications;
 CREATE TRIGGER update_vendor_certifications_updated_at BEFORE UPDATE ON vendor_certifications
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_vendor_performance_updated_at ON vendor_performance;
 CREATE TRIGGER update_vendor_performance_updated_at BEFORE UPDATE ON vendor_performance
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_procurement_requests_updated_at ON procurement_requests;
 CREATE TRIGGER update_procurement_requests_updated_at BEFORE UPDATE ON procurement_requests
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_supply_chain_nodes_updated_at ON supply_chain_nodes;
 CREATE TRIGGER update_supply_chain_nodes_updated_at BEFORE UPDATE ON supply_chain_nodes
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_supply_chain_optimization_updated_at ON supply_chain_optimization;
 CREATE TRIGGER update_supply_chain_optimization_updated_at BEFORE UPDATE ON supply_chain_optimization
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_supply_chain_tracking_updated_at ON supply_chain_tracking;
 CREATE TRIGGER update_supply_chain_tracking_updated_at BEFORE UPDATE ON supply_chain_tracking
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

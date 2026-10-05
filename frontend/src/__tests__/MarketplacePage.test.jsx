@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import MarketplacePage from '../pages/MarketplacePage';
 import * as rq from '@tanstack/react-query';
 
@@ -19,7 +20,11 @@ describe('MarketplacePage', () => {
 
     rq.useQuery.mockImplementation(() => ({ data: mockData, isLoading: false, error: null }));
 
-    render(<MarketplacePage />);
+    render(
+      <MemoryRouter>
+        <MarketplacePage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByText('Marketplace')).toBeInTheDocument();
     expect(screen.getByText('Test Grain')).toBeInTheDocument();

@@ -156,11 +156,10 @@ function addStandardHeaders() {
     // Response time header (will be set by response timer)
     res.setHeader('X-Response-Time', '0ms');
     
-    // CORS headers if not already set
-    if (!res.getHeader('Access-Control-Allow-Origin')) {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-    }
-    
+    // No Access-Control-Allow-Origin fallback here: the cors() middleware in
+    // index.js owns that header, and defaulting it to '*' whenever cors()
+    // declined an origin silently disabled the CORS allow-list.
+
     // Content type
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     
@@ -174,10 +173,20 @@ function addStandardHeaders() {
 function trackResponseTime() {
   return (req, res, next) => {
     const startTime = Date.now();
-    
+
+    // The header must be set before headers are flushed. Setting it in the
+    // 'finish' handler (as before) threw ERR_HTTP_HEADERS_SENT on every
+    // request, so hook writeHead instead and only log on 'finish'.
+    const originalWriteHead = res.writeHead;
+    res.writeHead = function writeHeadWithTiming(...args) {
+      if (!res.headersSent) {
+        res.setHeader('X-Response-Time', `${Date.now() - startTime}ms`);
+      }
+      return originalWriteHead.apply(this, args);
+    };
+
     res.on('finish', () => {
       const responseTime = Date.now() - startTime;
-      res.setHeader('X-Response-Time', `${responseTime}ms`);
       
       // Log slow requests
       if (responseTime > 1000) {
@@ -282,10 +291,10 @@ function generateCorrelationId() {
  */
 function contentNegotiation() {
   return (req, res, next) => {
-    const acceptHeader = req.headers.accept || 'application/json';
-    
-    // Currently only support JSON
-    if (!acceptHeader.includes('application/json')) {
+    // Currently only support JSON. req.accepts() honours wildcards, so
+    // `*/*` (curl, load-balancer/Docker health probes) and `application/*`
+    // are accepted; only clients that explicitly exclude JSON get a 406.
+    if (req.headers.accept && !req.accepts('json')) {
       return res.status(406).json({
         success: false,
         error: {

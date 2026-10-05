@@ -381,7 +381,7 @@ router.put('/deliveries/schedule/:scheduleId', authMiddleware, async (req, res) 
 
 router.post('/drivers/location', authMiddleware, async (req, res) => {
   try {
-    const data = await logisticsEnhancementService.recordDriverLocation(req.body);
+    const data = await logisticsService.recordDriverLocation(req.body);
     res.json({ success: true, data });
   } catch (error) {
     res.status(/Refusing|out of range/.test(error.message) ? 400 : 500)
@@ -391,7 +391,7 @@ router.post('/drivers/location', authMiddleware, async (req, res) => {
 
 router.get('/drivers/active', authMiddleware, async (req, res) => {
   try {
-    const data = await logisticsEnhancementService.getActiveDrivers(req.query);
+    const data = await logisticsService.getActiveDrivers(req.query);
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -400,7 +400,7 @@ router.get('/drivers/active', authMiddleware, async (req, res) => {
 
 router.get('/shipments/:id/trail', authMiddleware, async (req, res) => {
   try {
-    const data = await logisticsEnhancementService.getShipmentTrail(req.params.id);
+    const data = await logisticsService.getShipmentTrail(req.params.id);
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

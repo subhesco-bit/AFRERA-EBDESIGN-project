@@ -15,6 +15,9 @@ const router = express.Router();
 const pool = require('../../database/pool');
 
 // Lightweight test-mode implementations to avoid DB during unit tests
+// Test mode deliberately rebinds the hoisted function declarations below to
+// in-memory fakes before module.exports captures them.
+/* eslint-disable no-func-assign -- intentional, see above */
 if (process.env.NODE_ENV === 'test') {
   createKnowledgeNode = async (data) => ({ id: `node-${Date.now()}`, ...data });
   searchKnowledgeNodes = async () => ([]);
@@ -29,6 +32,7 @@ if (process.env.NODE_ENV === 'test') {
   });
   recordKnowledgeAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
 }
+/* eslint-enable no-func-assign */
 
 // ============================================================================
 // KNOWLEDGE NODES

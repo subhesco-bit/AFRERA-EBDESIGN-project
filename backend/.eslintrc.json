@@ -18,7 +18,7 @@
     "quotes": "off",
     "no-implicit-coercion": "off",
     "no-sync": "off",
-    "no-undef": "off",
+    "no-undef": "error",
     "no-empty-pattern": "off",
     "no-useless-catch": "off",
     "no-prototype-builtins": "off",
@@ -42,7 +42,10 @@
   ],
   "overrides": [
     {
-      "files": ["**/*.test.js", "**/*.spec.js"],
+      "files": [
+        "**/*.test.js",
+        "**/*.spec.js"
+      ],
       "env": {
         "jest": true
       },

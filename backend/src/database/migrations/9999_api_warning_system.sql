@@ -194,9 +194,6 @@ CREATE INDEX IF NOT EXISTS idx_api_warnings_message_fts
 CREATE INDEX IF NOT EXISTS idx_api_warnings_metadata 
     ON api_warnings USING gin(metadata);
 
--- Successful migration completion marker
-INSERT INTO migration_log (migration_name, executed_at, status)
-VALUES ('api_warning_system', CURRENT_TIMESTAMP, 'success')
-ON CONFLICT (migration_name) DO UPDATE SET 
-    executed_at = CURRENT_TIMESTAMP, 
-    status = 'success';
+-- Completion is recorded by migrate.js in the `migrations` table. (A
+-- `migration_log` insert here referenced a table no migration creates and
+-- aborted the chain; removed 2026-10-05.)

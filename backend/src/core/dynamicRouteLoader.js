@@ -59,9 +59,28 @@ class DynamicRouteLoader {
         }
       }
 
+      // Third pass: flat aliases for routes that live in a domain subfolder.
+      // The 2026-09-07 consolidation moved route files into routes/<domain>/,
+      // which (via _generateMountPath) silently moved their public URLs from
+      // /api/v1/<name> to /api/v1/<domain>/<name> - every path the frontend
+      // calls for those modules 404'd. Re-expose each at its flat path, unless
+      // a root-level route already owns that path (first mount wins).
+      this.aliasCount = 0;
+      for (const entry of this.routes.values()) {
+        if (!entry.mounted || !entry.router || !entry.subfolder || entry.subfolder === 'root') continue;
+        const versionPart = entry.version !== 'root' ? `/${entry.version}` : '';
+        const flatPath = `${apiVersion}${versionPart}/${this._toMountSegment(entry.name)}`;
+        if (this.mountedPaths.has(flatPath)) continue;
+        this.app.use(flatPath, entry.router);
+        this.mountedPaths.add(flatPath);
+        entry.aliasPath = flatPath;
+        this.aliasCount++;
+      }
+
       const elapsed = Date.now() - startTime;
 
       logger.info('✅ Route Discovery & Mounting Complete', {
+        flatAliases: this.aliasCount,
         discovered: this.discoveredCount,
         mounted: this.mountedCount,
         failed: this.failedCount,

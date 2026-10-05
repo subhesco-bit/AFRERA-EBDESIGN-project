@@ -11,6 +11,9 @@ const { authMiddleware } = require('../../middleware/auth');
 const router = express.Router();
 
 // Test-mode lightweight stubs to avoid DB dependency during unit tests
+// Test mode deliberately rebinds the hoisted function declarations below to
+// in-memory fakes before module.exports captures them.
+/* eslint-disable no-func-assign -- intentional, see above */
 if (process.env.NODE_ENV === 'test') {
   const now = new Date();
   getNutrients = async () => ([{ id: 'NUT-1', symbol: 'PRO', name: 'Protein', unit: 'g' }]);
@@ -70,6 +73,7 @@ if (process.env.NODE_ENV === 'test') {
 
   getDietaryProfiles = async () => ([{ id: 'dp-1', name: 'Vegan' }]);
 }
+/* eslint-enable no-func-assign */
 
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a

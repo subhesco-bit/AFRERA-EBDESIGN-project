@@ -76,13 +76,22 @@ function emitMutation(req, operation, item) {
   });
 }
 
+// Named routers: index.js destructures and mounts these individually
+// (/api/v1/water-budgeting/budgets, ...). The aggregate mainRouter is kept for
+// the auto-loader's default import.
+const routes = {
+  waterBudgetingRoutes: crudRouter(waterBudgeting, (body) => validateWaterBody(body, ['plot_name'])),
+  waterQualityRoutes: crudRouter(waterQuality, (body) => validateWaterBody(body, ['location', 'parameter'])),
+  rainwaterHarvestingRoutes: crudRouter(rainwaterHarvesting, (body) => validateWaterBody(body, ['structure_name', 'structure_type'])),
+  watershedManagementRoutes: crudRouter(watershedManagement, (body) => validateWaterBody(body, ['name'])),
+  waterAnalyticsRoutes: crudRouter(waterAnalytics, (body) => validateWaterBody(body, ['metric', 'period'])),
+};
+
 const mainRouter = express.Router();
+mainRouter.use('/budgeting', routes.waterBudgetingRoutes);
+mainRouter.use('/quality', routes.waterQualityRoutes);
+mainRouter.use('/rainwater-harvesting', routes.rainwaterHarvestingRoutes);
+mainRouter.use('/watershed', routes.watershedManagementRoutes);
+mainRouter.use('/analytics', routes.waterAnalyticsRoutes);
 
-// Mount all water management sub-routes
-mainRouter.use('/budgeting', crudRouter(waterBudgeting, (body) => validateWaterBody(body, ['plot_name'])));
-mainRouter.use('/quality', crudRouter(waterQuality, (body) => validateWaterBody(body, ['location', 'parameter'])));
-mainRouter.use('/rainwater-harvesting', crudRouter(rainwaterHarvesting, (body) => validateWaterBody(body, ['structure_name', 'structure_type'])));
-mainRouter.use('/watershed', crudRouter(watershedManagement, (body) => validateWaterBody(body, ['name'])));
-mainRouter.use('/analytics', crudRouter(waterAnalytics, (body) => validateWaterBody(body, ['metric', 'period'])));
-
-module.exports = mainRouter;
+module.exports = Object.assign(mainRouter, routes);

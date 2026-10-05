@@ -1,3 +1,10 @@
+-- 2026-10-05: converted from MySQL syntax (inline INDEX clauses, ON UPDATE
+-- CURRENT_TIMESTAMP) that PostgreSQL rejects; it aborted the migration chain.
+-- Index names are suffixed with their table so they stay unique schema-wide.
+-- Its category table is named ne_product_categories (not product_categories):
+-- 9514_m052_m052.sql owns product_categories with a different shape
+-- (category_id VARCHAR PK, parent_category_id), and since 9001 sorts first the
+-- shared name made 9514 fail with "column parent_category_id does not exist".
 -- North East India Variety Directory - Comprehensive Integration
 -- 100+ agricultural varieties with GI tags, biochemical profiles, and commercial data
 -- Generated: 2026-09-05
@@ -8,7 +15,7 @@ BEGIN;
 -- 1. PRODUCT CATEGORIES AND CLASSIFICATIONS
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS product_categories (
+CREATE TABLE IF NOT EXISTS ne_product_categories (
   id SERIAL PRIMARY KEY,
   category_name VARCHAR(100) UNIQUE NOT NULL,
   description TEXT,
@@ -16,7 +23,7 @@ CREATE TABLE IF NOT EXISTS product_categories (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO product_categories (category_name, description, market_segment) VALUES
+INSERT INTO ne_product_categories (category_name, description, market_segment) VALUES
   ('Citrus Fruits', 'GI-tagged and non-GI citrus varieties from NE states', 'Fresh & Processed'),
   ('Exotic Fruits', 'Temperate and high-altitude exotic fruits', 'Premium Retail'),
   ('Tropical Fruits', 'Tropical and seasonal fruits', 'Commercial Volume'),
@@ -54,10 +61,10 @@ CREATE TABLE IF NOT EXISTS gi_tags (
   unique_characteristics TEXT,
   commercial_potential TEXT,
   registered_date DATE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_state (state_of_origin),
-  INDEX idx_status (application_status)
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_state_gi_tags ON gi_tags (state_of_origin);
+CREATE INDEX IF NOT EXISTS idx_status_gi_tags ON gi_tags (application_status);
 
 -- ============================================================================
 -- 3. PRODUCT MASTER DATA
@@ -66,7 +73,7 @@ CREATE TABLE IF NOT EXISTS gi_tags (
 CREATE TABLE IF NOT EXISTS ne_variety_products (
   id SERIAL PRIMARY KEY,
   product_name VARCHAR(150) NOT NULL,
-  category_id INTEGER REFERENCES product_categories(id),
+  category_id INTEGER REFERENCES ne_product_categories(id),
   gi_tag_id INTEGER REFERENCES gi_tags(id),
   primary_state VARCHAR(50) NOT NULL,
   secondary_states TEXT,
@@ -95,12 +102,11 @@ CREATE TABLE IF NOT EXISTS ne_variety_products (
   certification_status TEXT,
 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  INDEX idx_category (category_id),
-  INDEX idx_state (primary_state),
-  INDEX idx_product (product_name)
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_category_ne_variety_products ON ne_variety_products (category_id);
+CREATE INDEX IF NOT EXISTS idx_state_ne_variety_products ON ne_variety_products (primary_state);
+CREATE INDEX IF NOT EXISTS idx_product_ne_variety_products ON ne_variety_products (product_name);
 
 -- ============================================================================
 -- 4. FERMENTATION & PROCESSING METHODS
@@ -240,7 +246,7 @@ CREATE TABLE IF NOT EXISTS ne_variety_media (
   usage_instructions_text TEXT,
 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================================================

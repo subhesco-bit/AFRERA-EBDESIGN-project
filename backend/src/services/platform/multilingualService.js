@@ -15,6 +15,9 @@ const router = express.Router();
 const pool = require('../../database/pool');
 
 // Test-mode fallbacks to avoid DB dependencies during unit tests
+// Test mode deliberately rebinds the hoisted function declarations below to
+// in-memory fakes before module.exports captures them.
+/* eslint-disable no-func-assign -- intentional, see above */
 if (process.env.NODE_ENV === 'test') {
   // In-memory stores for test mode
   const _translationStore = new Map();
@@ -81,6 +84,7 @@ if (process.env.NODE_ENV === 'test') {
 
   getTranslationMemoryStats = async () => ({ total_entries: 0, verified_entries: 0, auto_translated_entries: 0, avg_confidence: 0, total_usage: 0 });
 }
+/* eslint-enable no-func-assign */
 
 // ============================================================================
 // LANGUAGE DETECTION

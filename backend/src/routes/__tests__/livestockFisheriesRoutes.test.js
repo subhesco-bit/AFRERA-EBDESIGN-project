@@ -14,7 +14,7 @@ jest.mock('../../middleware/auth', () => ({
   },
   requireRole: () => (req, res, next) => next(),
 }));
-jest.mock('../../middleware/rateLimiter', () => ({ rateLimiter: (req, res, next) => next() }));
+jest.mock('../../middleware/rateLimiter', () => ({ rateLimiter: (req, res, next) => next(), apiLimiter: (req, res, next) => next() }));
 jest.mock('../../middleware/roleGroups', () => ({ FARM_OPERATIONS_ROLES: ['farmer'] }));
 jest.mock('../../utils/logger', () => ({ logger: { info: jest.fn(), error: jest.fn(), warn: jest.fn() } }));
 jest.mock('../../core/signalBus', () => ({
