@@ -91,20 +91,43 @@ Database
   new migration adding `user_profiles.phone/oauth_provider/oauth_id`
   (every registration failed without them).
 
+## Follow-up: targeted restore of main's Sept 6–8 work (owner-approved)
+
+The owner approved restoring main (`0b13d81`) over the Batch 4 overwrite. A
+blind restore of all 1,080 files was tried first and broke the build and tests:
+**both** histories contain regressions. Main's "recover"/"transfer" commits
+(`fbc14dc`, `b72e1c7`, `192eefd`, `0cc277d`, `13e1459`, `f87c90b`) overwrote
+newer code with stale copies, e.g. real module pages became stubs and the
+SSRF guard in `aiAgentService` disappeared. Final rule, per file:
+
+- branch root = `8c8d06c`; a file only the branch changed keeps the branch;
+- a file whose last main change is one of those stale-copy commits keeps the
+  branch;
+- otherwise (main's genuine fixes: `5e2eb01` security, `142dd97` boot,
+  `ba952f7` logger imports, `17e4708`, `2ef9fa0`, `55bffd1`, `c5355a4`, …)
+  main's version is restored — ~120 files, incl. `frontend/src/services/api.js`
+  and `App.jsx`, the legacy insurance/escrow/rural-finance services.
+
+Kept from the branch despite main touching them, because main's version broke
+something verifiable: `index.css` and the Jest test files (repo is on
+Tailwind 4 / Jest), `errorMonitoring.js`, `BottomNav.jsx`, migration `014`,
+`dual-use/authService.js` (main let a registrant pick their own role).
+Added to main's `api.js`: 6 API objects the branch's module pages import, and
+a same-origin default base URL (`/api/v1`; was `localhost:3003`). Gated the
+domain-folder copy of `GET …/fraud-analysis` to admins (the root copy already
+was, per `5e2eb01`).
+
+Result: lint clean; frontend build + 55/55; 409/409 migrations fresh; backend
+20 failing suites (was 24 at the first PR commit, 28 at `0830fb7`), no new
+failures; production boot; claim status/payout and escrow now 401 without auth.
+
 ## Not fixed — needs a decision (see PR description)
 
-1. **Restore main's version of the remaining ~1,080 files from the Batch 4
-   merge.** Attempted, but the bulk overwrite needs explicit owner approval.
-   Until it is done, known live consequences include:
-   - the Sept 7 security fixes are **not active** (`services/legacy/
-     insuranceClaimsService.js`, `escrowService.js`, `ruralFinanceService.js`,
-     `routes/insuranceEnhancements.js` are the pre-fix versions);
-   - self-registered users get `status: 'pending'` and there is no activation
-     endpoint, so they can never log in (`services/dual-use/authService.js`);
-   - `financeInsuranceDomain.test.js` fails (expects the fixed services).
-   Command (from repo root):
-   `git diff --name-only 0b13d81 1ec392d -- backend/src frontend/src` lists the
-   set; the classification script used is described in the PR.
+1. **Account activation (product decision).** Self-registration creates
+   `role: consumer, status: pending` by design (asserted by
+   `authService.security.test.js`), but no activation endpoint exists, so new
+   users cannot log in. Needs either email/OTP verification or an admin
+   approval endpoint (or a decision that consumers start `active`).
 2. 14 DB-backed integration suites (`src/tests/*Service.test.js`) self-register
    with `role: 'admin'` and expect a token. Secure registration never grants
    that, so every call is 401. They need a test helper that seeds an admin user

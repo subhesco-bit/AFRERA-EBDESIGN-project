@@ -1,5 +1,5 @@
 // Enterprise Monitoring & Metrics - Production Grade
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 class MetricsCollector {
   constructor() {

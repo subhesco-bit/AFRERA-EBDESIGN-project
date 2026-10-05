@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const weatherAdvisoryService = require('../services/weatherAdvisoryService');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 router.get('/weather/:lat/:lng/advisory', async (req, res, next) => {
   try {

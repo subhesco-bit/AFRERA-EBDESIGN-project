@@ -4,10 +4,9 @@
 
 Full write-up: `.ai/handoffs/2026-10-05_REPAIR_AND_LAUNCH_READINESS.md`.
 Build, boot, migrations, CI gates and frontend<->backend wiring were repaired
-and verified. **Open decision:** the Batch 4 merge (`1ec392d`) discarded main's
-version of ~1,080 files; restoring them (incl. the Sept 7 security fixes and
-account activation) is pending owner approval. Do not assume the Sept 7-8 fixes
-are live until that is done.
+and verified. Main's genuine Sept 6-8 fixes (incl. the Sept 7 security fixes) were
+restored file-by-file with owner approval; see the handoff for the rule used.
+**Open decision:** account activation for self-registered users.
 
 ## TODO — "make all gaps zero" (2026-08-29, in progress, resume here)
 
