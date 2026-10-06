@@ -59,7 +59,7 @@ class ${moduleName}Service {
     const enhancedPayload = await this.enrichPayload(payload);
     
     const res = await pg.query(
-      \`INSERT INTO ${tableName} (${this.getColumns(enhancedPayload).join(', ')}) VALUES (\${this.getPlaceholders(enhancedPayload).join(', ')}, NOW()) RETURNING *\`,
+      \`INSERT INTO ${tableName} (\${this.getColumns(enhancedPayload).join(', ')}) VALUES (\${this.getPlaceholders(enhancedPayload).join(', ')}, NOW()) RETURNING *\`,
       this.getValues(enhancedPayload)
     );
     

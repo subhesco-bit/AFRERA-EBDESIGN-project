@@ -10,6 +10,9 @@ const { authMiddleware } = require('../../middleware/auth');
 
 const router = express.Router();
 // Test-mode lightweight stubs to avoid DB dependency during unit tests
+// Test mode deliberately rebinds the hoisted function declarations below to
+// in-memory fakes before module.exports captures them.
+/* eslint-disable no-func-assign -- intentional, see above */
 if (process.env.NODE_ENV === 'test') {
   const now = new Date();
   getValueFactors = async () => ([{ id: 'vf-1', name: 'nutrition', weight: 1.5 }]);
@@ -54,6 +57,7 @@ if (process.env.NODE_ENV === 'test') {
   generateValueRecommendations = async (userId) => ([]);
   getValueTiers = async () => ([{ id: 'tier-A', min_score: 85, name: 'A' }]);
 }
+/* eslint-enable no-func-assign */
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.

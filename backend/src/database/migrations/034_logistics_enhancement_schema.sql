@@ -30,6 +30,28 @@ CREATE TABLE IF NOT EXISTS fleet_vehicles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:fleet_vehicles - `fleet_vehicles` is already created by 013_logistics_enhancements.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS type VARCHAR(100);
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS registration_number VARCHAR(100);
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS capacity DECIMAL(10,2);
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS make VARCHAR(100);
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS model VARCHAR(100);
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS year INTEGER;
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS driver_id INTEGER;
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS features JSONB;
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS current_location JSONB;
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS mileage DECIMAL(15,2);
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS fuel_level DECIMAL(5,2);
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS last_maintenance_date DATE;
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS next_maintenance_date DATE;
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE fleet_vehicles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_fleet_vehicles_id_merge ON fleet_vehicles(id);
 
 -- Reconciliation 2026-08-04: fleet_vehicles is also defined in an earlier migration,
 -- so the CREATE TABLE above is a no-op and this file's extra columns were
@@ -63,6 +85,25 @@ CREATE TABLE IF NOT EXISTS vehicle_maintenance (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:vehicle_maintenance - `vehicle_maintenance` is already created by 013_logistics_enhancements.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS vehicle_id INTEGER;
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS type VARCHAR(100);
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS scheduled_date DATE;
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS actual_date DATE;
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS estimated_cost DECIMAL(10,2);
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS actual_cost DECIMAL(10,2);
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS priority VARCHAR(50);
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'scheduled';
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS performed_by INTEGER;
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_vehicle_maintenance_id_merge ON vehicle_maintenance(id);
 
 -- Reconciliation 2026-08-04: vehicle_maintenance is also defined in an earlier migration,
 -- so the CREATE TABLE above is a no-op and this file's extra columns were
@@ -93,6 +134,24 @@ CREATE TABLE IF NOT EXISTS shipment_tracking (
     signal_strength INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:shipment_tracking - `shipment_tracking` is already created by 000_base_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS shipment_id INTEGER;
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS latitude DECIMAL(10,6);
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS longitude DECIMAL(10,6);
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS speed DECIMAL(10,2);
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS heading DECIMAL(5,2);
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS altitude DECIMAL(10,2);
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS accuracy DECIMAL(10,2);
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS battery_level DECIMAL(5,2);
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS signal_strength INTEGER;
+ALTER TABLE shipment_tracking ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_shipment_tracking_id_merge ON shipment_tracking(id);
 
 -- Reconciliation 2026-08-04: shipment_tracking is also defined in an earlier migration,
 -- so the CREATE TABLE above is a no-op and this file's extra columns were
@@ -120,6 +179,19 @@ CREATE TABLE IF NOT EXISTS shipment_geofences (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:shipment_geofences - `shipment_geofences` is already created by 013_logistics_enhancements.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE shipment_geofences ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE shipment_geofences ADD COLUMN IF NOT EXISTS shipment_id INTEGER;
+ALTER TABLE shipment_geofences ADD COLUMN IF NOT EXISTS type VARCHAR(50);
+ALTER TABLE shipment_geofences ADD COLUMN IF NOT EXISTS radius DECIMAL(10,2);
+ALTER TABLE shipment_geofences ADD COLUMN IF NOT EXISTS coordinates JSONB;
+ALTER TABLE shipment_geofences ADD COLUMN IF NOT EXISTS alert_enabled BOOLEAN DEFAULT true;
+ALTER TABLE shipment_geofences ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE shipment_geofences ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_shipment_geofences_id_merge ON shipment_geofences(id);
 
 CREATE INDEX IF NOT EXISTS idx_shipment_geofences_shipment ON shipment_geofences(shipment_id);
 CREATE INDEX IF NOT EXISTS idx_shipment_geofences_type ON shipment_geofences(type);
@@ -140,6 +212,21 @@ CREATE TABLE IF NOT EXISTS temperature_readings (
     sensor_status VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:temperature_readings - `temperature_readings` is already created by 013_logistics_enhancements.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS shipment_id INTEGER;
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS sensor_id VARCHAR(100);
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS temperature DECIMAL(5,2);
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS humidity DECIMAL(5,2);
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS zone VARCHAR(50);
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS battery_level DECIMAL(5,2);
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS sensor_status VARCHAR(50);
+ALTER TABLE temperature_readings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_temperature_readings_id_merge ON temperature_readings(id);
 
 -- Reconciliation 2026-08-04: temperature_readings is also defined in an earlier migration,
 -- so the CREATE TABLE above is a no-op and this file's extra columns were
@@ -171,6 +258,25 @@ CREATE TABLE IF NOT EXISTS temperature_alerts (
     status VARCHAR(50) DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:temperature_alerts - `temperature_alerts` is already created by 013_logistics_enhancements.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS shipment_id INTEGER;
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS sensor_id VARCHAR(100);
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS alert_type VARCHAR(50);
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS severity VARCHAR(50);
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS temperature DECIMAL(5,2);
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS threshold DECIMAL(5,2);
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS triggered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMP;
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS resolved_by INTEGER;
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS resolution_notes TEXT;
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_temperature_alerts_id_merge ON temperature_alerts(id);
 
 -- Reconciliation 2026-08-04: temperature_alerts is also defined in an earlier migration,
 -- so the CREATE TABLE above is a no-op and this file's extra columns were
@@ -241,6 +347,25 @@ CREATE TABLE IF NOT EXISTS warehouse_inventory (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:warehouse_inventory - `warehouse_inventory` is already created by 013_logistics_enhancements.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS id INTEGER;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS warehouse_id INTEGER;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS location_id INTEGER;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS product_id INTEGER;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS batch_number VARCHAR(100);
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS quantity DECIMAL(15,2);
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS unit VARCHAR(50);
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS expiry_date DATE;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS received_date DATE;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS last_count_date DATE;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'in_stock';
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS quality_status VARCHAR(50);
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE warehouse_inventory ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_warehouse_inventory_id_merge ON warehouse_inventory(id);
 
 -- Reconciliation 2026-08-04: warehouse_inventory is also defined in an earlier migration,
 -- so the CREATE TABLE above is a no-op and this file's extra columns were

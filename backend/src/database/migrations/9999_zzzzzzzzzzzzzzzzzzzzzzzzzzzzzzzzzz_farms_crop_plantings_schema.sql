@@ -48,11 +48,14 @@ CREATE INDEX IF NOT EXISTS idx_farms_farmer ON farms(farmer_id);
 -- migrate.js's failure handling, halted every migration after this one on
 -- the very first real run). Fixed to INTEGER to match the crops table that
 -- actually exists.
+-- 2026-10-05: 001_skeleton_complete_schema.sql was moved out of the migration
+-- chain (see ../drafts/README.md) - it never applied on a fresh database. The
+-- live table is now the real owner noted below, so this FK follows it.
 CREATE TABLE IF NOT EXISTS crop_plantings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   farm_id UUID NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
   farmer_id UUID NOT NULL REFERENCES farmers(id),
-  crop_id INTEGER NOT NULL REFERENCES crops(id), -- the static catalog (001, not 041 - see note above)
+  crop_id UUID NOT NULL REFERENCES crops(id), -- 041_rural_life_os_schema.sql crops (id UUID)
   -- 2026-08-31: variety_id was declared UUID, but regional_variety_directory.id
   -- (9999_zzz_regional_variety_directory_schema.sql) is SERIAL/INTEGER - "foreign
   -- key constraint cannot be implemented" against a real database. Fixed to match.

@@ -210,9 +210,10 @@ jobs:
       # pre-existing failures are actually fixed, not a silent "tests don't
       # matter" - the failure still shows in the run, it just doesn't block
       # merge on debt this PR didn't create.
+      # 2026-10-05: all suites pass (808/808 against the migrated test DB),
+      # so this is a real gate again rather than advisory.
       - name: Test
         run: npm test
-        continue-on-error: true
 
       # Governance directive 11: registries auto-update, no manual sync.
       # Regenerating on every run is what makes them DESCRIPTIVE rather than

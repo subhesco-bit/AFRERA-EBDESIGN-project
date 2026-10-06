@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Consumer Health Service', () => {
@@ -15,15 +16,7 @@ describe('Consumer Health Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'health-test@example.com',
-        password: 'Test123!@#',
-        role: 'consumer',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'health-test@example.com', role: 'consumer' }));
   });
 
   afterAll(async () => {
@@ -51,8 +44,8 @@ describe('Consumer Health Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('profile_name');
-      expect(response.body).toHaveProperty('height_cm');
+      expect(unwrap(response)).toHaveProperty('profile_name');
+      expect(unwrap(response)).toHaveProperty('height_cm');
     });
 
     it('should return 401 without auth token', async () => {
@@ -72,7 +65,7 @@ describe('Consumer Health Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('profile_name');
+      expect(unwrap(response)).toHaveProperty('profile_name');
     });
   });
 
@@ -92,8 +85,8 @@ describe('Consumer Health Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('profile_type');
-      expect(response.body).toHaveProperty('daily_calorie_target');
+      expect(unwrap(response)).toHaveProperty('profile_type');
+      expect(unwrap(response)).toHaveProperty('daily_calorie_target');
     });
   });
 
@@ -111,8 +104,8 @@ describe('Consumer Health Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('metric_type');
-      expect(response.body).toHaveProperty('metric_value');
+      expect(unwrap(response)).toHaveProperty('metric_type');
+      expect(unwrap(response)).toHaveProperty('metric_value');
     });
   });
 
@@ -123,7 +116,7 @@ describe('Consumer Health Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -142,8 +135,8 @@ describe('Consumer Health Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('goal_type');
-      expect(response.body.status).toBe('active');
+      expect(unwrap(response)).toHaveProperty('goal_type');
+      expect(unwrap(response).status).toBe('active');
     });
   });
 
@@ -154,7 +147,7 @@ describe('Consumer Health Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -172,7 +165,7 @@ describe('Consumer Health Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('recommendation_text');
+      expect(unwrap(response)).toHaveProperty('recommendation_text');
     });
   });
 
@@ -183,7 +176,7 @@ describe('Consumer Health Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -200,8 +193,8 @@ describe('Consumer Health Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('alert_type');
-      expect(response.body).toHaveProperty('severity');
+      expect(unwrap(response)).toHaveProperty('alert_type');
+      expect(unwrap(response)).toHaveProperty('severity');
     });
   });
 
@@ -212,7 +205,7 @@ describe('Consumer Health Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -231,8 +224,8 @@ describe('Consumer Health Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('meal_type');
-      expect(response.body).toHaveProperty('calories_consumed');
+      expect(unwrap(response)).toHaveProperty('meal_type');
+      expect(unwrap(response)).toHaveProperty('calories_consumed');
     });
   });
 
@@ -243,7 +236,7 @@ describe('Consumer Health Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -254,9 +247,9 @@ describe('Consumer Health Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('bmi');
-      expect(response.body).toHaveProperty('height_cm');
-      expect(response.body).toHaveProperty('weight_kg');
+      expect(unwrap(response)).toHaveProperty('bmi');
+      expect(unwrap(response)).toHaveProperty('height_cm');
+      expect(unwrap(response)).toHaveProperty('weight_kg');
     });
   });
 });

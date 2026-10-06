@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Conversational AI Service', () => {
@@ -17,15 +18,8 @@ describe('Conversational AI Service', () => {
     });
 
     // Create test user and get auth token
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'chat-test@example.com',
-        password: 'Test123!@#',
-        role: 'consumer',
-      });
 
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'chat-test@example.com', role: 'consumer' }));
   });
 
   afterAll(async () => {
@@ -38,10 +32,10 @@ describe('Conversational AI Service', () => {
         .get('/api/v1/conversational-ai/domains')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
-      expect(response.body[0]).toHaveProperty('name');
-      expect(response.body[0]).toHaveProperty('description');
+      expect(unwrap(response)).toBeInstanceOf(Array);
+      expect(unwrap(response).length).toBeGreaterThan(0);
+      expect(unwrap(response)[0]).toHaveProperty('name');
+      expect(unwrap(response)[0]).toHaveProperty('description');
     });
   });
 
@@ -56,10 +50,10 @@ describe('Conversational AI Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('session_id');
-      expect(response.body).toHaveProperty('status');
-      expect(response.body.status).toBe('active');
-      testSessionId = response.body.session_id;
+      expect(unwrap(response)).toHaveProperty('session_id');
+      expect(unwrap(response)).toHaveProperty('status');
+      expect(unwrap(response).status).toBe('active');
+      testSessionId = unwrap(response).session_id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -79,8 +73,8 @@ describe('Conversational AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('session_id');
-      expect(response.body).toHaveProperty('domain_name');
+      expect(unwrap(response)).toHaveProperty('session_id');
+      expect(unwrap(response)).toHaveProperty('domain_name');
     });
 
     it('should return 404 for non-existent session', async () => {
@@ -103,9 +97,9 @@ describe('Conversational AI Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('role');
-      expect(response.body).toHaveProperty('content');
-      expect(response.body).toHaveProperty('intent_detected');
+      expect(unwrap(response)).toHaveProperty('role');
+      expect(unwrap(response)).toHaveProperty('content');
+      expect(unwrap(response)).toHaveProperty('intent_detected');
     });
   });
 
@@ -116,8 +110,8 @@ describe('Conversational AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
+      expect(unwrap(response)).toBeInstanceOf(Array);
+      expect(unwrap(response).length).toBeGreaterThan(0);
     });
   });
 
@@ -131,9 +125,9 @@ describe('Conversational AI Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('intent');
-      expect(response.body).toHaveProperty('confidence');
-      expect(response.body.confidence).toBeGreaterThan(0);
+      expect(unwrap(response)).toHaveProperty('intent');
+      expect(unwrap(response)).toHaveProperty('confidence');
+      expect(unwrap(response).confidence).toBeGreaterThan(0);
     });
 
     it('should detect greeting intent', async () => {
@@ -145,7 +139,7 @@ describe('Conversational AI Service', () => {
         })
         .expect(200);
 
-      expect(response.body.intent).toBe('greeting');
+      expect(unwrap(response).intent).toBe('greeting');
     });
   });
 
@@ -159,9 +153,9 @@ describe('Conversational AI Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('content');
-      expect(response.body).toHaveProperty('intent');
-      expect(response.body).toHaveProperty('confidence');
+      expect(unwrap(response)).toHaveProperty('content');
+      expect(unwrap(response)).toHaveProperty('intent');
+      expect(unwrap(response)).toHaveProperty('confidence');
     });
   });
 
@@ -176,8 +170,8 @@ describe('Conversational AI Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('context_key');
-      expect(response.body).toHaveProperty('context_value');
+      expect(unwrap(response)).toHaveProperty('context_key');
+      expect(unwrap(response)).toHaveProperty('context_value');
     });
   });
 
@@ -188,7 +182,7 @@ describe('Conversational AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Object);
+      expect(unwrap(response)).toBeInstanceOf(Object);
     });
 
     it('should get specific context key', async () => {
@@ -197,7 +191,7 @@ describe('Conversational AI Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('context_key');
+      expect(unwrap(response)).toHaveProperty('context_key');
     });
   });
 
@@ -212,7 +206,7 @@ describe('Conversational AI Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('success');
+      expect(unwrap(response)).toHaveProperty('success');
     });
   });
 });

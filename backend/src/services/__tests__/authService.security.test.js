@@ -15,11 +15,11 @@ describe('AuthService production security', () => {
     jest.restoreAllMocks();
   });
 
-  it('forces public registration to consumer and pending', async () => {
+  it('forces public registration to an active consumer, ignoring requested role/status', async () => {
     const query = jest.fn()
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({
-        rows: [{ id: 'user-1', email: 'new@example.com', phone: null, role: 'consumer', status: 'pending' }],
+        rows: [{ id: 'user-1', email: 'new@example.com', phone: null, role: 'consumer', status: 'active' }],
       })
       .mockResolvedValueOnce({ rows: [{ user_id: 'user-1' }] });
     getPostgreSQL.mockReturnValue({ query });
@@ -28,15 +28,15 @@ describe('AuthService production security', () => {
       email: 'new@example.com',
       password: 'secure-password',
       role: 'admin',
-      status: 'active',
+      status: 'suspended',
     });
 
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO users'),
-      ['new@example.com', null, expect.any(String), 'consumer', 'pending'],
+      ['new@example.com', null, expect.any(String), 'consumer', 'active'],
     );
     expect(result.user.role).toBe('consumer');
-    expect(result.user.status).toBe('pending');
+    expect(result.user.status).toBe('active');
   });
 
   it.each([

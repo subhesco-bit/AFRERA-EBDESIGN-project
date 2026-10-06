@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Value Commerce Service', () => {
@@ -16,15 +17,7 @@ describe('Value Commerce Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'value-test@example.com',
-        password: 'Test123!@#',
-        role: 'consumer',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'value-test@example.com', role: 'consumer' }));
   });
 
   afterAll(async () => {
@@ -37,8 +30,8 @@ describe('Value Commerce Service', () => {
         .get('/api/v1/value-commerce/value-factors')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
+      expect(unwrap(response)).toBeInstanceOf(Array);
+      expect(unwrap(response).length).toBeGreaterThan(0);
     });
   });
 
@@ -58,9 +51,9 @@ describe('Value Commerce Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('overall_value_score');
-      expect(response.body).toHaveProperty('value_grade');
-      testProductId = response.body.product_id;
+      expect(unwrap(response)).toHaveProperty('overall_value_score');
+      expect(unwrap(response)).toHaveProperty('value_grade');
+      testProductId = unwrap(response).product_id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -80,8 +73,8 @@ describe('Value Commerce Service', () => {
         .get(`/api/v1/value-commerce/product-value-scores/${testProductId}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('overall_value_score');
-      expect(response.body).toHaveProperty('value_grade');
+      expect(unwrap(response)).toHaveProperty('overall_value_score');
+      expect(unwrap(response)).toHaveProperty('value_grade');
     });
 
     it('should return 404 for non-existent product', async () => {
@@ -102,11 +95,11 @@ describe('Value Commerce Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('base_price');
-      expect(response.body).toHaveProperty('value_premium');
-      expect(response.body).toHaveProperty('final_price');
-      expect(response.body).toHaveProperty('premium_percentage');
-      expect(response.body.final_price).toBeGreaterThan(response.body.base_price);
+      expect(unwrap(response)).toHaveProperty('base_price');
+      expect(unwrap(response)).toHaveProperty('value_premium');
+      expect(unwrap(response)).toHaveProperty('final_price');
+      expect(unwrap(response)).toHaveProperty('premium_percentage');
+      expect(unwrap(response).final_price).toBeGreaterThan(unwrap(response).base_price);
     });
   });
 
@@ -127,7 +120,7 @@ describe('Value Commerce Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('nutrition_importance');
+      expect(unwrap(response)).toHaveProperty('nutrition_importance');
     });
   });
 
@@ -138,7 +131,7 @@ describe('Value Commerce Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('nutrition_importance');
+      expect(unwrap(response)).toHaveProperty('nutrition_importance');
     });
   });
 
@@ -149,7 +142,7 @@ describe('Value Commerce Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -159,7 +152,7 @@ describe('Value Commerce Service', () => {
         .get('/api/v1/value-commerce/value-tiers')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 });

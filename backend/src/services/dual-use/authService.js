@@ -162,11 +162,15 @@ function generateRefreshToken(user) {
 function verifyToken(token) {
   try {
     const secret = JWT_CONFIG.secret;
-    // In test mode tests sign tokens without issuer/audience; relax checks there
+    // Pin the algorithm so a token can't be forged by switching to 'none' or
+    // an asymmetric alg (same hardening as services/authService.js). In test
+    // mode tests may sign tokens without issuer/audience; only those two
+    // checks are relaxed there.
     if (process.env.NODE_ENV === 'test') {
-      return jwt.verify(token, secret);
+      return jwt.verify(token, secret, { algorithms: ['HS256'] });
     }
     return jwt.verify(token, secret, {
+      algorithms: ['HS256'],
       issuer: JWT_CONFIG.issuer,
       audience: JWT_CONFIG.audience,
     });
@@ -296,10 +300,16 @@ async function registerUser(userData) {
   try {
     const pg = getPostgreSQL();
 
+    // Public self-registration always yields an active *consumer*: role and
+    // status are never taken from the request body (an earlier version used
+    // userData.role, letting anyone register as admin). Consumers start
+    // active so they can log in immediately (owner decision 2026-10-06; there
+    // is no activation/verification flow). Elevated roles are granted by an
+    // admin after registration.
     const registrationData = {
       ...userData,
       role: 'consumer',
-      status: 'pending',
+      status: 'active',
     };
 
     if (!pg) {

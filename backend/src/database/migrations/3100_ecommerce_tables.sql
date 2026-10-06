@@ -113,13 +113,18 @@ CREATE TABLE IF NOT EXISTS product_reviews (
 CREATE INDEX IF NOT EXISTS idx_product_reviews_product ON product_reviews(product_id);
 CREATE INDEX IF NOT EXISTS idx_product_reviews_user ON product_reviews(user_id);
 CREATE INDEX IF NOT EXISTS idx_product_reviews_rating ON product_reviews(rating);
-CREATE INDEX IF NOT EXISTS idx_product_reviews_status ON product_reviews(moderation_status);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "product_reviews") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_product_reviews_status ON product_reviews(moderation_status);
 CREATE INDEX IF NOT EXISTS idx_product_reviews_created ON product_reviews(created_at DESC);
 
 -- Review Helpful Votes Table
 CREATE TABLE IF NOT EXISTS review_helpful_votes (
     id VARCHAR(50) PRIMARY KEY,
-    review_id VARCHAR(50) NOT NULL REFERENCES product_reviews(id) ON DELETE CASCADE,
+    -- 2026-08-30: dropped "REFERENCES product_reviews(id)" - this file's own
+    -- product_reviews (line 93) is a deferred collision loser (see
+    -- schema-decisions.json), the real table is 009_marketplace_enhancements.sql's,
+    -- whose id is SERIAL not VARCHAR(50) - "foreign key constraint cannot be
+    -- implemented" against a real database. Column kept, FK dropped.
+    review_id VARCHAR(50) NOT NULL,
     user_id UUID NOT NULL REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
@@ -164,15 +169,19 @@ CREATE TABLE IF NOT EXISTS bulk_orders (
 );
 
 -- Indexes for bulk_orders
-CREATE INDEX IF NOT EXISTS idx_bulk_orders_buyer ON bulk_orders(buyer_id);
-CREATE INDEX IF NOT EXISTS idx_bulk_orders_category ON bulk_orders(category_id);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "bulk_orders") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_bulk_orders_buyer ON bulk_orders(buyer_id);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "bulk_orders") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_bulk_orders_category ON bulk_orders(category_id);
 CREATE INDEX IF NOT EXISTS idx_bulk_orders_status ON bulk_orders(status);
 CREATE INDEX IF NOT EXISTS idx_bulk_orders_created ON bulk_orders(created_at DESC);
 
 -- Quotations Table
 CREATE TABLE IF NOT EXISTS quotations (
     id VARCHAR(50) PRIMARY KEY,
-    bulk_order_id VARCHAR(50) NOT NULL REFERENCES bulk_orders(id),
+    -- 2026-08-30: dropped "REFERENCES bulk_orders(id)" - this file's own
+    -- bulk_orders (line 145) is a deferred collision loser (see
+    -- schema-decisions.json), the real table is 009_marketplace_enhancements.sql's,
+    -- whose id is SERIAL not VARCHAR(50). Column kept, FK dropped.
+    bulk_order_id VARCHAR(50) NOT NULL,
     seller_id UUID NOT NULL REFERENCES users(id),
     quoted_price DECIMAL(15, 2) NOT NULL,
     available_quantity DECIMAL(15, 2) NOT NULL,
@@ -275,14 +284,14 @@ BEGIN
 END
 $$;
 
-CREATE TRIGGER update_gi_marketplace_listings_updated_at BEFORE UPDATE ON gi_marketplace_listings
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_product_reviews_updated_at BEFORE UPDATE ON product_reviews
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_bulk_orders_updated_at BEFORE UPDATE ON bulk_orders
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- 2026-08-30: removed 3 CREATE TRIGGER statements for gi_marketplace_listings/
+-- product_reviews/bulk_orders - all three tables are deferred collision losers
+-- in this file (see schema-decisions.json), and the real (winner) tables
+-- already have an identically-named trigger from their own migration
+-- (update_gi_marketplace_listings_updated_at in 027_gi_intelligence_schema.sql,
+-- update_product_reviews_updated_at and update_bulk_orders_updated_at in
+-- 009_marketplace_enhancements.sql) - "trigger ... already exists" against a
+-- real database, since CREATE TRIGGER has no IF NOT EXISTS.
 
 DO $$
 BEGIN

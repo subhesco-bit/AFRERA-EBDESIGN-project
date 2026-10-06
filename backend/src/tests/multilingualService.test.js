@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Multilingual Service', () => {
@@ -16,15 +17,8 @@ describe('Multilingual Service', () => {
     });
 
     // Create test user and get auth token
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'test@example.com',
-        password: 'Test123!@#',
-        role: 'consumer',
-      });
 
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'test@example.com', role: 'consumer' }));
   });
 
   afterAll(async () => {
@@ -37,11 +31,11 @@ describe('Multilingual Service', () => {
         .get('/api/v1/multilingual/languages')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
-      expect(response.body[0]).toHaveProperty('iso_code');
-      expect(response.body[0]).toHaveProperty('name');
-      expect(response.body[0]).toHaveProperty('native_name');
+      expect(unwrap(response)).toBeInstanceOf(Array);
+      expect(unwrap(response).length).toBeGreaterThan(0);
+      expect(unwrap(response)[0]).toHaveProperty('iso_code');
+      expect(unwrap(response)[0]).toHaveProperty('name');
+      expect(unwrap(response)[0]).toHaveProperty('native_name');
     });
   });
 
@@ -55,10 +49,10 @@ describe('Multilingual Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('language_id');
-      expect(response.body).toHaveProperty('iso_code');
-      expect(response.body).toHaveProperty('confidence');
-      expect(response.body.iso_code).toBe('en');
+      expect(unwrap(response)).toHaveProperty('language_id');
+      expect(unwrap(response)).toHaveProperty('iso_code');
+      expect(unwrap(response)).toHaveProperty('confidence');
+      expect(unwrap(response).iso_code).toBe('en');
     });
 
     it('should detect Hindi text (Devanagari script)', async () => {
@@ -70,8 +64,8 @@ describe('Multilingual Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('iso_code');
-      expect(response.body.iso_code).toBe('hi');
+      expect(unwrap(response)).toHaveProperty('iso_code');
+      expect(unwrap(response).iso_code).toBe('hi');
     });
 
     it('should return 400 for empty text', async () => {
@@ -83,7 +77,7 @@ describe('Multilingual Service', () => {
         })
         .expect(400);
 
-      expect(response.body).toHaveProperty('error');
+      expect(unwrap(response)).toHaveProperty('error');
     });
 
     it('should return 401 without auth token', async () => {
@@ -108,12 +102,12 @@ describe('Multilingual Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('translated_text');
-      expect(response.body).toHaveProperty('source_language');
-      expect(response.body).toHaveProperty('target_language');
-      expect(response.body).toHaveProperty('confidence');
-      expect(response.body.source_language).toBe('en');
-      expect(response.body.target_language).toBe('hi');
+      expect(unwrap(response)).toHaveProperty('translated_text');
+      expect(unwrap(response)).toHaveProperty('source_language');
+      expect(unwrap(response)).toHaveProperty('target_language');
+      expect(unwrap(response)).toHaveProperty('confidence');
+      expect(unwrap(response).source_language).toBe('en');
+      expect(unwrap(response).target_language).toBe('hi');
     });
 
     it('should return 400 for missing required fields', async () => {
@@ -125,7 +119,7 @@ describe('Multilingual Service', () => {
         })
         .expect(400);
 
-      expect(response.body).toHaveProperty('error');
+      expect(unwrap(response)).toHaveProperty('error');
     });
   });
 
@@ -136,9 +130,9 @@ describe('Multilingual Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('user_id');
-      expect(response.body).toHaveProperty('primary_language_id');
-      expect(response.body).toHaveProperty('auto_detect_language');
+      expect(unwrap(response)).toHaveProperty('user_id');
+      expect(unwrap(response)).toHaveProperty('primary_language_id');
+      expect(unwrap(response)).toHaveProperty('auto_detect_language');
     });
 
     it('should return 401 without auth token', async () => {
@@ -160,8 +154,8 @@ describe('Multilingual Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('primary_language_id');
-      expect(response.body.auto_detect_language).toBe(true);
+      expect(unwrap(response)).toHaveProperty('primary_language_id');
+      expect(unwrap(response).auto_detect_language).toBe(true);
     });
   });
 
@@ -180,9 +174,9 @@ describe('Multilingual Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('content_key');
-      expect(response.body).toHaveProperty('translated_text');
-      expect(response.body.translated_text).toBe('उत्पाद नाम');
+      expect(unwrap(response)).toHaveProperty('content_key');
+      expect(unwrap(response)).toHaveProperty('translated_text');
+      expect(unwrap(response).translated_text).toBe('उत्पाद नाम');
     });
   });
 
@@ -193,8 +187,8 @@ describe('Multilingual Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('content_key');
-      expect(response.body).toHaveProperty('translated_text');
+      expect(unwrap(response)).toHaveProperty('content_key');
+      expect(unwrap(response)).toHaveProperty('translated_text');
     });
 
     it('should return 404 for non-existent translation', async () => {
@@ -211,11 +205,11 @@ describe('Multilingual Service', () => {
         .get('/api/v1/multilingual/memory/stats')
         .expect(200);
 
-      expect(response.body).toHaveProperty('total_entries');
-      expect(response.body).toHaveProperty('verified_entries');
-      expect(response.body).toHaveProperty('auto_translated_entries');
-      expect(response.body).toHaveProperty('avg_confidence');
-      expect(response.body).toHaveProperty('total_usage');
+      expect(unwrap(response)).toHaveProperty('total_entries');
+      expect(unwrap(response)).toHaveProperty('verified_entries');
+      expect(unwrap(response)).toHaveProperty('auto_translated_entries');
+      expect(unwrap(response)).toHaveProperty('avg_confidence');
+      expect(unwrap(response)).toHaveProperty('total_usage');
     });
   });
 });

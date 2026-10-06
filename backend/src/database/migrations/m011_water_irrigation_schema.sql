@@ -24,6 +24,22 @@ CREATE TABLE IF NOT EXISTS water_budgets (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:water_budgets - `water_budgets` is already created by 9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS plot_name VARCHAR(255);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS source VARCHAR(100);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS demand_liters DECIMAL(15,2);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS supply_liters DECIMAL(15,2);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS season VARCHAR(50);
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS ai_optimization JSONB;
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE water_budgets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_water_budgets_id_merge ON water_budgets(id);
 
 -- Water quality readings table
 CREATE TABLE IF NOT EXISTS water_quality_readings (
@@ -39,6 +55,22 @@ CREATE TABLE IF NOT EXISTS water_quality_readings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:water_quality_readings - `water_quality_readings` is already created by 9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS parameter VARCHAR(100);
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS value DECIMAL(10,2);
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS unit VARCHAR(50);
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS reading_date DATE;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS ai_analysis JSONB;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS recorded_by UUID;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE water_quality_readings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_water_quality_readings_id_merge ON water_quality_readings(id);
 
 -- ============================================================================
 -- IRRIGATION MANAGEMENT TABLES
@@ -59,6 +91,23 @@ CREATE TABLE IF NOT EXISTS irrigation_schedules (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:irrigation_schedules - `irrigation_schedules` is already created by 9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS field_name VARCHAR(255);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS crop VARCHAR(100);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS method VARCHAR(100);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS frequency_days INTEGER;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS water_source VARCHAR(100);
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS ai_timing_optimization JSONB;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE irrigation_schedules ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_irrigation_schedules_id_merge ON irrigation_schedules(id);
 
 -- Irrigation water sources table
 CREATE TABLE IF NOT EXISTS irrigation_water_sources (
@@ -72,6 +121,20 @@ CREATE TABLE IF NOT EXISTS irrigation_water_sources (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:irrigation_water_sources - `irrigation_water_sources` is already created by 9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS type VARCHAR(100);
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS capacity_liters DECIMAL(15,2);
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE irrigation_water_sources ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_irrigation_water_sources_id_merge ON irrigation_water_sources(id);
 
 -- Irrigation logs table
 CREATE TABLE IF NOT EXISTS irrigation_logs (
@@ -87,6 +150,22 @@ CREATE TABLE IF NOT EXISTS irrigation_logs (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:irrigation_logs - `irrigation_logs` is already created by 9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS schedule_id UUID;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS field_name VARCHAR(255);
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS volume_liters DECIMAL(15,2);
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS logged_at TIMESTAMP;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS ai_efficiency_analysis JSONB;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS logged_by UUID;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE irrigation_logs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_irrigation_logs_id_merge ON irrigation_logs(id);
 
 -- ============================================================================
 -- RAINWATER HARVESTING TABLES
@@ -106,6 +185,22 @@ CREATE TABLE IF NOT EXISTS rainwater_harvesting_structures (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:rainwater_harvesting_structures - `rainwater_harvesting_structures` is already created by 9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS structure_name VARCHAR(255);
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS structure_type VARCHAR(100);
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS village VARCHAR(255);
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS capacity_liters DECIMAL(15,2);
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS built_date DATE;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS ai_design_optimization JSONB;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE rainwater_harvesting_structures ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_rainwater_harvesting_structures_id_merge ON rainwater_harvesting_structures(id);
 
 -- ============================================================================
 -- WATERSHED MANAGEMENT TABLES
@@ -124,6 +219,21 @@ CREATE TABLE IF NOT EXISTS watersheds (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:watersheds - `watersheds` is already created by 9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS area_hectares DECIMAL(10,2);
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS villages_covered TEXT[];
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS ai_management_plan JSONB;
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE watersheds ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_watersheds_id_merge ON watersheds(id);
 
 -- ============================================================================
 -- WATER ANALYTICS TABLES
@@ -142,6 +252,21 @@ CREATE TABLE IF NOT EXISTS water_analytics_records (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:water_analytics_records - `water_analytics_records` is already created by 9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS metric VARCHAR(100);
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS period VARCHAR(50);
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS value DECIMAL(15,2);
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS unit VARCHAR(50);
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS ai_insights JSONB;
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS recorded_by UUID;
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE water_analytics_records ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_water_analytics_records_id_merge ON water_analytics_records(id);
 
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE

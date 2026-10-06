@@ -36,6 +36,35 @@ CREATE TABLE IF NOT EXISTS soil_samples (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:soil_samples - `soil_samples` is already created by 9510_m032_land_records_extra.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS sample_id VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS farm_id UUID;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS location JSONB;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS state VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS district VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS sample_depth VARCHAR(50);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS sample_type VARCHAR(50);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS crop_planned VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS irrigation_type VARCHAR(100);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS collection_date DATE;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS collector_name VARCHAR(255);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS lab_preference VARCHAR(255);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS ai_optimization JSONB;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'submitted';
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS tracking_number VARCHAR(50);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS assigned_lab VARCHAR(255);
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS estimated_completion_date DATE;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS analyzed_at TIMESTAMP;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS collected_by UUID;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE soil_samples ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_soil_samples_id_merge ON soil_samples(id);
+
 
 -- ============================================================================
 -- SOIL ANALYSIS TABLES
@@ -139,6 +168,24 @@ CREATE TABLE IF NOT EXISTS soil_health_cards (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:soil_health_cards - `soil_health_cards` is already created by 9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS farm_id UUID;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS overall_health_score DECIMAL(3,2);
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS nutrient_status JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS ph_status JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS organic_matter_status JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS ai_insights JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS recommendations JSONB;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS valid_until DATE;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS generated_by UUID;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE soil_health_cards ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_soil_health_cards_id_merge ON soil_health_cards(id);
 
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE

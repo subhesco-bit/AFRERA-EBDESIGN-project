@@ -1,12 +1,31 @@
 -- Phase 7: Advanced P3 Services
 CREATE TABLE IF NOT EXISTS blockchain_records (id UUID PRIMARY KEY, product_id UUID, from_address VARCHAR(255), to_address VARCHAR(255), created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS iot_readings (id UUID PRIMARY KEY, sensor_id UUID, reading_value NUMERIC, created_at TIMESTAMP);
+-- 2026-10-05 merge-collision:iot_readings - `iot_readings` is already created by 015_advanced_features.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE iot_readings ADD COLUMN IF NOT EXISTS id UUID;
+ALTER TABLE iot_readings ADD COLUMN IF NOT EXISTS sensor_id UUID;
+ALTER TABLE iot_readings ADD COLUMN IF NOT EXISTS reading_value NUMERIC;
+ALTER TABLE iot_readings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_iot_readings_id_merge ON iot_readings(id);
 CREATE TABLE IF NOT EXISTS automation_logs (id UUID PRIMARY KEY, workflow_id UUID, params JSONB, status VARCHAR(50), created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS biometric_logs (id UUID PRIMARY KEY, user_id UUID, biometric_type VARCHAR(50), verified BOOLEAN, created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS video_analyses (id UUID PRIMARY KEY, video_id UUID, analysis_type VARCHAR(100), result JSONB, created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS ar_experiences (id UUID PRIMARY KEY, product_id UUID, model_data JSONB, created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS vr_spaces (id UUID PRIMARY KEY, space_name VARCHAR(255), space_data JSONB, created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS ml_models (id UUID PRIMARY KEY, model_id UUID, training_data JSONB, accuracy NUMERIC, created_at TIMESTAMP);
+-- 2026-10-05 merge-collision:ml_models - `ml_models` is already created by 3005_phase2_price_forecasting.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE ml_models ADD COLUMN IF NOT EXISTS id UUID;
+ALTER TABLE ml_models ADD COLUMN IF NOT EXISTS model_id UUID;
+ALTER TABLE ml_models ADD COLUMN IF NOT EXISTS training_data JSONB;
+ALTER TABLE ml_models ADD COLUMN IF NOT EXISTS accuracy NUMERIC;
+ALTER TABLE ml_models ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_ml_models_id_merge ON ml_models(id);
 CREATE TABLE IF NOT EXISTS nlp_analyses (id UUID PRIMARY KEY, text TEXT, sentiment VARCHAR(50), created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS charts (id UUID PRIMARY KEY, data_id UUID, chart_type VARCHAR(100), created_at TIMESTAMP);
 CREATE INDEX IF NOT EXISTS idx_blockchain_product ON blockchain_records(product_id);

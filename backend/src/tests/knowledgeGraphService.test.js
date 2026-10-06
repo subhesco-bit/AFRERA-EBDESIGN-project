@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Knowledge Graph Service', () => {
@@ -16,15 +17,7 @@ describe('Knowledge Graph Service', () => {
       connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'kg-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
-
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'kg-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -47,9 +40,9 @@ describe('Knowledge Graph Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('node_type');
-      expect(response.body).toHaveProperty('name');
-      testNodeId = response.body.id;
+      expect(unwrap(response)).toHaveProperty('node_type');
+      expect(unwrap(response)).toHaveProperty('name');
+      testNodeId = unwrap(response).id;
     });
 
     it('should return 401 without auth token', async () => {
@@ -69,7 +62,7 @@ describe('Knowledge Graph Service', () => {
         .get('/api/v1/knowledge-graph/knowledge-nodes/search?q=rice')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
 
     it('should return 400 without query parameter', async () => {
@@ -94,8 +87,8 @@ describe('Knowledge Graph Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('relationship_type');
-      expect(response.body).toHaveProperty('source_node_id');
+      expect(unwrap(response)).toHaveProperty('relationship_type');
+      expect(unwrap(response)).toHaveProperty('source_node_id');
     });
   });
 
@@ -105,7 +98,7 @@ describe('Knowledge Graph Service', () => {
         .get(`/api/v1/knowledge-graph/knowledge-nodes/${testNodeId}/related`)
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 
@@ -123,8 +116,8 @@ describe('Knowledge Graph Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('query_name');
-      expect(response.body).toHaveProperty('query_type');
+      expect(unwrap(response)).toHaveProperty('query_name');
+      expect(unwrap(response)).toHaveProperty('query_type');
     });
   });
 
@@ -139,8 +132,8 @@ describe('Knowledge Graph Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('execution_time_ms');
-      expect(response.body).toHaveProperty('result');
+      expect(unwrap(response)).toHaveProperty('execution_time_ms');
+      expect(unwrap(response)).toHaveProperty('result');
     });
   });
 
@@ -161,7 +154,7 @@ describe('Knowledge Graph Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('total_nodes');
+      expect(unwrap(response)).toHaveProperty('total_nodes');
     });
   });
 });

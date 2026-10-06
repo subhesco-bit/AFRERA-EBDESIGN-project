@@ -12,16 +12,24 @@ require('dotenv').config();
 
 const migrationsDir = path.join(__dirname, 'migrations');
 
+// Plain lexicographic order, deliberately NOT numeric: the whole chain (and
+// backend/src/database/schema-decisions.json, tools/schema-collisions.js) is
+// written against filename order - e.g. 3102_*.sql runs before 996_*.sql and
+// 9999_zzz*.sql runs last. A numeric sort silently reorders ~100 files and
+// breaks every collision decision that depends on which CREATE wins.
 function getMigrationFiles() {
   return fs.readdirSync(migrationsDir)
     .filter(file => file.endsWith('.sql'))
-    .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
+    .sort();
 }
 
+// A bare `END;` line is NOT stripped: it is how every PL/pgSQL function and
+// DO block body terminates, and removing it leaves those bodies unterminated
+// ("syntax error at end of input"). Only unambiguous transaction markers go.
 function stripTransactionMarkers(sql) {
   return sql
-    .replace(/^\s*(BEGIN|START\s+TRANSACTION)\s*;\s*$/gim, '')
-    .replace(/^\s*(COMMIT|END|ROLLBACK)\s*;\s*$/gim, '');
+    .replace(/^\s*(BEGIN(\s+(TRANSACTION|WORK))?|START\s+TRANSACTION)\s*;\s*$/gim, '')
+    .replace(/^\s*(COMMIT|ROLLBACK|END\s+(TRANSACTION|WORK))\s*;\s*$/gim, '');
 }
 
 function runPreflight() {
@@ -36,12 +44,15 @@ function runPreflight() {
 }
 
 async function runMigrations() {
-  const pool = new Pool({
-    user: process.env.DB_USER || 'ebdesign_user',
-    password: process.env.DB_PASSWORD || 'ebdesign_dev_password_change_in_prod',
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'ebdesign',
+  // Same precedence as database/connection.js (DATABASE_URL, then PG_*), so
+  // migrations always target the database the app itself connects to. The
+  // older DB_* names are kept as a fallback for existing local .env files.
+  const pool = new Pool(process.env.DATABASE_URL ? { connectionString: process.env.DATABASE_URL } : {
+    user: process.env.PG_USER || process.env.DB_USER || 'ebdesign_user',
+    password: process.env.PG_PASSWORD || process.env.DB_PASSWORD || 'ebdesign_dev_password_change_in_prod',
+    host: process.env.PG_HOST || process.env.DB_HOST || 'localhost',
+    port: process.env.PG_PORT || process.env.DB_PORT || 5432,
+    database: process.env.PG_DATABASE || process.env.DB_NAME || 'ebdesign',
   });
 
   try {
@@ -80,19 +91,25 @@ async function runMigrations() {
       const filePath = path.join(migrationsDir, file);
       const sql = stripTransactionMarkers(fs.readFileSync(filePath, 'utf8'));
 
+      // One dedicated client per migration: pool.query() may hand BEGIN,
+      // the body and COMMIT to different connections, which would make the
+      // transaction (and the ROLLBACK on failure) meaningless.
+      const client = await pool.connect();
       try {
-        await pool.query('BEGIN');
-        await pool.query(sql);
-        await pool.query(
+        await client.query('BEGIN');
+        await client.query(sql);
+        await client.query(
           'INSERT INTO migrations (name) VALUES ($1)',
           [file],
         );
-        await pool.query('COMMIT');
+        await client.query('COMMIT');
         console.log(`✅ Executed ${file}`);
       } catch (err) {
-        await pool.query('ROLLBACK').catch(() => {});
+        await client.query('ROLLBACK').catch(() => {});
         console.error(`❌ Failed to execute ${file}:`, err.message);
         throw err;
+      } finally {
+        client.release();
       }
     }
 

@@ -8,6 +8,18 @@ CREATE TABLE IF NOT EXISTS shipments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP
 );
+-- 2026-10-05 merge-collision:shipments - `shipments` is already created by 000_base_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS product_id UUID;
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS origin VARCHAR(255);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS destination VARCHAR(255);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_shipments_id_merge ON shipments(id);
 
 CREATE TABLE IF NOT EXISTS tracking_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

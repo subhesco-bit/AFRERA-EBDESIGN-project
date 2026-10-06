@@ -130,6 +130,28 @@ CREATE TABLE IF NOT EXISTS equipment_exchange_listings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:equipment_exchange_listings - `equipment_exchange_listings` is already created by 9999_zzzzzzzzz_equipment_exchange_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS id UUID DEFAULT uuid_generate_v4();
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS listed_by UUID;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS equipment_name VARCHAR(255);
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS equipment_type VARCHAR(100);
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS condition_grade VARCHAR(50);
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS images JSONB;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS pricing_type VARCHAR(20) DEFAULT 'priced';
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS price_inr DECIMAL(15,2);
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS location_address TEXT;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS state_id UUID;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'available';
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS reserved_by UUID;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS reserved_at TIMESTAMP;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS exchanged_at TIMESTAMP;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE equipment_exchange_listings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_equipment_exchange_listings_id_merge ON equipment_exchange_listings(id);
 
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE
@@ -179,21 +201,27 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_machinery_assets_updated_at ON machinery_assets;
 CREATE TRIGGER update_machinery_assets_updated_at BEFORE UPDATE ON machinery_assets
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_machinery_maintenance_updated_at ON machinery_maintenance;
 CREATE TRIGGER update_machinery_maintenance_updated_at BEFORE UPDATE ON machinery_maintenance
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_village_operations_updated_at ON village_operations;
 CREATE TRIGGER update_village_operations_updated_at BEFORE UPDATE ON village_operations
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_village_resource_pools_updated_at ON village_resource_pools;
 CREATE TRIGGER update_village_resource_pools_updated_at BEFORE UPDATE ON village_resource_pools
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_village_infrastructure_updated_at ON village_infrastructure;
 CREATE TRIGGER update_village_infrastructure_updated_at BEFORE UPDATE ON village_infrastructure
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_equipment_exchange_listings_updated_at ON equipment_exchange_listings;
 CREATE TRIGGER update_equipment_exchange_listings_updated_at BEFORE UPDATE ON equipment_exchange_listings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

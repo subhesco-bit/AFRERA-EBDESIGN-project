@@ -169,7 +169,7 @@ router.post('/claims/:claimId/fraud-analysis', authMiddleware, adminMiddleware, 
   }
 });
 
-router.get('/claims/:claimId/fraud-analysis', authMiddleware, async (req, res) => {
+router.get('/claims/:claimId/fraud-analysis', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { claimId } = req.params;
     const analysis = await insuranceFraudDetectionService.getFraudAnalysis(claimId);

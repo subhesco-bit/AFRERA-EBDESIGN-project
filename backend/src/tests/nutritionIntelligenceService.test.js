@@ -4,6 +4,7 @@
 
 const request = require('supertest');
 const { app } = require('../index');
+const { createTestUserToken, unwrap } = require('./helpers/testAuth');
 const { Pool } = require('pg');
 
 describe('Nutrition Intelligence Service', () => {
@@ -17,15 +18,8 @@ describe('Nutrition Intelligence Service', () => {
     });
 
     // Create test user and get auth token
-    const registerResponse = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        email: 'nutrition-test@example.com',
-        password: 'Test123!@#',
-        role: 'admin',
-      });
 
-    authToken = registerResponse.body.token;
+    ({ token: authToken } = await createTestUserToken(pool, { email: 'nutrition-test@example.com', role: 'admin' }));
   });
 
   afterAll(async () => {
@@ -38,11 +32,11 @@ describe('Nutrition Intelligence Service', () => {
         .get('/api/v1/nutrition-intelligence/nutrients')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
-      expect(response.body[0]).toHaveProperty('symbol');
-      expect(response.body[0]).toHaveProperty('name');
-      expect(response.body[0]).toHaveProperty('unit');
+      expect(unwrap(response)).toBeInstanceOf(Array);
+      expect(unwrap(response).length).toBeGreaterThan(0);
+      expect(unwrap(response)[0]).toHaveProperty('symbol');
+      expect(unwrap(response)[0]).toHaveProperty('name');
+      expect(unwrap(response)[0]).toHaveProperty('unit');
     });
   });
 
@@ -81,8 +75,8 @@ describe('Nutrition Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('food_name');
-      expect(response.body).toHaveProperty('nutrition_data');
+      expect(unwrap(response)).toHaveProperty('food_name');
+      expect(unwrap(response)).toHaveProperty('nutrition_data');
     });
 
     it('should return 401 without auth token', async () => {
@@ -101,7 +95,7 @@ describe('Nutrition Intelligence Service', () => {
         .get('/api/v1/nutrition-intelligence/food-profiles/search?q=rice')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
 
     it('should return 400 without query parameter', async () => {
@@ -146,8 +140,8 @@ describe('Nutrition Intelligence Service', () => {
         })
         .expect(201);
 
-      expect(response.body).toHaveProperty('product_id');
-      expect(response.body).toHaveProperty('nutrition_data');
+      expect(unwrap(response)).toHaveProperty('product_id');
+      expect(unwrap(response)).toHaveProperty('nutrition_data');
     });
   });
 
@@ -157,8 +151,8 @@ describe('Nutrition Intelligence Service', () => {
         .get(`/api/v1/nutrition-intelligence/product-nutrition/${testProductId}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('nutrition_data');
-      expect(response.body).toHaveProperty('calories_per_serving');
+      expect(unwrap(response)).toHaveProperty('nutrition_data');
+      expect(unwrap(response)).toHaveProperty('calories_per_serving');
     });
 
     it('should return 404 for non-existent product', async () => {
@@ -178,10 +172,10 @@ describe('Nutrition Intelligence Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('overall_score');
-      expect(response.body).toHaveProperty('grade');
-      expect(response.body.overall_score).toBeGreaterThanOrEqual(0);
-      expect(response.body.overall_score).toBeLessThanOrEqual(100);
+      expect(unwrap(response)).toHaveProperty('overall_score');
+      expect(unwrap(response)).toHaveProperty('grade');
+      expect(unwrap(response).overall_score).toBeGreaterThanOrEqual(0);
+      expect(unwrap(response).overall_score).toBeLessThanOrEqual(100);
     });
   });
 
@@ -191,8 +185,8 @@ describe('Nutrition Intelligence Service', () => {
         .get(`/api/v1/nutrition-intelligence/product-nutrition/${testProductId}/score`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('overall_score');
-      expect(response.body).toHaveProperty('grade');
+      expect(unwrap(response)).toHaveProperty('overall_score');
+      expect(unwrap(response)).toHaveProperty('grade');
     });
   });
 
@@ -207,10 +201,10 @@ describe('Nutrition Intelligence Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('base_price');
-      expect(response.body).toHaveProperty('final_price');
-      expect(response.body).toHaveProperty('price_premium_percentage');
-      expect(response.body.final_price).toBeGreaterThanOrEqual(response.body.base_price);
+      expect(unwrap(response)).toHaveProperty('base_price');
+      expect(unwrap(response)).toHaveProperty('final_price');
+      expect(unwrap(response)).toHaveProperty('price_premium_percentage');
+      expect(unwrap(response).final_price).toBeGreaterThanOrEqual(unwrap(response).base_price);
     });
   });
 
@@ -224,10 +218,10 @@ describe('Nutrition Intelligence Service', () => {
         })
         .expect(200);
 
-      expect(response.body).toHaveProperty('product_a');
-      expect(response.body).toHaveProperty('product_b');
-      expect(response.body).toHaveProperty('winner');
-      expect(response.body).toHaveProperty('comparison_reason');
+      expect(unwrap(response)).toHaveProperty('product_a');
+      expect(unwrap(response)).toHaveProperty('product_b');
+      expect(unwrap(response)).toHaveProperty('winner');
+      expect(unwrap(response)).toHaveProperty('comparison_reason');
     });
   });
 
@@ -237,7 +231,7 @@ describe('Nutrition Intelligence Service', () => {
         .get('/api/v1/nutrition-intelligence/dietary-profiles')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
+      expect(unwrap(response)).toBeInstanceOf(Array);
     });
   });
 });

@@ -195,9 +195,12 @@ ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT '
 ALTER TABLE crop_varieties ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 CREATE INDEX IF NOT EXISTS idx_crop_varieties_crop_name ON crop_varieties(crop_name);
 
+-- 2026-10-05: 001_skeleton_complete_schema.sql was moved out of the migration
+-- chain (see ../drafts/README.md) - it never applied on a fresh database. The
+-- live table is now the real owner noted below, so this FK follows it.
 CREATE TABLE IF NOT EXISTS variety_performance (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  variety_id INTEGER REFERENCES crop_varieties(id), -- crop_varieties.id is SERIAL, see above
+  variety_id UUID REFERENCES crop_varieties(id), -- crop_management_schema crop_varieties (id UUID)
   farmer_id UUID REFERENCES farmers(id),
   actual_yield DECIMAL(10,2),
   planting_date DATE,
@@ -228,7 +231,7 @@ CREATE TABLE IF NOT EXISTS seed_plans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   farmer_id UUID REFERENCES farmers(id),
   crop_id UUID REFERENCES crop_registrations(id),
-  variety_id INTEGER REFERENCES crop_varieties(id),
+  variety_id UUID REFERENCES crop_varieties(id),
   area DECIMAL(10,2),
   seed_rate DECIMAL(10,2),
   total_seed_required DECIMAL(10,2),

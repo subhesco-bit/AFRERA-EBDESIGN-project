@@ -1,6 +1,16 @@
 -- Phase 6: Quality Assurance & Compliance
 CREATE TABLE IF NOT EXISTS qa_inspections (id UUID PRIMARY KEY, product_id UUID, quality_score INT, result VARCHAR(50), created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS compliance_records (id UUID PRIMARY KEY, entity_id UUID, regulation_id UUID, status VARCHAR(50), created_at TIMESTAMP);
+-- 2026-10-05 merge-collision:compliance_records - `compliance_records` is already created by 000_base_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS id UUID;
+ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS entity_id UUID;
+ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS regulation_id UUID;
+ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_compliance_records_id_merge ON compliance_records(id);
 CREATE TABLE IF NOT EXISTS audit_trails (id UUID PRIMARY KEY, user_id UUID, action VARCHAR(255), resource_id UUID, timestamp TIMESTAMP);
 CREATE TABLE IF NOT EXISTS certificates (id UUID PRIMARY KEY, entity_id UUID, certificate_type VARCHAR(100), expiry_date DATE, issued_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS risk_assessments (id UUID PRIMARY KEY, entity_id UUID, risk_score INT, risk_level VARCHAR(50), created_at TIMESTAMP);

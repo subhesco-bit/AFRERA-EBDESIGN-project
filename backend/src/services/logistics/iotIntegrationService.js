@@ -21,6 +21,9 @@ const router = express.Router();
 const pool = require('../../database/pool');
 
 // Test-mode lightweight stubs for IoT service
+// Test mode deliberately rebinds the hoisted function declarations below to
+// in-memory fakes before module.exports captures them.
+/* eslint-disable no-func-assign -- intentional, see above */
 if (process.env.NODE_ENV === 'test') {
   registerIoTDevice = async (data) => ({ id: `dev-${Date.now()}`, device_id: data.device_id || `dev-${Date.now()}`, device_name: data.device_name || 'Test Device', status: 'active' });
   getIoTDevices = async () => ([]);
@@ -34,6 +37,7 @@ if (process.env.NODE_ENV === 'test') {
   checkDeviceHealth = async () => ({ health_status: 'unknown' });
   recordIoTAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
 }
+/* eslint-enable no-func-assign */
 
 // ============================================================================
 // IOT DEVICES

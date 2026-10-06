@@ -52,6 +52,20 @@ COMMENT ON VIEW v_farmer_repayment_signal IS
 -- keeps that honest rather than reporting the eventual accuracy as if it were
 -- a real observed measurement.
 -- ---------------------------------------------------------------------------
+-- 2026-10-05: this file is a stale copy (re-added by a 2026-09-07 recovery
+-- commit) of 999_farmer_credit_risk_resolution.sql, which is where the
+-- 2026-08-30 renumbering moved it. ai_resolution_rules is created by
+-- 990_ai_outcomes.sql, so on a fresh database it does not exist yet when this
+-- file runs and the bare INSERT aborted the whole migration chain. Guarded so
+-- this file is a harmless no-op then; 999 performs the real INSERT (the view
+-- above is CREATE OR REPLACE, so running it twice is idempotent).
+DO $guard$
+BEGIN
+  IF to_regclass('public.ai_resolution_rules') IS NULL THEN
+    RAISE NOTICE '063: ai_resolution_rules not created yet - rule inserted by 999 instead';
+    RETURN;
+  END IF;
+  EXECUTE $sql$
 INSERT INTO ai_resolution_rules
  (prediction_type, truth_table, truth_column, subject_column, truth_aggregate,
   window_days, date_column, resolution_mode, verdict_weight, tolerance_pct, rationale)
@@ -66,4 +80,7 @@ VALUES
   'repayment percentage, so a close match is directional evidence, not identity. '
   'A farmer with no EMIs due in the window yields no_truth_yet, same as any other '
   'rule here — it does not resolve as a false pass.')
-ON CONFLICT (prediction_type) DO NOTHING;
+ON CONFLICT (prediction_type) DO NOTHING
+  $sql$;
+END
+$guard$;

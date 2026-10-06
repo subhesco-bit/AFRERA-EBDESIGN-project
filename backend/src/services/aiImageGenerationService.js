@@ -59,7 +59,7 @@ class AIImageGenerationService {
         quality: 'high',
       });
 
-      success(`Image generated for: ${varietyData.name}`);
+      logger.info(`Image generated for: ${varietyData.name}`);
       return imageData;
 
     } catch (err) {

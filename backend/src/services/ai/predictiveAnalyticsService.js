@@ -15,6 +15,9 @@ const router = express.Router();
 const pool = require('../../database/pool');
 
 // Test-mode stubs
+// Test mode deliberately rebinds the hoisted function declarations below to
+// in-memory fakes before module.exports captures them.
+/* eslint-disable no-func-assign -- intentional, see above */
 if (process.env.NODE_ENV === 'test') {
   createPredictiveModel = async (data) => ({ id: `model-${Date.now()}`, ...data });
   getActiveModels = async () => ([]);
@@ -24,6 +27,7 @@ if (process.env.NODE_ENV === 'test') {
   getUnacknowledgedAlerts = async () => ([]);
   recordPredictiveAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
 }
+/* eslint-enable no-func-assign */
 
 // ============================================================================
 // PREDICTIVE MODELS

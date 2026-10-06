@@ -235,6 +235,44 @@ CREATE TABLE IF NOT EXISTS contract_farming_agreements (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:contract_farming_agreements - `contract_farming_agreements` is already created by 9999_zzzzzz_pre_season_orders_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS farmer_id UUID;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS buyer_id UUID;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS technical_package_id UUID;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS crop_variety VARCHAR(100);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS area_hectares DECIMAL(10,2);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS expected_yield_tons DECIMAL(10,2);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS contract_period_start DATE;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS contract_period_end DATE;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS seed_variety VARCHAR(100);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS fertilizer_schedule JSONB DEFAULT '{}';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS irrigation_schedule JSONB DEFAULT '{}';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS pest_management_protocol JSONB DEFAULT '{}';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS quality_standards JSONB DEFAULT '{}';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS input_supplier_id UUID;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS input_credit_amount DECIMAL(10,2);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS input_delivery_schedule JSONB DEFAULT '{}';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS technical_advisor_id UUID;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS assistance_schedule JSONB DEFAULT '{}';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS training_programs JSONB DEFAULT '[]';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS base_price DECIMAL(10,2);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS quality_bonus_structure JSONB DEFAULT '{}';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS payment_schedule JSONB DEFAULT '{}';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS compliance_score DECIMAL(5,2);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS quality_score DECIMAL(5,2);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS yield_vs_target DECIMAL(5,2);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS dispute_status VARCHAR(50) DEFAULT 'none';
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS dispute_resolution_method VARCHAR(50);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS dispute_resolution_date DATE;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS smart_contract_address VARCHAR(255);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS blockchain_tx_hash VARCHAR(255);
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE contract_farming_agreements ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_contract_farming_agreements_id_merge ON contract_farming_agreements(id);
 
 CREATE INDEX idx_cf_agreements_farmer ON contract_farming_agreements(farmer_id);
 CREATE INDEX idx_cf_agreements_buyer ON contract_farming_agreements(buyer_id);
@@ -523,6 +561,26 @@ CREATE TABLE IF NOT EXISTS buyers (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:buyers - `buyers` is already created by 041_rural_life_os_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS buyer_type VARCHAR(50);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS organization_type VARCHAR(50);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS contact_person VARCHAR(255);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS business_regions JSONB DEFAULT '[]';
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS preferred_crops JSONB DEFAULT '[]';
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS credit_rating VARCHAR(10);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS annual_procurement_volume DECIMAL(15,2);
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE buyers ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_buyers_id_merge ON buyers(id);
 
 -- 2026-08-31: removed idx_buyers_type (duplicate name of 041_rural_life_os_
 -- schema.sql's already-IF-NOT-EXISTS-guarded index of the same name, on the
@@ -551,6 +609,25 @@ CREATE TABLE IF NOT EXISTS laboratories (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:laboratories - `laboratories` is already created by 033_laboratory_erp_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS laboratory_type VARCHAR(50);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS accreditation_number VARCHAR(100);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS accreditation_body VARCHAR(100);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS contact_person VARCHAR(255);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS testing_capabilities JSONB DEFAULT '[]';
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS quality_rating DECIMAL(3,2);
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE laboratories ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_laboratories_id_merge ON laboratories(id);
 
 -- 2026-08-31: removed idx_laboratories_type - real laboratories table
 -- (033_laboratory_erp_schema.sql, the winner of a deferred collision, see
@@ -575,6 +652,22 @@ CREATE TABLE IF NOT EXISTS crop_recommendations (
   data_source VARCHAR(100), -- 'agricultural_university', 'research_institute', 'expert_panel'
   last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 2026-10-05 merge-collision:crop_recommendations - `crop_recommendations` is already created by 3007_phase2_crop_recommendations.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS crop_name VARCHAR(100);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS region VARCHAR(100);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS recommended_seed_variety VARCHAR(100);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS standard_fertilizer_schedule JSONB DEFAULT '{}';
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS standard_irrigation_schedule JSONB DEFAULT '{}';
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS standard_pest_management JSONB DEFAULT '{}';
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS expected_yield DECIMAL(10,2);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS growing_season VARCHAR(50);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS data_source VARCHAR(100);
+ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_crop_recommendations_id_merge ON crop_recommendations(id);
 
 ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS crop_name VARCHAR(100);
 ALTER TABLE crop_recommendations ADD COLUMN IF NOT EXISTS region VARCHAR(100);

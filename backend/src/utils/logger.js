@@ -14,7 +14,7 @@ const REDACT_PATTERNS = [
   { regex: /Bearer\s+[A-Za-z0-9\-._~+/]+=*/gi, replacement: 'Bearer ***REDACTED***' },
   { regex: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g, replacement: '****-****-****-****' }, // Credit card
   { regex: /\b\d{6}\b/g, replacement: '***OTP***' }, // 6-digit OTP
-  { regex: /"password"\s*:\s*"[^"]*"/gi, replacement: '"password":"***REDACTED***' },
+  { regex: /"password"\s*:\s*"[^"]*"/gi, replacement: '"password":"***REDACTED***"' },
   { regex: /"token"\s*:\s*"[^"]*"/gi, replacement: '"token":"***REDACTED***' },
   { regex: /"secret"\s*:\s*"[^"]*"/gi, replacement: '"secret":"***REDACTED***' },
   { regex: /"api_key"\s*:\s*"[^"]*"/gi, replacement: '"api_key":"***REDACTED***' },
@@ -30,6 +30,30 @@ function redactSensitiveData(message) {
     redacted = redacted.replace(regex, replacement);
   });
   return redacted;
+}
+
+// Keys whose values are always secret, whatever they look like.
+const SENSITIVE_KEY = /^(password|passwd|token|access_token|refresh_token|secret|api[_-]?key|authorization|otp)$/i;
+
+// Redact metadata structurally. The previous approach ran the regexes over
+// JSON.stringify(metadata) and then JSON.parse()d the result, but the
+// replacements are not JSON-safe (any 6-digit number such as 300000 became a
+// bare ***OTP*** token), so JSON.parse threw *inside the logger* and the
+// request that logged it failed with a 500. This never re-parses anything.
+function redactMetadata(value, depth = 0) {
+  if (value === null || value === undefined) return value;
+  if (typeof value === 'string') return redactSensitiveData(value);
+  if (typeof value !== 'object') return value;
+  if (depth > 8) return '[Truncated]';
+  if (value instanceof Error) {
+    return { name: value.name, message: redactSensitiveData(value.message), stack: value.stack && redactSensitiveData(value.stack) };
+  }
+  if (Array.isArray(value)) return value.map((item) => redactMetadata(item, depth + 1));
+  const out = {};
+  for (const [key, item] of Object.entries(value)) {
+    out[key] = SENSITIVE_KEY.test(key) && item !== null && item !== undefined ? '***REDACTED***' : redactMetadata(item, depth + 1);
+  }
+  return out;
 }
 
 // Define log levels
@@ -61,8 +85,7 @@ const logFormat = winston.format.combine(
   winston.format.splat(),
   winston.format.printf(({ timestamp, level, message, ...metadata }) => {
     const redactedMessage = redactSensitiveData(message);
-    const redactedMeta = redactSensitiveData(JSON.stringify(metadata));
-    return JSON.stringify({ timestamp, level, message: redactedMessage, ...JSON.parse(redactedMeta || '{}') });
+    return JSON.stringify({ timestamp, level, message: redactedMessage, ...redactMetadata(metadata) });
   }),
 );
 
@@ -74,8 +97,7 @@ const consoleFormat = winston.format.combine(
     const redactedMessage = redactSensitiveData(message);
     let msg = `${timestamp} [${level}]: ${redactedMessage}`;
     if (Object.keys(metadata).length > 0) {
-      const redactedMeta = redactSensitiveData(JSON.stringify(metadata));
-      msg += ` ${redactedMeta}`;
+      msg += ` ${JSON.stringify(redactMetadata(metadata))}`;
     }
     return msg;
   }),
@@ -168,4 +190,5 @@ module.exports = {
   httpLogger,
   logError,
   redactSensitiveData,
+  redactMetadata,
 };

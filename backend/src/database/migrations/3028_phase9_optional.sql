@@ -8,6 +8,14 @@ CREATE TABLE IF NOT EXISTS offline_first (id UUID PRIMARY KEY, offline_id UUID, 
 CREATE TABLE IF NOT EXISTS reporting_services (id UUID PRIMARY KEY, report_id UUID, created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS notifications (id UUID PRIMARY KEY, notification_id UUID, created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS recommendations (id UUID PRIMARY KEY, recommendation_id UUID, created_at TIMESTAMP);
+-- 2026-10-05 merge-collision:recommendations - `recommendations` is already created by 000_base_schema.sql
+-- (sorts first), so the CREATE above is a no-op. Additive merge so this
+-- file's indexes/FKs and its service's columns exist (nullable: rows
+-- written through the other shape never populate them).
+ALTER TABLE recommendations ADD COLUMN IF NOT EXISTS id UUID;
+ALTER TABLE recommendations ADD COLUMN IF NOT EXISTS recommendation_id UUID;
+ALTER TABLE recommendations ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_recommendations_id_merge ON recommendations(id);
 CREATE TABLE IF NOT EXISTS advanced_security (id UUID PRIMARY KEY, security_id UUID, created_at TIMESTAMP);
 CREATE TABLE IF NOT EXISTS performance_optimization (id UUID PRIMARY KEY, performance_id UUID, created_at TIMESTAMP);
 CREATE INDEX IF NOT EXISTS idx_specialization ON specialization_services(service_type);
